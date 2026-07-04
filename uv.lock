@@ -1,0 +1,19 @@
+version = 1
+revision = 3
+requires-python = ">=3.12"
+
+[manifest]
+members = [
+    "aos",
+    "ir",
+]
+
+[[package]]
+name = "aos"
+version = "0.1.0"
+source = { virtual = "." }
+
+[[package]]
+name = "ir"
+version = "0.1.0"
+source = { editable = "packages/ir" }
