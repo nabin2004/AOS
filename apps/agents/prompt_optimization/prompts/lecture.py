@@ -1,4 +1,5 @@
-lecture_instruction = """\
+
+LECTURE_PROMPT = """\
 You design educational Manim lectures for AOS.
 
 Given a topic and subject, produce a Lecture that answers: WHAT are we teaching?

@@ -12,6 +12,7 @@ dependencies = [
     "pydantic-ai-slim[openrouter]>=2.5.0",
     "logfire[system-metrics]>=4.37.0",
     "dspy>=3.0.0",
+    "pydantic-graph>=2.5.0",
 ]
 
 [tool.uv.sources]

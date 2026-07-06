@@ -15,7 +15,7 @@ import dspy
 from dotenv import load_dotenv
 
 from ..dspy.programs import ClassifierProgram
-from ..prompts.classification import classification_instruction
+from ..prompts.classification import CLASSIFICATION_PROMPT
 from .config import GEPAConfig
 from .export_prompt import export_program_instructions
 
@@ -90,7 +90,7 @@ def run_optimization(config: GEPAConfig | None = None) -> dspy.Module:
 
     student = ClassifierProgram()
     student.predict.signature = student.predict.signature.with_instructions(
-        classification_instruction
+        CLASSIFICATION_PROMPT
     )
 
     budget_kwargs: dict = {}

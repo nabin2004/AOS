@@ -1,4 +1,4 @@
-from .classification import Classification, classification_instruction
+from .classification import Classification, CLASSIFICATION_PROMPT
 from .lecture import lecture_instruction
 from .storyboard import storyboard_instruction
 from .scene import scene_instruction
@@ -6,7 +6,7 @@ from .beat import beat_instruction
 
 __all__ = [
     "Classification",
-    "classification_instruction",
+    "CLASSIFICATION_PROMPT",
     "lecture_instruction",
     "storyboard_instruction",
     "scene_instruction",

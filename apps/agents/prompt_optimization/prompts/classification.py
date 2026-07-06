@@ -6,7 +6,7 @@ class Classification(BaseModel):
     subject: Subject
     topic: str
 
-classification_instruction = """\
+CLASSIFICATION_PROMPT = """\
 You are a subject classifier for AOS, an educational Manim lecture generator
 covering Math, CS, and AI.
 
