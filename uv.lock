@@ -22,6 +22,7 @@ version = "0.1.0"
 source = { virtual = "apps/agents" }
 dependencies = [
     { name = "dotenv" },
+    { name = "ir" },
     { name = "pydantic" },
     { name = "pydantic-ai" },
     { name = "pydantic-ai-slim", extra = ["openrouter"] },
@@ -30,6 +31,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "dotenv", specifier = ">=0.9.9" },
+    { name = "ir", editable = "packages/ir" },
     { name = "pydantic", specifier = ">=2.13.4" },
     { name = "pydantic-ai", specifier = ">=2.5.0" },
     { name = "pydantic-ai-slim", extras = ["openrouter"], specifier = ">=2.5.0" },
@@ -1693,8 +1695,8 @@ name = "secretstorage"
 version = "3.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cryptography" },
-    { name = "jeepney" },
+    { name = "cryptography", marker = "sys_platform != 'win32'" },
+    { name = "jeepney", marker = "sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1c/03/e834bcd866f2f8a49a85eaff47340affa3bfa391ee9912a952a1faa68c7b/secretstorage-3.5.0.tar.gz", hash = "sha256:f04b8e4689cbce351744d5537bf6b1329c6fc68f91fa666f60a380edddcd11be", size = 19884, upload-time = "2025-11-23T19:02:53.191Z" }
 wheels = [

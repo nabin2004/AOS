@@ -5,8 +5,12 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "ir",
     "dotenv>=0.9.9",
     "pydantic>=2.13.4",
     "pydantic-ai>=2.5.0",
     "pydantic-ai-slim[openrouter]>=2.5.0",
 ]
+
+[tool.uv.sources]
+ir = { workspace = true }

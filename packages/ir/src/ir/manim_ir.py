@@ -92,6 +92,8 @@ class Subject(str, Enum):
     MATH = "math"
     CS = "cs"
     AI = "ai"
+    UNKNOWN = "unknown"
+
 
 
 class EntityType(str, Enum):

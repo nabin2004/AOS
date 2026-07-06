@@ -1,15 +1,9 @@
-from enum import Enum
-
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 
-load_dotenv()
+from ir.manim_ir import Subject
 
-class Subject(str, Enum):
-    MATH = "math"
-    CS = "cs"
-    AI = "ai"
-    UNKNOWN = "unknown"
+load_dotenv()
 
 agent = Agent(
     'openrouter:openrouter/free',
