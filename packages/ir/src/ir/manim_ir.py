@@ -1,5 +1,5 @@
 """
-Intermediate Representation (IR)
+Intermediate Representation (IR) — v2
 =====================================================
 
 A version-pinned, statically-checkable representation of an educational
@@ -11,23 +11,48 @@ Layer stack — each layer answers exactly ONE question:
 
     Lecture     -> WHAT are we teaching?          (content, no animation)
     Storyboard  -> HOW should it be taught?       (pedagogy, no Manim)
-    Scene       -> WHERE do things live?          (scene graph + camera)
+    Scene       -> WHERE do things live?          (scene graph + camera + class)
     Beat        -> WHAT changes now?              (state transition)
-    [compiler]  -> emit self.play(...) Manim code (not in this file)
+    [compiler]  -> emit a `class <ClassName>(Scene)` with self.play(...)
 
-Two invariants are enforced here, before any render:
+Invariants enforced here, before any render:
 
   1. Reference integrity — a beat may only operate on objects that are
-     currently live in the scene graph. Creating twice, removing a
-     ghost, or touching an undeclared id is rejected. This is the
-     IR-level cousin of the undefined-symbol check.
+     currently live in the scene graph. Creating twice, removing a ghost,
+     or touching an undeclared id is rejected. Behaviors, computations and
+     trackers referenced by objects must exist. (Cousin of undefined-symbol.)
 
   2. Cognitive load — per-beat limits on new objects, equations, colors,
      simultaneous motion and narration length are enforced against a
      CognitiveLoadPolicy, so an overloaded beat cannot pass validation.
 
+  3. 3D discipline — a 3D scene that declares `begin_in_2d` must actually
+     move the camera into orientation at least once (don't slam into 3D);
+     `fix_in_frame` only means something in a 3D scene.
+
 The beat is also the unit of incremental execution: one beat -> one
 visual delta -> one frame that can be fed back to the model.
+
+------------------------------------------------------------------------
+What v2 adds (from the field notes)
+------------------------------------------------------------------------
+- Scene.class_name + Scene.runtime_params : every scene is a real Manim
+  class with typed knobs, so scenes are reusable/parameterizable.
+- 2D->3D discipline : Scene.is_3d / begin_in_2d + camera Operations
+  (move/pan/zoom/set_orientation) targeting a reserved camera id.
+- Computation layer : back animations with actual maths. A closed set of
+  libraries (numpy/scipy/sympy/pandas/python-chess) keeps scope to the
+  Math/CS/AI domain. E.g. Lorenz via scipy.solve_ivp.
+- SymbolSource : an equation can be authored inline or fetched from
+  Wikipedia / Wikidata.
+- rate_func on every Operation : lean on Manim's easing to look good.
+- Persistent Behaviors (add_updater) : traced tails, endpoint-tracking
+  dots, glow, follow-a-tracker, always_redraw. These persist across beats.
+- ValueTrackers : first-class state you can teach with.
+- Richer op vocabulary : TransformFromCopy, FlashAround, Circumscribe,
+  FocusOn — every glyph (even the "H" in "Hello") is transformable, and
+  sub-part targeting rides on op.params.
+- RenderConfig : a real quality ladder for the video renderer.
 """
 from __future__ import annotations
 
@@ -51,13 +76,17 @@ from pydantic import (
 FRAME_X_SAFE = 7.0   # |x| beyond this drifts off the visible frame
 FRAME_Y_SAFE = 4.0   # |y| beyond this drifts off the visible frame
 
+# Reserved scene-graph id for the camera. Camera Operations target this
+# sentinel; it is always "live" and is never declared as a SceneObject.
+CAMERA_TARGET = "__camera__"
+
 
 # ===========================================================================
 # Controlled vocabularies
 #
-# These are closed sets on purpose: the model learns a small, real API and
-# the compiler owns the (op -> Manim call) mapping. Free-text verbs are how
-# you get hallucinated APIs; enums are how you prevent them.
+# Closed sets on purpose: the model learns a small, real API and the
+# compiler owns the (op -> Manim call) mapping. Free-text verbs are how you
+# get hallucinated APIs; enums are how you prevent them.
 # ===========================================================================
 class Subject(str, Enum):
     MATH = "math"
@@ -84,10 +113,12 @@ class EntityType(str, Enum):
     TABLE = "table"               # -> Table
     # coordinate systems
     AXES = "axes"
+    THREE_D_AXES = "three_d_axes"     # -> ThreeDAxes
     NUMBER_LINE = "number_line"
     NUMBER_PLANE = "number_plane"
     COMPLEX_PLANE = "complex_plane"
     GRAPH = "graph"               # plotted function
+    PARAMETRIC_CURVE = "parametric_curve"  # -> ParametricFunction (2D/3D)
     # vectors / fields
     VECTOR = "vector"
     VECTOR_FIELD = "vector_field"
@@ -96,38 +127,48 @@ class EntityType(str, Enum):
     SPHERE = "sphere"
     CUBE = "cube"
     # grouping / mascot
-    GROUP = "group"
+    GROUP = "group"               # -> VGroup (use *unpacking to build it)
     PI_CREATURE = "pi_creature"   # NB: not in vanilla ManimCE; compiler must
                                   # target a bundled asset or manim_pi plugin.
 
 
 class OperationType(str, Enum):
     # --- introduce (CREATE family: make an object newly visible) ---
-    CREATE = "create"             # Create
-    WRITE = "write"               # Write            (text / tex)
-    FADE_IN = "fade_in"           # FadeIn
-    DRAW_BORDER = "draw_border"   # DrawBorderThenFill
-    GROW = "grow"                 # GrowFromCenter
+    CREATE = "create"                    # Create
+    WRITE = "write"                      # Write            (text / tex)
+    FADE_IN = "fade_in"                  # FadeIn
+    DRAW_BORDER = "draw_border"          # DrawBorderThenFill
+    GROW = "grow"                        # GrowFromCenter
+    TRANSFORM_FROM_COPY = "transform_from_copy"  # TransformFromCopy(src,tgt):
+                                         # leaves src, brings tgt on screen
     # --- transform ---
-    TRANSFORM = "transform"       # Transform / ReplacementTransform
-    MORPH = "morph"               # TransformMatchingTex / Shapes
+    TRANSFORM = "transform"              # Transform / ReplacementTransform
+    MORPH = "morph"                      # TransformMatchingTex / Shapes
     # --- move in space ---
-    MOVE = "move"                 # .animate.move_to
-    SHIFT = "shift"               # .animate.shift
-    ROTATE = "rotate"             # Rotate
-    SCALE = "scale"               # .animate.scale
+    MOVE = "move"                        # .animate.move_to
+    SHIFT = "shift"                      # .animate.shift
+    ROTATE = "rotate"                    # Rotate
+    SCALE = "scale"                      # .animate.scale
     RESCALE_TO_CORNER = "rescale_to_corner"  # shrink + park (Grant's move)
     # --- emphasise (no state change, pure attention) ---
-    HIGHLIGHT = "highlight"       # Indicate / Circumscribe
-    FLASH = "flash"               # Flash
-    WIGGLE = "wiggle"             # Wiggle
-    RECOLOR = "recolor"           # .animate.set_color
+    HIGHLIGHT = "highlight"              # Indicate
+    FLASH = "flash"                      # Flash
+    FLASH_AROUND = "flash_around"        # FlashAround
+    CIRCUMSCRIBE = "circumscribe"        # Circumscribe
+    FOCUS_ON = "focus_on"                # FocusOn
+    WIGGLE = "wiggle"                    # Wiggle
+    RECOLOR = "recolor"                  # .animate.set_color
     # --- value-driven ---
-    UPDATE_VALUE = "update_value" # ValueTracker-driven .animate
+    UPDATE_VALUE = "update_value"        # ValueTracker-driven .animate
+    # --- camera (target must be CAMERA_TARGET) ---
+    MOVE_CAMERA = "move_camera"          # self.move_camera(...)
+    PAN_CAMERA = "pan_camera"            # camera.frame.animate.shift
+    ZOOM_CAMERA = "zoom_camera"          # camera.frame.animate.scale
+    SET_CAMERA_ORIENTATION = "set_camera_orientation"  # phi/theta -> enter 3D
     # --- remove (make an object no longer live) ---
-    FADE_OUT = "fade_out"         # FadeOut
-    UNCREATE = "uncreate"         # Uncreate
-    REMOVE = "remove"             # self.remove (instant)
+    FADE_OUT = "fade_out"                # FadeOut
+    UNCREATE = "uncreate"                # Uncreate
+    REMOVE = "remove"                    # self.remove (instant)
 
 
 CREATE_FAMILY = {
@@ -136,17 +177,91 @@ CREATE_FAMILY = {
     OperationType.FADE_IN,
     OperationType.DRAW_BORDER,
     OperationType.GROW,
+    OperationType.TRANSFORM_FROM_COPY,   # brings the *target* on screen
 }
 REMOVE_FAMILY = {
     OperationType.FADE_OUT,
     OperationType.UNCREATE,
     OperationType.REMOVE,
 }
+EMPHASIS_OPS = {
+    OperationType.HIGHLIGHT,
+    OperationType.FLASH,
+    OperationType.FLASH_AROUND,
+    OperationType.CIRCUMSCRIBE,
+    OperationType.FOCUS_ON,
+    OperationType.WIGGLE,
+    OperationType.RECOLOR,
+}
+CAMERA_OPS = {
+    OperationType.MOVE_CAMERA,
+    OperationType.PAN_CAMERA,
+    OperationType.ZOOM_CAMERA,
+    OperationType.SET_CAMERA_ORIENTATION,
+}
+# Camera ops that establish/rotate the 3D viewpoint (used to enforce the
+# "don't slam into 3D — pan into it" discipline).
+CAMERA_ORIENTATION_OPS = {
+    OperationType.MOVE_CAMERA,
+    OperationType.SET_CAMERA_ORIENTATION,
+}
 INSTANT_OPS = {OperationType.REMOVE}  # produce no animation, run_time == 0
 
 
+class RateFunction(str, Enum):
+    """Manim easing. Lean on these — flat linear motion reads as cheap."""
+    LINEAR = "linear"
+    SMOOTH = "smooth"
+    EASE_IN_OUT = "ease_in_out_sine"
+    EASE_IN = "ease_in_sine"
+    EASE_OUT = "ease_out_sine"
+    RUSH_INTO = "rush_into"
+    RUSH_FROM = "rush_from"
+    SLOW_INTO = "slow_into"
+    DOUBLE_SMOOTH = "double_smooth"
+    THERE_AND_BACK = "there_and_back"
+    THERE_AND_BACK_WITH_PAUSE = "there_and_back_with_pause"
+    WIGGLE = "wiggle"
+    EXPONENTIAL_DECAY = "exponential_decay"
+
+
+class ComputeLibrary(str, Enum):
+    """
+    Closed set of numeric/symbolic backends, scoped to the Math/CS/AI
+    domain. The planner may only reach for real maths through these, so a
+    Lorenz trajectory is `solve_ivp` output, not invented coordinates.
+    """
+    NUMPY = "numpy"
+    SCIPY = "scipy"          # e.g. scipy.integrate.solve_ivp
+    SYMPY = "sympy"
+    PANDAS = "pandas"
+    PYTHON_CHESS = "python_chess"   # chess-themed CS videos
+
+
+class SymbolSource(str, Enum):
+    """Where a Text/MathTex payload comes from."""
+    INLINE = "inline"        # tex written directly in params
+    WIKIPEDIA = "wikipedia"  # fetched via the Wikipedia tool
+    WIKIDATA = "wikidata"    # fetched via Wikidata (structured)
+
+
+class BehaviorType(str, Enum):
+    """
+    Persistent updaters (compiler emits `mob.add_updater(...)`). Unlike an
+    AmbientAnimation (scoped to one beat's hold), a Behavior turns on when
+    its object is created and runs until the object is removed.
+    """
+    TRACE_PATH = "trace_path"            # TracedPath tail behind a mover
+    TRACK_ENDPOINT = "track_endpoint"    # dot pinned to the end of a path
+    FOLLOW_TRACKER = "follow_tracker"    # position/value driven by a tracker
+    GLOW_PULSE = "glow_pulse"            # animated glow (functions can glow)
+    CONTINUOUS_ROTATE = "continuous_rotate"
+    ALWAYS_REDRAW = "always_redraw"      # recompute the mobject each frame
+
+
 class AmbientType(str, Enum):
-    """Continuous, low-amplitude motion so a scene never fully freezes."""
+    """Continuous, low-amplitude motion so a scene never fully freezes.
+    Scoped to a single beat's hold (contrast with persistent Behaviors)."""
     BLINK = "blink"               # pi-creature eyes
     BREATHE = "breathe"           # subtle scale oscillation
     CAMERA_DRIFT = "camera_drift"
@@ -194,6 +309,8 @@ class TemplateType(str, Enum):
     VECTOR_FIELD_FLOW = "vector_field_flow"
     DECISION_BOUNDARY = "decision_boundary"
     EPSILON_DELTA = "epsilon_delta"
+    LORENZ_ATTRACTOR = "lorenz_attractor"   # 2D warm-up -> pan into 3D
+    STRANGE_ATTRACTOR = "strange_attractor"
 
 
 class Direction(str, Enum):
@@ -205,6 +322,17 @@ class Direction(str, Enum):
     UR = "up_right"
     DL = "down_left"
     DR = "down_right"
+    IN = "in"        # +z toward viewer (3D)
+    OUT = "out"      # -z away (3D)
+
+
+class Quality(str, Enum):
+    """Render ladder for the video renderer."""
+    LOW = "low_quality"                 # 854x480 @ 15fps  (fast iteration)
+    MEDIUM = "medium_quality"           # 1280x720 @ 30fps
+    HIGH = "high_quality"               # 1920x1080 @ 60fps
+    PRODUCTION = "production_quality"   # 2560x1440 @ 60fps
+    FOURK = "fourk_quality"             # 3840x2160 @ 60fps
 
 
 # ===========================================================================
@@ -230,6 +358,7 @@ class Position(BaseModel):
     """
     Absolute frame coordinates OR relative placement next to another object.
     Frame-safety is validated so objects don't silently drift off-screen.
+    z is honoured in 3D scenes.
     """
     model_config = ConfigDict(extra="forbid")
 
@@ -261,6 +390,10 @@ class Style(BaseModel):
     font_size: Optional[int] = None
     opacity: float = Field(default=1.0, ge=0.0, le=1.0)
     z_index: int = 0
+    # "functions can take glow" — a static glow halo (Behavior.GLOW_PULSE
+    # animates it). glow_color defaults to `color` at compile time.
+    glow: bool = False
+    glow_color: Optional[str] = None
 
 
 class CognitiveLoadPolicy(BaseModel):
@@ -278,6 +411,86 @@ class CognitiveLoadPolicy(BaseModel):
 
 
 DEFAULT_LOAD_POLICY = CognitiveLoadPolicy()
+
+
+# ===========================================================================
+# State / maths backing (v2)
+# ===========================================================================
+class ValueTracker(BaseModel):
+    """
+    First-class scene state. Beats mutate it with UPDATE_VALUE; objects can
+    ride it with a FOLLOW_TRACKER behaviour. This is how you 'use state to
+    teach' — one knob drives many mobjects.
+    """
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    initial: float = 0.0
+    min_value: Optional[float] = None
+    max_value: Optional[float] = None
+    label: str = ""
+
+
+class Computation(BaseModel):
+    """
+    The real maths under an animation. A GRAPH / PARAMETRIC_CURVE / surface
+    can reference a Computation by id; the compiler runs the routine at
+    build time and feeds the samples into the mobject. Scope is the closed
+    ComputeLibrary set, keeping the system inside Math/CS/AI.
+
+    Example (Lorenz):
+        Computation(id="lorenz", library=ComputeLibrary.SCIPY,
+                    routine="solve_ivp",
+                    params={"sigma":10,"rho":28,"beta":8/3,"t_end":40},
+                    produces="Lorenz trajectory (N,3) array")
+    """
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    library: ComputeLibrary
+    routine: str                          # e.g. "solve_ivp", "linspace"
+    params: dict[str, Any] = Field(default_factory=dict)
+    produces: str = ""                    # human note about the output
+
+
+class Behavior(BaseModel):
+    """
+    A persistent updater attached to a SceneObject. Turns on when the object
+    is created, runs until it is removed. This is the `add_updater(...)`
+    layer: traced tails, endpoint dots, glow, tracker-following, redraws.
+    """
+    model_config = ConfigDict(extra="forbid")
+
+    type: BehaviorType
+    of: Optional[str] = None       # id of another object this behaviour reads
+                                   # (e.g. the path a TRACK_ENDPOINT dot rides)
+    tracker: Optional[str] = None  # ValueTracker id (FOLLOW_TRACKER)
+    params: dict[str, Any] = Field(default_factory=dict)
+
+
+class SceneParameter(BaseModel):
+    """A typed runtime knob for a Scene, so scenes are reusable.
+    e.g. SceneParameter(name='rho', py_type='float', default=28.0)."""
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    py_type: str = "float"         # "int" | "float" | "str" | "bool"
+    default: Any = None
+    description: str = ""
+
+    @field_validator("name")
+    @classmethod
+    def _valid_identifier(cls, v: str) -> str:
+        if not v.isidentifier():
+            raise ValueError(f"scene parameter name '{v}' is not a valid identifier")
+        return v
+
+    @field_validator("py_type")
+    @classmethod
+    def _known_type(cls, v: str) -> str:
+        if v not in {"int", "float", "str", "bool"}:
+            raise ValueError(f"unsupported py_type '{v}'")
+        return v
 
 
 # ===========================================================================
@@ -301,9 +514,30 @@ class SceneObject(BaseModel):
     params: dict[str, Any] = Field(default_factory=dict)
     label: str = ""                      # human note for planners / SFT
 
+    # --- v2 ---
+    # equation/text provenance
+    symbol_source: SymbolSource = SymbolSource.INLINE
+    symbol_query: Optional[str] = None   # search term for wiki* sources
+    # maths backing (id of a Computation on the owning Scene)
+    computation: Optional[str] = None
+    # persistent updaters
+    behaviors: list[Behavior] = Field(default_factory=list)
+    # 3D: keep this glued to the camera frame (add_fixed_in_frame_mobjects).
+    # Only meaningful in a 3D scene; validated at Scene level.
+    fix_in_frame: bool = False
+
     @property
     def is_equation(self) -> bool:
         return self.entity_type == EntityType.MATH_TEX
+
+    @model_validator(mode="after")
+    def _wiki_needs_query(self) -> "SceneObject":
+        if self.symbol_source != SymbolSource.INLINE and not self.symbol_query:
+            raise ValueError(
+                f"object '{self.id}' uses symbol_source="
+                f"{self.symbol_source.value} but has no symbol_query"
+            )
+        return self
 
 
 class Camera(BaseModel):
@@ -321,21 +555,49 @@ class Camera(BaseModel):
 # ===========================================================================
 class Operation(BaseModel):
     """An action == an operation applied to one entity. There is no
-    standalone 'Actions' concept: Operation(target)."""
+    standalone 'Actions' concept: Operation(target).
+
+    Sub-part targeting (the 'H' in 'Hello' is transformable) rides on
+    params, e.g. {"parts": ["H"]} or {"index": 0}. Camera ops target the
+    reserved CAMERA_TARGET id."""
     model_config = ConfigDict(extra="forbid")
 
-    target: str                          # SceneObject.id
+    target: str                          # SceneObject.id or CAMERA_TARGET
     op: OperationType
     run_time: float = Field(default=1.0, ge=0.0)
+    rate_func: Optional[RateFunction] = None
     params: dict[str, Any] = Field(default_factory=dict)
     # optional: play concurrently with the previous op instead of after it
     with_previous: bool = False
 
     @model_validator(mode="after")
-    def _instant_ops_have_zero_runtime(self) -> "Operation":
+    def _op_shape(self) -> "Operation":
         if self.op in INSTANT_OPS and self.run_time != 0.0:
             raise ValueError(f"{self.op.value} is instant; run_time must be 0")
+        if self.op in CAMERA_OPS and self.target != CAMERA_TARGET:
+            raise ValueError(
+                f"camera op {self.op.value} must target '{CAMERA_TARGET}', "
+                f"got '{self.target}'"
+            )
+        if self.op not in CAMERA_OPS and self.target == CAMERA_TARGET:
+            raise ValueError(
+                f"'{CAMERA_TARGET}' is reserved for camera ops; "
+                f"{self.op.value} cannot target it"
+            )
+        if self.op == OperationType.TRANSFORM_FROM_COPY:
+            src = self.params.get("source") or self.params.get("from")
+            if not src:
+                raise ValueError(
+                    "transform_from_copy requires params['source'] "
+                    "(the id copied from)"
+                )
         return self
+
+    @property
+    def copy_source(self) -> Optional[str]:
+        if self.op == OperationType.TRANSFORM_FROM_COPY:
+            return self.params.get("source") or self.params.get("from")
+        return None
 
 
 class NarrationSegment(BaseModel):
@@ -355,7 +617,8 @@ class NarrationSegment(BaseModel):
 
 
 class AmbientAnimation(BaseModel):
-    """Runs continuously across a beat's hold so nothing freezes."""
+    """Runs continuously across a beat's hold so nothing freezes.
+    (Persistent, cross-beat behaviour lives on SceneObject.behaviors.)"""
     model_config = ConfigDict(extra="forbid")
 
     type: AmbientType
@@ -383,6 +646,11 @@ class Beat(BaseModel):
         return [o for o in self.animation_segment if o.op not in INSTANT_OPS]
 
     @property
+    def object_moving_ops(self) -> list[Operation]:
+        """Motion that counts against cognitive load (excludes camera)."""
+        return [o for o in self.moving_ops if o.op not in CAMERA_OPS]
+
+    @property
     def total_seconds(self) -> float:
         anim = sum(o.run_time for o in self.animation_segment)
         narr = self.narration.est_seconds if self.narration else 0.0
@@ -394,21 +662,41 @@ class Beat(BaseModel):
 # ===========================================================================
 class Scene(BaseModel):
     """
-    Owns a scene graph and an ordered list of beats. This is where the two
-    core invariants are enforced. Scenes are composable/reusable: a
-    COMPLEX_PLANE scene can be pulled into Euler, Fourier, roots-of-unity.
+    Owns a scene graph and an ordered list of beats. Every scene compiles to
+    a `class <class_name>(Scene | ThreeDScene)`. This is where the core
+    invariants are enforced. Scenes are composable/reusable: a COMPLEX_PLANE
+    scene can be pulled into Euler, Fourier, roots-of-unity, with different
+    runtime_params.
     """
     model_config = ConfigDict(extra="forbid")
 
     id: str
+    class_name: str = "GeneratedScene"   # the emitted Manim class name
     title: str = ""
     reusable: bool = False
     template: Optional[TemplateType] = None
+    runtime_params: list[SceneParameter] = Field(default_factory=list)
+
+    # dimensionality
+    is_3d: bool = False
+    begin_in_2d: bool = True             # if 3D: warm up flat, then pan in
+
     camera: Camera = Field(default_factory=Camera)
     scene_graph: list[SceneObject] = Field(default_factory=list)
+    trackers: list[ValueTracker] = Field(default_factory=list)
+    computations: list[Computation] = Field(default_factory=list)
     beats: list[Beat] = Field(default_factory=list)
     enter_transition: Optional[SceneTransition] = None
     exit_transition: Optional[SceneTransition] = None
+
+    @field_validator("class_name")
+    @classmethod
+    def _valid_class_name(cls, v: str) -> str:
+        if not v.isidentifier():
+            raise ValueError(f"class_name '{v}' is not a valid Python identifier")
+        if not v[0].isupper():
+            raise ValueError(f"class_name '{v}' should be PascalCase (upper first)")
+        return v
 
     @field_validator("scene_graph")
     @classmethod
@@ -417,20 +705,67 @@ class Scene(BaseModel):
         dupes = {i for i in ids if ids.count(i) > 1}
         if dupes:
             raise ValueError(f"duplicate scene object id(s): {sorted(dupes)}")
+        if CAMERA_TARGET in ids:
+            raise ValueError(f"'{CAMERA_TARGET}' is reserved and cannot be an object id")
         return graph
 
     @model_validator(mode="after")
     def _validate_dynamics(self, info: ValidationInfo) -> "Scene":
-        """Walk the beats as a mini-interpreter: enforce reference integrity
-        and cognitive-load limits. A CognitiveLoadPolicy may be injected via
-        validation context, else the default is used."""
+        """Walk the beats as a mini-interpreter: enforce reference integrity,
+        cognitive-load limits, static-reference wiring (trackers /
+        computations / behaviors) and 3D discipline. A CognitiveLoadPolicy
+        may be injected via validation context, else the default is used."""
         policy = DEFAULT_LOAD_POLICY
         ctx = getattr(info, "context", None) or {}
         if isinstance(ctx.get("load_policy"), CognitiveLoadPolicy):
             policy = ctx["load_policy"]
 
+        # camera consistency
+        if self.is_3d and not self.camera.is_3d:
+            raise ValueError(
+                f"scene '{self.id}' is_3d=True but camera.is_3d=False"
+            )
+
         types: dict[str, EntityType] = {o.id: o.entity_type for o in self.scene_graph}
+        tracker_ids = {t.id for t in self.trackers}
+        comp_ids = {c.id for c in self.computations}
+
+        # --- static wiring checks (before walking beats) ---
+        for o in self.scene_graph:
+            if o.fix_in_frame and not self.is_3d:
+                raise ValueError(
+                    f"object '{o.id}' sets fix_in_frame in a 2D scene "
+                    f"'{self.id}' (only meaningful in 3D)"
+                )
+            if o.computation and o.computation not in comp_ids:
+                raise ValueError(
+                    f"object '{o.id}' references unknown computation "
+                    f"'{o.computation}' in scene '{self.id}'"
+                )
+            for b in o.behaviors:
+                if b.of is not None and b.of not in types:
+                    raise ValueError(
+                        f"object '{o.id}' behavior {b.type.value} reads "
+                        f"unknown object '{b.of}' in scene '{self.id}'"
+                    )
+                if b.type == BehaviorType.FOLLOW_TRACKER and not b.tracker:
+                    raise ValueError(
+                        f"object '{o.id}' FOLLOW_TRACKER behavior needs a tracker"
+                    )
+                if b.tracker is not None and b.tracker not in tracker_ids:
+                    raise ValueError(
+                        f"object '{o.id}' behavior references unknown tracker "
+                        f"'{b.tracker}' in scene '{self.id}'"
+                    )
+                if b.type == BehaviorType.TRACK_ENDPOINT and not b.of:
+                    raise ValueError(
+                        f"object '{o.id}' TRACK_ENDPOINT behavior needs `of` "
+                        f"(the path it tracks)"
+                    )
+
+        # --- dynamic walk ---
         live: set[str] = {o.id for o in self.scene_graph if o.visible}
+        saw_camera_orientation = False
 
         for bi, beat in enumerate(self.beats):
             new_objects = 0
@@ -438,11 +773,34 @@ class Scene(BaseModel):
             new_colors: set[str] = set()
 
             for op in beat.animation_segment:
+                # camera ops: skip declaration/liveness; just note orientation
+                if op.op in CAMERA_OPS:
+                    if op.op in CAMERA_ORIENTATION_OPS:
+                        saw_camera_orientation = True
+                    if "color" in op.params and op.params["color"]:
+                        new_colors.add(str(op.params["color"]))
+                    continue
+
                 if op.target not in types:
                     raise ValueError(
                         f"beat[{bi}] {op.op.value} targets undeclared id "
                         f"'{op.target}' (not in scene_graph of '{self.id}')"
                     )
+
+                # TransformFromCopy needs a live source; brings target on screen
+                if op.op == OperationType.TRANSFORM_FROM_COPY:
+                    src = op.copy_source
+                    if src not in types:
+                        raise ValueError(
+                            f"beat[{bi}] transform_from_copy source '{src}' "
+                            f"is undeclared in scene '{self.id}'"
+                        )
+                    if src not in live:
+                        raise ValueError(
+                            f"beat[{bi}] transform_from_copy source '{src}' "
+                            f"is not live in scene '{self.id}'"
+                        )
+
                 if op.op in CREATE_FAMILY:
                     if op.target in live:
                         raise ValueError(
@@ -460,12 +818,13 @@ class Scene(BaseModel):
                             f"live in scene '{self.id}'"
                         )
                     live.discard(op.target)
-                else:  # transform / move / emphasise
+                else:  # transform / move / emphasise / value
                     if op.target not in live:
                         raise ValueError(
                             f"beat[{bi}] {op.op.value} on '{op.target}' before "
                             f"it is created in scene '{self.id}'"
                         )
+
                 if "color" in op.params and op.params["color"]:
                     new_colors.add(str(op.params["color"]))
 
@@ -485,16 +844,24 @@ class Scene(BaseModel):
                     f"beat[{bi}] introduces {len(new_colors)} new colors "
                     f"(max {policy.max_new_colors_per_beat})"
                 )
-            if len(beat.moving_ops) > policy.max_simultaneous_motion:
+            if len(beat.object_moving_ops) > policy.max_simultaneous_motion:
                 raise ValueError(
-                    f"beat[{bi}] has {len(beat.moving_ops)} concurrent moving "
-                    f"ops (max {policy.max_simultaneous_motion})"
+                    f"beat[{bi}] has {len(beat.object_moving_ops)} concurrent "
+                    f"moving ops (max {policy.max_simultaneous_motion})"
                 )
             if beat.narration and beat.narration.est_seconds > policy.max_narration_seconds:
                 raise ValueError(
                     f"beat[{bi}] narration is {beat.narration.est_seconds}s "
                     f"(max {policy.max_narration_seconds}s)"
                 )
+
+        # --- 3D discipline: don't slam into 3D, pan into it ---
+        if self.is_3d and self.begin_in_2d and not saw_camera_orientation:
+            raise ValueError(
+                f"scene '{self.id}' is 3D and begin_in_2d=True but never moves "
+                f"the camera into orientation — add a move_camera / "
+                f"set_camera_orientation op (reveal 3D, don't snap to it)"
+            )
         return self
 
     @property
@@ -551,6 +918,25 @@ class EndingScene(BaseModel):
     suggested_next_topics: list[str] = Field(default_factory=list)
 
 
+class RenderConfig(BaseModel):
+    """Video renderer settings — the quality ladder from the notes."""
+    model_config = ConfigDict(extra="forbid")
+
+    quality: Quality = Quality.HIGH
+    fps: int = Field(default=60, gt=0)
+    resolution: tuple[int, int] = (1920, 1080)
+    output_format: str = "mp4"           # mp4 | mov | gif | png_sequence
+    transparent: bool = False
+    preview: bool = False                # open the player after render
+
+    @field_validator("output_format")
+    @classmethod
+    def _known_format(cls, v: str) -> str:
+        if v not in {"mp4", "mov", "gif", "png_sequence"}:
+            raise ValueError(f"unsupported output_format '{v}'")
+        return v
+
+
 # ===========================================================================
 # Top-level document
 # ===========================================================================
@@ -563,11 +949,12 @@ class LectureIR(BaseModel):
 
     request_id: str = Field(default_factory=lambda: uuid4().hex)
     manim_version: str = "0.18.1"        # the pinned target; kills fork drift
-    ir_version: str = "1.0.0"
+    ir_version: str = "2.0.0"
     duration_target_seconds: Optional[float] = None
 
     branding: Branding = Field(default_factory=Branding)
     load_policy: CognitiveLoadPolicy = Field(default_factory=CognitiveLoadPolicy)
+    render: RenderConfig = Field(default_factory=RenderConfig)
 
     lecture: Lecture
     storyboard: Storyboard
@@ -582,6 +969,11 @@ class LectureIR(BaseModel):
         dupes = {s.id for s in self.scenes if [x.id for x in self.scenes].count(s.id) > 1}
         if dupes:
             raise ValueError(f"duplicate scene id(s): {sorted(dupes)}")
+        # class names should be unique too — they become Python classes
+        class_names = [s.class_name for s in self.scenes]
+        cdupes = {c for c in class_names if class_names.count(c) > 1}
+        if cdupes:
+            raise ValueError(f"duplicate scene class_name(s): {sorted(cdupes)}")
         for step in self.storyboard.steps:
             if step.scene_id not in scene_ids:
                 raise ValueError(
