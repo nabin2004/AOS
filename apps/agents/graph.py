@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
 
 from dotenv import load_dotenv
+from ir.manim_ir import Beat, Lecture, LectureIR, Scene, Storyboard
 from pydantic_graph import BaseNode, End, GraphBuilder, GraphRunContext, StepContext
 
 from beat_planner_agent import beat_planner_agent
-from classifier_agent import classifier_agent
-from inspector_agent import inspector_agent
+from classifier_agent import Classification, classifier_agent
+from inspector_agent import InspectionResult, inspector_agent
 from lecture_planner import lecture_planner_agent
 from narration_planner_agent import narration_planner_agent
 from repair_agent import repair_agent
 from scene_planner_agent import scene_planner_agent
 from storyboard_planner import storyboard_planner_agent
-from validation_agent import validation_agent
+from validation_agent import ValidationResult, validation_agent
 
 load_dotenv()
 
@@ -22,17 +22,32 @@ load_dotenv()
 @dataclass
 class AnimationState:
     user_request: str = ""
-    classification: Any = None
-    lecture_plan: Any = None
-    storyboard: Any = None
-    scenes: Any = None
-    beats: Any = None
-    narration: Any = None
-    validation_result: Any = None
-    repair_result: Any = None
-    inspection_result: Any = None
+    classification: Classification | None = None
+    lecture_plan: Lecture | None = None
+    storyboard: Storyboard | None = None
+    scenes: list[Scene] | None = None
+    beats: list[Beat] | None = None
+    narration_beats: list[Beat] | None = None
+    validation_result: ValidationResult | None = None
+    lecture_ir: LectureIR | None = None
+    inspection_result: InspectionResult | None = None
     validation_attempts: int = 0
     max_validation_attempts: int = 3
+
+
+def _ir_context(state: AnimationState) -> str:
+    if state.lecture_ir is not None:
+        return state.lecture_ir.model_dump_json()
+    parts = []
+    if state.lecture_plan is not None:
+        parts.append(f"Lecture: {state.lecture_plan.model_dump_json()}")
+    if state.storyboard is not None:
+        parts.append(f"Storyboard: {state.storyboard.model_dump_json()}")
+    if state.scenes is not None:
+        parts.append(f"Scenes: {[s.model_dump_json() for s in state.scenes]}")
+    if state.narration_beats is not None:
+        parts.append(f"Beats: {[b.model_dump_json() for b in state.narration_beats]}")
+    return "\n".join(parts)
 
 
 @dataclass
@@ -91,7 +106,7 @@ class AddNarration(BaseNode[AnimationState]):
         result = await narration_planner_agent.run(
             f"Beats: {ctx.state.beats}"
         )
-        ctx.state.narration = result.output
+        ctx.state.narration_beats = result.output
         return Validate()
 
 
@@ -99,13 +114,10 @@ class AddNarration(BaseNode[AnimationState]):
 class Validate(BaseNode[AnimationState]):
     async def run(self, ctx: GraphRunContext[AnimationState]) -> Repair | Inspect:
         ctx.state.validation_attempts += 1
-        result = await validation_agent.run(
-            f"Narration/IR: {ctx.state.narration}"
-        )
+        result = await validation_agent.run(_ir_context(ctx.state))
         ctx.state.validation_result = result.output
 
-        passed = getattr(result.output, "passed", False)
-        if passed or ctx.state.validation_attempts >= ctx.state.max_validation_attempts:
+        if result.output.passed or ctx.state.validation_attempts >= ctx.state.max_validation_attempts:
             return Inspect()
         return Repair()
 
@@ -113,22 +125,20 @@ class Validate(BaseNode[AnimationState]):
 @dataclass
 class Repair(BaseNode[AnimationState]):
     async def run(self, ctx: GraphRunContext[AnimationState]) -> Validate:
+        issues = ctx.state.validation_result.issues if ctx.state.validation_result else []
         result = await repair_agent.run(
-            f"Issues: {ctx.state.validation_result}\nIR: {ctx.state.narration}"
+            f"Issues: {issues}\n\n{_ir_context(ctx.state)}"
         )
-        ctx.state.repair_result = result.output
-        ctx.state.narration = result.output
+        ctx.state.lecture_ir = result.output
         return Validate()
 
 
 @dataclass
 class Inspect(BaseNode[AnimationState, None, str]):
     async def run(self, ctx: GraphRunContext[AnimationState]) -> End[str]:
-        result = await inspector_agent.run(
-            f"Final IR: {ctx.state.narration}"
-        )
+        result = await inspector_agent.run(_ir_context(ctx.state))
         ctx.state.inspection_result = result.output
-        return End(str(result.output))
+        return End(result.output.summary)
 
 
 g = GraphBuilder(state_type=AnimationState, output_type=str)
