@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 
+from tools import ToolDeps, aos_toolset
+
 load_dotenv()
 
 
@@ -31,4 +33,6 @@ inspector_agent = Agent(
     description='Inspects the compiled Manim videos for correctness and completeness.',
     system_prompt=INSPECTOR_PROMPT,
     output_type=InspectionResult,
+    toolsets=[aos_toolset],
+    deps_type=ToolDeps,
 )

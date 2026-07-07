@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 from dotenv import load_dotenv
 from ir.manim_ir import Beat, Lecture, LectureIR, Scene, Storyboard
@@ -14,9 +15,12 @@ from narration_planner_agent import narration_planner_agent
 from repair_agent import repair_agent
 from scene_planner_agent import scene_planner_agent
 from storyboard_planner import storyboard_planner_agent
+from tools import ToolDeps
 from validation_agent import ValidationResult, validation_agent
 
 load_dotenv()
+
+TOOL_DEPS = ToolDeps(workspace_dir=Path(__file__).parent / "workspace")
 
 
 @dataclass
@@ -114,7 +118,7 @@ class AddNarration(BaseNode[AnimationState]):
 class Validate(BaseNode[AnimationState]):
     async def run(self, ctx: GraphRunContext[AnimationState]) -> Repair | Inspect:
         ctx.state.validation_attempts += 1
-        result = await validation_agent.run(_ir_context(ctx.state))
+        result = await validation_agent.run(_ir_context(ctx.state), deps=TOOL_DEPS)
         ctx.state.validation_result = result.output
 
         if result.output.passed or ctx.state.validation_attempts >= ctx.state.max_validation_attempts:
@@ -127,7 +131,8 @@ class Repair(BaseNode[AnimationState]):
     async def run(self, ctx: GraphRunContext[AnimationState]) -> Validate:
         issues = ctx.state.validation_result.issues if ctx.state.validation_result else []
         result = await repair_agent.run(
-            f"Issues: {issues}\n\n{_ir_context(ctx.state)}"
+            f"Issues: {issues}\n\n{_ir_context(ctx.state)}",
+            deps=TOOL_DEPS,
         )
         ctx.state.lecture_ir = result.output
         return Validate()
@@ -136,7 +141,7 @@ class Repair(BaseNode[AnimationState]):
 @dataclass
 class Inspect(BaseNode[AnimationState, None, str]):
     async def run(self, ctx: GraphRunContext[AnimationState]) -> End[str]:
-        result = await inspector_agent.run(_ir_context(ctx.state))
+        result = await inspector_agent.run(_ir_context(ctx.state), deps=TOOL_DEPS)
         ctx.state.inspection_result = result.output
         return End(result.output.summary)
 

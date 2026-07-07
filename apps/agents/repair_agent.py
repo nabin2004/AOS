@@ -2,6 +2,8 @@ from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import LectureIR
 
+from tools import ToolDeps, aos_toolset
+
 load_dotenv()
 
 REPAIR_PROMPT = """\
@@ -25,4 +27,6 @@ repair_agent = Agent(
     description='Repairs the generated IR for correctness and completeness.',
     system_prompt=REPAIR_PROMPT,
     output_type=LectureIR,
+    toolsets=[aos_toolset],
+    deps_type=ToolDeps,
 )

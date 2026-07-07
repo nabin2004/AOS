@@ -13,6 +13,13 @@ dependencies = [
     "logfire[system-metrics]>=4.37.0",
     "dspy>=3.0.0",
     "pydantic-graph>=2.5.0",
+    "httpx>=0.28.0",
+    "numpy>=2.0.0",
+    "scipy>=1.14.0",
+    "sympy>=1.13.0",
+    "pandas>=2.2.0",
+    "python-chess>=1.999",
+    "qrcode[pil]>=8.0",
 ]
 
 [tool.uv.sources]

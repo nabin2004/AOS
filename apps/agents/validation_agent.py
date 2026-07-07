@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 
+from tools import ToolDeps, aos_toolset
+
 load_dotenv()
 
 
@@ -46,4 +48,6 @@ validation_agent = Agent(
     description='Validates the generated IR for correctness and completeness.',
     system_prompt=VALIDATION_PROMPT,
     output_type=ValidationResult,
+    toolsets=[aos_toolset],
+    deps_type=ToolDeps,
 )
