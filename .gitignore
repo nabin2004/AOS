@@ -13,3 +13,6 @@ wheels/
 
 # Runtime Manim workspace (created by ToolDeps at startup)
 apps/agents/workspace/
+
+prepdata/
+*/svg_dataset/*
