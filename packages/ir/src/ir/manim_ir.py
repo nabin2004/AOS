@@ -17,18 +17,17 @@ Layer stack — each layer answers exactly ONE question:
 
 Invariants enforced here, before any render:
 
-  1. Reference integrity — a beat may only operate on objects that are
-     currently live in the scene graph. Creating twice, removing a ghost,
-     or touching an undeclared id is rejected. Behaviors, computations and
-     trackers referenced by objects must exist. (Cousin of undefined-symbol.)
+  1. Structural wiring — behaviors, computations and trackers referenced by
+     scene-graph objects must exist. Duplicate ids and reserved names are
+     rejected.
 
-  2. Cognitive load — per-beat limits on new objects, equations, colors,
-     simultaneous motion and narration length are enforced against a
-     CognitiveLoadPolicy, so an overloaded beat cannot pass validation.
-
-  3. 3D discipline — a 3D scene that declares `begin_in_2d` must actually
+  2. 3D discipline — a 3D scene that declares `begin_in_2d` must actually
      move the camera into orientation at least once (don't slam into 3D);
      `fix_in_frame` only means something in a 3D scene.
+
+Beat-level reference integrity and cognitive-load limits are advisory: the
+agent pipeline sanitizes/heals common LLM mistakes instead of hard-failing.
+`CognitiveLoadPolicy` on LectureIR is metadata for prompts, not a gate.
 
 The beat is also the unit of incremental execution: one beat -> one
 visual delta -> one frame that can be fed back to the model.
@@ -57,7 +56,7 @@ What v2 adds (from the field notes)
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, List, Optional
 from uuid import uuid4
 
 from pydantic import (
@@ -94,6 +93,9 @@ class Subject(str, Enum):
     AI = "ai"
     UNKNOWN = "unknown"
 
+class Classification(BaseModel):
+    subject: Subject
+    topic: str
 
 
 class EntityType(str, Enum):
@@ -315,6 +317,16 @@ class TemplateType(str, Enum):
     STRANGE_ATTRACTOR = "strange_attractor"
 
 
+class SemanticLabel(str, Enum):
+    """Teaching role of a scene-graph object for beat/narration planners."""
+    PRIMARY_FOCUS = "primary_focus"
+    SUPPORTING_CONTEXT = "supporting_context"
+    ANNOTATION = "annotation"
+    CONTRAST = "contrast"
+    METAPHOR = "metaphor"
+    REVEAL = "reveal"
+
+
 class Direction(str, Enum):
     UP = "up"
     DOWN = "down"
@@ -504,7 +516,13 @@ class SceneObject(BaseModel):
     `visible=False` means it exists in the cast but hasn't been created yet;
     a CREATE-family op brings it on screen.
     """
-    model_config = ConfigDict(extra="forbid")
+    # extra="allow": small/cheap planner models drift on this schema (extra
+    # keys, slightly-off shapes) and extra="forbid" turned that into a hard
+    # validation failure -> ModelRetry loop, which in practice was settling
+    # on empty-but-valid params (e.g. MathTex(tex="")) just to pass. Allowing
+    # extra keys through unvalidated is a stopgap; a stricter, better-fitted
+    # schema is the real fix.
+    model_config = ConfigDict(extra="allow")
 
     id: str
     entity_type: EntityType
@@ -512,9 +530,25 @@ class SceneObject(BaseModel):
     style: Style = Field(default_factory=Style)
     layer: int = 0                       # z-ordering within the scene
     visible: bool = False                # initial visibility (pre-first-beat)
-    # type-specific payload, e.g. {"radius": 1.5} or {"tex": r"e^{i\pi}=-1"}
+    # The literal tex/text payload for MATH_TEX and TEXT entities. A typed
+    # string field, not a free-form dict key — structured-output models
+    # reliably fill a declared string field but tend to leave open-ended
+    # dict[str, Any] keys (like the old params["tex"]) empty, since nothing
+    # in the schema tells them the key even exists.
+    content: str = Field(
+        default="",
+        description="Literal text or LaTeX shown on screen (required for text/math_tex/title).",
+    )
+    # type-specific payload for everything else, e.g. {"radius": 1.5} or
+    # {"x_range": [-3, 3, 1]}. Not for tex/text — use `content` instead.
     params: dict[str, Any] = Field(default_factory=dict)
-    label: str = ""                      # human note for planners / SFT
+    label: str = Field(
+        default="",
+        description=(
+            "Semantic teaching role: primary_focus, supporting_context, "
+            "annotation, contrast, metaphor, or reveal."
+        ),
+    )
 
     # --- v2 ---
     # equation/text provenance
@@ -638,6 +672,9 @@ class Beat(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: str = Field(default_factory=lambda: f"beat_{uuid4().hex[:8]}")
+    scene_id: str = ""
+    visual_intent: str = ""
+    animation_seconds: float = Field(default=1.0, ge=0.0)
     animation_segment: list[Operation] = Field(default_factory=list)
     narration: Optional[NarrationSegment] = None
     hold_seconds: float = Field(default=0.0, ge=0.0)   # dwell after animating
@@ -654,7 +691,10 @@ class Beat(BaseModel):
 
     @property
     def total_seconds(self) -> float:
-        anim = sum(o.run_time for o in self.animation_segment)
+        if self.animation_segment:
+            anim = sum(o.run_time for o in self.animation_segment)
+        else:
+            anim = self.animation_seconds
         narr = self.narration.est_seconds if self.narration else 0.0
         return round(max(anim + self.hold_seconds, narr), 1)
 
@@ -675,6 +715,19 @@ class Scene(BaseModel):
     id: str
     class_name: str = "GeneratedScene"   # the emitted Manim class name
     title: str = ""
+
+    pedagogical_intent: str = Field(
+        default="",
+        description="The exact pedagogical goal from the storyboard step. "
+                    "Downstream agents (Beat, Narration) use this to make "
+                    "high-level decisions without inferring intent from geometry."
+    )
+    visual_brief: str = Field(
+        default="",
+        description="Free-text creative brief for the Manim code writer — "
+                    "what the viewer should see, without prescribing IR objects.",
+    )
+
     reusable: bool = False
     template: Optional[TemplateType] = None
     runtime_params: list[SceneParameter] = Field(default_factory=list)
@@ -712,16 +765,11 @@ class Scene(BaseModel):
         return graph
 
     @model_validator(mode="after")
-    def _validate_dynamics(self, info: ValidationInfo) -> "Scene":
-        """Walk the beats as a mini-interpreter: enforce reference integrity,
-        cognitive-load limits, static-reference wiring (trackers /
-        computations / behaviors) and 3D discipline. A CognitiveLoadPolicy
-        may be injected via validation context, else the default is used."""
-        policy = DEFAULT_LOAD_POLICY
-        ctx = getattr(info, "context", None) or {}
-        if isinstance(ctx.get("load_policy"), CognitiveLoadPolicy):
-            policy = ctx["load_policy"]
-
+    def _validate_dynamics(self, _info: ValidationInfo) -> "Scene":
+        """Walk the beats as a mini-interpreter: enforce static-reference
+        wiring (trackers / computations / behaviors) and 3D discipline.
+        Beat-level liveness and cognitive-load issues are tolerated — the
+        agent pipeline sanitizes them before compile."""
         # camera consistency
         if self.is_3d and not self.camera.is_3d:
             raise ValueError(
@@ -769,93 +817,37 @@ class Scene(BaseModel):
         live: set[str] = {o.id for o in self.scene_graph if o.visible}
         saw_camera_orientation = False
 
-        for bi, beat in enumerate(self.beats):
-            new_objects = 0
-            new_equations = 0
-            new_colors: set[str] = set()
-
+        for beat in self.beats:
             for op in beat.animation_segment:
                 # camera ops: skip declaration/liveness; just note orientation
                 if op.op in CAMERA_OPS:
                     if op.op in CAMERA_ORIENTATION_OPS:
                         saw_camera_orientation = True
-                    if "color" in op.params and op.params["color"]:
-                        new_colors.add(str(op.params["color"]))
                     continue
 
                 if op.target not in types:
-                    raise ValueError(
-                        f"beat[{bi}] {op.op.value} targets undeclared id "
-                        f"'{op.target}' (not in scene_graph of '{self.id}')"
-                    )
+                    if op.op in CREATE_FAMILY:
+                        types[op.target] = EntityType.TEXT
+                    else:
+                        continue
 
                 # TransformFromCopy needs a live source; brings target on screen
                 if op.op == OperationType.TRANSFORM_FROM_COPY:
                     src = op.copy_source
-                    if src not in types:
-                        raise ValueError(
-                            f"beat[{bi}] transform_from_copy source '{src}' "
-                            f"is undeclared in scene '{self.id}'"
-                        )
-                    if src not in live:
-                        raise ValueError(
-                            f"beat[{bi}] transform_from_copy source '{src}' "
-                            f"is not live in scene '{self.id}'"
-                        )
+                    if src not in types or src not in live:
+                        continue
 
                 if op.op in CREATE_FAMILY:
                     if op.target in live:
-                        raise ValueError(
-                            f"beat[{bi}] creates '{op.target}' which is "
-                            f"already live in scene '{self.id}'"
-                        )
+                        continue
                     live.add(op.target)
-                    new_objects += 1
-                    if types[op.target] == EntityType.MATH_TEX:
-                        new_equations += 1
                 elif op.op in REMOVE_FAMILY:
                     if op.target not in live:
-                        raise ValueError(
-                            f"beat[{bi}] removes '{op.target}' which is not "
-                            f"live in scene '{self.id}'"
-                        )
+                        continue
                     live.discard(op.target)
                 else:  # transform / move / emphasise / value
                     if op.target not in live:
-                        raise ValueError(
-                            f"beat[{bi}] {op.op.value} on '{op.target}' before "
-                            f"it is created in scene '{self.id}'"
-                        )
-
-                if "color" in op.params and op.params["color"]:
-                    new_colors.add(str(op.params["color"]))
-
-            # --- cognitive-load gates ---
-            if new_objects > policy.max_new_objects_per_beat:
-                raise ValueError(
-                    f"beat[{bi}] introduces {new_objects} objects "
-                    f"(max {policy.max_new_objects_per_beat})"
-                )
-            if new_equations > policy.max_new_equations_per_beat:
-                raise ValueError(
-                    f"beat[{bi}] introduces {new_equations} equations "
-                    f"(max {policy.max_new_equations_per_beat})"
-                )
-            if len(new_colors) > policy.max_new_colors_per_beat:
-                raise ValueError(
-                    f"beat[{bi}] introduces {len(new_colors)} new colors "
-                    f"(max {policy.max_new_colors_per_beat})"
-                )
-            if len(beat.object_moving_ops) > policy.max_simultaneous_motion:
-                raise ValueError(
-                    f"beat[{bi}] has {len(beat.object_moving_ops)} concurrent "
-                    f"moving ops (max {policy.max_simultaneous_motion})"
-                )
-            if beat.narration and beat.narration.est_seconds > policy.max_narration_seconds:
-                raise ValueError(
-                    f"beat[{bi}] narration is {beat.narration.est_seconds}s "
-                    f"(max {policy.max_narration_seconds}s)"
-                )
+                        continue
 
         # --- 3D discipline: don't slam into 3D, pan into it ---
         if self.is_3d and self.begin_in_2d and not saw_camera_orientation:
@@ -877,16 +869,23 @@ class Scene(BaseModel):
 class StoryboardStep(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    move: StoryboardMove
-    goal: str                            # why we show this
-    scene_id: str                        # which Scene realizes it
+    scene_id: str                 # snake_case identifier, e.g., "scene_ball_rolls"
+    pedagogical_move: StoryboardMove   # the "why" of this step
+    pedagogical_goal: str         # what the viewer should *understand* after this step
+    visual_description: str       # what appears on screen, including colors, shapes, motion, camera
+    narration_script: str         # the actual spoken words (or key phrases)
+    viewer_question: Optional[str] = None  # a question we pose to the viewer (to engage prediction)
+    transition_from_previous: Optional[str] = None  # how we flow from the previous scene
+    emotional_tone: str           # e.g., curiosity, confusion, revelation, satisfaction
+    estimated_duration_seconds: int = 10  # rough pacing
 
 
 class Storyboard(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    goal: str                            # e.g. "Introduce Euler's formula"
-    steps: list[StoryboardStep] = Field(default_factory=list)
+    title: str                    # short title for the whole animation
+    overall_emotional_arc: str    # e.g., "Curiosity → Prediction → Failure → Insight → Awe"
+    steps: List[StoryboardStep]
 
 
 class Lecture(BaseModel):
@@ -896,10 +895,18 @@ class Lecture(BaseModel):
     topic: str
     subject: Subject
     greeting: str = ""                   # time-of-day aware (filled at runtime)
-    assumptions: list[str] = Field(default_factory=list)
-    objectives: list[str] = Field(default_factory=list)
-    opener: str = ""                     # the "solid opener" hook
-    learning_outcomes: list[str] = Field(default_factory=list)
+    needed_formulas: list[str] = Field(default_factory=list, description="List of formulas that will be used in the lecture for programmting the manim video.") 
+    class_names: list[str] = Field(default_factory=list, description="List of class names for each scenes that will be used in the lecture for programmting the manim video.")   
+    does_it_needs_3d: bool = Field(default=False, description="Does the lecture needs 3D scenes for programmting the manim video. Use true for 3D and false for only using the 2D.")
+    assumptions: list[str] = Field(default_factory=list, description="List of assumptions that will be used in the lecture for audience.")
+    list_of_external_library_needed: list[str] = Field(default_factory=list, description="List of external libraries that will be used in the lecture for programmting the manim video like scipy, numpy,networkx, etc.")
+    animation_needed: list[str] = Field(default_factory=list, description="List of Manim animations functions that will be needed in the lecture for programing the manim video like gradient_bowl, neural_network, etc.")
+    animation_updaters_needed: list[str] = Field(default_factory=list, description="List of animation updaters that will be used in the lecture for programmting the manim video like trace_path, track_endpoint, etc.")
+    camera_needed: list[str] = Field(default_factory=list, description="List of camera operations that will be used in the lecture for programmting the manim video like move_camera, pan_camera, etc.")
+    Mobjects_needed: list[str] = Field(default_factory=list, description="List of manim objects that will be used in the lecture for programmting the manim video like Circle, Square, etc.")
+    objectives: list[str] = Field(default_factory=list, description="List of objectives that will be used in the lecture for audience.")
+    opener: str = Field(default="", description="The 'solid opener' hook make it bit longer than a single sentence, but it should be a single paragraph that is the hook for the lecture. It should be a story or a question that makes the audience curious about the topic of the lecture.")
+    learning_outcomes: list[str] = Field(default_factory=list, description="List of learning outcomes that will be used in the lecture for audience.")
 
 
 class OpeningScene(BaseModel):
@@ -979,7 +986,7 @@ class LectureIR(BaseModel):
         for step in self.storyboard.steps:
             if step.scene_id not in scene_ids:
                 raise ValueError(
-                    f"storyboard step '{step.move.value}' references unknown "
+                    f"storyboard step '{step.pedagogical_move.value}' references unknown "
                     f"scene_id '{step.scene_id}'"
                 )
         return self

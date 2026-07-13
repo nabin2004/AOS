@@ -10,11 +10,11 @@ Two lectures' worth of slices:
                    Computation, leave a traced tail + a glowing endpoint dot,
                    with a rho ValueTracker as a runtime knob.
 
-Then we deliberately break the guards (old and new) to show they fire.
+Then we deliberately break structural guards to show they fire.
 """
 from manim_ir import (
     AmbientAnimation, AmbientType, Beat, Behavior, BehaviorType, Branding,
-    Camera, CognitiveLoadPolicy, ComputeLibrary, Computation, Direction,
+    Camera, ComputeLibrary, Computation, Direction,
     EntityType, Lecture, LectureIR, NarrationSegment, Operation,
     OperationType, Position, Quality, RateFunction, RenderConfig, Scene,
     SceneObject, SceneParameter, Storyboard, StoryboardMove, StoryboardStep,
@@ -273,25 +273,6 @@ if __name__ == "__main__":
 
     print("\nNegative tests (each SHOULD be rejected):")
 
-    # -- original guards still hold --
-    expect_failure("op before create", lambda: Scene(
-        id="bad1", class_name="Bad1",
-        scene_graph=[SceneObject(id="c", entity_type=EntityType.CIRCLE)],
-        beats=[Beat(animation_segment=[
-            Operation(target="c", op=OperationType.MOVE)])],
-    ))
-
-    expect_failure("2 equations in a beat", lambda: Scene(
-        id="bad2", class_name="Bad2",
-        scene_graph=[
-            SceneObject(id="e1", entity_type=EntityType.MATH_TEX),
-            SceneObject(id="e2", entity_type=EntityType.MATH_TEX),
-        ],
-        beats=[Beat(animation_segment=[
-            Operation(target="e1", op=OperationType.WRITE),
-            Operation(target="e2", op=OperationType.WRITE)])],
-    ))
-
     expect_failure("off-frame position", lambda: Position(x=99, y=0))
 
     expect_failure("dangling storyboard ref", lambda: LectureIR(
@@ -356,22 +337,5 @@ if __name__ == "__main__":
     expect_failure("wiki without query", lambda: SceneObject(
         id="w", entity_type=EntityType.MATH_TEX,
         symbol_source=SymbolSource.WIKIDATA))
-
-    # 14. stricter policy via validation context
-    print("\nStricter policy via context (max_new_objects_per_beat=1):")
-    strict = CognitiveLoadPolicy(max_new_objects_per_beat=1)
-    expect_failure("2 objects under strict policy", lambda: Scene.model_validate(
-        {
-            "id": "strict", "class_name": "Strict",
-            "scene_graph": [
-                {"id": "a", "entity_type": "circle"},
-                {"id": "b", "entity_type": "square"},
-            ],
-            "beats": [{"animation_segment": [
-                {"target": "a", "op": "create"},
-                {"target": "b", "op": "create"}]}],
-        },
-        context={"load_policy": strict},
-    ))
 
     print("\nRound-trip JSON schema export works:", bool(LectureIR.model_json_schema()))

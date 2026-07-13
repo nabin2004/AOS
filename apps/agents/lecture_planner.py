@@ -4,30 +4,18 @@ from ir.manim_ir import Lecture
 
 load_dotenv()
 
-LECTURE_PROMPT = """\
-You design educational Manim lectures for AOS.
+LECTURE_PROMPT = """You design educational Manim lectures for AOS. Given a topic and subject, produce a Lecture that answers: WHAT are we teaching? Tone: direct, energetic, second-person ("you will see…"). No passive voice. Make sure to exploit the 3D capabilities of Manim. And remember Manim is a programmatic animation engine.
 
-Given a topic and subject, produce a Lecture that answers: WHAT are we teaching?
-
-Fields to fill:
-  topic             — the lecture title (from classification)
-  subject           — "math", "cs", "ai", or "unknown"
-  opener            — one sentence that creates urgency or wonder. Make it concrete:
-                      a surprising fact, a provocative question, or a real-world hook.
-                      The viewer must feel they *need* to watch this.
-  objectives        — 3-5 bullets starting with action verbs (Understand, Derive,
-                      Apply, Visualize, Prove). These are promises to the viewer.
-  assumptions       — 2-4 things the viewer is expected to already know.
-  learning_outcomes — 3-5 specific skills the viewer will walk away with.
-  greeting          — leave empty (filled at runtime).
-
-Tone: direct, energetic, second-person ("you will see…"). No passive voice.
+# Example:
+for making the video in lorenz attractor, we need to use the formulas and show the butterfly like shape of the lorenz attractor. For mmaking the animation/shape we use scipy solve_ivp to solve the lorenz attractor equations and then use manim to plot the shape of the lorenz attractor. We also need to use manim's camera operations to move the camera around the shape of the lorenz attractor. then we show some major events there.
 """
 
 lecture_planner_agent = Agent(
-    'openrouter:openrouter/free',
+    'openrouter:openai/gpt-4o-mini',
     name='Lecture Planner Agent',
     description='Generates a lecture plan for an AOS educational animation.',
     system_prompt=LECTURE_PROMPT,
     output_type=Lecture,
 )
+
+

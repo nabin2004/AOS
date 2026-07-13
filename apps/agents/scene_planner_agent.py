@@ -1,43 +1,38 @@
 from pydantic_ai import Agent
 from dotenv import load_dotenv
-from ir.manim_ir import Scene
+from ir.manim_ir import Scene, StoryboardStep
 
 load_dotenv()
 
 SCENE_PROMPT = """\
-You build Manim scenes for AOS educational animations.
+You translate **one storyboard step** into a **scene brief** for downstream planners.
 
-Given a Storyboard, produce one Scene per storyboard step. Return a list of Scene objects.
+You do NOT design Manim objects, IR scene graphs, or entity types. A separate
+code writer agent will implement all visuals with full creative freedom.
 
-Each Scene answers: WHERE do things live? (No beats yet — leave beats empty.)
+Given one storyboard step, return exactly one Scene with:
 
-── SCENE SETUP ─────────────────────────────────────────────────────────────
-  id          — must match the storyboard step's scene_id
-  class_name  — PascalCase Python identifier, e.g. "GradientDescentScene"
-  title       — short human-readable scene title
-  is_3d       — True only when 3D is essential to the concept
-  begin_in_2d — always True for 3D scenes (warm up flat, then pan into 3D)
+- `id` — must match the storyboard step's `scene_id`
+- `class_name` — unique PascalCase (e.g. `GradientBowlScene`), never `GeneratedScene`
+- `title` — short human-readable title
+- `pedagogical_intent` — copy or paraphrase the step's `pedagogical_goal`
+- `visual_brief` — rich prose from `visual_description`: what the viewer literally
+  sees, colors/metaphors, spatial layout hints, emotional tone, and any viewer
+  question pause. This is the creative brief for the Manim code writer.
+- `is_3d` — true only when depth is explicitly required; default false
+- `begin_in_2d` — true when `is_3d` is true
+- `scene_graph` — always `[]`
+- `beats` — always `[]`
 
-── SCENE GRAPH (declare every object up-front) ──────────────────────────────
-  - All objects start with visible=False; a CREATE-family op makes them appear later.
-  - Use descriptive snake_case ids: "title_text", "loss_curve", "grad_arrow"
-  - Equations: entity_type="math_tex", params={"tex": r"\\nabla L"}
-  - Axes:      entity_type="axes",     params={"x_range":[-3,3,1], "y_range":[0,9,1]}
-  - Positions: |x| ≤ 7.0, |y| ≤ 4.0 (frame-safe zone — enforce this)
-
-── BEATS ───────────────────────────────────────────────────────────────────
-Leave beats as an empty list. The beat planner fills animation ops later.
-
-Cognitive-load limits (enforced downstream — design with these in mind):
-  ≤ 3 new objects per beat, ≤ 1 new equation per beat
-  ≤ 2 simultaneously moving ops per beat
-  Every target must be declared in scene_graph before its first beat
+Do not populate `scene_graph`. Do not prescribe shapes, entity types, or Manim APIs.
 """
 
 scene_planner_agent = Agent(
-    'openrouter:openrouter/free',
-    name='Scene Planner Agent',
-    description='Generates Manim scenes from a storyboard.',
+    "openrouter:openai/gpt-4o-mini",
+    name="Scene Planner Agent",
+    description="Produces a scene brief from one storyboard step.",
     system_prompt=SCENE_PROMPT,
-    output_type=list[Scene],
+    output_type=Scene,
+    deps_type=StoryboardStep,
+    retries=4,
 )

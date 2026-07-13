@@ -14,19 +14,24 @@ full LectureIR document that fixes every listed issue.
 
 Rules:
 - Preserve the original pedagogical intent (lecture content and storyboard order).
-- Fix reference integrity: every op target must exist in scene_graph before use.
-- Respect cognitive load limits per beat.
 - Ensure storyboard step.scene_id values match scene.id values.
 - Fill in missing fields with sensible defaults (branding, render, opening, ending).
 - Do not invent unrelated content — repair only what is broken or missing.
+
+You only edit the IR document itself. You do not compile, render, or execute
+anything — use validate_lecture_ir to check your fix before returning it.
 """
 
+_REPAIR_TOOLS = {"validate_lecture_ir"}
+repair_toolset = aos_toolset.filtered(lambda _ctx, tool_def: tool_def.name in _REPAIR_TOOLS)
+
 repair_agent = Agent(
-    'openrouter:openrouter/free',
+    'openrouter:openai/gpt-4o-mini',
     name='Repair Agent',
     description='Repairs the generated IR for correctness and completeness.',
     system_prompt=REPAIR_PROMPT,
     output_type=LectureIR,
-    toolsets=[aos_toolset],
+    toolsets=[repair_toolset],
     deps_type=ToolDeps,
+    retries=4,
 )

@@ -1,0 +1,13 @@
+[project]
+name = "tui"
+version = "0.1.0"
+description = "Textual TUI for browsing, searching, and playing AOS lectures/courses"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "store",
+    "textual>=0.80.0",
+]
+
+[tool.uv.sources]
+store = { workspace = true }

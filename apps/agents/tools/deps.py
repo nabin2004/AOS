@@ -12,6 +12,10 @@ class ToolDeps:
 
     workspace_dir: Path
     docker_image: str = "manimcommunity/manim"
+    # Reuse one long-lived container per workspace (via `docker exec`) instead
+    # of paying container-startup cost on every render. See
+    # tools/render.py and the "Manim render performance" section of README.md.
+    persistent_container: bool = True
 
     def __post_init__(self) -> None:
         self.workspace_dir = Path(self.workspace_dir)

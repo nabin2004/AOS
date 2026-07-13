@@ -1,53 +1,41 @@
 from pydantic_ai import Agent
 from dotenv import load_dotenv
-from ir.manim_ir import Beat
+from ir.manim_ir import Beat, Scene
 
 load_dotenv()
 
 BEAT_PROMPT = """\
-You generate animation beats for AOS Manim scenes.
+You generate **pedagogical beats** for ONE scene at a time.
 
-Given a list of Scene objects (with scene_graph populated, beats empty),
-return a flat list of Beat objects — one beat per visual idea across all scenes.
+A beat is a unit of MEANING for the viewer and narrator — not a list of Manim
+operations. A separate code writer will implement visuals with full freedom.
 
-Each beat = animate → hold. Leave narration=None (the narration agent fills it later.)
+Given a Scene (with `visual_brief`, `pedagogical_intent`, empty `beats`) and
+storyboard context, return 4–7 Beat objects for that scene only.
 
-── OPERATIONS ───────────────────────────────────────────────────────────────
-Every operation needs:
-  target    — SceneObject id (must be declared in scene_graph)
-  op        — operation type (see below)
-  run_time  — seconds: 0.5–2.0 for most; must be 0 for "remove"
-  rate_func — "smooth" (default) | "ease_in_out" | "rush_into" | "linear"
-  params    — op-specific dict
+Each beat must include:
+- `visual_intent` — prose describing what the viewer sees and learns this beat
+- `animation_seconds` — how long the animation runs before the hold (0.5–3.0)
+- `hold_seconds` — pause after animation while narration plays (0.5–2.5; longer
+  before a reveal when a viewer question is present)
+- `animation_segment` — always `[]` (code writer owns Manim)
+- `narration` — leave None (narration agent fills later)
+- `ambient` — leave `[]`; mention subtle motion in `visual_intent` if needed
 
-Introduction (makes object appear):
-  create, write, fade_in, draw_border, grow, transform_from_copy
-
-Transformation:
-  transform, morph, move, shift, rotate, scale
-
-Emphasis (no state change):
-  highlight, flash, flash_around, circumscribe, wiggle, recolor
-
-Removal:
-  fade_out, uncreate, remove (instant; run_time must be 0)
-
-Camera (3D scenes only):
-  set_camera_orientation (target="__camera__")
-
-── BEAT FIELDS ──────────────────────────────────────────────────────────────
-  animation_segment — ordered list of Operation
-  hold_seconds      — pause after animation ends (0.5–2.0 s)
-  narration         — leave None
-  ambient           — optional subtle motion during hold (blinking, glow, etc.)
-
-Defaults: rate_func="smooth", run_time=1.0. Aim for 4-7 beats per scene.
+Rules:
+- One beat = one pedagogical moment. Group related visual changes together.
+- Do not split syntax-level actions into separate beats.
+- If the storyboard has a viewer question, delay the reveal beat and use longer
+  `hold_seconds` on earlier beats so the viewer can guess.
+- Aim for 4–7 beats total per scene.
 """
 
 beat_planner_agent = Agent(
-    'openrouter:openrouter/free',
-    name='Beat Planner Agent',
-    description='Generates animation beats for Manim scenes.',
+    "openrouter:openai/gpt-4o-mini",
+    name="Beat Planner Agent",
+    description="Generates pedagogical beats for one scene.",
     system_prompt=BEAT_PROMPT,
     output_type=list[Beat],
+    deps_type=Scene,
+    retries=4,
 )

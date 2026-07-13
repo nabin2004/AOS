@@ -80,7 +80,7 @@ import dspy
 from apps.agents.prompt_optimization.dspy.programs import ClassifierProgram
 from apps.agents.prompt_optimization.dspy.metrics import classification_score
 
-dspy.configure(lm=dspy.LM("openrouter/openrouter/free"))
+dspy.configure(lm=dspy.LM("openrouter/google/gemini-2.5-flash-lite"))
 
 optimizer = dspy.BootstrapFewShot(metric=classification_score)
 compiled = optimizer.compile(ClassifierProgram(), trainset=your_trainset)
@@ -116,4 +116,4 @@ Each `.jsonl` line is a JSON object with at minimum `"input"` and `"subject"`. A
 ```
 
 **Models**
-The default model is `openrouter/openrouter/free` for both the task and reflection LM. Swap them via `GEPAConfig.task_model` / `reflection_model`, and set `OPENROUTER_API_KEY` in `.env`.
+The default model is `openrouter/google/gemini-2.5-flash-lite` for both the task and reflection LM. Swap them via `GEPAConfig.task_model` / `reflection_model`, and set `OPENROUTER_API_KEY` in `.env`.

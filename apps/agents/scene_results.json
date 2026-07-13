@@ -1,0 +1,164 @@
+{
+  "ctx_state_scenes": [
+    {
+      "id": "scene_mountain_climb",
+      "class_name": "MountainClimbScene",
+      "title": "Navigating Uncertainty",
+      "pedagogical_intent": "Engage the viewer by presenting an analogy related to SGD.",
+      "visual_brief": "In this scene, we open with a climber standing on a foggy mountain path. The atmosphere is thick with mist, and visibility is low, symbolizing uncertainty. The climber, dressed in typical hiking gear, looks determined yet confused, glancing around as if assessing the best direction. The camera slowly zooms in on the climber's face, capturing the mix of determination and uncertainty. The overall emotional tone evokes curiosity, prompting the viewer to consider the challenges of decision-making. As the camera focuses on the climber, a viewer question appears: 'What do you think would be the best strategy to reach the peak?' inviting reflection on the analogy presented.",
+      "reusable": false,
+      "template": null,
+      "runtime_params": [],
+      "is_3d": false,
+      "begin_in_2d": true,
+      "camera": {
+        "center": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "next_to": null,
+          "direction": null,
+          "buff": 0.25
+        },
+        "zoom": 1.0,
+        "phi": 0.0,
+        "theta": 0.0,
+        "is_3d": false
+      },
+      "scene_graph": [],
+      "trackers": [],
+      "computations": [],
+      "beats": [],
+      "enter_transition": null,
+      "exit_transition": null
+    },
+    {
+      "id": "scene_sgd_explained",
+      "class_name": "StochasticGradientDescentScene",
+      "title": "Navigating the Fog of Decision-Making",
+      "pedagogical_intent": "Introduce the concept of Stochastic Gradient Descent by connecting it to decision-making in the fog.",
+      "visual_brief": "In this scene, we see a climber moving cautiously forward through a foggy landscape. The fog begins to lift slightly, revealing a rugged mountain path ahead. Each careful step the climber takes is marked with visual indicators, such as arrows or gradient lines, that represent the slope of the terrain guiding their ascent. The emotional atmosphere is one of intrigue, as viewers can empathize with the climber's cautious exploration. As the climber navigates, the question hangs in the air: 'How do you think this approach might affect your progress?' giving viewers a moment to reflect on the concept being introduced.",
+      "reusable": false,
+      "template": null,
+      "runtime_params": [],
+      "is_3d": false,
+      "begin_in_2d": true,
+      "camera": {
+        "center": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "next_to": null,
+          "direction": null,
+          "buff": 0.25
+        },
+        "zoom": 1.0,
+        "phi": 0.0,
+        "theta": 0.0,
+        "is_3d": false
+      },
+      "scene_graph": [],
+      "trackers": [],
+      "computations": [],
+      "beats": [],
+      "enter_transition": null,
+      "exit_transition": null
+    },
+    {
+      "id": "scene_comparison_with_gd",
+      "class_name": "SGDvsStandardGradientDescentScene",
+      "title": "Comparing SGD and Standard Gradient Descent",
+      "pedagogical_intent": "Clarify how SGD differs from standard gradient descent.",
+      "visual_brief": "The scene is split into two halves to illustrate a comparison between standard gradient descent and stochastic gradient descent (SGD). On the left side, there is a smooth visual of traditional gradient descent: a figure gracefully takes steady steps down a gentle hill, emphasizing the consistency of the method. On the right side, a climber takes energetic, zigzagging steps down a rugged, uneven slope, symbolizing the variable nature of SGD, where each step is influenced by the randomness of data points. The visuals should evoke a thoughtful tone as viewers reflect on the differences. A viewer question appears on screen asking, 'Which method do you think would be faster in practice?' inviting contemplation.",
+      "reusable": false,
+      "template": null,
+      "runtime_params": [],
+      "is_3d": false,
+      "begin_in_2d": true,
+      "camera": {
+        "center": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "next_to": null,
+          "direction": null,
+          "buff": 0.25
+        },
+        "zoom": 1.0,
+        "phi": 0.0,
+        "theta": 0.0,
+        "is_3d": false
+      },
+      "scene_graph": [],
+      "trackers": [],
+      "computations": [],
+      "beats": [],
+      "enter_transition": null,
+      "exit_transition": null
+    },
+    {
+      "id": "scene_trade_offs",
+      "class_name": "StochasticVsStandardScene",
+      "title": "SGD vs. Standard Gradient Descent",
+      "pedagogical_intent": "Provide a specific example of when SGD outperforms standard gradient descent.",
+      "visual_brief": "The scene presents two models being trained side by side. On the left, the Stochastic Gradient Descent (SGD) model exhibits rapid convergence, depicted by a jagged but steep ascent towards a target goal. It shows dynamic updates with each new data point, emanating a sense of urgency and quick movement. In contrast, the right side displays the standard gradient descent model, represented by a smooth, steady slope, indicating a slower, more consistent descent toward the same target. The background is animated with subtle color shifts to underscore the speed differences, and there\u2019s a moment where the viewer is prompted to reflect: 'What scenarios can you imagine where quick updates are essential?'. The overall tone is engaging, inviting viewers to consider the implications of fast convergence in machine learning.",
+      "reusable": false,
+      "template": null,
+      "runtime_params": [],
+      "is_3d": false,
+      "begin_in_2d": true,
+      "camera": {
+        "center": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "next_to": null,
+          "direction": null,
+          "buff": 0.25
+        },
+        "zoom": 1.0,
+        "phi": 0.0,
+        "theta": 0.0,
+        "is_3d": false
+      },
+      "scene_graph": [],
+      "trackers": [],
+      "computations": [],
+      "beats": [],
+      "enter_transition": null,
+      "exit_transition": null
+    },
+    {
+      "id": "scene_final_insights",
+      "class_name": "SummitInsightsScene",
+      "title": "Final Insights from the Lecture",
+      "pedagogical_intent": "Wrap up the lecture by summarizing key insights and applications.",
+      "visual_brief": "The scene opens with a vivid depiction of a clear mountain summit, representing achievement and success. On one side of the summit, key points from the session are elegantly listed, featuring phrases like 'quick updates,' 'handling large data,' and 'adaptability.' The overall color palette radiates a sense of accomplishment, with bright blues and greens symbolizing clarity and hope. As the viewer observes this tranquil summit view, a gentle sense of satisfaction washes over them, pausing briefly to reflect on the insights gained. The narration echoes the importance of Stochastic Gradient Descent in navigating optimization landscapes, establishing a connection to real-world applications. The emotional tone should resonate with feelings of fulfillment and forward-looking optimism. Following the previous visuals of climbing, we transition smoothly to this serene summit, embodying the sense of conclusion.",
+      "reusable": false,
+      "template": null,
+      "runtime_params": [],
+      "is_3d": false,
+      "begin_in_2d": true,
+      "camera": {
+        "center": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "next_to": null,
+          "direction": null,
+          "buff": 0.25
+        },
+        "zoom": 1.0,
+        "phi": 0.0,
+        "theta": 0.0,
+        "is_3d": false
+      },
+      "scene_graph": [],
+      "trackers": [],
+      "computations": [],
+      "beats": [],
+      "enter_transition": null,
+      "exit_transition": null
+    }
+  ]
+}

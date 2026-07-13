@@ -10,3 +10,6 @@ wheels/
 .venv
 
 .env
+
+# Runtime Manim workspace (created by ToolDeps at startup)
+apps/agents/workspace/

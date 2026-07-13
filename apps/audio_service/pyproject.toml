@@ -8,3 +8,10 @@ dependencies = [
     "pocket-tts>=0.1.0",
     "scipy>=1.14.0",
 ]
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["narrator", "main"]

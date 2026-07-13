@@ -7,7 +7,9 @@ authors = [
     { name = "nabin2004", email = "olinabin2004@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "pydantic>=2.0.0",
+]
 
 [project.scripts]
 ir = "ir:main"

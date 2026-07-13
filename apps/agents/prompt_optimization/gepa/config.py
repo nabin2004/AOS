@@ -6,8 +6,8 @@ from typing import Literal
 class GEPAConfig:
     """Configuration for one dspy.GEPA prompt optimization run."""
 
-    task_model: str = "openrouter/openrouter/free"
-    reflection_model: str = "openrouter/openrouter/free"
+    task_model: str = "openrouter/google/gemini-2.5-flash-lite"
+    reflection_model: str = "openrouter/google/gemini-2.5-flash-lite"
 
     # Budget — exactly one of these is passed to dspy.GEPA.
     auto: Literal["light", "medium", "heavy"] | None = "light"

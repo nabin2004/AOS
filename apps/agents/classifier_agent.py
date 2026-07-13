@@ -1,14 +1,11 @@
 from pydantic import BaseModel
 from pydantic_ai import Agent
 from dotenv import load_dotenv
-from ir.manim_ir import Subject
+from ir.manim_ir import Classification
 
 load_dotenv()
 
 
-class Classification(BaseModel):
-    subject: Subject
-    topic: str
 
 
 CLASSIFICATION_PROMPT = """\
@@ -33,7 +30,7 @@ Rules:
 """
 
 classifier_agent = Agent(
-    'openrouter:openrouter/free',
+    'openrouter:openai/gpt-4o-mini',
     name='Classifier Agent',
     description='Classifies a user request into a subject domain and topic name. If its out of domain, returns unknown.',
     system_prompt=CLASSIFICATION_PROMPT,

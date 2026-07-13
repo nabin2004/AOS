@@ -4,12 +4,30 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "store",
+    "typer>=0.12.0",
+    "rich>=13.0.0",
+    "terminaltexteffects>=0.11.0",
+    "pydantic-ai-slim[google]>=2.5.0",
+    "pydantic-ai-harness[code-mode]>=0.6.0",
+]
+
+[tool.uv.sources]
+store = { workspace = true }
 
 [tool.uv.workspace]
 members = [
     "packages/ir",
     "packages/schemas",
+    "packages/store",
     "apps/agents",
     "apps/server",
+    "apps/audio_service",
+    "apps/tui",
+    "prepdata",
+    "apps/manimator",
+    "apps/manimator/agents",
+    "apps/manimator/manim_agents",
+    "apps/mcpservers",
 ]

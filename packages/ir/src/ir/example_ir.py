@@ -3,13 +3,13 @@ Golden example + validator smoke test.
 
 Builds a slice of the Euler's-formula lecture described from Grant
 Sanderson's talk (unit circle -> e^{i pi} = -1 -> i^2 = -1 -> a+bi on the
-complex plane), then deliberately breaks three rules to show the guards fire.
+complex plane), then deliberately breaks structural rules to show the guards fire.
 """
 from .manim_ir import (
     AmbientAnimation, AmbientType, Beat, Branding, Camera, EntityType,
     Lecture, LectureIR, NarrationSegment, Operation, OperationType, Position,
     Scene, SceneObject, Storyboard, StoryboardStep, StoryboardMove, Style,
-    Subject, Direction, CognitiveLoadPolicy,
+    Subject, Direction,
 )
 from pydantic import ValidationError
 
@@ -134,54 +134,17 @@ if __name__ == "__main__":
 
     print("\nNegative tests (each SHOULD be rejected):")
 
-    # 1. operate on an object before creating it
-    expect_failure("op before create", lambda: Scene(
-        id="bad1",
-        scene_graph=[SceneObject(id="c", entity_type=EntityType.CIRCLE)],
-        beats=[Beat(animation_segment=[
-            Operation(target="c", op=OperationType.MOVE)])],
-    ))
-
-    # 2. too many new equations in one beat (cognitive load: max 1)
-    expect_failure("2 equations in a beat", lambda: Scene(
-        id="bad2",
-        scene_graph=[
-            SceneObject(id="e1", entity_type=EntityType.MATH_TEX),
-            SceneObject(id="e2", entity_type=EntityType.MATH_TEX),
-        ],
-        beats=[Beat(animation_segment=[
-            Operation(target="e1", op=OperationType.WRITE),
-            Operation(target="e2", op=OperationType.WRITE)])],
-    ))
-
-    # 3. object placed off the safe frame
+    # 1. object placed off the safe frame
     expect_failure("off-frame position",
                    lambda: Position(x=99, y=0))
 
-    # 4. storyboard references a scene that doesn't exist
+    # 2. storyboard references a scene that doesn't exist
     expect_failure("dangling storyboard ref", lambda: LectureIR(
         lecture=Lecture(topic="x", subject=Subject.CS),
         storyboard=Storyboard(goal="g", steps=[
             StoryboardStep(move=StoryboardMove.INTRODUCE, goal="g",
                            scene_id="ghost")]),
         scenes=[],
-    ))
-
-    # Show the load policy is overridable per-lecture via validation context
-    print("\nStricter policy via context (max_new_objects_per_beat=1):")
-    strict = CognitiveLoadPolicy(max_new_objects_per_beat=1)
-    expect_failure("2 objects under strict policy", lambda: Scene.model_validate(
-        {
-            "id": "strict",
-            "scene_graph": [
-                {"id": "a", "entity_type": "circle"},
-                {"id": "b", "entity_type": "square"},
-            ],
-            "beats": [{"animation_segment": [
-                {"target": "a", "op": "create"},
-                {"target": "b", "op": "create"}]}],
-        },
-        context={"load_policy": strict},
     ))
 
     print("\nRound-trip JSON schema export works:", bool(LectureIR.model_json_schema()))

@@ -12,8 +12,11 @@ WHERE do things live and WHAT happens beat by beat?
 ── SCENE GRAPH (declare every object up-front) ──────────────────────────────
   - All objects start with visible=False; a CREATE-family op makes them appear.
   - Use descriptive snake_case ids: "title_text", "loss_curve", "grad_arrow"
-  - Equations: entity_type="math_tex", params={"tex": r"\\nabla L"}
+  - Equations: entity_type="math_tex", content=r"\\nabla L"   (LaTeX, no $ delimiters)
+  - Plain text: entity_type="text",    content="Gradient Descent"
   - Axes:      entity_type="axes",     params={"x_range":[-3,3,1], "y_range":[0,9,1]}
+  - Every math_tex / text object MUST have a non-empty `content` string —
+    this is the literal thing shown on screen, not optional metadata.
   - Positions: |x| ≤ 7.0, |y| ≤ 4.0 (frame-safe zone — enforce this)
 
 ── BEATS (one visual idea each) ─────────────────────────────────────────────
