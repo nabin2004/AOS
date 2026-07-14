@@ -4,6 +4,11 @@ from pydantic_ai_harness import CodeMode
 from tools import compile_manim_code, manim_write
 from tools.manim_docs import manim_doc_rag
 from tools.voiceover import voiceover_tools
+import logfire
+import logfire
+
+logfire.configure()
+logfire.instrument_pydantic_ai()
 
 load_dotenv()
 
