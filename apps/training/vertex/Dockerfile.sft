@@ -1,0 +1,41 @@
+# SFT training image for Vertex AI Custom Jobs.
+# Build from repo root:
+#   docker build -f apps/training/vertex/Dockerfile.sft -t aos-sft .
+
+FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PIP_NO_CACHE_DIR=1
+ENV HF_HOME=/tmp/hf
+ENV TRANSFORMERS_CACHE=/tmp/hf
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/aos
+
+COPY apps/sft/pyproject.toml apps/sft/
+COPY apps/sft/*.py apps/sft/
+COPY apps/training/wandb_env.py apps/training/
+COPY apps/training/vertex/env.py apps/training/vertex/gcs_download.py apps/training/vertex/
+COPY apps/training/vertex/entrypoint_sft.sh /entrypoint.sh
+
+RUN pip install --upgrade pip && pip install \
+    "accelerate>=1.0.0" \
+    "bitsandbytes>=0.45.0" \
+    "datasets>=5.0.0" \
+    "peft>=0.19.1" \
+    "transformers>=4.50.0" \
+    "trl>=1.9.0" \
+    "wandb>=0.19.0" \
+    "google-cloud-storage>=2.19.0"
+
+RUN chmod +x /entrypoint.sh
+
+WORKDIR /opt/aos/apps/sft
+ENTRYPOINT ["/entrypoint.sh"]

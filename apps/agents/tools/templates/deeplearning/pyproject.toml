@@ -1,0 +1,16 @@
+[project]
+name = "manim-deeplearning"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["manim>=0.18", "torch>=2.0"]
+
+[project.entry-points."manim.plugins"]
+manim_deeplearning = "manim_deeplearning"
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["manim_deeplearning*"]

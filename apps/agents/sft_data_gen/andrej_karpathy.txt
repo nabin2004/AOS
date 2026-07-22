@@ -1,0 +1,189 @@
+Micrograd – Autograd Engine
+Micrograd – Scalar Autograd
+Micrograd – Building a Neural Network Library
+Micrograd – Backpropagation from First Principles
+Micrograd – Manual Gradient Computation
+Micrograd – Training a Neural Network with Micrograd
+Micrograd – Computational Graph for Neural Networks
+Building makemore – Bigram Character-Level Language Model
+Bigram Language Model – Character-Level
+Bigram Language Model – Probability Estimation
+Bigram Language Model – Training and Sampling
+Bigram Language Model – Negative Log Likelihood Loss
+Bigram Language Model – Model Evaluation
+Bigram Language Model – Generating Text from Bigram Model
+Introducing torch.Tensor for Neural Networks
+torch.Tensor – Subtleties and Efficient Evaluation
+torch.Tensor – Tensor Operations for Neural Nets
+torch.Tensor – Broadcasting and Tensor Shapes
+torch.Tensor – Automatic Differentiation with Autograd
+Language Modeling Framework – Training, Sampling, Loss Evaluation
+Language Modeling – Autoregressive Framework
+Language Modeling – Character-Level Modeling
+Language Modeling – Sequence Prediction
+MLP – Multilayer Perceptron Character-Level Language Model
+MLP – Implementing a Multilayer Perceptron
+MLP – Embedding Layer for Characters
+MLP – Linear Layers and Activation Functions
+MLP – Forward Pass and Loss Computation
+MLP – Training Loop and Optimization
+MLP – Learning Rate Tuning
+MLP – Hyperparameter Tuning
+MLP – Train/Dev/Test Splits
+MLP – Underfitting and Overfitting
+MLP – Model Evaluation and Diagnostics
+MLP – Negative Log Likelihood for Classification
+MLP – Softmax for Output Probabilities
+MLP – Cross-Entropy Loss
+MLP – Embedding Table and Character Vectors
+Activations, Gradients, and Batch Normalization
+MLP Internals – Forward Pass Activations Statistics
+MLP Internals – Backward Pass Gradients Statistics
+MLP Internals – Activation Scaling Pitfalls
+MLP Internals – Gradient Scaling Pitfalls
+MLP Internals – Xavier/Glorot Initialization
+MLP Internals – Weight Initialization for Deep Networks
+Diagnostic Tools for Neural Networks – Visualizations
+Diagnostic Tools – Activation Histograms
+Diagnostic Tools – Gradient Histograms
+Diagnostic Tools – Monitoring Training Health
+Batch Normalization – Modern Innovation for Deep Networks
+Batch Normalization – Forward Pass Statistics
+Batch Normalization – Backward Pass Gradients
+Batch Normalization – Training vs Inference Mode
+Batch Normalization – Reducing Internal Covariate Shift
+Batch Normalization – Implementation Details
+Batch Normalization – Effect on Gradient Flow
+Batch Normalization – Scaling and Shifting Parameters
+Batch Normalization – Running Mean and Variance
+Residual Connections – Notable Todo
+Adam Optimizer – Notable Todo
+Becoming a Backprop Ninja – Manual Backpropagation
+Backpropagation Ninja – Manual Gradient Through MLP with BatchNorm
+Backpropagation Ninja – Manual Gradient Through Cross-Entropy Loss
+Backpropagation Ninja – Manual Gradient Through Linear Layers
+Backpropagation Ninja – Manual Gradient Through Tanh Activation
+Backpropagation Ninja – Manual Gradient Through BatchNorm
+Backpropagation Ninja – Manual Gradient Through Embedding Table
+Backpropagation Ninja – Manual Gradient Through Entire Compute Graph
+Backpropagation Ninja – Understanding Gradient Flow
+Backpropagation Ninja – Efficient Tensor-Level Gradients
+Backpropagation Ninja – Building Intuition for Optimization
+Backpropagation Ninja – Debugging Neural Networks
+Building WaveNet – Deep Convolutional Language Model
+WaveNet – Tree-Like Hierarchical Architecture
+WaveNet – Dilated Causal Convolutions (Not Yet Covered)
+WaveNet – Causal Convolutions for Language Modeling
+WaveNet – Receptive Field and Context Size
+WaveNet – Residual Connections in WaveNet
+WaveNet – Gated Activations
+WaveNet – Training Deeper Networks
+torch.nn – Understanding the Module System
+torch.nn – Building Neural Network Layers
+torch.nn – Under the Hood of PyTorch Modules
+torch.nn – Parameter Management and Registration
+Deep Learning Development Process – Reading Documentation
+Deep Learning Development Process – Tracking Tensor Shapes
+Deep Learning Development Process – Jupyter Notebooks to Production
+Deep Learning Development Process – Iterative Model Improvement
+Building GPT – Generatively Pretrained Transformer
+GPT – Attention is All You Need Paper
+GPT – Transformer Architecture Implementation
+GPT – Multi-Head Self-Attention
+GPT – Causal Self-Attention for Autoregressive Generation
+GPT – Scaled Dot-Product Attention
+GPT – Positional Encoding
+GPT – Transformer Block
+GPT – Layer Normalization in Transformers
+GPT – Feedforward Neural Network in Transformer
+GPT – Residual Connections in Transformers
+GPT – Training a GPT Model
+GPT – GPT-2 / GPT-3 Architecture Connections
+GPT – ChatGPT Connections
+GPT – Autoregressive Language Modeling
+GPT – Tokenization and Byte-Pair Encoding (BPE) (covered in minBPE)
+GPT – Pretraining and Fine-Tuning
+GPT – Generative Pretraining
+GPT – Token Prediction and Sampling
+GPT – Temperature Sampling for Generation
+GPT – Top-K and Top-P Sampling
+GPT – Text Generation with GPT
+minBPE – Byte-Pair Encoding Tokenization
+minBPE – Building a Minimal BPE Tokenizer
+minBPE – Training a BPE Tokenizer
+minBPE – Encoding and Decoding with BPE
+minBPE – Special Tokens and Control Tokens
+minBPE – Handling Unknown Tokens
+Tokenization – Importance for Language Models
+Tokenization – Subword Tokenization
+Tokenization – Vocabulary Size and Model Capacity
+Neural Networks from Scratch – Building Everything from Code
+Neural Networks – Fundamentals to Advanced
+Neural Networks – Coding and Training Together
+Neural Networks – Practical Applications
+Neural Networks – Hands-On Learning Approach
+Backpropagation – Spelled-Out Explanation
+Backpropagation – Step-by-Step Derivations
+Backpropagation – Chain Rule for Neural Networks
+Backpropagation – Gradients Through Computations
+Backpropagation – Training Neural Networks Efficiently
+Autograd – Automatic Differentiation in PyTorch
+Autograd – Computational Graphs for Backpropagation
+Autograd – Gradient Accumulation and Zeroing
+PyTorch – Using PyTorch for Deep Learning
+PyTorch – Tensor Operations and Autograd
+PyTorch – Building Models with torch.nn
+PyTorch – Optimizers and Training Loops
+PyTorch – Data Loading and Batching
+Language Models – Building from Bigram to GPT
+Language Models – Autoregressive Framework
+Language Models – Training Objectives
+Language Models – Evaluation Metrics (Loss, Perplexity)
+Language Models – Sampling Strategies
+Language Models – Generative Capabilities
+Character-Level Language Models – Bigram and MLP
+Character-Level Language Models – Training on Character Data
+Character-Level Language Models – Generating Text
+Optimization – Gradient Descent and Variants
+Optimization – Learning Rate Scheduling
+Optimization – Hyperparameter Tuning
+Optimization – Train/Dev/Test Splits
+Optimization – Underfitting and Overfitting Diagnosis
+Activation Functions – Tanh, ReLU, and Others
+Activation Functions – Gradient Flow and Saturation
+Activation Functions – Choice for Different Layers
+Weight Initialization – Impact on Training
+Weight Initialization – Xavier, He, and Orthogonal
+Training Deep Networks – Fragility and Pitfalls
+Training Deep Networks – Diagnostic Visualizations
+Training Deep Networks – Batch Normalization Benefits
+Deep Learning Development – Practical Workflow
+Deep Learning Development – Debugging and Troubleshooting
+Deep Learning Development – Experiment Tracking
+Deep Learning Development – Reproducibility
+Modern Deep Neural Networks – From Basics to GPT
+Deep Neural Networks – Architecture Design Principles
+Deep Neural Networks – Scaling and Performance
+GPT – Implementation from Scratch
+GPT – Training on Large Text Corpora
+GPT – Inference and Generation
+GPT – Scaling Laws and Model Sizes
+GPT – Attention Mechanism Intuition
+GPT – Query, Key, Value in Attention
+GPT – Masked Attention for Autoregressive
+GPT – Transformer Decoder Architecture
+NLP – Natural Language Processing with Neural Networks
+NLP – Language Modeling Fundamentals
+NLP – Autoregressive Text Generation
+NLP – Evaluating Language Models
+LLM – Large Language Models Foundations
+LLM – Building GPT from Scratch
+LLM – Connections to ChatGPT and GPT-3
+LLM – Pretraining and Fine-Tuning
+LLM – Applications and Capabilities
+GitHub Copilot – AI-Assisted Coding
+GitHub Copilot – GPT Model for Code Generation
+Deep Learning – Transferable Skills to Other Domains (Computer Vision, etc.)
+Deep Learning – Immediate Applicability of Language Models
+Deep Learning – Code-First Approach
+Deep Learning – Intuitive Understanding of Neural Nets

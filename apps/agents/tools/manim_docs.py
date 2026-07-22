@@ -1,25 +1,17 @@
 from __future__ import annotations
-import sys
-from pathlib import Path
 from typing import Callable
-
-_MCPSERVERS_DIR = Path(__file__).resolve().parents[2] / "mcpservers"
 
 _index = None
 _embedder = None
 _SEARCH_TOP_K = 5
 
 
-
 def _get_index():
     """Lazy-load index + embedder on first search (avoids slow import)."""
     global _index, _embedder, _SEARCH_TOP_K
     if _index is None:
-        path = str(_MCPSERVERS_DIR)
-        if path not in sys.path:
-            sys.path.insert(0, path)
-        from mcpservers.config import SEARCH_TOP_K
-        from mcpservers.vector_index import get_or_build_index
+        from config import SEARCH_TOP_K
+        from vector_index import get_or_build_index
 
         _SEARCH_TOP_K = SEARCH_TOP_K
         _index, _embedder, _ = get_or_build_index()

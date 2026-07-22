@@ -1,0 +1,24 @@
+[project]
+name = "grpo"
+version = "0.1.0"
+description = "GRPO Phase 2 training on ManiBench with stacked SFT LoRA"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bitsandbytes>=0.45.0",
+    "datasets>=5.0.0",
+    "huggingface-hub>=0.27.0",
+    "peft>=0.19.1",
+    "torch>=2.5.0",
+    "transformers>=4.50.0",
+    "trl>=1.9.0",
+    "unsloth",
+    "wandb>=0.19.0",
+]
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["config", "manibench", "model", "rewards", "run", "trainer"]

@@ -6,8 +6,12 @@ from typing import Callable
 
 import scipy.io.wavfile
 
+import dbos_setup  # noqa: F401 — configure DBOS before @DBOS.step
+from dbos import DBOS
+
 from narrator import DEFAULT_VOICE, Narrator
 from tools.coder_workspace import (
+    OutputDirError,
     load_manifest,
     record_step,
     resolve_output_dir,
@@ -37,6 +41,7 @@ def _wav_duration_seconds(path: Path) -> float:
     return round(data.shape[0] / rate, 2)
 
 
+@DBOS.step()
 def synthesize_narration(
     text: str,
     voice: str = DEFAULT_VOICE,
@@ -84,6 +89,14 @@ def synthesize_narration(
             voice=voice,
             manifest=str(workspace / "manifest.json"),
             message=f"Synthesized narration to {wav_path}.",
+        )
+    except OutputDirError as e:
+        return result_json(
+            ok=False,
+            step="narration",
+            output_dir=output_dir,
+            error="invalid_output_dir",
+            message=str(e),
         )
     except Exception as e:
         return result_json(

@@ -1,0 +1,23 @@
+[project]
+name = "sft"
+version = "0.1.0"
+description = "Gemma 4 LoRA fine-tuning on Code Agent trajectories"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "accelerate>=1.0.0",
+    "bitsandbytes>=0.45.0",
+    "datasets>=5.0.0",
+    "peft>=0.19.1",
+    "torch>=2.5.0",
+    "transformers>=4.50.0",
+    "trl>=1.9.0",
+    "wandb>=0.19.0",
+]
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["config", "data", "model", "run", "trainer"]

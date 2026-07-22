@@ -1,0 +1,12 @@
+# This file is used internally by FFMPEG.
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1840948755_276317845_223132457.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_1432596116_1238047419.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_4243562946_2998698785.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_4058975763_596073307.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_2872842549_3870617330.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_2988739725_3454067567.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_1432596116_918738581.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_3264197329_3622118492.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_647905925_2771321934.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_1432596116_3756965072.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Branding/1920800317_2872842549_631829896.mp4'

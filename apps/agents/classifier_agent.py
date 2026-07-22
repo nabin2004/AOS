@@ -1,12 +1,8 @@
-from pydantic import BaseModel
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import Classification
 
 load_dotenv()
-
-
-
 
 CLASSIFICATION_PROMPT = """\
 You are a subject classifier for AOS, an educational Manim lecture generator
@@ -30,9 +26,9 @@ Rules:
 """
 
 classifier_agent = Agent(
-    'openrouter:openai/gpt-4o-mini',
-    name='Classifier Agent',
-    description='Classifies a user request into a subject domain and topic name. If its out of domain, returns unknown.',
+    "openrouter:openai/gpt-4o-mini",
+    name="Classifier Agent",
+    description="Classifies a user request into a subject domain and topic name. If its out of domain, returns unknown.",
     system_prompt=CLASSIFICATION_PROMPT,
     output_type=Classification,
 )

@@ -30,14 +30,22 @@ class AgentProfile:
 # Per-agent rules for final_answer conversion (all graph agents).
 AGENT_PROFILES: dict[str, AgentProfile] = {
     "Classifier Agent": AgentProfile("Classifier Agent", FinalOutputMode.JSON),
-    "Lecture Planner Agent": AgentProfile("Lecture Planner Agent", FinalOutputMode.JSON),
-    "Storyboard Planner Agent": AgentProfile("Storyboard Planner Agent", FinalOutputMode.JSON),
+    "Lecture Planner Agent": AgentProfile(
+        "Lecture Planner Agent", FinalOutputMode.JSON
+    ),
+    "Storyboard Planner Agent": AgentProfile(
+        "Storyboard Planner Agent", FinalOutputMode.JSON
+    ),
     "Scene Planner Agent": AgentProfile("Scene Planner Agent", FinalOutputMode.JSON),
     "Beat Planner Agent": AgentProfile("Beat Planner Agent", FinalOutputMode.JSON),
-    "Narration Planner Agent": AgentProfile("Narration Planner Agent", FinalOutputMode.JSON),
+    "Narration Planner Agent": AgentProfile(
+        "Narration Planner Agent", FinalOutputMode.JSON
+    ),
     "Manim Code Writer": AgentProfile(
         "Manim Code Writer", FinalOutputMode.SOURCE, source_field="source"
     ),
+    # Prefer --format tool_trace for Code Agent SFT (CodeMode + workspace tools).
+    # final_answer stays TEXT (summary); tool_trace keeps write/compile/narration turns.
     "Code Agent": AgentProfile("Code Agent", FinalOutputMode.TEXT),
     "Inspector Agent": AgentProfile("Inspector Agent", FinalOutputMode.JSON),
     "Validation Agent": AgentProfile("Validation Agent", FinalOutputMode.JSON),

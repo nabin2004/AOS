@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from pydantic_ai.messages import ModelMessage, ModelMessagesTypeAdapter
+
 from export_traces.config import VALIDATION_FEEDBACK_PREFIX
 
 PartType = str
@@ -31,11 +33,7 @@ def get_attributes(span: dict[str, Any]) -> dict[str, Any]:
 
 def agent_name_from_span(span: dict[str, Any]) -> str:
     attrs = get_attributes(span)
-    return (
-        attrs.get("gen_ai.agent.name")
-        or attrs.get("agent_name")
-        or "Unknown Agent"
-    )
+    return attrs.get("gen_ai.agent.name") or attrs.get("agent_name") or "Unknown Agent"
 
 
 def conversation_id_from_span(span: dict[str, Any]) -> str | None:
@@ -79,29 +77,34 @@ def metadata_from_span(span: dict[str, Any]) -> dict[str, Any]:
 
 
 def _normalize_part(part: dict[str, Any]) -> NormalizedPart | None:
-    part_type = part.get("type", "")
-    if part_type == "text":
+    part_type = part.get("type") or part.get("part_kind") or ""
+
+    if part_type in ("text", "user-prompt"):
         content = part.get("content", "")
         return {"type": "text", "content": str(content)} if content else None
     if part_type == "thinking":
         content = part.get("content", "")
         return {"type": "thinking", "content": str(content)} if content else None
-    if part_type == "tool_call":
-        arguments = part.get("arguments", "{}")
+    if part_type in ("tool_call", "tool-call"):
+        arguments = part.get("arguments")
+        if arguments is None:
+            arguments = part.get("args", {})
         if not isinstance(arguments, str):
             arguments = json.dumps(arguments, ensure_ascii=False)
         return {
             "type": "tool_call",
-            "id": part.get("id", ""),
-            "name": part.get("name", ""),
+            "id": part.get("id") or part.get("tool_call_id", ""),
+            "name": part.get("name") or part.get("tool_name", ""),
             "arguments": arguments,
         }
-    if part_type == "tool_call_response":
+    if part_type in ("tool_call_response", "tool-return"):
         return {
             "type": "tool_call_response",
-            "id": part.get("id", ""),
-            "name": part.get("name", ""),
-            "result": str(part.get("result", part.get("response", ""))),
+            "id": part.get("id") or part.get("tool_call_id", ""),
+            "name": part.get("name") or part.get("tool_name", ""),
+            "result": str(
+                part.get("result", part.get("response", part.get("content", "")))
+            ),
         }
     if part_type in ("image", "audio"):
         return {"type": part_type, "content": f"[{part_type.upper()}]"}
@@ -109,6 +112,18 @@ def _normalize_part(part: dict[str, Any]) -> NormalizedPart | None:
     if content:
         return {"type": "text", "content": str(content)}
     return None
+
+
+def _role_from_pydantic_message(msg: dict[str, Any]) -> str:
+    role = str(msg.get("role", "")).strip()
+    if role:
+        return role
+    kind = msg.get("kind", "")
+    if kind == "request":
+        return "user"
+    if kind == "response":
+        return "assistant"
+    return ""
 
 
 def _parts_from_otel_message(msg: dict[str, Any]) -> list[NormalizedPart]:
@@ -121,7 +136,9 @@ def _parts_from_otel_message(msg: dict[str, Any]) -> list[NormalizedPart]:
     return parts
 
 
-def _message_from_role_parts(role: str, parts: list[NormalizedPart]) -> NormalizedMessage | None:
+def _message_from_role_parts(
+    role: str, parts: list[NormalizedPart]
+) -> NormalizedMessage | None:
     if not parts:
         return None
     return {"role": role, "parts": parts}
@@ -209,6 +226,31 @@ def extract_normalized_messages(span: dict[str, Any]) -> list[NormalizedMessage]
     return _extract_from_gen_ai(attrs)
 
 
+def normalize_model_messages(messages: list[ModelMessage]) -> list[NormalizedMessage]:
+    """Normalize pydantic-ai ModelMessage objects to the Logfire message shape."""
+    raw = json.loads(ModelMessagesTypeAdapter.dump_json(messages))
+    if not isinstance(raw, list):
+        return []
+
+    normalized: list[NormalizedMessage] = []
+    for msg in raw:
+        if not isinstance(msg, dict):
+            continue
+        role = _role_from_pydantic_message(msg)
+        parts: list[NormalizedPart] = []
+        for part in msg.get("parts") or []:
+            if isinstance(part, dict):
+                normalized_part = _normalize_part(part)
+                if normalized_part:
+                    parts.append(normalized_part)
+        normalized_msg = _message_from_role_parts(role, parts)
+        if normalized_msg:
+            if msg.get("finish_reason"):
+                normalized_msg["finish_reason"] = msg["finish_reason"]
+            normalized.append(normalized_msg)
+    return normalized
+
+
 def parts_to_text(parts: list[NormalizedPart], *, keep_thinking: bool = False) -> str:
     chunks: list[str] = []
     for part in parts:
@@ -237,7 +279,9 @@ def is_validation_feedback_message(msg: NormalizedMessage) -> bool:
     return text.strip().startswith(VALIDATION_FEEDBACK_PREFIX)
 
 
-def strip_validation_retry_turns(messages: list[NormalizedMessage]) -> list[NormalizedMessage]:
+def strip_validation_retry_turns(
+    messages: list[NormalizedMessage],
+) -> list[NormalizedMessage]:
     """Remove validation feedback user turns and the assistant turn before each."""
     result: list[NormalizedMessage] = []
     i = 0

@@ -13,6 +13,16 @@ wheels/
 
 # Runtime Manim workspace (created by ToolDeps at startup)
 apps/agents/workspace/
+apps/agents/output/
+apps/agents/voiceover_cache/
+apps/agents/media/
+
+# Generated training traces and rendered media (>1MB)
+apps/agents/training_data/
+apps/agents/export_traces/coder_traces.jsonl
+apps/agents/export_traces/coder_sft/
+apps/agents/tools/assets/media/videos/
+apps/agents/tools/templates/videos/
 
 prepdata/
 */svg_dataset/*

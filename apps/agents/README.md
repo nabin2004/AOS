@@ -1,5 +1,166 @@
 # AOS Agents
 
+## Web UI
+
+Chat with the full pipeline (classify → lecture plan → Manim code) or the code agent alone:
+
+```bash
+cd apps/agents
+uv run pai web --agent agent_graph:animation_agent   # full graph
+uv run pai web --agent coder_agent:coder_agent         # code agent only
+```
+
+`pai web` uses streaming (`run_stream_events`), which DBOS durable workflows do **not** support. Keep the web UI on plain agents (default).
+
+Agent compiles default to Manim `-ql` (fast). SFT uses code/tool traces, not video pixels. For a sharper preview: `export AOS_MANIM_QUALITY=h`.
+
+## Durable execution (DBOS + Logfire)
+
+For graph/batch runs, enable DBOS so classifier → planner → coder can resume after crashes. Model requests and `@DBOS.step` tools (manim write/compile/read/narration) are checkpointed. DBOS OTLP spans join existing Pydantic AI Logfire traces (`enable_otlp=True`).
+
+```bash
+cd apps/agents
+
+# durable graph/batch (SQLite under workspace/dbos_sys.sqlite)
+export AOS_DBOS=1
+uv run python -c "import asyncio; from agent_graph import run_pipeline; print(asyncio.run(run_pipeline('Teach me eigenvalues')))"
+
+# optional Postgres instead of SQLite
+export DBOS_SYSTEM_DATABASE_URL=postgresql://user:pass@localhost/dbos
+
+# pai web stays non-durable (streaming)
+uv run pai web --agent agent_graph:animation_agent
+```
+
+## SFT data collection (Code Agent)
+
+Collect tool-calling traces from the Code Agent (`coder_agent.py` via `agent_graph.py`) for LLM finetuning. Training data is captured at the **application layer** into local JSONL — no Logfire parsing required.
+
+### Prerequisites
+
+- `apps/agents/.env` with OpenRouter (or configured model) API keys
+- Optional: Logfire **write** token — production observability only (`coder_agent.py` / `agent_graph.py`)
+- Optional (Logfire export path): `export_traces/.env` with `LOGFIRE_READ_TOKEN`
+
+### Workflow
+
+```text
+topics.txt  →  generate_prompts.py  →  prompts.jsonl
+                                              ↓
+                                    collect_traces.py
+                                              ↓
+              batch_runs.jsonl + workspace/coder_runs/*/traces/
+              + training_data/trajectories.jsonl
+                                              ↓
+                              export_local_sft.py  →  coder_sft/tool_trace*.jsonl
+
+(Logfire remains optional for prod debugging; export_coder_sft.py is secondary)
+```
+
+**Step 1 — prompts (optional)**
+
+Generate synthetic user requests from topic seeds:
+
+```bash
+cd apps/agents
+uv run python sft_data_gen/generate_prompts.py \
+  --num 500 \
+  --output sft_data_gen/prompts.jsonl \
+  --topics sft_data_gen/topics.txt
+```
+
+`topics.txt` seeds the prompt generator; it is **not** passed directly to the coding agent.
+
+**Step 2 — collect traces**
+
+Recommended fast batch (disables Logfire/DBOS overhead, skips narration, 2 parallel runs):
+
+```bash
+uv run python sft_data_gen/collect_traces.py \
+  --limit 100 \
+  --fast \
+  --convert-after-local \
+  --resume
+```
+
+Standard run (classify → plan → coder):
+
+```bash
+uv run python sft_data_gen/collect_traces.py \
+  --prompts sft_data_gen/prompts.jsonl \
+  --limit 50 \
+  --resume
+```
+
+Useful flags:
+
+- `--fast` — disable Logfire + DBOS, skip narration, preload RAG index (recommended for batch SFT)
+- `--concurrency 2` — parallel runs (default: 2; use `1` if rate-limited)
+- `--dry-run --limit 3` — preview selected prompts without API calls
+- `--indices 0,3,7` — run specific prompt indices
+- `--convert-after-local` — run `export_local_sft.py` when the batch finishes (recommended)
+- `--export-after` — run Logfire export (`export_coder_sft.py`) when the batch finishes
+
+Batch env vars (set automatically by `--fast`, or override manually):
+
+- `AOS_LOGFIRE=0` — no OTLP export (avoids timeout stalls during batch)
+- `AOS_DBOS=0` — plain agents, no durable checkpointing
+- `AOS_SFT_BATCH=1` — coder skips `synthesize_narration`
+
+Each run writes:
+
+```text
+workspace/coder_runs/{timestamp}-{slug}/
+  scene.py, manifest.json, run_result.json
+  logs/compile.log, audio/*.wav, media/
+  traces/messages.json      # pydantic-ai message history
+  traces/trajectory.json    # structured SFT record
+  traces/meta.json
+training_data/trajectories.jsonl   # append-only global bank
+```
+
+Progress is logged to `sft_data_gen/batch_runs.jsonl` (resume skips indices with `"status": "ok"`).
+
+**Step 3 — export SFT JSONL (local, no Logfire)**
+
+Convert accumulated trajectories to training format:
+
+```bash
+uv run python export_local_sft.py
+```
+
+- Default input: `training_data/trajectories.jsonl`
+- `--scan-workspace` — rebuild from `workspace/coder_runs/*/traces/trajectory.json`
+- Output: `export_traces/coder_sft/`
+- Prefer **`tool_trace*.jsonl`** for tool-use / CodeMode finetuning
+- `final_answer*.jsonl` is a text-only collapse (secondary)
+- Dedup: one row per `user_prompt`; keeps the **shortest successful** trajectory
+
+**Optional — Logfire export**
+
+For spans already sent to Logfire (production traffic):
+
+```bash
+uv run python export_coder_sft.py --days 30
+```
+
+Export-only or convert-only:
+
+```bash
+uv run python export_coder_sft.py --days 7 --export-only
+uv run python export_coder_sft.py --skip-export --input export_traces/coder_traces.jsonl
+```
+
+### Quality tips
+
+- Start with `--limit 10` before large batches (each run = multiple LLM calls + Manim compile).
+- Filter on `"compile_ok": true` in `batch_runs.jsonl` or `run_result.json` for higher-quality SFT rows.
+- Loop caps per run: `request_limit=20`, `tool_calls_limit=40` (see `coder_run.py`).
+- Logfire = live debugging; `training_data/trajectories.jsonl` = training gold.
+- More detail: [`sft_data_gen/README.md`](sft_data_gen/README.md)
+
+---
+
 ## Scene content: `content` vs `params`
 
 `SceneObject` (`packages/ir/src/ir/manim_ir.py`) has a dedicated `content: str`

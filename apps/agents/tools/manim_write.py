@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import dbos_setup  # noqa: F401 — configure DBOS before @DBOS.step
+from dbos import DBOS
+
 from tools.coder_workspace import (
+    OutputDirError,
     load_manifest,
     record_step,
     resolve_output_dir,
@@ -10,6 +14,7 @@ from tools.coder_workspace import (
 )
 
 
+@DBOS.step()
 def manim_write(
     code: str,
     scene_name: str = "scene",
@@ -26,6 +31,15 @@ def manim_write(
     Returns a JSON summary with paths and status.
     """
     try:
+        if not isinstance(code, str) or not code.strip():
+            return result_json(
+                ok=False,
+                step="write",
+                output_dir=output_dir,
+                error="empty_code",
+                message="Refusing to write: code is empty (would wipe the scene file).",
+            )
+
         workspace = resolve_output_dir(output_dir)
         scene_path = scene_file_path(workspace, scene_name)
         scene_path.write_text(code, encoding="utf-8")
@@ -55,6 +69,14 @@ def manim_write(
             scene_file=manifest["scene_file"],
             manifest=str(workspace / "manifest.json"),
             message=f"Wrote Manim code to {scene_path}.",
+        )
+    except OutputDirError as e:
+        return result_json(
+            ok=False,
+            step="write",
+            output_dir=output_dir,
+            error="invalid_output_dir",
+            message=str(e),
         )
     except Exception as e:
         return result_json(

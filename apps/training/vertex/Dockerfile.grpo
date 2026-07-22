@@ -1,0 +1,43 @@
+# GRPO training image for Vertex AI Custom Jobs.
+# Build from repo root:
+#   docker build -f apps/training/vertex/Dockerfile.grpo -t aos-grpo .
+
+FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PIP_NO_CACHE_DIR=1
+ENV HF_HOME=/tmp/hf
+ENV TRANSFORMERS_CACHE=/tmp/hf
+ENV PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/aos
+
+COPY apps/grpo/pyproject.toml apps/grpo/
+COPY apps/grpo/*.py apps/grpo/
+COPY apps/training/wandb_env.py apps/training/
+COPY apps/training/vertex/env.py apps/training/vertex/gcs_download.py apps/training/vertex/
+COPY apps/training/vertex/entrypoint_grpo.sh /entrypoint.sh
+
+RUN pip install --upgrade pip && pip install \
+    "bitsandbytes>=0.45.0" \
+    "datasets>=5.0.0" \
+    "huggingface-hub>=0.27.0" \
+    "peft>=0.19.1" \
+    "transformers>=4.50.0" \
+    "trl>=1.9.0" \
+    "unsloth" \
+    "wandb>=0.19.0" \
+    "google-cloud-storage>=2.19.0"
+
+RUN chmod +x /entrypoint.sh
+
+WORKDIR /opt/aos/apps/grpo
+ENTRYPOINT ["/entrypoint.sh"]

@@ -4,15 +4,69 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parent.parent / "workspace" / "coder"
+AGENTS_ROOT = Path(__file__).resolve().parent.parent
+WORKSPACE_ROOT = AGENTS_ROOT / "workspace"
+DEFAULT_OUTPUT_DIR = WORKSPACE_ROOT / "coder"
+# Legacy/accidental run dir used by some web sessions; kept allowlisted.
+LEGACY_OUTPUT_DIR = AGENTS_ROOT / "output"
+
+_ALLOWED_ROOTS = (WORKSPACE_ROOT, LEGACY_OUTPUT_DIR)
+
+
+class OutputDirError(ValueError):
+    """Raised when output_dir is outside the allowlisted coder workspace roots."""
+
+
+def _is_under(path: Path, root: Path) -> bool:
+    try:
+        path.resolve().relative_to(root.resolve())
+        return True
+    except ValueError:
+        return False
+
+
+def _candidate_path(output_dir: str | None) -> Path:
+    if output_dir is None or not str(output_dir).strip():
+        return DEFAULT_OUTPUT_DIR
+
+    raw = str(output_dir).strip()
+    path = Path(raw)
+
+    # Bare relative names like "output" or "coder" map under workspace/.
+    if not path.is_absolute():
+        # Explicit workspace-relative paths: workspace/coder_runs/...
+        if raw.startswith("workspace/") or raw == "workspace":
+            return AGENTS_ROOT / path
+        return WORKSPACE_ROOT / path
+
+    return path
 
 
 def resolve_output_dir(output_dir: str | None = None) -> Path:
-    path = Path(output_dir) if output_dir else DEFAULT_OUTPUT_DIR
+    """
+    Resolve and create a coder workspace directory.
+
+    Allowed locations (after resolve):
+      - apps/agents/workspace/**  (default: workspace/coder)
+      - apps/agents/output/**     (legacy allowlist)
+
+    Relative paths like ``output`` become ``workspace/output``.
+    Absolute paths outside the allowlist (e.g. ``/workspace``) raise OutputDirError.
+    """
+    path = _candidate_path(output_dir).resolve()
+
+    if not any(_is_under(path, root) for root in _ALLOWED_ROOTS):
+        allowed = ", ".join(str(r) for r in _ALLOWED_ROOTS)
+        raise OutputDirError(
+            f"output_dir must be under {allowed} "
+            f"(got {path!s}). Omit output_dir to use the default "
+            f"{DEFAULT_OUTPUT_DIR}, or pass a path under workspace/."
+        )
+
     path.mkdir(parents=True, exist_ok=True)
     (path / "logs").mkdir(exist_ok=True)
     (path / "audio").mkdir(exist_ok=True)
-    return path.resolve()
+    return path
 
 
 def scene_file_path(output_dir: Path, scene_name: str = "scene") -> Path:

@@ -1,0 +1,6 @@
+# This file is used internally by FFMPEG.
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Quote/4209808850_3427007342_223132457.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Quote/534414599_2574473371_2907665049.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Quote/534414599_2030777478_2046094302.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Quote/534414599_4277570474_954357078.mp4'
+file 'file:/home/nabin/myallprojects/AOS/apps/agents/tools/templates/media/videos/001_intro/1080p60/partial_movie_files/Quote/534414599_2168675621_554207670.mp4'

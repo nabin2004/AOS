@@ -16,6 +16,15 @@ dependencies = [
 [tool.uv.sources]
 store = { workspace = true }
 
+[tool.ruff.lint.per-file-ignores]
+"apps/agents/tools/templates/**" = ["F403", "F405"]
+"apps/agents/tools/assets/**" = ["F403", "F405", "F841"]
+"apps/agents/agent_graph.py" = ["E402"]
+"apps/agents/export_local_sft.py" = ["E402"]
+"apps/agents/export_traces/tests/**" = ["E402"]
+"apps/agents/tools/templates/001_intro.py" = ["E402"]
+"apps/agents/tools/templates/deeplearning/**" = ["F841"]
+
 [tool.uv.workspace]
 members = [
     "packages/ir",
@@ -30,4 +39,6 @@ members = [
     "apps/manimator/agents",
     "apps/manimator/manim_agents",
     "apps/mcpservers",
+    "apps/sft",
+    "apps/grpo",
 ]

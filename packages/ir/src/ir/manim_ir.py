@@ -53,6 +53,7 @@ What v2 adds (from the field notes)
   sub-part targeting rides on op.params.
 - RenderConfig : a real quality ladder for the video renderer.
 """
+
 from __future__ import annotations
 
 from enum import Enum
@@ -72,8 +73,8 @@ from pydantic import (
 # ---------------------------------------------------------------------------
 # Frame geometry (ManimCE default frame is ~14.22 wide x 8 tall)
 # ---------------------------------------------------------------------------
-FRAME_X_SAFE = 7.0   # |x| beyond this drifts off the visible frame
-FRAME_Y_SAFE = 4.0   # |y| beyond this drifts off the visible frame
+FRAME_X_SAFE = 7.0  # |x| beyond this drifts off the visible frame
+FRAME_Y_SAFE = 4.0  # |y| beyond this drifts off the visible frame
 
 # Reserved scene-graph id for the camera. Camera Operations target this
 # sentinel; it is always "live" and is never declared as a SceneObject.
@@ -93,6 +94,7 @@ class Subject(str, Enum):
     AI = "ai"
     UNKNOWN = "unknown"
 
+
 class Classification(BaseModel):
     subject: Subject
     topic: str
@@ -110,18 +112,18 @@ class EntityType(str, Enum):
     ARC = "arc"
     POLYGON = "polygon"
     # text / symbolic
-    TEXT = "text"                 # -> Text
-    MATH_TEX = "math_tex"         # -> MathTex  (an "equation")
-    TITLE = "title"               # -> Title
-    CODE_BLOCK = "code_block"     # -> Code
-    TABLE = "table"               # -> Table
+    TEXT = "text"  # -> Text
+    MATH_TEX = "math_tex"  # -> MathTex  (an "equation")
+    TITLE = "title"  # -> Title
+    CODE_BLOCK = "code_block"  # -> Code
+    TABLE = "table"  # -> Table
     # coordinate systems
     AXES = "axes"
-    THREE_D_AXES = "three_d_axes"     # -> ThreeDAxes
+    THREE_D_AXES = "three_d_axes"  # -> ThreeDAxes
     NUMBER_LINE = "number_line"
     NUMBER_PLANE = "number_plane"
     COMPLEX_PLANE = "complex_plane"
-    GRAPH = "graph"               # plotted function
+    GRAPH = "graph"  # plotted function
     PARAMETRIC_CURVE = "parametric_curve"  # -> ParametricFunction (2D/3D)
     # vectors / fields
     VECTOR = "vector"
@@ -131,48 +133,48 @@ class EntityType(str, Enum):
     SPHERE = "sphere"
     CUBE = "cube"
     # grouping / mascot
-    GROUP = "group"               # -> VGroup (use *unpacking to build it)
-    PI_CREATURE = "pi_creature"   # NB: not in vanilla ManimCE; compiler must
-                                  # target a bundled asset or manim_pi plugin.
+    GROUP = "group"  # -> VGroup (use *unpacking to build it)
+    PI_CREATURE = "pi_creature"  # NB: not in vanilla ManimCE; compiler must
+    # target a bundled asset or manim_pi plugin.
 
 
 class OperationType(str, Enum):
     # --- introduce (CREATE family: make an object newly visible) ---
-    CREATE = "create"                    # Create
-    WRITE = "write"                      # Write            (text / tex)
-    FADE_IN = "fade_in"                  # FadeIn
-    DRAW_BORDER = "draw_border"          # DrawBorderThenFill
-    GROW = "grow"                        # GrowFromCenter
+    CREATE = "create"  # Create
+    WRITE = "write"  # Write            (text / tex)
+    FADE_IN = "fade_in"  # FadeIn
+    DRAW_BORDER = "draw_border"  # DrawBorderThenFill
+    GROW = "grow"  # GrowFromCenter
     TRANSFORM_FROM_COPY = "transform_from_copy"  # TransformFromCopy(src,tgt):
-                                         # leaves src, brings tgt on screen
+    # leaves src, brings tgt on screen
     # --- transform ---
-    TRANSFORM = "transform"              # Transform / ReplacementTransform
-    MORPH = "morph"                      # TransformMatchingTex / Shapes
+    TRANSFORM = "transform"  # Transform / ReplacementTransform
+    MORPH = "morph"  # TransformMatchingTex / Shapes
     # --- move in space ---
-    MOVE = "move"                        # .animate.move_to
-    SHIFT = "shift"                      # .animate.shift
-    ROTATE = "rotate"                    # Rotate
-    SCALE = "scale"                      # .animate.scale
+    MOVE = "move"  # .animate.move_to
+    SHIFT = "shift"  # .animate.shift
+    ROTATE = "rotate"  # Rotate
+    SCALE = "scale"  # .animate.scale
     RESCALE_TO_CORNER = "rescale_to_corner"  # shrink + park (Grant's move)
     # --- emphasise (no state change, pure attention) ---
-    HIGHLIGHT = "highlight"              # Indicate
-    FLASH = "flash"                      # Flash
-    FLASH_AROUND = "flash_around"        # FlashAround
-    CIRCUMSCRIBE = "circumscribe"        # Circumscribe
-    FOCUS_ON = "focus_on"                # FocusOn
-    WIGGLE = "wiggle"                    # Wiggle
-    RECOLOR = "recolor"                  # .animate.set_color
+    HIGHLIGHT = "highlight"  # Indicate
+    FLASH = "flash"  # Flash
+    FLASH_AROUND = "flash_around"  # FlashAround
+    CIRCUMSCRIBE = "circumscribe"  # Circumscribe
+    FOCUS_ON = "focus_on"  # FocusOn
+    WIGGLE = "wiggle"  # Wiggle
+    RECOLOR = "recolor"  # .animate.set_color
     # --- value-driven ---
-    UPDATE_VALUE = "update_value"        # ValueTracker-driven .animate
+    UPDATE_VALUE = "update_value"  # ValueTracker-driven .animate
     # --- camera (target must be CAMERA_TARGET) ---
-    MOVE_CAMERA = "move_camera"          # self.move_camera(...)
-    PAN_CAMERA = "pan_camera"            # camera.frame.animate.shift
-    ZOOM_CAMERA = "zoom_camera"          # camera.frame.animate.scale
+    MOVE_CAMERA = "move_camera"  # self.move_camera(...)
+    PAN_CAMERA = "pan_camera"  # camera.frame.animate.shift
+    ZOOM_CAMERA = "zoom_camera"  # camera.frame.animate.scale
     SET_CAMERA_ORIENTATION = "set_camera_orientation"  # phi/theta -> enter 3D
     # --- remove (make an object no longer live) ---
-    FADE_OUT = "fade_out"                # FadeOut
-    UNCREATE = "uncreate"                # Uncreate
-    REMOVE = "remove"                    # self.remove (instant)
+    FADE_OUT = "fade_out"  # FadeOut
+    UNCREATE = "uncreate"  # Uncreate
+    REMOVE = "remove"  # self.remove (instant)
 
 
 CREATE_FAMILY = {
@@ -181,7 +183,7 @@ CREATE_FAMILY = {
     OperationType.FADE_IN,
     OperationType.DRAW_BORDER,
     OperationType.GROW,
-    OperationType.TRANSFORM_FROM_COPY,   # brings the *target* on screen
+    OperationType.TRANSFORM_FROM_COPY,  # brings the *target* on screen
 }
 REMOVE_FAMILY = {
     OperationType.FADE_OUT,
@@ -214,6 +216,7 @@ INSTANT_OPS = {OperationType.REMOVE}  # produce no animation, run_time == 0
 
 class RateFunction(str, Enum):
     """Manim easing. Lean on these — flat linear motion reads as cheap."""
+
     LINEAR = "linear"
     SMOOTH = "smooth"
     EASE_IN_OUT = "ease_in_out_sine"
@@ -235,18 +238,20 @@ class ComputeLibrary(str, Enum):
     domain. The planner may only reach for real maths through these, so a
     Lorenz trajectory is `solve_ivp` output, not invented coordinates.
     """
+
     NUMPY = "numpy"
-    SCIPY = "scipy"          # e.g. scipy.integrate.solve_ivp
+    SCIPY = "scipy"  # e.g. scipy.integrate.solve_ivp
     SYMPY = "sympy"
     PANDAS = "pandas"
-    PYTHON_CHESS = "python_chess"   # chess-themed CS videos
+    PYTHON_CHESS = "python_chess"  # chess-themed CS videos
 
 
 class SymbolSource(str, Enum):
     """Where a Text/MathTex payload comes from."""
-    INLINE = "inline"        # tex written directly in params
+
+    INLINE = "inline"  # tex written directly in params
     WIKIPEDIA = "wikipedia"  # fetched via the Wikipedia tool
-    WIKIDATA = "wikidata"    # fetched via Wikidata (structured)
+    WIKIDATA = "wikidata"  # fetched via Wikidata (structured)
 
 
 class BehaviorType(str, Enum):
@@ -255,19 +260,21 @@ class BehaviorType(str, Enum):
     AmbientAnimation (scoped to one beat's hold), a Behavior turns on when
     its object is created and runs until the object is removed.
     """
-    TRACE_PATH = "trace_path"            # TracedPath tail behind a mover
-    TRACK_ENDPOINT = "track_endpoint"    # dot pinned to the end of a path
-    FOLLOW_TRACKER = "follow_tracker"    # position/value driven by a tracker
-    GLOW_PULSE = "glow_pulse"            # animated glow (functions can glow)
+
+    TRACE_PATH = "trace_path"  # TracedPath tail behind a mover
+    TRACK_ENDPOINT = "track_endpoint"  # dot pinned to the end of a path
+    FOLLOW_TRACKER = "follow_tracker"  # position/value driven by a tracker
+    GLOW_PULSE = "glow_pulse"  # animated glow (functions can glow)
     CONTINUOUS_ROTATE = "continuous_rotate"
-    ALWAYS_REDRAW = "always_redraw"      # recompute the mobject each frame
+    ALWAYS_REDRAW = "always_redraw"  # recompute the mobject each frame
 
 
 class AmbientType(str, Enum):
     """Continuous, low-amplitude motion so a scene never fully freezes.
     Scoped to a single beat's hold (contrast with persistent Behaviors)."""
-    BLINK = "blink"               # pi-creature eyes
-    BREATHE = "breathe"           # subtle scale oscillation
+
+    BLINK = "blink"  # pi-creature eyes
+    BREATHE = "breathe"  # subtle scale oscillation
     CAMERA_DRIFT = "camera_drift"
     GLOW_PULSE = "glow_pulse"
     OSCILLATE = "oscillate"
@@ -277,6 +284,7 @@ class AmbientType(str, Enum):
 
 class StoryboardMove(str, Enum):
     """Pedagogical intent of a storyboard step (the teaching strategy)."""
+
     HOOK = "hook"
     INTRODUCE = "introduce"
     MOTIVATE = "motivate"
@@ -295,13 +303,14 @@ class SceneTransition(str, Enum):
     CROSSFADE = "crossfade"
     MORPH_INTO = "morph_into"
     SLIDE = "slide"
-    CLEAR_KEEP = "clear_keep"        # wipe most, keep a named subset
+    CLEAR_KEEP = "clear_keep"  # wipe most, keep a named subset
     CAMERA_MOVE = "camera_move"
     RESCALE_TO_CORNER = "rescale_to_corner"
 
 
 class TemplateType(str, Enum):
     """First-class 'magnum opus' animations the planner can reach for."""
+
     GRADIENT_BOWL = "gradient_bowl"
     NEURAL_NETWORK = "neural_network"
     ATTENTION = "attention"
@@ -313,12 +322,13 @@ class TemplateType(str, Enum):
     VECTOR_FIELD_FLOW = "vector_field_flow"
     DECISION_BOUNDARY = "decision_boundary"
     EPSILON_DELTA = "epsilon_delta"
-    LORENZ_ATTRACTOR = "lorenz_attractor"   # 2D warm-up -> pan into 3D
+    LORENZ_ATTRACTOR = "lorenz_attractor"  # 2D warm-up -> pan into 3D
     STRANGE_ATTRACTOR = "strange_attractor"
 
 
 class SemanticLabel(str, Enum):
     """Teaching role of a scene-graph object for beat/narration planners."""
+
     PRIMARY_FOCUS = "primary_focus"
     SUPPORTING_CONTEXT = "supporting_context"
     ANNOTATION = "annotation"
@@ -336,17 +346,18 @@ class Direction(str, Enum):
     UR = "up_right"
     DL = "down_left"
     DR = "down_right"
-    IN = "in"        # +z toward viewer (3D)
-    OUT = "out"      # -z away (3D)
+    IN = "in"  # +z toward viewer (3D)
+    OUT = "out"  # -z away (3D)
 
 
 class Quality(str, Enum):
     """Render ladder for the video renderer."""
-    LOW = "low_quality"                 # 854x480 @ 15fps  (fast iteration)
-    MEDIUM = "medium_quality"           # 1280x720 @ 30fps
-    HIGH = "high_quality"               # 1920x1080 @ 60fps
-    PRODUCTION = "production_quality"   # 2560x1440 @ 60fps
-    FOURK = "fourk_quality"             # 3840x2160 @ 60fps
+
+    LOW = "low_quality"  # 854x480 @ 15fps  (fast iteration)
+    MEDIUM = "medium_quality"  # 1280x720 @ 30fps
+    HIGH = "high_quality"  # 1920x1080 @ 60fps
+    PRODUCTION = "production_quality"  # 2560x1440 @ 60fps
+    FOURK = "fourk_quality"  # 3840x2160 @ 60fps
 
 
 # ===========================================================================
@@ -354,6 +365,7 @@ class Quality(str, Enum):
 # ===========================================================================
 class Branding(BaseModel):
     """Global look. Styles reference this so a single change re-themes all."""
+
     model_config = ConfigDict(extra="forbid")
 
     brand_name: str = "AOS"
@@ -374,6 +386,7 @@ class Position(BaseModel):
     Frame-safety is validated so objects don't silently drift off-screen.
     z is honoured in 3D scenes.
     """
+
     model_config = ConfigDict(extra="forbid")
 
     x: float = 0.0
@@ -415,6 +428,7 @@ class CognitiveLoadPolicy(BaseModel):
     Learning constraints, not renderer constraints. These encode Grant's
     restraint: reveal little at a time. Enforced per beat by Scene.
     """
+
     model_config = ConfigDict(extra="forbid")
 
     max_new_objects_per_beat: int = 3
@@ -436,6 +450,7 @@ class ValueTracker(BaseModel):
     ride it with a FOLLOW_TRACKER behaviour. This is how you 'use state to
     teach' — one knob drives many mobjects.
     """
+
     model_config = ConfigDict(extra="forbid")
 
     id: str
@@ -458,13 +473,14 @@ class Computation(BaseModel):
                     params={"sigma":10,"rho":28,"beta":8/3,"t_end":40},
                     produces="Lorenz trajectory (N,3) array")
     """
+
     model_config = ConfigDict(extra="forbid")
 
     id: str
     library: ComputeLibrary
-    routine: str                          # e.g. "solve_ivp", "linspace"
+    routine: str  # e.g. "solve_ivp", "linspace"
     params: dict[str, Any] = Field(default_factory=dict)
-    produces: str = ""                    # human note about the output
+    produces: str = ""  # human note about the output
 
 
 class Behavior(BaseModel):
@@ -473,11 +489,12 @@ class Behavior(BaseModel):
     is created, runs until it is removed. This is the `add_updater(...)`
     layer: traced tails, endpoint dots, glow, tracker-following, redraws.
     """
+
     model_config = ConfigDict(extra="forbid")
 
     type: BehaviorType
-    of: Optional[str] = None       # id of another object this behaviour reads
-                                   # (e.g. the path a TRACK_ENDPOINT dot rides)
+    of: Optional[str] = None  # id of another object this behaviour reads
+    # (e.g. the path a TRACK_ENDPOINT dot rides)
     tracker: Optional[str] = None  # ValueTracker id (FOLLOW_TRACKER)
     params: dict[str, Any] = Field(default_factory=dict)
 
@@ -485,10 +502,11 @@ class Behavior(BaseModel):
 class SceneParameter(BaseModel):
     """A typed runtime knob for a Scene, so scenes are reusable.
     e.g. SceneParameter(name='rho', py_type='float', default=28.0)."""
+
     model_config = ConfigDict(extra="forbid")
 
     name: str
-    py_type: str = "float"         # "int" | "float" | "str" | "bool"
+    py_type: str = "float"  # "int" | "float" | "str" | "bool"
     default: Any = None
     description: str = ""
 
@@ -516,6 +534,7 @@ class SceneObject(BaseModel):
     `visible=False` means it exists in the cast but hasn't been created yet;
     a CREATE-family op brings it on screen.
     """
+
     # extra="allow": small/cheap planner models drift on this schema (extra
     # keys, slightly-off shapes) and extra="forbid" turned that into a hard
     # validation failure -> ModelRetry loop, which in practice was settling
@@ -528,8 +547,8 @@ class SceneObject(BaseModel):
     entity_type: EntityType
     position: Position = Field(default_factory=Position)
     style: Style = Field(default_factory=Style)
-    layer: int = 0                       # z-ordering within the scene
-    visible: bool = False                # initial visibility (pre-first-beat)
+    layer: int = 0  # z-ordering within the scene
+    visible: bool = False  # initial visibility (pre-first-beat)
     # The literal tex/text payload for MATH_TEX and TEXT entities. A typed
     # string field, not a free-form dict key — structured-output models
     # reliably fill a declared string field but tend to leave open-ended
@@ -553,7 +572,7 @@ class SceneObject(BaseModel):
     # --- v2 ---
     # equation/text provenance
     symbol_source: SymbolSource = SymbolSource.INLINE
-    symbol_query: Optional[str] = None   # search term for wiki* sources
+    symbol_query: Optional[str] = None  # search term for wiki* sources
     # maths backing (id of a Computation on the owning Scene)
     computation: Optional[str] = None
     # persistent updaters
@@ -581,8 +600,8 @@ class Camera(BaseModel):
 
     center: Position = Field(default_factory=Position)
     zoom: float = Field(default=1.0, gt=0.0)
-    phi: float = 0.0                     # 3D polar (radians)
-    theta: float = 0.0                   # 3D azimuth (radians)
+    phi: float = 0.0  # 3D polar (radians)
+    theta: float = 0.0  # 3D azimuth (radians)
     is_3d: bool = False
 
 
@@ -596,9 +615,10 @@ class Operation(BaseModel):
     Sub-part targeting (the 'H' in 'Hello' is transformable) rides on
     params, e.g. {"parts": ["H"]} or {"index": 0}. Camera ops target the
     reserved CAMERA_TARGET id."""
+
     model_config = ConfigDict(extra="forbid")
 
-    target: str                          # SceneObject.id or CAMERA_TARGET
+    target: str  # SceneObject.id or CAMERA_TARGET
     op: OperationType
     run_time: float = Field(default=1.0, ge=0.0)
     rate_func: Optional[RateFunction] = None
@@ -624,8 +644,7 @@ class Operation(BaseModel):
             src = self.params.get("source") or self.params.get("from")
             if not src:
                 raise ValueError(
-                    "transform_from_copy requires params['source'] "
-                    "(the id copied from)"
+                    "transform_from_copy requires params['source'] (the id copied from)"
                 )
         return self
 
@@ -655,10 +674,11 @@ class NarrationSegment(BaseModel):
 class AmbientAnimation(BaseModel):
     """Runs continuously across a beat's hold so nothing freezes.
     (Persistent, cross-beat behaviour lives on SceneObject.behaviors.)"""
+
     model_config = ConfigDict(extra="forbid")
 
     type: AmbientType
-    target: Optional[str] = None         # entity id, or None for camera/scene
+    target: Optional[str] = None  # entity id, or None for camera/scene
     amplitude: float = Field(default=0.1, ge=0.0)
     period: float = Field(default=2.0, gt=0.0)
 
@@ -669,6 +689,7 @@ class Beat(BaseModel):
     A beat may animate then hold; during the hold, narration plays and
     ambient animations keep subtle motion alive.
     """
+
     model_config = ConfigDict(extra="forbid")
 
     id: str = Field(default_factory=lambda: f"beat_{uuid4().hex[:8]}")
@@ -677,7 +698,7 @@ class Beat(BaseModel):
     animation_seconds: float = Field(default=1.0, ge=0.0)
     animation_segment: list[Operation] = Field(default_factory=list)
     narration: Optional[NarrationSegment] = None
-    hold_seconds: float = Field(default=0.0, ge=0.0)   # dwell after animating
+    hold_seconds: float = Field(default=0.0, ge=0.0)  # dwell after animating
     ambient: list[AmbientAnimation] = Field(default_factory=list)
 
     @property
@@ -710,22 +731,23 @@ class Scene(BaseModel):
     scene can be pulled into Euler, Fourier, roots-of-unity, with different
     runtime_params.
     """
+
     model_config = ConfigDict(extra="forbid")
 
     id: str
-    class_name: str = "GeneratedScene"   # the emitted Manim class name
+    class_name: str = "GeneratedScene"  # the emitted Manim class name
     title: str = ""
 
     pedagogical_intent: str = Field(
         default="",
         description="The exact pedagogical goal from the storyboard step. "
-                    "Downstream agents (Beat, Narration) use this to make "
-                    "high-level decisions without inferring intent from geometry."
+        "Downstream agents (Beat, Narration) use this to make "
+        "high-level decisions without inferring intent from geometry.",
     )
     visual_brief: str = Field(
         default="",
         description="Free-text creative brief for the Manim code writer — "
-                    "what the viewer should see, without prescribing IR objects.",
+        "what the viewer should see, without prescribing IR objects.",
     )
 
     reusable: bool = False
@@ -734,7 +756,7 @@ class Scene(BaseModel):
 
     # dimensionality
     is_3d: bool = False
-    begin_in_2d: bool = True             # if 3D: warm up flat, then pan in
+    begin_in_2d: bool = True  # if 3D: warm up flat, then pan in
 
     camera: Camera = Field(default_factory=Camera)
     scene_graph: list[SceneObject] = Field(default_factory=list)
@@ -761,7 +783,9 @@ class Scene(BaseModel):
         if dupes:
             raise ValueError(f"duplicate scene object id(s): {sorted(dupes)}")
         if CAMERA_TARGET in ids:
-            raise ValueError(f"'{CAMERA_TARGET}' is reserved and cannot be an object id")
+            raise ValueError(
+                f"'{CAMERA_TARGET}' is reserved and cannot be an object id"
+            )
         return graph
 
     @model_validator(mode="after")
@@ -772,9 +796,7 @@ class Scene(BaseModel):
         agent pipeline sanitizes them before compile."""
         # camera consistency
         if self.is_3d and not self.camera.is_3d:
-            raise ValueError(
-                f"scene '{self.id}' is_3d=True but camera.is_3d=False"
-            )
+            raise ValueError(f"scene '{self.id}' is_3d=True but camera.is_3d=False")
 
         types: dict[str, EntityType] = {o.id: o.entity_type for o in self.scene_graph}
         tracker_ids = {t.id for t in self.trackers}
@@ -869,44 +891,88 @@ class Scene(BaseModel):
 class StoryboardStep(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    scene_id: str                 # snake_case identifier, e.g., "scene_ball_rolls"
-    pedagogical_move: StoryboardMove   # the "why" of this step
-    pedagogical_goal: str         # what the viewer should *understand* after this step
-    visual_description: str       # what appears on screen, including colors, shapes, motion, camera
-    narration_script: str         # the actual spoken words (or key phrases)
-    viewer_question: Optional[str] = None  # a question we pose to the viewer (to engage prediction)
-    transition_from_previous: Optional[str] = None  # how we flow from the previous scene
-    emotional_tone: str           # e.g., curiosity, confusion, revelation, satisfaction
+    scene_id: str  # snake_case identifier, e.g., "scene_ball_rolls"
+    pedagogical_move: StoryboardMove  # the "why" of this step
+    pedagogical_goal: str  # what the viewer should *understand* after this step
+    visual_description: (
+        str  # what appears on screen, including colors, shapes, motion, camera
+    )
+    narration_script: str  # the actual spoken words (or key phrases)
+    viewer_question: Optional[str] = (
+        None  # a question we pose to the viewer (to engage prediction)
+    )
+    transition_from_previous: Optional[str] = (
+        None  # how we flow from the previous scene
+    )
+    emotional_tone: str  # e.g., curiosity, confusion, revelation, satisfaction
     estimated_duration_seconds: int = 10  # rough pacing
 
 
 class Storyboard(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    title: str                    # short title for the whole animation
-    overall_emotional_arc: str    # e.g., "Curiosity → Prediction → Failure → Insight → Awe"
+    title: str  # short title for the whole animation
+    overall_emotional_arc: (
+        str  # e.g., "Curiosity → Prediction → Failure → Insight → Awe"
+    )
     steps: List[StoryboardStep]
 
 
 class Lecture(BaseModel):
     """Content layer: what to teach. No animation lives here."""
+
     model_config = ConfigDict(extra="forbid")
 
     topic: str
     subject: Subject
-    greeting: str = ""                   # time-of-day aware (filled at runtime)
-    needed_formulas: list[str] = Field(default_factory=list, description="List of formulas that will be used in the lecture for programmting the manim video.") 
-    class_names: list[str] = Field(default_factory=list, description="List of class names for each scenes that will be used in the lecture for programmting the manim video.")   
-    does_it_needs_3d: bool = Field(default=False, description="Does the lecture needs 3D scenes for programmting the manim video. Use true for 3D and false for only using the 2D.")
-    assumptions: list[str] = Field(default_factory=list, description="List of assumptions that will be used in the lecture for audience.")
-    list_of_external_library_needed: list[str] = Field(default_factory=list, description="List of external libraries that will be used in the lecture for programmting the manim video like scipy, numpy,networkx, etc.")
-    animation_needed: list[str] = Field(default_factory=list, description="List of Manim animations functions that will be needed in the lecture for programing the manim video like gradient_bowl, neural_network, etc.")
-    animation_updaters_needed: list[str] = Field(default_factory=list, description="List of animation updaters that will be used in the lecture for programmting the manim video like trace_path, track_endpoint, etc.")
-    camera_needed: list[str] = Field(default_factory=list, description="List of camera operations that will be used in the lecture for programmting the manim video like move_camera, pan_camera, etc.")
-    Mobjects_needed: list[str] = Field(default_factory=list, description="List of manim objects that will be used in the lecture for programmting the manim video like Circle, Square, etc.")
-    objectives: list[str] = Field(default_factory=list, description="List of objectives that will be used in the lecture for audience.")
-    opener: str = Field(default="", description="The 'solid opener' hook make it bit longer than a single sentence, but it should be a single paragraph that is the hook for the lecture. It should be a story or a question that makes the audience curious about the topic of the lecture.")
-    learning_outcomes: list[str] = Field(default_factory=list, description="List of learning outcomes that will be used in the lecture for audience.")
+    greeting: str = ""  # time-of-day aware (filled at runtime)
+    needed_formulas: list[str] = Field(
+        default_factory=list,
+        description="List of formulas that will be used in the lecture for programmting the manim video.",
+    )
+    class_names: list[str] = Field(
+        default_factory=list,
+        description="List of class names for each scenes that will be used in the lecture for programmting the manim video.",
+    )
+    does_it_needs_3d: bool = Field(
+        description="Does the lecture needs 3D scenes for programmting the manim video. Use true for 3D and false for only using the 2D."
+    )
+    assumptions: list[str] = Field(
+        default_factory=list,
+        description="List of assumptions that will be used in the lecture for audience.",
+    )
+    list_of_external_library_needed: list[str] = Field(
+        default_factory=list,
+        description="List of external libraries that will be used in the lecture for programmting the manim video like scipy, numpy,networkx, etc.",
+    )
+    animation_needed: list[str] = Field(
+        default_factory=list,
+        description="List of Manim animations functions that will be needed in the lecture for programing the manim video like gradient_bowl, neural_network, etc.",
+    )
+    animation_updaters_needed: list[str] = Field(
+        default_factory=list,
+        description="List of animation updaters that will be used in the lecture for programmting the manim video like trace_path, track_endpoint, etc.",
+    )
+    camera_needed: list[str] = Field(
+        default_factory=list,
+        description="List of camera operations that will be used in the lecture for programmting the manim video like move_camera, pan_camera, etc.",
+    )
+    Mobjects_needed: list[str] = Field(
+        default_factory=list,
+        description="List of manim objects that will be used in the lecture for programmting the manim video like Circle, Square, etc.",
+    )
+    objectives: list[str] = Field(
+        default_factory=list,
+        description="List of objectives that will be used in the lecture for audience.",
+    )
+    opener: str = Field(
+        default="",
+        description="The 'solid opener' hook make it bit longer than a single sentence, but it should be a single paragraph that is the hook for the lecture. It should be a story or a question that makes the audience curious about the topic of the lecture.",
+    )
+    learning_outcomes: list[str] = Field(
+        default_factory=list,
+        description="List of learning outcomes that will be used in the lecture for audience.",
+    )
 
 
 class OpeningScene(BaseModel):
@@ -929,14 +995,15 @@ class EndingScene(BaseModel):
 
 class RenderConfig(BaseModel):
     """Video renderer settings — the quality ladder from the notes."""
+
     model_config = ConfigDict(extra="forbid")
 
     quality: Quality = Quality.HIGH
     fps: int = Field(default=60, gt=0)
     resolution: tuple[int, int] = (1920, 1080)
-    output_format: str = "mp4"           # mp4 | mov | gif | png_sequence
+    output_format: str = "mp4"  # mp4 | mov | gif | png_sequence
     transparent: bool = False
-    preview: bool = False                # open the player after render
+    preview: bool = False  # open the player after render
 
     @field_validator("output_format")
     @classmethod
@@ -954,10 +1021,11 @@ class LectureIR(BaseModel):
     The full, self-contained, version-pinned lecture. Ordering of `scenes`
     is playback order; the storyboard references scenes by id.
     """
+
     model_config = ConfigDict(extra="forbid")
 
     request_id: str = Field(default_factory=lambda: uuid4().hex)
-    manim_version: str = "0.18.1"        # the pinned target; kills fork drift
+    manim_version: str = "0.18.1"  # the pinned target; kills fork drift
     ir_version: str = "2.0.0"
     duration_target_seconds: Optional[float] = None
 
@@ -975,7 +1043,9 @@ class LectureIR(BaseModel):
     @model_validator(mode="after")
     def _storyboard_refs_exist(self) -> "LectureIR":
         scene_ids = {s.id for s in self.scenes}
-        dupes = {s.id for s in self.scenes if [x.id for x in self.scenes].count(s.id) > 1}
+        dupes = {
+            s.id for s in self.scenes if [x.id for x in self.scenes].count(s.id) > 1
+        }
         if dupes:
             raise ValueError(f"duplicate scene id(s): {sorted(dupes)}")
         # class names should be unique too — they become Python classes

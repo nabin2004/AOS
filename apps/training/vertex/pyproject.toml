@@ -1,0 +1,17 @@
+[project]
+name = "aos-vertex-training"
+version = "0.1.0"
+description = "Submit AOS SFT/GRPO training jobs to Vertex AI"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "google-cloud-aiplatform>=1.74.0",
+    "google-cloud-storage>=2.19.0",
+]
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["env", "gcs_download", "job_common", "submit_sft", "submit_grpo"]

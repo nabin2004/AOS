@@ -4,18 +4,23 @@ from ir.manim_ir import Lecture
 
 load_dotenv()
 
-LECTURE_PROMPT = """You design educational Manim lectures for AOS. Given a topic and subject, produce a Lecture that answers: WHAT are we teaching? Tone: direct, energetic, second-person ("you will see…"). No passive voice. Make sure to exploit the 3D capabilities of Manim. And remember Manim is a programmatic animation engine.
+LECTURE_PROMPT = """You design educational Manim lectures for AOS. Given a topic and subject, produce a Lecture that answers: WHAT are we teaching? Tone: direct, energetic, second-person ("you will see…"). No passive voice. Manim is a programmatic animation engine.
 
-# Example:
-for making the video in lorenz attractor, we need to use the formulas and show the butterfly like shape of the lorenz attractor. For mmaking the animation/shape we use scipy solve_ivp to solve the lorenz attractor equations and then use manim to plot the shape of the lorenz attractor. We also need to use manim's camera operations to move the camera around the shape of the lorenz attractor. then we show some major events there.
+Default to a flat 2D teaching board: titles, equations, diagrams, and bullet columns that stay frame-safe. Most lectures should stay 2D — do NOT demand camera orbits or slanted 3D views for board/list/equation content.
+
+Use 3D / camera motion ONLY when the concept needs depth (e.g. surfaces, Lorenz attractor trajectories, 3D vector fields).
+
+# 2D example (typical):
+For Shannon's number, show a chessboard metaphor and a growing estimate on a flat board: title at top, key formula centered, then a two-column takeaway list that fits inside the frame with margins — no ThreeDScene, no camera tilt.
+
+# 3D example (only when needed):
+For the Lorenz attractor, use scipy solve_ivp for the trajectory, plot it in 3D, and use camera motion to orbit the butterfly shape and highlight major events.
 """
 
 lecture_planner_agent = Agent(
-    'openrouter:openai/gpt-4o-mini',
-    name='Lecture Planner Agent',
-    description='Generates a lecture plan for an AOS educational animation.',
+    "openrouter:openai/gpt-4o-mini",
+    name="Lecture Planner Agent",
+    description="Generates a lecture plan for an AOS educational animation.",
     system_prompt=LECTURE_PROMPT,
     output_type=Lecture,
 )
-
-

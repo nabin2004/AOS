@@ -2,6 +2,43 @@
 
 This guide explains how the **coder agent** adds narration directly inside Manim scenes using [Manim Voiceover](https://voiceover.manim.community/en/stable/), backed by our local Pocket TTS stack in [`apps/audio_service`](../../audio_service/narrator.py).
 
+## Prerequisites
+
+### SoX (audio)
+
+Manim Voiceover shells out to **SoX** for audio processing. Install it on the host before compiling voiceover scenes:
+
+```bash
+# Arch
+sudo pacman -S sox
+
+# Debian/Ubuntu
+sudo apt install sox
+```
+
+Without SoX you will see `SoX could not be found!` and `/bin/sh: line 1: sox: command not found` during render.
+
+### LaTeX (MathTex / Tex)
+
+Manim’s `MathTex` and `Tex` use a `standalone` document class. Install these TeX Live packages on the host:
+
+```bash
+# Arch
+sudo pacman -S --needed texlive-latexextra texlive-fontsrecommended texlive-mathscience
+
+# Debian/Ubuntu
+sudo apt install texlive-latex-extra texlive-fonts-recommended texlive-science
+```
+
+Verify:
+
+```bash
+kpsewhich standalone.cls
+kpsewhich amsmath.sty
+```
+
+If compile logs show `File 'standalone.cls' not found` or other `LaTeX Error`s, fix the TeX install rather than thrashing on string escapes in scene code.
+
 ## Why AOSSpeechService?
 
 Manim Voiceover supports many cloud speech services (Azure, OpenAI, ElevenLabs, etc.). AOS uses **`AOSSpeechService`** instead:

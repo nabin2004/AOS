@@ -4,6 +4,7 @@ import json
 from typing import Any
 
 from export_traces.otel_messages import (
+    NormalizedMessage,
     extract_normalized_messages,
     parts_to_text,
     strip_validation_retry_turns,
@@ -63,7 +64,9 @@ def _assistant_message(
     return msg
 
 
-def _tool_message(part: dict[str, Any], *, max_tool_result_chars: int | None) -> dict[str, Any]:
+def _tool_message(
+    part: dict[str, Any], *, max_tool_result_chars: int | None
+) -> dict[str, Any]:
     result = str(part.get("result", ""))
     return {
         "role": "tool",
@@ -73,15 +76,15 @@ def _tool_message(part: dict[str, Any], *, max_tool_result_chars: int | None) ->
     }
 
 
-def convert_tool_trace(
-    span: dict[str, Any],
+def convert_normalized_messages(
+    messages: list[NormalizedMessage],
     *,
     keep_thinking: bool = False,
     max_tool_result_chars: int | None = 8192,
     strip_validation_retries: bool = True,
+    user_prompt_override: str | None = None,
 ) -> dict[str, Any] | None:
-    """Convert span to OpenAI-style tool-call conversation rows."""
-    messages = extract_normalized_messages(span)
+    """Convert normalized pydantic-ai messages to OpenAI-style tool-call rows."""
     if not messages:
         return None
 
@@ -89,6 +92,7 @@ def convert_tool_trace(
         messages = strip_validation_retry_turns(messages)
 
     out_messages: list[dict[str, Any]] = []
+    user_injected = False
 
     for msg in messages:
         role = msg.get("role", "")
@@ -108,10 +112,10 @@ def convert_tool_trace(
                     content = str(part.get("content", "")).strip()
                     if content:
                         text_parts.append(content)
-            if text_parts:
-                out_messages.append(
-                    {"role": "user", "content": "\n".join(text_parts).strip()}
-                )
+            if text_parts and not user_injected:
+                user_text = user_prompt_override or "\n".join(text_parts).strip()
+                out_messages.append({"role": "user", "content": user_text})
+                user_injected = True
             for part in tool_responses:
                 out_messages.append(
                     _tool_message(part, max_tool_result_chars=max_tool_result_chars)
@@ -131,6 +135,12 @@ def convert_tool_trace(
                         _tool_message(part, max_tool_result_chars=max_tool_result_chars)
                     )
 
+    if user_prompt_override and not user_injected:
+        out_messages.insert(
+            0 if not out_messages or out_messages[0].get("role") != "system" else 1,
+            {"role": "user", "content": user_prompt_override},
+        )
+
     if not out_messages:
         return None
 
@@ -140,3 +150,20 @@ def convert_tool_trace(
         return None
 
     return {"messages": out_messages}
+
+
+def convert_tool_trace(
+    span: dict[str, Any],
+    *,
+    keep_thinking: bool = False,
+    max_tool_result_chars: int | None = 8192,
+    strip_validation_retries: bool = True,
+) -> dict[str, Any] | None:
+    """Convert span to OpenAI-style tool-call conversation rows."""
+    messages = extract_normalized_messages(span)
+    return convert_normalized_messages(
+        messages,
+        keep_thinking=keep_thinking,
+        max_tool_result_chars=max_tool_result_chars,
+        strip_validation_retries=strip_validation_retries,
+    )
