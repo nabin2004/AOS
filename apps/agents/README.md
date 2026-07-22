@@ -53,6 +53,8 @@ topics.txt  →  generate_prompts.py  →  prompts.jsonl
               + training_data/trajectories.jsonl
                                               ↓
                               export_local_sft.py  →  coder_sft/tool_trace*.jsonl
+                                              ↓
+                              upload_dataset.py  →  Hugging Face (nabin2004/AOS-Trajectories)
 
 (Logfire remains optional for prod debugging; export_coder_sft.py is secondary)
 ```
@@ -136,6 +138,18 @@ uv run python export_local_sft.py
 - `final_answer*.jsonl` is a text-only collapse (secondary)
 - Dedup: one row per `user_prompt`; keeps the **shortest successful** trajectory
 
+**Step 4 — publish to Hugging Face (optional)**
+
+Upload trajectories and tool_trace exports to the public dataset:
+
+```bash
+export HF_TOKEN=hf_...   # write token; never commit
+cd ../sft
+uv run python upload_dataset.py
+```
+
+Dataset: [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories). Phase 1 SFT (`apps/sft/run.py`) loads from this Hub repo by default.
+
 **Optional — Logfire export**
 
 For spans already sent to Logfire (production traffic):
@@ -156,7 +170,7 @@ uv run python export_coder_sft.py --skip-export --input export_traces/coder_trac
 - Start with `--limit 10` before large batches (each run = multiple LLM calls + Manim compile).
 - Filter on `"compile_ok": true` in `batch_runs.jsonl` or `run_result.json` for higher-quality SFT rows.
 - Loop caps per run: `request_limit=20`, `tool_calls_limit=40` (see `coder_run.py`).
-- Logfire = live debugging; `training_data/trajectories.jsonl` = training gold.
+- Logfire = live debugging; `training_data/trajectories.jsonl` = local training gold; [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories) = published Hub copy.
 - More detail: [`sft_data_gen/README.md`](sft_data_gen/README.md)
 
 ---

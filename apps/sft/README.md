@@ -8,15 +8,28 @@ Fine-tunes Gemma 4 E2B/E4B on Code Agent trajectories using LoRA + TRL `SFTTrain
 | Module                     | Role                                                             |
 | -------------------------- | ---------------------------------------------------------------- |
 | `[config.py](config.py)`   | `TrainingConfig` dataclass, LoRA/SFTConfig factories, CLI parser |
-| `[data.py](data.py)`       | Load JSONL, filter successful runs, Gemma chat formatting        |
+| `[data.py](data.py)`       | Load JSONL from HF or local path, filter, Gemma chat formatting  |
 | `[model.py](model.py)`     | Tokenizer + model load, 4-bit quant, freeze multimodal towers    |
 | `[trainer.py](trainer.py)` | Build `SFTTrainer`, train, save adapter + tokenizer              |
 | `[run.py](run.py)`         | CLI entrypoint                                                   |
+| `[upload_dataset.py](upload_dataset.py)` | Publish trajectories to Hugging Face Hub               |
 
 
-## Data format
+## Dataset
 
-Input JSONL records (one per trajectory). Keys from `[apps/agents/training_data/trajectories.jsonl](../agents/training_data/trajectories.jsonl)`:
+**Default:** [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories) on Hugging Face (public).
+
+| HF path | Use |
+|---------|-----|
+| `trajectories.jsonl` | Raw agent trajectories — **used by this trainer** |
+| `tool_trace/train.jsonl` | OpenAI-style tool-calling format (export / external finetune) |
+| `tool_trace/val.jsonl` | Held-out tool trace split |
+
+Local override: `--data-path ../agents/training_data/trajectories.jsonl`
+
+### Raw trajectory schema
+
+One JSON object per line:
 
 - `user_prompt` (or `prompt`) — user task
 - `trajectory` — list of `{input, output}` tool-call steps
@@ -29,6 +42,7 @@ Input JSONL records (one per trajectory). Keys from `[apps/agents/training_data/
 ```bash
 cd apps/sft
 uv run python run.py
+uv run python run.py --dataset-repo nabin2004/AOS-Trajectories
 uv run python run.py --data-path ../agents/training_data/trajectories.jsonl
 uv run python run.py --output-dir ./my-run --epochs 3 --batch-size 1
 uv run python run.py --no-4bit --report-to none
@@ -39,7 +53,9 @@ uv run python run.py --no-4bit --report-to none
 
 | Flag              | Description                                              |
 | ----------------- | -------------------------------------------------------- |
-| `--data-path`     | Trajectory JSONL path                                    |
+| `--dataset-repo`  | HF dataset id (default: `nabin2004/AOS-Trajectories`)    |
+| `--dataset-file`  | File within HF repo (default: `trajectories.jsonl`)      |
+| `--data-path`     | Local trajectory JSONL override (skips Hub download)      |
 | `--output-dir`    | Output directory for adapter + tokenizer                 |
 | `--model-id`      | Hugging Face model id (default: `google/gemma-4-E2B-it`) |
 | `--epochs`        | Training epochs                                          |
@@ -50,6 +66,19 @@ uv run python run.py --no-4bit --report-to none
 
 
 Edit defaults in `[config.py](config.py)` (`TrainingConfig`).
+
+## Publish / refresh dataset on Hugging Face
+
+After collecting traces and running `export_local_sft.py` in `apps/agents`:
+
+```bash
+export HF_TOKEN=hf_...   # write token; never commit
+cd apps/sft
+uv sync
+uv run python upload_dataset.py
+```
+
+Uploads `trajectories.jsonl`, `tool_trace/train.jsonl`, `tool_trace/val.jsonl`, and `metadata.jsonl` to the Hub.
 
 ## Weights & Biases
 

@@ -5,6 +5,7 @@ Usage (from apps/sft):
 
     uv run python run.py
     uv run python run.py --data-path ../agents/training_data/trajectories.jsonl
+    uv run python run.py --dataset-repo nabin2004/AOS-Trajectories
     uv run python run.py --no-4bit --report-to none
 """
 
@@ -41,11 +42,18 @@ def main() -> int:
     else:
         config = replace(config, report_to=resolve_report_to(config.report_to))
 
-    if not config.data_path.is_file():
+    if config.data_path is not None and not config.data_path.is_file():
         print(f"ERROR: Data file not found: {config.data_path}", file=sys.stderr)
         return 1
 
     config.output_dir.mkdir(parents=True, exist_ok=True)
+
+    data_source = (
+        str(config.data_path)
+        if config.data_path is not None
+        else f"hf://datasets/{config.dataset_repo}/{config.dataset_file}"
+    )
+    print(f"Loading dataset from {data_source}")
 
     tokenizer = load_tokenizer(config.model_id)
     dataset = load_training_dataset(config, tokenizer)

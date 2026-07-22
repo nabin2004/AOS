@@ -111,7 +111,20 @@ cp config.example.env config.env
 
 ## Stage training data
 
-Upload SFT trajectories (from trace collection):
+**Option A — Hugging Face (default for local SFT)**
+
+Phase 1 SFT loads from [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories) by default. No GCS upload needed for local runs.
+
+Refresh the Hub dataset after trace collection:
+
+```bash
+export HF_TOKEN=hf_...
+cd apps/sft && uv run python upload_dataset.py
+```
+
+**Option B — GCS (Vertex jobs)**
+
+Upload SFT trajectories for Vertex containers that read from GCS:
 
 ```bash
 gcloud storage cp \

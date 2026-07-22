@@ -14,7 +14,9 @@ SFT_ROOT = Path(__file__).resolve().parent
 @dataclass
 class TrainingConfig:
     model_id: str = "google/gemma-4-E2B-it"
-    data_path: Path = SFT_ROOT / "../agents/training_data/trajectories.jsonl"
+    dataset_repo: str = "nabin2004/AOS-Trajectories"
+    dataset_file: str = "trajectories.jsonl"
+    data_path: Path | None = None
     output_dir: Path = SFT_ROOT / "gemma4-manim-ft"
     use_4bit: bool = True
     seq_len: int = 8192
@@ -29,9 +31,12 @@ class TrainingConfig:
     attn_implementation: str = "sdpa"
 
     def resolve_paths(self) -> TrainingConfig:
+        data_path = self.data_path
+        if data_path is not None:
+            data_path = _resolve_path(data_path)
         return replace(
             self,
-            data_path=_resolve_path(self.data_path),
+            data_path=data_path,
             output_dir=_resolve_path(self.output_dir),
         )
 
@@ -85,6 +90,10 @@ class TrainingConfig:
         config = cls().resolve_paths()
         if args.data_path is not None:
             config = replace(config, data_path=_resolve_path(Path(args.data_path)))
+        if args.dataset_repo is not None:
+            config = replace(config, dataset_repo=args.dataset_repo)
+        if args.dataset_file is not None:
+            config = replace(config, dataset_file=args.dataset_file)
         if args.output_dir is not None:
             config = replace(config, output_dir=_resolve_path(Path(args.output_dir)))
         if args.model_id is not None:
@@ -126,7 +135,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--data-path",
         default=None,
-        help="Trajectory JSONL (default: ../agents/training_data/trajectories.jsonl)",
+        help="Local trajectory JSONL override (default: Hugging Face dataset)",
+    )
+    parser.add_argument(
+        "--dataset-repo",
+        default=None,
+        help='HF dataset id (default: "nabin2004/AOS-Trajectories")',
+    )
+    parser.add_argument(
+        "--dataset-file",
+        default=None,
+        help='File within HF dataset repo (default: "trajectories.jsonl")',
     )
     parser.add_argument(
         "--output-dir",

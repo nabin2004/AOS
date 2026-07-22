@@ -29,11 +29,15 @@ uv run python sft_data_gen/collect_traces.py --limit 100 --fast --convert-after-
 
 # 3) Or export separately after a batch
 uv run python export_local_sft.py
+
+# 4) Publish to Hugging Face (optional)
+export HF_TOKEN=hf_...   # write token; never commit
+cd ../sft && uv run python upload_dataset.py
 ```
 
 `--fast` disables Logfire/DBOS (no OTLP timeout stalls), skips narration, preloads the Manim doc RAG index, and runs **2 prompts in parallel** by default.
 
-Use `tool_trace*.jsonl` under `export_traces/coder_sft/` for tool-calling finetune data.
+Use `tool_trace*.jsonl` under `export_traces/coder_sft/` for tool-calling finetune data. Published copies live at [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories).
 
 ## Notes
 

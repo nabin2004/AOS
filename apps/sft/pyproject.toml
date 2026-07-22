@@ -8,6 +8,7 @@ dependencies = [
     "accelerate>=1.0.0",
     "bitsandbytes>=0.45.0",
     "datasets>=5.0.0",
+    "huggingface-hub>=0.27.0",
     "peft>=0.19.1",
     "torch>=2.5.0",
     "transformers>=4.50.0",
@@ -20,4 +21,4 @@ requires = ["setuptools>=69.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["config", "data", "model", "run", "trainer"]
+py-modules = ["config", "data", "model", "run", "trainer", "upload_dataset"]

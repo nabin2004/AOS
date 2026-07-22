@@ -8,6 +8,13 @@ from transformers import PreTrainedTokenizerBase
 from config import TrainingConfig
 
 
+def resolve_data_files(config: TrainingConfig) -> str:
+    """Return a path or hf:// URL for load_dataset."""
+    if config.data_path is not None:
+        return str(config.data_path)
+    return f"hf://datasets/{config.dataset_repo}/{config.dataset_file}"
+
+
 def format_trajectory_to_gemma(
     sample: dict[str, Any],
     tokenizer: PreTrainedTokenizerBase,
@@ -51,7 +58,8 @@ def load_training_dataset(
     config: TrainingConfig,
     tokenizer: PreTrainedTokenizerBase,
 ) -> Dataset:
-    dataset = load_dataset("json", data_files=str(config.data_path), split="train")
+    data_files = resolve_data_files(config)
+    dataset = load_dataset("json", data_files=data_files, split="train")
     dataset = dataset.filter(_is_trainable_record, num_proc=config.num_proc)
 
     def _format(sample: dict[str, Any]) -> dict[str, str]:
