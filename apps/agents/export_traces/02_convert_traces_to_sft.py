@@ -14,8 +14,9 @@ Usage:
 Gemma 4 E2B TRL handoff:
     - Base model: google/gemma-4-E2B
     - Tokenizer: google/gemma-4-E2B-it
-    - Dataset field: messages
+    - Dataset field: messages (structured tool_calls + tool roles)
     - SFTConfig(assistant_only_loss=True, packing=False)
+    - apps/sft applies templates/gemma4_training.jinja for loss masking
 """
 
 from __future__ import annotations
@@ -34,7 +35,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Convert Logfire traces to Gemma 4 E2B SFT JSONL"
     )
-    parser.add_argument("--input", required=True, help="Input JSONL from 01_export_traces")
+    parser.add_argument(
+        "--input", required=True, help="Input JSONL from 01_export_traces"
+    )
     parser.add_argument(
         "--output-dir",
         default="export_traces/sft_out",

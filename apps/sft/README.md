@@ -128,8 +128,10 @@ uv run --package sft python apps/sft/run.py --kaggle \
 Notes:
 
 - The `--kaggle` preset is also applied automatically when `KAGGLE_KERNEL_RUN_TYPE` is set.
-- Dataset rows are emitted as a `messages` column for TRL conversational SFT.
-- Gemma 4 has no TRL training chat template yet; `assistant_only_loss` is auto-disabled and the full sequence is trained.
+- Dataset rows use structured `tool_calls` + `tool` messages (Gemma 4 native format); pre-exported `messages` JSONL is passed through unchanged.
+- Gemma 4 uses [`templates/gemma4_training.jinja`](templates/gemma4_training.jinja) with `assistant_only_loss=True` so tool errors are visible but not trained on.
+- Validate masking before a long run: `uv run --package sft python apps/sft/test_assistant_mask.py`.
+- Harmless log noise is expected: BitsAndBytes `FutureWarning`, `warmup_ratio` deprecation, wandb init delay.
 - The Kaggle preset disables sequence packing (T4 uses SDPA, not Flash Attention).
 - Adapter weights and tokenizer are written under `/kaggle/working/` (persist as notebook output).
 - If you hit CUDA OOM, lower sequence length: `--seq-len 1024` (keep `--batch-size 1`).
