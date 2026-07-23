@@ -64,6 +64,7 @@ uv run python run.py --no-4bit --report-to none
 | `--no-4bit`       | Full BF16 instead of 4-bit (needs ~80GB+ VRAM)           |
 | `--report-to`     | Logging backend (`wandb` default; use `none` to disable) |
 | `--kaggle`        | T4-friendly preset: batch 1, seq 2048, GPU 0, strip towers |
+| `--runpod`        | RunPod preset: GPU-safe settings, output under `/workspace` |
 | `--seq-len`       | Max packed sequence length                               |
 | `--grad-accum`    | Gradient accumulation steps                              |
 | `--device-map`    | Model device map (`auto` or GPU index like `0`)          |
@@ -71,6 +72,31 @@ uv run python run.py --no-4bit --report-to none
 
 
 Edit defaults in `[config.py](config.py)` (`TrainingConfig`).
+
+## Run on RunPod
+
+Use a GPU pod with the repo cloned under your workspace. Do **not** use Kaggle `/kaggle/working/...` paths on RunPod.
+
+```bash
+export HF_TOKEN=...   # recommended for gated model + faster Hub downloads
+cd ~/AOS
+
+uv sync --package sft
+uv run --package sft python apps/sft/run.py --runpod \
+  --epochs 1 --report-to none
+```
+
+| Environment | Flag / command | Default output dir |
+|-------------|----------------|--------------------|
+| RunPod | `--runpod` | `/workspace/gemma4-manim-ft` |
+| Kaggle | `--kaggle --output-dir /kaggle/working/...` | notebook output |
+| Local | omit flags | `apps/sft/gemma4-manim-ft` |
+
+Notes:
+
+- `--runpod` applies the same GPU-safe training settings as `--kaggle` (batch 1, seq 2048, no packing).
+- If `/workspace` is not writable, output falls back to `./gemma4-manim-ft` in the current directory.
+- Override output with `--output-dir ./my-run` if needed.
 
 ## Run on Kaggle (T4×2)
 

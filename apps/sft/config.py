@@ -91,6 +91,8 @@ class TrainingConfig:
         config = cls().resolve_paths()
         if args.kaggle or os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
             config = apply_kaggle_preset(config)
+        if args.runpod:
+            config = apply_runpod_preset(config)
         if args.data_path is not None:
             config = replace(config, data_path=_resolve_path(Path(args.data_path)))
         if args.dataset_repo is not None:
@@ -137,6 +139,18 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
         packing=False,
         report_to=report_to,
     )
+
+
+def default_runpod_output_dir() -> Path:
+    workspace = Path("/workspace")
+    if workspace.is_dir() and os.access(workspace, os.W_OK):
+        return workspace / "gemma4-manim-ft"
+    return Path.cwd() / "gemma4-manim-ft"
+
+
+def apply_runpod_preset(config: TrainingConfig) -> TrainingConfig:
+    config = apply_kaggle_preset(config)
+    return replace(config, output_dir=default_runpod_output_dir())
 
 
 def _parse_device_map(value: str) -> str | dict[str, int]:
@@ -212,6 +226,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--kaggle",
         action="store_true",
         help="Apply Kaggle T4-friendly defaults (batch 1, seq 2048, GPU 0)",
+    )
+    parser.add_argument(
+        "--runpod",
+        action="store_true",
+        help="Apply RunPod defaults (GPU-safe settings, output under /workspace)",
     )
     parser.add_argument(
         "--seq-len",

@@ -8,10 +8,12 @@ Usage (from apps/sft):
     uv run python run.py --dataset-repo nabin2004/AOS-Trajectories
     uv run python run.py --no-4bit --report-to none
     uv run python run.py --kaggle --report-to none
+    uv run python run.py --runpod --epochs 1 --report-to none
 """
 
 from __future__ import annotations
 
+import os
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -27,6 +29,25 @@ if str(TRAINING_ROOT) not in sys.path:
     sys.path.insert(0, str(TRAINING_ROOT))
 
 from wandb_env import configure_wandb, resolve_report_to  # noqa: E402
+
+
+def ensure_output_dir(output_dir: Path) -> int | None:
+    """Validate and create output_dir; return exit code on failure."""
+    path_str = str(output_dir)
+    if path_str.startswith("/kaggle") and not os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
+        print(
+            "ERROR: /kaggle/... paths only work on Kaggle. "
+            "Use --runpod or --output-dir ./gemma4-manim-ft",
+            file=sys.stderr,
+        )
+        return 1
+
+    try:
+        output_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        print(f"ERROR: Cannot create output directory {output_dir}: {exc}", file=sys.stderr)
+        return 1
+    return None
 
 
 def main() -> int:
@@ -48,7 +69,8 @@ def main() -> int:
         print(f"ERROR: Data file not found: {config.data_path}", file=sys.stderr)
         return 1
 
-    config.output_dir.mkdir(parents=True, exist_ok=True)
+    if (err := ensure_output_dir(config.output_dir)) is not None:
+        return err
 
     data_source = (
         str(config.data_path)
