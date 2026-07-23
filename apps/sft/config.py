@@ -93,6 +93,8 @@ class TrainingConfig:
             config = apply_kaggle_preset(config)
         if args.runpod:
             config = apply_runpod_preset(config)
+        if args.colab or is_colab_runtime():
+            config = apply_colab_preset(config)
         if args.data_path is not None:
             config = replace(config, data_path=_resolve_path(Path(args.data_path)))
         if args.dataset_repo is not None:
@@ -151,6 +153,28 @@ def default_runpod_output_dir() -> Path:
 def apply_runpod_preset(config: TrainingConfig) -> TrainingConfig:
     config = apply_kaggle_preset(config)
     return replace(config, output_dir=default_runpod_output_dir())
+
+
+COLAB_DRIVE_ROOT = Path("/content/drive/MyDrive")
+
+
+def is_colab_runtime() -> bool:
+    return bool(os.environ.get("COLAB_RELEASE_TAG"))
+
+
+def default_colab_output_dir() -> Path:
+    override = os.environ.get("SFT_OUTPUT_DIR", "").strip()
+    if override:
+        return Path(override)
+    drive_out = COLAB_DRIVE_ROOT / "gemma4-manim-ft"
+    if COLAB_DRIVE_ROOT.is_dir() and os.access(COLAB_DRIVE_ROOT, os.W_OK):
+        return drive_out
+    return Path("/content/gemma4-manim-ft")
+
+
+def apply_colab_preset(config: TrainingConfig) -> TrainingConfig:
+    config = apply_kaggle_preset(config)
+    return replace(config, output_dir=default_colab_output_dir())
 
 
 def _parse_device_map(value: str) -> str | dict[str, int]:
@@ -231,6 +255,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--runpod",
         action="store_true",
         help="Apply RunPod defaults (GPU-safe settings, output under /workspace)",
+    )
+    parser.add_argument(
+        "--colab",
+        action="store_true",
+        help="Apply Colab defaults (GPU-safe settings, output under Google Drive)",
     )
     parser.add_argument(
         "--seq-len",

@@ -64,6 +64,7 @@ uv run python run.py --no-4bit --report-to none
 | `--no-4bit`       | Full BF16 instead of 4-bit (needs ~80GB+ VRAM)           |
 | `--report-to`     | Logging backend (`wandb` default; use `none` to disable) |
 | `--kaggle`        | T4-friendly preset: batch 1, seq 2048, GPU 0, strip towers |
+| `--colab`         | Colab preset: GPU-safe settings, output under Google Drive |
 | `--runpod`        | RunPod preset: GPU-safe settings, output under `/workspace` |
 | `--seq-len`       | Max packed sequence length                               |
 | `--grad-accum`    | Gradient accumulation steps                              |
@@ -73,30 +74,41 @@ uv run python run.py --no-4bit --report-to none
 
 Edit defaults in `[config.py](config.py)` (`TrainingConfig`).
 
-## Run on RunPod
+## Run on Google Colab
 
-Use a GPU pod with the repo cloned under your workspace. Do **not** use Kaggle `/kaggle/working/...` paths on RunPod.
+Mount Google Drive **before** training so adapter weights persist after the runtime disconnects. Do **not** use Kaggle `/kaggle/working/...` paths on Colab.
 
-```bash
-export HF_TOKEN=...   # recommended for gated model + faster Hub downloads
-cd ~/AOS
+```python
+# Cell 1 — mount Drive first (required for persistence)
+from google.colab import drive
+drive.mount("/content/drive")
 
-uv sync --package sft
-uv run --package sft python apps/sft/run.py --runpod \
-  --epochs 1 --report-to none
+import os
+os.environ["HF_TOKEN"] = "..."  # Colab secret
 ```
 
-| Environment | Flag / command | Default output dir |
-|-------------|----------------|--------------------|
-| RunPod | `--runpod` | `/workspace/gemma4-manim-ft` |
+```bash
+# Cell 2 — clone + train
+!git clone https://github.com/<your-org>/AOS.git /content/AOS
+%cd /content/AOS
+!pip install uv
+!uv sync --package sft
+!uv run --package sft python apps/sft/run.py --colab --epochs 1 --report-to none
+```
+
+| Environment | Flag | Default output dir |
+|-------------|------|--------------------|
+| **Colab** | `--colab` (auto when `COLAB_RELEASE_TAG` set) | `/content/drive/MyDrive/gemma4-manim-ft` |
 | Kaggle | `--kaggle --output-dir /kaggle/working/...` | notebook output |
+| RunPod | `--runpod` | `/workspace/gemma4-manim-ft` |
 | Local | omit flags | `apps/sft/gemma4-manim-ft` |
 
 Notes:
 
-- `--runpod` applies the same GPU-safe training settings as `--kaggle` (batch 1, seq 2048, no packing).
-- If `/workspace` is not writable, output falls back to `./gemma4-manim-ft` in the current directory.
-- Override output with `--output-dir ./my-run` if needed.
+- `--colab` applies the same GPU-safe training settings as `--kaggle` (batch 1, seq 2048, no packing).
+- If Drive is not mounted, output falls back to `/content/gemma4-manim-ft` (ephemeral — lost when runtime disconnects).
+- Override output with `--output-dir /content/drive/MyDrive/my-run` or `export SFT_OUTPUT_DIR=...`.
+- RunPod users: use `--runpod` instead (saves under `/workspace/gemma4-manim-ft`).
 
 ## Run on Kaggle (T4×2)
 

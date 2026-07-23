@@ -9,6 +9,7 @@ Usage (from apps/sft):
     uv run python run.py --no-4bit --report-to none
     uv run python run.py --kaggle --report-to none
     uv run python run.py --runpod --epochs 1 --report-to none
+    uv run python run.py --colab --epochs 1 --report-to none
 """
 
 from __future__ import annotations
@@ -31,16 +32,30 @@ if str(TRAINING_ROOT) not in sys.path:
 from wandb_env import configure_wandb, resolve_report_to  # noqa: E402
 
 
+def _is_ephemeral_colab_path(path: Path) -> bool:
+    path_str = str(path)
+    return path_str.startswith("/content") and not path_str.startswith("/content/drive")
+
+
 def ensure_output_dir(output_dir: Path) -> int | None:
     """Validate and create output_dir; return exit code on failure."""
     path_str = str(output_dir)
     if path_str.startswith("/kaggle") and not os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
         print(
-            "ERROR: /kaggle/... paths only work on Kaggle. "
-            "Use --runpod or --output-dir ./gemma4-manim-ft",
+            "ERROR: /kaggle/... paths only work on Kaggle.\n"
+            "On Colab use --colab (saves to Google Drive) or "
+            "--output-dir /content/drive/MyDrive/gemma4-manim-ft",
             file=sys.stderr,
         )
         return 1
+
+    if _is_ephemeral_colab_path(output_dir):
+        print(
+            f"WARNING: Saving to {output_dir} is ephemeral. "
+            "Mount Drive and use --colab or "
+            "--output-dir /content/drive/MyDrive/gemma4-manim-ft",
+            file=sys.stderr,
+        )
 
     try:
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -71,6 +86,8 @@ def main() -> int:
 
     if (err := ensure_output_dir(config.output_dir)) is not None:
         return err
+
+    print(f"Output directory: {config.output_dir}")
 
     data_source = (
         str(config.data_path)
