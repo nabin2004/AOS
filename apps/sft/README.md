@@ -63,9 +63,37 @@ uv run python run.py --no-4bit --report-to none
 | `--learning-rate` | AdamW learning rate                                      |
 | `--no-4bit`       | Full BF16 instead of 4-bit (needs ~80GB+ VRAM)           |
 | `--report-to`     | Logging backend (`wandb` default; use `none` to disable) |
+| `--kaggle`        | T4-friendly preset: batch 1, seq 2048, GPU 0, strip towers |
+| `--seq-len`       | Max packed sequence length                               |
+| `--grad-accum`    | Gradient accumulation steps                              |
+| `--device-map`    | Model device map (`auto` or GPU index like `0`)          |
+| `--no-strip-towers` | Keep vision/audio towers loaded (more VRAM)            |
 
 
 Edit defaults in `[config.py](config.py)` (`TrainingConfig`).
+
+## Run on Kaggle (T4×2)
+
+Use a Kaggle notebook with **GPU T4 x2** enabled. Add a notebook secret `HF_TOKEN` with a Hugging Face token that has accepted the [google/gemma-4-E2B-it](https://huggingface.co/google/gemma-4-E2B-it) license.
+
+```bash
+export UV_LINK_MODE=copy
+export HF_TOKEN=...   # from Kaggle secrets
+cd /kaggle/working && git clone https://github.com/<your-org>/AOS.git AOS && cd AOS
+
+uv sync --package sft
+uv run --package sft python apps/sft/run.py --kaggle \
+  --report-to none \
+  --output-dir /kaggle/working/gemma4-manim-ft
+```
+
+Notes:
+
+- The `--kaggle` preset is also applied automatically when `KAGGLE_KERNEL_RUN_TYPE` is set.
+- Adapter weights and tokenizer are written under `/kaggle/working/` (persist as notebook output).
+- If you hit CUDA OOM, lower sequence length: `--seq-len 1024` (keep `--batch-size 1`).
+- `UV_LINK_MODE=copy` avoids uv hardlink warnings on Kaggle’s filesystem.
+- Optional: add a `WANDB_API_KEY` secret to re-enable wandb logging with `--kaggle`.
 
 ## Publish / refresh dataset on Hugging Face
 

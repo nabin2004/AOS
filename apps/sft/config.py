@@ -10,6 +10,10 @@ from trl import SFTConfig
 
 SFT_ROOT = Path(__file__).resolve().parent
 
+LANGUAGE_MODEL_LORA_TARGETS = (
+    r".*\.language_model.*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)"
+)
+
 
 @dataclass
 class TrainingConfig:
@@ -29,6 +33,8 @@ class TrainingConfig:
     run_name: str = "gemma4-manim-sft"
     wandb_project: str = "aos-sft"
     attn_implementation: str = "sdpa"
+    device_map: str | dict[str, int] = "auto"
+    strip_multimodal_towers: bool = False
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -45,18 +51,11 @@ class TrainingConfig:
             r=64,
             lora_alpha=128,
             lora_dropout=0.05,
-            target_modules=[
-                "q_proj",
-                "k_proj",
-                "v_proj",
-                "o_proj",
-                "gate_proj",
-                "up_proj",
-                "down_proj",
-            ],
+            target_modules=LANGUAGE_MODEL_LORA_TARGETS,
             bias="none",
             task_type="CAUSAL_LM",
             modules_to_save=["embed_tokens", "lm_head"],
+            ensure_weight_tying=True,
         )
 
     def sft_config(self) -> SFTConfig:
@@ -78,7 +77,7 @@ class TrainingConfig:
             logging_steps=10,
             save_strategy="epoch",
             packing=True,
-            # max_seq_length=self.seq_len,
+            max_seq_length=self.seq_len,
             assistant_only_loss=True,
             dataset_kwargs={"add_special_tokens": False},
             report_to=self.report_to,
@@ -88,6 +87,8 @@ class TrainingConfig:
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
         config = cls().resolve_paths()
+        if args.kaggle or os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
+            config = apply_kaggle_preset(config)
         if args.data_path is not None:
             config = replace(config, data_path=_resolve_path(Path(args.data_path)))
         if args.dataset_repo is not None:
@@ -108,7 +109,41 @@ class TrainingConfig:
             config = replace(config, use_4bit=False)
         if args.report_to is not None:
             config = replace(config, report_to=args.report_to)
+        if args.seq_len is not None:
+            config = replace(config, seq_len=args.seq_len)
+        if args.grad_accum is not None:
+            config = replace(config, grad_accum=args.grad_accum)
+        if args.device_map is not None:
+            config = replace(config, device_map=_parse_device_map(args.device_map))
+        if args.no_strip_towers:
+            config = replace(config, strip_multimodal_towers=False)
         return apply_vertex_env(config)
+
+
+def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    return replace(
+        config,
+        batch_size=1,
+        grad_accum=8,
+        seq_len=2048,
+        num_proc=2,
+        device_map={"": 0},
+        strip_multimodal_towers=True,
+        report_to=report_to,
+    )
+
+
+def _parse_device_map(value: str) -> str | dict[str, int]:
+    if value == "auto":
+        return "auto"
+    if value.isdigit():
+        return {"": int(value)}
+    raise argparse.ArgumentTypeError(
+        f'Invalid device map "{value}". Use "auto" or a GPU index like "0".'
+    )
 
 
 def apply_vertex_env(config: TrainingConfig) -> TrainingConfig:
@@ -169,5 +204,32 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--report-to",
         default=None,
         help='Logging backend (default: "wandb"; use "none" to disable)',
+    )
+    parser.add_argument(
+        "--kaggle",
+        action="store_true",
+        help="Apply Kaggle T4-friendly defaults (batch 1, seq 2048, GPU 0)",
+    )
+    parser.add_argument(
+        "--seq-len",
+        type=int,
+        default=None,
+        help="Max sequence length for SFT packing (default: 8192, 2048 with --kaggle)",
+    )
+    parser.add_argument(
+        "--grad-accum",
+        type=int,
+        default=None,
+        help="Gradient accumulation steps",
+    )
+    parser.add_argument(
+        "--device-map",
+        default=None,
+        help='Device map for model load ("auto" or GPU index like "0")',
+    )
+    parser.add_argument(
+        "--no-strip-towers",
+        action="store_true",
+        help="Keep vision/audio towers loaded (uses more VRAM)",
     )
     return parser

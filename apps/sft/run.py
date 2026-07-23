@@ -7,6 +7,7 @@ Usage (from apps/sft):
     uv run python run.py --data-path ../agents/training_data/trajectories.jsonl
     uv run python run.py --dataset-repo nabin2004/AOS-Trajectories
     uv run python run.py --no-4bit --report-to none
+    uv run python run.py --kaggle --report-to none
 """
 
 from __future__ import annotations
