@@ -78,7 +78,7 @@ class TrainingConfig:
             logging_steps=10,
             save_strategy="epoch",
             packing=True,
-            max_seq_length=self.seq_len,
+            # max_seq_length=self.seq_len,
             assistant_only_loss=True,
             dataset_kwargs={"add_special_tokens": False},
             report_to=self.report_to,
