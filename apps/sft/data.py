@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from datasets import Dataset, load_dataset
-from transformers import PreTrainedTokenizerBase
 
 from config import TrainingConfig
 
@@ -15,11 +14,10 @@ def resolve_data_files(config: TrainingConfig) -> str:
     return f"hf://datasets/{config.dataset_repo}/{config.dataset_file}"
 
 
-def format_trajectory_to_gemma(
+def format_trajectory_messages(
     sample: dict[str, Any],
-    tokenizer: PreTrainedTokenizerBase,
-) -> dict[str, str]:
-    """Convert an agent trajectory record into Gemma 4 chat-formatted text."""
+) -> dict[str, list[dict[str, str]]]:
+    """Convert an agent trajectory record into a conversational messages list."""
     prompt = sample.get("prompt") or sample.get("user_prompt") or ""
     narration = sample.get("narration") or sample.get("summary", "")
     final_code = sample.get("final_code") or ""
@@ -38,13 +36,7 @@ def format_trajectory_to_gemma(
     final_content = f"```python\n{final_code}\n```\n\nNarration: {narration}"
     messages.append({"role": "assistant", "content": final_content})
 
-    text = tokenizer.apply_chat_template(
-        messages,
-        tokenize=False,
-        add_generation_prompt=False,
-        enable_thinking=True,
-    )
-    return {"text": text}
+    return {"messages": messages}
 
 
 def _is_trainable_record(sample: dict[str, Any]) -> bool:
@@ -54,19 +46,13 @@ def _is_trainable_record(sample: dict[str, Any]) -> bool:
     return bool(final_code and str(final_code).strip())
 
 
-def load_training_dataset(
-    config: TrainingConfig,
-    tokenizer: PreTrainedTokenizerBase,
-) -> Dataset:
+def load_training_dataset(config: TrainingConfig) -> Dataset:
     data_files = resolve_data_files(config)
     dataset = load_dataset("json", data_files=data_files, split="train")
     dataset = dataset.filter(_is_trainable_record, num_proc=config.num_proc)
 
-    def _format(sample: dict[str, Any]) -> dict[str, str]:
-        return format_trajectory_to_gemma(sample, tokenizer)
-
     return dataset.map(
-        _format,
+        format_trajectory_messages,
         remove_columns=dataset.column_names,
         num_proc=config.num_proc,
     )

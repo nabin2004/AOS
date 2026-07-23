@@ -57,7 +57,7 @@ def main() -> int:
     print(f"Loading dataset from {data_source}")
 
     tokenizer = load_tokenizer(config.model_id)
-    dataset = load_training_dataset(config, tokenizer)
+    dataset = load_training_dataset(config)
     model = load_model(config)
     trainer = build_trainer(model, tokenizer, dataset, config)
     train_and_save(trainer, tokenizer, config)

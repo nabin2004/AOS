@@ -35,6 +35,7 @@ class TrainingConfig:
     attn_implementation: str = "sdpa"
     device_map: str | dict[str, int] = "auto"
     strip_multimodal_towers: bool = False
+    packing: bool = True
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -76,8 +77,8 @@ class TrainingConfig:
             bf16=True,
             logging_steps=10,
             save_strategy="epoch",
-            packing=True,
-            # max_seq_length=self.seq_len,
+            packing=self.packing,
+            max_length=self.seq_len,
             assistant_only_loss=True,
             dataset_kwargs={"add_special_tokens": False},
             report_to=self.report_to,
@@ -132,6 +133,7 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
         num_proc=2,
         device_map={"": 0},
         strip_multimodal_towers=True,
+        packing=False,
         report_to=report_to,
     )
 
