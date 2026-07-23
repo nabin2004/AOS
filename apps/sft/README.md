@@ -90,12 +90,13 @@ uv run --package sft python apps/sft/run.py --kaggle \
 Notes:
 
 - The `--kaggle` preset is also applied automatically when `KAGGLE_KERNEL_RUN_TYPE` is set.
-- Dataset rows are emitted as a `messages` column so TRL can apply `assistant_only_loss` (train on assistant turns only).
+- Dataset rows are emitted as a `messages` column for TRL conversational SFT.
+- Gemma 4 has no TRL training chat template yet; `assistant_only_loss` is auto-disabled and the full sequence is trained.
 - The Kaggle preset disables sequence packing (T4 uses SDPA, not Flash Attention).
 - Adapter weights and tokenizer are written under `/kaggle/working/` (persist as notebook output).
 - If you hit CUDA OOM, lower sequence length: `--seq-len 1024` (keep `--batch-size 1`).
 - `UV_LINK_MODE=copy` avoids uv hardlink warnings on Kaggle's filesystem.
-- Optional: add `HF_TOKEN` as a Kaggle secret to avoid Hub rate-limit warnings (public dataset downloads work without it).
+- Set `HF_TOKEN` as a Kaggle secret for faster Hub downloads and gated model access.
 - Optional: add a `WANDB_API_KEY` secret to re-enable wandb logging with `--kaggle`.
 
 ## Publish / refresh dataset on Hugging Face

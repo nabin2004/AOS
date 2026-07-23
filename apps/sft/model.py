@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 import torch
 from transformers import (
     AutoModelForCausalLM,
@@ -18,8 +20,13 @@ _MULTIMODAL_TOWER_ATTRS = (
 )
 
 
+def _hub_token() -> str | None:
+    token = os.environ.get("HF_TOKEN", "").strip()
+    return token or None
+
+
 def load_tokenizer(model_id: str) -> PreTrainedTokenizerBase:
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    tokenizer = AutoTokenizer.from_pretrained(model_id, token=_hub_token())
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     return tokenizer
@@ -66,10 +73,12 @@ def load_model(config: TrainingConfig) -> torch.nn.Module:
     if config.use_4bit:
         patch_kbit_training_prep()
 
+    token = _hub_token()
     common_kwargs = {
-        "torch_dtype": torch.bfloat16,
+        "dtype": torch.bfloat16,
         "attn_implementation": config.attn_implementation,
         "device_map": config.device_map,
+        "token": token,
     }
 
     if config.use_4bit:

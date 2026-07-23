@@ -16,6 +16,7 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 
+from chat_template import prepare_training_tokenizer
 from config import TrainingConfig, build_arg_parser
 from data import load_training_dataset
 from model import load_model, load_tokenizer
@@ -57,6 +58,7 @@ def main() -> int:
     print(f"Loading dataset from {data_source}")
 
     tokenizer = load_tokenizer(config.model_id)
+    config = prepare_training_tokenizer(tokenizer, config)
     dataset = load_training_dataset(config)
     model = load_model(config)
     trainer = build_trainer(model, tokenizer, dataset, config)

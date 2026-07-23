@@ -36,6 +36,7 @@ class TrainingConfig:
     device_map: str | dict[str, int] = "auto"
     strip_multimodal_towers: bool = False
     packing: bool = True
+    assistant_only_loss: bool = True
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -79,7 +80,7 @@ class TrainingConfig:
             save_strategy="epoch",
             packing=self.packing,
             max_length=self.seq_len,
-            assistant_only_loss=True,
+            assistant_only_loss=self.assistant_only_loss,
             dataset_kwargs={"add_special_tokens": False},
             report_to=self.report_to,
             run_name=self.run_name,
