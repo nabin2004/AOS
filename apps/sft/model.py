@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import torch
 from transformers import (
@@ -69,7 +70,9 @@ def patch_kbit_training_prep() -> None:
     peft_other._aos_kbit_patch_applied = True
 
 
-def load_model(config: TrainingConfig) -> torch.nn.Module:
+def load_model(
+    config: TrainingConfig, *, for_inference: bool = False
+) -> torch.nn.Module:
     if config.use_4bit:
         patch_kbit_training_prep()
 
@@ -103,5 +106,46 @@ def load_model(config: TrainingConfig) -> torch.nn.Module:
         strip_multimodal_towers(model)
 
     freeze_multimodal_towers(model)
-    model.gradient_checkpointing_enable()
+    if for_inference:
+        model.eval()
+    else:
+        model.gradient_checkpointing_enable()
     return model
+
+
+def load_adapter_tokenizer(
+    config: TrainingConfig,
+    adapter_dir: Path | str,
+) -> PreTrainedTokenizerBase:
+    adapter_path = Path(adapter_dir)
+    tokenizer_source = (
+        adapter_path
+        if (adapter_path / "tokenizer_config.json").is_file()
+        else config.model_id
+    )
+    tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_source), token=_hub_token())
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    return tokenizer
+
+
+def load_inference_model(
+    config: TrainingConfig,
+    adapter_dir: Path | str,
+) -> tuple[torch.nn.Module, PreTrainedTokenizerBase]:
+    from peft import PeftModel
+
+    adapter_path = Path(adapter_dir)
+    if not adapter_path.is_dir():
+        raise FileNotFoundError(f"Adapter directory not found: {adapter_path}")
+    if not (adapter_path / "adapter_config.json").is_file():
+        raise FileNotFoundError(
+            f"No adapter_config.json in {adapter_path}. "
+            "Point --adapter-dir at the directory saved by run.py."
+        )
+
+    tokenizer = load_adapter_tokenizer(config, adapter_path)
+    model = load_model(config, for_inference=True)
+    model = PeftModel.from_pretrained(model, str(adapter_path), token=_hub_token())
+    model.eval()
+    return model, tokenizer

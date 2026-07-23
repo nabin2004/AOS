@@ -12,6 +12,7 @@ Fine-tunes Gemma 4 E2B/E4B on Code Agent trajectories using LoRA + TRL `SFTTrain
 | `[model.py](model.py)`     | Tokenizer + model load, 4-bit quant, freeze multimodal towers    |
 | `[trainer.py](trainer.py)` | Build `SFTTrainer`, train, save adapter + tokenizer              |
 | `[run.py](run.py)`         | CLI entrypoint                                                   |
+| `[infer.py](infer.py)`     | Load a fine-tuned adapter and generate a Manim response          |
 | `[upload_dataset.py](upload_dataset.py)` | Publish trajectories to Hugging Face Hub               |
 
 
@@ -73,6 +74,43 @@ uv run python run.py --no-4bit --report-to none
 
 
 Edit defaults in `[config.py](config.py)` (`TrainingConfig`).
+
+## Inference after fine-tuning
+
+Load the LoRA adapter saved by `run.py` and generate a Manim response:
+
+```bash
+cd apps/sft
+uv run python infer.py --adapter-dir ./gemma4-manim-ft \
+  --prompt "Animate a unit circle morphing into an ellipse under a 2x2 matrix."
+```
+
+Colab (after training to `/content/gemma4-manim-ft`):
+
+```bash
+uv run --package sft python apps/sft/infer.py \
+  --adapter-dir /content/gemma4-manim-ft \
+  --colab \
+  --prompt "Create a short Manim scene explaining eigenvectors in 2D."
+```
+
+Use a training-set prompt for a quick sanity check:
+
+```bash
+uv run python infer.py --adapter-dir ./gemma4-manim-ft --dataset-index 0
+```
+
+| Flag | Description |
+|------|-------------|
+| `--adapter-dir` | Output dir from training (default: `gemma4-manim-ft` or Colab Drive path with `--colab`) |
+| `--prompt` | User task text |
+| `--prompt-file` | Read prompt from a file |
+| `--dataset-index` | Pull `user_prompt` from the HF trajectories dataset |
+| `--max-new-tokens` | Generation limit (default: 2048) |
+| `--temperature` | Sampling temperature; `0` = greedy (default: 0.7) |
+| `--colab` / `--kaggle` / `--runpod` | Same VRAM-friendly load defaults as training |
+
+The script prints the raw assistant turn (tool calls and/or Python code). Render the extracted Manim script with your usual Code Agent or `manim` workflow to verify quality.
 
 ## Run on Google Colab
 
