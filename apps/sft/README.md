@@ -13,6 +13,8 @@ Fine-tunes Gemma 4 E2B/E4B on Code Agent trajectories using LoRA + TRL `SFTTrain
 | `[trainer.py](trainer.py)` | Build `SFTTrainer`, train, save adapter + tokenizer              |
 | `[run.py](run.py)`         | CLI entrypoint                                                   |
 | `[infer.py](infer.py)`     | Load a fine-tuned adapter and generate a Manim response          |
+| `[preflight_gemma4.py](preflight_gemma4.py)` | Pre-flight chat template + mask checks before training |
+| `[merge_adapter.py](merge_adapter.py)` | Merge LoRA into bf16 base for vLLM / HF deploy (CPU)     |
 | `[upload_dataset.py](upload_dataset.py)` | Publish trajectories to Hugging Face Hub               |
 
 
@@ -71,9 +73,25 @@ uv run python run.py --no-4bit --report-to none
 | `--grad-accum`    | Gradient accumulation steps                              |
 | `--device-map`    | Model device map (`auto` or GPU index like `0`)          |
 | `--no-strip-towers` | Keep vision/audio towers loaded (more VRAM)            |
+| `--attn-implementation` | Attention backend: `eager` (default), `sdpa`, `flash_attention_2` |
+| `--use-liger-kernel` | Enable liger-kernel fused ops (~2GB activation savings on T4) |
 
 
 Edit defaults in `[config.py](config.py)` (`TrainingConfig`).
+
+## Pre-flight (run before a long training job)
+
+Gemma 4 unified models need correct chat-template formatting and `{% generation %}` markers for `assistant_only_loss`. Run this on Colab/Kaggle before `--epochs 2`:
+
+```bash
+cd apps/sft
+uv run python preflight_gemma4.py --colab
+uv run python preflight_gemma4.py --kaggle --load-model   # optional GPU smoke load
+```
+
+Checks: rendered template has `<|turn>model` (not `<unknown_role>`), assistant loss masks are non-zero, tool errors are masked but visible in context.
+
+Legacy mask test: `uv run python test_assistant_mask.py`.
 
 ## Inference after fine-tuning
 
@@ -112,6 +130,21 @@ uv run python infer.py --adapter-dir ./gemma4-manim-ft --dataset-index 0
 
 The script prints the raw assistant turn (tool calls and/or Python code). Render the extracted Manim script with your usual Code Agent or `manim` workflow to verify quality.
 
+Inference validates that the adapter directory saved a training chat template with `{% generation %}` markers (required for models trained with `assistant_only_loss=True`).
+
+## Merge adapter for deployment
+
+Training saves **LoRA adapter weights only**. For vLLM or a merged Hugging Face upload, merge on **CPU in bf16** — never merge into the 4-bit training checkpoint:
+
+```bash
+cd apps/sft
+uv run python merge_adapter.py \
+  --adapter-dir ./gemma4-manim-ft \
+  --output-dir ./gemma4-manim-merged
+```
+
+Quantize the merged model separately (GGUF / AWQ) if needed.
+
 ## Run on Google Colab
 
 Mount Google Drive **before** training so adapter weights persist after the runtime disconnects. Do **not** use Kaggle `/kaggle/working/...` paths on Colab.
@@ -131,6 +164,7 @@ os.environ["HF_TOKEN"] = "..."  # Colab secret
 %cd /content/AOS
 !pip install uv
 !uv sync --package sft
+!uv run --package sft python apps/sft/preflight_gemma4.py --colab
 !uv run --package sft python apps/sft/run.py --colab --epochs 1 --report-to none
 ```
 
@@ -168,9 +202,10 @@ Notes:
 - The `--kaggle` preset is also applied automatically when `KAGGLE_KERNEL_RUN_TYPE` is set.
 - Dataset rows use structured `tool_calls` + `tool` messages (Gemma 4 native format); pre-exported `messages` JSONL is passed through unchanged.
 - Gemma 4 uses [`templates/gemma4_training.jinja`](templates/gemma4_training.jinja) with `assistant_only_loss=True` so tool errors are visible but not trained on.
-- Validate masking before a long run: `uv run --package sft python apps/sft/test_assistant_mask.py`.
+- Run [`preflight_gemma4.py`](preflight_gemma4.py) before a long run (replaces manual template inspection).
+- Default attention is **`eager`** (Gemma 4 unified arch). Use `--attn-implementation sdpa` only after a successful preflight if you need the speed/VRAM tradeoff.
 - Harmless log noise is expected: BitsAndBytes `FutureWarning`, `warmup_ratio` deprecation, wandb init delay.
-- The Kaggle preset disables sequence packing (T4 uses SDPA, not Flash Attention).
+- The Kaggle preset disables sequence packing and strips unused vision/audio towers.
 - Adapter weights and tokenizer are written under `/kaggle/working/` (persist as notebook output).
 - If you hit CUDA OOM, lower sequence length: `--seq-len 1024` (keep `--batch-size 1`).
 - `UV_LINK_MODE=copy` avoids uv hardlink warnings on Kaggle's filesystem.
@@ -207,8 +242,23 @@ For GPU training on Google Cloud (Custom Jobs, GCS staging, Artifact Registry im
 
 ## Dependencies
 
+Gemma 4 requires a recent **transformers** build with `gemma4_unified` support (`>=4.51.0` in `pyproject.toml`). If model load fails on Colab/Kaggle with an unknown architecture error:
+
+```bash
+pip install "git+https://github.com/huggingface/transformers.git"
+```
+
 4-bit training requires `bitsandbytes` (CUDA). Install via workspace:
 
 ```bash
 cd apps/sft && uv sync
 ```
+
+Optional activation-memory savings on T4/L4 (~2GB):
+
+```bash
+uv sync --package sft --extra liger
+uv run python run.py --colab --use-liger-kernel --report-to none
+```
+
+Model loading uses `AutoModelForImageTextToText` (falls back to `AutoModelForCausalLM` on older transformers).

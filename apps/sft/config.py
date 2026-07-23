@@ -32,11 +32,12 @@ class TrainingConfig:
     report_to: str = "wandb"
     run_name: str = "gemma4-manim-sft"
     wandb_project: str = "aos-sft"
-    attn_implementation: str = "sdpa"
+    attn_implementation: str = "eager"
     device_map: str | dict[str, int] = "auto"
     strip_multimodal_towers: bool = False
     packing: bool = True
     assistant_only_loss: bool = True
+    use_liger_kernel: bool = False
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -62,29 +63,32 @@ class TrainingConfig:
 
     def sft_config(self) -> SFTConfig:
         logging_dir = os.environ.get("AIP_TENSORBOARD_LOG_DIR") or None
-        return SFTConfig(
-            output_dir=str(self.output_dir),
-            logging_dir=logging_dir,
-            num_train_epochs=self.epochs,
-            per_device_train_batch_size=self.batch_size,
-            gradient_accumulation_steps=self.grad_accum,
-            gradient_checkpointing=True,
-            gradient_checkpointing_kwargs={"use_reentrant": False},
-            use_cache=False,
-            learning_rate=self.learning_rate,
-            lr_scheduler_type="cosine",
-            warmup_ratio=0.03,
-            optim="adamw_torch_fused",
-            bf16=True,
-            logging_steps=10,
-            save_strategy="epoch",
-            packing=self.packing,
-            max_length=self.seq_len,
-            assistant_only_loss=self.assistant_only_loss,
-            dataset_kwargs={"add_special_tokens": False},
-            report_to=self.report_to,
-            run_name=self.run_name,
-        )
+        sft_kwargs: dict = {
+            "output_dir": str(self.output_dir),
+            "logging_dir": logging_dir,
+            "num_train_epochs": self.epochs,
+            "per_device_train_batch_size": self.batch_size,
+            "gradient_accumulation_steps": self.grad_accum,
+            "gradient_checkpointing": True,
+            "gradient_checkpointing_kwargs": {"use_reentrant": False},
+            "use_cache": False,
+            "learning_rate": self.learning_rate,
+            "lr_scheduler_type": "cosine",
+            "warmup_ratio": 0.03,
+            "optim": "adamw_torch_fused",
+            "bf16": True,
+            "logging_steps": 10,
+            "save_strategy": "epoch",
+            "packing": self.packing,
+            "max_length": self.seq_len,
+            "assistant_only_loss": self.assistant_only_loss,
+            "dataset_kwargs": {"add_special_tokens": False},
+            "report_to": self.report_to,
+            "run_name": self.run_name,
+        }
+        if self.use_liger_kernel and _liger_kernel_available():
+            sft_kwargs["use_liger_kernel"] = True
+        return SFTConfig(**sft_kwargs)
 
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
@@ -123,7 +127,20 @@ class TrainingConfig:
             config = replace(config, device_map=_parse_device_map(args.device_map))
         if args.no_strip_towers:
             config = replace(config, strip_multimodal_towers=False)
+        if args.attn_implementation is not None:
+            config = replace(config, attn_implementation=args.attn_implementation)
+        if args.use_liger_kernel:
+            config = replace(config, use_liger_kernel=True)
         return apply_vertex_env(config)
+
+
+def _liger_kernel_available() -> bool:
+    try:
+        import liger_kernel  # noqa: F401
+
+        return True
+    except ImportError:
+        return False
 
 
 def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
@@ -139,6 +156,7 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
         device_map={"": 0},
         strip_multimodal_towers=True,
         packing=False,
+        attn_implementation="eager",
         report_to=report_to,
     )
 
@@ -282,5 +300,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--no-strip-towers",
         action="store_true",
         help="Keep vision/audio towers loaded (uses more VRAM)",
+    )
+    parser.add_argument(
+        "--attn-implementation",
+        choices=("eager", "sdpa", "flash_attention_2"),
+        default=None,
+        help='Attention backend (default: "eager" for Gemma 4 unified arch)',
+    )
+    parser.add_argument(
+        "--use-liger-kernel",
+        action="store_true",
+        help="Enable liger-kernel fused ops in SFTTrainer (requires optional extra)",
     )
     return parser

@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 
-from chat_template import prepare_training_tokenizer
+from chat_template import prepare_training_tokenizer, validate_training_template
 from config import TrainingConfig
 from data import format_trajectory_messages
 from model import load_tokenizer
@@ -43,6 +43,7 @@ def main() -> int:
     tokenizer = load_tokenizer("google/gemma-4-E2B-it")
     config = prepare_training_tokenizer(tokenizer, TrainingConfig())
     assert config.assistant_only_loss is True, "assistant_only_loss should stay enabled"
+    validate_training_template(tokenizer, require_generation_markers=True)
 
     processed = tokenizer.apply_chat_template(
         messages,

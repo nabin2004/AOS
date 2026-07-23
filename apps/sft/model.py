@@ -70,6 +70,28 @@ def patch_kbit_training_prep() -> None:
     peft_other._aos_kbit_patch_applied = True
 
 
+def _load_pretrained_gemma4(model_id: str, **kwargs) -> torch.nn.Module:
+    """Load Gemma 4 unified checkpoint; prefer ImageTextToText over CausalLM."""
+    try:
+        from transformers import AutoModelForImageTextToText
+
+        return AutoModelForImageTextToText.from_pretrained(
+            model_id,
+            trust_remote_code=True,
+            **kwargs,
+        )
+    except Exception as exc:
+        print(
+            "WARNING: AutoModelForImageTextToText load failed "
+            f"({type(exc).__name__}: {exc}). Falling back to AutoModelForCausalLM."
+        )
+        return AutoModelForCausalLM.from_pretrained(
+            model_id,
+            trust_remote_code=True,
+            **kwargs,
+        )
+
+
 def load_model(
     config: TrainingConfig, *, for_inference: bool = False
 ) -> torch.nn.Module:
@@ -91,16 +113,13 @@ def load_model(
             bnb_4bit_quant_type="nf4",
             bnb_4bit_compute_dtype=torch.bfloat16,
         )
-        model = AutoModelForCausalLM.from_pretrained(
+        model = _load_pretrained_gemma4(
             config.model_id,
             quantization_config=bnb_config,
             **common_kwargs,
         )
     else:
-        model = AutoModelForCausalLM.from_pretrained(
-            config.model_id,
-            **common_kwargs,
-        )
+        model = _load_pretrained_gemma4(config.model_id, **common_kwargs)
 
     if config.strip_multimodal_towers:
         strip_multimodal_towers(model)
@@ -132,8 +151,12 @@ def load_adapter_tokenizer(
 def load_inference_model(
     config: TrainingConfig,
     adapter_dir: Path | str,
+    *,
+    validate_template: bool = True,
 ) -> tuple[torch.nn.Module, PreTrainedTokenizerBase]:
     from peft import PeftModel
+
+    from chat_template import prepare_training_tokenizer, validate_training_template
 
     adapter_path = Path(adapter_dir)
     if not adapter_path.is_dir():
@@ -145,6 +168,10 @@ def load_inference_model(
         )
 
     tokenizer = load_adapter_tokenizer(config, adapter_path)
+    if validate_template:
+        prepare_training_tokenizer(tokenizer, config)
+        validate_training_template(tokenizer, require_generation_markers=True)
+
     model = load_model(config, for_inference=True)
     model = PeftModel.from_pretrained(model, str(adapter_path), token=_hub_token())
     model.eval()
