@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import sys
 from pathlib import Path
@@ -65,6 +66,32 @@ def test_configure_logfire_skipped_when_disabled(
             configure_logfire()
     configure.assert_not_called()
     instrument.assert_not_called()
+
+
+def test_select_prompts_applies_limit_after_resume(tmp_path: Path) -> None:
+    """--limit must take the next N unfinished prompts, not the first N rows."""
+    mod = _import_collect_traces()
+    records = [{"index": i, "prompt": f"p{i}"} for i in range(10)]
+    manifest = tmp_path / "batch.jsonl"
+    # Indices 0-4 already completed
+    manifest.write_text(
+        "\n".join(
+            json.dumps({"index": i, "status": "ok", "compile_ok": True})
+            for i in range(5)
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    selected = mod.select_prompts(
+        records,
+        offset=0,
+        limit=3,
+        indices=None,
+        resume=True,
+        skip_failed=False,
+        manifest_path=manifest,
+    )
+    assert [r["index"] for r in selected] == [5, 6, 7]
 
 
 def test_collect_traces_runs_concurrent_tasks(

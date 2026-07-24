@@ -30,6 +30,7 @@ py-modules = [
     "config",
     "data",
     "infer",
+    "infer_tools",
     "merge_adapter",
     "model",
     "preflight_gemma4",

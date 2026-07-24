@@ -12,7 +12,8 @@ Fine-tunes Gemma 4 E2B/E4B on Code Agent trajectories using LoRA + TRL `SFTTrain
 | `[model.py](model.py)`     | Tokenizer + model load, 4-bit quant, freeze multimodal towers    |
 | `[trainer.py](trainer.py)` | Build `SFTTrainer`, train, save adapter + tokenizer              |
 | `[run.py](run.py)`         | CLI entrypoint                                                   |
-| `[infer.py](infer.py)`     | Load a fine-tuned adapter and generate a Manim response          |
+| `[infer.py](infer.py)`     | Load adapter; multi-turn tool loop (or `--no-tools` one-shot)    |
+| `[infer_tools.py](infer_tools.py)` | Gemma tool-call parse + CodeMode / Manim tool execution   |
 | `[preflight_gemma4.py](preflight_gemma4.py)` | Pre-flight chat template + mask checks before training |
 | `[merge_adapter.py](merge_adapter.py)` | Merge LoRA into bf16 base for vLLM / HF deploy (CPU)     |
 | `[upload_dataset.py](upload_dataset.py)` | Publish trajectories to Hugging Face Hub               |
@@ -95,7 +96,7 @@ Legacy mask test: `uv run python test_assistant_mask.py`.
 
 ## Inference after fine-tuning
 
-Load the LoRA adapter saved by `run.py` and generate a Manim response:
+Trajectory adapters are trained on **multi-turn Code Agent tool calls** (`run_code` → write/compile → final fenced Manim), not single-turn lecture prose. `infer.py` defaults to that same tool loop.
 
 ```bash
 cd apps/sft
@@ -118,6 +119,13 @@ Use a training-set prompt for a quick sanity check:
 uv run python infer.py --adapter-dir ./gemma4-manim-ft --dataset-index 0
 ```
 
+One-shot smoke check (no tools — often falls back to base-model lecture prose):
+
+```bash
+uv run python infer.py --adapter-dir ./gemma4-manim-ft --no-tools \
+  --prompt "Animate a circle."
+```
+
 | Flag | Description |
 |------|-------------|
 | `--adapter-dir` | Output dir from training (default: `gemma4-manim-ft` or Colab Drive path with `--colab`) |
@@ -126,9 +134,12 @@ uv run python infer.py --adapter-dir ./gemma4-manim-ft --dataset-index 0
 | `--dataset-index` | Pull `user_prompt` from the HF trajectories dataset |
 | `--max-new-tokens` | Generation limit (default: 2048) |
 | `--temperature` | Sampling temperature; `0` = greedy (default: 0.7) |
+| `--max-tool-rounds` | Max assistant tool-calling rounds (default: 8) |
+| `--output-dir` | Workspace for `manim_write` / `compile_manim_code` (default: `apps/agents/workspace/infer_runs/<timestamp>`) |
+| `--no-tools` | Disable tool defs + loop; one-shot `generate` only |
 | `--colab` / `--kaggle` / `--runpod` | Same VRAM-friendly load defaults as training |
 
-The script prints the raw assistant turn (tool calls and/or Python code). Render the extracted Manim script with your usual Code Agent or `manim` workflow to verify quality.
+With tools enabled, the script prints each tool round, executes CodeMode `run_code` / Manim workspace tools under `--output-dir`, then prints the final assistant text (typically fenced Manim + narration). Use `--no-tools` only for debugging template/load issues.
 
 Inference validates that the adapter directory saved a training chat template with `{% generation %}` markers (required for models trained with `assistant_only_loss=True`).
 

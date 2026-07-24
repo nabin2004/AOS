@@ -23,6 +23,12 @@ apps/agents/export_traces/coder_traces.jsonl
 apps/agents/export_traces/coder_sft/
 apps/agents/tools/assets/media/videos/
 apps/agents/tools/templates/videos/
+apps/agents/tools/templates/media/
+
+# SFT data-gen runtime artifacts
+apps/agents/sft_data_gen/*.log
+apps/agents/sft_data_gen/*.bak
+*.bak
 
 prepdata/
 */svg_dataset/*

@@ -87,7 +87,7 @@ train = load_dataset(
 
 ## Collection
 
-Trajectories are collected from the AOS Code Agent (`coder_agent.py`) via `collect_traces.py` and exported with `export_local_sft.py`. See the [AOS agents README](https://github.com/nabin2004/AOS/blob/master/apps/agents/README.md#sft-data-collection-code-agent).
+Trajectories are collected from the AOS Code Agent (`coder_agent.py`) via `collect_traces.py` and exported with `export_local_sft.py`. Scale-up target for LoRA SFT: ~8k synthetic prompts → ~5k compile-ok trajectories (`sft_data_gen/run_waves.sh` + `status.py`). See the [AOS agents README](https://github.com/nabin2004/AOS/blob/master/apps/agents/README.md#sft-data-collection-code-agent) and [`sft_data_gen/README.md`](https://github.com/nabin2004/AOS/blob/master/apps/agents/sft_data_gen/README.md).
 
 ## Related
 

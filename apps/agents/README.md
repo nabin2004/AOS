@@ -75,15 +75,18 @@ uv run python sft_data_gen/generate_prompts.py \
 
 **Step 2 — collect traces**
 
-Recommended fast batch (disables Logfire/DBOS overhead, skips narration, 2 parallel runs):
+Recommended fast batch (disables Logfire/DBOS overhead, skips narration; use concurrency 2–4):
 
 ```bash
 uv run python sft_data_gen/collect_traces.py \
-  --limit 100 \
+  --limit 200 \
   --fast \
   --convert-after-local \
-  --resume
+  --resume \
+  --concurrency 4
 ```
+
+Scale to multi-thousand compile-ok trajectories (~5k target): expand prompts first, then run waves via `sft_data_gen/run_waves.sh` and monitor with `sft_data_gen/status.py`. Details in [`sft_data_gen/README.md`](sft_data_gen/README.md).
 
 Standard run (classify → plan → coder):
 

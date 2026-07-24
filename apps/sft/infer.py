@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Run inference with a fine-tuned Gemma 4 LoRA adapter.
 
+By default this mirrors the SFT trajectory distribution: multi-turn tool calling
+(CodeMode ``run_code`` + Manim workspace tools) until a final text turn.
+
 Usage (from apps/sft):
 
     uv run python infer.py --adapter-dir ./gemma4-manim-ft --prompt "Animate a circle."
     uv run python infer.py --adapter-dir /content/gemma4-manim-ft --colab
-    uv run python infer.py --adapter-dir /content/drive/MyDrive/gemma4-manim-ft --dataset-index 0
+    uv run python infer.py --adapter-dir ./gemma4-manim-ft --dataset-index 0
+    uv run python infer.py --adapter-dir ./gemma4-manim-ft --no-tools  # one-shot smoke
 """
 
 from __future__ import annotations
@@ -26,6 +30,12 @@ from config import (
     default_colab_output_dir,
     default_runpod_output_dir,
     is_colab_runtime,
+)
+from infer_tools import (
+    INFER_TOOLS,
+    assistant_message_from_generation,
+    default_infer_output_dir,
+    execute_tool_call,
 )
 from model import load_inference_model
 
@@ -116,6 +126,26 @@ def build_arg_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Keep vision/audio towers loaded (uses more VRAM)",
     )
+    parser.add_argument(
+        "--no-tools",
+        action="store_true",
+        help="One-shot generate without tool definitions or tool loop (debug only)",
+    )
+    parser.add_argument(
+        "--max-tool-rounds",
+        type=int,
+        default=8,
+        help="Max assistant tool-calling rounds before stopping (default: 8)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help=(
+            "Coder workspace for manim_write/compile "
+            "(default: apps/agents/workspace/infer_runs/<timestamp>)"
+        ),
+    )
     return parser
 
 
@@ -159,22 +189,25 @@ def resolve_prompt(args: argparse.Namespace, config: TrainingConfig) -> str:
     return DEFAULT_PROMPT
 
 
-def generate_response(
+def _generate_once(
     model: torch.nn.Module,
     tokenizer: PreTrainedTokenizerBase,
-    prompt: str,
+    messages: list[dict],
     *,
+    tools: list[dict] | None,
     max_new_tokens: int,
     temperature: float,
     top_p: float,
 ) -> str:
-    messages = [{"role": "user", "content": prompt}]
-    model_input = tokenizer.apply_chat_template(
-        messages,
-        add_generation_prompt=True,
-        return_tensors="pt",
-        return_dict=True,
-    )
+    template_kwargs: dict = {
+        "tokenize": True,
+        "return_tensors": "pt",
+        "return_dict": True,
+        "add_generation_prompt": True,
+    }
+    if tools is not None:
+        template_kwargs["tools"] = tools
+    model_input = tokenizer.apply_chat_template(messages, **template_kwargs)
     input_ids = model_input["input_ids"]
     attention_mask = model_input.get("attention_mask")
     device = model.get_input_embeddings().weight.device
@@ -204,6 +237,93 @@ def generate_response(
 
     new_tokens = output_ids[0, input_ids.shape[-1] :]
     return tokenizer.decode(new_tokens, skip_special_tokens=False)
+
+
+def generate_response(
+    model: torch.nn.Module,
+    tokenizer: PreTrainedTokenizerBase,
+    prompt: str,
+    *,
+    max_new_tokens: int,
+    temperature: float,
+    top_p: float,
+) -> str:
+    """One-shot user→assistant generate (no tools). Prefer generate_with_tools."""
+    messages = [{"role": "user", "content": prompt}]
+    return _generate_once(
+        model,
+        tokenizer,
+        messages,
+        tools=None,
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        top_p=top_p,
+    )
+
+
+def generate_with_tools(
+    model: torch.nn.Module,
+    tokenizer: PreTrainedTokenizerBase,
+    prompt: str,
+    *,
+    output_dir: Path,
+    max_tool_rounds: int,
+    max_new_tokens: int,
+    temperature: float,
+    top_p: float,
+) -> tuple[str, list[dict]]:
+    """Multi-turn tool loop matching SFT trajectory formatting.
+
+    Returns (final_assistant_text, full_messages).
+    """
+    messages: list[dict] = [{"role": "user", "content": prompt}]
+    final_text = ""
+
+    for round_idx in range(max_tool_rounds):
+        print(f"--- tool round {round_idx + 1}/{max_tool_rounds} ---")
+        raw = _generate_once(
+            model,
+            tokenizer,
+            messages,
+            tools=INFER_TOOLS,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+            top_p=top_p,
+        )
+        assistant = assistant_message_from_generation(raw)
+        messages.append(assistant)
+        tool_calls = assistant.get("tool_calls") or []
+        if not tool_calls:
+            final_text = str(assistant.get("content") or raw)
+            break
+
+        for tc in tool_calls:
+            fn = tc.get("function") or {}
+            name = str(fn.get("name") or "unknown")
+            arguments = fn.get("arguments") or {}
+            print(f"  tool: {name}")
+            result = execute_tool_call(name, arguments, output_dir=output_dir)
+            preview = result if len(result) <= 400 else result[:400] + "…"
+            print(f"  result: {preview}")
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tc.get("id", ""),
+                    "name": name,
+                    "content": result,
+                }
+            )
+    else:
+        # Exhausted rounds while still tool-calling; surface last assistant turn.
+        last = messages[-1] if messages else {}
+        final_text = str(last.get("content") or "")
+        if not final_text and last.get("tool_calls"):
+            final_text = (
+                f"(stopped after {max_tool_rounds} tool rounds; "
+                "last turn still contained tool_calls)"
+            )
+
+    return final_text, messages
 
 
 def default_adapter_dir(args: argparse.Namespace) -> Path:
@@ -239,9 +359,17 @@ def main() -> int:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
 
+    output_dir = (args.output_dir or default_infer_output_dir()).resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     print(f"Adapter: {adapter_dir}")
     print(f"Base model: {config.model_id}")
     print(f"Prompt:\n{prompt}\n")
+    if args.no_tools:
+        print("Mode: one-shot (--no-tools)")
+    else:
+        print(f"Mode: tool loop (max_rounds={args.max_tool_rounds})")
+        print(f"Workspace output_dir: {output_dir}")
     print("Loading model...")
 
     try:
@@ -251,16 +379,53 @@ def main() -> int:
         return 1
 
     print("Generating...\n")
-    response = generate_response(
+    if args.no_tools:
+        response = generate_response(
+            model,
+            tokenizer,
+            prompt,
+            max_new_tokens=args.max_new_tokens,
+            temperature=args.temperature,
+            top_p=args.top_p,
+        )
+        print("=== Assistant response ===")
+        print(response)
+        return 0
+
+    final_text, messages = generate_with_tools(
         model,
         tokenizer,
         prompt,
+        output_dir=output_dir,
+        max_tool_rounds=args.max_tool_rounds,
         max_new_tokens=args.max_new_tokens,
         temperature=args.temperature,
         top_p=args.top_p,
     )
-    print("=== Assistant response ===")
-    print(response)
+    n_tools = sum(1 for m in messages if m.get("role") == "tool")
+    print(f"\n=== Transcript ({len(messages)} messages, {n_tools} tool results) ===")
+    for msg in messages:
+        role = msg.get("role")
+        if role == "user":
+            print(f"[user] {msg.get('content')}")
+        elif role == "assistant":
+            if msg.get("tool_calls"):
+                names = [
+                    (tc.get("function") or {}).get("name") for tc in msg["tool_calls"]
+                ]
+                print(f"[assistant tool_calls] {names}")
+                if msg.get("content"):
+                    print(msg["content"])
+            else:
+                print("[assistant]")
+                print(msg.get("content") or "")
+        elif role == "tool":
+            content = str(msg.get("content") or "")
+            preview = content if len(content) <= 240 else content[:240] + "…"
+            print(f"[tool {msg.get('name')}] {preview}")
+    print("\n=== Final assistant text ===")
+    print(final_text)
+    print(f"\nWorkspace: {output_dir}")
     return 0
 
 

@@ -142,9 +142,9 @@ def select_prompts(
         selected = [r for r in selected if r["index"] in indices]
     if offset:
         selected = selected[offset:]
-    if limit is not None:
-        selected = selected[:limit]
 
+    # Filter completed before applying --limit so waves pick the next N
+    # unfinished prompts, not the first N rows (which are often already done).
     if resume:
         done = load_completed_indices(manifest_path, skip_failed=skip_failed)
         before = len(selected)
@@ -152,6 +152,9 @@ def select_prompts(
         skipped = before - len(selected)
         if skipped:
             logger.info("Resume: skipping %s already completed prompt(s)", skipped)
+
+    if limit is not None:
+        selected = selected[:limit]
     return selected
 
 
@@ -401,8 +404,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--concurrency",
         type=int,
-        default=2,
-        help="Parallel pipeline runs (default: 2)",
+        default=None,
+        help="Parallel pipeline runs (default: 4 with --fast, else 2)",
     )
     parser.add_argument(
         "--fast",
@@ -447,6 +450,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.concurrency is None:
+        args.concurrency = 4 if args.fast else 2
     apply_batch_env(fast=args.fast)
     if args.fast:
         logger.info(

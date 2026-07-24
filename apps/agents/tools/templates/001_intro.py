@@ -209,21 +209,36 @@ class TwoColumnSlide(Scene):
         self.wait()
 
 
+from manim import *
+
+
 class Disclaimer(Scene):
     def construct(self):
         tit = Title("DISCLAIMER", color=RED)
-        title = Text("LLMs ARE NON-DETERMINISTIC SYSTEMS.", font_size=40)
-        title2 = Text(
-            "Their outputs require VERIFICATION and should not be trusted BLINDLY.",
-            font_size=30,
-        )
-        # title.move_to(UP)
-        title2.move_to(DOWN)
-        self.play(Write(tit))
-        self.play(FadeIn(title))
-        self.play(FadeIn(title2))
 
-        self.wait(1)
+        line1 = Text(
+            "LLMs are non-deterministic systems.",
+            font_size=40,
+            t2c={"non-deterministic": YELLOW},
+        )
+        line2 = Text(
+            "Their outputs require verification and should not be trusted blindly.",
+            font_size=30,
+            t2c={"verification": GREEN, "not be trusted blindly": RED},
+        )
+
+        body = VGroup(line1, line2).arrange(DOWN, buff=0.5)
+        body.next_to(tit, DOWN, buff=1.0)
+
+        self.play(Write(tit), run_time=1.2)
+        self.wait(0.3)
+        self.play(FadeIn(line1, shift=UP * 0.3), run_time=0.8)
+        self.wait(0.4)
+        self.play(Write(line2), run_time=2)
+
+        self.wait(2)
+
+        self.play(FadeOut(VGroup(tit, body)), run_time=0.8)
 
 
 class ArchitectureExplaining(Scene):
