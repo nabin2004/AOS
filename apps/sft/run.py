@@ -10,6 +10,7 @@ Usage (from apps/sft):
     uv run python run.py --kaggle --report-to none
     uv run python run.py --runpod --epochs 1 --report-to none
     uv run python run.py --colab --epochs 1 --report-to none
+    uv run python run.py --colab --epochs 1 --report-to none --push-to-hub
 """
 
 from __future__ import annotations
@@ -60,7 +61,10 @@ def ensure_output_dir(output_dir: Path) -> int | None:
     try:
         output_dir.mkdir(parents=True, exist_ok=True)
     except OSError as exc:
-        print(f"ERROR: Cannot create output directory {output_dir}: {exc}", file=sys.stderr)
+        print(
+            f"ERROR: Cannot create output directory {output_dir}: {exc}",
+            file=sys.stderr,
+        )
         return 1
     return None
 
@@ -102,6 +106,17 @@ def main() -> int:
     model = load_model(config)
     trainer = build_trainer(model, tokenizer, dataset, config)
     train_and_save(trainer, tokenizer, config)
+
+    if config.push_to_hub:
+        from upload_adapter import require_token, upload_adapter
+
+        upload_adapter(
+            adapter_dir=config.output_dir,
+            repo_id=config.hub_model_id,
+            token=require_token(),
+            private=config.hub_private,
+        )
+
     return 0
 
 

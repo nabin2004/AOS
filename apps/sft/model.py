@@ -26,6 +26,11 @@ def _hub_token() -> str | None:
     return token or None
 
 
+def is_hub_repo_id(value: str | Path) -> bool:
+    text = str(value)
+    return "/" in text and not text.startswith(("/", "./", "../"))
+
+
 def load_tokenizer(model_id: str) -> PreTrainedTokenizerBase:
     tokenizer = AutoTokenizer.from_pretrained(model_id, token=_hub_token())
     if tokenizer.pad_token is None:
@@ -136,13 +141,17 @@ def load_adapter_tokenizer(
     config: TrainingConfig,
     adapter_dir: Path | str,
 ) -> PreTrainedTokenizerBase:
-    adapter_path = Path(adapter_dir)
-    tokenizer_source = (
-        adapter_path
-        if (adapter_path / "tokenizer_config.json").is_file()
-        else config.model_id
-    )
-    tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_source), token=_hub_token())
+    adapter_ref = str(adapter_dir)
+    if is_hub_repo_id(adapter_ref):
+        tokenizer_source = adapter_ref
+    else:
+        adapter_path = Path(adapter_ref)
+        tokenizer_source = (
+            adapter_ref
+            if (adapter_path / "tokenizer_config.json").is_file()
+            else config.model_id
+        )
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_source, token=_hub_token())
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     return tokenizer
@@ -158,21 +167,27 @@ def load_inference_model(
 
     from chat_template import prepare_training_tokenizer, validate_training_template
 
-    adapter_path = Path(adapter_dir)
-    if not adapter_path.is_dir():
-        raise FileNotFoundError(f"Adapter directory not found: {adapter_path}")
-    if not (adapter_path / "adapter_config.json").is_file():
-        raise FileNotFoundError(
-            f"No adapter_config.json in {adapter_path}. "
-            "Point --adapter-dir at the directory saved by run.py."
-        )
+    adapter_ref = str(adapter_dir)
+    if is_hub_repo_id(adapter_ref):
+        adapter_source = adapter_ref
+    else:
+        adapter_path = Path(adapter_ref)
+        if not adapter_path.is_dir():
+            raise FileNotFoundError(f"Adapter directory not found: {adapter_path}")
+        if not (adapter_path / "adapter_config.json").is_file():
+            raise FileNotFoundError(
+                f"No adapter_config.json in {adapter_path}. "
+                "Point --adapter-dir at the directory saved by run.py "
+                "or a Hugging Face model repo id."
+            )
+        adapter_source = adapter_ref
 
-    tokenizer = load_adapter_tokenizer(config, adapter_path)
+    tokenizer = load_adapter_tokenizer(config, adapter_source)
     if validate_template:
         prepare_training_tokenizer(tokenizer, config)
         validate_training_template(tokenizer, require_generation_markers=True)
 
     model = load_model(config, for_inference=True)
-    model = PeftModel.from_pretrained(model, str(adapter_path), token=_hub_token())
+    model = PeftModel.from_pretrained(model, adapter_source, token=_hub_token())
     model.eval()
     return model, tokenizer

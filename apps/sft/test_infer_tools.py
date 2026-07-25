@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from infer_tools import (
+    _codemode_preflight,
     assistant_message_from_generation,
     extract_run_code_source,
     parse_gemma_tool_calls,
@@ -60,10 +61,33 @@ def test_extract_run_code_from_dict_code() -> None:
     )
 
 
+def test_codemode_preflight_rejects_star_import() -> None:
+    err = _codemode_preflight("from manim import *\nclass Demo(Scene):\n    pass")
+    assert err is not None
+    assert err["error"] == "codemode_star_import"
+
+
+def test_codemode_preflight_allows_nested_star_import() -> None:
+    code = (
+        "code = '''from manim import *\\nclass Demo(Scene): pass'''\\n"
+        "await manim_write(code=code, scene_name='Demo')"
+    )
+    assert _codemode_preflight(code) is None
+
+    multiline = (
+        "code = '''from manim import *\n"
+        "class Demo(Scene): pass'''\n"
+        "await manim_write(code=code, scene_name='Demo')"
+    )
+    assert _codemode_preflight(multiline) is None
+
+
 if __name__ == "__main__":
     test_parse_run_code_with_input_string()
     test_parse_manim_write_nested_args()
     test_strip_leaves_prose()
     test_assistant_message_tool_only()
     test_extract_run_code_from_dict_code()
+    test_codemode_preflight_rejects_star_import()
+    test_codemode_preflight_allows_nested_star_import()
     print("OK")

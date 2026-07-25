@@ -17,6 +17,7 @@ Fine-tunes Gemma 4 E2B/E4B on Code Agent trajectories using LoRA + TRL `SFTTrain
 | `[preflight_gemma4.py](preflight_gemma4.py)` | Pre-flight chat template + mask checks before training |
 | `[merge_adapter.py](merge_adapter.py)` | Merge LoRA into bf16 base for vLLM / HF deploy (CPU)     |
 | `[upload_dataset.py](upload_dataset.py)` | Publish trajectories to Hugging Face Hub               |
+| `[upload_adapter.py](upload_adapter.py)` | Publish LoRA adapter to Hugging Face Hub               |
 
 
 ## Dataset
@@ -76,6 +77,9 @@ uv run python run.py --no-4bit --report-to none
 | `--no-strip-towers` | Keep vision/audio towers loaded (more VRAM)            |
 | `--attn-implementation` | Attention backend: `eager` (default), `sdpa`, `flash_attention_2` |
 | `--use-liger-kernel` | Enable liger-kernel fused ops (~2GB activation savings on T4) |
+| `--push-to-hub` | Upload LoRA adapter to Hugging Face Hub after training |
+| `--hub-model-id` | HF model repo id for adapter upload (default: `nabin2004/AOS-gemma4-manim-sft`) |
+| `--hub-private` | Create/upload the Hub model repo as private |
 
 
 Edit defaults in `[config.py](config.py)` (`TrainingConfig`).
@@ -113,6 +117,15 @@ uv run --package sft python apps/sft/infer.py \
   --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
 
+Colab (load adapter from Hugging Face Hub):
+
+```bash
+uv run --package sft python apps/sft/infer.py \
+  --adapter-dir nabin2004/AOS-gemma4-manim-sft \
+  --colab \
+  --prompt "Create a short Manim scene explaining eigenvectors in 2D."
+```
+
 Use a training-set prompt for a quick sanity check:
 
 ```bash
@@ -128,18 +141,20 @@ uv run python infer.py --adapter-dir ./gemma4-manim-ft --no-tools \
 
 | Flag | Description |
 |------|-------------|
-| `--adapter-dir` | Output dir from training (default: `gemma4-manim-ft` or Colab Drive path with `--colab`) |
+| `--adapter-dir` | Output dir from training, or HF model repo id (default: `gemma4-manim-ft` or Colab Drive path with `--colab`) |
 | `--prompt` | User task text |
 | `--prompt-file` | Read prompt from a file |
 | `--dataset-index` | Pull `user_prompt` from the HF trajectories dataset |
 | `--max-new-tokens` | Generation limit (default: 2048) |
-| `--temperature` | Sampling temperature; `0` = greedy (default: 0.7) |
+| `--temperature` | Sampling temperature; `0` = greedy (default: 0) |
 | `--max-tool-rounds` | Max assistant tool-calling rounds (default: 8) |
+| `--all-tools` | Also expose direct `manim_write` / `compile_manim_code` / `manim_read` (default: `run_code` only, matching SFT) |
+| `--no-system-prompt` | Skip Code Agent system instructions prepended at infer time |
 | `--output-dir` | Workspace for `manim_write` / `compile_manim_code` (default: `apps/agents/workspace/infer_runs/<timestamp>`) |
 | `--no-tools` | Disable tool defs + loop; one-shot `generate` only |
 | `--colab` / `--kaggle` / `--runpod` | Same VRAM-friendly load defaults as training |
 
-With tools enabled, the script prints each tool round, executes CodeMode `run_code` / Manim workspace tools under `--output-dir`, then prints the final assistant text (typically fenced Manim + narration). Use `--no-tools` only for debugging template/load issues.
+With tools enabled, the script prepends a short Code Agent system prompt, exposes **`run_code` only** by default (matching training), retries empty assistant turns after tool errors, and exits with code **2** if no scene `.py` was written (hallucinated success). Use `--all-tools` only if you intentionally trained on direct tool calls.
 
 Inference validates that the adapter directory saved a training chat template with `{% generation %}` markers (required for models trained with `assistant_only_loss=True`).
 
@@ -155,6 +170,33 @@ uv run python merge_adapter.py \
 ```
 
 Quantize the merged model separately (GGUF / AWQ) if needed.
+
+## Publish adapter to Hugging Face
+
+Training saves **LoRA adapter weights only** (not merged). Publish to the Hub with a write token:
+
+**Default model repo:** [nabin2004/AOS-gemma4-manim-sft](https://huggingface.co/nabin2004/AOS-gemma4-manim-sft)
+
+### Push after training
+
+```bash
+export HF_TOKEN=hf_...   # write token; never commit
+cd apps/sft
+uv run python run.py --colab --epochs 1 --report-to none --push-to-hub
+```
+
+Optional flags: `--hub-model-id`, `--hub-private`.
+
+### Push an existing adapter
+
+```bash
+export HF_TOKEN=hf_...
+cd apps/sft
+uv run python upload_adapter.py --adapter-dir ./gemma4-manim-ft
+uv run python upload_adapter.py --adapter-dir /content/gemma4-manim-ft --colab
+```
+
+Uploads adapter weights, tokenizer, and `model_card.md` as the repo README. Skips `checkpoint-*` and other training artifacts.
 
 ## Run on Google Colab
 
@@ -177,6 +219,30 @@ os.environ["HF_TOKEN"] = "..."  # Colab secret
 !uv sync --package sft
 !uv run --package sft python apps/sft/preflight_gemma4.py --colab
 !uv run --package sft python apps/sft/run.py --colab --epochs 1 --report-to none
+```
+
+Train and push to Hugging Face in one step:
+
+```bash
+!uv run --package sft python apps/sft/run.py --colab --epochs 1 --report-to none --push-to-hub
+```
+
+Infer after training (local adapter):
+
+```bash
+!uv run --package sft python apps/sft/infer.py \
+  --adapter-dir /content/gemma4-manim-ft \
+  --colab \
+  --prompt "Create a short Manim scene explaining eigenvectors in 2D."
+```
+
+Or infer from the Hub (no local adapter copy):
+
+```bash
+!uv run --package sft python apps/sft/infer.py \
+  --adapter-dir nabin2004/AOS-gemma4-manim-sft \
+  --colab \
+  --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
 
 | Environment | Flag | Default output dir |

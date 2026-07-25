@@ -38,6 +38,9 @@ class TrainingConfig:
     packing: bool = True
     assistant_only_loss: bool = True
     use_liger_kernel: bool = False
+    push_to_hub: bool = False
+    hub_model_id: str = "nabin2004/AOS-gemma4-manim-sft"
+    hub_private: bool = False
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -131,6 +134,12 @@ class TrainingConfig:
             config = replace(config, attn_implementation=args.attn_implementation)
         if args.use_liger_kernel:
             config = replace(config, use_liger_kernel=True)
+        if args.push_to_hub:
+            config = replace(config, push_to_hub=True)
+        if args.hub_model_id is not None:
+            config = replace(config, hub_model_id=args.hub_model_id)
+        if args.hub_private:
+            config = replace(config, hub_private=True)
         return apply_vertex_env(config)
 
 
@@ -311,5 +320,20 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--use-liger-kernel",
         action="store_true",
         help="Enable liger-kernel fused ops in SFTTrainer (requires optional extra)",
+    )
+    parser.add_argument(
+        "--push-to-hub",
+        action="store_true",
+        help="Upload LoRA adapter to Hugging Face Hub after training",
+    )
+    parser.add_argument(
+        "--hub-model-id",
+        default=None,
+        help='HF model repo id for adapter upload (default: "nabin2004/AOS-gemma4-manim-sft")',
+    )
+    parser.add_argument(
+        "--hub-private",
+        action="store_true",
+        help="Create/upload the Hub model repo as private",
     )
     return parser

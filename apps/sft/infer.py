@@ -15,6 +15,8 @@ Usage (from apps/sft):
 from __future__ import annotations
 
 import argparse
+import json
+import re
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -32,12 +34,13 @@ from config import (
     is_colab_runtime,
 )
 from infer_tools import (
-    INFER_TOOLS,
+    INFER_SYSTEM_PROMPT,
     assistant_message_from_generation,
     default_infer_output_dir,
     execute_tool_call,
+    resolve_infer_tools,
 )
-from model import load_inference_model
+from model import is_hub_repo_id, load_inference_model
 
 DEFAULT_PROMPT = (
     "Create a short Manim animation that visualizes gradient descent on a simple "
@@ -52,9 +55,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--adapter-dir",
-        type=Path,
         default=None,
-        help="Directory saved by run.py (default: gemma4-manim-ft or Colab Drive path)",
+        help="Directory saved by run.py or HF model repo id (default: gemma4-manim-ft or Colab Drive path)",
     )
     parser.add_argument(
         "--prompt",
@@ -87,8 +89,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--temperature",
         type=float,
-        default=0.7,
-        help="Sampling temperature (0 for greedy decoding)",
+        default=0.0,
+        help="Sampling temperature (0 for greedy decoding; default: 0)",
     )
     parser.add_argument(
         "--top-p",
@@ -136,6 +138,19 @@ def build_arg_parser() -> argparse.ArgumentParser:
         type=int,
         default=8,
         help="Max assistant tool-calling rounds before stopping (default: 8)",
+    )
+    parser.add_argument(
+        "--all-tools",
+        action="store_true",
+        help=(
+            "Expose manim_write/compile_manim_code/manim_read directly "
+            "(default: run_code only, matching SFT training)"
+        ),
+    )
+    parser.add_argument(
+        "--no-system-prompt",
+        action="store_true",
+        help="Do not prepend the Code Agent system instructions",
     )
     parser.add_argument(
         "--output-dir",
@@ -261,11 +276,59 @@ def generate_response(
     )
 
 
+def build_infer_messages(
+    prompt: str,
+    *,
+    use_system_prompt: bool,
+) -> list[dict]:
+    messages: list[dict] = []
+    if use_system_prompt:
+        messages.append({"role": "system", "content": INFER_SYSTEM_PROMPT})
+    messages.append({"role": "user", "content": prompt})
+    return messages
+
+
+def _is_empty_assistant_turn(content: str | None) -> bool:
+    text = str(content or "").strip()
+    if not text:
+        return True
+    cleaned = re.sub(r"<eos>\s*$", "", text, flags=re.IGNORECASE).strip()
+    cleaned = re.sub(r"<\|[^|>]+(?:\|>)?$", "", cleaned).strip()
+    return not cleaned
+
+
+def _last_tool_failed(messages: list[dict]) -> bool:
+    for msg in reversed(messages):
+        if msg.get("role") != "tool":
+            continue
+        content = str(msg.get("content") or "")
+        try:
+            payload = json.loads(content)
+        except json.JSONDecodeError:
+            return '"ok": false' in content or '"ok":false' in content
+        return payload.get("ok") is False
+    return False
+
+
+def _workspace_has_scene(output_dir: Path) -> bool:
+    manifest = output_dir / "manifest.json"
+    if manifest.is_file():
+        try:
+            data = json.loads(manifest.read_text(encoding="utf-8"))
+            scene_path = data.get("scene_path") or data.get("scene_file")
+            if scene_path and (output_dir / scene_path).is_file():
+                return True
+        except (json.JSONDecodeError, OSError):
+            pass
+    return any(output_dir.glob("*.py"))
+
+
 def generate_with_tools(
     model: torch.nn.Module,
     tokenizer: PreTrainedTokenizerBase,
-    prompt: str,
+    messages: list[dict],
     *,
+    tools: list[dict],
     output_dir: Path,
     max_tool_rounds: int,
     max_new_tokens: int,
@@ -276,7 +339,6 @@ def generate_with_tools(
 
     Returns (final_assistant_text, full_messages).
     """
-    messages: list[dict] = [{"role": "user", "content": prompt}]
     final_text = ""
 
     for round_idx in range(max_tool_rounds):
@@ -285,7 +347,7 @@ def generate_with_tools(
             model,
             tokenizer,
             messages,
-            tools=INFER_TOOLS,
+            tools=tools,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
@@ -294,6 +356,14 @@ def generate_with_tools(
         messages.append(assistant)
         tool_calls = assistant.get("tool_calls") or []
         if not tool_calls:
+            if (
+                _is_empty_assistant_turn(assistant.get("content"))
+                and _last_tool_failed(messages)
+                and round_idx + 1 < max_tool_rounds
+            ):
+                print("  (empty assistant after tool error; retrying generation)")
+                messages.pop()
+                continue
             final_text = str(assistant.get("content") or raw)
             break
 
@@ -326,32 +396,36 @@ def generate_with_tools(
     return final_text, messages
 
 
-def default_adapter_dir(args: argparse.Namespace) -> Path:
+def default_adapter_dir(args: argparse.Namespace) -> str:
     if args.adapter_dir is not None:
         return args.adapter_dir
     if args.colab or is_colab_runtime():
-        return default_colab_output_dir()
+        return str(default_colab_output_dir())
     if args.runpod:
-        return default_runpod_output_dir()
-    return TrainingConfig().output_dir
+        return str(default_runpod_output_dir())
+    return str(TrainingConfig().output_dir)
 
 
 def main() -> int:
     parser = build_arg_parser()
     args = parser.parse_args()
     config = resolve_inference_config(args)
-    adapter_dir = (args.adapter_dir or default_adapter_dir(args)).resolve()
-
-    if not adapter_dir.is_dir():
-        print(f"ERROR: Adapter directory not found: {adapter_dir}", file=sys.stderr)
-        if args.colab or is_colab_runtime():
-            print(
-                "On Colab, point --adapter-dir at your training output, e.g.\n"
-                "  /content/gemma4-manim-ft\n"
-                "  /content/drive/MyDrive/gemma4-manim-ft",
-                file=sys.stderr,
-            )
-        return 1
+    adapter_ref = args.adapter_dir or default_adapter_dir(args)
+    if is_hub_repo_id(adapter_ref):
+        adapter_dir = adapter_ref
+    else:
+        adapter_dir = str(Path(adapter_ref).resolve())
+        if not Path(adapter_dir).is_dir():
+            print(f"ERROR: Adapter directory not found: {adapter_dir}", file=sys.stderr)
+            if args.colab or is_colab_runtime():
+                print(
+                    "On Colab, point --adapter-dir at your training output, e.g.\n"
+                    "  /content/gemma4-manim-ft\n"
+                    "  /content/drive/MyDrive/gemma4-manim-ft\n"
+                    "Or use a Hub repo id, e.g. nabin2004/AOS-gemma4-manim-sft",
+                    file=sys.stderr,
+                )
+            return 1
 
     try:
         prompt = resolve_prompt(args, config)
@@ -369,6 +443,8 @@ def main() -> int:
         print("Mode: one-shot (--no-tools)")
     else:
         print(f"Mode: tool loop (max_rounds={args.max_tool_rounds})")
+        print(f"Tools: {'all' if args.all_tools else 'run_code only'}")
+        print(f"System prompt: {'off' if args.no_system_prompt else 'on'}")
         print(f"Workspace output_dir: {output_dir}")
     print("Loading model...")
 
@@ -395,7 +471,11 @@ def main() -> int:
     final_text, messages = generate_with_tools(
         model,
         tokenizer,
-        prompt,
+        build_infer_messages(
+            prompt,
+            use_system_prompt=not args.no_system_prompt,
+        ),
+        tools=resolve_infer_tools(all_tools=args.all_tools),
         output_dir=output_dir,
         max_tool_rounds=args.max_tool_rounds,
         max_new_tokens=args.max_new_tokens,
@@ -426,6 +506,13 @@ def main() -> int:
     print("\n=== Final assistant text ===")
     print(final_text)
     print(f"\nWorkspace: {output_dir}")
+    if not _workspace_has_scene(output_dir):
+        print(
+            "\nWARNING: No scene .py was written in the workspace. "
+            "The model may have hallucinated success — inspect tool results above.",
+            file=sys.stderr,
+        )
+        return 2
     return 0
 
 

@@ -27,34 +27,55 @@ TOOL_CALL_START = "<|tool_call>call:"
 TOOL_CALL_END = "<tool_call|>"
 STRING_DELIM = '<|"|>'
 
-# OpenAI-style tool defs passed to apply_chat_template(..., tools=...).
-INFER_TOOLS: list[dict[str, Any]] = [
-    {
-        "type": "function",
-        "function": {
-            "name": "run_code",
-            "description": (
-                "Execute CodeMode sandbox Python that can call manim_write, "
-                "compile_manim_code, manim_read, search_manim_docs, "
-                "search_manim_signatures, and synthesize_narration."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "input": {
-                        "type": "string",
-                        "description": (
-                            'JSON string {"code": "..."} or raw CodeMode Python.'
-                        ),
-                    },
-                    "code": {
-                        "type": "string",
-                        "description": "CodeMode Python (alternative to input).",
-                    },
+INFER_SYSTEM_PROMPT = """You are a Manim coding agent. Call tools ONLY via run_code (CodeMode).
+
+Inside run_code, orchestrate workspace tools with await:
+- await manim_write(code='''...''', scene_name='ClassName')
+- await compile_manim_code(code='''...''', scene_name='ClassName')
+- await manim_read()
+
+CRITICAL: Put `from manim import *` and scene classes INSIDE the code= string passed to
+manim_write or compile_manim_code. Never write `from manim import *` directly in run_code —
+Python forbids star imports inside functions and it will fail.
+
+Workflow: manim_write → compile_manim_code → fix (at most 3 compile attempts) → stop.
+After compile returns ok=true, respond with fenced ```python and a Narration: line.
+Do NOT claim the scene was written or compiled until tool results show ok=true."""
+
+_RUN_CODE_TOOL: dict[str, Any] = {
+    "type": "function",
+    "function": {
+        "name": "run_code",
+        "description": (
+            "Execute CodeMode sandbox Python that can call manim_write, "
+            "compile_manim_code, manim_read, search_manim_docs, "
+            "search_manim_signatures, and synthesize_narration."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "input": {
+                    "type": "string",
+                    "description": (
+                        'JSON string {"code": "..."} or raw CodeMode Python.'
+                    ),
+                },
+                "code": {
+                    "type": "string",
+                    "description": "CodeMode Python (alternative to input).",
                 },
             },
         },
     },
+}
+
+# OpenAI-style tool defs passed to apply_chat_template(..., tools=...).
+# Default matches SFT training (run_code only). Use resolve_infer_tools(all_tools=True)
+# to also expose direct manim_write / compile_manim_code / manim_read.
+INFER_TOOLS: list[dict[str, Any]] = [_RUN_CODE_TOOL]
+
+INFER_TOOLS_ALL: list[dict[str, Any]] = [
+    _RUN_CODE_TOOL,
     {
         "type": "function",
         "function": {
@@ -122,6 +143,64 @@ INFER_TOOLS: list[dict[str, Any]] = [
         },
     },
 ]
+
+
+def resolve_infer_tools(*, all_tools: bool = False) -> list[dict[str, Any]]:
+    """Return tool schemas for inference (run_code-only by default)."""
+    return INFER_TOOLS_ALL if all_tools else INFER_TOOLS
+
+
+_STAR_IMPORT_LINE_RE = re.compile(r"^\s*from\s+manim\s+import\s+\*")
+
+
+def _codemode_preflight(code: str) -> dict[str, Any] | None:
+    """Return an error payload when run_code body has common train/infer mistakes."""
+    in_triple: str | None = None
+    for line in code.splitlines():
+        if in_triple is not None:
+            if in_triple in line:
+                in_triple = None
+            continue
+
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+
+        for quote in ("'''", '"""'):
+            if quote not in line:
+                continue
+            first = line.find(quote)
+            rest = line[first + len(quote) :]
+            if quote not in rest:
+                in_triple = quote
+            break
+
+        if in_triple is None and _STAR_IMPORT_LINE_RE.match(line):
+            return {
+                "ok": False,
+                "error": "codemode_star_import",
+                "message": (
+                    "Do not put `from manim import *` directly in run_code. "
+                    "Nest Manim source inside await manim_write(code='''...''', "
+                    "scene_name='YourScene') or compile_manim_code(...)."
+                ),
+            }
+    return None
+
+
+def _syntax_error_payload(exc: SyntaxError) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "ok": False,
+        "error": "syntax_error",
+        "message": str(exc),
+    }
+    if exc.msg and "import *" in str(exc.msg):
+        payload["hint"] = (
+            "Star imports are only allowed at module level. Move "
+            "`from manim import *` into the code= string passed to "
+            "await manim_write(...) or await compile_manim_code(...)."
+        )
+    return payload
 
 
 def default_infer_output_dir() -> Path:
@@ -401,6 +480,10 @@ def extract_run_code_source(arguments: dict[str, Any] | str) -> str:
 
 
 async def _exec_codemode(code: str, output_dir: str) -> str:
+    preflight = _codemode_preflight(code)
+    if preflight is not None:
+        return json.dumps(preflight)
+
     tools = _load_agent_tools()
 
     def _force_output_dir(kwargs: dict[str, Any]) -> dict[str, Any]:
@@ -441,7 +524,7 @@ async def _exec_codemode(code: str, output_dir: str) -> str:
     try:
         exec(wrapped, ns)  # noqa: S102 — intentional CodeMode sandbox for SFT infer
     except SyntaxError as exc:
-        return json.dumps({"ok": False, "error": "syntax_error", "message": str(exc)})
+        return json.dumps(_syntax_error_payload(exc))
 
     buf = io.StringIO()
     try:
