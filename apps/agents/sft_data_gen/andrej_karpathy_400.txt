@@ -1,0 +1,400 @@
+Animate a computational graph for the expression `(a * b) + c`, showing the forward pass with numerical values propagating from input nodes to the output.
+Visualize the chain rule as a backward flow of gradients through a two-layer expression tree, highlighting each derivative multiplied along the path.
+Create a step-by-step animation of a scalar-valued computational graph where each node displays both its value and its local derivative.
+Show a side-by-side comparison of a forward pass (green arrows) and a backward pass (red arrows) on a simple `sin(x) * y` graph.
+Illustrate the topological ordering of nodes in a computational graph, numbering each operation sequentially from inputs to output.
+Visualize a single scalar neuron with inputs `x1, x2`, weights `w1, w2`, and bias `b`, animating the weighted sum and the subsequent tanh activation.
+Animate the gradient accumulation process during backpropagation, showing how partial derivatives sum when a variable is used in multiple branches.
+Display a scalar-valued loss function (e.g., MSE) as a 2D curve, and highlight the specific point where the gradient is computed via backprop.
+Show the internal state of a scalar `Value` object, boxing the data, gradient, and `_prev` children nodes in a colorful UML-style diagram.
+Animate the backward pass through a `+` node, demonstrating how the upstream gradient is split equally to both children.
+Visualize the class hierarchy of a minimal neural network library: `Module` → `Neuron` → `Layer` → `MLP`, expanding each class's methods.
+Create a 3D block diagram showing how a `Neuron` encapsulates weights, bias, and the forward/backward logic.
+Animate the initialization of a multilayer perceptron with random weights, showing weight matrices with varying colors based on their random values.
+Show the forward pass data flow through a 3-layer MLP, with input vector expanding and contracting through hidden layer sizes.
+Visualize the parameter count calculation for each layer, displaying the total number of trainable parameters at the bottom.
+Animate the derivation of the derivative of `x^2` using the limit definition, converging to `2x` as `h` approaches zero.
+Visualize the chain rule for a composite function `f(g(x))` by showing three stacked number lines with arrows connecting differentials.
+Create a step-by-step expansion of the backpropagation equations for a neuron, showing each partial derivative term explicitly.
+Show a 2D contour plot of a loss surface, and animate the gradient vector at multiple points pointing in the direction of steepest ascent.
+Illustrate the "staircase" of backpropagation through a deep network, with gradients shrinking as they travel backward.
+Animate the manual calculation of `dL/dw` for a single weight using the finite difference method, comparing it to the analytical gradient.
+Visualize the derivative of the tanh function as a bell-shaped curve, highlighting regions of saturation (vanishing gradients).
+Show a table of input values and their corresponding gradients for a simple linear regression scenario, updating row by row.
+Animate the gradient descent update rule `w = w - lr * dw` as a vector moving a point on a parabolic surface.
+Create a heatmap of gradient magnitudes across all weights in a small network after one backward pass.
+Plot the training loss curve over 1000 steps, updating in real-time with an oscillating line approaching convergence.
+Animate the decision boundary of a 2D binary classification problem as the MLP trains, showing misclassified points shifting color.
+Visualize the weight matrix as a grid of small squares, with their colors changing (blue to red) as weights update during training.
+Show a bar chart of the per-layer gradient norms, updating every epoch to reveal vanishing/exploding trends.
+Create a side-by-side comparison of the initial random output distribution and the final output distribution after training (softmax probabilities).
+Display a 26x26 character transition matrix as a heatmap, where each cell's color intensity represents the log-frequency of a character pair.
+Animate the generation process of a bigram model, sequentially revealing characters one by one, with arrows indicating transition probabilities from the current character.
+Visualize the probability mass distribution over the next character for a given input character (e.g., 'h'), shown as a horizontal bar chart.
+Show a flow diagram of the training loop: gather counts → normalize rows → sample → compute loss.
+Illustrate a trie (prefix tree) of character sequences, highlighting the depth-2 branches for the bigram model.
+Animate the maximum likelihood estimation (MLE) process for bigram probabilities, showing counts being divided by row sums.
+Create a 3D surface plot of the log-likelihood function for a single bigram probability parameter (p).
+Visualize the effect of additive smoothing (Laplace smoothing) on the transition matrix, flattening the color distribution.
+Show a confusion matrix comparing predicted next-character probabilities vs. actual next-character labels in the validation set.
+Animate the calculation of negative log probability for a specific training pair, breaking down the exponentiation and log operations.
+Visualize the training data as a sliding window over a text corpus, highlighting the current bigram pair.
+Animate the sampling process: a spinning wheel divided into character slices, landing on the next character based on learned probabilities.
+Plot the perplexity (exp(loss)) over training iterations, decreasing as the model fits the data.
+Show the generated text string being typed out character by character, with a glowing cursor indicating the next predicted character's probability distribution.
+Create a parallel visualization of two bigram models (trained on different datasets) sampling the same starting character, generating diverging strings.
+Animate the formula for NLL loss step-by-step: `-(1/N) * sum(log(p(y|x)))`, highlighting the log and sum operations over the batch.
+Visualize the loss as a function of a single logit value, showing the characteristic exponential tail.
+Create an animated bar chart comparing the NLL loss contributions of each character in a sequence.
+Show the gradient of the NLL loss with respect to the logits, indicating where gradients are large or small.
+Illustrate the relationship between cross-entropy and KL-divergence using overlapping probability distributions.
+Animate a confusion matrix morphing into a precision/recall table for character prediction.
+Display a line chart of training vs. validation loss over epochs, clearly marking the point of overfitting.
+Visualize the generated text quality score (e.g., BLEU-1) as a moving gauge needle.
+Show a word cloud of the most frequently predicted character transitions in the validation set.
+Create a block diagram of the evaluation pipeline: Model → Generate → Compare to Ground Truth → Compute Metrics.
+Animate a typewriter effect displaying a 50-character string sampled from the bigram model.
+Visualize the "tree" of possible generated sequences, pruning low-probability branches to show the most likely path.
+Show a histogram of sequence lengths generated over 100 independent sampling runs.
+Animate the state transition graph of the bigram model, highlighting the active transition arrow during each step of generation.
+Create a side-by-side comparison of human-written text vs. bigram-generated text, color-coding differences.
+Visualize a rank-0 scalar, rank-1 vector, rank-2 matrix, and rank-3 tensor as expanding 3D geometric blocks.
+Animate a tensor slicing operation, highlighting a specific row/column being extracted from a 2D matrix.
+Show the storage layout (contiguous memory) of a tensor in row-major order using a strip of colored cells.
+Create an animation of tensor reshaping (e.g., 2x3 to 3x2) as a grid re-arranging its elements.
+Visualize tensor indexing using 3D coordinates, drawing a red dot moving to the indexed position in a 3D cube.
+Animate the difference between `view` (shared data) and `clone` (copy) using two separate color-coded memory blocks.
+Show the effect of `requires_grad=True` on a tensor, displaying a gradient accumulation box that fills up during backward passes.
+Visualize in-place operations (`add_`) modifying the original tensor memory address, vs. out-of-place operations creating a new address.
+Create a performance comparison bar chart: Python loop (slow) vs. vectorized tensor operation (fast) for element-wise addition.
+Animate the broadcasting rule: a shape (1, 3) tensor expanding to match a (4, 3) matrix, duplicating rows.
+Visualize matrix multiplication (`matmul`) as a 3D animation where rows of A slide over columns of B, with dot products lighting up the output matrix.
+Animate `softmax` as a temperature-controlled process: high temp (flat distribution) to low temp (spiky one-hot).
+Show `log_softmax` applied to a vector, highlighting the numerical stability tricks (subtracting max).
+Illustrate `embedding` lookup as a table where a specific index highlights an entire row vector.
+Animate a `conv2d` operation on a small image, showing the kernel sliding and the dot product lighting up the output pixel.
+Visualize a shape mismatch error with red flashing, followed by the automatic expansion of dimensions during broadcasting.
+Animate an element-wise multiplication between a (3,1) and (1,3) tensor, showing the resulting (3,3) outer product.
+Create a 3D animation of adding a bias vector (1, 20) to a batch of features (128, 20), expanding across the batch dimension.
+Show a decision tree of broadcasting rules: Check dims → Align right → Expand size 1 → Check compatibility.
+Visualize tensor transposition as a cube rotating 90 degrees, swapping axes.
+Animate the dynamic construction of a computational graph when performing operations on tensors with `requires_grad=True`.
+Visualize the `.grad` attribute of a tensor accumulating gradients from multiple loss terms (e.g., regularization + data loss).
+Show the `backward()` call as a signal propagating backward through the graph, lighting up each operation node.
+Illustrate the difference between `retain_graph=True` and `retain_graph=False` with a reference counter decreasing to zero.
+Animate the `detach()` operation, severing a tensor from its computation history, turning the edge from solid to dashed.
+Visualize the main training loop as an infinite cycle: Forward → Loss → Backward → Optimizer step, with a rotating progress wheel.
+Create a real-time line plot of training loss and a separate bar chart of gradient norm during a single epoch.
+Animate the batch sampling process: shuffling dataset indices, grouping them into mini-batches, and feeding them to the model.
+Show a "loss landscape" 3D terrain for a small language model, with the optimizer's trajectory descending into a valley.
+Visualize a learning rate scheduler (Cosine Annealing) as a sinusoidal curve with the LR value updating on top.
+Animate the iterative prediction loop for an autoregressive model, where the output token at step T becomes the input token at step T+1.
+Visualize a causal mask in a matrix (upper triangle filled with -inf, lower triangle with 0) used to prevent future token cheating.
+Show a time-unrolled RNN/Transformer cell, duplicating the network architecture across the sequence length dimension.
+Illustrate "teacher forcing" by showing ground-truth tokens fed into the decoder during training (green arrows) vs. model predictions during inference (blue arrows).
+Create a sliding window animation of a context buffer shifting left as new tokens are generated.
+Visualize a character vocabulary as a color-coded legend, mapping each character (a-z, space, punctuation) to a unique color.
+Animate the conversion of a text string into a sequence of one-hot vectors (spike trains).
+Show the character embeddings as points in a 2D PCA-projected space, clustering semantically similar characters (vowels, consonants).
+Illustrate the input sequence (characters) being passed through an embedding layer, transforming discrete IDs into dense vectors.
+Visualize the output logits over the vocabulary as a horizontal bar chart for each time step during generation.
+Animate the architecture of a 2-layer MLP as interconnected neuron circles, with thickness of edges representing weight magnitudes.
+Visualize the flattening of a context window (e.g., 3 characters) into a single input vector for the MLP.
+Show the forward pass through the MLP: Input → Linear1 → Tanh → Linear2 → Logits, with dimension sizes displayed between layers.
+Create a "weight explosion" animation where random weights initialize and the activation statistics are computed.
+Illustrate the backpropagation path through the MLP, highlighting the gradient updates on each linear layer.
+Visualize the `nn.Linear` module as a box containing a weight matrix and bias vector, with internal shape annotations.
+Animate the data flow inside a forward hook and backward hook, intercepting activations and gradients.
+Show a code-like pseudocode block of the `forward` method, animating the execution line-by-line.
+Create a UML class diagram for the MLP, showing inheritance from `nn.Module` and composition of layers.
+Visualize the parameter iterator yielding all trainable tensors, highlighting each layer's parameters.
+Animate an embedding table as a 2D grid (vocab_size x embedding_dim), looking up a character by highlighting its row vector.
+Visualize the gradient flow into the embedding table, updating only the rows corresponding to the current batch of characters.
+Show the embedding vectors of similar characters (e.g., 'a', 'e', 'i') clustering together in a 3D scatter plot.
+Illustrate the effect of embedding dimension size: small dim (underfit) vs. large dim (overfit) on the loss curve.
+Animate the embedding initialization (uniform distribution) and how it evolves after 1000 training steps.
+Visualize a linear layer transformation geometrically: a square grid being rotated, scaled, and translated (plus bias).
+Animate the Tanh activation function curve mapping input logits (-inf, inf) to outputs (-1, 1), showing saturation zones in red.
+Compare ReLU and Tanh side-by-side using two identical MLPs, highlighting the dead ReLU neurons with static black bars.
+Show the effect of bias in a linear layer: shifting the decision boundary in a 2D classification plot.
+Visualize the weight matrix as a heatmap and the bias vector as a side-column, combining to form the layer's output.
+Animate the full forward pass from raw character IDs to final cross-entropy loss, highlighting each mathematical operation in sequence.
+Visualize the computation of the cross-entropy loss as: Logits → Softmax → Log → Negative Mean, showing intermediate tensors.
+Show the batch dimension flowing through the model, with a stack of parallel arrows representing each sample.
+Create a block diagram of the loss surface for a mini-batch, aggregating individual sample losses into a single scalar.
+Animate the loss value being printed to a console log in real-time during training.
+Visualize the optimizer stepping: `optimizer.zero_grad()` (clearing red gradients) → `loss.backward()` (filling blue gradients) → `optimizer.step()` (weights shift).
+Animate the parameter updates as small nudges on a 2D contour plot of the loss function.
+Show a scrolling log of epoch, loss, and accuracy, updating line by line at the bottom of the screen.
+Illustrate the effect of momentum in SGD: a moving average of gradients represented by a trailing vector.
+Visualize the batch size effect: small batches (noisy loss line) vs. large batches (smooth loss line).
+Animate three different learning rates (0.001, 0.01, 0.1) on the same loss landscape, showing divergence, optimal, and slow convergence paths.
+Visualize a learning rate range test: loss plotted against LR on a log-scale, with the optimal range highlighted.
+Show a cyclic learning rate schedule as a sawtooth wave oscillating between min and max bounds.
+Illustrate the effect of LR decay over epochs, with the step size shrinking like a staircase.
+Animate a grid search over LR and weight decay, with each point's final loss represented as color on a heatmap.
+Visualize a 3D hyperparameter landscape (hidden_dim vs. LR), with the optimal point marked by a star.
+Animate random search vs. grid search sampling points on a 2D plane, showing coverage and efficiency.
+Create a parallel coordinates plot tracking multiple runs with different hyperparameters.
+Show a summary table of hyperparameter configurations ranked by validation accuracy, sorted ascending.
+Illustrate the effect of dropout as a mask randomly turning off neurons (graying them out) during forward pass.
+Animate the splitting of a dataset into three colored blocks (Train=Blue, Dev=Green, Test=Red) with a rotating separator.
+Visualize the distribution shift between splits, using overlapping histograms of character frequencies.
+Show the training loop evaluating on the dev set after each epoch, with a vertical dashed line indicating the best checkpoint.
+Illustrate the final test evaluation as a single forward pass through the untouched test block, displaying final accuracy.
+Animate k-fold cross-validation, where the dataset rotates into k different train/dev partitions.
+Visualize underfitting as a high-bias scenario: a straight line unable to fit a sinusoidal dataset.
+Animate overfitting as a high-variance scenario: a complex polynomial oscillating wildly to pass through every noise point.
+Show the classic train/dev loss curves: underfitting (both high), overfitting (train low, dev high), ideal (both low and close).
+Create a "capacity" slider animation, increasing model parameters and watching the dev error form a U-shape (bias-variance tradeoff).
+Visualize regularization (L2) shrinking weights, displayed as a compression of the weight distribution histogram toward zero.
+Animate a confusion matrix for character classification, with correct predictions on the diagonal lighting up green.
+Visualize a subset of test samples, displaying the model's predicted character above the actual character, with a checkmark or X.
+Show a precision-recall curve for the most frequent characters, interpolating as the threshold varies.
+Create an animation of the top-5 predicted characters for a given context, expanding into a tree of possibilities.
+Illustrate the model's confidence score as a thermometer rising or falling for each prediction.
+Visualize the NLL loss per sample as a bar chart, with high-loss samples highlighted in red.
+Animate the equation `Loss = -log(p_correct)` where the probability bar of the correct class is isolated and transformed.
+Show the gradient of NLL w.r.t. logits: `dL/dz = softmax(z) - y`, animating the error vector pointing from prediction to target.
+Illustrate the difference between NLL and cross-entropy using two overlapping integral curves.
+Visualize the effect of label smoothing on the loss distribution, flattening the peaks.
+Animate the softmax exponentiation step: raw logits (spiky) → exponentiated (positive) → normalized (sums to 1).
+Show the softmax output as a pie chart, with slices representing probabilities of each character.
+Visualize the "temperature" parameter scaling logits: high T (flat pie), low T (dominating slice), and T=1 (standard).
+Illustrate the numerical stability of softmax by subtracting the maximum logit, shown as shifting the entire curve down.
+Animate the probability mass moving from the wrong class to the correct class as training progresses.
+Visualize cross-entropy as the overlap integral between the predicted distribution (blue) and the target distribution (red, one-hot).
+Animate the formula `H(p,q) = -sum(p * log(q))` with a focusing effect on the correct label's term.
+Show the cross-entropy surface for a 2-class problem as a 3D terrain, with the gradient descent path.
+Illustrate the relationship between cross-entropy and KL-divergence, adding a constant entropy term.
+Visualize the gradient of cross-entropy with respect to the logits as a vector field on the probability simplex.
+Animate the embedding table as a grid of colored tiles, where each row represents a character and each column a feature.
+Visualize the nearest-neighbor search: taking a character embedding and finding its closest neighbors in the embedding space.
+Show the evolution of embeddings over time using a t-SNE animation, where character clusters gradually separate.
+Illustrate the dot product between an embedding vector and a weight matrix row as the "compatibility" score.
+Animate the gradient update on a single embedding row, shifting its position in vector space.
+Visualize the pre-activation distribution (histogram) before and after BatchNorm in a hidden layer.
+Animate the saturation of Tanh neurons: activations near -1/1 cause gradients to vanish (represented by shrinking red arrows).
+Show the gradient flow through a deep network (10 layers) with no BN, comparing layer 1 vs. layer 10 gradient magnitudes.
+Create a heatmap of activation correlations across neurons in a layer, showing co-adaptation.
+Visualize the "internal covariate shift" as the input distribution to a layer shifting epoch by epoch (moving histograms).
+Animate a scrolling dashboard showing mean, std, min, and max of activations for each layer during forward pass.
+Visualize the activation distribution for Layer 1 as a violin plot, updating in real-time over batches.
+Show a line chart of the standard deviation of activations per layer, with a reference line for ideal scaling (e.g., ~0.6 for Tanh).
+Illustrate the effect of input normalization on subsequent layer activations using before/after histograms.
+Animate the forward pass sequentially lighting up each layer's activation statistics panel.
+Visualize the gradient distribution for Layer 5 vs. Layer 1 as two side-by-side histograms, highlighting vanishing.
+Show the gradient flow as a cascade of shrinking waterfall bars descending through the layers.
+Animate the gradient-to-activation ratio (Grad/Activation) per layer, diagnosing training instability.
+Visualize the root-mean-square (RMS) of gradients per layer as a line chart, ideally staying constant.
+Illustrate the effect of a single outlier gradient exploding, with a red spike in the bar chart.
+Visualize the forward pass with untuned scaling: activations growing exponentially deeper, eventually hitting NaN.
+Animate the ReLU dead neuron problem: a histogram of pre-activations shifting entirely into the negative region, killing gradients.
+Show the effect of a poor initialization on Tanh: all outputs saturating to ±1, represented as a flat line.
+Create an animation of the "dying ReLU" where a neuron's output remains zero regardless of input (flat line).
+Visualize the difference between maintaining variance (`sqrt(n)`) and not maintaining it (`1`) using two parallel training runs.
+Animate vanishing gradients in a 10-layer network: the first layer's gradient updates are microscopic (tiny arrows), the last layer's are large (big arrows).
+Show exploding gradients as massive updates causing the loss to spike vertically off the chart.
+Visualize gradient clipping in action: a huge gradient vector being truncated to a maximum norm (dashed circle).
+Illustrate the Hessian and curvature: gradients pointing in a narrow canyon causing oscillations.
+Animate the gradient noise scale (batch size effect) as a jittering arrow tip.
+Visualize Xavier initialization: scaling weights by `sqrt(1/fan_in)` to maintain variance of 1 across layers.
+Show a comparison of activation histograms after forward pass: Xavier init (stable) vs. standard init (shrinking/exploding).
+Animate the derivation of the Xavier formula, showing the variance propagation derivation step-by-step.
+Visualize the effect of Xavier on gradients: backward pass variance also maintained, shown as equal bar heights.
+Illustrate the fan_in vs fan_out tradeoff in different initialization variants (Xavier vs. He).
+Animate the `torchinfo` summary table being generated, expanding rows for each layer with parameter counts.
+Visualize a "gradient flow" diagram using thick blue lines for strong gradients and thin red lines for vanishing gradients.
+Show a real-time dashboard: Loss (top-left), LR (top-right), Accuracy (bottom-left), Gradient Norms (bottom-right).
+Animate the weights histogram across epochs, starting uniform, then spreading, then stabilizing.
+Create a plot of the first principal component of the weight matrix over time, showing its direction drifting.
+Visualize a 3D stack of activation histograms for all layers, rotating to show the distribution changes.
+Animate the pre-activation (before activation function) histogram turning from a bell curve to a skewed distribution.
+Show a color-coded grid of activations for a mini-batch, where black indicates dead neurons.
+Illustrate the distribution of outputs after softmax: high entropy (flat) vs low entropy (spiky).
+Visualize the evolution of activations from epoch 1 to epoch 100 using a violin plot that widens/narrows.
+Animate a heatmap of the gradient matrix for a linear layer, showing which weights receive the largest updates.
+Show a histogram of gradients overlaying a histogram of weights, comparing update magnitude to current magnitude.
+Visualize the norm of gradients as a vertical bar per layer, ideally all bars of similar height (balanced).
+Illustrate the gradient noise scale (`grad_noise = grad_std / grad_norm`) as a scatter plot over steps.
+Animate a "gradient check" comparison between analytical gradients and numerical gradients, showing tiny differences.
+Create a "training health" traffic light: Green (healthy), Yellow (warning), Red (NaN/divergence) based on loss and gradient metrics.
+Visualize the loss surface curvature using a 2D slice, with the optimizer position and local curvature estimated by the Hessian.
+Show the ratio of parameter updates to parameter values (`update/param`) per layer, ideally ~1e-3.
+Animate a summary of dead neurons percentage per layer, with a warning threshold line at 30%.
+Visualize the effective rank of activations, showing how many dimensions are actually used by the layer.
+Visualize BatchNorm as a "processing block" inserted between Linear and Activation, normalizing the distribution.
+Animate the standardization step: subtract mean (shift to 0) and divide by std (scale to 1) for a batch of features.
+Show the effect of BN on a single neuron's pre-activation distribution across a batch: from shifted/scaled to centered/unit-variance.
+Illustrate the "learnable scale and shift" parameters (gamma, beta) re-introducing flexibility after normalization.
+Visualize BN's regularizing effect: adding slight noise via batch statistics, smoothing the loss landscape.
+Animate the calculation of batch mean and variance for a single feature dimension across the batch axis.
+Visualize the running mean and running variance updating via exponential moving average (smoothing).
+Show the batch statistics vs. running statistics side-by-side during training (batch is noisy, running is smooth).
+Illustrate the computation of the normalized output: `(x - mean) / sqrt(var + eps)` broken down into three substeps.
+Animate the forward pass of a BN layer with a mini-batch of 4 samples, showing individual sample paths.
+Visualize the backward pass through BN, showing the gradients w.r.t input, mean, variance, gamma, and beta.
+Animate the derivative chain for the standard deviation term, highlighting the `1/sqrt(var)` factor.
+Show the gradient flow through the normalization block: input gradients are rescaled and adjusted by batch size.
+Illustrate the gradient w.r.t gamma (scale) and beta (shift) as simple summations over the batch dimension.
+Visualize the effect of BN on gradient magnitude: preventing the scale from exploding in early layers (shown as equalized arrows).
+Visualize a toggle switch between `model.train()` and `model.eval()`, highlighting that BN uses batch stats in train and running stats in eval.
+Animate the evaluation mode: the batch mean/variance are ignored, and the fixed running mean/variance are used instead.
+Show a comparison of outputs for the same input in train vs. eval mode, revealing slight differences.
+Illustrate the freezing of BN parameters after training, locking gamma and beta values.
+Visualize the running mean/variance converging over time, becoming stable by the end of training.
+Visualize "internal covariate shift" as a drifting distribution of inputs to a layer, and BN as a clamp holding it steady.
+Show a before/after comparison of layer input distributions over 10 epochs: without BN (drifting), with BN (stationary).
+Animate the loss landscape smoothing effect of BN, transforming a rugged terrain into a bowl.
+Illustrate BN allowing higher learning rates by showing a larger LR step being stable with BN (green) vs. unstable without BN (red).
+Visualize the reduction in sensitivity to initialization, showing multiple initializations converging to the same valley with BN.
+Animate the creation of `gamma` and `beta` as tensors of shape (num_features), initialized to 1 and 0.
+Show the momentum hyperparameter controlling the running average update rate, visualized as a damping spring.
+Visualize the epsilon (eps) term as a tiny buffer added to the variance to avoid division by zero.
+Animate the input shape transformation: (N, H) → (N, H) with normalization applied independently per feature.
+Show a PyTorch `BatchNorm1d` module diagram, including buffers for running_mean and running_var.
+Visualize gradient flow through a deep 20-layer network with and without BN, comparing gradient norm bars.
+Animate the reduction of gradient vanishing in early layers: arrows become visibly stronger after adding BN.
+Show the gradient distribution of the first layer widening after BN is applied.
+Illustrate the reduced dependence on dropout, showing BN's regularizing effect lowering validation loss.
+Visualize the gradient signal-to-noise ratio improving with BN, shown as a cleaner gradient vector.
+Animate gamma scaling: multiplying the normalized output by gamma, stretching or compressing the distribution.
+Visualize beta shifting: adding beta to the output, translating the entire distribution left or right.
+Show the gradients of gamma and beta as tracking the optimal scale and shift for the layer.
+Illustrate the effect of fixing gamma=1 and beta=0 (pure normalization) vs. learning them.
+Animate a 2D grid of features, applying scale (zoom) and shift (translate) as affine transformations.
+Visualize the running mean and variance as two lines converging to the population statistics over time.
+Animate the update equation: `running_mean = momentum * running_mean + (1 - momentum) * batch_mean`.
+Show the running statistics being saved in the model state dictionary, highlighted in blue.
+Illustrate the warmup phase where running stats are unreliable (early epochs) vs. stable later.
+Visualize the inference forward pass using the frozen running stats, with a lock icon over them.
+Visualize a residual block as a main highway plus a skip connection branching around the weight layers.
+Animate the gradient flow through a residual connection: the gradient bypasses the weight layers, preserving magnitude.
+Show the addition of the skip connection output and the main path output, merging two streams.
+Illustrate the effect of residual connections on the loss landscape: making it smoother and easier to optimize.
+Visualize a deep ResNet with 50 layers, where the skip connections are shown as jumping-over arrows.
+Visualize the momentum component of Adam as a moving average of gradients (exponential decay of past gradients).
+Animate the adaptive learning rate component: dividing by the root mean square of past gradients.
+Show the bias correction step in Adam for early training, scaling up the low initial estimates.
+Illustrate the effect of beta1 and beta2 on the update trajectory using a 2D contour plot.
+Visualize Adam's update rule compared to vanilla SGD on a pathological saddle point (SGD oscillates, Adam escapes).
+Animate the manual chain rule derivation for a simple nested function `f(g(h(x)))`, showing intermediate variables.
+Visualize a compute graph and ask the user to trace gradients, revealing the answer with a color fade.
+Show a table of intermediate variables (a, b, c) and their gradients, updating row-by-row during backward pass.
+Illustrate the "staged" backward computation: compute local gradients first, then multiply by upstream.
+Animate the manual gradient check by perturbing inputs and comparing to the analytical gradient.
+Visualize the manual forward pass through an MLP+BN, labeling each intermediate tensor with a variable name.
+Animate the backward pass through BN by hand, showing the complex derivative terms decomposed into simple operations.
+Show the gradient flow from the loss through the Linear layer, BN, and Tanh sequentially.
+Illustrate the manual computation of gradients w.r.t gamma and beta using summations over the batch.
+Visualize the updated weights after a manual step, comparing them to the PyTorch autograd result side-by-side.
+Animate the derivation of the gradient of Cross-Entropy loss w.r.t logits: `dL/dz = softmax(z) - y`.
+Visualize the backward pass through the log-softmax combination, canceling terms to simplify.
+Show the gradient vector (p - y) pointing to increase the probability of the correct class and decrease the others.
+Illustrate the manual calculation of NLL gradient for a single sample with a one-hot target.
+Visualize the batch-level gradient averaging over the mini-batch dimension.
+Animate the derivative of a matrix multiplication: `dL/dW = X^T * dL/dY` and `dL/dX = dL/dY * W^T`.
+Visualize the gradient flowing through a linear layer as a matrix multiplication, with shapes displayed.
+Show the bias gradient `dL/db` as the sum of gradients over the batch dimension.
+Illustrate the weight update direction calculated from the gradient of the linear layer.
+Animate a step-by-step manual gradient computation for a 2x3 weight matrix.
+Visualize the gradient of Tanh: `d/dx tanh(x) = 1 - tanh(x)^2`, showing the inverted parabola shape.
+Animate the backward pass through Tanh: upstream gradient multiplied by the local gradient map.
+Show saturation points on the Tanh curve where local gradient is near zero (flat regions).
+Illustrate the manual computation of the Tanh gradient for a batch of inputs, element-wise.
+Visualize the effect of the Tanh derivative on the gradient signal: attenuating large inputs.
+Animate the three-step derivative for BN: output → normalized → variance/mean → input.
+Show the complex formula for `dL/dx` in BN expanded into a large equation on the screen.
+Visualize the manual gradient contribution from the mean and variance terms separately.
+Illustrate the scaling factor `(1/N)` in the BN gradient, showing the averaging effect.
+Animate the verification of manual BN gradients against autograd using a numeric checker.
+Visualize the embedding backward pass: only rows corresponding to the current batch indices receive gradients.
+Animate the index selection process: a vector of indices selects specific rows from the gradient table.
+Show the accumulation of gradient contributions if the same index appears multiple times in a batch.
+Illustrate the manual gradient update for a single embedding row, shifting it in the embedding space.
+Visualize the gradient sparsity in the embedding table (only a few rows updated per batch).
+Animate the entire forward and backward pass from input text to final loss, showing all intermediate tensors in a scrollable view.
+Visualize the computational graph of a single training step as a massive directed acyclic graph (DAG).
+Show the gradient tape unwinding sequentially from the output back to the inputs.
+Illustrate the accumulation of gradients at a branching node where two paths meet.
+Animate the manual calculation of gradients for a 3-layer MLP, showing the nested chain rule expansion.
+Visualize gradient flow as a river system: tributaries (local gradients) merging into the main stream (upstream gradient).
+Animate the gradient flow through residual connections: a direct tributary bypassing obstacles.
+Show the gradient flow through a softmax layer, highlighting the competition between classes.
+Illustrate the gradient flow through a dropout layer: some streams are stochastically blocked (multiplied by 0).
+Visualize gradient flow through layer normalization, dividing the stream by the input's standard deviation.
+Animate the vectorization of gradient computations: replacing nested loops with matrix operations.
+Show the einsum notation for gradient computations, mapping indices to tensor contractions.
+Visualize the performance speedup of tensor-level gradients (GPU) vs. scalar loops (CPU) using a racing bar chart.
+Illustrate the memory efficiency of in-place gradient accumulation vs. allocating new tensors.
+Animate the batch matrix multiplication used in attention gradient calculations.
+Visualize the loss landscape as a 3D mountain range, and the gradients as downhill vectors.
+Animate a 2D contour plot where the optimizer takes steps perpendicular to the contour lines (steepest descent).
+Show the effect of momentum: the optimizer ball rolling down the slope, gaining speed.
+Illustrate the concept of "flat minima" by showing a wide valley vs. a sharp spike, both with low loss.
+Visualize the Hessian eigenvalues as an ellipse, with gradient steps adapting to curvature.
+Animate the process of adding `assert` statements to check tensor shapes and values during forward/backward.
+Visualize a debugger breakpoint pausing the forward pass, displaying current layer outputs.
+Show a "gradient flow dashboard" highlighting layers with near-zero gradient norms in red.
+Illustrate the process of reducing the learning rate when loss spikes, visualized as turning a dial.
+Animate the layer-wise learning rate decay, where earlier layers get smaller updates.
+Visualize a 1D convolutional filter sliding over a sequence of character embeddings.
+Animate the hierarchy of convolutions capturing longer and longer contexts (like a pyramid).
+Show the dilation factor as expanding gaps between filter taps, growing exponentially with depth.
+Illustrate the "causal" constraint: the convolution only looks at past tokens (masked future tokens).
+Visualize the WaveNet stack as a series of blocks with increasing dilation rates (1, 2, 4, 8...).
+Animate the receptive field growing like a binary tree as depth increases (two leaves merge).
+Show the hierarchical feature extraction: low-level (characters) → mid-level (morphology) → high-level (semantics).
+Visualize the downsampling/upsampling paths in a hierarchical decoder structure.
+Illustrate the distance between input tokens that can interact at each layer, doubling each time.
+Animate a tree visualization of the dilated convolutions, where each node's output depends on nodes far apart.
+Visualize a dilation rate of 2: the filter skips every other input, effectively spanning a wider context.
+Animate the stack of dilated convolutions, showing how a single output at the top can see the entire sequence.
+Show the kernel weights being applied to non-contiguous positions (gaps in the input).
+Illustrate the exponential receptive field growth: layer 1 covers 2, layer 2 covers 4, layer 3 covers 8.
+Visualize the "dilation" as a spring stretching the filter taps apart.
+Visualize the causal mask: a triangular matrix of zeros above the diagonal, preventing future token leakage.
+Animate the generation process: output at time T depends only on inputs ≤ T (strictly left-context).
+Show the padding strategy: padding left side to maintain sequence length for causal convolutions.
+Illustrate the difference between causal and non-causal convolution using overlapping arrows.
+Visualize the receptive field's "left context" growing as the model gets deeper.
+Animate a line graph showing the receptive field size as a function of number of layers and dilation rate.
+Visualize the receptive field as a colored window expanding over the input sequence.
+Show a table comparing receptive field for different architectures: MLP (fixed), RNN (infinite), WaveNet (exponential).
+Illustrate the context size needed for a long-range dependency (e.g., matching parentheses).
+Animate the receptive field growth when increasing filter size vs. increasing dilation rate.
+Visualize a WaveNet block: input → Dilated Conv → Tanh/Sigmoid (gated) → 1x1 Conv → + Input (residual).
+Animate the skip connections from each block summing to the final output layer.
+Show the residual pathway as a thick highway preserving the gradient flow.
+Illustrate the gated activation: Tanh (magnitude) × Sigmoid (gate) element-wise.
+Visualize the gradient flow through the residual stack, bypassing the convolutional layers.
+Animate the split of the convolution output into two paths: one through Tanh, one through Sigmoid.
+Show the element-wise multiplication of the Tanh output and the Sigmoid gate, controlling information flow.
+Visualize the "gate" as a sliding door that opens (close to 1) or closes (close to 0) based on input.
+Illustrate the gradient of the gated activation, combining both Tanh and Sigmoid derivatives.
+Animate the effect of gating on long-range dependencies: allowing only relevant signals to pass.
+Visualize the training loss for WaveNet with different depths (10, 20, 30 layers) converging.
+Animate the gradient flow through 30 layers with residual connections (stable) vs. without (vanishing).
+Show the effect of weight initialization for very deep conv layers (scaling by receptive field).
+Illustrate the memory footprint of WaveNet, growing with depth and dilation.
+Visualize the training time scaling linearly with depth, shown as a bar chart.
+Animate the `nn.Module` tree: a root container expanding into submodules recursively.
+Show the `named_parameters()` iterator traversing the tree, yielding parameter names and tensors.
+Visualize the `apply()` function recursively applying a function (e.g., weight init) to all modules.
+Illustrate the `state_dict` and `load_state_dict` as a serialization/deserialization pipeline.
+Animate the `to(device)` method moving all parameters and buffers from CPU to GPU.
+Visualize a custom `Linear` layer subclassing `nn.Module`, with `__init__` and `forward` methods.
+Show the registration of parameters using `nn.Parameter`, highlighting them in the module's state.
+Animate the forward pass of a custom `Block` module consisting of Linear, BN, and ReLU.
+Illustrate the use of `nn.Sequential` as a container, chaining layers in a pipeline.
+Visualize the creation of a custom `Embedding` layer with a weight matrix and a forward lookup.
+Animate the hook system: a forward hook triggering to log activations, and a backward hook logging gradients.
+Show the parameter buffer registration (`register_buffer`) for non-trainable tensors (e.g., running_mean).
+Visualize the module's `__call__` method wrapping the `forward` call with hooks and pre/post processing.
+Illustrate the `zero_grad()` method iterating over all parameters and setting their grad to None.
+Animate the module's training/eval mode flag propagating down to all child modules.
+Visualize a "docs" page with a search bar, highlighting the API reference for a specific function.
+Animate the process of tracing tensor shapes manually using pen and paper (visible scratchpad).
+Show a Jupyter Notebook cell transforming into a production Python script during export.
+Illustrate the iterative improvement cycle: Hypothesis → Code Change → Run → Evaluate → Visualize Results.
+Visualize the entire ML project lifecycle: Data Collection → Preprocessing → Model Training → Evaluation → Deployment (DevOps pipe).

@@ -1,22 +1,16 @@
 {
-  "started_at": "2026-07-21T17:43:33.410438+00:00",
-  "prompts_file": "/home/nabin/myallprojects/AOS/apps/agents/sft_data_gen/prompts.jsonl",
+  "started_at": "2026-07-25T10:22:54.549233+00:00",
+  "prompts_file": "/home/nabin/myallprojects/AOS/apps/agents/sft_data_gen/prompts_andrej_400.jsonl",
   "manifest_file": "/home/nabin/myallprojects/AOS/apps/agents/sft_data_gen/batch_runs.jsonl",
-  "attempted": 10,
-  "ok": 10,
+  "concurrency": 4,
+  "fast": true,
+  "attempted": 1,
+  "ok": 1,
   "failed": 0,
-  "compile_ok": 9,
+  "compile_ok": 1,
   "failed_indices": [],
   "compile_ok_indices": [
-    4,
-    7,
-    0,
-    5,
-    3,
-    1,
-    8,
-    6,
-    2
+    382
   ],
-  "finished_at": "2026-07-21T18:41:30.791768+00:00"
+  "finished_at": "2026-07-25T10:27:31.070150+00:00"
 }

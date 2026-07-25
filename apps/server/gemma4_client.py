@@ -9,7 +9,10 @@ The vLLM server itself is launched separately, e.g.:
 
     vllm serve google/gemma-4-31B-it --max-model-len 16384
 
-See README.md for full server launch flags (thinking mode, tool calling,
+LoRA adapters trained in apps/sft are served with --enable-lora and registered
+module names (see README.md). Pass adapter="manim-sft" to target a LoRA module.
+
+See README.md for full server launch flags (LoRA, thinking mode, tool calling,
 audio, TPU/AMD deployment).
 """
 
@@ -22,6 +25,10 @@ from openai import OpenAI
 
 DEFAULT_BASE_URL = "http://localhost:8000/v1"
 DEFAULT_MODEL = "google/gemma-4-31B-it"
+DEFAULT_BASE_MODEL = "google/gemma-4-E2B-it"
+DEFAULT_LORA_MODULE = "manim-sft"
+DEFAULT_ADAPTER_REPO = "nabin2004/AOS-gemma4-manim-sft"
+DEFAULT_LORA_RANK = 64
 
 # Per-image token budgets vLLM accepts for Gemma 4's dynamic vision resolution.
 VISION_TOKEN_BUDGETS = (70, 140, 280, 560, 1120)
@@ -42,7 +49,9 @@ def _as_messages(prompt_or_messages: str | list[Message]) -> list[Message]:
 
 def _media_message(prompt: str, media_type: str, urls: list[str]) -> Message:
     url_key = f"{media_type}_url"
-    content: list[dict[str, Any]] = [{"type": url_key, url_key: {"url": url}} for url in urls]
+    content: list[dict[str, Any]] = [
+        {"type": url_key, url_key: {"url": url}} for url in urls
+    ]
     content.append({"type": "text", "text": prompt})
     return {"role": "user", "content": content}
 
@@ -52,12 +61,20 @@ class Gemma4Client:
 
     def __init__(
         self,
-        model: str = DEFAULT_MODEL,
+        model: str = DEFAULT_BASE_MODEL,
+        *,
+        adapter: str | None = None,
         base_url: str = DEFAULT_BASE_URL,
         api_key: str = "EMPTY",
     ) -> None:
-        self.model = model
+        self.base_model = model
+        self.adapter = adapter
+        self.model = adapter or model
         self._client = OpenAI(base_url=base_url, api_key=api_key)
+
+    def list_models(self) -> list[str]:
+        """Return model ids exposed by the vLLM /v1/models endpoint."""
+        return [entry.id for entry in self._client.models.list().data]
 
     def chat(
         self,
@@ -98,7 +115,9 @@ class Gemma4Client:
             **kwargs,
         )
         message = response.choices[0].message
-        return ThinkingResult(content=message.content, reasoning=getattr(message, "reasoning", None))
+        return ThinkingResult(
+            content=message.content, reasoning=getattr(message, "reasoning", None)
+        )
 
     def describe_images(
         self,
@@ -111,9 +130,15 @@ class Gemma4Client:
     ) -> str:
         """Ask a question about one or more images."""
         if vision_tokens is not None and vision_tokens not in VISION_TOKEN_BUDGETS:
-            raise ValueError(f"vision_tokens must be one of {VISION_TOKEN_BUDGETS}, got {vision_tokens}")
+            raise ValueError(
+                f"vision_tokens must be one of {VISION_TOKEN_BUDGETS}, got {vision_tokens}"
+            )
 
-        extra_body = {"mm_processor_kwargs": {"max_soft_tokens": vision_tokens}} if vision_tokens else {}
+        extra_body = (
+            {"mm_processor_kwargs": {"max_soft_tokens": vision_tokens}}
+            if vision_tokens
+            else {}
+        )
         response = self._client.chat.completions.create(
             model=self.model,
             messages=[_media_message(prompt, "image", image_urls)],
@@ -211,7 +236,10 @@ class Gemma4Client:
         response = self._client.chat.completions.create(
             model=self.model,
             messages=_as_messages(prompt_or_messages),
-            response_format={"type": "json_schema", "json_schema": {"name": schema_name, "schema": schema}},
+            response_format={
+                "type": "json_schema",
+                "json_schema": {"name": schema_name, "schema": schema},
+            },
             max_tokens=max_tokens,
             **kwargs,
         )

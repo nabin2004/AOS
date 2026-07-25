@@ -258,6 +258,31 @@ introductory, intermediate, advanced undergraduate,
 graduate, research intuition.
 
 --------------------------------------------------------------------
+CURRICULUM WAVE (Manim visualization topics)
+--------------------------------------------------------------------
+
+When topics are concrete visualization subjects (geometry constructions,
+ODE attractors, sorting algorithms, quantum orbitals, etc.), stay tightly
+faithful to that assigned topic. Match the visual genre to the domain:
+- Geometry / trig → constructions, loci, unit circle, tilings
+- Calculus / DE / LA → graphs, fields, surfaces, transformations
+- Probability / stats → distributions evolving, sampling animations
+- Physics → trajectories, fields, spacetime diagrams
+- CS algorithms / DS → step-by-step state changes, call stacks, graphs
+- ML → loss surfaces, decision boundaries, layer operations
+
+Across a batch (not every single prompt), mix in natural asks for:
+- Camera: pan, zoom into a detail, orbit a 3D object
+- Color emphasis: highlight the key object / step in a distinct color
+- Pacing: slow down the key insight; keep setup brisk
+
+Write these as a real user would ("zoom into the surface", "slow down
+when the swap happens") — never name Manim scene classes or APIs.
+
+Prefer concrete visual beats: axes, vectors, bar charts, number lines,
+3D orbits, matrix grids, particle clouds — not abstract lecture scripts.
+
+--------------------------------------------------------------------
 OUTPUT
 --------------------------------------------------------------------
 Return structured prompts only — one entry per assigned topic.
@@ -548,6 +573,7 @@ async def generate_prompts(
     topics: List[str],
     batch_size: int = DEFAULT_BATCH_SIZE,
     resume: bool = True,
+    exhaust_topics: bool = False,
 ):
     # Count existing lines for resuming
     start_index = 0
@@ -571,6 +597,17 @@ async def generate_prompts(
     if num_to_generate <= 0:
         return
 
+    if exhaust_topics:
+        if num_to_generate > len(topics):
+            logging.warning(
+                f"--exhaust-topics: capping num_to_generate from {num_to_generate} "
+                f"to {len(topics)} (one prompt per unique topic)."
+            )
+            num_to_generate = len(topics)
+        logging.info(
+            f"--exhaust-topics: using each of {num_to_generate} topics exactly once."
+        )
+
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
     sem = asyncio.Semaphore(concurrency)
@@ -579,6 +616,7 @@ async def generate_prompts(
     next_index = start_index
     written = 0
     written_lock = asyncio.Lock()
+    written_topics: set[str] = set()
 
     try:
         from tqdm.asyncio import tqdm
@@ -589,11 +627,20 @@ async def generate_prompts(
 
     # Build topic batches covering num_to_generate slots
     topic_batches: List[List[str]] = []
-    remaining = num_to_generate
-    while remaining > 0:
-        size = min(batch_size, remaining)
-        topic_batches.append([random.choice(topics) for _ in range(size)])
-        remaining -= size
+    if exhaust_topics:
+        ordered = topics[:]
+        random.shuffle(ordered)
+        ordered = ordered[:num_to_generate]
+        for i in range(0, len(ordered), batch_size):
+            topic_batches.append(ordered[i : i + batch_size])
+        exhaust_pool = ordered[:]
+    else:
+        remaining = num_to_generate
+        while remaining > 0:
+            size = min(batch_size, remaining)
+            topic_batches.append([random.choice(topics) for _ in range(size)])
+            remaining -= size
+        exhaust_pool = []
 
     async def append_items(items: List[SFTPromptItem]) -> int:
         """Write items up to the remaining quota. Returns how many were written."""
@@ -611,6 +658,7 @@ async def generate_prompts(
                 lines.append(json.dumps(record, ensure_ascii=False) + "\n")
                 next_index += 1
                 written += 1
+                written_topics.add(item.topic.casefold())
         if lines:
             async with write_lock:
                 with open(output_file, "a", encoding="utf-8") as f:
@@ -634,7 +682,15 @@ async def generate_prompts(
         while written < num_to_generate and topup_rounds < 50:
             need = num_to_generate - written
             size = min(batch_size, need)
-            fill_topics = [random.choice(topics) for _ in range(size)]
+            if exhaust_topics:
+                missing = [
+                    t for t in exhaust_pool if t.casefold() not in written_topics
+                ]
+                if not missing:
+                    break
+                fill_topics = missing[:size]
+            else:
+                fill_topics = [random.choice(topics) for _ in range(size)]
             async with sem:
                 items = await generate_valid_batch(fill_topics, reject_counts)
             if not items:
@@ -754,6 +810,14 @@ def parse_args():
         help="Do not resume from existing file; backup and start fresh.",
     )
     parser.add_argument(
+        "--exhaust-topics",
+        action="store_true",
+        help=(
+            "Use each loaded topic exactly once (shuffled). "
+            "Caps generation at len(topics); ideal for curriculum waves."
+        ),
+    )
+    parser.add_argument(
         "--verify",
         action="store_true",
         help="After generation, print alignment stats and a random sample.",
@@ -792,6 +856,7 @@ def main():
             topics=topics,
             batch_size=args.batch_size,
             resume=not args.no_resume,
+            exhaust_topics=args.exhaust_topics,
         )
     )
 

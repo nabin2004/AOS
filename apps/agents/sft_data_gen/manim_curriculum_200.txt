@@ -1,0 +1,200 @@
+Visualizing integer addition and subtraction on a number line
+Multiplication as repeated addition (grid/array visualization)
+Exponentiation and exponential growth curves
+Prime factorization using factor trees
+Simplifying algebraic fractions with cross-cancellation
+Solving a linear equation (e.g., 2x + 3 = 7) step-by-step
+Completing the square for a quadratic equation
+The quadratic formula and its discriminant (real vs. complex roots)
+Complex number addition and multiplication on the Argand plane
+Euler's formula: e^(iθ) = cosθ + i sinθ as a rotating unit circle vector
+De Moivre's theorem and roots of unity
+Binomial expansion visualized with Pascal's triangle
+Arithmetic vs. geometric sequences and series
+Partial fraction decomposition graphically
+Logarithmic functions and their inverses (exponential)
+The unit circle and radian measure
+Sine, cosine, and tangent as right-triangle ratios
+Graphing sine and cosine waves with phase shifts
+The tangent function and its asymptotes
+Lissajous curves with varying frequency ratios
+The Pythagorean theorem with square areas on triangle sides
+Euclidean construction of an equilateral triangle
+Polygon interior angle sum formula
+Pi visualized as the ratio of circumference to diameter
+Area of a circle via integration (slicing into rings)
+The golden ratio in a pentagon and pentagram
+Conic sections: parabola, ellipse, and hyperbola generation
+Ellipse as a locus of points with constant sum of distances to foci
+Hyperbola as a locus of points with constant difference to foci
+Polar coordinates and converting to Cartesian
+Spiral of Archimedes vs. logarithmic spiral
+The cycloid curve (rolling circle)
+Epicycloids and hypocycloids
+Tiling with regular polygons (tessellations)
+Fractal: Sierpinski triangle generation
+Secant lines approaching a tangent line (derivative definition)
+The derivative of x^2 as a visual slope field
+The chain rule shown via nested function graphs
+Visualizing the product rule with rectangle areas
+Riemann sums (left, right, midpoint) approaching the definite integral
+The Fundamental Theorem of Calculus: derivative cancels integral
+Area between two curves
+Volume of revolution (disk/washer method) for a solid
+Shell method for volume of revolution
+Arc length of a parametric curve
+Taylor series approximation of sin(x) around 0
+Taylor series of e^x converging pointwise
+Radius of convergence of a power series
+Gradient vector field of a scalar function
+Directional derivatives and the steepest ascent
+Saddle points, local minima, and maxima on a 3D surface
+Double integrals over a rectangular region
+Divergence of a vector field
+Curl of a vector field (rotation)
+Green's theorem in the plane
+Slope fields for a first-order ODE (dy/dx = x + y)
+Euler's method approximation vs. exact solution
+The logistic growth equation (carrying capacity)
+Phase portrait for a harmonic oscillator
+Damped harmonic oscillator (underdamped, critically, overdamped)
+Forced oscillations and resonance
+The Lorenz attractor (chaotic butterfly)
+The Rossler attractor
+Lotka-Volterra predator-prey cycles
+The Van der Pol oscillator
+Duffing oscillator and chaos
+Double pendulum chaotic motion
+Bifurcation diagram of the logistic map
+The heat equation (diffusion) on a 1D rod
+The wave equation on a vibrating string
+Vector addition and scalar multiplication geometrically
+Linear combination of two vectors in R²
+Span of a single vector (line) vs. two vectors (plane)
+Dot product and projection of one vector onto another
+Cross product of two 3D vectors (perpendicular vector)
+Matrix multiplication as a linear transformation of the unit square
+Rotation matrix (2D) rotating a square
+Scaling and shearing transformations
+Reflection across the x-axis and y-axis
+Eigenvectors and eigenvalues for a 2x2 matrix (stretch directions)
+Matrix diagonalization visually
+Gram-Schmidt orthogonalization process
+Singular Value Decomposition (SVD) – geometric interpretation
+PCA (Principal Component Analysis) – reducing 2D data to 1D
+The determinant as the area scaling factor of a parallelogram
+Flipping a fair coin – law of large numbers
+Rolling two dice – distribution of sums
+The normal (Gaussian) distribution and the empirical rule
+The Central Limit Theorem with sample means
+Binomial distribution as n increases towards normal
+Poisson distribution and arrival rates
+Exponential distribution (waiting times)
+Cumulative distribution functions (CDFs)
+Correlation coefficient (r) – positive vs. negative vs. zero
+Linear regression and the least-squares line
+Bayesian updating with prior and posterior distributions
+Markov chain transition matrices (e.g., weather states)
+Random walk in 1D and 2D
+Monte Carlo simulation for estimating Pi
+Confidence intervals and margin of error
+Projectile motion with initial angle and velocity
+Free-body diagram of forces on a block
+Newton's second law (F=ma) on an inclined plane
+Friction and the coefficient of friction
+Circular motion and centripetal acceleration
+Kepler's first law: elliptical orbits of planets
+Kepler's second law: equal areas in equal times
+Kepler's third law: period vs. semi-major axis
+Gravitational field lines of two masses
+The three-body problem (simplified restricted)
+Simple pendulum: small-angle approximation vs. real motion
+Spring-mass system and Hooke's law
+Elastic vs. inelastic collisions in 1D
+Conservation of momentum in 2D collisions
+Gyroscope precession
+Electric field lines for a dipole
+Equipotential surfaces around a charge
+Coulomb's law – force between two charges
+Magnetic field of a current-carrying wire
+The Lorentz force on a moving charged particle
+Electromagnetic wave propagation (E and B fields in phase)
+Constructive and destructive interference of two waves
+Standing waves on a string (harmonics)
+Diffraction through a single slit
+Double-slit interference pattern
+Polarization of light – rotating polarizer
+Fourier synthesis – adding sine waves to build a square wave
+Fourier transform of a Gaussian pulse
+Snell's law and refraction between media
+Total internal reflection and critical angle
+Blackbody radiation and Planck's law
+The photoelectric effect (photon energy vs. work function)
+De Broglie wavelength – particle-wave duality
+The Heisenberg uncertainty principle (position vs. momentum)
+Time dilation (twin paradox) with Lorentz factor
+Length contraction at relativistic speeds
+Spacetime diagrams (Minkowski space)
+The twin paradox on a spacetime diagram
+The quantum harmonic oscillator (energy levels)
+Probability density of a particle in a 1D box
+Hydrogen atom orbitals (1s, 2p, 3d) shapes
+Stern-Gerlach experiment – spin quantization
+Feynman path integral – sum over histories
+Quantum tunneling through a barrier
+Entropy and the second law of thermodynamics (visualizing microstates)
+Pressure vs. volume (PV) diagram for an ideal gas
+The Carnot cycle (heat engine)
+Adiabatic vs. isothermal expansion
+Convection currents in a fluid
+Laminar vs. turbulent flow visualization
+Bernoulli's principle and a Venturi tube
+Navier-Stokes equations – fluid flow around a cylinder
+Diffusion of particles (Fick's law)
+Brownian motion of a particle
+Phase transition – melting/freezing at a molecular level
+Array vs. Linked List memory layout
+Stack operations (push/pop) with animation
+Queue operations (FIFO) with animated buffer
+Binary Search Tree – insertion and traversal
+AVL tree balancing rotations
+Heap data structure – max-heap property
+Hash table – open addressing and chaining collisions
+Trie data structure for word prefix search
+Graph representations (adjacency matrix vs. list)
+Recursion visualized with a call stack (e.g., Fibonacci)
+The Tower of Hanoi recursive solution
+Depth-First Search (DFS) on a graph
+Breadth-First Search (BFS) on a graph
+Dijkstra's algorithm – shortest path visualization
+A* pathfinding with a heuristic
+Bubble Sort with element swaps highlighted
+Selection Sort scanning for minimum
+Insertion Sort shifting elements
+Merge Sort – divide and conquer merging
+Quick Sort – partitioning with a pivot
+Heap Sort with heapify operations
+Counting Sort and Radix Sort visualizations
+Binary search on a sorted array
+KMP (Knuth-Morris-Pratt) pattern matching
+The traveling salesman problem (brute-force vs. heuristic)
+Gradient descent on a 3D loss surface
+Simulated annealing – escaping local minima
+Genetic algorithm – crossover and mutation
+PageRank algorithm – random surfer model
+The Stable Marriage problem (Gale-Shapley)
+Perceptron decision boundary (linear classifier)
+Sigmoid, Tanh, and ReLU activation functions
+Feedforward neural network – forward pass
+Backpropagation – visualizing gradient flow
+Convolutional layer – sliding kernel over an image
+Max pooling and average pooling operations
+Decision tree – splitting on features
+K-Means clustering convergence (centroid movement)
+Support Vector Machine – maximum margin hyperplane
+t-SNE – reducing high-dimensional data to 2D
+Sieve of Eratosthenes filtering composites
+Euclidean algorithm – finding GCD visually with rectangles
+Modular multiplication on a clock face
+The Collatz conjecture (3n+1 problem) sequence
+Visualizing graph isomorphisms and non-isomorphisms

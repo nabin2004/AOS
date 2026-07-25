@@ -11,8 +11,12 @@ See the full workflow in the parent [README](../README.md#sft-data-collection-co
 | `topics.txt` | Topic seeds for `generate_prompts.py` (one topic per line) |
 | `additional_topics.txt` | Extra topic seeds (bare names; wrappers are stripped on load) |
 | `andrej_karpathy.txt` | ML / education topic seeds |
+| `andrej_karpathy_400.txt` | 400 Karpathy/Micrograd→torch.nn Manim seeds (from `_andrej_karpathy.txt`) |
+| `manim_curriculum_200.txt` | 200 Manim curriculum topics (algebra → discrete math) |
 | `generate_prompts.py` | Batched LLM user requests → `prompts.jsonl` |
 | `prompts.jsonl` | Prompt bank (`{"index", "topic", "prompt"}` per line) |
+| `prompts_curriculum_200.jsonl` | Dedicated bank for the curriculum-200 wave |
+| `prompts_andrej_400.jsonl` | Dedicated bank for the Karpathy-400 wave |
 | `prompts.jsonl.bak` | Backup of previous bank (created by `--no-resume`) |
 | `collect_traces.py` | Batch-run `agent_graph` over `prompts.jsonl` |
 | `run_waves.sh` | Loop `collect_traces` until unique success target |
@@ -70,6 +74,67 @@ export HF_TOKEN=hf_...   # write token; never commit
 cd ../sft && uv run python upload_dataset.py
 ```
 
+## Curriculum wave (next 200 prompts)
+
+One naturalistic user request per topic from `manim_curriculum_200.txt` (algebra → discrete math). Uses `--exhaust-topics` so each seed appears exactly once, written to a dedicated file (does not fight resume against the 8k main bank).
+
+```bash
+cd apps/agents
+
+# Generate exactly 200 prompts (one per curriculum topic)
+uv run python sft_data_gen/generate_prompts.py \
+  --num 200 \
+  --exhaust-topics \
+  --topics sft_data_gen/manim_curriculum_200.txt \
+  --output sft_data_gen/prompts_curriculum_200.jsonl \
+  --no-resume \
+  --concurrency 20 \
+  --batch-size 8 \
+  --verify
+
+# Collect Code Agent traces from that bank
+uv run python sft_data_gen/collect_traces.py \
+  --prompts sft_data_gen/prompts_curriculum_200.jsonl \
+  --limit 200 \
+  --fast \
+  --convert-after-local \
+  --resume \
+  --concurrency 4
+```
+
+Optional: append into the main bank later with
+`cat sft_data_gen/prompts_curriculum_200.jsonl >> sft_data_gen/prompts.jsonl`
+(re-index if you rely on contiguous `index` values).
+
+## Karpathy wave (next 400 prompts)
+
+One naturalistic user request per seed from `andrej_karpathy_400.txt` (Micrograd → torch.nn / DL process), extracted from `_andrej_karpathy.txt`. Uses `--exhaust-topics` so each seed appears exactly once.
+
+```bash
+cd apps/agents
+
+# Generate exactly 400 user requests (one per seed)
+uv run python sft_data_gen/generate_prompts.py \
+  --num 400 \
+  --exhaust-topics \
+  --topics sft_data_gen/andrej_karpathy_400.txt \
+  --output sft_data_gen/prompts_andrej_400.jsonl \
+  --no-resume \
+  --concurrency 20 \
+  --batch-size 8 \
+  --verify
+
+# Collect Code Agent traces from that bank
+uv run python sft_data_gen/collect_traces.py \
+  --prompts sft_data_gen/prompts_andrej_400.jsonl \
+  --limit 400 \
+  --fast \
+  --convert-after-local \
+  --resume \
+  --concurrency 4
+```
+
+Optional merge: `cat sft_data_gen/prompts_andrej_400.jsonl >> sft_data_gen/prompts.jsonl`.
 
 Prompt generation uses batched OpenRouter calls (`--batch-size`, default 8) and
 enforces teaching vs learning voice: instructor frames must say **teaching**;
