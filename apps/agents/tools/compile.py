@@ -6,8 +6,7 @@ import re
 import subprocess
 from pathlib import Path
 
-import dbos_setup  # noqa: F401 — configure DBOS before @DBOS.step
-from dbos import DBOS
+from dbos_setup import DBOS
 
 from tools.coder_workspace import (
     OutputDirError,

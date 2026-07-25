@@ -6,8 +6,7 @@ from typing import Callable
 
 import scipy.io.wavfile
 
-import dbos_setup  # noqa: F401 — configure DBOS before @DBOS.step
-from dbos import DBOS
+from dbos_setup import DBOS
 
 from narrator import DEFAULT_VOICE, Narrator
 from tools.coder_workspace import (
