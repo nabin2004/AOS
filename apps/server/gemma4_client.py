@@ -18,7 +18,7 @@ module names (see README.md). Pass adapter="manim-sft" to target a LoRA module.
 Ollama example (after export_gguf.py + ollama create):
 
     client = Gemma4Client(
-        model="aos-gemma4-manim",
+        model="aos-gemma4-31b-manim",
         base_url=DEFAULT_OLLAMA_BASE_URL,
         api_key="ollama",
     )
@@ -30,17 +30,29 @@ audio, TPU/AMD deployment).
 from __future__ import annotations
 
 import json
+import sys
+from pathlib import Path
 from typing import Any, NamedTuple
 
 from openai import OpenAI
 
+TRAINING_ROOT = Path(__file__).resolve().parents[1] / "training"
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from model_identity import (  # noqa: E402
+    BASE_MODEL_ID,
+    HUB_SFT_REPO,
+    OLLAMA_MODEL_TAG,
+)
+
 DEFAULT_BASE_URL = "http://localhost:8000/v1"
 DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/v1"
-DEFAULT_OLLAMA_MODEL = "aos-gemma4-manim"
-DEFAULT_MODEL = "google/gemma-4-31B-it"
-DEFAULT_BASE_MODEL = "google/gemma-4-E2B-it"
+DEFAULT_OLLAMA_MODEL = OLLAMA_MODEL_TAG
+DEFAULT_MODEL = BASE_MODEL_ID
+DEFAULT_BASE_MODEL = BASE_MODEL_ID
 DEFAULT_LORA_MODULE = "manim-sft"
-DEFAULT_ADAPTER_REPO = "nabin2004/AOS-gemma4-manim-sft"
+DEFAULT_ADAPTER_REPO = HUB_SFT_REPO
 DEFAULT_LORA_RANK = 64
 
 # Per-image token budgets vLLM accepts for Gemma 4's dynamic vision resolution.

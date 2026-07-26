@@ -2,11 +2,24 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 from dataclasses import dataclass, replace
 from pathlib import Path
 
 GRPO_ROOT = Path(__file__).resolve().parent
-DEFAULT_BASE_MODEL = "google/gemma-4-E2B-it"
+TRAINING_ROOT = GRPO_ROOT.parent / "training"
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from model_identity import (  # noqa: E402
+    BASE_MODEL_ID,
+    SFT_OUTPUT_DIR_NAME,
+    WANDB_GRPO_RUN_NAME,
+    WANDB_RUN_GROUP,
+    WANDB_TAGS,
+)
+
+DEFAULT_BASE_MODEL = BASE_MODEL_ID
 DEFAULT_LEARNING_RATE = 1e-4
 DEFAULT_BETA = 0.001
 DEFAULT_LENGTH_PENALTY_COEF = 0.001
@@ -15,7 +28,7 @@ GRPO_ADAPTER = "grpo"
 
 @dataclass
 class TrainingConfig:
-    sft_lora_path: Path = GRPO_ROOT / "../sft/gemma4-manim-ft"
+    sft_lora_path: Path = GRPO_ROOT / ".." / "sft" / SFT_OUTPUT_DIR_NAME
     base_model: str | None = None
     dataset_repo: str = "nabin2004/ManiBench"
     dataset_path: Path | None = None
@@ -36,8 +49,10 @@ class TrainingConfig:
     reward_debug: bool = False
     length_penalty: float = DEFAULT_LENGTH_PENALTY_COEF
     report_to: str = "wandb"
-    run_name: str = "gemma4-manim-grpo"
+    run_name: str = WANDB_GRPO_RUN_NAME
     wandb_project: str = "aos-grpo"
+    wandb_group: str = WANDB_RUN_GROUP
+    wandb_tags: tuple[str, ...] = WANDB_TAGS
 
     def resolve_paths(self) -> TrainingConfig:
         dataset_path = self.dataset_path
@@ -136,7 +151,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--sft-lora",
         default=None,
-        help="SFT LoRA path (default: ../sft/gemma4-manim-ft)",
+        help=f"SFT LoRA path (default: ../sft/{SFT_OUTPUT_DIR_NAME})",
     )
     parser.add_argument(
         "--base-model",
@@ -228,6 +243,6 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--run-name",
         default=None,
-        help='W&B run name (default: "gemma4-manim-grpo")',
+        help=f'W&B run name (default: "{WANDB_GRPO_RUN_NAME}")',
     )
     return parser

@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 
 from dbos_setup import DBOS
+from error_feedback import summarize_diagnostic_output
 
 from tools.coder_workspace import (
     OutputDirError,
@@ -232,7 +233,7 @@ def compile_manim_code(
             returncode=proc.returncode,
             failure_marker=failure_marker,
             tex_failure=tex_failure,
-            log_excerpt=output[-4000:] if len(output) > 4000 else output,
+            log_excerpt=summarize_diagnostic_output(output, max_chars=1200),
             message=message,
         )
     except OutputDirError as e:

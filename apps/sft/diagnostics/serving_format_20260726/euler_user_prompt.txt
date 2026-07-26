@@ -1,0 +1,32 @@
+Topic: Euler's Formula Visualization
+Subject: Subject.MATH
+output_dir: /home/nabin/myallprojects/AOS/apps/agents/workspace/coder_runs/20260726-114637-euler-s-formula-visualization
+Use output_dir=/home/nabin/myallprojects/AOS/apps/agents/workspace/coder_runs/20260726-114637-euler-s-formula-visualization for every manim_write / compile_manim_code / manim_read / synthesize_narration call.
+
+Plan:
+{
+  "topic": "Euler's Formula Visualization",
+  "subject": "math",
+  "greeting": "",
+  "needed_formulas": [
+    "e^(ix) = cos(x) + i*sin(x)",
+    "e^(ix) = cos(x) + i*sin(x) for x = 0 to 2*pi"
+  ],
+  "class_names": [],
+  "does_it_needs_3d": false,
+  "assumptions": [],
+  "list_of_external_library_needed": [],
+  "animation_needed": [],
+  "animation_updaters_needed": [],
+  "camera_needed": [],
+  "Mobjects_needed": [],
+  "objectives": [
+    "Understand Euler's formula and its implications in complex analysis.",
+    "Visualize the relationship between exponential functions and trigonometric functions."
+  ],
+  "opener": "Have you ever wondered how a simple equation can bridge the worlds of geometry, algebra, and calculus? Welcome to the enchanting world of Euler's formula! This formula reveals the incredible relationship between exponential functions and circular motion.",
+  "learning_outcomes": [
+    "You will understand how Euler's formula connects complex numbers, exponentials, and trigonometric functions.",
+    "You will see how changing the angle affects the position on the unit circle."
+  ]
+}

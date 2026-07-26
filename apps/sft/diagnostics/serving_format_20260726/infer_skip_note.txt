@@ -1,0 +1,1 @@
+INFER_NOTE: no CUDA; matched infer.py skipped — Ollama GGUF is the serving path under test

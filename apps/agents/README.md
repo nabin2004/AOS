@@ -1,5 +1,71 @@
 # AOS Agents
 
+## Model configuration
+
+Pipeline agents read model selection from [`llm_config.py`](llm_config.py) and
+[`apps/agents/.env`](.env.example). Copy `.env.example` → `.env` and set
+`OPENROUTER_API_KEY` (cloud) and `OLLAMA_BASE_URL` (local).
+
+### Profiles
+
+Set `AOS_MODEL_PROFILE` to switch the whole animation pipeline at once:
+
+| Profile | Classifier / planner / orchestrator | Coder |
+| --- | --- | --- |
+| `hybrid` (default) | OpenRouter (`gpt-4o-mini`) | Local Ollama (fine-tuned Gemma) |
+| `local` | Ollama | Ollama |
+| `cloud` | OpenRouter | OpenRouter |
+
+```bash
+# Default: cloud planning + local Manim coder
+export AOS_MODEL_PROFILE=hybrid
+export OLLAMA_BASE_URL=http://localhost:11434/v1
+
+# Fully local (requires Ollama + pulled GGUF model)
+export AOS_MODEL_PROFILE=local
+
+# Fully cloud
+export AOS_MODEL_PROFILE=cloud
+```
+
+### Per-role overrides
+
+Optional env vars beat the profile for a single agent:
+
+- `AOS_CLASSIFIER_MODEL`
+- `AOS_PLANNER_MODEL`
+- `AOS_CODER_MODEL`
+- `AOS_ANIMATION_MODEL`
+
+Example — cloud coder with Kimi:
+
+```bash
+export AOS_CODER_MODEL=openrouter:moonshotai/kimi-k2.5
+```
+
+### Local model token limits
+
+Ollama models default to `num_ctx=16384` (see
+[`apps/sft/templates/Modelfile.gemma4-31b-manim`](../sft/templates/Modelfile.gemma4-31b-manim)).
+The agents pipeline also passes `options.num_ctx` on every Ollama request via
+`AOS_OLLAMA_NUM_CTX` (default `16384`) so runtime context is not silently capped
+by VRAM-based defaults (e.g. 4096 on CPU).
+
+The coder's system prompt + tools consume much of that budget, so local models
+get an explicit output cap:
+
+- `AOS_CODER_MAX_TOKENS` (default `2048`)
+- `AOS_MAX_TOKENS` (default `2048`) for other local roles
+- `AOS_OLLAMA_NUM_CTX` (default `16384`) for the context window
+- `AOS_OLLAMA_THINKING` (default `0`) — disable Gemma reasoning/thinking on Ollama
+  to keep multi-turn CodeMode retries from filling the context window. The coder also
+  stops echoing prior `reasoning` fields back to the model on later turns.
+
+Keep `prompt + max_tokens <= num_ctx`. If you still hit token-limit errors,
+lower output caps (e.g. `1024`) or raise `AOS_OLLAMA_NUM_CTX` / Modelfile
+`num_ctx` and recreate the Ollama model. As a server-side fallback you can also
+set `OLLAMA_CONTEXT_LENGTH=16384` when starting `ollama serve`.
+
 ## Web UI
 
 Chat with the full pipeline (classify → lecture plan → Manim code) or the code agent alone:

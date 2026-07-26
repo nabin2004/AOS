@@ -1,6 +1,7 @@
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import Classification
+from llm_config import model_for, settings_for
 
 load_dotenv()
 
@@ -26,9 +27,11 @@ Rules:
 """
 
 classifier_agent = Agent(
-    "openrouter:openai/gpt-4o-mini",
+    model_for("classifier"),
     name="Classifier Agent",
     description="Classifies a user request into a subject domain and topic name. If its out of domain, returns unknown.",
     system_prompt=CLASSIFICATION_PROMPT,
     output_type=Classification,
+    model_settings=settings_for("classifier"),
+    retries=3,
 )

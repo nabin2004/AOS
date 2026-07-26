@@ -7,7 +7,7 @@ Usage (from apps/sft):
 
     uv run python preflight_gemma4.py
     uv run python preflight_gemma4.py --colab --load-model
-    uv run python preflight_gemma4.py --adapter-dir ./gemma4-manim-ft
+    uv run python preflight_gemma4.py --adapter-dir ./gemma4-31b-manim-ft
 """
 
 from __future__ import annotations

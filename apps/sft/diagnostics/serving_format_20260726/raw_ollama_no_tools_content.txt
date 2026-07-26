@@ -1,0 +1,81 @@
+```python
+import asyncio
+from manim import *
+
+async def visualize_eulers_formula():
+    # Define the scene content
+    code = """
+import asyncio
+from manim import *
+
+class EulersFormulaVisualization(Scene):
+    def construct(self):
+        # --- Setup ---
+        self.camera.background_color = "#000000"
+
+        # Title
+        title = MathTex(
+            "Euler's Formula",
+            font_size="60pt",
+            color=BLUE
+        ).to_edge(UP + LEFT)
+        self.play(Write(title))
+        self.wait(0.5)
+
+        # Define the unit circle and axes
+        circle = Circle(radius=2, color=WHITE, stroke_width=4)
+        axes = Axes(
+            x_range=[-3, 3, 1],
+            y_range=[-3, 3, 1],
+            axis_config={"include_numbers": True},
+            tips=False
+        ).shift(DOWN * 0.5)
+
+        # Draw axes lines (optional, but good for context)
+        axes.add_coordinates()
+
+        # Add labels for axes
+        x_label = axes.get_x_axis().set_color(WHITE)
+        y_label = axes.get_y_axis().set_color(WHITE)
+
+        # Draw the unit circle (centered at origin)
+        circle.move_to(axes.get_center())
+
+        # Add a label for the circle itself (optional, but helpful)
+        circle_label = MathTex(r"|", color=YELLOW).next_to(circle, RIGHT, buff=0.1)
+
+        self.play(Create(axes), Create(circle))
+        self.play(FadeIn(circle_label, shift=UP))
+
+        # --- The Formula Visualization ---
+
+        # 1. Draw the complex plane context (optional: show real/imaginary axes)
+        axes_text = MathTex(r"Re(z)", r"Im(z)").next_to(axes, DOWN, buff=0.5).shift(LEFT * 2)
+        self.play(Write(axes_text))
+        self.wait(0.5)
+
+        # 2. Visualize the exponential function e^(ix) = cos(x) + i*sin(x)
+
+        # Define the path for the unit circle (for reference)
+        circle_path = circle.get_points()
+
+        # Draw the real axis and imaginary axis lines through the origin
+        axes_lines = VGroup(
+            Line(axes.c2p(*[0, 0]), axes.c2p(*[3, 0])),
+            Line(axes.c2p(*[0, 0]), axes.c2p(*[0, 3]))
+        )
+        self.play(Create(axes_lines))
+
+        # Draw the unit circle again for clarity on top of axes lines
+        self.play(FadeIn(circle, shift=UP))
+
+
+        # 3. Visualize the mapping: e^(ix) -> cos(x) + i*sin(x)
+
+        # Define the function to plot (the unit circle parameterized by x)
+        # We use a parameter t for the angle x in [0, 2pi]
+
+        # Create a function that maps the angle x to coordinates on the circle
+        def get_points(t):
+            x = 2 * PI * t
+            y = 0 # For unit circle visualization, we only care

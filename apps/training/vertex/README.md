@@ -47,7 +47,7 @@ Phase 1 (SFT)  →  gs://BUCKET/artifacts/sft/  →  Phase 2 (GRPO)  →  gs://B
    gcloud auth application-default login
    gcloud config set project YOUR_PROJECT_ID
   ```
-5. **Hugging Face token** with access to `google/gemma-4-E2B-it`:
+5. **Hugging Face token** with access to `google/gemma-4-31B-it`:
   ```bash
    export HF_TOKEN=hf_...
   ```
@@ -216,8 +216,9 @@ uv run python submit_sft.py \
 
 | Workload                 | Machine type     | GPU          | Notes                           |
 | ------------------------ | ---------------- | ------------ | ------------------------------- |
-| SFT 4-bit, seq 8192      | `a2-highgpu-1g`  | 1× A100 40GB | Default in `config.example.env` |
-| GRPO 4-bit               | `a2-highgpu-1g`  | 1× A100 40GB | Same                            |
+| SFT 4-bit, seq 8192 (31B) | `a2-ultragpu-1g` | 1× A100 80GB | Default in `config.example.env` |
+| GRPO 4-bit (31B)          | `a2-ultragpu-1g` | 1× A100 80GB | Same                            |
+| SFT smoke / smaller models | `a2-highgpu-1g`  | 1× A100 40GB | Pass `--smoke` or override `--machine-type` |
 | Budget / smaller context | `g2-standard-12` | 1× L4 24GB   | May OOM at default seq lengths  |
 
 

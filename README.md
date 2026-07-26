@@ -7,6 +7,9 @@ uv sync
 cp apps/agents/.env.example apps/agents/.env   # then fill in OPENROUTER_API_KEY
 ```
 
+See [`apps/agents/README.md`](apps/agents/README.md#model-configuration) for
+local/cloud model switching (`AOS_MODEL_PROFILE`, `OLLAMA_BASE_URL`).
+
 ## Run the full lecture pipeline
 
 The pipeline (`apps/agents/graph.py`) is a `pydantic_graph` graph:

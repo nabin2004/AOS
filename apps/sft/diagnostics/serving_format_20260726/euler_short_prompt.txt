@@ -1,0 +1,5 @@
+Topic: Euler's Formula Visualization
+Subject: math
+Create a short Manim VoiceoverScene that visualizes e^(ix)=cos(x)+i*sin(x) on the unit circle.
+Use scene_name=EulersFormulaVisualization.
+Call tools ONLY via run_code (CodeMode): wrap Manim source in a string and await manim_write / compile_manim_code.

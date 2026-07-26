@@ -8,13 +8,13 @@ Usage (from apps/sft):
 
     export LLAMA_CPP_DIR=~/llama.cpp
     uv run python export_gguf.py \\
-      --model-dir ./gemma4-manim-merged \\
-      --output-dir ./gemma4-manim-gguf
+      --model-dir ./gemma4-31b-manim-merged \\
+      --output-dir ./gemma4-31b-manim-gguf
 
     export HF_TOKEN=hf_...
     uv run python export_gguf.py \\
-      --model-dir ./gemma4-manim-merged \\
-      --output-dir ./gemma4-manim-gguf \\
+      --model-dir ./gemma4-31b-manim-merged \\
+      --output-dir ./gemma4-31b-manim-gguf \\
       --push-to-hub
 """
 
@@ -31,11 +31,20 @@ from pathlib import Path
 from hub_upload import push_model_folder, require_token
 
 SFT_ROOT = Path(__file__).resolve().parent
-DEFAULT_MODEL_NAME = "aos-gemma4-manim"
+TRAINING_ROOT = SFT_ROOT.parent / "training"
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from model_identity import (  # noqa: E402
+    HUB_GGUF_REPO,
+    OLLAMA_MODEL_TAG,
+)
+
+DEFAULT_MODEL_NAME = OLLAMA_MODEL_TAG
 DEFAULT_QUANT = "Q4_K_M"
-DEFAULT_HUB_REPO_ID = "nabin2004/AOS-gemma4-manim-gguf"
+DEFAULT_HUB_REPO_ID = HUB_GGUF_REPO
 DEFAULT_LLAMA_CPP_DIR = Path("./llama.cpp")
-MODELFILE_TEMPLATE = SFT_ROOT / "templates" / "Modelfile.gemma4-manim"
+MODELFILE_TEMPLATE = SFT_ROOT / "templates" / "Modelfile.gemma4-31b-manim"
 GGUF_MODEL_CARD = SFT_ROOT / "gguf_model_card.md"
 
 

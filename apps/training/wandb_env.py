@@ -56,6 +56,9 @@ def configure_wandb(
     run_name: str,
     job_type: str,
     project_env_key: str | None = None,
+    group: str | None = None,
+    tags: tuple[str, ...] | list[str] | None = None,
+    config: dict[str, object] | None = None,
 ) -> str:
     """Apply W&B env defaults and login. Returns effective report_to backend."""
     load_training_dotenv()
@@ -74,6 +77,12 @@ def configure_wandb(
     if not os.environ.get("WANDB_JOB_TYPE", "").strip():
         os.environ["WANDB_JOB_TYPE"] = job_type
 
+    if group and not os.environ.get("WANDB_RUN_GROUP", "").strip():
+        os.environ["WANDB_RUN_GROUP"] = group
+
+    if tags and not os.environ.get("WANDB_TAGS", "").strip():
+        os.environ["WANDB_TAGS"] = ",".join(tags)
+
     key = wandb_api_key()
     if not key:
         return "none"
@@ -81,6 +90,17 @@ def configure_wandb(
     import wandb
 
     wandb.login(key=key)
+
+    if config is not None and wandb.run is None:
+        wandb.init(
+            project=project,
+            name=os.environ.get("WANDB_RUN_NAME") or run_name or None,
+            group=group,
+            tags=list(tags) if tags else None,
+            config=config,
+            job_type=job_type,
+        )
+
     return "wandb"
 
 
@@ -89,6 +109,8 @@ def collect_wandb_env_vars(
     project: str,
     run_name: str | None = None,
     project_env_key: str | None = None,
+    group: str | None = None,
+    tags: tuple[str, ...] | list[str] | None = None,
 ) -> dict[str, str]:
     """Build env dict for Vertex container submission."""
     load_training_dotenv()
@@ -113,5 +135,14 @@ def collect_wandb_env_vars(
     effective_run_name = run_name or os.environ.get("WANDB_RUN_NAME", "").strip()
     if effective_run_name:
         env_vars["WANDB_RUN_NAME"] = effective_run_name
+
+    effective_group = group or os.environ.get("WANDB_RUN_GROUP", "").strip()
+    if effective_group:
+        env_vars["WANDB_RUN_GROUP"] = effective_group
+
+    if tags:
+        env_vars["WANDB_TAGS"] = ",".join(tags)
+    elif os.environ.get("WANDB_TAGS", "").strip():
+        env_vars["WANDB_TAGS"] = os.environ["WANDB_TAGS"].strip()
 
     return env_vars

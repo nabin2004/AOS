@@ -14,8 +14,8 @@
 set -euo pipefail
 
 VLLM_VENV="${VLLM_VENV:-${HOME}/.venvs/aos-vllm}"
-BASE_MODEL="${BASE_MODEL:-google/gemma-4-E2B-it}"
-LORA_MODULE="${LORA_MODULE:-manim-sft=nabin2004/AOS-gemma4-manim-sft}"
+BASE_MODEL="${BASE_MODEL:-google/gemma-4-31B-it}"
+LORA_MODULE="${LORA_MODULE:-manim-sft=nabin2004/AOS-gemma4-31b-manim-sft}"
 HOST="${HOST:-0.0.0.0}"
 PORT="${PORT:-8000}"
 MAX_MODEL_LEN="${MAX_MODEL_LEN:-4096}"

@@ -1,0 +1,26 @@
+{
+  "models": [
+    {
+      "name": "huggingface.co/nabin2004/AOS-gemma4-manim-gguf:Q4_K_M",
+      "model": "huggingface.co/nabin2004/AOS-gemma4-manim-gguf:Q4_K_M",
+      "modified_at": "2026-07-26T16:34:36.514251669+05:45",
+      "size": 3416123614,
+      "digest": "e2e72fe917c6e653c0cb022097563468628fb3776d5b1649278624ecc0ab95da",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "gemma4",
+        "families": [
+          "gemma4"
+        ],
+        "parameter_size": "4.63B",
+        "quantization_level": "unknown",
+        "context_length": 131072,
+        "embedding_length": 1536
+      },
+      "capabilities": [
+        "completion"
+      ]
+    }
+  ]
+}

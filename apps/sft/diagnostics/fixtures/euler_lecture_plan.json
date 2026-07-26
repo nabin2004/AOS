@@ -1,0 +1,105 @@
+{
+  "topic": "Euler's Formula",
+  "subject": "math",
+  "greeting": "Good evening — let's explore one of the most beautiful equations in mathematics.",
+  "needed_formulas": [
+    "e^{ix} = \\cos(x) + i\\sin(x)",
+    "e^{i\\pi} + 1 = 0",
+    "z = \\cos(\\theta) + i\\sin(\\theta) \\text{ on the unit circle}"
+  ],
+  "class_names": ["EulersFormulaVisualization"],
+  "does_it_needs_3d": false,
+  "assumptions": [
+    "You know what complex numbers are (a + bi).",
+    "You are comfortable with sine and cosine on the unit circle.",
+    "Radians measure angle around the origin."
+  ],
+  "list_of_external_library_needed": [],
+  "animation_needed": [
+    "Write",
+    "Create",
+    "FadeIn",
+    "FadeOut",
+    "Transform",
+    "MathTex",
+    "Circle",
+    "Line",
+    "Dot",
+    "Arrow",
+    "Axes",
+    "VGroup"
+  ],
+  "animation_updaters_needed": ["always_redraw"],
+  "camera_needed": [],
+  "Mobjects_needed": [
+    "MathTex for the formula",
+    "Circle radius=1 for the unit circle",
+    "Dot at e^{i\\theta}",
+    "Line from origin to the dot",
+    "Axes for real and imaginary components"
+  ],
+  "learning_objectives": [
+    "Understand that e^{ix} traces the unit circle as x varies.",
+    "See cos(x) and sin(x) as the real and imaginary parts of e^{ix}.",
+    "Connect rotation in the complex plane to exponential form."
+  ],
+  "storyboard_beats": [
+    {
+      "beat": 1,
+      "title": "Opener",
+      "narration": "Have you ever wondered how exponentials and circles are secretly the same idea? Euler's formula reveals that connection.",
+      "visual": "Title 'Euler's Formula' and subtitle with the main equation centered on a flat 2D board."
+    },
+    {
+      "beat": 2,
+      "title": "The formula",
+      "narration": "Here is the identity: e to the i x equals cosine x plus i sine x.",
+      "visual": "Write MathTex e^{ix} = \\cos(x) + i\\sin(x); hold on screen while naming each term."
+    },
+    {
+      "beat": 3,
+      "title": "Complex plane setup",
+      "narration": "Picture the complex plane: horizontal real axis, vertical imaginary axis.",
+      "visual": "Fade in Axes; label Real and Imaginary; keep margins inside frame."
+    },
+    {
+      "beat": 4,
+      "title": "Unit circle",
+      "narration": "Every point on the unit circle can be written as cosine theta plus i sine theta.",
+      "visual": "Create Circle radius 1; highlight circumference."
+    },
+    {
+      "beat": 5,
+      "title": "Rotating vector",
+      "narration": "As theta sweeps from zero to two pi, the tip of this vector traces the circle.",
+      "visual": "Arrow from origin to Dot; animate theta with ValueTracker or parametric motion."
+    },
+    {
+      "beat": 6,
+      "title": "Real and imaginary parts",
+      "narration": "The horizontal projection is cosine theta; the vertical projection is sine theta.",
+      "visual": "Show dashed projections to axes; label cos(theta) and sin(theta)."
+    },
+    {
+      "beat": 7,
+      "title": "Exponential form",
+      "narration": "That rotating point is exactly e to the i theta — exponential form meets geometry.",
+      "visual": "Transform or ReplacementTransform linking e^{i\\theta} label to the moving dot."
+    },
+    {
+      "beat": 8,
+      "title": "Special case",
+      "narration": "At pi radians, e to the i pi equals negative one — the famous Euler identity.",
+      "visual": "Pause at theta=pi; flash e^{i\\pi}+1=0 briefly."
+    },
+    {
+      "beat": 9,
+      "title": "Takeaways",
+      "narration": "You just saw how rotation, trig, and exponentials are one story on the unit circle.",
+      "visual": "Two-column takeaway list inside SurroundingRectangle; no overflow past frame edges."
+    }
+  ],
+  "voiceover_notes": "Use VoiceoverScene with short beats; every visual change needs a spoken line. Prefer present tense, second person.",
+  "layout_notes": "Flat 2D board only. Keep |x| <= 6.5, |y| <= 3.5. Scale text rather than letting groups clip.",
+  "duration_target_seconds": 180
+}

@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-07-26T16:37:19.689318+00:00",
+  "model": "huggingface.co/nabin2004/AOS-gemma4-manim-gguf:Q4_K_M",
+  "base_url": "http://127.0.0.1:11434/v1",
+  "max_tokens": 2048,
+  "prompt_variant": "local",
+  "prompt_chars": 1816,
+  "finish_reason": "tool_calls",
+  "usage": {
+    "prompt_tokens": 744,
+    "completion_tokens": 1789,
+    "total_tokens": 2533
+  },
+  "n_tool_calls": 1,
+  "tool_name": "run_code",
+  "code_class": "raw_manim_top_level",
+  "code_preview": "from manim import *\nfrom manim_voiceover import VoiceoverScene\nfrom tools.aos_speech_service import AOSSpeechService\n\nclass EulerFormulaVisualization(VoiceoverScene):\n    def construct(self):\n        self.set_speech_service(\n            AOSSpeechService(voice=\"alba\", cache_dir=\"voiceover_cache\")\n        )\n        \n        # Title\n        title = Text(\"Euler's Formula\", font_size=40).to_edge(UP)\n        self.play(Write(title))\n        self.wait(0.5)\n\n        # Setup for the circle and axes\n      ",
+  "has_star_import": true,
+  "has_manim_write": false,
+  "pass": false
+}

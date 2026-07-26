@@ -1,0 +1,317 @@
+{
+  "timestamp": "2026-07-26T17:33:56.817288+00:00",
+  "datasets": [
+    {
+      "path": "/home/nabin/myallprojects/AOS/apps/agents/export_traces/coder_sft/tool_trace.train.jsonl",
+      "total_rows": 334,
+      "rows_with_violations": 96,
+      "violation_counts": {
+        "codemode_multiline_single_quote": 44,
+        "codemode_star_import": 57
+      },
+      "samples": [
+        {
+          "row": 3,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm learning neural nets and want to understand gated activations: show the element-wise product of Tanh (magnitude) and",
+          "code_preview": "\\n# Compile the scene\\nresult = await compile_manim_code(\\n    code=code,\\n    scene_name=\"GatedActivationsScene\",\\n    output_dir=\"/home/nabin/myallprojects/AOS/app"
+        },
+        {
+          "row": 4,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning how the gradient noise scale depends on batch size and want to see a jittering arrow tip representing gradi",
+          "code_preview": "\\ncompile_result = await compile_manim_code(\\n    code=code,\\n    scene_name=\"GradientNoiseScaleLecture\",\\n    output_dir=\"/home/nabin/myallprojects/AOS/apps/agents"
+        },
+        {
+          "row": 5,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm teaching undergrads about debugging neural nets. Create an animation where a breakpoint pauses the forward pass mid-",
+          "code_preview": "\\n# Check the manifest to verify the compilation was successful\\nimport json\\n\\nwith open('/home/nabin/myallprojects/AOS/apps/agents/workspace/coder_runs/20260724-1"
+        },
+        {
+          "row": 13,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm learning PyTorch concepts and want a clear visualization of state_dict and load_state_dict as a serialization/deseri",
+          "code_preview": "\\nimport asyncio\\n\\nasync def write_and_compile_v2():\\n    write_result = await manim_write(\\n        code=scene_code,\\n        scene_name=\"PyTorchStateDictSerializat"
+        },
+        {
+          "row": 17,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm teaching an NLP course and want to illustrate a causal mask matrix used in Transformers. Visualize a square attentio",
+          "code_preview": "compile_result = await compile_manim_code(\\n    code=scene_code,\\n    scene_name=\"CausalMaskScene\",\\n    output_dir=\"/home/nabin/myallprojects/AOS/apps/agents/work"
+        },
+        {
+          "row": 25,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning optimization dynamics and want to see LR decay in action. Animate an optimizer step where the learning rate",
+          "code_preview": "\\nimport asyncio\\n\\n# Fixed Manim scene code - avoid BulletedList which may use LaTeX internally\\nscene_code = '''\\nfrom manim import *\\nfrom manim_voiceover import V"
+        },
+        {
+          "row": 31,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning optimization and want to visualize the loss surface curvature with a 2D slice, including the optimizer's cu",
+          "code_preview": "\\nscene_code = '''from manim import *\\nfrom manim_voiceover import VoiceoverScene\\nfrom tools.aos_speech_service import AOSSpeechService\\nimport numpy as np\\n\\n\\nclass"
+        },
+        {
+          "row": 37,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm teaching software engineering and want a live visualization of how a linter detects style and quality issues. Animat",
+          "code_preview": "\\n# Compile the simplified Manim scene\\nresult = await compile_manim_code(\\n    code=scene_code,\\n    scene_name=\"LinterDetectionVisualization\",\\n    output_dir=\"/ho"
+        },
+        {
+          "row": 38,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm teaching an undergraduate statistics class and want a visual of linear regression via least squares. Plot noisy data",
+          "code_preview": "\\n# Compile the simplified Manim code\\nresult = await compile_manim_code(\\n    code='''\\nfrom manim import *\\n\\nclass LinearRegressionLeastSquares(Scene):\\n    def con"
+        },
+        {
+          "row": 39,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm studying probabilistic models and want to see the breakdown of computing the negative log probability for a specific",
+          "code_preview": "\\n# Let's isolate which MathTex is causing issues\\n# Test formula without the array table\\n\\nscene_code_v2 = r'''\\nfrom manim import *\\nfrom manim_voiceover import Vo"
+        },
+        {
+          "row": 41,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning robustness to misspecification and want to animate sensitivity analysis: perturb priors/likelihoods, displa",
+          "code_preview": "\\nimport asyncio\\n\\nasync def compile_scene():\\n    result = await compile_manim_code(\\n        code='''from manim import *\\nfrom manim_voiceover import VoiceoverScen"
+        },
+        {
+          "row": 42,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm teaching an undergrad ML course and want a geometric visualization of the Bayesian Elastic Net. Display the prior as",
+          "code_preview": "import asyncio\\n\\nscene_code = r'''\\nfrom manim import *\\nfrom manim_voiceover import VoiceoverScene\\nfrom tools.aos_speech_service import AOSSpeechService\\n\\nclass Ba"
+        },
+        {
+          "row": 44,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I want to animate the NLL loss formula step-by-step: -(1/N) * sum(log(p(y|x))). Visualize a batch of predictions, highli",
+          "code_preview": "\\nimport asyncio\\n\\nasync def compile_manim():\\n    result = await compile_manim_code(\\n        code='''from manim import *\\nfrom manim_voiceover import VoiceoverScen"
+        },
+        {
+          "row": 54,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm exploring Bayesian optimization in model-based RL for biophysics. Show how a Gaussian process prior guides experimen",
+          "code_preview": "\\n# Compile the scene\\ncompile_result = await compile_manim_code(\\n    code=code,\\n    scene_name=\"BayesianOptimizationRL\",\\n    output_dir=\"/home/nabin/myallproject"
+        },
+        {
+          "row": 55,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I’m learning sophomore linear algebra and want a concise Manim animation that builds intuition for SVD. Visualize A acti",
+          "code_preview": "\\n# Synthesize a short narration sample\\nresult = await synthesize_narration(\\n    text=\"Singular Value Decomposition, or SVD, acts like a secret sauce in data sci"
+        },
+        {
+          "row": 57,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm teaching an intro statistics course and want to visualize conditional distributions P(A|B). Show a simple joint dist",
+          "code_preview": "\\n# Compile the Manim scene\\nresult = await compile_manim_code(\\n    code=scene_code, \\n    scene_name=\"ConditionalDistributionsAndBayesTheorem\", \\n    output_dir=\"/"
+        },
+        {
+          "row": 64,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning a linear algebra module to upper-undergraduates and want a visual that makes eigen decomposition intuition-",
+          "code_preview": "\\nimport asyncio\\n\\nresult = await synthesize_narration(\\n    text=\"Imagine you have a rotating shape that deforms under a transformation. What if I told you there "
+        },
+        {
+          "row": 76,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning multivariable calculus and want students to truly grasp the gradient intuition. Create a visualization of a",
+          "code_preview": "result_compile = await compile_manim_code(code=scene_code, scene_name=\"GradientLecture\", output_dir=output_dir)\\nresult_compile\\n"
+        },
+        {
+          "row": 77,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning numerical methods and want to see Euler's method compared to the exact solution for a simple ODE. Create a ",
+          "code_preview": "\\nimport asyncio, json\\n\\ncode = r'''\\nfrom manim import *\\nfrom manim_voiceover import VoiceoverScene\\nfrom tools.aos_speech_service import AOSSpeechService\\nimport m"
+        },
+        {
+          "row": 78,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "In a signals course, I want a rich visualization of Fourier series convergence for a square wave.  Show partial sums bui",
+          "code_preview": "\\nimport json\\n\\n# Synthesize a sample narration\\nresult = await synthesize_narration(\\n    text=\"Have you ever wondered how complex waveforms can be represented as "
+        }
+      ]
+    },
+    {
+      "path": "/home/nabin/myallprojects/AOS/apps/agents/export_traces/coder_sft/tool_trace.val.jsonl",
+      "total_rows": 38,
+      "rows_with_violations": 16,
+      "violation_counts": {
+        "codemode_multiline_single_quote": 7,
+        "codemode_star_import": 11
+      },
+      "samples": [
+        {
+          "row": 1,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm teaching numerical vs analytic gradients and want to demonstrate a manual gradient check by perturbing inputs. Compa",
+          "code_preview": "\\nresult = await compile_manim_code(\\n    code=code,\\n    scene_name=\"GradientLecture\",\\n    output_dir=output_dir\\n)\\nprint(result)\\n"
+        },
+        {
+          "row": 2,
+          "violations": [
+            "codemode_multiline_single_quote",
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm teaching undergrads calculus and want a vivid visualization of the derivative as a limit of secant slopes. Plot f(x)",
+          "code_preview": "async def write_and_compile():\\n    # Write the code\\n    write_result = await manim_write(\\n        code=code,\\n        scene_name=\"DerivativeAsLimitScene\",\\n      "
+        },
+        {
+          "row": 4,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm teaching an undergrad ML course and want a visualization of a single scalar neuron with inputs x1, x2, weights w1, w",
+          "code_preview": "\\noutput_dir = \"/home/nabin/myallprojects/AOS/apps/agents/workspace/coder_runs/20260725-071832-scalar-neuron-visualization\"\\nresult = await compile_manim_code(cod"
+        },
+        {
+          "row": 5,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm learning optimization and want to visualize how gradients are averaged across a mini-batch. Show several sample grad",
+          "code_preview": "\\nasync def compile_scene():\\n    return await compile_manim_code(\\n        code=scene_code,\\n        scene_name=\"BatchGradientVisualization\",\\n        output_dir=\"/"
+        },
+        {
+          "row": 9,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm learning about neural saturations and backprop. I want to visualize Tanh activations near -1 and 1 where gradients v",
+          "code_preview": "\\ncompile_result = await compile_manim_code(\\n    code=scene_code, \\n    scene_name=\"TanhGradientFlowScene\", \\n    output_dir=\"/home/nabin/myallprojects/AOS/apps/ag"
+        },
+        {
+          "row": 10,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm exploring dilated convolutions and want a visualization where the dilation concept is shown as a spring pulling filt",
+          "code_preview": "\\n# Compile the fixed scene\\ncompile_result = await compile_manim_code(\\n    code=code,\\n    scene_name=\"DilatedConvolutionsScene\",\\n    output_dir=\"/home/nabin/myal"
+        },
+        {
+          "row": 11,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm teaching undergrads an intro NN course and want a vivid visualization of a dense layer. Visualize the weight matrix ",
+          "code_preview": "\\ncode = \"\"\"from manim import *\\nfrom manim_voiceover import VoiceoverScene\\nfrom tools.aos_speech_service import AOSSpeechService\\n\\nclass DenseLayerVisualization(V"
+        },
+        {
+          "row": 14,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm teaching an undergrad course on PyTorch architectures and want an animated nn.Module tree visualization. Start from ",
+          "code_preview": "\\nawait compile_manim_code(\\n    output_dir=\"/home/nabin/myallprojects/AOS/apps/agents/workspace/coder_runs/20260725-073646-visualizing-pytorch-module-architectur"
+        },
+        {
+          "row": 17,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm studying character-level models and want to visualize a subset of test samples. Display the model's predicted charac",
+          "code_preview": "\\n# Compile the scene with fixed opacity\\nresult = await compile_manim_code(\\n    code='''\\nfrom manim import Scene, Text, Write, FadeIn, FadeOut, TransformFromCopy"
+        },
+        {
+          "row": 21,
+          "violations": [
+            "codemode_star_import",
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm teaching an undergrad geometry course and want a vivid tessellation visualization. Show how regular triangles, squar",
+          "code_preview": "\\nimport asyncio\\n\\n# Fixed code with standard colors only\\ncode = '''\\nfrom manim import *\\nfrom manim_voiceover import VoiceoverScene\\nfrom tools.aos_speech_service "
+        },
+        {
+          "row": 22,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm studying symmetry and want to visualize reflections across the x-axis and y-axis. Show a set of points or shapes and",
+          "code_preview": "\\ncompile_result = await compile_manim_code(\\n    code=scene_code,\\n    scene_name=\"VisualizingReflectionsAndSymmetry\",\\n    output_dir=\"/home/nabin/myallprojects/A"
+        },
+        {
+          "row": 25,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning upper-level CS and want a vivid visualization of Kruskal's algorithm. Show a weighted undirected graph and ",
+          "code_preview": "\\n# Synthesize a sample narration\\nresult = await synthesize_narration(\\n    text=\"Welcome to Kruskal's Algorithm. Today, we'll learn how to find the Minimum Spann"
+        },
+        {
+          "row": 28,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning numerical analysis to upper-level undergrads and want a rich visualization of Newton's method for root find",
+          "code_preview": "result = await compile_manim_code(\\n    code=code,\\n    scene_name=\"NewtonMethodScene\",\\n    output_dir=\"/home/nabin/myallprojects/AOS/apps/agents/workspace/coder_"
+        },
+        {
+          "row": 31,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm learning introductory calculus and I want a rich, multi-scene animation to explain the derivative from first princip",
+          "code_preview": "\\nresult = await compile_manim_code(\\n    code=\"\"\"\\nfrom manim import *\\nfrom manim_voiceover import VoiceoverScene\\nfrom tools.aos_speech_service import AOSSpeechSe"
+        },
+        {
+          "row": 33,
+          "violations": [
+            "codemode_star_import"
+          ],
+          "user_preview": "I'm studying analytic geometry and want a dynamic construction of parabola, ellipse, and hyperbola. Animate the focus–di",
+          "code_preview": "\\n# Compile\\ntry:\\n    compile_result = await compile_manim_code(code=code, scene_name=scene_name, output_dir=output_dir)\\n    print(compile_result)\\nexcept Exceptio"
+        },
+        {
+          "row": 34,
+          "violations": [
+            "codemode_multiline_single_quote"
+          ],
+          "user_preview": "I'm learning linear algebra and want a geometric visualization of linear combinations in R^2. Plot vectors v1 and v2, th",
+          "code_preview": "\\n# Compile the fixed scene\\nresult = await compile_manim_code(\\n    code=scene_code,\\n    scene_name=\"LinearCombinationScene\",\\n    output_dir=\"/home/nabin/myallpro"
+        }
+      ]
+    }
+  ]
+}

@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import sys
+from pathlib import Path
 
 from job_common import (
     add_common_args,
@@ -13,6 +15,12 @@ from job_common import (
     require_settings,
     submit_custom_job,
 )
+
+TRAINING_ROOT = Path(__file__).resolve().parents[1]
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from model_identity import WANDB_GRPO_RUN_NAME, WANDB_RUN_GROUP, WANDB_TAGS  # noqa: E402
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -48,7 +56,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Skip frozen SFT adapter (train GRPO LoRA on base only)",
     )
-    parser.set_defaults(display_name="aos-grpo-manim")
+    parser.set_defaults(display_name="aos-grpo-gemma4-31b-manim")
     return parser
 
 
@@ -67,8 +75,10 @@ def main() -> int:
 
     env_vars = merge_training_env_vars(
         wandb_project="aos-grpo",
-        wandb_run_name="gemma4-manim-grpo",
+        wandb_run_name=WANDB_GRPO_RUN_NAME,
         wandb_project_env_key="WANDB_PROJECT_GRPO",
+        wandb_group=WANDB_RUN_GROUP,
+        wandb_tags=[*WANDB_TAGS, "grpo"],
         extra={"MANIBENCH_GRPO_RENDER": "0"},
     )
 

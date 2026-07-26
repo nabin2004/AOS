@@ -61,6 +61,7 @@ from typing import Any, List, Optional
 from uuid import uuid4
 
 from pydantic import (
+    AliasChoices,
     BaseModel,
     ConfigDict,
     Field,
@@ -935,7 +936,8 @@ class Lecture(BaseModel):
         description="List of class names for each scenes that will be used in the lecture for programmting the manim video.",
     )
     does_it_needs_3d: bool = Field(
-        description="Does the lecture needs 3D scenes for programmting the manim video. Use true for 3D and false for only using the 2D."
+        validation_alias=AliasChoices("does_it_needs_3d", "does_it_need_3d"),
+        description="Does the lecture needs 3D scenes for programmting the manim video. Use true for 3D and false for only using the 2D.",
     )
     assumptions: list[str] = Field(
         default_factory=list,

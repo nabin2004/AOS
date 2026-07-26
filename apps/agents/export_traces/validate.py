@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from export_traces.codemode_contract import tool_trace_violates_codemode
+
 
 REQUIRED_ROLES_FINAL = {"user", "assistant"}
 REQUIRED_ROLES_TOOL = {"user", "assistant"}
@@ -66,6 +68,9 @@ def validate_messages_row(row: dict[str, Any], *, format_name: str) -> list[str]
                 errors.append(f"message_{i}_missing_tool_call_id")
             if not str(msg.get("content", "")).strip() and msg.get("content") != "":
                 errors.append(f"message_{i}_empty_tool_content")
+
+    if format_name == "tool_trace":
+        errors.extend(tool_trace_violates_codemode(row))
 
     return errors
 

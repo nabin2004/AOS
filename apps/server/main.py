@@ -12,7 +12,7 @@ With Ollama (after export_gguf.py):
 
     uv run --package server python apps/server/main.py \\
       --base-url http://localhost:11434/v1 \\
-      --model aos-gemma4-manim
+      --model aos-gemma4-31b-manim
 """
 
 from __future__ import annotations

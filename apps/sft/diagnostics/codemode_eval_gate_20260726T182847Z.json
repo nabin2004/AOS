@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-07-26T18:26:31.000351+00:00",
+  "model": "huggingface.co/nabin2004/AOS-gemma4-manim-gguf:Q4_K_M",
+  "base_url": "http://127.0.0.1:11434/v1",
+  "max_tokens": 2048,
+  "num_ctx": 16384,
+  "prompt_variant": "local",
+  "probe": "production",
+  "prompt_chars": 825,
+  "user_prompt_chars": 3051,
+  "finish_reason": "tool_calls",
+  "usage": {
+    "prompt_tokens": 1206,
+    "completion_tokens": 1779,
+    "total_tokens": 2985
+  },
+  "n_tool_calls": 1,
+  "tool_name": "run_code",
+  "code_class": "wrap_then_manim_write",
+  "code_preview": "import asyncio\n\nasync def main():\n    await manim_write(code='\"\"'\n        'from manim import *\n        import numpy as np\n\n        class EulersFormulaVisualization(Scene):\n            def construct(self):\n                # --- Opener ---\n                self.play(FadeIn(self.title(\"Euler\\'s Formula\"), FadeIn(self.subtitle(\"The connection between exponentials and circles\"))), run_time=1.5)\n                self.wait(0.5)\n\n                # --- The formula ---\n                formula = MathTex(r\"e^",
+  "has_star_import": false,
+  "has_manim_write": true,
+  "pass": true
+}

@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-07-26T17:34:01.759652+00:00",
+  "model": "huggingface.co/nabin2004/AOS-gemma4-manim-gguf:Q4_K_M",
+  "base_url": "http://127.0.0.1:11434/v1",
+  "max_tokens": 2048,
+  "num_ctx": 16384,
+  "prompt_variant": "local",
+  "prompt_chars": 825,
+  "finish_reason": "tool_calls",
+  "usage": {
+    "prompt_tokens": 405,
+    "completion_tokens": 976,
+    "total_tokens": 1381
+  },
+  "n_tool_calls": 1,
+  "tool_name": "run_code",
+  "code_class": "wrap_then_manim_write",
+  "code_preview": "await manim_write(code='''\nfrom manim import *\n\nclass EulersFormulaVisualization(Scene):\n    def construct(self):\n        self.camera.background_color = \"#000000\"\n        \n        # Title\n        title = MathTex(r\"e^{ix} = \\cos(x) + i\\sin(x)\", font_size=40)\n        self.play(Write(title))\n        self.wait(0.5)\n\n        # Setup for the unit circle visualization\n        circle = Circle(radius=1, color=BLUE, stroke_width=3)\n        self.play(Create(circle))\n        self.wait(0.5)\n\n        # Define",
+  "has_star_import": false,
+  "has_manim_write": true,
+  "pass": true
+}

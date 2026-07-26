@@ -1,6 +1,6 @@
 ---
 license: apache-2.0
-base_model: nabin2004/AOS-gemma4-manim-merged
+base_model: nabin2004/AOS-gemma4-31b-manim-merged
 library_name: gguf
 pipeline_tag: text-generation
 language:
@@ -8,6 +8,7 @@ language:
 tags:
   - manim
   - gemma4
+  - gemma4-31b
   - gguf
   - ollama
   - llama.cpp
@@ -16,33 +17,33 @@ tags:
   - sft
 ---
 
-# AOS Gemma 4 Manim SFT (GGUF)
+# AOS Gemma 4 31B Manim SFT (GGUF)
 
 **Q4_K_M** GGUF of the AOS Manim SFT merged model. Drop-in for **Ollama** and **llama.cpp**.
 
-**Model URL:** https://huggingface.co/nabin2004/AOS-gemma4-manim-gguf
+**Model URL:** https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-gguf
 
 ## Files
 
 | File | Description |
 |------|-------------|
-| `aos-gemma4-manim-Q4_K_M.gguf` | Quantized weights (~2 GB for E2B) |
+| `aos-gemma4-31b-manim-Q4_K_M.gguf` | Quantized weights (~15–20 GB for 31B) |
 | `Modelfile` | Ollama import template |
 
 ## Related repos
 
 | Artifact | Repo |
 |----------|------|
-| LoRA adapter | [nabin2004/AOS-gemma4-manim-sft](https://huggingface.co/nabin2004/AOS-gemma4-manim-sft) |
-| Merged HF weights | [nabin2004/AOS-gemma4-manim-merged](https://huggingface.co/nabin2004/AOS-gemma4-manim-merged) |
+| LoRA adapter | [nabin2004/AOS-gemma4-31b-manim-sft](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-sft) |
+| Merged HF weights | [nabin2004/AOS-gemma4-31b-manim-merged](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-merged) |
 
 ## Ollama
 
 Pull from Hugging Face or create locally from the downloaded GGUF:
 
 ```bash
-ollama create aos-gemma4-manim -f Modelfile
-ollama run aos-gemma4-manim
+ollama create aos-gemma4-31b-manim -f Modelfile
+ollama run aos-gemma4-31b-manim
 ```
 
 Requires **Ollama 0.30+** (native Gemma 4 support).
@@ -55,7 +56,7 @@ Ollama exposes `/v1/chat/completions` on port 11434:
 from gemma4_client import DEFAULT_OLLAMA_BASE_URL, Gemma4Client
 
 client = Gemma4Client(
-    model="aos-gemma4-manim",
+    model="aos-gemma4-31b-manim",
     base_url=DEFAULT_OLLAMA_BASE_URL,
     api_key="ollama",
 )
@@ -67,7 +68,7 @@ See [`apps/server/README.md`](https://github.com/nabin2004/AOS/tree/master/apps/
 ## llama.cpp
 
 ```bash
-./llama-server -m aos-gemma4-manim-Q4_K_M.gguf --chat-template gemma --port 8080
+./llama-server -m aos-gemma4-31b-manim-Q4_K_M.gguf --chat-template gemma --port 8080
 ```
 
 ## How this was produced
@@ -76,8 +77,8 @@ See [`apps/server/README.md`](https://github.com/nabin2004/AOS/tree/master/apps/
 cd apps/sft
 export LLAMA_CPP_DIR=~/llama.cpp
 uv run python export_gguf.py \
-  --model-dir ./gemma4-manim-merged \
-  --output-dir ./gemma4-manim-gguf \
+  --model-dir ./gemma4-31b-manim-merged \
+  --output-dir ./gemma4-31b-manim-gguf \
   --push-to-hub
 ```
 

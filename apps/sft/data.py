@@ -4,6 +4,7 @@ from typing import Any
 
 from datasets import Dataset, load_dataset
 
+from codemode_contract import messages_violate_codemode
 from config import TrainingConfig
 
 
@@ -71,13 +72,27 @@ def _is_trainable_record(sample: dict[str, Any]) -> bool:
     return bool(final_code and str(final_code).strip())
 
 
+def _passes_codemode_contract(sample: dict[str, Any]) -> bool:
+    messages = sample.get("messages")
+    if isinstance(messages, list):
+        return not messages_violate_codemode(messages)
+    return True
+
+
 def load_training_dataset(config: TrainingConfig) -> Dataset:
     data_files = resolve_data_files(config)
     dataset = load_dataset("json", data_files=data_files, split="train")
     dataset = dataset.filter(_is_trainable_record, num_proc=config.num_proc)
-
-    return dataset.map(
+    dataset = dataset.map(
         format_trajectory_messages,
         remove_columns=dataset.column_names,
         num_proc=config.num_proc,
     )
+    before = len(dataset)
+    dataset = dataset.filter(_passes_codemode_contract, num_proc=config.num_proc)
+    dropped = before - len(dataset)
+    if dropped:
+        print(
+            f"Dropped {dropped} rows with CodeMode star-import violations ({len(dataset)} remain)"
+        )
+    return dataset

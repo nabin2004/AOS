@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import sys
+from pathlib import Path
 
 from job_common import (
     add_common_args,
@@ -12,6 +14,17 @@ from job_common import (
     merge_training_env_vars,
     require_settings,
     submit_custom_job,
+)
+
+TRAINING_ROOT = Path(__file__).resolve().parents[1]
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from model_identity import (  # noqa: E402
+    VERTEX_SFT_DISPLAY_NAME,
+    WANDB_RUN_GROUP,
+    WANDB_SFT_RUN_NAME,
+    WANDB_TAGS,
 )
 
 
@@ -38,7 +51,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Run a minimal SFT job (1 epoch, batch size 1)",
     )
-    parser.set_defaults(display_name="aos-sft-gemma4-manim")
+    parser.set_defaults(display_name=VERTEX_SFT_DISPLAY_NAME)
     return parser
 
 
@@ -54,8 +67,10 @@ def main() -> int:
 
     env_vars = merge_training_env_vars(
         wandb_project="aos-sft",
-        wandb_run_name="gemma4-manim-sft",
+        wandb_run_name=WANDB_SFT_RUN_NAME,
         wandb_project_env_key="WANDB_PROJECT_SFT",
+        wandb_group=WANDB_RUN_GROUP,
+        wandb_tags=[*WANDB_TAGS, "sft"],
     )
 
     report_to = args.report_to

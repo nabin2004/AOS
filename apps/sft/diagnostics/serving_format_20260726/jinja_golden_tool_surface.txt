@@ -1,0 +1,2 @@
+<|tool_call>call:run_code{code:<|"|>code = '''from manim import *\nclass Demo(Scene):\n    def construct(self):\n        self.play(Create(Circle()))'''
+await manim_write(code=code, scene_name='Demo')<|"|>}<tool_call|><|tool_response>

@@ -5,7 +5,7 @@ set -euo pipefail
 # Downloads SFT adapter (and optional dataset) from GCS, then runs apps/grpo/run.py.
 
 SFT_LORA_URI="${AOS_SFT_LORA_URI:-}"
-SFT_LORA_PATH="${AOS_SFT_LORA_PATH:-/tmp/sft/gemma4-manim-ft}"
+SFT_LORA_PATH="${AOS_SFT_LORA_PATH:-/tmp/sft/gemma4-31b-manim-ft}"
 DATASET_URI="${AOS_DATASET_URI:-}"
 DATASET_PATH="${AOS_DATASET_PATH:-/tmp/data/ManiBench_Pilot_Dataset.json}"
 OUTPUT_DIR="${AIP_MODEL_DIR:-/tmp/output/grpo}"

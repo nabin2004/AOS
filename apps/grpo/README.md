@@ -1,11 +1,11 @@
 # GRPO — ManiBench Phase 2
 
-Reinforcement fine-tuning (GRPO) on [ManiBench](https://huggingface.co/datasets/nabin2004/ManiBench) after Phase 1 SFT. Stacks a trainable GRPO LoRA on top of a frozen SFT adapter (Gemma 4 E2B via Unsloth).
+Reinforcement fine-tuning (GRPO) on [ManiBench](https://huggingface.co/datasets/nabin2004/ManiBench) after Phase 1 SFT. Stacks a trainable GRPO LoRA on top of a frozen SFT adapter (Gemma 4 31B via Unsloth).
 
 ## Workflow
 
 ```text
-Phase 1 (apps/sft)  →  ../sft/gemma4-manim-ft  →  Phase 2 (apps/grpo)  →  grpo_manim/
+Phase 1 (apps/sft)  →  ../sft/gemma4-31b-manim-ft  →  Phase 2 (apps/grpo)  →  grpo_manim/
 ```
 
 ## Layout
@@ -35,7 +35,7 @@ uv sync
 uv run python run.py --smoke
 
 # Full training with local SFT adapter
-uv run python run.py --sft-lora ../sft/gemma4-manim-ft
+uv run python run.py --sft-lora ../sft/gemma4-31b-manim-ft
 
 # Offline dataset
 uv run python run.py --dataset-path ./ManiBench_Pilot_Dataset.json
@@ -45,7 +45,7 @@ uv run python run.py --dataset-path ./ManiBench_Pilot_Dataset.json
 
 | Flag | Description |
 |------|-------------|
-| `--sft-lora` | SFT adapter path (default: `../sft/gemma4-manim-ft`) |
+| `--sft-lora` | SFT adapter path (default: `../sft/gemma4-31b-manim-ft`) |
 | `--dataset-path` | Local pilot JSON override |
 | `--output-dir` | GRPO adapter output (default: `./grpo_manim`) |
 | `--repeat-factor` | Upsample factor per problem (default: 50) |
@@ -55,7 +55,7 @@ uv run python run.py --dataset-path ./ManiBench_Pilot_Dataset.json
 | `--grpo-only` | Skip frozen SFT stack |
 | `--full-precision` | 16-bit instead of 4-bit |
 | `--report-to` | Logging backend (`wandb` default; use `none` to disable) |
-| `--run-name` | W&B run name (default: `gemma4-manim-grpo`) |
+| `--run-name` | W&B run name (default: `gemma4-31b-manim-grpo`) |
 
 Requires CUDA and `HF_TOKEN` if downloading adapters or dataset from HuggingFace.
 

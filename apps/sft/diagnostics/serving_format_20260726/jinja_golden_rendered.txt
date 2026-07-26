@@ -1,0 +1,11 @@
+<bos><|turn>system
+You are a Manim coding agent. Call tools ONLY via run_code.<|tool>declaration:run_code{description:<|"|>Execute CodeMode sandbox code<|"|>,parameters:{properties:{code:{type:<|"|>STRING<|"|>}},required:[<|"|>code<|"|>],type:<|"|>OBJECT<|"|>}}<tool|><turn|>
+<|turn>user
+Topic: Euler's Formula Visualization
+Subject: math
+Create a short Manim VoiceoverScene that visualizes e^(ix)=cos(x)+i*sin(x) on the unit circle.
+Use scene_name=EulersFormulaVisualization.
+Call tools ONLY via run_code (CodeMode): wrap Manim source in a string and await manim_write / compile_manim_code.<turn|>
+<|turn>model
+<|tool_call>call:run_code{code:<|"|>code = '''from manim import *\nclass Demo(Scene):\n    def construct(self):\n        self.play(Create(Circle()))'''
+await manim_write(code=code, scene_name='Demo')<|"|>}<tool_call|><|tool_response>

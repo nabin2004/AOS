@@ -7,8 +7,8 @@ Usage (from apps/sft):
 
     export HF_TOKEN=hf_...
     uv run python upload_adapter.py
-    uv run python upload_adapter.py --adapter-dir ./gemma4-manim-ft
-    uv run python upload_adapter.py --adapter-dir /content/gemma4-manim-ft --colab
+    uv run python upload_adapter.py --adapter-dir ./gemma4-31b-manim-ft
+    uv run python upload_adapter.py --adapter-dir /content/gemma4-31b-manim-ft --colab
 """
 
 from __future__ import annotations
@@ -26,7 +26,13 @@ from config import (
 from hub_upload import push_model_folder, require_token
 
 SFT_ROOT = Path(__file__).resolve().parent
-DEFAULT_REPO_ID = "nabin2004/AOS-gemma4-manim-sft"
+TRAINING_ROOT = SFT_ROOT.parent / "training"
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from model_identity import HUB_SFT_REPO, SFT_OUTPUT_DIR_NAME  # noqa: E402
+
+DEFAULT_REPO_ID = HUB_SFT_REPO
 MODEL_CARD = SFT_ROOT / "model_card.md"
 
 UPLOAD_IGNORE_PATTERNS = [
@@ -83,7 +89,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--adapter-dir",
         type=Path,
         default=None,
-        help="Directory saved by run.py (default: gemma4-manim-ft or Colab path)",
+        help=f"Directory saved by run.py (default: {SFT_OUTPUT_DIR_NAME} or Colab path)",
     )
     parser.add_argument(
         "--repo-id",

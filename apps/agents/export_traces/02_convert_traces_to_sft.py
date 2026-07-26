@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Convert Logfire agent traces to Gemma 4 E2B SFT JSONL.
+Convert Logfire agent traces to Gemma 4 31B SFT JSONL.
 
 Produces final_answer (TRL messages) and/or tool_trace (OpenAI tool turns) formats.
 
@@ -11,9 +11,9 @@ Usage:
         --output-dir export_traces/sft_out \
         --format both
 
-Gemma 4 E2B TRL handoff:
-    - Base model: google/gemma-4-E2B
-    - Tokenizer: google/gemma-4-E2B-it
+Gemma 4 31B TRL handoff:
+    - Base model: google/gemma-4-31B-it
+    - Tokenizer: google/gemma-4-31B-it
     - Dataset field: messages (structured tool_calls + tool roles)
     - SFTConfig(assistant_only_loss=True, packing=False)
     - apps/sft applies templates/gemma4_training.jinja for loss masking

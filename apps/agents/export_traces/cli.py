@@ -5,11 +5,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from export_traces.codemode_contract import tool_trace_violates_codemode
 from export_traces.config import SFTFormat
 from export_traces.converters.final_answer import convert_final_answer
 from export_traces.converters.tool_trace import convert_tool_trace
 from export_traces.logfire_export import load_spans
-from export_traces.otel_messages import agent_name_from_span, metadata_from_span
+from export_traces.otel_messages import metadata_from_span
 from export_traces.trace_select import SelectionResult, select_spans
 from export_traces.validate import (
     ValidationReport,
@@ -26,6 +27,7 @@ class ConversionResult:
     metadata: list[dict[str, Any]] = field(default_factory=list)
     selection: SelectionResult = field(default_factory=SelectionResult)
     skipped_conversion: int = 0
+    skipped_codemode: int = 0
 
 
 def convert_spans_to_sft(
@@ -65,7 +67,6 @@ def convert_spans_to_sft(
         seen_conversion.add(key)
 
         meta = metadata_from_span(span)
-        agent = agent_name_from_span(span)
 
         fa_row = None
         tt_row = None
@@ -82,6 +83,9 @@ def convert_spans_to_sft(
                 keep_thinking=keep_thinking,
                 max_tool_result_chars=max_tool_result_chars,
             )
+            if tt_row and tool_trace_violates_codemode(tt_row):
+                result.skipped_codemode += 1
+                tt_row = None
             if tt_row:
                 tt_row["_metadata"] = meta
                 result.tool_trace.append(tt_row)
@@ -146,6 +150,8 @@ def print_conversion_report(
     print(f"\nSelection: {len(result.selection.selected_spans)} spans selected")
     print(f"Dropped: {json.dumps(stats)}")
     print(f"Skipped during conversion: {result.skipped_conversion}")
+    if result.skipped_codemode:
+        print(f"Skipped CodeMode star-import violations: {result.skipped_codemode}")
 
     if sft_format in ("final_answer", "both"):
         print(f"Final answer examples: {len(result.final_answer)}")

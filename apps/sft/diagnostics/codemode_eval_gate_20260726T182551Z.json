@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-07-26T18:25:00.793256+00:00",
+  "model": "huggingface.co/nabin2004/AOS-gemma4-manim-gguf:Q4_K_M",
+  "base_url": "http://127.0.0.1:11434/v1",
+  "max_tokens": 2048,
+  "num_ctx": 16384,
+  "prompt_variant": "local",
+  "probe": "production",
+  "prompt_chars": 825,
+  "user_prompt_chars": 4321,
+  "finish_reason": "tool_calls",
+  "usage": {
+    "prompt_tokens": 1629,
+    "completion_tokens": 436,
+    "total_tokens": 2065
+  },
+  "n_tool_calls": 1,
+  "tool_name": "run_code",
+  "code_class": "raw_manim_top_level",
+  "code_preview": "import asyncio\nfrom manim import *\n\nasync def main():\n    await EulersFormulaVisualization()\n\nasync def run_euler_formula():\n    await main()\n\nasyncio.run(run_euler_formula())",
+  "has_star_import": true,
+  "has_manim_write": false,
+  "pass": false
+}

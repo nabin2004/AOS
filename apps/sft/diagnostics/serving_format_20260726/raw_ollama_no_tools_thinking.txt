@@ -1,0 +1,14 @@
+The user wants me to create a Manim scene that visualizes Euler's formula, $e^{ix} = \cos(x) + i\sin(x)$, on the unit circle.
+I need to use `MathTex` or similar tools for mathematical expressions and visualize the complex exponential in terms of trigonometric functions.
+
+I will use `MathTex` for the formula and potentially `Arc` or coordinate system setup to draw the unit circle and points.
+
+Plan:
+1.  Import necessary classes from `manim`.
+2.  Define a class inheriting from `Scene`.
+3.  Create the scene structure.
+4.  Visualize the unit circle, real axis, imaginary axis, and points corresponding to $e^{ix}$ (which is $e^{i\theta} = \cos(\theta) + i\sin(\theta)$).
+
+Since this involves complex numbers and rotation, I'll need to handle the visualization carefully.
+
+Let's start drafting the code.

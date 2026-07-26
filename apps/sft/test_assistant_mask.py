@@ -40,7 +40,7 @@ def main() -> int:
     formatted = format_trajectory_messages(sample)
     messages = formatted["messages"]
 
-    tokenizer = load_tokenizer("google/gemma-4-E2B-it")
+    tokenizer = load_tokenizer(TrainingConfig().model_id)
     config = prepare_training_tokenizer(tokenizer, TrainingConfig())
     assert config.assistant_only_loss is True, "assistant_only_loss should stay enabled"
     validate_training_template(tokenizer, require_generation_markers=True)

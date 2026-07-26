@@ -150,49 +150,35 @@ def resolve_infer_tools(*, all_tools: bool = False) -> list[dict[str, Any]]:
     return INFER_TOOLS_ALL if all_tools else INFER_TOOLS
 
 
-_STAR_IMPORT_LINE_RE = re.compile(r"^\s*from\s+manim\s+import\s+\*")
-
-
 def _codemode_preflight(code: str) -> dict[str, Any] | None:
     """Return an error payload when run_code body has common train/infer mistakes."""
-    in_triple: str | None = None
-    for line in code.splitlines():
-        if in_triple is not None:
-            if in_triple in line:
-                in_triple = None
-            continue
+    from codemode_contract import run_code_has_star_import
 
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-
-        for quote in ("'''", '"""'):
-            if quote not in line:
-                continue
-            first = line.find(quote)
-            rest = line[first + len(quote) :]
-            if quote not in rest:
-                in_triple = quote
-            break
-
-        if in_triple is None and _STAR_IMPORT_LINE_RE.match(line):
-            return {
-                "ok": False,
-                "error": "codemode_star_import",
-                "message": (
-                    "Do not put `from manim import *` directly in run_code. "
-                    "Nest Manim source inside await manim_write(code='''...''', "
-                    "scene_name='YourScene') or compile_manim_code(...)."
-                ),
-            }
+    if run_code_has_star_import(code):
+        return {
+            "ok": False,
+            "error": "codemode_star_import",
+            "message": (
+                "Do not put `from manim import *` directly in run_code. "
+                "Nest Manim source inside await manim_write(code='''...''', "
+                "scene_name='YourScene') or compile_manim_code(...)."
+            ),
+        }
     return None
+
+
+def _summarize_error(text: str) -> str:
+    _ensure_agents_importable()
+    from error_feedback import summarize_diagnostic_output
+
+    return summarize_diagnostic_output(text, max_chars=1200)
 
 
 def _syntax_error_payload(exc: SyntaxError) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "ok": False,
         "error": "syntax_error",
-        "message": str(exc),
+        "message": _summarize_error(str(exc)),
     }
     if exc.msg and "import *" in str(exc.msg):
         payload["hint"] = (
@@ -531,10 +517,14 @@ async def _exec_codemode(code: str, output_dir: str) -> str:
         with contextlib.redirect_stdout(buf):
             result = await ns["__codemode_main"]()
     except Exception as exc:  # noqa: BLE001 — surface tool failures to the model
-        err = {"ok": False, "error": type(exc).__name__, "message": str(exc)}
+        err = {
+            "ok": False,
+            "error": type(exc).__name__,
+            "message": _summarize_error(str(exc)),
+        }
         printed = buf.getvalue().strip()
         if printed:
-            err["stdout"] = printed
+            err["stdout"] = _summarize_error(printed)
         return json.dumps(err)
 
     printed = buf.getvalue().strip()

@@ -6,10 +6,10 @@ By default this mirrors the SFT trajectory distribution: multi-turn tool calling
 
 Usage (from apps/sft):
 
-    uv run python infer.py --adapter-dir ./gemma4-manim-ft --prompt "Animate a circle."
-    uv run python infer.py --adapter-dir /content/gemma4-manim-ft --colab
-    uv run python infer.py --adapter-dir ./gemma4-manim-ft --dataset-index 0
-    uv run python infer.py --adapter-dir ./gemma4-manim-ft --no-tools  # one-shot smoke
+    uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --prompt "Animate a circle."
+    uv run python infer.py --adapter-dir /content/gemma4-31b-manim-ft --colab
+    uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --dataset-index 0
+    uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --no-tools  # one-shot smoke
 """
 
 from __future__ import annotations
@@ -24,7 +24,13 @@ from pathlib import Path
 import torch
 from transformers import PreTrainedTokenizerBase
 
-from config import (
+TRAINING_ROOT = Path(__file__).resolve().parent.parent / "training"
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from model_identity import BASE_MODEL_ID, HUB_SFT_REPO, SFT_OUTPUT_DIR_NAME  # noqa: E402
+
+from config import (  # noqa: E402
     TrainingConfig,
     apply_colab_preset,
     apply_kaggle_preset,
@@ -33,14 +39,14 @@ from config import (
     default_runpod_output_dir,
     is_colab_runtime,
 )
-from infer_tools import (
+from infer_tools import (  # noqa: E402
     INFER_SYSTEM_PROMPT,
     assistant_message_from_generation,
     default_infer_output_dir,
     execute_tool_call,
     resolve_infer_tools,
 )
-from model import is_hub_repo_id, load_inference_model
+from model import is_hub_repo_id, load_inference_model  # noqa: E402
 
 DEFAULT_PROMPT = (
     "Create a short Manim animation that visualizes gradient descent on a simple "
@@ -56,7 +62,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--adapter-dir",
         default=None,
-        help="Directory saved by run.py or HF model repo id (default: gemma4-manim-ft or Colab Drive path)",
+        help=f"Directory saved by run.py or HF model repo id (default: {SFT_OUTPUT_DIR_NAME} or Colab Drive path)",
     )
     parser.add_argument(
         "--prompt",
@@ -77,7 +83,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--model-id",
-        default="google/gemma-4-E2B-it",
+        default=BASE_MODEL_ID,
         help="Base model id (must match the adapter training run)",
     )
     parser.add_argument(
@@ -420,9 +426,9 @@ def main() -> int:
             if args.colab or is_colab_runtime():
                 print(
                     "On Colab, point --adapter-dir at your training output, e.g.\n"
-                    "  /content/gemma4-manim-ft\n"
-                    "  /content/drive/MyDrive/gemma4-manim-ft\n"
-                    "Or use a Hub repo id, e.g. nabin2004/AOS-gemma4-manim-sft",
+                    f"  /content/{SFT_OUTPUT_DIR_NAME}\n"
+                    f"  /content/drive/MyDrive/{SFT_OUTPUT_DIR_NAME}\n"
+                    f"Or use a Hub repo id, e.g. {HUB_SFT_REPO}",
                     file=sys.stderr,
                 )
             return 1

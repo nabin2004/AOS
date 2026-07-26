@@ -31,6 +31,7 @@ if str(TRAINING_ROOT) not in sys.path:
     sys.path.insert(0, str(TRAINING_ROOT))
 
 from wandb_env import configure_wandb, resolve_report_to  # noqa: E402
+from model_identity import SFT_OUTPUT_DIR_NAME  # noqa: E402
 
 
 def _is_ephemeral_colab_path(path: Path) -> bool:
@@ -45,7 +46,7 @@ def ensure_output_dir(output_dir: Path) -> int | None:
         print(
             "ERROR: /kaggle/... paths only work on Kaggle.\n"
             "On Colab use --colab (saves to Google Drive) or "
-            "--output-dir /content/drive/MyDrive/gemma4-manim-ft",
+            f"--output-dir /content/drive/MyDrive/{SFT_OUTPUT_DIR_NAME}",
             file=sys.stderr,
         )
         return 1
@@ -54,7 +55,7 @@ def ensure_output_dir(output_dir: Path) -> int | None:
         print(
             f"WARNING: Saving to {output_dir} is ephemeral. "
             "Mount Drive and use --colab or "
-            "--output-dir /content/drive/MyDrive/gemma4-manim-ft",
+            f"--output-dir /content/drive/MyDrive/{SFT_OUTPUT_DIR_NAME}",
             file=sys.stderr,
         )
 
@@ -79,6 +80,17 @@ def main() -> int:
             run_name=config.run_name,
             job_type="sft",
             project_env_key="WANDB_PROJECT_SFT",
+            group=config.wandb_group,
+            tags=[*config.wandb_tags, "sft"],
+            config={
+                "base_model": config.model_id,
+                "hub_model_id": config.hub_model_id,
+                "output_dir": str(config.output_dir),
+                "seq_len": config.seq_len,
+                "use_4bit": config.use_4bit,
+                "batch_size": config.batch_size,
+                "grad_accum": config.grad_accum,
+            },
         )
         config = replace(config, report_to=effective)
     else:

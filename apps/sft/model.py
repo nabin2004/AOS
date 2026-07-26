@@ -39,7 +39,7 @@ def load_tokenizer(model_id: str) -> PreTrainedTokenizerBase:
 
 
 def freeze_multimodal_towers(model: torch.nn.Module) -> None:
-    """Gemma 4 E2B/E4B: train only the language model backbone."""
+    """Gemma 4 (incl. 31B): train only the language model backbone."""
     for name, param in model.named_parameters():
         if not name.startswith("model.language_model"):
             param.requires_grad = False

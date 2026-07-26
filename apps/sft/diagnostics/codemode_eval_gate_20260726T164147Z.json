@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-07-26T16:39:51.735517+00:00",
+  "model": "huggingface.co/nabin2004/AOS-gemma4-manim-gguf:Q4_K_M",
+  "base_url": "http://127.0.0.1:11434/v1",
+  "max_tokens": 2048,
+  "prompt_variant": "local",
+  "prompt_chars": 1245,
+  "finish_reason": "tool_calls",
+  "usage": {
+    "prompt_tokens": 583,
+    "completion_tokens": 1598,
+    "total_tokens": 2181
+  },
+  "n_tool_calls": 1,
+  "tool_name": "run_code",
+  "code_class": "raw_manim_top_level",
+  "code_preview": "from manim import *\n\nclass EulerFormulaVisualization(Scene):\n    def construct(self):\n        # --- Setup Title ---\n        title = MathTex(r\"Euler's Formula\", font_size=40)\n        self.play(Write(title))\n        self.wait(0.5)\n\n        # --- Define the Unit Circle and Axes ---\n        # Create a coordinate system for context\n        axes = Axes(\n            x_range=[-3, 3, 1],\n            y_range=[-3, 3, 1],\n            axis_config={\"include_numbers\": True},\n            tips=False,\n        ).t",
+  "has_star_import": true,
+  "has_manim_write": false,
+  "pass": false
+}

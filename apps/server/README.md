@@ -23,7 +23,7 @@ client = Gemma4Client(model="google/gemma-4-31B-it")
 print(client.chat("Write a short poem about the ocean."))
 ```
 
-For LoRA adapters trained in [`apps/sft`](../sft/) (base model `google/gemma-4-E2B-it`), pass the
+For LoRA adapters trained in [`apps/sft`](../sft/) (base model `google/gemma-4-31B-it`), pass the
 LoRA module name registered with vLLM:
 
 ```python
@@ -49,8 +49,8 @@ the model on its OpenAI-compatible API at `http://localhost:11434/v1`.
 
 ```bash
 # Create model (if export_gguf.py was run with --skip-ollama-create)
-ollama create aos-gemma4-manim -f ./gemma4-manim-gguf/Modelfile
-ollama run aos-gemma4-manim
+ollama create aos-gemma4-31b-manim -f ./gemma4-31b-manim-gguf/Modelfile
+ollama run aos-gemma4-31b-manim
 ```
 
 ```python
@@ -69,7 +69,7 @@ CLI demo:
 ```bash
 uv run --package server python apps/server/main.py \
   --base-url http://localhost:11434/v1 \
-  --model aos-gemma4-manim \
+  --model aos-gemma4-31b-manim \
   --api-key ollama \
   --prompt "Animate a unit circle morphing into an ellipse."
 ```
@@ -79,10 +79,10 @@ Smoke test with curl:
 ```bash
 curl http://localhost:11434/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model":"aos-gemma4-manim","messages":[{"role":"user","content":"Hello"}]}'
+  -d '{"model":"aos-gemma4-31b-manim","messages":[{"role":"user","content":"Hello"}]}'
 ```
 
-Tool calling works when the GGUF carries tool metadata — verify with `ollama show aos-gemma4-manim`.
+Tool calling works when the GGUF carries tool metadata — verify with `ollama show aos-gemma4-31b-manim`.
 Use `client.call_with_tools(...)` the same way as with vLLM.
 
 ## API
@@ -114,8 +114,8 @@ LoRA and QLoRA fine-tuning for Manim trajectory SFT lives in [`apps/sft`](../sft
 uses **QLoRA** (4-bit NF4) for memory efficiency; **serving** loads bf16 base weights plus LoRA
 adapter weights through vLLM — not the 4-bit training checkpoint.
 
-Default SFT base model: `google/gemma-4-E2B-it`. Published adapter:
-[`nabin2004/AOS-gemma4-manim-sft`](https://huggingface.co/nabin2004/AOS-gemma4-manim-sft).
+Default SFT base model: `google/gemma-4-31B-it`. Published adapter:
+[`nabin2004/AOS-gemma4-31b-manim-sft`](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-sft).
 
 ### Launch vLLM with a LoRA adapter
 
@@ -123,10 +123,10 @@ Register the adapter at server startup with `--enable-lora` and `--lora-modules`
 name is what you pass to `Gemma4Client(adapter=...)`:
 
 ```bash
-vllm serve google/gemma-4-E2B-it \
+vllm serve google/gemma-4-31B-it \
   --enable-lora \
   --max-lora-rank 64 \
-  --lora-modules manim-sft=nabin2004/AOS-gemma4-manim-sft \
+  --lora-modules manim-sft=nabin2004/AOS-gemma4-31b-manim-sft \
   --max-model-len 8192 \
   --host 0.0.0.0 \
   --port 8000
@@ -135,10 +135,10 @@ vllm serve google/gemma-4-E2B-it \
 Local adapter directory (output from `apps/sft/run.py`):
 
 ```bash
-vllm serve google/gemma-4-E2B-it \
+vllm serve google/gemma-4-31B-it \
   --enable-lora \
   --max-lora-rank 64 \
-  --lora-modules manim-sft=./gemma4-manim-ft \
+  --lora-modules manim-sft=./gemma4-31b-manim-ft \
   --max-model-len 8192 \
   --host 0.0.0.0 \
   --port 8000
@@ -230,10 +230,10 @@ Equivalent manual launch:
 ```bash
 export VLLM_CPU_KVCACHE_SPACE=2          # GiB for KV cache; increase if you have RAM to spare
 export VLLM_CPU_OMP_THREADS_BIND=auto
-vllm serve google/gemma-4-E2B-it \
+vllm serve google/gemma-4-31B-it \
   --enable-lora \
   --max-lora-rank 64 \
-  --lora-modules manim-sft=nabin2004/AOS-gemma4-manim-sft \
+  --lora-modules manim-sft=nabin2004/AOS-gemma4-31b-manim-sft \
   --max-model-len 4096 \
   --dtype bfloat16 \
   --host 0.0.0.0 \

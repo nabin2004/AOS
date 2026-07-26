@@ -2,13 +2,26 @@ from __future__ import annotations
 
 import argparse
 import os
-from dataclasses import dataclass, replace
+import sys
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from peft import LoraConfig
 from trl import SFTConfig
 
 SFT_ROOT = Path(__file__).resolve().parent
+TRAINING_ROOT = SFT_ROOT.parent / "training"
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from model_identity import (  # noqa: E402
+    BASE_MODEL_ID,
+    HUB_SFT_REPO,
+    SFT_OUTPUT_DIR_NAME,
+    WANDB_RUN_GROUP,
+    WANDB_SFT_RUN_NAME,
+    WANDB_TAGS,
+)
 
 LANGUAGE_MODEL_LORA_TARGETS = (
     r".*\.language_model.*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)"
@@ -17,21 +30,23 @@ LANGUAGE_MODEL_LORA_TARGETS = (
 
 @dataclass
 class TrainingConfig:
-    model_id: str = "google/gemma-4-E2B-it"
+    model_id: str = BASE_MODEL_ID
     dataset_repo: str = "nabin2004/AOS-Trajectories"
     dataset_file: str = "trajectories.jsonl"
     data_path: Path | None = None
-    output_dir: Path = SFT_ROOT / "gemma4-manim-ft"
+    output_dir: Path = SFT_ROOT / SFT_OUTPUT_DIR_NAME
     use_4bit: bool = True
     seq_len: int = 8192
     epochs: int = 2
-    batch_size: int = 2
-    grad_accum: int = 4
+    batch_size: int = 1
+    grad_accum: int = 8
     learning_rate: float = 5e-6
     num_proc: int = 8
     report_to: str = "wandb"
-    run_name: str = "gemma4-manim-sft"
+    run_name: str = WANDB_SFT_RUN_NAME
     wandb_project: str = "aos-sft"
+    wandb_group: str = WANDB_RUN_GROUP
+    wandb_tags: tuple[str, ...] = field(default_factory=lambda: WANDB_TAGS)
     attn_implementation: str = "eager"
     device_map: str | dict[str, int] = "auto"
     strip_multimodal_towers: bool = False
@@ -39,7 +54,7 @@ class TrainingConfig:
     assistant_only_loss: bool = True
     use_liger_kernel: bool = False
     push_to_hub: bool = False
-    hub_model_id: str = "nabin2004/AOS-gemma4-manim-sft"
+    hub_model_id: str = HUB_SFT_REPO
     hub_private: bool = False
 
     def resolve_paths(self) -> TrainingConfig:
@@ -140,6 +155,8 @@ class TrainingConfig:
             config = replace(config, hub_model_id=args.hub_model_id)
         if args.hub_private:
             config = replace(config, hub_private=True)
+        if args.run_name is not None:
+            config = replace(config, run_name=args.run_name)
         return apply_vertex_env(config)
 
 
@@ -153,6 +170,13 @@ def _liger_kernel_available() -> bool:
 
 
 def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
+    if config.model_id == BASE_MODEL_ID:
+        print(
+            "WARNING: --kaggle/--colab presets target T4 GPUs and are not suitable "
+            f"for {BASE_MODEL_ID} (needs ~80GB VRAM). Use Vertex ultragpu or a local "
+            "A100 80GB+ instead.",
+            file=sys.stderr,
+        )
     report_to = config.report_to
     if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
         report_to = "none"
@@ -173,8 +197,8 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
 def default_runpod_output_dir() -> Path:
     workspace = Path("/workspace")
     if workspace.is_dir() and os.access(workspace, os.W_OK):
-        return workspace / "gemma4-manim-ft"
-    return Path.cwd() / "gemma4-manim-ft"
+        return workspace / SFT_OUTPUT_DIR_NAME
+    return Path.cwd() / SFT_OUTPUT_DIR_NAME
 
 
 def apply_runpod_preset(config: TrainingConfig) -> TrainingConfig:
@@ -193,10 +217,10 @@ def default_colab_output_dir() -> Path:
     override = os.environ.get("SFT_OUTPUT_DIR", "").strip()
     if override:
         return Path(override)
-    drive_out = COLAB_DRIVE_ROOT / "gemma4-manim-ft"
+    drive_out = COLAB_DRIVE_ROOT / SFT_OUTPUT_DIR_NAME
     if COLAB_DRIVE_ROOT.is_dir() and os.access(COLAB_DRIVE_ROOT, os.W_OK):
         return drive_out
-    return Path("/content/gemma4-manim-ft")
+    return Path(f"/content/{SFT_OUTPUT_DIR_NAME}")
 
 
 def apply_colab_preset(config: TrainingConfig) -> TrainingConfig:
@@ -258,7 +282,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--model-id",
         default=None,
-        help='Hugging Face model id (default: "google/gemma-4-E2B-it")',
+        help=f'Hugging Face model id (default: "{BASE_MODEL_ID}")',
     )
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--batch-size", type=int, default=None)
@@ -329,11 +353,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--hub-model-id",
         default=None,
-        help='HF model repo id for adapter upload (default: "nabin2004/AOS-gemma4-manim-sft")',
+        help=f'HF model repo id for adapter upload (default: "{HUB_SFT_REPO}")',
     )
     parser.add_argument(
         "--hub-private",
         action="store_true",
         help="Create/upload the Hub model repo as private",
+    )
+    parser.add_argument(
+        "--run-name",
+        default=None,
+        help=f'W&B run name (default: "{WANDB_SFT_RUN_NAME}")',
     )
     return parser

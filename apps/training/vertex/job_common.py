@@ -54,7 +54,7 @@ def load_settings(args: argparse.Namespace) -> dict[str, str]:
         "GCP_REGION": pick("GCP_REGION", args.region, "us-central1"),
         "GCS_BUCKET": pick("GCS_BUCKET", args.bucket),
         "ARTIFACT_REPO": pick("ARTIFACT_REPO", args.repo, "aos-training"),
-        "MACHINE_TYPE": pick("MACHINE_TYPE", args.machine_type, "a2-highgpu-1g"),
+        "MACHINE_TYPE": pick("MACHINE_TYPE", args.machine_type, "a2-ultragpu-1g"),
         "ACCELERATOR_TYPE": pick(
             "ACCELERATOR_TYPE", args.accelerator_type, "NVIDIA_TESLA_A100"
         ),
@@ -82,6 +82,8 @@ def collect_wandb_env_vars(
     project: str,
     run_name: str | None = None,
     project_env_key: str | None = None,
+    group: str | None = None,
+    tags: tuple[str, ...] | list[str] | None = None,
 ) -> dict[str, str]:
     training_root = VERTEX_ROOT.parent
     if str(training_root) not in sys.path:
@@ -92,6 +94,8 @@ def collect_wandb_env_vars(
         project=project,
         run_name=run_name,
         project_env_key=project_env_key,
+        group=group,
+        tags=tags,
     )
 
 
@@ -100,6 +104,8 @@ def merge_training_env_vars(
     wandb_project: str,
     wandb_run_name: str | None = None,
     wandb_project_env_key: str | None = None,
+    wandb_group: str | None = None,
+    wandb_tags: tuple[str, ...] | list[str] | None = None,
     extra: dict[str, str] | None = None,
 ) -> dict[str, str]:
     env_vars = dict(extra or {})
@@ -108,6 +114,8 @@ def merge_training_env_vars(
             project=wandb_project,
             run_name=wandb_run_name,
             project_env_key=wandb_project_env_key,
+            group=wandb_group,
+            tags=wandb_tags,
         )
     )
     hf_token = os.environ.get("HF_TOKEN", "").strip()

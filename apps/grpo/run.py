@@ -4,7 +4,7 @@
 Usage (from apps/grpo):
 
     uv run python run.py --smoke
-    uv run python run.py --sft-lora ../sft/gemma4-manim-ft
+    uv run python run.py --sft-lora ../sft/gemma4-31b-manim-ft
     uv run python run.py --dataset-path ./ManiBench_Pilot_Dataset.json
 """
 
@@ -31,6 +31,7 @@ if str(TRAINING_ROOT) not in sys.path:
     sys.path.insert(0, str(TRAINING_ROOT))
 
 from wandb_env import configure_wandb, resolve_report_to  # noqa: E402
+from model_identity import BASE_MODEL_ID, HUB_SFT_REPO  # noqa: E402
 
 
 def main() -> int:
@@ -42,6 +43,15 @@ def main() -> int:
             run_name=config.run_name,
             job_type="grpo",
             project_env_key="WANDB_PROJECT_GRPO",
+            group=config.wandb_group,
+            tags=[*config.wandb_tags, "grpo"],
+            config={
+                "base_model": config.base_model or BASE_MODEL_ID,
+                "sft_lora_path": str(config.sft_lora_path),
+                "hub_sft_repo": HUB_SFT_REPO,
+                "output_dir": str(config.output_dir),
+                "load_in_4bit": config.load_in_4bit,
+            },
         )
         config = replace(config, report_to=effective)
     else:

@@ -7,13 +7,13 @@ quantize separately (GGUF / AWQ / vLLM) if needed.
 Usage (from apps/sft):
 
     uv run python merge_adapter.py \\
-      --adapter-dir ./gemma4-manim-ft \\
-      --output-dir ./gemma4-manim-merged
+      --adapter-dir ./gemma4-31b-manim-ft \\
+      --output-dir ./gemma4-31b-manim-merged
 
     export HF_TOKEN=hf_...
     uv run python merge_adapter.py \\
-      --adapter-dir ./gemma4-manim-ft \\
-      --output-dir ./gemma4-manim-merged \\
+      --adapter-dir ./gemma4-31b-manim-ft \\
+      --output-dir ./gemma4-31b-manim-merged \\
       --push-to-hub
 """
 
@@ -34,7 +34,16 @@ from hub_upload import push_model_folder, require_token
 from model import _load_pretrained_gemma4, _hub_token
 
 SFT_ROOT = Path(__file__).resolve().parent
-DEFAULT_HUB_REPO_ID = "nabin2004/AOS-gemma4-manim-merged"
+TRAINING_ROOT = SFT_ROOT.parent / "training"
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from model_identity import (  # noqa: E402
+    BASE_MODEL_ID,
+    HUB_MERGED_REPO,
+)
+
+DEFAULT_HUB_REPO_ID = HUB_MERGED_REPO
 MERGED_MODEL_CARD = SFT_ROOT / "merged_model_card.md"
 
 
@@ -65,7 +74,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--model-id",
-        default="google/gemma-4-E2B-it",
+        default=BASE_MODEL_ID,
         help="Base model id (must match adapter training run)",
     )
     parser.add_argument(

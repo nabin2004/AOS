@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+import json
+import sys
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,6 +11,12 @@ from pydantic_ai.exceptions import UsageLimitExceeded
 from pydantic_ai.usage import RunUsage
 
 from observability import configure_logfire, sft_batch_enabled
+from llm_config import is_ollama, model_for, settings_for
+from coder_prompt import (
+    LOCAL_CODER_CODEMODE_HINT,
+    compact_plan_for_local_coder,
+    plan_to_payload,
+)
 
 configure_logfire()
 
@@ -49,6 +57,30 @@ def _run_coder():
 
 
 @dataclass
+class PipelineDeps:
+    topic: str | None = None
+    subject: str | None = None
+    lecture_plan: dict | None = None
+
+
+# pai web (and other callers) often run the agent without deps=PipelineDeps().
+# Keep pipeline state in a module store reset at classify_topic.
+_pipeline_state = PipelineDeps()
+
+
+def _reset_pipeline_state() -> PipelineDeps:
+    global _pipeline_state
+    _pipeline_state = PipelineDeps()
+    return _pipeline_state
+
+
+def _pipeline_state_for(ctx: RunContext[PipelineDeps]) -> PipelineDeps:
+    if ctx.deps is not None:
+        return ctx.deps
+    return _pipeline_state
+
+
+@dataclass
 class AnimationState:
     user_query: str
     classification: Classification | None = None
@@ -59,10 +91,16 @@ class AnimationState:
     prompt_index: int | None = None
 
 
+def _subject_str(subject: str | Subject) -> str:
+    if isinstance(subject, Subject):
+        return subject.value
+    return str(subject)
+
+
 async def run_coder_step(
     topic: str,
     subject: str | Subject,
-    plan: Lecture | str,
+    plan: Lecture | str | dict,
     *,
     usage: RunUsage | None = None,
     user_prompt: str | None = None,
@@ -74,13 +112,21 @@ async def run_coder_step(
 
     run_dir = new_coder_run_dir(topic)
 
+    payload = plan_to_payload(plan)
+    if is_ollama(model_for("coder")):
+        payload = compact_plan_for_local_coder(payload)
+    plan_text = json.dumps(payload, indent=2)
+
+    codemode_hint = LOCAL_CODER_CODEMODE_HINT if is_ollama(model_for("coder")) else ""
+
     prompt = (
         f"Topic: {topic}\n"
-        f"Subject: {subject}\n"
+        f"Subject: {_subject_str(subject)}\n"
         f"output_dir: {run_dir}\n"
         f"Use output_dir={run_dir!s} for every manim_write / compile_manim_code / "
-        f"manim_read / synthesize_narration call.\n\n"
-        f"Plan:\n{plan}"
+        f"manim_read / synthesize_narration call.\n"
+        f"{codemode_hint}\n"
+        f"Plan:\n{plan_text}"
     )
     if sft_batch_enabled():
         prompt += SFT_BATCH_ADDENDUM
@@ -100,6 +146,9 @@ async def run_coder_step(
         summary = str(result.output) if result.output is not None else ""
     except UsageLimitExceeded as exc:
         stopped_reason = f"usage_limit: {exc}"
+        summary = stopped_reason
+    except Exception as exc:
+        stopped_reason = f"error: {exc}"
         summary = stopped_reason
 
     return arrange_coder_artifacts(
@@ -214,9 +263,11 @@ async def run_pipeline(
 
 
 animation_agent = Agent(
-    "openrouter:moonshotai/kimi-k2.5",
+    model_for("animation"),
+    deps_type=PipelineDeps,
     name="Manim Animation Pipeline",
     description="Runs classify → lecture plan → Manim code/compile for a learning topic.",
+    model_settings=settings_for("animation"),
     system_prompt=(
         "You run the Manim animation pipeline for educational topics.\n"
         "Act immediately — do not write long reasoning or preambles.\n"
@@ -224,7 +275,8 @@ animation_agent = Agent(
         "1. classify_topic with the user's exact message\n"
         "2. plan_lecture with the returned topic and subject "
         "(skip if subject is unknown / unsupported — tell the user and stop)\n"
-        "3. write_manim_animation with topic, subject, and the lecture plan\n"
+        "3. write_manim_animation with topic and subject only "
+        "(the lecture plan is stored automatically — do not pass plan text)\n"
         "Between tools, at most one short status line "
         "(e.g. 'Classifying…', 'Planning…', 'Writing Manim…').\n"
         "After write_manim_animation, summarize only from the tool result: "
@@ -235,8 +287,9 @@ animation_agent = Agent(
 
 
 @animation_agent.tool
-async def classify_topic(ctx: RunContext, user_query: str) -> dict:
+async def classify_topic(ctx: RunContext[PipelineDeps], user_query: str) -> dict:
     """Classify the user request into a subject domain and lecture topic."""
+    _reset_pipeline_state()
     result = await classifier_agent.run(user_query, usage=ctx.usage)
     classification = result.output
     if classification is None:
@@ -257,7 +310,7 @@ async def classify_topic(ctx: RunContext, user_query: str) -> dict:
 
 
 @animation_agent.tool
-async def plan_lecture(ctx: RunContext, topic: str, subject: str) -> dict:
+async def plan_lecture(ctx: RunContext[PipelineDeps], topic: str, subject: str) -> dict:
     """Generate a lecture plan for the classified topic."""
     result = await lecture_planner_agent.run(
         f"Topic: {topic}\nSubject: {subject}",
@@ -267,22 +320,44 @@ async def plan_lecture(ctx: RunContext, topic: str, subject: str) -> dict:
     if plan is None:
         return {"ok": False, "message": "Lecture planning failed."}
     if hasattr(plan, "model_dump"):
-        return {"ok": True, "plan": plan.model_dump(mode="json")}
-    return {"ok": True, "plan": str(plan)}
+        plan_payload = plan.model_dump(mode="json")
+    else:
+        plan_payload = {"raw": str(plan)}
+    state = _pipeline_state_for(ctx)
+    state.topic = topic
+    state.subject = subject
+    state.lecture_plan = plan_payload
+    return {"ok": True, "plan": plan_payload}
 
 
 @animation_agent.tool
 async def write_manim_animation(
-    ctx: RunContext,
+    ctx: RunContext[PipelineDeps],
     topic: str,
     subject: str,
-    plan: str,
 ) -> dict:
-    """Write, compile, and optionally narrate Manim code from the lecture plan."""
-    coder_result = await run_coder_step(topic, subject, plan, usage=ctx.usage)
+    """Write, compile, and optionally narrate Manim code from the stored lecture plan."""
+    state = _pipeline_state_for(ctx)
+    if state.lecture_plan is None:
+        return {
+            "ok": False,
+            "stopped_reason": "no_plan",
+            "message": "No lecture plan stored — call plan_lecture first.",
+        }
+    coder_result = await run_coder_step(
+        topic,
+        subject,
+        state.lecture_plan,
+        usage=ctx.usage,
+    )
     return coder_result.model_dump(mode="json")
 
 
 if __name__ == "__main__":
-    result = asyncio.run(run_pipeline("I want to learn about Hairy Ball theorem."))
+    prompt = (
+        sys.argv[1]
+        if len(sys.argv) > 1
+        else "I want to learn about Hairy Ball theorem."
+    )
+    result = asyncio.run(run_pipeline(prompt))
     print(result)

@@ -1,6 +1,6 @@
 ---
 license: apache-2.0
-base_model: google/gemma-4-E2B-it
+base_model: google/gemma-4-31B-it
 library_name: peft
 pipeline_tag: text-generation
 language:
@@ -9,21 +9,22 @@ tags:
   - manim
   - lora
   - gemma4
+  - gemma4-31b
   - tool-use
   - code-generation
   - animation
   - sft
 ---
 
-# AOS Gemma 4 Manim SFT (LoRA)
+# AOS Gemma 4 31B Manim SFT (LoRA)
 
 LoRA adapter fine-tuned on Code Agent trajectories for **Manim animation generation** via multi-turn tool calling (`run_code` + workspace tools).
 
-**Model URL:** https://huggingface.co/nabin2004/AOS-gemma4-manim-sft
+**Model URL:** https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-sft
 
 ## Base model
 
-This adapter is trained on top of [google/gemma-4-E2B-it](https://huggingface.co/google/gemma-4-E2B-it). You must accept the Gemma license and set `HF_TOKEN` to download the base weights.
+This adapter is trained on top of [google/gemma-4-31B-it](https://huggingface.co/google/gemma-4-31B-it). You must accept the Gemma license and set `HF_TOKEN` to download the base weights.
 
 ## Training data
 
@@ -40,8 +41,8 @@ from peft import PeftModel
 from transformers import AutoModelForImageTextToText, AutoTokenizer, BitsAndBytesConfig
 
 token = os.environ["HF_TOKEN"]
-base_id = "google/gemma-4-E2B-it"
-adapter_id = "nabin2004/AOS-gemma4-manim-sft"
+base_id = "google/gemma-4-31B-it"
+adapter_id = "nabin2004/AOS-gemma4-31b-manim-sft"
 
 bnb = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -69,7 +70,7 @@ The adapter is trained on **multi-turn Code Agent tool calls**, not single-turn 
 ```bash
 cd apps/sft
 uv run python infer.py \
-  --adapter-dir nabin2004/AOS-gemma4-manim-sft \
+  --adapter-dir nabin2004/AOS-gemma4-31b-manim-sft \
   --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
 
@@ -77,7 +78,7 @@ Colab:
 
 ```bash
 uv run --package sft python apps/sft/infer.py \
-  --adapter-dir nabin2004/AOS-gemma4-manim-sft \
+  --adapter-dir nabin2004/AOS-gemma4-31b-manim-sft \
   --colab \
   --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
@@ -94,14 +95,14 @@ uv run --package sft python apps/sft/infer.py \
 
 ```bash
 cd apps/sft
-uv run python run.py --colab --epochs 1 --report-to none --push-to-hub
+uv run python run.py --epochs 2 --report-to wandb --push-to-hub
 ```
 
 Or upload an existing adapter:
 
 ```bash
 export HF_TOKEN=hf_...
-uv run python upload_adapter.py --adapter-dir ./gemma4-manim-ft
+uv run python upload_adapter.py --adapter-dir ./gemma4-31b-manim-ft
 ```
 
 ## Related
