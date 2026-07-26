@@ -10,15 +10,18 @@ Usage (from apps/sft):
       --adapter-dir ./gemma4-manim-ft \\
       --output-dir ./gemma4-manim-merged
 
+    export HF_TOKEN=hf_...
     uv run python merge_adapter.py \\
-      --adapter-dir /content/drive/MyDrive/gemma4-manim-ft \\
-      --output-dir /content/drive/MyDrive/gemma4-manim-merged
+      --adapter-dir ./gemma4-manim-ft \\
+      --output-dir ./gemma4-manim-merged \\
+      --push-to-hub
 """
 
 from __future__ import annotations
 
 import argparse
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 import torch
@@ -27,7 +30,23 @@ from transformers import AutoTokenizer
 
 from chat_template import prepare_training_tokenizer, validate_training_template
 from config import TrainingConfig
+from hub_upload import push_model_folder, require_token
 from model import _load_pretrained_gemma4, _hub_token
+
+SFT_ROOT = Path(__file__).resolve().parent
+DEFAULT_HUB_REPO_ID = "nabin2004/AOS-gemma4-manim-merged"
+MERGED_MODEL_CARD = SFT_ROOT / "merged_model_card.md"
+
+
+@dataclass(frozen=True)
+class MergeConfig:
+    adapter_dir: Path
+    output_dir: Path
+    model_id: str
+    push_to_hub: bool
+    hub_repo_id: str
+    hub_private: bool
+    hub_revision: str | None
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -49,14 +68,34 @@ def build_parser() -> argparse.ArgumentParser:
         default="google/gemma-4-E2B-it",
         help="Base model id (must match adapter training run)",
     )
+    parser.add_argument(
+        "--push-to-hub",
+        action="store_true",
+        help="Upload merged weights to Hugging Face Hub after merge",
+    )
+    parser.add_argument(
+        "--hub-repo-id",
+        default=DEFAULT_HUB_REPO_ID,
+        help=f"HF model repo id (default: {DEFAULT_HUB_REPO_ID})",
+    )
+    parser.add_argument(
+        "--hub-private",
+        action="store_true",
+        help="Create/upload as a private model repo",
+    )
+    parser.add_argument(
+        "--hub-revision",
+        default=None,
+        help="Optional branch or tag name for the Hub upload",
+    )
     return parser
 
 
-def merge_adapter(
-    adapter_dir: Path,
-    output_dir: Path,
-    model_id: str,
-) -> None:
+def merge_adapter(config: MergeConfig) -> None:
+    adapter_dir = config.adapter_dir
+    output_dir = config.output_dir
+    model_id = config.model_id
+
     if not adapter_dir.is_dir():
         raise FileNotFoundError(f"Adapter directory not found: {adapter_dir}")
     if not (adapter_dir / "adapter_config.json").is_file():
@@ -85,20 +124,40 @@ def merge_adapter(
         adapter_dir if (adapter_dir / "tokenizer_config.json").is_file() else model_id
     )
     tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_source), token=token)
-    config = prepare_training_tokenizer(tokenizer, TrainingConfig(model_id=model_id))
+    training_config = prepare_training_tokenizer(
+        tokenizer, TrainingConfig(model_id=model_id)
+    )
     validate_training_template(
-        tokenizer, require_generation_markers=config.assistant_only_loss
+        tokenizer, require_generation_markers=training_config.assistant_only_loss
     )
     tokenizer.save_pretrained(str(output_dir))
     print("Merge complete.")
 
+    if config.push_to_hub:
+        hub_token = require_token()
+        push_model_folder(
+            output_dir,
+            config.hub_repo_id,
+            hub_token,
+            readme=MERGED_MODEL_CARD,
+            private=config.hub_private,
+            revision=config.hub_revision,
+        )
+
 
 def main() -> int:
     args = build_parser().parse_args()
+    config = MergeConfig(
+        adapter_dir=args.adapter_dir.resolve(),
+        output_dir=args.output_dir.resolve(),
+        model_id=args.model_id,
+        push_to_hub=args.push_to_hub,
+        hub_repo_id=args.hub_repo_id,
+        hub_private=args.hub_private,
+        hub_revision=args.hub_revision,
+    )
     try:
-        merge_adapter(
-            args.adapter_dir.resolve(), args.output_dir.resolve(), args.model_id
-        )
+        merge_adapter(config)
     except (FileNotFoundError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1

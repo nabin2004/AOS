@@ -31,6 +31,8 @@ py-modules = [
     "data",
     "infer",
     "infer_tools",
+    "export_gguf",
+    "hub_upload",
     "merge_adapter",
     "model",
     "preflight_gemma4",

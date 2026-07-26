@@ -1,16 +1,27 @@
-"""Client for Gemma 4 models served through vLLM's OpenAI-compatible API.
+"""Client for Gemma 4 models served through an OpenAI-compatible API.
+
+Works with vLLM (default) or Ollama after exporting a merged checkpoint to GGUF
+via apps/sft/export_gguf.py.
 
 Gemma 4 is a multimodal model family (text, image, audio) that adds thinking
 mode, tool calling, and structured outputs on top of the standard chat
 completions API. This module wraps those capabilities behind a small client
 so callers don't need to hand-build request payloads.
 
-The vLLM server itself is launched separately, e.g.:
+vLLM server example:
 
     vllm serve google/gemma-4-31B-it --max-model-len 16384
 
 LoRA adapters trained in apps/sft are served with --enable-lora and registered
 module names (see README.md). Pass adapter="manim-sft" to target a LoRA module.
+
+Ollama example (after export_gguf.py + ollama create):
+
+    client = Gemma4Client(
+        model="aos-gemma4-manim",
+        base_url=DEFAULT_OLLAMA_BASE_URL,
+        api_key="ollama",
+    )
 
 See README.md for full server launch flags (LoRA, thinking mode, tool calling,
 audio, TPU/AMD deployment).
@@ -24,6 +35,8 @@ from typing import Any, NamedTuple
 from openai import OpenAI
 
 DEFAULT_BASE_URL = "http://localhost:8000/v1"
+DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/v1"
+DEFAULT_OLLAMA_MODEL = "aos-gemma4-manim"
 DEFAULT_MODEL = "google/gemma-4-31B-it"
 DEFAULT_BASE_MODEL = "google/gemma-4-E2B-it"
 DEFAULT_LORA_MODULE = "manim-sft"
@@ -57,7 +70,7 @@ def _media_message(prompt: str, media_type: str, urls: list[str]) -> Message:
 
 
 class Gemma4Client:
-    """Thin wrapper around the OpenAI SDK for a Gemma 4 vLLM server."""
+    """Thin wrapper around the OpenAI SDK for a Gemma 4 inference server."""
 
     def __init__(
         self,
@@ -73,7 +86,7 @@ class Gemma4Client:
         self._client = OpenAI(base_url=base_url, api_key=api_key)
 
     def list_models(self) -> list[str]:
-        """Return model ids exposed by the vLLM /v1/models endpoint."""
+        """Return model ids exposed by the /v1/models endpoint."""
         return [entry.id for entry in self._client.models.list().data]
 
     def chat(

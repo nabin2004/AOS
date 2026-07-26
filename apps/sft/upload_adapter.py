@@ -14,11 +14,8 @@ Usage (from apps/sft):
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from pathlib import Path
-
-from huggingface_hub import HfApi, get_token
 
 from config import (
     TrainingConfig,
@@ -26,6 +23,7 @@ from config import (
     default_colab_output_dir,
     is_colab_runtime,
 )
+from hub_upload import push_model_folder, require_token
 
 SFT_ROOT = Path(__file__).resolve().parent
 DEFAULT_REPO_ID = "nabin2004/AOS-gemma4-manim-sft"
@@ -38,17 +36,6 @@ UPLOAD_IGNORE_PATTERNS = [
     "training_args.bin",
     "README.md",
 ]
-
-
-def require_token() -> str:
-    token = os.environ.get("HF_TOKEN", "").strip() or get_token()
-    if not token:
-        print(
-            "ERROR: Set HF_TOKEN or run `huggingface-cli login` (write token required).",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    return token
 
 
 def upload_adapter(
@@ -69,38 +56,15 @@ def upload_adapter(
         )
         sys.exit(1)
 
-    api = HfApi()
-    print(f"Creating model repo {repo_id} (private={private})...")
-    api.create_repo(
+    push_model_folder(
+        adapter_dir,
         repo_id,
-        repo_type="model",
-        exist_ok=True,
+        token,
+        readme=MODEL_CARD,
         private=private,
-        token=token,
-    )
-
-    print(f"Uploading adapter from {adapter_dir} -> {repo_id}")
-    api.upload_folder(
-        folder_path=str(adapter_dir),
-        repo_id=repo_id,
-        repo_type="model",
-        token=token,
         revision=revision,
         ignore_patterns=UPLOAD_IGNORE_PATTERNS,
     )
-
-    if MODEL_CARD.is_file():
-        print(f"Uploading model card -> {repo_id}/README.md")
-        api.upload_file(
-            path_or_fileobj=str(MODEL_CARD),
-            path_in_repo="README.md",
-            repo_id=repo_id,
-            repo_type="model",
-            token=token,
-            revision=revision,
-        )
-
-    print(f"Done: https://huggingface.co/{repo_id}")
 
 
 def default_adapter_dir(args: argparse.Namespace) -> Path:

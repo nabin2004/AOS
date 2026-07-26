@@ -42,6 +42,49 @@ uv run --package server python apps/server/main.py --adapter manim-sft
 uv run --package server python apps/server/main.py --list-models
 ```
 
+## Ollama (GGUF export)
+
+After merging and exporting with [`apps/sft/export_gguf.py`](../sft/export_gguf.py), Ollama serves
+the model on its OpenAI-compatible API at `http://localhost:11434/v1`.
+
+```bash
+# Create model (if export_gguf.py was run with --skip-ollama-create)
+ollama create aos-gemma4-manim -f ./gemma4-manim-gguf/Modelfile
+ollama run aos-gemma4-manim
+```
+
+```python
+from gemma4_client import DEFAULT_OLLAMA_BASE_URL, DEFAULT_OLLAMA_MODEL, Gemma4Client
+
+client = Gemma4Client(
+    model=DEFAULT_OLLAMA_MODEL,
+    base_url=DEFAULT_OLLAMA_BASE_URL,
+    api_key="ollama",
+)
+print(client.chat("Create a Manim scene explaining eigenvectors."))
+```
+
+CLI demo:
+
+```bash
+uv run --package server python apps/server/main.py \
+  --base-url http://localhost:11434/v1 \
+  --model aos-gemma4-manim \
+  --api-key ollama \
+  --prompt "Animate a unit circle morphing into an ellipse."
+```
+
+Smoke test with curl:
+
+```bash
+curl http://localhost:11434/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"aos-gemma4-manim","messages":[{"role":"user","content":"Hello"}]}'
+```
+
+Tool calling works when the GGUF carries tool metadata — verify with `ollama show aos-gemma4-manim`.
+Use `client.call_with_tools(...)` the same way as with vLLM.
+
 ## API
 
 All methods take `max_tokens` and forward extra `**kwargs` straight to the underlying

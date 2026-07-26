@@ -16,6 +16,7 @@ Fine-tunes Gemma 4 E2B/E4B on Code Agent trajectories using LoRA + TRL `SFTTrain
 | `[infer_tools.py](infer_tools.py)` | Gemma tool-call parse + CodeMode / Manim tool execution   |
 | `[preflight_gemma4.py](preflight_gemma4.py)` | Pre-flight chat template + mask checks before training |
 | `[merge_adapter.py](merge_adapter.py)` | Merge LoRA into bf16 base for vLLM / HF deploy (CPU)     |
+| `[export_gguf.py](export_gguf.py)` | Convert merged HF weights to GGUF for Ollama (via llama.cpp) |
 | `[upload_dataset.py](upload_dataset.py)` | Publish trajectories to Hugging Face Hub               |
 | `[upload_adapter.py](upload_adapter.py)` | Publish LoRA adapter to Hugging Face Hub               |
 
@@ -169,7 +170,92 @@ uv run python merge_adapter.py \
   --output-dir ./gemma4-manim-merged
 ```
 
-Quantize the merged model separately (GGUF / AWQ) if needed.
+Push merged weights to Hugging Face (separate repo from the LoRA adapter):
+
+```bash
+export HF_TOKEN=hf_...   # write token; never commit
+uv run python merge_adapter.py \
+  --adapter-dir ./gemma4-manim-ft \
+  --output-dir ./gemma4-manim-merged \
+  --push-to-hub
+```
+
+**Default merged repo:** [nabin2004/AOS-gemma4-manim-merged](https://huggingface.co/nabin2004/AOS-gemma4-manim-merged)
+
+| Flag | Description |
+|------|-------------|
+| `--push-to-hub` | Upload merged safetensors + tokenizer after merge |
+| `--hub-repo-id` | HF model repo (default: `nabin2004/AOS-gemma4-manim-merged`) |
+| `--hub-private` | Create/upload as a private repo |
+| `--hub-revision` | Optional branch or tag for the upload |
+
+### Export to GGUF for Ollama
+
+Convert the merged checkpoint to Q4_K_M GGUF and register it with Ollama. Requires a
+recent [llama.cpp](https://github.com/ggml-org/llama.cpp) build (Gemma 4 support) and
+Ollama 0.30+.
+
+**Prerequisites:**
+
+```bash
+git clone https://github.com/ggml-org/llama.cpp
+cd llama.cpp && cmake -B build && cmake --build build -j
+# Ollama 0.30+ installed
+```
+
+**End-to-end:**
+
+```bash
+cd apps/sft
+
+# 1. Merge (if not done already)
+uv run python merge_adapter.py \
+  --adapter-dir ./gemma4-manim-ft \
+  --output-dir ./gemma4-manim-merged
+
+# 2. Export GGUF + create Ollama model
+export LLAMA_CPP_DIR=~/llama.cpp
+uv run python export_gguf.py \
+  --model-dir ./gemma4-manim-merged \
+  --output-dir ./gemma4-manim-gguf
+
+# 2b. Export GGUF + push to Hugging Face (separate repo from merged HF weights)
+export HF_TOKEN=hf_...
+uv run python export_gguf.py \
+  --model-dir ./gemma4-manim-merged \
+  --output-dir ./gemma4-manim-gguf \
+  --push-to-hub
+
+# 3. Run locally
+ollama run aos-gemma4-manim
+```
+
+**Default GGUF repo:** [nabin2004/AOS-gemma4-manim-gguf](https://huggingface.co/nabin2004/AOS-gemma4-manim-gguf)
+
+| Flag | Description |
+|------|-------------|
+| `--model-dir` | Merged HF directory from `merge_adapter.py` |
+| `--output-dir` | Where GGUF files and `Modelfile` are written |
+| `--model-name` | Ollama model tag (default: `aos-gemma4-manim`) |
+| `--llama-cpp-dir` | llama.cpp clone path (default: `$LLAMA_CPP_DIR` or `./llama.cpp`) |
+| `--quantize` | Quant type (default: `Q4_K_M`); use `none` for F16 only |
+| `--skip-ollama-create` | Write files only; run `ollama create` yourself |
+| `--push-to-hub` | Upload GGUF + Modelfile to Hugging Face after export |
+| `--hub-repo-id` | HF model repo (default: `nabin2004/AOS-gemma4-manim-gguf`) |
+| `--hub-private` | Create/upload as a private repo |
+| `--hub-revision` | Optional branch or tag for the upload |
+| `--upload-f16` | Include F16 intermediate in Hub upload (large; skipped by default) |
+
+### Hub repos summary
+
+| Artifact | Default repo | Upload command |
+|----------|--------------|----------------|
+| LoRA adapter | [nabin2004/AOS-gemma4-manim-sft](https://huggingface.co/nabin2004/AOS-gemma4-manim-sft) | `upload_adapter.py` or `run.py --push-to-hub` |
+| Merged bf16 | [nabin2004/AOS-gemma4-manim-merged](https://huggingface.co/nabin2004/AOS-gemma4-manim-merged) | `merge_adapter.py --push-to-hub` |
+| GGUF (Q4_K_M) | [nabin2004/AOS-gemma4-manim-gguf](https://huggingface.co/nabin2004/AOS-gemma4-manim-gguf) | `export_gguf.py --push-to-hub` |
+
+Use the model through Ollama's OpenAI-compatible API at `http://localhost:11434/v1` — see
+[`apps/server/README.md`](../server/README.md).
 
 ## Publish adapter to Hugging Face
 
