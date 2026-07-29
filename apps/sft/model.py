@@ -31,6 +31,11 @@ def is_hub_repo_id(value: str | Path) -> bool:
     return "/" in text and not text.startswith(("/", "./", "../"))
 
 
+def is_gemma_model_id(model_id: str) -> bool:
+    lowered = model_id.lower()
+    return "gemma" in lowered
+
+
 def load_tokenizer(model_id: str) -> PreTrainedTokenizerBase:
     tokenizer = AutoTokenizer.from_pretrained(model_id, token=_hub_token())
     if tokenizer.pad_token is None:
@@ -39,7 +44,7 @@ def load_tokenizer(model_id: str) -> PreTrainedTokenizerBase:
 
 
 def freeze_multimodal_towers(model: torch.nn.Module) -> None:
-    """Gemma 4 (incl. 31B): train only the language model backbone."""
+    """Gemma 4: train only the language model backbone."""
     for name, param in model.named_parameters():
         if not name.startswith("model.language_model"):
             param.requires_grad = False
@@ -62,7 +67,7 @@ def strip_multimodal_towers(model: torch.nn.Module) -> None:
 
 
 def patch_kbit_training_prep() -> None:
-    """Skip fp32 embedding upcast that can OOM Gemma 4 on small GPUs."""
+    """Skip fp32 embedding upcast that can OOM large models on small GPUs."""
     import peft.utils.other as peft_other
 
     if getattr(peft_other, "_aos_kbit_patch_applied", False):
@@ -97,6 +102,16 @@ def _load_pretrained_gemma4(model_id: str, **kwargs) -> torch.nn.Module:
         )
 
 
+def _load_pretrained_model(model_id: str, **kwargs) -> torch.nn.Module:
+    if is_gemma_model_id(model_id):
+        return _load_pretrained_gemma4(model_id, **kwargs)
+    return AutoModelForCausalLM.from_pretrained(
+        model_id,
+        trust_remote_code=True,
+        **kwargs,
+    )
+
+
 def load_model(
     config: TrainingConfig, *, for_inference: bool = False
 ) -> torch.nn.Module:
@@ -118,18 +133,19 @@ def load_model(
             bnb_4bit_quant_type="nf4",
             bnb_4bit_compute_dtype=torch.bfloat16,
         )
-        model = _load_pretrained_gemma4(
+        model = _load_pretrained_model(
             config.model_id,
             quantization_config=bnb_config,
             **common_kwargs,
         )
     else:
-        model = _load_pretrained_gemma4(config.model_id, **common_kwargs)
+        model = _load_pretrained_model(config.model_id, **common_kwargs)
 
-    if config.strip_multimodal_towers:
-        strip_multimodal_towers(model)
+    if is_gemma_model_id(config.model_id):
+        if config.strip_multimodal_towers:
+            strip_multimodal_towers(model)
+        freeze_multimodal_towers(model)
 
-    freeze_multimodal_towers(model)
     if for_inference:
         model.eval()
     else:

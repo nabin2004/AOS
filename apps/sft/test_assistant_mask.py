@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Smoke test: Gemma 4 assistant-only loss masks tool errors but not tool calls."""
+"""Smoke test: assistant-only loss masks tool errors but not tool calls."""
 
 from __future__ import annotations
-
 
 from chat_template import prepare_training_tokenizer, validate_training_template
 from config import TrainingConfig
@@ -17,6 +16,14 @@ def _masked_text(tokenizer, input_ids: list[int], assistant_masks: list[int]) ->
         if mask
     ]
     return tokenizer.decode(masked_ids)
+
+
+def _has_tool_call_markup(text: str) -> bool:
+    return (
+        "<tool_call>" in text
+        or "<|tool_call>" in text
+        or "tool_call" in text
+    )
 
 
 def main() -> int:
@@ -67,7 +74,7 @@ def main() -> int:
         print("masked:", repr(masked))
         return 1
 
-    if "<|tool_call>" not in masked and "tool_call" not in masked:
+    if not _has_tool_call_markup(masked):
         print("FAIL: tool_call tokens missing from assistant loss mask")
         print("masked:", repr(masked))
         return 1

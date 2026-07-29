@@ -9,11 +9,27 @@ from typing import Any
 _STAR_IMPORT_LINE_RE = re.compile(r"^\s*from\s+manim\s+import\s+\*")
 _NESTED_RUN_CODE_RE = re.compile(r"\bawait\s+run_code\s*\(|\brun_code\s*\(")
 
+_SANDBOX_TOOL_NAMES = (
+    "compile_manim_code",
+    "manim_write",
+    "manim_read",
+    "synthesize_narration",
+    "search_manim_docs",
+    "search_manim_signatures",
+)
+_TOOL_NAME_ALT = "|".join(_SANDBOX_TOOL_NAMES)
+_TOOL_DEF_RE = re.compile(
+    rf"^\s*(?:async\s+)?def\s+(?:{_TOOL_NAME_ALT})\b"
+    rf"|^\s*class\s+(?:{_TOOL_NAME_ALT})\b"
+)
+_TOOL_IMPORT_RE = re.compile(
+    r"^\s*(?:from\s+tools(?:\.\w+)*\s+import\b|import\s+tools\b)"
+    rf"|^\s*from\s+\S+\s+import\s+.*\b(?:{_TOOL_NAME_ALT})\b"
+)
 
-def run_code_has_star_import(code: str) -> bool:
-    """True when ``from manim import *`` appears outside a triple-quoted string."""
-    if not code or not isinstance(code, str):
-        return False
+
+def _lines_outside_triple_quotes(code: str):
+    """Yield non-comment lines that are outside triple-quoted string literals."""
     in_triple: str | None = None
     for line in code.splitlines():
         if in_triple is not None:
@@ -34,7 +50,26 @@ def run_code_has_star_import(code: str) -> bool:
                 in_triple = quote
             break
 
-        if in_triple is None and _STAR_IMPORT_LINE_RE.match(line):
+        if in_triple is None:
+            yield line
+
+
+def run_code_has_star_import(code: str) -> bool:
+    """True when ``from manim import *`` appears outside a triple-quoted string."""
+    if not code or not isinstance(code, str):
+        return False
+    for line in _lines_outside_triple_quotes(code):
+        if _STAR_IMPORT_LINE_RE.match(line):
+            return True
+    return False
+
+
+def run_code_has_tool_redefinition(code: str) -> bool:
+    """True when sandbox tools are defined/imported outside nested Manim strings."""
+    if not code or not isinstance(code, str):
+        return False
+    for line in _lines_outside_triple_quotes(code):
+        if _TOOL_DEF_RE.search(line) or _TOOL_IMPORT_RE.search(line):
             return True
     return False
 
@@ -98,6 +133,8 @@ def codemode_violations(code: str) -> list[str]:
         violations.append("codemode_nested_run_code")
     if run_code_has_multiline_single_quoted_string(code):
         violations.append("codemode_multiline_single_quote")
+    if run_code_has_tool_redefinition(code):
+        violations.append("codemode_tool_redefinition")
     return violations
 
 

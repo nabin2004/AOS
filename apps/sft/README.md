@@ -1,8 +1,8 @@
-# SFT — Gemma 4 Manim Trajectory Fine-Tuning
+# SFT — Qwen2.5-Coder Manim Trajectory Fine-Tuning
 
-Fine-tunes **Gemma 4 31B IT** on Code Agent trajectories using LoRA + TRL `SFTTrainer`.
+Fine-tunes **Qwen2.5-Coder-7B-Instruct** on Code Agent trajectories using LoRA + TRL `SFTTrainer`.
 
-**Base model:** [`google/gemma-4-31B-it`](https://huggingface.co/google/gemma-4-31B-it) (~80 GB VRAM for 4-bit LoRA at seq 8192). Kaggle T4 presets are not suitable for full 31B training.
+**Base model:** [`Qwen/Qwen2.5-Coder-7B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) (dense 7.61B; QLoRA fits T4/Colab with `--kaggle`/`--colab`). See [docs/MODEL_SELECTION.md](docs/MODEL_SELECTION.md) for the FYP justification.
 
 ## Layout
 
@@ -10,13 +10,15 @@ Fine-tunes **Gemma 4 31B IT** on Code Agent trajectories using LoRA + TRL `SFTTr
 | Module                     | Role                                                             |
 | -------------------------- | ---------------------------------------------------------------- |
 | `[config.py](config.py)`   | `TrainingConfig` dataclass, LoRA/SFTConfig factories, CLI parser |
-| `[data.py](data.py)`       | Load JSONL from HF or local path, filter, Gemma chat formatting  |
-| `[model.py](model.py)`     | Tokenizer + model load, 4-bit quant, freeze multimodal towers    |
+| `[data.py](data.py)`       | Load JSONL from HF or local path, filter, normalize tool args    |
+| `[model.py](model.py)`     | Tokenizer + CausalLM load, 4-bit quant (Gemma multimodal path kept for LEGACY) |
 | `[trainer.py](trainer.py)` | Build `SFTTrainer`, train, save adapter + tokenizer              |
 | `[run.py](run.py)`         | CLI entrypoint                                                   |
 | `[infer.py](infer.py)`     | Load adapter; multi-turn tool loop (or `--no-tools` one-shot)    |
-| `[infer_tools.py](infer_tools.py)` | Gemma tool-call parse + CodeMode / Manim tool execution   |
-| `[preflight_gemma4.py](preflight_gemma4.py)` | Pre-flight chat template + mask checks before training |
+| `[infer_tools.py](infer_tools.py)` | Qwen/Gemma tool-call parse + CodeMode / Manim execution |
+| `[preflight_sft.py](preflight_sft.py)` | Pre-flight chat template + mask checks before training |
+| `[chat_template.py](chat_template.py)` | Training Jinja + `{% generation %}` markers for assistant-only loss |
+| `[docs/MODEL_SELECTION.md](docs/MODEL_SELECTION.md)` | Why Qwen2.5-Coder-7B (report-ready) |
 | `[merge_adapter.py](merge_adapter.py)` | Merge LoRA into bf16 base for vLLM / HF deploy (CPU)     |
 | `[export_gguf.py](export_gguf.py)` | Convert merged HF weights to GGUF for Ollama (via llama.cpp) |
 | `[upload_dataset.py](upload_dataset.py)` | Publish trajectories to Hugging Face Hub               |
@@ -65,24 +67,25 @@ uv run python run.py --no-4bit --report-to none
 | `--dataset-file`  | File within HF repo (default: `trajectories.jsonl`)      |
 | `--data-path`     | Local trajectory JSONL override (skips Hub download)      |
 | `--output-dir`    | Output directory for adapter + tokenizer                 |
-| `--model-id`      | Hugging Face model id (default: `google/gemma-4-31B-it`) |
+| `--model-id`      | Hugging Face model id (default: `Qwen/Qwen2.5-Coder-7B-Instruct`) |
 | `--epochs`        | Training epochs                                          |
 | `--batch-size`    | Per-device batch size                                    |
 | `--learning-rate` | AdamW learning rate                                      |
-| `--no-4bit`       | Full BF16 instead of 4-bit (needs ~80GB+ VRAM)           |
+| `--no-4bit`       | Full BF16 instead of 4-bit (more VRAM)                   |
 | `--report-to`     | Logging backend (`wandb` default; use `none` to disable) |
-| `--kaggle`        | T4-friendly preset (not recommended for 31B; warns at startup) |
+| `--kaggle`        | T4-friendly preset (batch 1, seq 4096, packing off)      |
 | `--colab`         | Colab preset: GPU-safe settings, output under Google Drive |
 | `--runpod`        | RunPod preset: GPU-safe settings, output under `/workspace` |
-| `--seq-len`       | Max packed sequence length                               |
+| `--seq-len`       | Max sequence length (default 16384; 4096 with `--kaggle`) |
+| `--packing` / `--no-packing` | Sequence packing (default **off** for long trajectories) |
 | `--grad-accum`    | Gradient accumulation steps                              |
 | `--device-map`    | Model device map (`auto` or GPU index like `0`)          |
-| `--no-strip-towers` | Keep vision/audio towers loaded (more VRAM)            |
-| `--attn-implementation` | Attention backend: `eager` (default), `sdpa`, `flash_attention_2` |
+| `--no-strip-towers` | Keep vision/audio towers loaded (Gemma LEGACY only)    |
+| `--attn-implementation` | Attention backend: `sdpa` (default), `eager`, `flash_attention_2` |
 | `--use-liger-kernel` | Enable liger-kernel fused ops (~2GB activation savings on T4) |
 | `--push-to-hub` | Upload LoRA adapter to Hugging Face Hub after training |
-| `--hub-model-id` | HF model repo id for adapter upload (default: `nabin2004/AOS-gemma4-31b-manim-sft`) |
-| `--run-name`      | W&B run name (default: `gemma4-31b-manim-sft`, group `gemma4-31b-manim`) |
+| `--hub-model-id` | HF model repo id for adapter upload (default: `nabin2004/AOS-qwen25-coder-7b-manim-sft`) |
+| `--run-name`      | W&B run name (default: `qwen25-coder-7b-manim-sft`, group `qwen25-coder-7b-manim`) |
 | `--hub-private` | Create/upload the Hub model repo as private |
 
 
@@ -90,15 +93,15 @@ Edit defaults in `[config.py](config.py)` (`TrainingConfig`).
 
 ## Pre-flight (run before a long training job)
 
-Gemma 4 unified models need correct chat-template formatting and `{% generation %}` markers for `assistant_only_loss`. Run this on Colab/Kaggle before `--epochs 2`:
+Qwen2.5-Coder needs correct ChatML + tool formatting and `{% generation %}` markers for `assistant_only_loss`. Run this before a long job:
 
 ```bash
 cd apps/sft
-uv run python preflight_gemma4.py --colab
-uv run python preflight_gemma4.py --kaggle --load-model   # optional GPU smoke load
+uv run python preflight_sft.py --colab
+uv run python preflight_sft.py --kaggle --load-model   # optional GPU smoke load
 ```
 
-Checks: rendered template has `<|turn>model` (not `<unknown_role>`), assistant loss masks are non-zero, tool errors are masked but visible in context.
+Checks: rendered template has `<|im_start|>assistant` and `<tool_call>` / `<tool_response>`, assistant loss masks are non-zero, tool errors are masked but visible in context.
 
 Legacy mask test: `uv run python test_assistant_mask.py`.
 
@@ -108,15 +111,15 @@ Trajectory adapters are trained on **multi-turn Code Agent tool calls** (`run_co
 
 ```bash
 cd apps/sft
-uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft \
+uv run python infer.py --adapter-dir ./qwen25-coder-7b-manim-ft \
   --prompt "Animate a unit circle morphing into an ellipse under a 2x2 matrix."
 ```
 
-Colab (after training to `/content/gemma4-31b-manim-ft`):
+Colab (after training to `/content/qwen25-coder-7b-manim-ft`):
 
 ```bash
 uv run --package sft python apps/sft/infer.py \
-  --adapter-dir /content/gemma4-31b-manim-ft \
+  --adapter-dir /content/qwen25-coder-7b-manim-ft \
   --colab \
   --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
@@ -125,7 +128,7 @@ Colab (load adapter from Hugging Face Hub):
 
 ```bash
 uv run --package sft python apps/sft/infer.py \
-  --adapter-dir nabin2004/AOS-gemma4-31b-manim-sft \
+  --adapter-dir nabin2004/AOS-qwen25-coder-7b-manim-sft \
   --colab \
   --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
@@ -133,19 +136,19 @@ uv run --package sft python apps/sft/infer.py \
 Use a training-set prompt for a quick sanity check:
 
 ```bash
-uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --dataset-index 0
+uv run python infer.py --adapter-dir ./qwen25-coder-7b-manim-ft --dataset-index 0
 ```
 
 One-shot smoke check (no tools — often falls back to base-model lecture prose):
 
 ```bash
-uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --no-tools \
+uv run python infer.py --adapter-dir ./qwen25-coder-7b-manim-ft --no-tools \
   --prompt "Animate a circle."
 ```
 
 | Flag | Description |
 |------|-------------|
-| `--adapter-dir` | Output dir from training, or HF model repo id (default: `gemma4-31b-manim-ft` or Colab Drive path with `--colab`) |
+| `--adapter-dir` | Output dir from training, or HF model repo id (default: `qwen25-coder-7b-manim-ft` or Colab Drive path with `--colab`) |
 | `--prompt` | User task text |
 | `--prompt-file` | Read prompt from a file |
 | `--dataset-index` | Pull `user_prompt` from the HF trajectories dataset |
@@ -167,7 +170,7 @@ Inference validates that the adapter directory saved a training chat template wi
 Hybrid/local coder uses compact `CODE_PROMPT_LOCAL` (Infer-style). Before calling a GGUF “ready”, run a greedy OpenAI-compat probe with that same prompt. Pass = first `run_code` nests Manim inside `manim_write` / `compile_manim_code` (no top-level `from manim import *`):
 
 ```bash
-# Ollama serving AOS-gemma4-31b-manim-gguf
+# Ollama serving AOS-qwen25-coder-7b-manim-gguf
 uv run python diagnostics/codemode_eval_gate.py
 # Optional: probe the long cloud CODE_PROMPT against the 31B GGUF
 uv run python diagnostics/codemode_eval_gate.py --prompt-variant full
@@ -191,7 +194,7 @@ cd apps/sft
 
 uv run python run.py \
   --data-path ../agents/export_traces/coder_sft/tool_trace.train.codemode_clean.jsonl \
-  --output-dir ./gemma4-31b-manim-ft-codemode \
+  --output-dir ./qwen25-coder-7b-manim-ft-codemode \
   --epochs 2 \
   --report-to none
 ```
@@ -205,8 +208,8 @@ Training saves **LoRA adapter weights only**. For vLLM or a merged Hugging Face 
 ```bash
 cd apps/sft
 uv run python merge_adapter.py \
-  --adapter-dir ./gemma4-31b-manim-ft \
-  --output-dir ./gemma4-31b-manim-merged
+  --adapter-dir ./qwen25-coder-7b-manim-ft \
+  --output-dir ./qwen25-coder-7b-manim-merged
 ```
 
 Push merged weights to Hugging Face (separate repo from the LoRA adapter):
@@ -214,17 +217,17 @@ Push merged weights to Hugging Face (separate repo from the LoRA adapter):
 ```bash
 export HF_TOKEN=hf_...   # write token; never commit
 uv run python merge_adapter.py \
-  --adapter-dir ./gemma4-31b-manim-ft \
-  --output-dir ./gemma4-31b-manim-merged \
+  --adapter-dir ./qwen25-coder-7b-manim-ft \
+  --output-dir ./qwen25-coder-7b-manim-merged \
   --push-to-hub
 ```
 
-**Default merged repo:** [nabin2004/AOS-gemma4-31b-manim-merged](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-merged)
+**Default merged repo:** [nabin2004/AOS-qwen25-coder-7b-manim-merged](https://huggingface.co/nabin2004/AOS-qwen25-coder-7b-manim-merged)
 
 | Flag | Description |
 |------|-------------|
 | `--push-to-hub` | Upload merged safetensors + tokenizer after merge |
-| `--hub-repo-id` | HF model repo (default: `nabin2004/AOS-gemma4-31b-manim-merged`) |
+| `--hub-repo-id` | HF model repo (default: `nabin2004/AOS-qwen25-coder-7b-manim-merged`) |
 | `--hub-private` | Create/upload as a private repo |
 | `--hub-revision` | Optional branch or tag for the upload |
 
@@ -249,38 +252,38 @@ cd apps/sft
 
 # 1. Merge (if not done already)
 uv run python merge_adapter.py \
-  --adapter-dir ./gemma4-31b-manim-ft \
-  --output-dir ./gemma4-31b-manim-merged
+  --adapter-dir ./qwen25-coder-7b-manim-ft \
+  --output-dir ./qwen25-coder-7b-manim-merged
 
 # 2. Export GGUF + create Ollama model
 export LLAMA_CPP_DIR=~/llama.cpp
 uv run python export_gguf.py \
-  --model-dir ./gemma4-31b-manim-merged \
-  --output-dir ./gemma4-31b-manim-gguf
+  --model-dir ./qwen25-coder-7b-manim-merged \
+  --output-dir ./qwen25-coder-7b-manim-gguf
 
 # 2b. Export GGUF + push to Hugging Face (separate repo from merged HF weights)
 export HF_TOKEN=hf_...
 uv run python export_gguf.py \
-  --model-dir ./gemma4-31b-manim-merged \
-  --output-dir ./gemma4-31b-manim-gguf \
+  --model-dir ./qwen25-coder-7b-manim-merged \
+  --output-dir ./qwen25-coder-7b-manim-gguf \
   --push-to-hub
 
 # 3. Run locally
-ollama run aos-gemma4-31b-manim
+ollama run aos-qwen25-coder-7b-manim
 ```
 
-**Default GGUF repo:** [nabin2004/AOS-gemma4-31b-manim-gguf](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-gguf)
+**Default GGUF repo:** [nabin2004/AOS-qwen25-coder-7b-manim-gguf](https://huggingface.co/nabin2004/AOS-qwen25-coder-7b-manim-gguf)
 
 | Flag | Description |
 |------|-------------|
 | `--model-dir` | Merged HF directory from `merge_adapter.py` |
 | `--output-dir` | Where GGUF files and `Modelfile` are written |
-| `--model-name` | Ollama model tag (default: `aos-gemma4-31b-manim`) |
+| `--model-name` | Ollama model tag (default: `aos-qwen25-coder-7b-manim`) |
 | `--llama-cpp-dir` | llama.cpp clone path (default: `$LLAMA_CPP_DIR` or `./llama.cpp`) |
 | `--quantize` | Quant type (default: `Q4_K_M`); use `none` for F16 only |
 | `--skip-ollama-create` | Write files only; run `ollama create` yourself |
 | `--push-to-hub` | Upload GGUF + Modelfile to Hugging Face after export |
-| `--hub-repo-id` | HF model repo (default: `nabin2004/AOS-gemma4-31b-manim-gguf`) |
+| `--hub-repo-id` | HF model repo (default: `nabin2004/AOS-qwen25-coder-7b-manim-gguf`) |
 | `--hub-private` | Create/upload as a private repo |
 | `--hub-revision` | Optional branch or tag for the upload |
 | `--upload-f16` | Include F16 intermediate in Hub upload (large; skipped by default) |
@@ -289,9 +292,9 @@ ollama run aos-gemma4-31b-manim
 
 | Artifact | Default repo | Upload command |
 |----------|--------------|----------------|
-| LoRA adapter | [nabin2004/AOS-gemma4-31b-manim-sft](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-sft) | `upload_adapter.py` or `run.py --push-to-hub` |
-| Merged bf16 | [nabin2004/AOS-gemma4-31b-manim-merged](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-merged) | `merge_adapter.py --push-to-hub` |
-| GGUF (Q4_K_M) | [nabin2004/AOS-gemma4-31b-manim-gguf](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-gguf) | `export_gguf.py --push-to-hub` |
+| LoRA adapter | [nabin2004/AOS-qwen25-coder-7b-manim-sft](https://huggingface.co/nabin2004/AOS-qwen25-coder-7b-manim-sft) | `upload_adapter.py` or `run.py --push-to-hub` |
+| Merged bf16 | [nabin2004/AOS-qwen25-coder-7b-manim-merged](https://huggingface.co/nabin2004/AOS-qwen25-coder-7b-manim-merged) | `merge_adapter.py --push-to-hub` |
+| GGUF (Q4_K_M) | [nabin2004/AOS-qwen25-coder-7b-manim-gguf](https://huggingface.co/nabin2004/AOS-qwen25-coder-7b-manim-gguf) | `export_gguf.py --push-to-hub` |
 
 Use the model through Ollama's OpenAI-compatible API at `http://localhost:11434/v1` — see
 [`apps/server/README.md`](../server/README.md).
@@ -300,7 +303,7 @@ Use the model through Ollama's OpenAI-compatible API at `http://localhost:11434/
 
 Training saves **LoRA adapter weights only** (not merged). Publish to the Hub with a write token:
 
-**Default model repo:** [nabin2004/AOS-gemma4-31b-manim-sft](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-sft)
+**Default model repo:** [nabin2004/AOS-qwen25-coder-7b-manim-sft](https://huggingface.co/nabin2004/AOS-qwen25-coder-7b-manim-sft)
 
 ### Push after training
 
@@ -317,8 +320,8 @@ Optional flags: `--hub-model-id`, `--hub-private`.
 ```bash
 export HF_TOKEN=hf_...
 cd apps/sft
-uv run python upload_adapter.py --adapter-dir ./gemma4-31b-manim-ft
-uv run python upload_adapter.py --adapter-dir /content/gemma4-31b-manim-ft --colab
+uv run python upload_adapter.py --adapter-dir ./qwen25-coder-7b-manim-ft
+uv run python upload_adapter.py --adapter-dir /content/qwen25-coder-7b-manim-ft --colab
 ```
 
 Uploads adapter weights, tokenizer, and `model_card.md` as the repo README. Skips `checkpoint-*` and other training artifacts.
@@ -342,7 +345,7 @@ os.environ["HF_TOKEN"] = "..."  # Colab secret
 %cd /content/AOS
 !pip install uv
 !uv sync --package sft
-!uv run --package sft python apps/sft/preflight_gemma4.py --colab
+!uv run --package sft python apps/sft/preflight_sft.py --colab
 !uv run --package sft python apps/sft/run.py --colab --epochs 1 --report-to none
 ```
 
@@ -356,7 +359,7 @@ Infer after training (local adapter):
 
 ```bash
 !uv run --package sft python apps/sft/infer.py \
-  --adapter-dir /content/gemma4-31b-manim-ft \
+  --adapter-dir /content/qwen25-coder-7b-manim-ft \
   --colab \
   --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
@@ -365,30 +368,28 @@ Or infer from the Hub (no local adapter copy):
 
 ```bash
 !uv run --package sft python apps/sft/infer.py \
-  --adapter-dir nabin2004/AOS-gemma4-31b-manim-sft \
+  --adapter-dir nabin2004/AOS-qwen25-coder-7b-manim-sft \
   --colab \
   --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
 
 | Environment | Flag | Default output dir |
 |-------------|------|--------------------|
-| **Colab** | `--colab` (auto when `COLAB_RELEASE_TAG` set) | `/content/drive/MyDrive/gemma4-31b-manim-ft` |
+| **Colab** | `--colab` (auto when `COLAB_RELEASE_TAG` set) | `/content/drive/MyDrive/qwen25-coder-7b-manim-ft` |
 | Kaggle | `--kaggle --output-dir /kaggle/working/...` | notebook output |
-| RunPod | `--runpod` | `/workspace/gemma4-31b-manim-ft` |
-| Local | omit flags | `apps/sft/gemma4-31b-manim-ft` |
+| RunPod | `--runpod` | `/workspace/qwen25-coder-7b-manim-ft` |
+| Local | omit flags | `apps/sft/qwen25-coder-7b-manim-ft` |
 
 Notes:
 
-- `--colab` applies the same GPU-safe training settings as `--kaggle` (batch 1, seq 2048, no packing).
-- If Drive is not mounted, output falls back to `/content/gemma4-31b-manim-ft` (ephemeral — lost when runtime disconnects).
+- `--colab` applies the same GPU-safe training settings as `--kaggle` (batch 1, seq 4096, packing off).
+- If Drive is not mounted, output falls back to `/content/qwen25-coder-7b-manim-ft` (ephemeral — lost when runtime disconnects).
 - Override output with `--output-dir /content/drive/MyDrive/my-run` or `export SFT_OUTPUT_DIR=...`.
-- RunPod users: use `--runpod` instead (saves under `/workspace/gemma4-31b-manim-ft`).
+- RunPod users: use `--runpod` instead (saves under `/workspace/qwen25-coder-7b-manim-ft`).
 
-## Run on Kaggle (T4×2) — not recommended for 31B
+## Run on Kaggle (T4×2)
 
-The `--kaggle` preset targets T4 GPUs and will **warn** when the default base model is `google/gemma-4-31B-it` (needs ~80 GB VRAM). Use Vertex ultragpu or a local A100 80GB+ for full training.
-
-For smoke tests on smaller Gemma 4 sizes only, use a Kaggle notebook with **GPU T4 x2** and pass `--model-id google/gemma-4-E4B-it` explicitly. Add a notebook secret `HF_TOKEN` with a Hugging Face token that has accepted the [google/gemma-4-31B-it](https://huggingface.co/google/gemma-4-31B-it) license.
+The `--kaggle` preset targets T4 GPUs and is suitable for **Qwen2.5-Coder-7B** QLoRA (seq 4096, packing off). Add a notebook secret `HF_TOKEN` for Hub downloads.
 
 ```bash
 export UV_LINK_MODE=copy
@@ -398,22 +399,21 @@ cd /kaggle/working && git clone https://github.com/<your-org>/AOS.git AOS && cd 
 uv sync --package sft
 uv run --package sft python apps/sft/run.py --kaggle \
   --report-to none \
-  --output-dir /kaggle/working/gemma4-31b-manim-ft
+  --output-dir /kaggle/working/qwen25-coder-7b-manim-ft
 ```
 
 Notes:
 
 - The `--kaggle` preset is also applied automatically when `KAGGLE_KERNEL_RUN_TYPE` is set.
-- Dataset rows use structured `tool_calls` + `tool` messages (Gemma 4 native format); pre-exported `messages` JSONL is passed through unchanged.
-- Gemma 4 uses [`templates/gemma4_training.jinja`](templates/gemma4_training.jinja) with `assistant_only_loss=True` so tool errors are visible but not trained on.
-- Run [`preflight_gemma4.py`](preflight_gemma4.py) before a long run (replaces manual template inspection).
-- Default attention is **`eager`** (Gemma 4 unified arch). Use `--attn-implementation sdpa` only after a successful preflight if you need the speed/VRAM tradeoff.
+- Dataset rows use structured `tool_calls` + `tool` messages (OpenAI-style); arguments are normalized to dicts; pre-exported `messages` JSONL is passed through after normalization.
+- Default training template is [`templates/qwen25_coder_training.jinja`](templates/qwen25_coder_training.jinja) with `assistant_only_loss=True` so tool errors are visible but not trained on. Legacy Gemma Jinja remains for `--model-id` overrides.
+- Run [`preflight_sft.py`](preflight_sft.py) before a long run (replaces manual template inspection).
+- Default attention is **`sdpa`**. Packing defaults to **off** (long agent trajectories).
 - Harmless log noise is expected: BitsAndBytes `FutureWarning`, `warmup_ratio` deprecation, wandb init delay.
-- The Kaggle preset disables sequence packing and strips unused vision/audio towers.
 - Adapter weights and tokenizer are written under `/kaggle/working/` (persist as notebook output).
-- If you hit CUDA OOM, lower sequence length: `--seq-len 1024` (keep `--batch-size 1`).
+- If you hit CUDA OOM, lower sequence length: `--seq-len 2048` (keep `--batch-size 1`).
 - `UV_LINK_MODE=copy` avoids uv hardlink warnings on Kaggle's filesystem.
-- Set `HF_TOKEN` as a Kaggle secret for faster Hub downloads and gated model access.
+- Set `HF_TOKEN` as a Kaggle secret for faster Hub downloads.
 - Optional: add a `WANDB_API_KEY` secret to re-enable wandb logging with `--kaggle`.
 
 ## Publish / refresh dataset on Hugging Face
@@ -438,7 +438,7 @@ cp apps/training/.env.example apps/training/.env
 # Set WANDB_API_KEY in apps/training/.env (never commit)
 ```
 
-Optional env vars: `WANDB_ENTITY`, `WANDB_PROJECT_SFT`, `WANDB_RUN_NAME`. Default run name: `gemma4-31b-manim-sft` (group `gemma4-31b-manim`, tags `gemma4-31b,manim,aos,sft`). Disable with `--report-to none`.
+Optional env vars: `WANDB_ENTITY`, `WANDB_PROJECT_SFT`, `WANDB_RUN_NAME`. Default run name: `qwen25-coder-7b-manim-sft` (group `qwen25-coder-7b-manim`, tags `qwen25-coder-7b,manim,aos,sft`). Disable with `--report-to none`.
 
 ## Run on Vertex AI
 
@@ -446,13 +446,7 @@ For GPU training on Google Cloud (Custom Jobs, GCS staging, Artifact Registry im
 
 ## Dependencies
 
-Gemma 4 requires a recent **transformers** build with `gemma4_unified` support (`>=4.51.0` in `pyproject.toml`). If model load fails on Colab/Kaggle with an unknown architecture error:
-
-```bash
-pip install "git+https://github.com/huggingface/transformers.git"
-```
-
-4-bit training requires `bitsandbytes` (CUDA). Install via workspace:
+Requires a recent **transformers** / **trl** / **peft** stack (`apps/sft/pyproject.toml`). 4-bit training requires `bitsandbytes` (CUDA). Install via workspace:
 
 ```bash
 cd apps/sft && uv sync

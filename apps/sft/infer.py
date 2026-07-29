@@ -340,6 +340,7 @@ def generate_with_tools(
     max_new_tokens: int,
     temperature: float,
     top_p: float,
+    model_id: str | None = None,
 ) -> tuple[str, list[dict]]:
     """Multi-turn tool loop matching SFT trajectory formatting.
 
@@ -358,7 +359,7 @@ def generate_with_tools(
             temperature=temperature,
             top_p=top_p,
         )
-        assistant = assistant_message_from_generation(raw)
+        assistant = assistant_message_from_generation(raw, model_id=model_id)
         messages.append(assistant)
         tool_calls = assistant.get("tool_calls") or []
         if not tool_calls:
@@ -487,6 +488,7 @@ def main() -> int:
         max_new_tokens=args.max_new_tokens,
         temperature=args.temperature,
         top_p=args.top_p,
+        model_id=config.model_id,
     )
     n_tools = sum(1 for m in messages if m.get("role") == "tool")
     print(f"\n=== Transcript ({len(messages)} messages, {n_tools} tool results) ===")

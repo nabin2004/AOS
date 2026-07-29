@@ -1,6 +1,6 @@
 ---
 license: apache-2.0
-base_model: google/gemma-4-31B-it
+base_model: Qwen/Qwen2.5-Coder-7B-Instruct
 library_name: peft
 pipeline_tag: text-generation
 language:
@@ -8,23 +8,23 @@ language:
 tags:
   - manim
   - lora
-  - gemma4
-  - gemma4-31b
+  - qwen2.5-coder
+  - qwen25-coder-7b
   - tool-use
   - code-generation
   - animation
   - sft
 ---
 
-# AOS Gemma 4 31B Manim SFT (LoRA)
+# AOS Qwen2.5-Coder-7B Manim SFT (LoRA)
 
 LoRA adapter fine-tuned on Code Agent trajectories for **Manim animation generation** via multi-turn tool calling (`run_code` + workspace tools).
 
-**Model URL:** https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-sft
+**Model URL:** https://huggingface.co/nabin2004/AOS-qwen25-coder-7b-manim-sft
 
 ## Base model
 
-This adapter is trained on top of [google/gemma-4-31B-it](https://huggingface.co/google/gemma-4-31B-it). You must accept the Gemma license and set `HF_TOKEN` to download the base weights.
+This adapter is trained on top of [Qwen/Qwen2.5-Coder-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct) (Apache 2.0). See [`docs/MODEL_SELECTION.md`](docs/MODEL_SELECTION.md) for the selection rationale.
 
 ## Training data
 
@@ -38,11 +38,11 @@ Fine-tuned on [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin
 import os
 import torch
 from peft import PeftModel
-from transformers import AutoModelForImageTextToText, AutoTokenizer, BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
-token = os.environ["HF_TOKEN"]
-base_id = "google/gemma-4-31B-it"
-adapter_id = "nabin2004/AOS-gemma4-31b-manim-sft"
+token = os.environ.get("HF_TOKEN")
+base_id = "Qwen/Qwen2.5-Coder-7B-Instruct"
+adapter_id = "nabin2004/AOS-qwen25-coder-7b-manim-sft"
 
 bnb = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -51,7 +51,7 @@ bnb = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.bfloat16,
 )
 
-base = AutoModelForImageTextToText.from_pretrained(
+base = AutoModelForCausalLM.from_pretrained(
     base_id,
     quantization_config=bnb,
     device_map="auto",
@@ -70,43 +70,6 @@ The adapter is trained on **multi-turn Code Agent tool calls**, not single-turn 
 ```bash
 cd apps/sft
 uv run python infer.py \
-  --adapter-dir nabin2004/AOS-gemma4-31b-manim-sft \
+  --adapter-dir nabin2004/AOS-qwen25-coder-7b-manim-sft \
   --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
-
-Colab:
-
-```bash
-uv run --package sft python apps/sft/infer.py \
-  --adapter-dir nabin2004/AOS-gemma4-31b-manim-sft \
-  --colab \
-  --prompt "Create a short Manim scene explaining eigenvectors in 2D."
-```
-
-## Files
-
-| File | Description |
-|------|-------------|
-| `adapter_config.json` | PEFT LoRA configuration |
-| `adapter_model.safetensors` | LoRA weights |
-| `tokenizer_config.json` | Training chat template (includes `{% generation %}` markers) |
-
-## Training
-
-```bash
-cd apps/sft
-uv run python run.py --epochs 2 --report-to wandb --push-to-hub
-```
-
-Or upload an existing adapter:
-
-```bash
-export HF_TOKEN=hf_...
-uv run python upload_adapter.py --adapter-dir ./gemma4-31b-manim-ft
-```
-
-## Related
-
-- [AOS-Trajectories dataset](https://huggingface.co/datasets/nabin2004/AOS-Trajectories)
-- [ManiBench](https://huggingface.co/datasets/nabin2004/ManiBench) — GRPO benchmark (Phase 2)
-- [AOS repository](https://github.com/nabin2004/AOS)

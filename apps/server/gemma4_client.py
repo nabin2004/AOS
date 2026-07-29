@@ -41,18 +41,19 @@ if str(TRAINING_ROOT) not in sys.path:
     sys.path.insert(0, str(TRAINING_ROOT))
 
 from model_identity import (  # noqa: E402
-    BASE_MODEL_ID,
-    HUB_SFT_REPO,
-    OLLAMA_MODEL_TAG,
+    LEGACY_BASE_MODEL_ID,
+    SERVING_MODEL_ID,
+    SERVING_OLLAMA_MODEL_TAG,
 )
 
 DEFAULT_BASE_URL = "http://localhost:8000/v1"
 DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/v1"
-DEFAULT_OLLAMA_MODEL = OLLAMA_MODEL_TAG
-DEFAULT_MODEL = BASE_MODEL_ID
-DEFAULT_BASE_MODEL = BASE_MODEL_ID
+DEFAULT_OLLAMA_MODEL = SERVING_OLLAMA_MODEL_TAG
+DEFAULT_MODEL = SERVING_MODEL_ID
+DEFAULT_BASE_MODEL = LEGACY_BASE_MODEL_ID
 DEFAULT_LORA_MODULE = "manim-sft"
-DEFAULT_ADAPTER_REPO = HUB_SFT_REPO
+# Serving still uses the published Gemma adapter until Qwen GGUF/serving lands.
+DEFAULT_ADAPTER_REPO = "nabin2004/AOS-gemma4-31b-manim-sft"
 DEFAULT_LORA_RANK = 64
 
 # Per-image token budgets vLLM accepts for Gemma 4's dynamic vision resolution.

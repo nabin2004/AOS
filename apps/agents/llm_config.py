@@ -15,13 +15,13 @@ TRAINING_ROOT = Path(__file__).resolve().parents[1] / "training"
 if str(TRAINING_ROOT) not in sys.path:
     sys.path.insert(0, str(TRAINING_ROOT))
 
-from model_identity import OLLAMA_HF_GGUF_REF  # noqa: E402
+from model_identity import SERVING_OLLAMA_HF_GGUF_REF  # noqa: E402
 
 AgentRole = Literal["classifier", "planner", "coder", "animation"]
 
 _PIPELINE_ROLES: tuple[AgentRole, ...] = ("classifier", "planner", "coder", "animation")
 
-_DEFAULT_OLLAMA = f"ollama:{OLLAMA_HF_GGUF_REF}"
+_DEFAULT_OLLAMA = f"ollama:{SERVING_OLLAMA_HF_GGUF_REF}"
 _DEFAULT_OPENROUTER = "openrouter:openai/gpt-4o-mini"
 
 _PROFILES: dict[str, dict[AgentRole, str]] = {

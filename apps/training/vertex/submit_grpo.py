@@ -56,7 +56,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Skip frozen SFT adapter (train GRPO LoRA on base only)",
     )
-    parser.set_defaults(display_name="aos-grpo-gemma4-31b-manim")
+    parser.set_defaults(display_name="aos-grpo-qwen25-coder-7b-manim")
     return parser
 
 

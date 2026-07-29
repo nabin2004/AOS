@@ -7,6 +7,7 @@ from export_traces.codemode_contract import (
     run_code_has_multiline_single_quoted_string,
     run_code_has_nested_run_code,
     run_code_has_star_import,
+    run_code_has_tool_redefinition,
     tool_trace_violates_codemode,
 )
 from export_traces.validate import validate_messages_row
@@ -146,3 +147,80 @@ def test_multiline_single_quote_fails() -> None:
     code = 'await manim_write(code="line1\nline2", scene_name="Demo")'
     assert run_code_has_multiline_single_quoted_string(code)
     assert "codemode_multiline_single_quote" in codemode_violations(code)
+
+
+def test_async_def_compile_manim_code_fails() -> None:
+    """Lorenz-style mock: model redefines compile_manim_code inside run_code."""
+    code = (
+        "async def compile_manim_code(code: str, scene_name: str = 'scene') -> str:\n"
+        "    import json\n"
+        '    return json.dumps({"status": "success"})\n'
+        "\n"
+        'code = """\n'
+        "from manim import *\n"
+        "class LorenzAttractor(Scene):\n"
+        "    def construct(self):\n"
+        "        pass\n"
+        '"""\n'
+        "print(await compile_manim_code(code=code, scene_name='LorenzAttractor'))\n"
+    )
+    assert run_code_has_tool_redefinition(code)
+    assert "codemode_tool_redefinition" in codemode_violations(code)
+    row = {
+        "messages": [
+            {"role": "user", "content": "lorenz"},
+            {
+                "role": "assistant",
+                "content": None,
+                "tool_calls": [
+                    {
+                        "id": "c1",
+                        "type": "function",
+                        "function": {
+                            "name": "run_code",
+                            "arguments": {"code": code},
+                        },
+                    }
+                ],
+            },
+        ]
+    }
+    assert "codemode_tool_redefinition" in tool_trace_violates_codemode(row)
+
+
+def test_await_compile_without_redefinition_passes() -> None:
+    code = (
+        'code = """\n'
+        "from manim import *\n"
+        "class Demo(Scene):\n"
+        "    def construct(self):\n"
+        "        pass\n"
+        '"""\n'
+        "await manim_write(code=code, scene_name='Demo')\n"
+        "await compile_manim_code(code=code, scene_name='Demo')\n"
+    )
+    assert not run_code_has_tool_redefinition(code)
+    assert "codemode_tool_redefinition" not in codemode_violations(code)
+
+
+def test_tool_name_only_inside_manim_string_passes() -> None:
+    code = (
+        'code = """\n'
+        "from manim import *\n"
+        "# mention compile_manim_code in a comment inside the scene string\n"
+        "class Demo(Scene):\n"
+        "    def construct(self):\n"
+        "        pass\n"
+        '"""\n'
+        "await compile_manim_code(code=code, scene_name='Demo')\n"
+    )
+    assert not run_code_has_tool_redefinition(code)
+
+
+def test_from_tools_import_fails() -> None:
+    code = (
+        "from tools import compile_manim_code\n"
+        "await compile_manim_code(code='x', scene_name='Demo')\n"
+    )
+    assert run_code_has_tool_redefinition(code)
+    assert "codemode_tool_redefinition" in codemode_violations(code)

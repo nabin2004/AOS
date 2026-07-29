@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fine-tune Gemma 4 on Code Agent trajectories.
+"""Fine-tune Qwen2.5-Coder on Code Agent trajectories.
 
 Usage (from apps/sft):
 
@@ -20,9 +20,9 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 
-from chat_template import prepare_training_tokenizer
+from chat_template import prepare_training_tokenizer, validate_training_template
 from config import TrainingConfig, build_arg_parser
-from data import load_training_dataset
+from data import load_training_dataset, log_token_length_stats
 from model import load_model, load_tokenizer
 from trainer import build_trainer, train_and_save
 
@@ -114,7 +114,15 @@ def main() -> int:
 
     tokenizer = load_tokenizer(config.model_id)
     config = prepare_training_tokenizer(tokenizer, config)
+    validate_training_template(
+        tokenizer, require_generation_markers=config.assistant_only_loss
+    )
+    print(
+        f"Chat template ready (assistant_only_loss={config.assistant_only_loss}, "
+        f"packing={config.packing}, seq_len={config.seq_len})"
+    )
     dataset = load_training_dataset(config)
+    log_token_length_stats(tokenizer, dataset, config.seq_len)
     model = load_model(config)
     trainer = build_trainer(model, tokenizer, dataset, config)
     train_and_save(trainer, tokenizer, config)

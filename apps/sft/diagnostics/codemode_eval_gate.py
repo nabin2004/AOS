@@ -33,9 +33,9 @@ sys.path.insert(0, str(SFT_ROOT))
 sys.path.insert(0, str(TRAINING_ROOT))
 
 from codemode_contract import extract_run_code_body, run_code_has_star_import  # noqa: E402
-from model_identity import OLLAMA_HF_GGUF_REF  # noqa: E402
+from model_identity import SERVING_OLLAMA_HF_GGUF_REF  # noqa: E402
 
-DEFAULT_MODEL = OLLAMA_HF_GGUF_REF
+DEFAULT_MODEL = SERVING_OLLAMA_HF_GGUF_REF
 DEFAULT_BASE = "http://127.0.0.1:11434/v1"
 
 # Keep close to the diagnosis short prompt that greedily passes CodeMode on E2B GGUF.

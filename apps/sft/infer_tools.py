@@ -1,4 +1,7 @@
-"""Tool schemas, Gemma tool-call parsing, and Manim/CodeMode execution for infer.py.
+"""Tool schemas, tool-call parsing, and Manim/CodeMode execution for infer.py.
+
+Supports Qwen2.5-Coder (``<tool_call>...</tool_call>``) and legacy Gemma 4
+(``<|tool_call>call:name{...}<tool_call|>``) markup.
 
 Training trajectories almost exclusively use CodeMode ``run_code`` (see
 ``apps/agents/training_data/trajectories.jsonl``). ``format_trajectory_messages``
@@ -18,7 +21,7 @@ import re
 import sys
 import textwrap
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 
 AGENTS_ROOT = Path(__file__).resolve().parents[1] / "agents"
 WORKSPACE_INFER_ROOT = AGENTS_ROOT / "workspace" / "infer_runs"
@@ -26,6 +29,12 @@ WORKSPACE_INFER_ROOT = AGENTS_ROOT / "workspace" / "infer_runs"
 TOOL_CALL_START = "<|tool_call>call:"
 TOOL_CALL_END = "<tool_call|>"
 STRING_DELIM = '<|"|>'
+QWEN_TOOL_CALL_RE = re.compile(
+    r"<tool_call>\s*(\{.*?\})\s*</tool_call>",
+    re.DOTALL,
+)
+
+ModelFamily = Literal["qwen", "gemma", "auto"]
 
 INFER_SYSTEM_PROMPT = """You are a Manim coding agent. Call tools ONLY via run_code (CodeMode).
 
@@ -389,6 +398,67 @@ def parse_gemma_tool_calls(text: str) -> list[dict[str, Any]]:
     return calls
 
 
+def parse_qwen_tool_calls(text: str) -> list[dict[str, Any]]:
+    """Parse Qwen2-style ``<tool_call>\\n{...}\\n</tool_call>`` blocks."""
+    calls: list[dict[str, Any]] = []
+    for match in QWEN_TOOL_CALL_RE.finditer(text):
+        raw = match.group(1)
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(payload, dict):
+            continue
+        name = payload.get("name")
+        if not isinstance(name, str) or not name:
+            continue
+        arguments = payload.get("arguments", {})
+        if isinstance(arguments, str):
+            try:
+                parsed_args = json.loads(arguments)
+                arguments = parsed_args if isinstance(parsed_args, dict) else {
+                    "input": arguments
+                }
+            except json.JSONDecodeError:
+                arguments = {"input": arguments}
+        elif not isinstance(arguments, dict):
+            arguments = {"input": arguments}
+        calls.append(
+            {
+                "id": f"call_{len(calls)}",
+                "type": "function",
+                "function": {"name": name, "arguments": arguments},
+            }
+        )
+    return calls
+
+
+def resolve_model_family(
+    model_id: str | None = None,
+    *,
+    family: ModelFamily = "auto",
+) -> Literal["qwen", "gemma"]:
+    if family in ("qwen", "gemma"):
+        return family
+    text = (model_id or "").lower()
+    if "gemma" in text:
+        return "gemma"
+    return "qwen"
+
+
+def parse_model_tool_calls(
+    text: str,
+    *,
+    model_id: str | None = None,
+    family: ModelFamily = "auto",
+) -> list[dict[str, Any]]:
+    """Parse tool calls for the active model family (default: Qwen)."""
+    resolved = resolve_model_family(model_id, family=family)
+    if resolved == "gemma":
+        return parse_gemma_tool_calls(text)
+    return parse_qwen_tool_calls(text)
+
+
 def _find_matching_brace(text: str, open_idx: int) -> int:
     depth = 0
     in_string = False
@@ -411,27 +481,28 @@ def _find_matching_brace(text: str, open_idx: int) -> int:
 
 
 def strip_tool_call_markup(text: str) -> str:
-    """Remove tool-call blocks; leftover is plain assistant text."""
-    if TOOL_CALL_START not in text:
-        return text.strip()
+    """Remove Qwen and Gemma tool-call blocks; leftover is plain assistant text."""
+    cleaned = QWEN_TOOL_CALL_RE.sub("", text)
+    if TOOL_CALL_START not in cleaned:
+        return cleaned.strip()
     parts: list[str] = []
     i = 0
-    while i < len(text):
-        start = text.find(TOOL_CALL_START, i)
+    while i < len(cleaned):
+        start = cleaned.find(TOOL_CALL_START, i)
         if start < 0:
-            parts.append(text[i:])
+            parts.append(cleaned[i:])
             break
-        parts.append(text[i:start])
-        brace = text.find("{", start + len(TOOL_CALL_START))
+        parts.append(cleaned[i:start])
+        brace = cleaned.find("{", start + len(TOOL_CALL_START))
         if brace < 0:
-            parts.append(text[start:])
+            parts.append(cleaned[start:])
             break
         try:
-            _, end = _parse_object(text, brace)
+            _, end = _parse_object(cleaned, brace)
         except ValueError:
-            end = _find_matching_brace(text, brace) + 1
-        end = _skip_ws(text, end)
-        if text.startswith(TOOL_CALL_END, end):
+            end = _find_matching_brace(cleaned, brace) + 1
+        end = _skip_ws(cleaned, end)
+        if cleaned.startswith(TOOL_CALL_END, end):
             end += len(TOOL_CALL_END)
         i = end
     return "".join(parts).strip()
@@ -598,13 +669,27 @@ def execute_tool_call(
         )
 
 
-def assistant_message_from_generation(raw: str) -> dict[str, Any]:
+def assistant_message_from_generation(
+    raw: str,
+    *,
+    model_id: str | None = None,
+    family: ModelFamily = "auto",
+) -> dict[str, Any]:
     """Build an OpenAI-style assistant message from a decoded model turn."""
-    tool_calls = parse_gemma_tool_calls(raw)
+    tool_calls = parse_model_tool_calls(raw, model_id=model_id, family=family)
+    # Auto-fallback: if preferred family found nothing, try the other markup.
+    if not tool_calls and family == "auto":
+        alt = (
+            parse_gemma_tool_calls(raw)
+            if resolve_model_family(model_id) == "qwen"
+            else parse_qwen_tool_calls(raw)
+        )
+        tool_calls = alt
     text = strip_tool_call_markup(raw)
     # Drop trailing special tokens often left when skip_special_tokens=False.
     text = re.sub(r"<\|[^|>]+(?:\|>)?$", "", text).strip()
     text = re.sub(r"<eos>\s*$", "", text).strip()
+    text = re.sub(r"<\|im_end\|>\s*$", "", text).strip()
     msg: dict[str, Any] = {"role": "assistant"}
     if tool_calls:
         msg["content"] = text or None

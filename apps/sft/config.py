@@ -23,9 +23,25 @@ from model_identity import (  # noqa: E402
     WANDB_TAGS,
 )
 
-LANGUAGE_MODEL_LORA_TARGETS = (
+# Dense Qwen / Llama-style modules (default base: Qwen2.5-Coder-7B-Instruct).
+DENSE_LORA_TARGETS = (
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj",
+)
+
+# Gemma 4 multimodal backbone: LoRA only under language_model.*.
+GEMMA_LANGUAGE_MODEL_LORA_TARGETS = (
     r".*\.language_model.*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)"
 )
+
+
+def _is_gemma_model_id(model_id: str) -> bool:
+    return "gemma" in model_id.lower()
 
 
 @dataclass
@@ -36,7 +52,7 @@ class TrainingConfig:
     data_path: Path | None = None
     output_dir: Path = SFT_ROOT / SFT_OUTPUT_DIR_NAME
     use_4bit: bool = True
-    seq_len: int = 8192
+    seq_len: int = 16384
     epochs: int = 2
     batch_size: int = 1
     grad_accum: int = 8
@@ -47,10 +63,10 @@ class TrainingConfig:
     wandb_project: str = "aos-sft"
     wandb_group: str = WANDB_RUN_GROUP
     wandb_tags: tuple[str, ...] = field(default_factory=lambda: WANDB_TAGS)
-    attn_implementation: str = "eager"
+    attn_implementation: str = "sdpa"
     device_map: str | dict[str, int] = "auto"
     strip_multimodal_towers: bool = False
-    packing: bool = True
+    packing: bool = False
     assistant_only_loss: bool = True
     use_liger_kernel: bool = False
     push_to_hub: bool = False
@@ -68,15 +84,25 @@ class TrainingConfig:
         )
 
     def lora_config(self) -> LoraConfig:
+        if _is_gemma_model_id(self.model_id):
+            target_modules: str | list[str] | tuple[str, ...] = (
+                GEMMA_LANGUAGE_MODEL_LORA_TARGETS
+            )
+            modules_to_save = ["embed_tokens", "lm_head"]
+            ensure_weight_tying = True
+        else:
+            target_modules = list(DENSE_LORA_TARGETS)
+            modules_to_save = ["embed_tokens", "lm_head"]
+            ensure_weight_tying = True
         return LoraConfig(
             r=64,
             lora_alpha=128,
             lora_dropout=0.05,
-            target_modules=LANGUAGE_MODEL_LORA_TARGETS,
+            target_modules=target_modules,
             bias="none",
             task_type="CAUSAL_LM",
-            modules_to_save=["embed_tokens", "lm_head"],
-            ensure_weight_tying=True,
+            modules_to_save=modules_to_save,
+            ensure_weight_tying=ensure_weight_tying,
         )
 
     def sft_config(self) -> SFTConfig:
@@ -127,6 +153,8 @@ class TrainingConfig:
             config = replace(config, output_dir=_resolve_path(Path(args.output_dir)))
         if args.model_id is not None:
             config = replace(config, model_id=args.model_id)
+            if _is_gemma_model_id(args.model_id) and args.attn_implementation is None:
+                config = replace(config, attn_implementation="eager")
         if args.epochs is not None:
             config = replace(config, epochs=args.epochs)
         if args.batch_size is not None:
@@ -147,6 +175,10 @@ class TrainingConfig:
             config = replace(config, strip_multimodal_towers=False)
         if args.attn_implementation is not None:
             config = replace(config, attn_implementation=args.attn_implementation)
+        if getattr(args, "packing", None) is True:
+            config = replace(config, packing=True)
+        if getattr(args, "no_packing", None) is True:
+            config = replace(config, packing=False)
         if args.use_liger_kernel:
             config = replace(config, use_liger_kernel=True)
         if args.push_to_hub:
@@ -170,26 +202,27 @@ def _liger_kernel_available() -> bool:
 
 
 def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
-    if config.model_id == BASE_MODEL_ID:
+    if _is_gemma_model_id(config.model_id):
         print(
             "WARNING: --kaggle/--colab presets target T4 GPUs and are not suitable "
-            f"for {BASE_MODEL_ID} (needs ~80GB VRAM). Use Vertex ultragpu or a local "
-            "A100 80GB+ instead.",
+            f"for {config.model_id} (needs ~80GB VRAM). Use Vertex ultragpu or a "
+            "local A100 80GB+ instead.",
             file=sys.stderr,
         )
     report_to = config.report_to
     if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
         report_to = "none"
+    attn = "eager" if _is_gemma_model_id(config.model_id) else "sdpa"
     return replace(
         config,
         batch_size=1,
         grad_accum=8,
-        seq_len=2048,
+        seq_len=4096,
         num_proc=2,
         device_map={"": 0},
-        strip_multimodal_towers=True,
+        strip_multimodal_towers=_is_gemma_model_id(config.model_id),
         packing=False,
-        attn_implementation="eager",
+        attn_implementation=attn,
         report_to=report_to,
     )
 
@@ -257,7 +290,7 @@ def _resolve_path(path: Path) -> Path:
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Fine-tune Gemma 4 on agent trajectories"
+        description="Fine-tune Qwen2.5-Coder on agent trajectories"
     )
     parser.add_argument(
         "--data-path",
@@ -290,7 +323,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--no-4bit",
         action="store_true",
-        help="Disable 4-bit quantization (requires ~80GB+ VRAM for full BF16)",
+        help="Disable 4-bit quantization (requires more VRAM for full BF16)",
     )
     parser.add_argument(
         "--report-to",
@@ -300,7 +333,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--kaggle",
         action="store_true",
-        help="Apply Kaggle T4-friendly defaults (batch 1, seq 2048, GPU 0)",
+        help="Apply Kaggle T4-friendly defaults (batch 1, seq 4096, GPU 0)",
     )
     parser.add_argument(
         "--runpod",
@@ -316,7 +349,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--seq-len",
         type=int,
         default=None,
-        help="Max sequence length for SFT packing (default: 8192, 2048 with --kaggle)",
+        help="Max sequence length for SFT (default: 16384, 4096 with --kaggle)",
+    )
+    parser.add_argument(
+        "--packing",
+        action="store_true",
+        help="Enable sequence packing (off by default; unsafe for long trajectories)",
+    )
+    parser.add_argument(
+        "--no-packing",
+        action="store_true",
+        help="Disable sequence packing (default behavior)",
     )
     parser.add_argument(
         "--grad-accum",
@@ -332,13 +375,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--no-strip-towers",
         action="store_true",
-        help="Keep vision/audio towers loaded (uses more VRAM)",
+        help="Keep vision/audio towers loaded (Gemma only; uses more VRAM)",
     )
     parser.add_argument(
         "--attn-implementation",
         choices=("eager", "sdpa", "flash_attention_2"),
         default=None,
-        help='Attention backend (default: "eager" for Gemma 4 unified arch)',
+        help='Attention backend (default: "sdpa"; "eager" for Gemma 4)',
     )
     parser.add_argument(
         "--use-liger-kernel",

@@ -31,7 +31,7 @@ if str(TRAINING_ROOT) not in sys.path:
     sys.path.insert(0, str(TRAINING_ROOT))
 
 from wandb_env import configure_wandb, resolve_report_to  # noqa: E402
-from model_identity import BASE_MODEL_ID, HUB_SFT_REPO  # noqa: E402
+from model_identity import HUB_SFT_REPO, SERVING_MODEL_ID  # noqa: E402
 
 
 def main() -> int:
@@ -46,7 +46,7 @@ def main() -> int:
             group=config.wandb_group,
             tags=[*config.wandb_tags, "grpo"],
             config={
-                "base_model": config.base_model or BASE_MODEL_ID,
+                "base_model": config.base_model or SERVING_MODEL_ID,
                 "sft_lora_path": str(config.sft_lora_path),
                 "hub_sft_repo": HUB_SFT_REPO,
                 "output_dir": str(config.output_dir),
