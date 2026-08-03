@@ -1,6 +1,6 @@
-# SFT — Gemma 4 Manim Trajectory Fine-Tuning
+# SFT — Gemma 4 Manim Instruction Fine-Tuning
 
-Fine-tunes **Gemma 4 31B IT** on Code Agent trajectories using LoRA + TRL `SFTTrainer`.
+Fine-tunes **Gemma 4 31B IT** on Manim instruction chat pairs using LoRA + TRL `SFTTrainer`.
 
 **Base model:** [`google/gemma-4-31B-it`](https://huggingface.co/google/gemma-4-31B-it) (~80 GB VRAM for 4-bit LoRA at seq 8192). Kaggle T4 presets are not suitable for full 31B training.
 
@@ -25,35 +25,43 @@ Fine-tunes **Gemma 4 31B IT** on Code Agent trajectories using LoRA + TRL `SFTTr
 
 ## Dataset
 
-**Default:** [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories) on Hugging Face (public).
+**Default:** [nabin2004/manim-sft](https://huggingface.co/datasets/nabin2004/manim-sft) on Hugging Face (38,491 rows).
 
 | HF path | Use |
 |---------|-----|
-| `trajectories.jsonl` | Raw agent trajectories — **used by this trainer** |
-| `tool_trace/train.jsonl` | OpenAI-style tool-calling format (export / external finetune) |
-| `tool_trace/val.jsonl` | Held-out tool trace split |
+| `data/train.jsonl` | Manim instruction chat pairs — **used by this trainer** |
 
-Local override: `--data-path ../agents/training_data/trajectories.jsonl`
+Each row has pre-built `messages` (system → user → assistant). The assistant turn is full Manim Python source. No tool calls.
 
-### Raw trajectory schema
+**Legacy agent trajectories:** [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories) (`trajectories.jsonl`, `tool_trace/*.jsonl`) — use `--dataset-repo nabin2004/AOS-Trajectories --dataset-file trajectories.jsonl` or `--data-path`.
+
+Local override: `--data-path /path/to/train.jsonl`
+
+### manim-sft schema
 
 One JSON object per line:
 
-- `user_prompt` (or `prompt`) — user task
-- `trajectory` — list of `{input, output}` tool-call steps
-- `final_code` — successful Manim script (required)
-- `summary` (or `narration`) — optional narration text
-- `success` — records with `success: false` or missing `final_code` are skipped
+- `messages` — list of `{role, content}` turns (system, user, assistant)
+- `metadata` — optional provenance (`source`, `quality_tier`, etc.)
+
+Legacy trajectory rows (`user_prompt`, `trajectory`, `final_code`) are still supported when using `--data-path` or AOS-Trajectories.
 
 ## Usage
 
 ```bash
 cd apps/sft
 uv run python run.py
-uv run python run.py --dataset-repo nabin2004/AOS-Trajectories
+uv run python run.py --dataset-repo nabin2004/manim-sft --dataset-file data/train.jsonl
 uv run python run.py --data-path ../agents/training_data/trajectories.jsonl
-uv run python run.py --output-dir ./my-run --epochs 3 --batch-size 1
+uv run python run.py --output-dir ./my-run --epochs 1 --batch-size 1
 uv run python run.py --no-4bit --report-to none
+```
+
+Post-training inference for manim-sft models uses direct codegen (not the Code Agent tool loop):
+
+```bash
+uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --no-tools --prompt "Animate a circle."
+uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --dataset-index 0 --no-tools
 ```
 
 ### CLI flags
@@ -61,8 +69,8 @@ uv run python run.py --no-4bit --report-to none
 
 | Flag              | Description                                              |
 | ----------------- | -------------------------------------------------------- |
-| `--dataset-repo`  | HF dataset id (default: `nabin2004/AOS-Trajectories`)    |
-| `--dataset-file`  | File within HF repo (default: `trajectories.jsonl`)      |
+| `--dataset-repo`  | HF dataset id (default: `nabin2004/manim-sft`)    |
+| `--dataset-file`  | File within HF repo (default: `data/train.jsonl`)      |
 | `--data-path`     | Local trajectory JSONL override (skips Hub download)      |
 | `--output-dir`    | Output directory for adapter + tokenizer                 |
 | `--model-id`      | Hugging Face model id (default: `google/gemma-4-31B-it`) |

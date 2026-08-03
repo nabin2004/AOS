@@ -35,7 +35,7 @@ Merged from [google/gemma-4-31B-it](https://huggingface.co/google/gemma-4-31B-it
 
 ## Training data
 
-Fine-tuned on [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories) using the AOS Phase 1 SFT trainer ([`apps/sft`](https://github.com/nabin2004/AOS/tree/master/apps/sft)).
+Fine-tuned on [nabin2004/manim-sft](https://huggingface.co/datasets/nabin2004/manim-sft) using the AOS SFT trainer ([`apps/sft`](https://github.com/nabin2004/AOS/tree/master/apps/sft)).
 
 ## Usage
 

@@ -6,9 +6,9 @@ By default this mirrors the SFT trajectory distribution: multi-turn tool calling
 
 Usage (from apps/sft):
 
-    uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --prompt "Animate a circle."
-    uv run python infer.py --adapter-dir /content/gemma4-31b-manim-ft --colab
-    uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --dataset-index 0
+    uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --no-tools --prompt "Animate a circle."
+    uv run python infer.py --adapter-dir /content/gemma4-31b-manim-ft --colab --no-tools
+    uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --dataset-index 0 --no-tools
     uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --no-tools  # one-shot smoke
 """
 
@@ -79,7 +79,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--dataset-index",
         type=int,
         default=None,
-        help="Use prompt #N from the AOS trajectories dataset on Hugging Face",
+        help="Use prompt #N from the training dataset (manim-sft messages or legacy trajectories)",
     )
     parser.add_argument(
         "--model-id",
@@ -195,18 +195,16 @@ def resolve_prompt(args: argparse.Namespace, config: TrainingConfig) -> str:
     if args.prompt is not None:
         return args.prompt.strip()
     if args.dataset_index is not None:
-        from datasets import load_dataset
+        from data import _load_raw_dataset, extract_user_prompt
 
-        dataset = load_dataset(
-            "json",
-            data_files=f"hf://datasets/{config.dataset_repo}/{config.dataset_file}",
-            split="train",
-        )
+        dataset = _load_raw_dataset(config)
         row = dataset[args.dataset_index]
-        prompt = row.get("user_prompt") or row.get("prompt") or ""
+        prompt = extract_user_prompt(row)
         if not prompt:
-            raise ValueError(f"Dataset row {args.dataset_index} has no prompt field")
-        return str(prompt).strip()
+            raise ValueError(
+                f"Dataset row {args.dataset_index} has no user prompt"
+            )
+        return prompt
     return DEFAULT_PROMPT
 
 

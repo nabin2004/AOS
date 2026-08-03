@@ -31,13 +31,13 @@ LANGUAGE_MODEL_LORA_TARGETS = (
 @dataclass
 class TrainingConfig:
     model_id: str = BASE_MODEL_ID
-    dataset_repo: str = "nabin2004/AOS-Trajectories"
-    dataset_file: str = "trajectories.jsonl"
+    dataset_repo: str = "nabin2004/manim-sft"
+    dataset_file: str = "data/train.jsonl"
     data_path: Path | None = None
     output_dir: Path = SFT_ROOT / SFT_OUTPUT_DIR_NAME
     use_4bit: bool = True
     seq_len: int = 8192
-    epochs: int = 2
+    epochs: int = 1
     batch_size: int = 1
     grad_accum: int = 8
     learning_rate: float = 5e-6
@@ -50,7 +50,7 @@ class TrainingConfig:
     attn_implementation: str = "eager"
     device_map: str | dict[str, int] = "auto"
     strip_multimodal_towers: bool = False
-    packing: bool = True
+    packing: bool = False
     assistant_only_loss: bool = True
     use_liger_kernel: bool = False
     push_to_hub: bool = False
@@ -257,7 +257,7 @@ def _resolve_path(path: Path) -> Path:
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Fine-tune Gemma 4 on agent trajectories"
+        description="Fine-tune Gemma 4 on Manim instruction chat pairs"
     )
     parser.add_argument(
         "--data-path",
@@ -267,12 +267,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--dataset-repo",
         default=None,
-        help='HF dataset id (default: "nabin2004/AOS-Trajectories")',
+        help='HF dataset id (default: "nabin2004/manim-sft")',
     )
     parser.add_argument(
         "--dataset-file",
         default=None,
-        help='File within HF dataset repo (default: "trajectories.jsonl")',
+        help='File within HF dataset repo (default: "data/train.jsonl")',
     )
     parser.add_argument(
         "--output-dir",

@@ -1,7 +1,7 @@
 [project]
 name = "sft"
 version = "0.1.0"
-description = "Gemma 4 LoRA fine-tuning on Code Agent trajectories"
+description = "Gemma 4 LoRA fine-tuning on Manim instruction chat pairs"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

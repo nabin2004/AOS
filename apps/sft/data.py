@@ -15,6 +15,16 @@ def resolve_data_files(config: TrainingConfig) -> str:
     return f"hf://datasets/{config.dataset_repo}/{config.dataset_file}"
 
 
+def extract_user_prompt(sample: dict[str, Any]) -> str:
+    """Return the user turn from a chat row or legacy trajectory record."""
+    messages = sample.get("messages")
+    if isinstance(messages, list):
+        for msg in messages:
+            if msg.get("role") == "user" and msg.get("content"):
+                return str(msg["content"]).strip()
+    return str(sample.get("user_prompt") or sample.get("prompt") or "").strip()
+
+
 def format_trajectory_messages(
     sample: dict[str, Any],
 ) -> dict[str, list[dict[str, Any]]]:
@@ -79,9 +89,23 @@ def _passes_codemode_contract(sample: dict[str, Any]) -> bool:
     return True
 
 
-def load_training_dataset(config: TrainingConfig) -> Dataset:
+def _load_raw_dataset(config: TrainingConfig) -> Dataset:
+    """Load the configured dataset from a local path or Hugging Face."""
+    if config.data_path is not None:
+        return load_dataset(
+            "json", data_files=str(config.data_path), split="train"
+        )
+    if config.dataset_repo == "nabin2004/manim-sft":
+        try:
+            return load_dataset(config.dataset_repo, split="train")
+        except Exception:
+            pass
     data_files = resolve_data_files(config)
-    dataset = load_dataset("json", data_files=data_files, split="train")
+    return load_dataset("json", data_files=data_files, split="train")
+
+
+def load_training_dataset(config: TrainingConfig) -> Dataset:
+    dataset = _load_raw_dataset(config)
     dataset = dataset.filter(_is_trainable_record, num_proc=config.num_proc)
     dataset = dataset.map(
         format_trajectory_messages,

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Fine-tune Gemma 4 on Code Agent trajectories.
+"""Fine-tune Gemma 4 on Manim instruction chat pairs.
 
 Usage (from apps/sft):
 
     uv run python run.py
+    uv run python run.py --dataset-repo nabin2004/manim-sft --dataset-file data/train.jsonl
     uv run python run.py --data-path ../agents/training_data/trajectories.jsonl
-    uv run python run.py --dataset-repo nabin2004/AOS-Trajectories
     uv run python run.py --no-4bit --report-to none
     uv run python run.py --kaggle --report-to none
     uv run python run.py --runpod --epochs 1 --report-to none

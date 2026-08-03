@@ -7,16 +7,65 @@ language:
 tags:
   - manim
   - code-generation
-  - tool-use
   - animation
   - sft
 size_categories:
-  - n<1K
+  - 10K<n<100K
 ---
 
-# AOS-Trajectories
+# manim-sft (primary training dataset)
 
-Code Agent tool-calling trajectories for fine-tuning LLMs on Manim animation generation (AOS project).
+TRL-ready supervised fine-tuning corpus of Manim animation instruction pairs in chat `messages` format.
+
+**Dataset URL:** https://huggingface.co/datasets/nabin2004/manim-sft
+
+## Files
+
+| File | Format | Use |
+|------|--------|-----|
+| `data/train.jsonl` | Chat `messages` (system → user → assistant) | **Default SFT input** via [`apps/sft`](https://github.com/nabin2004/AOS/tree/master/apps/sft) |
+
+38,491 rows. Each assistant turn is full Manim Python source (`from manim import *`).
+
+## Schema
+
+```json
+{
+  "messages": [
+    {"role": "system", "content": "..."},
+    {"role": "user", "content": "..."},
+    {"role": "assistant", "content": "..."}
+  ],
+  "metadata": {
+    "source": "huggingface-dataset-id",
+    "quality_tier": "high|medium|standard"
+  }
+}
+```
+
+## Usage
+
+### Load with datasets
+
+```python
+from datasets import load_dataset
+
+ds = load_dataset("nabin2004/manim-sft", split="train")
+print(len(ds), ds[0]["messages"][1]["role"])
+```
+
+### Train with AOS SFT
+
+```bash
+cd apps/sft
+uv run python run.py
+```
+
+---
+
+# AOS-Trajectories (legacy)
+
+Code Agent tool-calling trajectories collected from the AOS pipeline.
 
 **Dataset URL:** https://huggingface.co/datasets/nabin2004/AOS-Trajectories
 
@@ -24,7 +73,7 @@ Code Agent tool-calling trajectories for fine-tuning LLMs on Manim animation gen
 
 | File | Format | Use |
 |------|--------|-----|
-| `trajectories.jsonl` | Raw agent trajectories | Phase 1 SFT via [`apps/sft`](https://github.com/nabin2004/AOS/tree/master/apps/sft) |
+| `trajectories.jsonl` | Raw agent trajectories | Legacy SFT via `--dataset-repo nabin2004/AOS-Trajectories` |
 | `tool_trace/train.jsonl` | OpenAI-style multi-turn `messages` | Tool-use / CodeMode finetuning |
 | `tool_trace/val.jsonl` | Same schema, held-out split | Validation |
 | `metadata.jsonl` | Run metadata | Filtering / analysis |
