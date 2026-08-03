@@ -4,6 +4,8 @@ AI Explainer
 
 > Generated with [Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template).
 
+> **Developing prompt-to-Manim animations?** See [LOCAL_DEV.md](LOCAL_DEV.md) for the full parallel setup guide (UI + agents pipeline).
+
 ---
 
 ## Stack

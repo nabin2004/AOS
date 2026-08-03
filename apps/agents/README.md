@@ -1,5 +1,7 @@
 # AOS Agents
 
+> **Setting up local development?** See [apps/ui/aos/LOCAL_DEV.md](../ui/aos/LOCAL_DEV.md) for the full guide covering both the web UI and this Manim pipeline.
+
 ## Model configuration
 
 Pipeline agents read model selection from [`llm_config.py`](llm_config.py) and
