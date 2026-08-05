@@ -7,6 +7,7 @@ interface, auth, and dashboard for **aos**.
 
 - [Bun](https://bun.sh) (recommended) or Node.js 18+
 - The backend running at `http://localhost:8000` (see the project root `README.md` — `make dev`)
+- On Windows, use **WSL2** or **Git Bash** for local frontend work. The package scripts now normalize the frontend root before starting Next.js, but the supported shell environment is still the Linux side of the workspace.
 
 ## Getting Started
 
