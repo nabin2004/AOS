@@ -107,17 +107,18 @@ async def persist_user_turn(
     file_ids: list[Any],
     requested_conversation_id: str | None,
     current_conversation_id: str | None,
-) -> tuple[str | None, bool, str | None]:
+) -> tuple[str | None, bool, str | None, str | None]:
     """Resolve the conversation, persist the user message, and link any uploaded files.
 
-    Returns ``(conversation_id, was_newly_created, organization_id)``. When
-    ``was_newly_created`` is True the caller should emit a ``conversation_created``
+    Returns ``(conversation_id, was_newly_created, organization_id, user_message_id)``.
+    When ``was_newly_created`` is True the caller should emit a ``conversation_created``
     WebSocket event. ``organization_id`` is the conversation's owning org (the user's
     Personal org for new conversations) so usage events can be billed correctly;
     None when teams are disabled or no org context is available.
     """
     newly_created = False
     organization_id: str | None = None
+    user_message_id: str | None = None
     try:
         async with get_db_context() as db:
             conv_service = get_conversation_service(db)
@@ -153,6 +154,7 @@ async def persist_user_turn(
                 UUID(current_conversation_id),
                 MessageCreate(role="user", content=user_message),
             )
+            user_message_id = str(user_msg.id)
             if file_ids:
                 try:
                     await conv_service.link_files_to_message(user_msg.id, file_ids)
@@ -161,7 +163,7 @@ async def persist_user_turn(
     except Exception as e:
         logger.warning("Failed to persist conversation: %s", e)
 
-    return current_conversation_id, newly_created, organization_id
+    return current_conversation_id, newly_created, organization_id, user_message_id
 
 
 def normalize_tool_args(args: Any) -> dict[str, Any]:

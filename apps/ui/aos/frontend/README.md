@@ -5,15 +5,22 @@ interface, auth, and dashboard for **aos**.
 
 ## Prerequisites
 
-- [Bun](https://bun.sh) (recommended) or Node.js 18+
-- The backend running at `http://localhost:8000` (see the project root `README.md` — `make dev`)
-- On Windows, use **WSL2** or **Git Bash** for local frontend work. The package scripts now normalize the frontend root before starting Next.js, but the supported shell environment is still the Linux side of the workspace.
+- [Bun](https://bun.sh) (recommended) or Node.js 18+ / npm
+- The backend running at `http://localhost:8000` (see the project root `README.md` — `make dev`, or on Windows `.\scripts\setup-local.ps1`)
+- **Windows:** PowerShell + `npm run dev` (or `bun dev` if bun works) is supported. WSL2 / Git Bash are optional.
 
 ## Getting Started
 
 ```bash
 bun install        # install dependencies
 bun dev            # start the dev server on http://localhost:3000
+```
+
+Windows / npm fallback:
+
+```powershell
+npm install --legacy-peer-deps
+npm run dev
 ```
 
 Or run it in Docker from the project root: `make dev-frontend`.

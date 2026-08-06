@@ -14,6 +14,8 @@ Fine-tunes **Gemma 4 31B IT** on Manim instruction chat pairs using LoRA + TRL `
 | `[model.py](model.py)`     | Tokenizer + model load, 4-bit quant, freeze multimodal towers    |
 | `[trainer.py](trainer.py)` | Build `SFTTrainer`, train, save adapter + tokenizer              |
 | `[run.py](run.py)`         | CLI entrypoint                                                   |
+| `[train.sh](train.sh)`     | RunPod end-to-end: train → merge → GGUF → Hub pushes             |
+| `[runpod_sft.ipynb](runpod_sft.ipynb)` | Minimal RunPod notebook (calls `train.sh`)                |
 | `[infer.py](infer.py)`     | Load adapter; multi-turn tool loop (or `--no-tools` one-shot)    |
 | `[infer_tools.py](infer_tools.py)` | Gemma tool-call parse + CodeMode / Manim tool execution   |
 | `[preflight_gemma4.py](preflight_gemma4.py)` | Pre-flight chat template + mask checks before training |
@@ -80,8 +82,8 @@ uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --dataset-index 0 --n
 | `--no-4bit`       | Full BF16 instead of 4-bit (needs ~80GB+ VRAM)           |
 | `--report-to`     | Logging backend (`wandb` default; use `none` to disable) |
 | `--kaggle`        | T4-friendly preset (not recommended for 31B; warns at startup) |
-| `--colab`         | Colab preset: GPU-safe settings, output under Google Drive |
-| `--runpod`        | RunPod preset: GPU-safe settings, output under `/workspace` |
+| `--colab`         | Colab preset: T4-safe settings (seq 2048), output under Google Drive |
+| `--runpod`        | RunPod A100 preset: full seq 8192, output under `/workspace` |
 | `--seq-len`       | Max packed sequence length                               |
 | `--grad-accum`    | Gradient accumulation steps                              |
 | `--device-map`    | Model device map (`auto` or GPU index like `0`)          |
@@ -98,10 +100,11 @@ Edit defaults in `[config.py](config.py)` (`TrainingConfig`).
 
 ## Pre-flight (run before a long training job)
 
-Gemma 4 unified models need correct chat-template formatting and `{% generation %}` markers for `assistant_only_loss`. Run this on Colab/Kaggle before `--epochs 2`:
+Gemma 4 unified models need correct chat-template formatting and `{% generation %}` markers for `assistant_only_loss`. Run this on RunPod/Colab/Kaggle before a long job:
 
 ```bash
 cd apps/sft
+uv run python preflight_gemma4.py --runpod
 uv run python preflight_gemma4.py --colab
 uv run python preflight_gemma4.py --kaggle --load-model   # optional GPU smoke load
 ```
@@ -164,7 +167,7 @@ uv run python infer.py --adapter-dir ./gemma4-31b-manim-ft --no-tools \
 | `--no-system-prompt` | Skip Code Agent system instructions prepended at infer time |
 | `--output-dir` | Workspace for `manim_write` / `compile_manim_code` (default: `apps/agents/workspace/infer_runs/<timestamp>`) |
 | `--no-tools` | Disable tool defs + loop; one-shot `generate` only |
-| `--colab` / `--kaggle` / `--runpod` | Same VRAM-friendly load defaults as training |
+| `--colab` / `--kaggle` / `--runpod` | Same load defaults as the matching training preset |
 
 With tools enabled, the script prepends a short Code Agent system prompt, exposes **`run_code` only** by default (matching training), retries empty assistant turns after tool errors, and exits with code **2** if no scene `.py` was written (hallucinated success). Use `--all-tools` only if you intentionally trained on direct tool calls.
 
@@ -331,9 +334,89 @@ uv run python upload_adapter.py --adapter-dir /content/gemma4-31b-manim-ft --col
 
 Uploads adapter weights, tokenizer, and `model_card.md` as the repo README. Skips `checkpoint-*` and other training artifacts.
 
+## Run on RunPod (recommended for full 31B)
+
+Prefer RunPod **A100 80GB** over Colab for Gemma 4 31B (`seq_len=8192` 4-bit LoRA needs ~80 GB VRAM).
+
+Use the minimal notebook [`runpod_sft.ipynb`](runpod_sft.ipynb), or run [`train.sh`](train.sh) directly. Both run the full pipeline:
+
+**preflight → SFT + push LoRA → merge + push → llama.cpp → GGUF + push**
+
+1. Deploy a GPU Pod with a PyTorch template and a **network volume** on `/workspace`.
+2. Accept the [google/gemma-4-31B-it](https://huggingface.co/google/gemma-4-31B-it) license.
+3. Set a write-capable `HF_TOKEN` (and optionally `WANDB_API_KEY`).
+
+### One-shot (`train.sh`)
+
+```bash
+cd /workspace/AOS   # after git clone
+export HF_TOKEN=hf_...
+# export WANDB_API_KEY=...   # optional
+bash apps/sft/train.sh
+
+# Overrides:
+# EPOCHS=3 bash apps/sft/train.sh
+# SEQ_LEN=2048 bash apps/sft/train.sh          # 40GB GPUs
+# SKIP_TRAIN=1 bash apps/sft/train.sh          # resume from merge/GGUF
+```
+
+Artifacts:
+
+| Step | Path / Hub |
+|------|------------|
+| LoRA adapter | `/workspace/gemma4-31b-manim-ft` → `nabin2004/AOS-gemma4-31b-manim-sft` |
+| Merged bf16 | `/workspace/gemma4-31b-manim-merged` → `nabin2004/AOS-gemma4-31b-manim-merged` |
+| GGUF Q4_K_M | `/workspace/gemma4-31b-manim-gguf` → `nabin2004/AOS-gemma4-31b-manim-gguf` |
+
+### Notebook cells (same flow)
+
+```python
+# Cell 1 — secrets
+import os
+os.environ["HF_TOKEN"] = "hf_..."  # required write token
+# os.environ["WANDB_API_KEY"] = "..."  # optional
+```
+
+```bash
+# Cell 2 — clone + deps
+!git clone https://github.com/nabin2004/AOS.git /workspace/AOS
+%cd /workspace/AOS
+!pip install uv
+!uv sync --package sft
+```
+
+```bash
+# Cell 3 — full pipeline
+!bash apps/sft/train.sh
+```
+
+Infer after training (local adapter):
+
+```bash
+!uv run --package sft python apps/sft/infer.py \
+  --adapter-dir /workspace/gemma4-31b-manim-ft \
+  --runpod \
+  --no-tools \
+  --prompt "Create a short Manim scene explaining eigenvectors in 2D."
+```
+
+| Environment | Flag | Default output dir |
+|-------------|------|--------------------|
+| **RunPod** | `--runpod` | `/workspace/gemma4-31b-manim-ft` |
+| Colab | `--colab` (auto when `COLAB_RELEASE_TAG` set) | `/content/drive/MyDrive/gemma4-31b-manim-ft` |
+| Kaggle | `--kaggle --output-dir /kaggle/working/...` | notebook output |
+| Local | omit flags | `apps/sft/gemma4-31b-manim-ft` |
+
+Notes:
+
+- `--runpod` keeps full defaults (`seq_len=8192`, batch 1, grad accum 8), pins `device_map` to GPU 0, strips multimodal towers, and writes under `/workspace`.
+- Attach a network volume at `/workspace` so adapters persist across pod stops.
+- `train.sh` builds llama.cpp under `/workspace/llama.cpp` if needed and uses `--skip-ollama-create` (Hub push only).
+- Override output with `--output-dir /workspace/my-run` when calling `run.py` directly.
+
 ## Run on Google Colab
 
-Mount Google Drive **before** training so adapter weights persist after the runtime disconnects. Do **not** use Kaggle `/kaggle/working/...` paths on Colab.
+Colab is fine for smoke tests on smaller Gemma sizes; for full **31B** prefer [RunPod](#run-on-runpod-recommended-for-full-31b). Mount Google Drive **before** training so adapter weights persist after the runtime disconnects. Do **not** use Kaggle `/kaggle/working/...` paths on Colab.
 
 ```python
 # Cell 1 — mount Drive first (required for persistence)
@@ -346,7 +429,7 @@ os.environ["HF_TOKEN"] = "..."  # Colab secret
 
 ```bash
 # Cell 2 — clone + train
-!git clone https://github.com/<your-org>/AOS.git /content/AOS
+!git clone https://github.com/nabin2004/AOS.git /content/AOS
 %cd /content/AOS
 !pip install uv
 !uv sync --package sft
@@ -378,23 +461,15 @@ Or infer from the Hub (no local adapter copy):
   --prompt "Create a short Manim scene explaining eigenvectors in 2D."
 ```
 
-| Environment | Flag | Default output dir |
-|-------------|------|--------------------|
-| **Colab** | `--colab` (auto when `COLAB_RELEASE_TAG` set) | `/content/drive/MyDrive/gemma4-31b-manim-ft` |
-| Kaggle | `--kaggle --output-dir /kaggle/working/...` | notebook output |
-| RunPod | `--runpod` | `/workspace/gemma4-31b-manim-ft` |
-| Local | omit flags | `apps/sft/gemma4-31b-manim-ft` |
-
 Notes:
 
-- `--colab` applies the same GPU-safe training settings as `--kaggle` (batch 1, seq 2048, no packing).
+- `--colab` applies the same T4-safe training settings as `--kaggle` (batch 1, seq 2048, no packing) — not suitable for full 31B at seq 8192.
 - If Drive is not mounted, output falls back to `/content/gemma4-31b-manim-ft` (ephemeral — lost when runtime disconnects).
 - Override output with `--output-dir /content/drive/MyDrive/my-run` or `export SFT_OUTPUT_DIR=...`.
-- RunPod users: use `--runpod` instead (saves under `/workspace/gemma4-31b-manim-ft`).
 
 ## Run on Kaggle (T4×2) — not recommended for 31B
 
-The `--kaggle` preset targets T4 GPUs and will **warn** when the default base model is `google/gemma-4-31B-it` (needs ~80 GB VRAM). Use Vertex ultragpu or a local A100 80GB+ for full training.
+The `--kaggle` preset targets T4 GPUs and will **warn** when the default base model is `google/gemma-4-31B-it` (needs ~80 GB VRAM). Use [RunPod A100 80GB](#run-on-runpod-recommended-for-full-31b), Vertex ultragpu, or a local A100 80GB+ for full training.
 
 For smoke tests on smaller Gemma 4 sizes only, use a Kaggle notebook with **GPU T4 x2** and pass `--model-id google/gemma-4-E4B-it` explicitly. Add a notebook secret `HF_TOKEN` with a Hugging Face token that has accepted the [google/gemma-4-31B-it](https://huggingface.co/google/gemma-4-31B-it) license.
 

@@ -4,7 +4,7 @@ AI Explainer
 
 > Generated with [Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template).
 
-> **Developing prompt-to-Manim animations?** See [LOCAL_DEV.md](LOCAL_DEV.md) for the full parallel setup guide (UI + agents pipeline).
+> **Developing prompt-to-Manim animations?** See [LOCAL_DEV.md](LOCAL_DEV.md) for UI + agents setup, including chat video generation (Celery → MinIO → Video.js).
 
 ---
 
@@ -29,25 +29,36 @@ AI Explainer
 | Tool | Version | Install |
 |---|---|---|
 | **Docker** | Desktop / Engine 24+ | <https://docs.docker.com/get-docker/> |
-| **Make** | GNU Make 3.81+ (preinstalled on macOS/Linux) | Windows: install via [chocolatey](https://chocolatey.org/) `choco install make` or use WSL2 |
+| **Make** | GNU Make 3.81+ (preinstalled on macOS/Linux) | Optional on Windows — use PowerShell script below, or WSL2 / Git Bash |
 | **uv** | latest | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| **bun** | 1.x | `curl -fsSL https://bun.sh/install \| bash` (or use `npm` / `pnpm` if you prefer) |
+| **bun** or **npm** | bun 1.x / Node 18+ | [bun.sh](https://bun.sh) or [nodejs.org](https://nodejs.org) |
 
-> **Windows users:** the Makefile and shell helpers assume bash. Use **WSL2** or **Git Bash** for the smoothest experience. The Docker workflow below works identically on macOS, Linux, and WSL2.
+> **Windows users:** prefer PowerShell + `.\scripts\setup-local.ps1` (no Make required). Make targets need **WSL2** or **Git Bash**. See [LOCAL_DEV.md](LOCAL_DEV.md) for the full Windows guide.
 
 ---
 
 ## Quick Start (Local Dev)
 
-### First time
+### Windows (PowerShell)
+
+```powershell
+cd apps\ui\aos
+.\scripts\setup-local.ps1
+cd frontend
+npm run dev
+```
+
+`setup-local.ps1` installs deps, starts Docker (`docker-compose.dev.yml`), migrates, and seeds the admin user. Then open <http://localhost:3000>.
+
+### macOS / Linux / WSL — first time
 
 ```bash
 make bootstrap       # = make dev + make seed
 ```
 
-That's the only command you need on a fresh clone. After this, day-to-day is just `make dev`.
+That's the only Make command you need on a fresh clone. After this, day-to-day is just `make dev`.
 
-### Subsequent runs
+### Subsequent runs (Make)
 
 ```bash
 make dev
@@ -60,14 +71,14 @@ make dev
 3. Poll Postgres until it accepts connections (`pg_isready` — no fixed sleeps)
 4. Apply pending Alembic migrations (no-op if already at head)
 
-It does **not** re-seed the admin user — that lives in `make seed` and is run once. This way `make dev` stays cheap to re-run after every code/config change.
+It does **not** re-seed the admin user — that lives in `make seed` (or `setup-local.ps1`) and is run once. This way `make dev` stays cheap to re-run after every code/config change.
 
 **Then access:**
 
 - API: <http://localhost:8000>
 - Docs: <http://localhost:8000/docs>
-- Admin: <http://localhost:8000/admin> — `admin@example.com` / `admin123` after `make seed`
-- Frontend: <http://localhost:3000> — start with `make dev-frontend` (Docker) or `cd frontend && bun install && bun dev` (local)
+- Admin: <http://localhost:8000/admin> — `admin@example.com` / `admin123` after seed
+- Frontend: <http://localhost:3000> — `cd frontend && npm run dev` (or `bun dev`), or `make dev-frontend` (Docker)
 
 ### Day-to-day commands
 

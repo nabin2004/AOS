@@ -136,7 +136,18 @@ export type WSEventType =
   | "context_usage"
   | "context_compacted"
   | "llm_started"
-  | "llm_completed";
+  | "llm_completed"
+  | "video_status";
+
+/** Structured video payload from the Manim generate_video tool. */
+export interface VideoSpec {
+  kind: "video";
+  video_generation_id: string;
+  minio_key?: string | null;
+  mode?: string;
+  status?: string;
+  error?: string | null;
+}
 
 export interface WSEvent {
   type: WSEventType;

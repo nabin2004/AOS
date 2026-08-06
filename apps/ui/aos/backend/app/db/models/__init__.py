@@ -17,6 +17,7 @@ from app.db.models.organization import Invitation, Organization, OrganizationMem
 from app.db.models.audit_log import AppAdminAuditLog
 from app.db.models.knowledge_base import KnowledgeBase
 from app.db.models.user_slash_command import UserSlashCommand
+from app.db.models.video_generation import VideoGeneration
 
 __all__ = [
     "User",
@@ -39,4 +40,5 @@ __all__ = [
     "AppAdminAuditLog",
     "KnowledgeBase",
     "UserSlashCommand",
+    "VideoGeneration",
 ]

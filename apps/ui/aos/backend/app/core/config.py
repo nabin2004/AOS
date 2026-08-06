@@ -222,6 +222,18 @@ class Settings(BaseSettings):
     S3_RAG_BUCKET: str = "aos-rag"
     S3_RAG_REGION: str = "us-east-1"
 
+    # MinIO / S3 for compiled Manim videos (chat video generations)
+    # Local compose maps MinIO API to host port 9010 (container 9000).
+    S3_VIDEO_ENDPOINT: str | None = None
+    S3_VIDEO_ACCESS_KEY: str = "minioadmin"
+    S3_VIDEO_SECRET_KEY: str = "minioadmin"
+    S3_VIDEO_BUCKET: str = "aos-videos"
+    S3_VIDEO_REGION: str = "us-east-1"
+
+    # Subprocess path to apps/agents for Celery video jobs
+    AGENTS_DIR: Path | None = None
+    AGENTS_UV_CMD: str = "uv"
+
     STRIPE_SECRET_KEY: str = ""
     STRIPE_PUBLISHABLE_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""

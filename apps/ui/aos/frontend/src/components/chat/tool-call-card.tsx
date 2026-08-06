@@ -2,6 +2,15 @@
 import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import { Card, CardContent, Button } from "@/components/ui";
 import type { ToolCall } from "@/types";
+import { ChartMessage, parseChartResult } from "./chart-message";
+import { DateTimeResult } from "./tool-results/datetime";
+import { RAGSearchResults } from "./tool-results/rag";
+import { WebSearchResults, parseWebSearch } from "./tool-results/web-search";
+import { LoadSkillResult, formatSkillName } from "./tool-results/skills";
+import { AskUserResult } from "./tool-results/ask-user";
+import { GenericToolResult, RawToolView } from "./tool-results/generic";
+import { RunPythonResult } from "./tool-results/run-python";
+import { VideoResult, parseVideoResult } from "./tool-results/video-result";
 import {
   Wrench,
   Clock,
@@ -15,17 +24,10 @@ import {
   CheckCircle2,
   XCircle,
   BarChart3,
+  Film,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toolCaption } from "@/lib/agent-step-captions";
-import { ChartMessage, parseChartResult } from "./chart-message";
-import { DateTimeResult } from "./tool-results/datetime";
-import { RAGSearchResults } from "./tool-results/rag";
-import { WebSearchResults, parseWebSearch } from "./tool-results/web-search";
-import { LoadSkillResult, formatSkillName } from "./tool-results/skills";
-import { AskUserResult } from "./tool-results/ask-user";
-import { GenericToolResult, RawToolView } from "./tool-results/generic";
-import { RunPythonResult } from "./tool-results/run-python";
 
 interface ToolCallCardProps {
   toolCall: ToolCall;
@@ -41,7 +43,10 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
       (isRunPython && toolCall.status === "completed") ||
       (toolCall.name === "create_chart_tool" &&
         toolCall.status === "completed" &&
-        parseChartResult(toolCall.result) !== null),
+        parseChartResult(toolCall.result) !== null) ||
+      (toolCall.name === "generate_video" &&
+        toolCall.status === "completed" &&
+        parseVideoResult(toolCall.result) !== null),
   );
   const [showRaw, setShowRaw] = useState(false);
 
@@ -90,14 +95,26 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
     [toolCall.name, toolCall.status, toolCall.result],
   );
   const isChart = chartSpec !== null;
+  const videoSpec = useMemo(
+    () =>
+      toolCall.name === "generate_video" &&
+      (toolCall.status === "completed" || toolCall.status === "error")
+        ? parseVideoResult(toolCall.result)
+        : null,
+    [toolCall.name, toolCall.status, toolCall.result],
+  );
+  const isVideo = videoSpec !== null;
   // A chart that finishes after this card mounted (live streaming) won't
   // have triggered the initial-state default — expand it on transition.
   useEffect(() => {
     if (isChart) setExpanded(true);
   }, [isChart]);
+  useEffect(() => {
+    if (isVideo) setExpanded(true);
+  }, [isVideo]);
 
   const hasSpecialRenderer =
-    isDateTime || isRAGSearch || isWebSearch || isAskUser || isChart || isRunPython;
+    isDateTime || isRAGSearch || isWebSearch || isAskUser || isChart || isRunPython || isVideo;
   const friendlyName = isDateTime
     ? "Current Date & Time"
     : isRAGSearch
@@ -106,17 +123,21 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
         ? "Web Search"
         : isChart
           ? "Chart"
-          : isAskUser
-            ? "Question"
-            : isLoadSkill
-              ? loadedSkillName
-                ? formatSkillName(loadedSkillName)
-                : "Load Skill"
-              : isListSkills
-                ? "Available Skills"
-                : toolCall.name === "run_python"
-                  ? "Run Python"
-                  : toolCall.name;
+          : isVideo
+            ? "Generated Video"
+            : isAskUser
+              ? "Question"
+              : isLoadSkill
+                ? loadedSkillName
+                  ? formatSkillName(loadedSkillName)
+                  : "Load Skill"
+                : isListSkills
+                  ? "Available Skills"
+                  : toolCall.name === "run_python"
+                    ? "Run Python"
+                    : toolCall.name === "generate_video"
+                      ? "Generate Video"
+                      : toolCall.name;
 
   const ToolIcon = isDateTime
     ? Clock
@@ -126,11 +147,13 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
         ? Globe
         : isChart
           ? BarChart3
-          : isAskUser
-            ? MessageCircleQuestion
-            : isRunPython
-              ? Code2
-            : Wrench;
+          : isVideo
+            ? Film
+            : isAskUser
+              ? MessageCircleQuestion
+              : isRunPython
+                ? Code2
+                : Wrench;
 
   const toggleExpanded = () => {
     setExpanded((prev) => {
@@ -251,6 +274,8 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
             <WebSearchResults data={webResults} />
           ) : toolCall.status === "completed" && isChart && chartSpec ? (
             <ChartMessage spec={chartSpec} />
+          ) : isVideo && videoSpec ? (
+            <VideoResult data={videoSpec} />
           ) : isAskUser ? (
             <AskUserResult args={toolCall.args} resultText={resultText} />
           ) : isRunPython ? (

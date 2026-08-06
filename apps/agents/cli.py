@@ -4,11 +4,16 @@
     $ animus animate "I want to see Euler's formula visually"
 
 Run with: uv run python cli.py generate|animate "..."   (from apps/agents)
+
+JSON mode (for UI/Celery subprocess):
+    $ uv run python cli.py animate "…" --json --no-banner
+    $ uv run python cli.py generate "…" --json --no-banner
 """
 
 from __future__ import annotations
 
 import asyncio
+import json
 import sys
 
 import typer
@@ -49,8 +54,15 @@ def _show_banner() -> None:
 
 def _show_command_help() -> None:
     console.print("Usage:")
-    console.print('  animus generate "<request>" [--max-repairs N] [--no-banner]')
-    console.print('  animus animate "<request>" [--no-banner]')
+    console.print('  animus generate "<request>" [--max-repairs N] [--no-banner] [--json]')
+    console.print('  animus animate "<request>" [--no-banner] [--json]')
+
+
+def _emit_json(payload: dict) -> None:
+    """Write a single JSON object to stdout (no Rich chrome)."""
+    sys.stdout.write(json.dumps(payload, default=str))
+    sys.stdout.write("\n")
+    sys.stdout.flush()
 
 
 async def _run_full_pipeline(user_request: str, max_validation_attempts: int):
@@ -122,8 +134,22 @@ def generate(
     banner: bool = typer.Option(
         True, "--banner/--no-banner", help="Show the intro effect"
     ),
+    as_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Print a single JSON VideoArtifact to stdout (for UI/Celery)",
+    ),
 ) -> None:
-    """Run the full IR lecture pipeline (storyboard → beats → validate → inspect)."""
+    """Run the full IR lecture pipeline and assemble lecture_final.mp4."""
+    if as_json:
+        from video_entry import run_lecture
+
+        artifact = asyncio.run(
+            run_lecture(request, max_validation_attempts=max_repairs)
+        )
+        _emit_json(artifact.model_dump(mode="json"))
+        raise typer.Exit(code=0 if artifact.ok else 1)
+
     if banner:
         _show_banner()
 
@@ -156,6 +182,11 @@ def animate(
         "--fast",
         help="Skip narration synthesis during coding (faster compile; sets AOS_SFT_BATCH=1)",
     ),
+    as_json: bool = typer.Option(
+        False,
+        "--json",
+        help="Print a single JSON VideoArtifact to stdout (for UI/Celery)",
+    ),
 ) -> None:
     """Run the animation pipeline (classify → plan → Manim coder → compile)."""
     import os
@@ -164,6 +195,28 @@ def animate(
 
     if fast:
         os.environ["AOS_SFT_BATCH"] = "1"
+
+    if as_json:
+        from video_entry import run_animate
+
+        try:
+            validate_pipeline_env()
+        except PipelineEnvError as exc:
+            _emit_json(
+                {
+                    "ok": False,
+                    "mode": "animate",
+                    "video_path": None,
+                    "run_dir": None,
+                    "error": str(exc),
+                    "detail": {},
+                }
+            )
+            raise typer.Exit(code=1) from exc
+
+        artifact = asyncio.run(run_animate(request))
+        _emit_json(artifact.model_dump(mode="json"))
+        raise typer.Exit(code=0 if artifact.ok else 1)
 
     if banner:
         _show_banner()

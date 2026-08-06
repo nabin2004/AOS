@@ -11,10 +11,12 @@ from app.worker.tasks.rag_tasks import (
     sync_collection_task,
     sync_single_source_task,
 )
+from app.worker.tasks.video_tasks import generate_video_task
 
 __all__ = [
     "check_scheduled_syncs",
     "cleanup_usage_events_task",
+    "generate_video_task",
     "ingest_document_task",
     "refresh_usage_matview_task",
     "send_low_credits_alerts_task",

@@ -173,8 +173,8 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
     if config.model_id == BASE_MODEL_ID:
         print(
             "WARNING: --kaggle/--colab presets target T4 GPUs and are not suitable "
-            f"for {BASE_MODEL_ID} (needs ~80GB VRAM). Use Vertex ultragpu or a local "
-            "A100 80GB+ instead.",
+            f"for {BASE_MODEL_ID} (needs ~80GB VRAM). Use RunPod A100 80GB+ "
+            "(--runpod), Vertex ultragpu, or a local A100 80GB+ instead.",
             file=sys.stderr,
         )
     report_to = config.report_to
@@ -202,8 +202,25 @@ def default_runpod_output_dir() -> Path:
 
 
 def apply_runpod_preset(config: TrainingConfig) -> TrainingConfig:
-    config = apply_kaggle_preset(config)
-    return replace(config, output_dir=default_runpod_output_dir())
+    """A100 80GB+ defaults: full seq_len 8192, output under /workspace."""
+    if config.model_id == BASE_MODEL_ID:
+        print(
+            "NOTE: --runpod targets A100 80GB+ (~80GB VRAM for "
+            f"{BASE_MODEL_ID} 4-bit LoRA at seq 8192). "
+            "On smaller GPUs pass --seq-len 2048.",
+            file=sys.stderr,
+        )
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    return replace(
+        config,
+        # Keep TrainingConfig defaults: seq_len=8192, batch_size=1, grad_accum=8, packing=False
+        device_map={"": 0},
+        strip_multimodal_towers=True,
+        report_to=report_to,
+        output_dir=default_runpod_output_dir(),
+    )
 
 
 COLAB_DRIVE_ROOT = Path("/content/drive/MyDrive")
@@ -305,7 +322,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--runpod",
         action="store_true",
-        help="Apply RunPod defaults (GPU-safe settings, output under /workspace)",
+        help="Apply RunPod A100/workspace defaults (seq 8192, output under /workspace)",
     )
     parser.add_argument(
         "--colab",

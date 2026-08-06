@@ -3,16 +3,21 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export type VideoMode = "off" | "animate" | "lecture";
+
 /**
- * Per-client chat-mode toggle: whether the next turn runs as a deep-research
- * turn (planner + parallel subagents + cited report) or as a normal chat turn.
- * Carried on the WS payload as `deep_research`. Persisted so the preferred mode
- * survives a refresh; the backend forces normal chat when the feature is off.
+ * Per-client chat-mode toggles:
+ * - deepResearch: planner + parallel subagents
+ * - videoMode: Manim video pipeline (off | animate | lecture)
+ *
+ * Carried on the WS payload. Persisted so preferences survive a refresh.
  */
 interface ChatModeState {
   deepResearch: boolean;
   setDeepResearch: (on: boolean) => void;
   toggleDeepResearch: () => void;
+  videoMode: VideoMode;
+  setVideoMode: (mode: VideoMode) => void;
 }
 
 export const useChatModeStore = create<ChatModeState>()(
@@ -21,10 +26,22 @@ export const useChatModeStore = create<ChatModeState>()(
       deepResearch: false,
       setDeepResearch: (on) => set({ deepResearch: on }),
       toggleDeepResearch: () => set((s) => ({ deepResearch: !s.deepResearch })),
+      videoMode: "off",
+      setVideoMode: (mode) => set({ videoMode: mode }),
     }),
     {
       name: "chat-mode",
-      version: 1,
+      version: 2,
+      migrate: (persisted, version) => {
+        const state = (persisted ?? {}) as Partial<ChatModeState>;
+        if (version < 2) {
+          return {
+            deepResearch: Boolean(state.deepResearch),
+            videoMode: "off" as VideoMode,
+          };
+        }
+        return state as ChatModeState;
+      },
     },
   ),
 );

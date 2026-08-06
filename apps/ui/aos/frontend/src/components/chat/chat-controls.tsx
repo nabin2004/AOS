@@ -17,6 +17,7 @@ import {
   Sparkles,
   Users,
   Telescope,
+  Film,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -153,18 +154,25 @@ export function ChatControls({
   const [effort, setEffort] = useState<ThinkingEffort>("off");
   const settingsOverridden = temperature !== null || effort !== "off";
   const deepResearch = useChatModeStore((s) => s.deepResearch);
+  const videoMode = useChatModeStore((s) => s.videoMode);
 
   const triggerSummary = useMemo(() => {
     const parts: string[] = [];
     if (deepResearch) parts.push("Research");
+    if (videoMode === "animate") parts.push("Animate");
+    if (videoMode === "lecture") parts.push("Lecture");
     if (activeCount > 0) parts.push(`${activeCount} KB${activeCount === 1 ? "" : "s"}`);
     if (selectedModel.value) parts.push(selectedModel.value);
     if (settingsOverridden) parts.push("Custom");
     return parts.length ? parts.join(" · ") : "Controls";
-  }, [deepResearch, activeCount, selectedModel, settingsOverridden]);
+  }, [deepResearch, videoMode, activeCount, selectedModel, settingsOverridden]);
 
   const hasOverrides =
-    deepResearch || activeCount > 0 || selectedModel.value !== "" || settingsOverridden;
+    deepResearch ||
+    videoMode !== "off" ||
+    activeCount > 0 ||
+    selectedModel.value !== "" ||
+    settingsOverridden;
 
   return (
     <Popover>
@@ -447,6 +455,8 @@ function SettingsPanel({
 }) {
   const deepResearch = useChatModeStore((s) => s.deepResearch);
   const setDeepResearch = useChatModeStore((s) => s.setDeepResearch);
+  const videoMode = useChatModeStore((s) => s.videoMode);
+  const setVideoMode = useChatModeStore((s) => s.setVideoMode);
   return (
     <div className="space-y-6">
       <div className="space-y-2.5">
@@ -479,6 +489,47 @@ function SettingsPanel({
             : "Answers directly in a single fast pass, with no planning or delegation."}
         </p>
       </div>
+
+      <div className="space-y-2.5">
+        <div className="flex items-baseline justify-between">
+          <span className="text-foreground inline-flex items-center gap-1.5 text-sm font-semibold">
+            <Film className="h-3.5 w-3.5" />
+            Video generation
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-1">
+          {(
+            [
+              { value: "off", label: "Off", hint: "Normal chat" },
+              { value: "animate", label: "Animate", hint: "Fast Manim scene" },
+              { value: "lecture", label: "Lecture", hint: "Full IR + assemble" },
+            ] as const
+          ).map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              title={opt.hint}
+              onClick={() => setVideoMode(opt.value)}
+              className={cn(
+                "rounded-md px-2 py-1.5 text-xs font-medium transition-colors",
+                videoMode === opt.value
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10",
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-foreground/55 text-[11px] leading-relaxed">
+          {videoMode === "off"
+            ? "Chat replies normally without compiling a video."
+            : videoMode === "animate"
+              ? "Your next prompt runs the animate pipeline (classify → plan → Manim compile)."
+              : "Your next prompt runs the full lecture pipeline (IR → render → ffmpeg assemble)."}
+        </p>
+      </div>
+
       <div className="space-y-2.5">
         <div className="flex items-baseline justify-between">
           <label htmlFor="chat-temp" className="text-foreground text-sm font-semibold">

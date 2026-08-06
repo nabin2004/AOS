@@ -14,6 +14,7 @@ const EXACT_CAPTIONS: Record<string, string> = {
   run_python: "Running calculations",
   create_chart_tool: "Creating a chart",
   create_map_tool: "Drawing a map",
+  generate_video: "Compiling Manim video",
   ask_user: "Asking you a question",
   load_skill: "Loading a skill",
 };

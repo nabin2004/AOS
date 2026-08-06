@@ -217,6 +217,34 @@ export function useChat(options: UseChatOptions = {}) {
           break;
         }
 
+        case "video_status": {
+          const data = wsEvent.data as {
+            video_generation_id?: string;
+            status?: string;
+            error?: string;
+            mode?: string;
+          };
+          if (!currentMessageIdRef.current || !data.video_generation_id) break;
+          const toolCallId = `generate_video_${data.video_generation_id}`;
+          if (data.status === "running" || data.status === "pending") {
+            updateToolCallPart(currentMessageIdRef.current, toolCallId, {
+              status: "running",
+            });
+          } else if (data.status === "failed") {
+            updateToolCallPart(currentMessageIdRef.current, toolCallId, {
+              status: "error",
+              result: JSON.stringify({
+                kind: "video",
+                video_generation_id: data.video_generation_id,
+                mode: data.mode,
+                status: "failed",
+                error: data.error,
+              }),
+            });
+          }
+          break;
+        }
+
         case "final_result": {
           // Finalize message
           if (currentMessageIdRef.current) {
@@ -439,6 +467,10 @@ export function useChat(options: UseChatOptions = {}) {
       const activeKBIds = useKBSelectionStore.getState().activeKBIds;
       if (activeKBIds.length) payload.active_knowledge_base_ids = activeKBIds;
       payload.deep_research = useChatModeStore.getState().deepResearch;
+      const videoMode = useChatModeStore.getState().videoMode;
+      if (videoMode === "animate" || videoMode === "lecture") {
+        payload.video_mode = videoMode;
+      }
       sendMessage(payload);
     },
     [addMessage, sendMessage, conversationId],

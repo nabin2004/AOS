@@ -27,6 +27,7 @@ from app.repositories import member as member_repo
 from app.repositories import organization as organization_repo
 
 from app.repositories import user_slash_command as user_slash_command_repo
+from app.repositories import video_generation as video_generation_repo
 
 __all__ = [
     "user_repo",
@@ -46,4 +47,5 @@ __all__ = [
     "member_repo",
     "invitation_repo",
     "user_slash_command_repo",
+    "video_generation_repo",
 ]

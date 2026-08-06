@@ -879,40 +879,40 @@
       "endOfPost": "end of post"
     },
     "landing": {
-      "metaDescription": "An AI assistant that knows your team's work. Plug in your docs, your tools, and your data — get answers grounded in everything your team has ever shipped.",
+      "metaDescription": "Turn ideas, notes, or prompts into beautiful Manim-powered educational videos. Generate animations, voiceovers, and presentations with AI—no animation experience required.",
       "hero": {
-        "eyebrow": "Meet your team's AI co-worker",
-        "titlePre": "AI that",
-        "titleHighlight": "knows",
-        "titleEm": "your work.",
-        "description": "Plug in your docs, your tools, and your data. Ask anything — get answers grounded in everything your team has ever shipped.",
-        "ctaPrimary": "Start free",
-        "ctaSecondary": "Book a demo",
-        "stat_teams": "Teams using",
-        "stat_speed": "Faster answers",
-        "stat_uptime": "Always on",
-        "ratingLabel": "rated 4.9/5 by 1,200+ teams",
+        "eyebrow": "Meet your AI Manimator",
+        "titlePre": "Create",
+        "titleHighlight": "Videos",
+        "titleEm": "using AI.",
+      "description": "Transform prompts into professional STEM animations powered by Manim. Generate visuals, narration, and videos in minutes.",
+        "ctaPrimary": "Start creating",
+        "ctaSecondary": "Watch demo",
+        "stat_teams": "Videos created",
+        "stat_speed": "Faster production",
+        "stat_uptime": "Cloud rendering",
+        "ratingLabel": "rated 4.9/5 by 10 users",
         "trustNote": "No credit card required · Cancel anytime"
       },
       "social": {
-        "title": "Trusted by teams across industries"
+        "title": "Trusted by educators, creators, and AI enthusiasts"
       },
       "how": {
         "eyebrow": "How it works",
-        "title": "Three steps to a smarter team"
+        "title": "Three steps from idea to animation"
       },
       "features": {
         "eyebrow": "Features",
-        "title": "Built-in features that ship today",
-        "subtitle": "The boring infrastructure parts you'd otherwise spend a quarter wiring up."
+        "title": "Everything you need to create educational videos",
+      "subtitle": "From AI-powered scripting to Manim rendering, voice generation, and export—all in one platform."
       },
       "data": {
-        "eyebrow": "How retrieval works",
-        "title": "Your sources, ranked + cited"
+        "eyebrow": "AI generation pipeline",
+        "title": "Prompt → Script → Manim → Video"
       },
       "testimonials": {
-        "eyebrow": "Loved by teams",
-        "titlePre": "Teams that ship faster",
+        "eyebrow": "Loved by creators",
+        "titlePre": "Teach visually",
         "titleEm": "with us."
       },
       "pricing": {

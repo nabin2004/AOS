@@ -35,7 +35,7 @@ export const TEASER_PLANS: TeaserPlan[] = [
   },
   {
     name: "Pro",
-    price: "$29",
+    price: "$1.98",
     cadence: "/ user / month",
     description: "For small teams getting real work done.",
     features: [
@@ -50,7 +50,7 @@ export const TEASER_PLANS: TeaserPlan[] = [
   },
   {
     name: "Business",
-    price: "$99",
+    price: "$19",
     cadence: "/ user / month",
     description: "For organisations rolling out across teams.",
     features: [

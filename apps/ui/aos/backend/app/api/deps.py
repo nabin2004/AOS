@@ -136,6 +136,15 @@ def get_file_upload_service(db: DBSession) -> FileUploadService:
 
 
 FileUploadSvc = Annotated[FileUploadService, Depends(get_file_upload_service)]
+from app.services.video_generation import VideoGenerationService
+
+
+def get_video_generation_service(db: DBSession) -> VideoGenerationService:
+    """Create VideoGenerationService instance with database session."""
+    return VideoGenerationService(db)
+
+
+VideoGenerationSvc = Annotated[VideoGenerationService, Depends(get_video_generation_service)]
 from app.repositories import member_repo, organization_repo
 from app.services.organization import OrganizationService
 from app.services.member import MemberService

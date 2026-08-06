@@ -127,7 +127,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--runpod",
         action="store_true",
-        help="Apply RunPod-friendly load defaults",
+        help="Apply RunPod A100/workspace load defaults",
     )
     parser.add_argument(
         "--no-strip-towers",

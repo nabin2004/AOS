@@ -140,7 +140,12 @@ class AgentSession:
         if not user_message and not file_ids:
             await send_event(self.websocket, "error", {"message": "Empty message"})
             return
-        self.current_conversation_id, newly_created, organization_id = await persist_user_turn(
+        (
+            self.current_conversation_id,
+            newly_created,
+            organization_id,
+            user_message_id,
+        ) = await persist_user_turn(
             self.user,
             user_message,
             file_ids,
@@ -155,6 +160,15 @@ class AgentSession:
             )
 
         await send_event(self.websocket, "user_prompt", {"content": user_message})
+
+        video_mode = data.get("video_mode")
+        if video_mode in ("animate", "lecture") and self.current_conversation_id:
+            await self._process_video_turn(
+                user_message=user_message,
+                video_mode=video_mode,
+                user_message_id=user_message_id,
+            )
+            return
 
         try:
             deep_research = settings.ENABLE_DEEP_RESEARCH and bool(data.get("deep_research", False))
@@ -265,6 +279,207 @@ class AgentSession:
         except Exception as e:
             logger.exception("Error processing agent request")
             await send_event(self.websocket, "error", {"message": str(e)})
+
+    async def _process_video_turn(
+        self,
+        *,
+        user_message: str,
+        video_mode: str,
+        user_message_id: str | None,
+    ) -> None:
+        """Enqueue a Manim video job and stream status over this WebSocket."""
+        from uuid import UUID as UUIDType
+
+        from app.schemas.video_generation import VideoGenerationCreate
+        from app.services.video_generation import VideoGenerationService
+        from app.worker.tasks.video_tasks import VIDEO_STATUS_CHANNEL
+
+        try:
+            async with get_db_context() as db:
+                svc = VideoGenerationService(db)
+                row = await svc.create_pending(
+                    user_id=self.user.id,
+                    data=VideoGenerationCreate(
+                        prompt=user_message,
+                        mode=video_mode,  # type: ignore[arg-type]
+                        conversation_id=UUIDType(self.current_conversation_id),
+                        user_message_id=UUIDType(user_message_id) if user_message_id else None,
+                    ),
+                )
+                task_id = svc.enqueue(row.id)
+                await svc.set_celery_task(row.id, task_id)
+                generation_id = str(row.id)
+
+            tool_call_id = f"generate_video_{generation_id}"
+            await send_event(self.websocket, "model_request_start", {})
+            await send_event(
+                self.websocket,
+                "tool_call",
+                {
+                    "tool_call_id": tool_call_id,
+                    "tool_name": "generate_video",
+                    "args": {"mode": video_mode, "video_generation_id": generation_id},
+                },
+            )
+            await send_event(
+                self.websocket,
+                "video_status",
+                {
+                    "video_generation_id": generation_id,
+                    "conversation_id": self.current_conversation_id,
+                    "status": "pending",
+                    "mode": video_mode,
+                },
+            )
+            await send_event(
+                self.websocket,
+                "text_delta",
+                {
+                    "index": 0,
+                    "content": (
+                        f"Starting {video_mode} video generation… "
+                        "This can take several minutes. I'll update this chat when it's ready."
+                    ),
+                },
+            )
+
+            # Forward Redis status updates until terminal state (or timeout).
+            await self._watch_video_status(
+                generation_id=generation_id,
+                tool_call_id=tool_call_id,
+                channel=VIDEO_STATUS_CHANNEL,
+            )
+
+            await send_event(
+                self.websocket,
+                "complete",
+                {"conversation_id": self.current_conversation_id},
+            )
+        except WebSocketDisconnect:
+            raise
+        except Exception as e:
+            logger.exception("Error starting video generation")
+            await send_event(self.websocket, "error", {"message": str(e)})
+
+    async def _watch_video_status(
+        self,
+        *,
+        generation_id: str,
+        tool_call_id: str,
+        channel: str,
+        timeout_seconds: float = 60 * 60,
+    ) -> None:
+        """Subscribe to Redis ``video_status`` and relay matching events to the client."""
+        import json
+
+        import redis.asyncio as aioredis
+
+        r = aioredis.from_url(
+            f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}"
+        )  # type: ignore[no-untyped-call]
+        pubsub = r.pubsub()
+        await pubsub.subscribe(channel)
+        try:
+            deadline = asyncio.get_running_loop().time() + timeout_seconds
+            while True:
+                if asyncio.get_running_loop().time() >= deadline:
+                    await send_event(
+                        self.websocket,
+                        "video_status",
+                        {
+                            "video_generation_id": generation_id,
+                            "status": "failed",
+                            "error": "timed_out_waiting_for_worker",
+                        },
+                    )
+                    break
+
+                message = await pubsub.get_message(
+                    ignore_subscribe_messages=True, timeout=1.0
+                )
+                if message is None or message.get("type") != "message":
+                    await asyncio.sleep(0.05)
+                    continue
+
+                raw = message.get("data")
+                if isinstance(raw, bytes):
+                    raw = raw.decode("utf-8")
+                try:
+                    payload = json.loads(raw)
+                except (TypeError, json.JSONDecodeError):
+                    continue
+                if str(payload.get("video_generation_id")) != generation_id:
+                    continue
+
+                status = payload.get("status")
+                await send_event(self.websocket, "video_status", payload)
+
+                if status == "completed":
+                    result = {
+                        "kind": "video",
+                        "video_generation_id": generation_id,
+                        "minio_key": payload.get("minio_key"),
+                        "mode": payload.get("mode"),
+                        "status": "completed",
+                    }
+                    await send_event(
+                        self.websocket,
+                        "tool_result",
+                        {
+                            "tool_call_id": tool_call_id,
+                            "content": json.dumps(result),
+                        },
+                    )
+                    await send_event(
+                        self.websocket,
+                        "text_delta",
+                        {"index": 0, "content": "\n\nYour video is ready."},
+                    )
+                    if payload.get("assistant_message_id"):
+                        await send_event(
+                            self.websocket,
+                            "message_saved",
+                            {
+                                "message_id": payload["assistant_message_id"],
+                                "conversation_id": self.current_conversation_id,
+                            },
+                        )
+                    break
+
+                if status == "failed":
+                    result = {
+                        "kind": "video",
+                        "video_generation_id": generation_id,
+                        "mode": payload.get("mode"),
+                        "status": "failed",
+                        "error": payload.get("error"),
+                    }
+                    await send_event(
+                        self.websocket,
+                        "tool_result",
+                        {
+                            "tool_call_id": tool_call_id,
+                            "content": json.dumps(result),
+                        },
+                    )
+                    await send_event(
+                        self.websocket,
+                        "text_delta",
+                        {
+                            "index": 0,
+                            "content": f"\n\nVideo generation failed: {payload.get('error')}",
+                        },
+                    )
+                    break
+        except WebSocketDisconnect:
+            raise
+        except Exception as exc:
+            logger.warning("video_status watcher ended: %s", exc)
+        finally:
+            with contextlib.suppress(Exception):
+                await pubsub.unsubscribe(channel)
+                await pubsub.aclose()
+                await r.aclose()
 
     async def _ask_user(self, questions: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Pause the run: ask the client questions and block until they answer.
