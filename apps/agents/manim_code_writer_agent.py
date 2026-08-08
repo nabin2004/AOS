@@ -1,6 +1,7 @@
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -35,10 +36,11 @@ class SceneManimCode(BaseModel):
 
 
 manim_code_writer_agent = Agent(
-    "openrouter:moonshotai/kimi-k2.5",
+    model_for_agent("coder"),
     name="Manim Code Writer",
     description="Writes free-form Manim Python for one scene from beats + brief.",
     system_prompt=CODE_WRITER_PROMPT,
     output_type=SceneManimCode,
+    model_settings=settings_for("coder"),
     retries=3,
 )

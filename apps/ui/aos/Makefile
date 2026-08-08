@@ -1,4 +1,4 @@
-.PHONY: install format lint test run clean help db-init dev dev-down dev-logs dev-rebuild dev-frontend docker-clean stage stage-down prod prod-down
+.PHONY: install format lint test run clean help db-init dev dev-down dev-logs dev-rebuild refresh dev-frontend docker-clean stage stage-down prod prod-down
 
 # === Environments ===========================================================
 # `make dev`   — local development (docker-compose.dev.yml + bind-mounted source)
@@ -39,10 +39,18 @@ dev:
 	docker compose -f docker-compose.dev.yml exec -T app aos db upgrade
 	@echo ""
 	@echo "🚀 Dev stack ready:"
-	@echo "   API:      http://localhost:8000"
-	@echo "   Docs:     http://localhost:8000/docs"
-	@echo "   Admin:    http://localhost:8000/admin"
-	@echo "   Frontend: http://localhost:3000  (run 'make dev-frontend' or 'cd frontend && bun dev')"
+	@echo "   API:           http://localhost:8000"
+	@echo "   Docs:          http://localhost:8000/docs"
+	@echo "   Admin:         http://localhost:8000/admin"
+	@echo "   Flower:        http://localhost:5555"
+	@echo "   MinIO console: http://localhost:9011  (minioadmin / minioadmin)"
+	@echo "   MinIO API:     http://localhost:9010"
+	@echo "   Frontend:      http://localhost:3000  (run 'make dev-frontend' or 'cd frontend && bun dev')"
+	@echo ""
+	@echo "Celery for Animate = HOST (Windows: .\\scripts\\dev-refresh.ps1 auto-starts it)."
+	@echo "Do not use Docker celery_worker for video (no uv/Manim). Diagnose: .\\scripts\\diagnose-animate.ps1"
+	@echo "After backend code changes: make refresh  (or: .\\scripts\\dev-refresh.ps1)"
+	@echo "Dockerfile/deps changed: make dev-rebuild  (or: .\\scripts\\dev-refresh.ps1 -Rebuild)"
 	@echo ""
 	@echo "First time? Run 'make seed' to create the default admin user."
 
@@ -81,7 +89,23 @@ dev-logs:
 
 dev-rebuild:
 	docker compose -f docker-compose.dev.yml build --no-cache app
-	docker compose -f docker-compose.dev.yml up -d --force-recreate app
+	docker compose -f docker-compose.dev.yml up -d --force-recreate app flower
+	@echo ""
+	@echo "✅ Recreated app + flower (Docker Celery is profile docker-celery — off by default)"
+	@echo "   Animate: run .\\scripts\\dev-refresh.ps1 to start HOST Celery"
+	@echo "   MinIO console: http://localhost:9011"
+	@echo "   Diagnose: .\\scripts\\diagnose-animate.ps1"
+
+# Pick up API container changes; ensure Docker Celery is stopped (Animate uses host).
+refresh:
+	docker compose -f docker-compose.dev.yml up -d
+	-docker compose -f docker-compose.dev.yml stop celery_worker celery_beat 2>/dev/null || true
+	@echo ""
+	@echo "✅ Stack up; Docker celery stopped (if it was running)"
+	@echo "   Windows Animate worker: .\\scripts\\dev-refresh.ps1"
+	@echo "   Diagnose:             .\\scripts\\diagnose-animate.ps1"
+	@echo "   Flower:               http://localhost:5555"
+	@echo "   MinIO console:        http://localhost:9011"
 dev-frontend:
 	docker compose -f docker-compose.frontend.yml up -d
 	@echo ""
@@ -324,11 +348,14 @@ help:
 	@echo "Day-to-day dev:"
 	@echo "  make dev            Build + start dev stack + apply migrations (idempotent)"
 	@echo "  make seed           One-shot admin seed (admin@example.com / admin123)"
+	@echo "  make refresh        Ensure stack up; stop Docker celery (Animate uses host)"
 	@echo "  make dev-down       Stop dev stack"
 	@echo "  make dev-logs       Tail dev container logs"
-	@echo "  make dev-rebuild    Force-rebuild backend image"
+	@echo "  make dev-rebuild    Rebuild image + recreate app + flower"
 	@echo "  make docker-clean   Wipe containers + networks + volumes (DESTROYS data)"
 	@echo "  make dev-frontend   Start frontend container (after 'make dev')"
+	@echo "  (Windows) .\\scripts\\dev-refresh.ps1 [-Rebuild|-AgentsOnly|-Logs]"
+	@echo "  (Windows) .\\scripts\\diagnose-animate.ps1"
 	@echo ""
 	@echo "📦 Other environments:"
 	@echo "  make stage          Production-like stack on localhost (no bind mounts)"
@@ -363,10 +390,10 @@ help:
 	@echo "  uv run aos rag-source-add                      Add sync source"
 	@echo "  uv run aos rag-source-sync <id>                Trigger sync"
 	@echo ""
-	@echo "Celery:"
-	@echo "  make celery-worker  Start Celery worker"
-	@echo "  make celery-beat    Start Celery beat scheduler"
-	@echo "  make celery-flower  Start Flower monitoring UI"
+	@echo "Celery (Animate = HOST via .\\scripts\\dev-refresh.ps1; Docker profile docker-celery is advanced):"
+	@echo "  make celery-worker  Start Celery worker on host"
+	@echo "  make celery-beat    Start Celery beat scheduler on host"
+	@echo "  make celery-flower  Start Flower monitoring UI on host"
 	@echo ""
 	@echo "Docker (Development):"
 	@echo "  make docker-up            Start backend services"

@@ -14,20 +14,20 @@ Set `AOS_MODEL_PROFILE` to switch the whole animation pipeline at once:
 
 | Profile | Classifier / planner / orchestrator | Coder |
 | --- | --- | --- |
-| `hybrid` (default) | OpenRouter (`gpt-4o-mini`) | Local Ollama (fine-tuned Gemma) |
+| `cloud` (recommended for UI Animate) | OpenRouter (`gpt-4o-mini`) | OpenRouter |
+| `hybrid` | OpenRouter (`gpt-4o-mini`) | Local Ollama (fine-tuned Gemma) |
 | `local` | Ollama | Ollama |
-| `cloud` | OpenRouter | OpenRouter |
 
 ```bash
-# Default: cloud planning + local Manim coder
+# Fully cloud (no Ollama) — what the UI Celery Animate worker forces
+export AOS_MODEL_PROFILE=cloud
+
+# Cloud planning + local Manim coder
 export AOS_MODEL_PROFILE=hybrid
 export OLLAMA_BASE_URL=http://localhost:11434/v1
 
 # Fully local (requires Ollama + pulled GGUF model)
 export AOS_MODEL_PROFILE=local
-
-# Fully cloud
-export AOS_MODEL_PROFILE=cloud
 ```
 
 ### Per-role overrides

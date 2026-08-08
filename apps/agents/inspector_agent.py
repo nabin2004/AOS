@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from dotenv import load_dotenv
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -34,9 +35,10 @@ You have no tools. Answer from the IR and render results in the prompt only.
 """
 
 inspector_agent = Agent(
-    'openrouter:openai/gpt-4o-mini',
+    model_for_agent("planner"),
     name='Inspector Agent',
     description='Inspects compiled Manim videos for correctness and completeness.',
     system_prompt=INSPECTOR_PROMPT,
     output_type=InspectionResult,
+    model_settings=settings_for("planner"),
 )

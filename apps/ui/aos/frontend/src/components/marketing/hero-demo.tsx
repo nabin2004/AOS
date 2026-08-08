@@ -8,15 +8,15 @@ import { cn } from "@/lib/utils";
 const SCRIPT = [
   {
     role: "user" as const,
-    text: "Summarize this quarter's customer onboarding feedback.",
+    text: "Teach me about Euler's formula.",
   },
   {
     role: "tool" as const,
-    text: "rag.search · 4 documents · 12 chunks",
+    text: "manim.write · Compiling... · 12 chunks",
   },
   {
     role: "agent" as const,
-    text: "Across 137 onboarding sessions, top three friction points are: (1) database setup confusion, (2) Stripe webhook configuration, (3) missing example projects. 58% of churned trials cited #1.",
+    text: "Euler's formula is a mathematical equation that relates the exponential function to trigonometric functions. It states that e^(ix) = cos(x) + i*sin(x), where i is the imaginary unit.",
   },
 ];
 

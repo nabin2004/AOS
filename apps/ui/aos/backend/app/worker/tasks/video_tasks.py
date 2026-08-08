@@ -6,11 +6,14 @@ import asyncio
 import json
 import logging
 import os
+import re
 import subprocess
+import threading
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 from uuid import UUID
 
+import redis
 import redis.asyncio as aioredis
 from celery import shared_task
 
@@ -24,6 +27,34 @@ VIDEO_STATUS_CHANNEL = "video_status"
 # Lecture pipelines can run a long time (IR + Docker Manim + ffmpeg).
 _SOFT_LIMIT = 50 * 60
 _HARD_LIMIT = 60 * 60
+
+# Agents CLI prints ``-> {node_id}`` (Rich may wrap with ANSI); strip and map.
+_NODE_PROGRESS_RE = re.compile(r"->\s*([A-Za-z0-9_]+)")
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
+
+_STAGE_MESSAGES: dict[str, str] = {
+    "ClassifyNode": "Classifying topic…",
+    "PlanLectureNode": "Planning the lecture…",
+    "CodeAgent": "Writing Manim code…",
+    "CodeAgentNode": "Writing Manim code…",
+    "starting": "Starting animation pipeline…",
+    "compile": "Compiling Manim scene…",
+    "render": "Rendering video…",
+    "assemble": "Assembling final video…",
+    "upload": "Uploading video…",
+}
+
+
+def _friendly_stage_message(stage: str) -> str:
+    if stage in _STAGE_MESSAGES:
+        return _STAGE_MESSAGES[stage]
+    # CamelCase / snake → readable fallback
+    spaced = re.sub(r"([a-z])([A-Z])", r"\1 \2", stage).replace("_", " ")
+    return f"{spaced}…"
+
+
+def _strip_ansi(text: str) -> str:
+    return _ANSI_RE.sub("", text)
 
 
 def _resolve_agents_dir() -> Path:
@@ -45,8 +76,43 @@ def _resolve_agents_dir() -> Path:
     )
 
 
-def _run_agents_cli(mode: str, prompt: str) -> dict[str, Any]:
-    """Invoke ``cli.py animate|generate --json`` and parse the VideoArtifact."""
+def _notify_video_status_sync(payload: dict[str, Any]) -> None:
+    """Publish from the sync CLI-reader thread (no event loop)."""
+    try:
+        r = redis.from_url(
+            f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}"
+        )
+        try:
+            r.publish(VIDEO_STATUS_CHANNEL, json.dumps(payload, default=str))
+        finally:
+            r.close()
+    except Exception as exc:
+        logger.warning("Failed to publish video_status (sync): %s", exc)
+
+
+def _parse_progress_stage(line: str) -> str | None:
+    cleaned = _strip_ansi(line).strip()
+    match = _NODE_PROGRESS_RE.search(cleaned)
+    if not match:
+        return None
+    return match.group(1)
+
+
+def _run_agents_cli(
+    mode: str,
+    prompt: str,
+    *,
+    llm_base_url: str | None = None,
+    llm_api_key: str | None = None,
+    model_name: str | None = None,
+    generation_id: str | None = None,
+    conversation_id: str | None = None,
+    user_id: str | None = None,
+) -> dict[str, Any]:
+    """Invoke ``cli.py animate|generate --json`` and parse the VideoArtifact.
+
+    Streams ``-> {node}`` progress lines to Redis while the process runs.
+    """
     agents_dir = _resolve_agents_dir()
     command = "animate" if mode == "animate" else "generate"
     cmd = [
@@ -64,18 +130,123 @@ def _run_agents_cli(mode: str, prompt: str) -> dict[str, Any]:
 
     logger.info("Running agents CLI in %s: %s …", agents_dir, command)
     env = os.environ.copy()
-    proc = subprocess.run(
+    # Force unbuffered / line-buffered Python so progress appears promptly.
+    env["PYTHONUNBUFFERED"] = "1"
+    # Host Celery often inherits backend VIRTUAL_ENV; agents `uv run` must use apps/agents.
+    env.pop("VIRTUAL_ENV", None)
+    custom_base = (llm_base_url or "").strip()
+    custom_key = (llm_api_key or "").strip()
+    custom_model = (model_name or "").strip()
+
+    if custom_base:
+        # BYOK / local OpenAI-compatible endpoint for all pipeline roles.
+        env["AOS_OPENAI_BASE_URL"] = custom_base
+        env["AOS_OPENAI_API_KEY"] = custom_key or "local"
+        if custom_model:
+            env["AOS_OPENAI_MODEL"] = custom_model
+            # Keep role overrides aligned so lecture hardcodes via llm_config pick it up.
+            for role_env in (
+                "AOS_CLASSIFIER_MODEL",
+                "AOS_PLANNER_MODEL",
+                "AOS_CODER_MODEL",
+                "AOS_ANIMATION_MODEL",
+                "AOS_OPENROUTER_MODEL",
+            ):
+                env[role_env] = custom_model
+        env["AOS_MODEL_PROFILE"] = "openai_compatible"
+    else:
+        # UI Animate path: force OpenRouter for the full Classify→Plan→Code graph
+        # (default agents profile is hybrid and expects Ollama for the coder).
+        env["AOS_MODEL_PROFILE"] = "cloud"
+        openrouter_key = custom_key or settings.OPENROUTER_API_KEY
+        if openrouter_key:
+            env["OPENROUTER_API_KEY"] = openrouter_key
+        if custom_model:
+            env["AOS_OPENROUTER_MODEL"] = (
+                custom_model
+                if custom_model.startswith("openrouter:")
+                else f"openrouter:{custom_model}"
+            )
+            for role_env in (
+                "AOS_CLASSIFIER_MODEL",
+                "AOS_PLANNER_MODEL",
+                "AOS_CODER_MODEL",
+                "AOS_ANIMATION_MODEL",
+            ):
+                env[role_env] = env["AOS_OPENROUTER_MODEL"]
+
+    def publish_stage(stage: str, message: str | None = None) -> None:
+        if not generation_id:
+            return
+        _notify_video_status_sync(
+            {
+                "type": "video_status",
+                "video_generation_id": generation_id,
+                "conversation_id": conversation_id,
+                "user_id": user_id,
+                "status": "running",
+                "stage": stage,
+                "message": message or _friendly_stage_message(stage),
+                "mode": mode,
+                "prompt": prompt,
+            }
+        )
+
+    proc = subprocess.Popen(
         cmd,
         cwd=str(agents_dir),
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
         encoding="utf-8",
         errors="replace",
         env=env,
-        check=False,
+        bufsize=1,
     )
-    stdout = (proc.stdout or "").strip()
-    stderr = (proc.stderr or "").strip()
+
+    stdout_chunks: list[str] = []
+    stderr_chunks: list[str] = []
+    seen_stages: set[str] = set()
+
+    def _read_stream(
+        stream: Any,
+        sink: list[str],
+        *,
+        on_line: Callable[[str], None] | None = None,
+    ) -> None:
+        assert stream is not None
+        for line in stream:
+            sink.append(line)
+            if on_line is not None:
+                on_line(line)
+
+    def _on_progress_line(line: str) -> None:
+        stage = _parse_progress_stage(line)
+        if not stage or stage in seen_stages:
+            return
+        seen_stages.add(stage)
+        publish_stage(stage)
+
+    stdout_thread = threading.Thread(
+        target=_read_stream,
+        args=(proc.stdout, stdout_chunks),
+        kwargs={"on_line": _on_progress_line},
+        daemon=True,
+    )
+    stderr_thread = threading.Thread(
+        target=_read_stream,
+        args=(proc.stderr, stderr_chunks),
+        kwargs={"on_line": _on_progress_line},
+        daemon=True,
+    )
+    stdout_thread.start()
+    stderr_thread.start()
+    returncode = proc.wait()
+    stdout_thread.join(timeout=30)
+    stderr_thread.join(timeout=30)
+
+    stdout = "".join(stdout_chunks).strip()
+    stderr = "".join(stderr_chunks).strip()
     if stderr:
         logger.info("agents stderr (tail): %s", stderr[-2000:])
 
@@ -98,7 +269,7 @@ def _run_agents_cli(mode: str, prompt: str) -> dict[str, Any]:
             "video_path": None,
             "run_dir": None,
             "error": (
-                f"agents CLI returned no JSON (exit={proc.returncode}): "
+                f"agents CLI returned no JSON (exit={returncode}): "
                 f"{stderr[-500:] or stdout[-500:] or 'empty output'}"
             ),
             "detail": {},
@@ -122,11 +293,13 @@ async def _persist_assistant_result(
     conversation_id: UUID,
     generation_id: UUID,
     mode: str,
+    prompt: str,
     ok: bool,
     minio_key: str | None,
     error: str | None,
+    existing_assistant_message_id: UUID | None = None,
 ) -> UUID | None:
-    """Persist assistant message + generate_video tool call; return message id."""
+    """Persist or update assistant message + generate_video tool call; return message id."""
     from datetime import UTC, datetime
 
     from app.schemas.conversation import MessageCreate, ToolCallComplete, ToolCallCreate
@@ -140,6 +313,7 @@ async def _persist_assistant_result(
                 "video_generation_id": str(generation_id),
                 "minio_key": minio_key,
                 "mode": mode,
+                "prompt": prompt,
                 "status": "completed",
             }
         )
@@ -151,14 +325,38 @@ async def _persist_assistant_result(
                 "kind": "video",
                 "video_generation_id": str(generation_id),
                 "mode": mode,
+                "prompt": prompt,
                 "status": "failed",
                 "error": error,
             }
         )
         success = False
 
+    external_tc_id = f"generate_video_{generation_id}"
+
     async with get_worker_db_context() as db:
         conv = ConversationService(db)
+
+        if existing_assistant_message_id is not None:
+            try:
+                await conv.update_message_content(existing_assistant_message_id, content)
+                tc = await conv.get_tool_call_by_external_id(external_tc_id)
+                if tc is not None:
+                    await conv.complete_tool_call(
+                        tc.id,
+                        ToolCallComplete(
+                            result=tool_result,
+                            completed_at=datetime.now(UTC),
+                            success=success,
+                        ),
+                    )
+                    return existing_assistant_message_id
+            except Exception:
+                logger.exception(
+                    "Failed to update existing assistant message %s; creating new one",
+                    existing_assistant_message_id,
+                )
+
         msg = await conv.add_message(
             conversation_id,
             MessageCreate(role="assistant", content=content, model_name="manim-pipeline"),
@@ -166,9 +364,13 @@ async def _persist_assistant_result(
         tc = await conv.start_tool_call(
             msg.id,
             ToolCallCreate(
-                tool_call_id=f"generate_video_{generation_id}",
+                tool_call_id=external_tc_id,
                 tool_name="generate_video",
-                args={"mode": mode, "video_generation_id": str(generation_id)},
+                args={
+                    "mode": mode,
+                    "video_generation_id": str(generation_id),
+                    "prompt": prompt,
+                },
                 started_at=datetime.now(UTC),
             ),
         )
@@ -183,7 +385,13 @@ async def _persist_assistant_result(
         return msg.id
 
 
-async def _run_generate_video(generation_id: str) -> dict[str, Any]:
+async def _run_generate_video(
+    generation_id: str,
+    *,
+    llm_base_url: str | None = None,
+    llm_api_key: str | None = None,
+    model_name: str | None = None,
+) -> dict[str, Any]:
     from app.services.video_generation import VideoGenerationService
     from app.services.video_storage import get_video_storage
 
@@ -196,6 +404,7 @@ async def _run_generate_video(generation_id: str) -> dict[str, Any]:
         prompt = row.prompt
         user_id = row.user_id
         conversation_id = row.conversation_id
+        existing_assistant_message_id = row.assistant_message_id
         object_key = svc.build_object_key(row)
 
     await _notify_video_status(
@@ -205,22 +414,48 @@ async def _run_generate_video(generation_id: str) -> dict[str, Any]:
             "conversation_id": str(conversation_id),
             "user_id": str(user_id),
             "status": "running",
+            "stage": "starting",
+            "message": "Starting animation pipeline…",
             "mode": mode,
+            "prompt": prompt,
         }
     )
 
-    artifact = await asyncio.to_thread(_run_agents_cli, mode, prompt)
+    artifact = await asyncio.to_thread(
+        _run_agents_cli,
+        mode,
+        prompt,
+        llm_base_url=llm_base_url,
+        llm_api_key=llm_api_key,
+        model_name=model_name,
+        generation_id=generation_id,
+        conversation_id=str(conversation_id),
+        user_id=str(user_id),
+    )
     run_dir = artifact.get("run_dir")
 
     if not artifact.get("ok") or not artifact.get("video_path"):
-        error = artifact.get("error") or "video_pipeline_failed"
+        error = (
+            artifact.get("error")
+            or artifact.get("stopped_reason")
+            or "video_pipeline_failed"
+        )
+        if error == "completed" and not artifact.get("video_path"):
+            summary = (artifact.get("summary") or artifact.get("message") or "").strip()
+            error = (
+                f"pipeline_finished_without_video: {summary[:400]}"
+                if summary
+                else "pipeline_finished_without_video"
+            )
         assistant_id = await _persist_assistant_result(
             conversation_id=conversation_id,
             generation_id=gid,
             mode=mode,
+            prompt=prompt,
             ok=False,
             minio_key=None,
             error=error,
+            existing_assistant_message_id=existing_assistant_message_id,
         )
         async with get_worker_db_context() as db:
             await VideoGenerationService(db).mark_failed(
@@ -236,7 +471,10 @@ async def _run_generate_video(generation_id: str) -> dict[str, Any]:
                 "conversation_id": str(conversation_id),
                 "user_id": str(user_id),
                 "status": "failed",
+                "stage": "failed",
+                "message": f"Video generation failed: {error}",
                 "mode": mode,
+                "prompt": prompt,
                 "error": error,
             }
         )
@@ -244,6 +482,19 @@ async def _run_generate_video(generation_id: str) -> dict[str, Any]:
 
     video_path = artifact["video_path"]
     try:
+        await _notify_video_status(
+            {
+                "type": "video_status",
+                "video_generation_id": generation_id,
+                "conversation_id": str(conversation_id),
+                "user_id": str(user_id),
+                "status": "running",
+                "stage": "upload",
+                "message": "Uploading video…",
+                "mode": mode,
+                "prompt": prompt,
+            }
+        )
         storage = get_video_storage()
         storage.upload_file(video_path, object_key)
     except Exception as exc:
@@ -253,9 +504,11 @@ async def _run_generate_video(generation_id: str) -> dict[str, Any]:
             conversation_id=conversation_id,
             generation_id=gid,
             mode=mode,
+            prompt=prompt,
             ok=False,
             minio_key=None,
             error=error,
+            existing_assistant_message_id=existing_assistant_message_id,
         )
         async with get_worker_db_context() as db:
             await VideoGenerationService(db).mark_failed(
@@ -271,7 +524,10 @@ async def _run_generate_video(generation_id: str) -> dict[str, Any]:
                 "conversation_id": str(conversation_id),
                 "user_id": str(user_id),
                 "status": "failed",
+                "stage": "upload",
+                "message": f"Upload failed: {error}",
                 "mode": mode,
+                "prompt": prompt,
                 "error": error,
             }
         )
@@ -281,9 +537,11 @@ async def _run_generate_video(generation_id: str) -> dict[str, Any]:
         conversation_id=conversation_id,
         generation_id=gid,
         mode=mode,
+        prompt=prompt,
         ok=True,
         minio_key=object_key,
         error=None,
+        existing_assistant_message_id=existing_assistant_message_id,
     )
     async with get_worker_db_context() as db:
         await VideoGenerationService(db).mark_completed(
@@ -300,7 +558,10 @@ async def _run_generate_video(generation_id: str) -> dict[str, Any]:
             "conversation_id": str(conversation_id),
             "user_id": str(user_id),
             "status": "completed",
+            "stage": "completed",
+            "message": "Your video is ready.",
             "mode": mode,
+            "prompt": prompt,
             "minio_key": object_key,
             "assistant_message_id": str(assistant_id) if assistant_id else None,
         }
@@ -314,11 +575,24 @@ async def _run_generate_video(generation_id: str) -> dict[str, Any]:
     soft_time_limit=_SOFT_LIMIT,
     time_limit=_HARD_LIMIT,
 )  # type: ignore[misc]
-def generate_video_task(self: Any, generation_id: str) -> dict[str, Any]:
+def generate_video_task(
+    self: Any,
+    generation_id: str,
+    llm_base_url: str | None = None,
+    llm_api_key: str | None = None,
+    model_name: str | None = None,
+) -> dict[str, Any]:
     """Run Manim pipeline via agents CLI, upload MP4 to MinIO, update DB."""
     logger.info("generate_video_task start: %s", generation_id)
     try:
-        return asyncio.run(_run_generate_video(generation_id))
+        return asyncio.run(
+            _run_generate_video(
+                generation_id,
+                llm_base_url=llm_base_url,
+                llm_api_key=llm_api_key,
+                model_name=model_name,
+            )
+        )
     except Exception as exc:
         logger.exception("generate_video_task failed: %s", generation_id)
         try:

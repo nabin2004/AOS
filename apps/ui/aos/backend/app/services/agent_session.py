@@ -1,6 +1,7 @@
 # Thin session wrapper — the route is lifecycle plumbing only; orchestration lives here.
 import asyncio
 import contextlib
+import json
 import logging
 from datetime import datetime
 from typing import Any
@@ -162,11 +163,16 @@ class AgentSession:
         await send_event(self.websocket, "user_prompt", {"content": user_message})
 
         video_mode = data.get("video_mode")
+        llm_base_url = (data.get("llm_base_url") or "").strip() or None
+        llm_api_key = (data.get("llm_api_key") or "").strip() or None
         if video_mode in ("animate", "lecture") and self.current_conversation_id:
             await self._process_video_turn(
                 user_message=user_message,
                 video_mode=video_mode,
                 user_message_id=user_message_id,
+                llm_base_url=llm_base_url,
+                llm_api_key=llm_api_key,
+                model_name=data.get("model"),
             )
             return
 
@@ -177,7 +183,12 @@ class AgentSession:
             subagent_cap = None
             ctx_manager_cap = None
             if deep_research and self.current_conversation_id:
-                self._research = ResearchToolkit(self._send, model_name=data.get("model"))
+                self._research = ResearchToolkit(
+                    self._send,
+                    model_name=data.get("model"),
+                    base_url=llm_base_url,
+                    api_key=llm_api_key,
+                )
                 caps = await self._research.build(self.current_conversation_id)
                 todo_cap = caps.todo
                 subagent_cap = caps.subagents
@@ -187,10 +198,13 @@ class AgentSession:
             assistant = get_agent(
                 model_name=data.get("model"),
                 thinking_effort=data.get("thinking_effort"),
+                temperature=data.get("temperature"),
                 deep_research=deep_research,
                 todo_capability=todo_cap,
                 subagent_capability=subagent_cap,
                 context_manager_capability=ctx_manager_cap,
+                base_url=llm_base_url,
+                api_key=llm_api_key,
             )
             model_history = build_message_history(self.conversation_history)
             user_input = await self._build_multimodal_input(user_message, file_ids)
@@ -286,15 +300,22 @@ class AgentSession:
         user_message: str,
         video_mode: str,
         user_message_id: str | None,
+        llm_base_url: str | None = None,
+        llm_api_key: str | None = None,
+        model_name: str | None = None,
     ) -> None:
         """Enqueue a Manim video job and stream status over this WebSocket."""
+        from datetime import UTC, datetime
         from uuid import UUID as UUIDType
 
+        from app.schemas.conversation import MessageCreate, ToolCallCreate
         from app.schemas.video_generation import VideoGenerationCreate
+        from app.services.conversation import ConversationService
         from app.services.video_generation import VideoGenerationService
         from app.worker.tasks.video_tasks import VIDEO_STATUS_CHANNEL
 
         try:
+            # 1) Persist pending row + in-flight assistant message (survives refresh).
             async with get_db_context() as db:
                 svc = VideoGenerationService(db)
                 row = await svc.create_pending(
@@ -306,11 +327,51 @@ class AgentSession:
                         user_message_id=UUIDType(user_message_id) if user_message_id else None,
                     ),
                 )
-                task_id = svc.enqueue(row.id)
-                await svc.set_celery_task(row.id, task_id)
                 generation_id = str(row.id)
+                generation_uuid = row.id
 
-            tool_call_id = f"generate_video_{generation_id}"
+                conv = ConversationService(db)
+                pending_result = json.dumps(
+                    {
+                        "kind": "video",
+                        "video_generation_id": generation_id,
+                        "mode": video_mode,
+                        "prompt": user_message,
+                        "status": "pending",
+                        "stage": "queued",
+                        "message": "Queued… preparing animation pipeline.",
+                    }
+                )
+                assistant_msg = await conv.add_message(
+                    UUIDType(self.current_conversation_id),
+                    MessageCreate(
+                        role="assistant",
+                        content=(
+                            f"Starting {video_mode} video generation… "
+                            "This can take several minutes — I'll stream progress here."
+                        ),
+                        model_name="manim-pipeline",
+                    ),
+                )
+                tool_call_id = f"generate_video_{generation_id}"
+                tc = await conv.start_tool_call(
+                    assistant_msg.id,
+                    ToolCallCreate(
+                        tool_call_id=tool_call_id,
+                        tool_name="generate_video",
+                        args={
+                            "mode": video_mode,
+                            "video_generation_id": generation_id,
+                            "prompt": user_message,
+                        },
+                        started_at=datetime.now(UTC),
+                    ),
+                )
+                tc.result = pending_result
+                await db.flush()
+                await svc.set_assistant_message(generation_uuid, assistant_msg.id)
+                assistant_message_id = str(assistant_msg.id)
+
             await send_event(self.websocket, "model_request_start", {})
             await send_event(
                 self.websocket,
@@ -318,7 +379,11 @@ class AgentSession:
                 {
                     "tool_call_id": tool_call_id,
                     "tool_name": "generate_video",
-                    "args": {"mode": video_mode, "video_generation_id": generation_id},
+                    "args": {
+                        "mode": video_mode,
+                        "video_generation_id": generation_id,
+                        "prompt": user_message,
+                    },
                 },
             )
             await send_event(
@@ -328,7 +393,10 @@ class AgentSession:
                     "video_generation_id": generation_id,
                     "conversation_id": self.current_conversation_id,
                     "status": "pending",
+                    "stage": "queued",
+                    "message": "Queued… preparing animation pipeline.",
                     "mode": video_mode,
+                    "prompt": user_message,
                 },
             )
             await send_event(
@@ -338,18 +406,77 @@ class AgentSession:
                     "index": 0,
                     "content": (
                         f"Starting {video_mode} video generation… "
-                        "This can take several minutes. I'll update this chat when it's ready."
+                        "This can take several minutes — I'll stream progress here."
                     ),
                 },
             )
-
-            # Forward Redis status updates until terminal state (or timeout).
-            await self._watch_video_status(
-                generation_id=generation_id,
-                tool_call_id=tool_call_id,
-                channel=VIDEO_STATUS_CHANNEL,
+            await send_event(
+                self.websocket,
+                "message_saved",
+                {
+                    "message_id": assistant_message_id,
+                    "conversation_id": self.current_conversation_id,
+                },
             )
 
+            # Fail fast if no Celery workers are connected to the broker.
+            if not await asyncio.to_thread(self._celery_workers_available):
+                err = (
+                    "No Celery worker is connected. From apps/ui/aos/backend run: "
+                    "`uv run aos celery worker`"
+                )
+                async with get_db_context() as db:
+                    await VideoGenerationService(db).mark_failed(
+                        generation_uuid, error_message=err
+                    )
+                await self._emit_video_terminal(
+                    generation_id=generation_id,
+                    tool_call_id=tool_call_id,
+                    prompt=user_message,
+                    status="failed",
+                    mode=video_mode,
+                    error=err,
+                    message=err,
+                )
+                await send_event(self.websocket, "final_result", {"output": ""})
+                await send_event(
+                    self.websocket,
+                    "complete",
+                    {"conversation_id": self.current_conversation_id},
+                )
+                return
+
+            # 2) Subscribe to Redis BEFORE enqueue so early "running" pubs are not lost.
+            subscribed = asyncio.Event()
+            watch_task = asyncio.create_task(
+                self._watch_video_status(
+                    generation_id=generation_id,
+                    tool_call_id=tool_call_id,
+                    prompt=user_message,
+                    channel=VIDEO_STATUS_CHANNEL,
+                    subscribed=subscribed,
+                    mode=video_mode,
+                )
+            )
+            try:
+                await asyncio.wait_for(subscribed.wait(), timeout=10.0)
+            except TimeoutError:
+                logger.warning("Redis video_status subscribe timed out; enqueueing anyway")
+
+            # 3) Enqueue Celery after the client has UI + Redis watcher is ready.
+            async with get_db_context() as db:
+                svc = VideoGenerationService(db)
+                task_id = svc.enqueue(
+                    generation_uuid,
+                    llm_base_url=llm_base_url,
+                    llm_api_key=llm_api_key,
+                    model_name=model_name,
+                )
+                await svc.set_celery_task(generation_uuid, task_id)
+
+            await watch_task
+
+            await send_event(self.websocket, "final_result", {"output": ""})
             await send_event(
                 self.websocket,
                 "complete",
@@ -361,38 +488,239 @@ class AgentSession:
             logger.exception("Error starting video generation")
             await send_event(self.websocket, "error", {"message": str(e)})
 
+    @staticmethod
+    def _celery_workers_available() -> bool:
+        """Return True if at least one Celery worker responds to ping."""
+        try:
+            from app.worker.celery_app import celery_app
+
+            inspector = celery_app.control.inspect(timeout=2.0)
+            pinged = inspector.ping() if inspector is not None else None
+            return bool(pinged)
+        except Exception as exc:
+            logger.warning("Celery worker ping failed: %s", exc)
+            return False
+
+    async def _emit_video_terminal(
+        self,
+        *,
+        generation_id: str,
+        tool_call_id: str,
+        prompt: str,
+        status: str,
+        mode: str | None = None,
+        error: str | None = None,
+        message: str | None = None,
+        minio_key: str | None = None,
+        assistant_message_id: str | None = None,
+        stage: str | None = None,
+    ) -> None:
+        import json
+
+        payload = {
+            "video_generation_id": generation_id,
+            "conversation_id": self.current_conversation_id,
+            "status": status,
+            "mode": mode,
+            "prompt": prompt,
+            "stage": stage or status,
+            "message": message,
+            "error": error,
+            "minio_key": minio_key,
+            "assistant_message_id": assistant_message_id,
+        }
+        await send_event(self.websocket, "video_status", payload)
+
+        if status == "completed":
+            result = {
+                "kind": "video",
+                "video_generation_id": generation_id,
+                "minio_key": minio_key,
+                "mode": mode,
+                "prompt": prompt,
+                "status": "completed",
+                "stage": "completed",
+                "message": message or "Your video is ready.",
+            }
+            await send_event(
+                self.websocket,
+                "tool_result",
+                {"tool_call_id": tool_call_id, "content": json.dumps(result)},
+            )
+            await send_event(
+                self.websocket,
+                "text_delta",
+                {"index": 0, "content": "\n\nYour video is ready."},
+            )
+        else:
+            result = {
+                "kind": "video",
+                "video_generation_id": generation_id,
+                "mode": mode,
+                "prompt": prompt,
+                "status": "failed",
+                "stage": stage or "failed",
+                "message": message or f"Video generation failed: {error}",
+                "error": error,
+            }
+            await send_event(
+                self.websocket,
+                "tool_result",
+                {"tool_call_id": tool_call_id, "content": json.dumps(result)},
+            )
+            await send_event(
+                self.websocket,
+                "text_delta",
+                {
+                    "index": 0,
+                    "content": f"\n\nVideo generation failed: {error or message}",
+                },
+            )
+        if assistant_message_id:
+            await send_event(
+                self.websocket,
+                "message_saved",
+                {
+                    "message_id": assistant_message_id,
+                    "conversation_id": self.current_conversation_id,
+                },
+            )
+
     async def _watch_video_status(
         self,
         *,
         generation_id: str,
         tool_call_id: str,
+        prompt: str,
         channel: str,
         timeout_seconds: float = 60 * 60,
+        pending_idle_seconds: float = 60.0,
+        subscribed: asyncio.Event | None = None,
+        mode: str | None = None,
     ) -> None:
-        """Subscribe to Redis ``video_status`` and relay matching events to the client."""
+        """Relay Redis ``video_status`` and fall back to DB polling."""
         import json
+        from uuid import UUID as UUIDType
 
         import redis.asyncio as aioredis
+
+        from app.services.video_generation import VideoGenerationService
 
         r = aioredis.from_url(
             f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}"
         )  # type: ignore[no-untyped-call]
         pubsub = r.pubsub()
         await pubsub.subscribe(channel)
+        if subscribed is not None:
+            subscribed.set()
+
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + timeout_seconds
+        pending_deadline = loop.time() + pending_idle_seconds
+        last_db_poll = 0.0
+        last_emitted_status: str | None = "pending"
+        saw_running = False
+
         try:
-            deadline = asyncio.get_running_loop().time() + timeout_seconds
             while True:
-                if asyncio.get_running_loop().time() >= deadline:
-                    await send_event(
-                        self.websocket,
-                        "video_status",
-                        {
-                            "video_generation_id": generation_id,
-                            "status": "failed",
-                            "error": "timed_out_waiting_for_worker",
-                        },
+                now = loop.time()
+                if now >= deadline:
+                    err = "Timed out waiting for the animation worker."
+                    async with get_db_context() as db:
+                        await VideoGenerationService(db).mark_failed(
+                            UUIDType(generation_id), error_message=err
+                        )
+                    await self._emit_video_terminal(
+                        generation_id=generation_id,
+                        tool_call_id=tool_call_id,
+                        prompt=prompt,
+                        status="failed",
+                        mode=mode,
+                        error="timed_out_waiting_for_worker",
+                        message=err,
+                        stage="timeout",
                     )
                     break
+
+                # Idle while still pending → worker never picked up the job.
+                if not saw_running and now >= pending_deadline:
+                    err = (
+                        "Celery worker is not picking up video jobs. "
+                        "Ensure Redis is up and run `uv run aos celery worker` "
+                        "from apps/ui/aos/backend (with AGENTS_DIR set)."
+                    )
+                    async with get_db_context() as db:
+                        row = await VideoGenerationService(db).get_by_id(
+                            UUIDType(generation_id)
+                        )
+                        if row is None or row.status == "pending":
+                            await VideoGenerationService(db).mark_failed(
+                                UUIDType(generation_id), error_message=err
+                            )
+                            await self._emit_video_terminal(
+                                generation_id=generation_id,
+                                tool_call_id=tool_call_id,
+                                prompt=prompt,
+                                status="failed",
+                                mode=mode or (row.mode if row else None),
+                                error="worker_not_picking_up_jobs",
+                                message=err,
+                                stage="halted",
+                            )
+                            break
+                        # DB already advanced — treat as running and keep watching.
+                        saw_running = True
+
+                # DB poll fallback every ~3s (covers missed Redis pubs).
+                if now - last_db_poll >= 3.0:
+                    last_db_poll = now
+                    async with get_db_context() as db:
+                        row = await VideoGenerationService(db).get_by_id(
+                            UUIDType(generation_id)
+                        )
+                    if row is not None and row.status != last_emitted_status:
+                        if row.status == "running":
+                            saw_running = True
+                            last_emitted_status = "running"
+                            await send_event(
+                                self.websocket,
+                                "video_status",
+                                {
+                                    "video_generation_id": generation_id,
+                                    "conversation_id": self.current_conversation_id,
+                                    "status": "running",
+                                    "stage": "starting",
+                                    "message": "Starting animation pipeline…",
+                                    "mode": row.mode,
+                                    "prompt": row.prompt or prompt,
+                                },
+                            )
+                        elif row.status in ("completed", "failed"):
+                            last_emitted_status = row.status
+                            await self._emit_video_terminal(
+                                generation_id=generation_id,
+                                tool_call_id=tool_call_id,
+                                prompt=prompt,
+                                status=row.status,
+                                mode=row.mode,
+                                error=row.error_message,
+                                message=(
+                                    "Your video is ready."
+                                    if row.status == "completed"
+                                    else (
+                                        f"Video generation failed: {row.error_message}"
+                                        if row.error_message
+                                        else "Video generation failed."
+                                    )
+                                ),
+                                minio_key=row.minio_key,
+                                assistant_message_id=(
+                                    str(row.assistant_message_id)
+                                    if row.assistant_message_id
+                                    else None
+                                ),
+                            )
+                            break
 
                 message = await pubsub.get_message(
                     ignore_subscribe_messages=True, timeout=1.0
@@ -412,63 +740,26 @@ class AgentSession:
                     continue
 
                 status = payload.get("status")
-                await send_event(self.websocket, "video_status", payload)
+                if status == "running":
+                    saw_running = True
+                if status in ("pending", "running"):
+                    last_emitted_status = status
+                    await send_event(self.websocket, "video_status", payload)
+                    continue
 
-                if status == "completed":
-                    result = {
-                        "kind": "video",
-                        "video_generation_id": generation_id,
-                        "minio_key": payload.get("minio_key"),
-                        "mode": payload.get("mode"),
-                        "status": "completed",
-                    }
-                    await send_event(
-                        self.websocket,
-                        "tool_result",
-                        {
-                            "tool_call_id": tool_call_id,
-                            "content": json.dumps(result),
-                        },
-                    )
-                    await send_event(
-                        self.websocket,
-                        "text_delta",
-                        {"index": 0, "content": "\n\nYour video is ready."},
-                    )
-                    if payload.get("assistant_message_id"):
-                        await send_event(
-                            self.websocket,
-                            "message_saved",
-                            {
-                                "message_id": payload["assistant_message_id"],
-                                "conversation_id": self.current_conversation_id,
-                            },
-                        )
-                    break
-
-                if status == "failed":
-                    result = {
-                        "kind": "video",
-                        "video_generation_id": generation_id,
-                        "mode": payload.get("mode"),
-                        "status": "failed",
-                        "error": payload.get("error"),
-                    }
-                    await send_event(
-                        self.websocket,
-                        "tool_result",
-                        {
-                            "tool_call_id": tool_call_id,
-                            "content": json.dumps(result),
-                        },
-                    )
-                    await send_event(
-                        self.websocket,
-                        "text_delta",
-                        {
-                            "index": 0,
-                            "content": f"\n\nVideo generation failed: {payload.get('error')}",
-                        },
+                if status in ("completed", "failed"):
+                    last_emitted_status = status
+                    await self._emit_video_terminal(
+                        generation_id=generation_id,
+                        tool_call_id=tool_call_id,
+                        prompt=prompt,
+                        status=status,
+                        mode=payload.get("mode") or mode,
+                        error=payload.get("error"),
+                        message=payload.get("message"),
+                        minio_key=payload.get("minio_key"),
+                        assistant_message_id=payload.get("assistant_message_id"),
+                        stage=payload.get("stage"),
                     )
                     break
         except WebSocketDisconnect:

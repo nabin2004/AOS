@@ -51,12 +51,61 @@ flowchart TB
 4. The worker uploads the MP4 to MinIO bucket `aos-videos` and stores `minio_key` on `video_generations`.
 5. Chat receives `video_status` / `tool_result` and renders the player via `/api/videos/{id}/stream`.
 
-**Required for video jobs:** Redis + Celery worker, MinIO (`S3_VIDEO_ENDPOINT=http://localhost:9010`), agents env (Ollama/OpenRouter), and for **Lecture** also Docker Manim + ffmpeg.
+**Required for video jobs:** Docker for Redis / MinIO / API (`make dev` or `.\scripts\dev-refresh.ps1`), plus **host Celery** (auto-started by `dev-refresh.ps1` — Docker `celery_worker` cannot run `uv`/Manim). Also `OPENROUTER_API_KEY` or BYOK LLM fields. For **Lecture**, also Docker Manim + ffmpeg.
+
+Why host Celery: the Compose image has no `uv`, mounts agents read-only, and lacks Manim. Profile `docker-celery` is advanced-only.
+
+```powershell
+cd apps\ui\aos
+.\scripts\dev-refresh.ps1              # infra + API + HOST Celery
+.\scripts\dev-refresh.ps1 -Rebuild     # Dockerfile / deps changed
+.\scripts\dev-refresh.ps1 -AgentsOnly  # restart host Celery only
+.\scripts\dev-refresh.ps1 -Logs        # host celery log + minio
+.\scripts\diagnose-animate.ps1         # hop-by-hop PASS/FAIL
+```
+
+Host worker uses `AGENTS_DIR` → `apps/agents`, broker `redis://localhost:6379/0`, `S3_VIDEO_ENDPOINT=http://localhost:9010`. Log: `apps/ui/aos/.local/celery-worker.log`.
+
+**Day-to-day Animate checklist**
+
+1. `.\scripts\dev-refresh.ps1` — Postgres, Redis, MinIO, API, **host Celery**
+2. Frontend: `cd frontend && bun dev`
+3. Confirm: `.\scripts\diagnose-animate.ps1` (celery inspect PASS) or Flower http://localhost:5555
+4. Chat Controls → Video generation → Animate → send a short prompt
+5. Expect: Queued → Starting / Classifying… → completed player; re-run diagnose → `status=completed` + `minio_key`
+
+If Queued forever: diagnose script / `.local/celery-worker.log` — ensure Docker `celery_worker` is **stopped** so it does not steal jobs without being able to run agents.
+
+### Animate E2E debug
+
+| Hop | Success signal |
+|-----|----------------|
+| Enqueue | `video_generations` row `pending` → `running`; Flower / host log `generate_video_task` |
+| Agents | Host log: `Running agents CLI` / `-> Classifier`… |
+| Compile | `apps/agents/workspace/coder_runs/...` with mp4 |
+| MinIO | `minio_key` set; console `:9011` bucket `aos-videos` |
+| UI | Completed player via `/api/videos/{id}/stream` |
+
+Run `.\scripts\diagnose-animate.ps1` after a failed Animate — `error_message` on the latest DB row names the hop.
+
+### Animate smoke test (OpenRouter + `agent_graph.py`)
+
+1. Set `OPENROUTER_API_KEY` in `apps/ui/aos/backend/.env` (and optionally `apps/agents/.env`).
+2. `.\scripts\dev-refresh.ps1` + frontend.
+3. In chat **Settings**, set **Video generation** to **Animate**.
+4. Send a short prompt (e.g. `draw a bouncing ball`).
+5. Expect: tool card → pending/running → completed player; `.\scripts\diagnose-animate.ps1` shows completed + minio_key.
+
+CLI equivalent (no UI):
 
 ```bash
-# From apps/ui/aos/backend — with Redis up
-uv run aos celery worker
+cd apps/agents
+# Ensure OPENROUTER_API_KEY is set; cloud profile uses OpenRouter for coder too
+set AOS_MODEL_PROFILE=cloud   # PowerShell: $env:AOS_MODEL_PROFILE="cloud"
+uv run python cli.py animate "draw a bouncing ball" --json --no-banner
 ```
+
+If compile fails, pull the Manim Docker image (`docker pull manimcommunity/manim`) — the coder still needs a working Manim compile path.
 
 ---
 
@@ -67,7 +116,7 @@ uv run aos celery worker
 | **Docker Desktop** | 24+ | [docker.com/get-docker](https://docs.docker.com/get-docker/) |
 | **uv** | latest | [docs.astral.sh/uv](https://docs.astral.sh/uv/) |
 | **bun** or **npm** | bun 1.x / node 18+ | [bun.sh](https://bun.sh) or [nodejs.org](https://nodejs.org) |
-| **Ollama** | latest (Manim agents) | [ollama.com](https://ollama.com) |
+| **Ollama** | latest (optional — only for `hybrid`/`local` Manim profiles) | [ollama.com](https://ollama.com) |
 | **Make** (optional) | GNU Make | macOS/Linux, or WSL2 / Git Bash on Windows |
 
 ### Windows notes
@@ -85,7 +134,7 @@ uv run aos celery worker
 | ffmpeg | Final video assembly (`lecture_final.mp4`) |
 | Docker + `manimcommunity/manim` image | Full IR pipeline render step |
 
-For fast prompt-to-Manim iteration, only **Ollama + OpenRouter + uv sync** are required.
+For UI **Animate** via OpenRouter only, Ollama is not required (`AOS_MODEL_PROFILE=cloud`). For fast local coder iteration with `hybrid`/`local`, use **Ollama + OpenRouter + uv sync**.
 
 ---
 
@@ -153,20 +202,25 @@ cp apps/agents/.env.example           apps/agents/.env
 **UI backend** — edit `apps/ui/aos/backend/.env`:
 
 ```env
-OPENROUTER_API_KEY=sk-or-v1-...    # required for chat agent
+OPENROUTER_API_KEY=sk-or-v1-...    # required for chat + Celery Animate (passed to agents CLI)
+# Optional: absolute path if auto-detect fails
+# AGENTS_DIR=C:/Users/you/Desktop/myall/AOS/apps/agents
+S3_VIDEO_ENDPOINT=http://localhost:9010
 ```
 
 **Manim agents** — edit `apps/agents/.env`:
 
 ```env
 OPENROUTER_API_KEY=sk-or-v1-...
-OLLAMA_BASE_URL=http://localhost:11434/v1
-AOS_MODEL_PROFILE=hybrid
+AOS_MODEL_PROFILE=cloud            # recommended for UI Animate (no Ollama)
+# For hybrid local coder instead:
+# AOS_MODEL_PROFILE=hybrid
+# OLLAMA_BASE_URL=http://localhost:11434/v1
 ```
 
 Get an OpenRouter key at [openrouter.ai/keys](https://openrouter.ai/keys).
 
-#### 4. Pull the local Manim coder model
+#### 4. Pull the local Manim coder model (optional — hybrid/local only)
 
 ```bash
 ollama pull huggingface.co/nabin2004/AOS-gemma4-31b-manim-gguf:Q4_K_M
@@ -272,9 +326,9 @@ uv run uvicorn app.main:app --reload --port 8000
 
 ## Running prompt-to-Manim
 
-The Manim pipeline lives in `apps/agents`. It is **not** connected to the web UI yet.
+The Manim pipeline lives in `apps/agents` and **is connected to the web UI** via Celery (`generate_video_task`). Prefer Chat → Animate for end-to-end; use the CLI below for isolated debugging.
 
-### CLI (recommended for development)
+### CLI (recommended for pipeline debugging)
 
 ```bash
 cd apps/agents
@@ -317,9 +371,9 @@ Set in `apps/agents/.env`:
 
 | Profile | Classifier / planner | Coder |
 |---------|---------------------|-------|
-| `hybrid` (default) | OpenRouter | Local Ollama |
+| `cloud` (recommended for UI Animate) | OpenRouter | OpenRouter |
+| `hybrid` | OpenRouter | Local Ollama |
 | `local` | Ollama | Ollama |
-| `cloud` | OpenRouter | OpenRouter |
 
 See [apps/agents/README.md](../../agents/README.md) for per-role overrides and token limits.
 
@@ -351,9 +405,10 @@ Run these after setup to confirm everything works:
 | Docker running | `docker ps` | Lists UI stack containers (after setup / `make dev`) |
 | UI API healthy | `curl http://127.0.0.1:8000/api/v1/health` (or browser) | `{"status":"ok"}` |
 | UI frontend | http://localhost:3000 | Marketing / login loads |
-| Ollama running | `curl http://localhost:11434/v1/models` | Manim GGUF model listed |
-| Prompt-to-Manim | `uv run python cli.py animate "draw a circle"` | Creates `coder_runs/` workspace |
+| Ollama running (optional) | `curl http://localhost:11434/v1/models` | Manim GGUF listed when using `hybrid`/`local` |
+| Prompt-to-Manim (OpenRouter) | `AOS_MODEL_PROFILE=cloud uv run python cli.py animate "draw a circle" --json --no-banner` | JSON `VideoArtifact` with `ok` / `video_path` |
 | Manim compile | Check `coder_runs/.../media/` | `.mp4` file present |
+| UI Animate | Chat Settings → Animate → send prompt | Prompt on tool card + Video.js after MinIO upload |
 
 ---
 
@@ -461,31 +516,33 @@ Ensure `OPENROUTER_API_KEY` is set in both:
 - `apps/ui/aos/backend/.env`
 - `apps/agents/.env`
 
-For agents, verify the profile matches your setup (`hybrid` needs both OpenRouter and Ollama).
+For agents, use `AOS_MODEL_PROFILE=cloud` for OpenRouter-only runs. `hybrid` needs both OpenRouter and Ollama. Celery Animate jobs force `cloud` and inject the backend `OPENROUTER_API_KEY`.
 
 ---
 
 ## Development workflow
 
-Typical day developing prompt-to-Manim animations:
+Typical day developing prompt-to-Manim animations via the UI:
 
-1. **Terminal 1** — UI stack (if working on web app):
-   ```bash
-   cd apps/ui/aos && make dev
-   cd frontend && bun dev
+1. **Terminal 1** — Docker infra/API + **host Celery** (one script) and frontend:
+   ```powershell
+   cd apps\ui\aos
+   .\scripts\dev-refresh.ps1
+   .\scripts\diagnose-animate.ps1   # optional: hop check
+   cd frontend; bun dev
    ```
 
-2. **Terminal 2** — Manim pipeline:
+2. **Optional Terminal 2** — Manim CLI for isolated debugging:
    ```bash
    cd apps/agents
    uv run python cli.py animate "your prompt here"
    ```
 
-3. **Inspect output** — open `workspace/coder_runs/{latest}/scene.py` and `media/*.mp4`.
+3. **Inspect output** — chat player, Flower `:5555`, MinIO `:9011`, or `workspace/coder_runs/{latest}/`.
 
-4. **Iterate** — adjust prompts, model profile, or agent code in `apps/agents/`.
+4. **Iterate** — adjust prompts or agent code. After backend/worker edits, re-run `.\scripts\dev-refresh.ps1` (or `-AgentsOnly`).
 
-For agent-only work, skip the UI stack entirely and use `cli.py animate` or `pai web`.
+For agent-only work, skip the UI stack and use `cli.py animate` or `pai web`.
 
 ---
 

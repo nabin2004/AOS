@@ -1,6 +1,7 @@
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import Scene, StoryboardStep
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -28,11 +29,12 @@ Do not populate `scene_graph`. Do not prescribe shapes, entity types, or Manim A
 """
 
 scene_planner_agent = Agent(
-    "openrouter:openai/gpt-4o-mini",
+    model_for_agent("planner"),
     name="Scene Planner Agent",
     description="Produces a scene brief from one storyboard step.",
     system_prompt=SCENE_PROMPT,
     output_type=Scene,
     deps_type=StoryboardStep,
+    model_settings=settings_for("planner"),
     retries=4,
 )

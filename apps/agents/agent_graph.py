@@ -5,13 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from pydantic_graph import BaseNode, End, GraphBuilder, GraphRunContext
+from pydantic_graph import BaseNode, End, EndMarker, GraphBuilder, GraphRunContext
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.exceptions import UsageLimitExceeded
 from pydantic_ai.usage import RunUsage
 
 from observability import configure_logfire, sft_batch_enabled
-from llm_config import is_ollama, model_for, settings_for
+from llm_config import is_ollama, model_for, model_for_agent, settings_for
 from coder_prompt import (
     LOCAL_CODER_CODEMODE_HINT,
     compact_plan_for_local_coder,
@@ -250,7 +250,15 @@ async def run_pipeline(
     if dbos_enabled():
         ensure_dbos_launched()
     state = AnimationState(user_query=user_query, prompt_index=prompt_index)
-    summary = await animation_graph.run(state=state)
+    # Prefer iter so UI/Celery can stream ``-> {node_id}`` on stderr.
+    summary = ""
+    async with animation_graph.iter(state=state) as run:
+        async for step in run:
+            if isinstance(step, EndMarker):
+                summary = step.value if isinstance(step.value, str) else ""
+                break
+            for task in step:
+                print(f"-> {task.node_id}", file=sys.stderr, flush=True)
     if state.coder_result is not None:
         result = state.coder_result.model_dump(mode="json")
         if prompt_index is not None:
@@ -263,7 +271,7 @@ async def run_pipeline(
 
 
 animation_agent = Agent(
-    model_for("animation"),
+    model_for_agent("animation"),
     deps_type=PipelineDeps,
     name="Manim Animation Pipeline",
     description="Runs classify → lecture plan → Manim code/compile for a learning topic.",

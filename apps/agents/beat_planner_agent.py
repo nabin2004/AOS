@@ -1,6 +1,7 @@
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import Beat, Scene
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -31,11 +32,12 @@ Rules:
 """
 
 beat_planner_agent = Agent(
-    "openrouter:openai/gpt-4o-mini",
+    model_for_agent("planner"),
     name="Beat Planner Agent",
     description="Generates pedagogical beats for one scene.",
     system_prompt=BEAT_PROMPT,
     output_type=list[Beat],
     deps_type=Scene,
+    model_settings=settings_for("planner"),
     retries=4,
 )

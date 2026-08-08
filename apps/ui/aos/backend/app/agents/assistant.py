@@ -21,7 +21,9 @@ from pydantic_ai.messages import (
     UserPromptPart,
 )
 from pydantic_ai.models.openrouter import OpenRouterModel
+from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
+from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.settings import ModelSettings
 from pydantic_ai_skills import SkillsToolset
 from pydantic_ai_summarization import ContextManagerCapability
@@ -41,11 +43,33 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+# OpenAI client libraries often require a non-empty api_key even for keyless local servers.
+_LOCAL_API_KEY_PLACEHOLDER = "local"
 
-def _build_model(model_name: str) -> OpenRouterModel:
+
+def _build_model(
+    model_name: str,
+    *,
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> OpenRouterModel | OpenAIChatModel:
+    """Build a chat model: custom OpenAI-compatible endpoint, or OpenRouter default."""
+    name = model_name or settings.AI_MODEL
+    custom_base = (base_url or "").strip()
+    key = (api_key or "").strip()
+
+    if custom_base:
+        return OpenAIChatModel(
+            name,
+            provider=OpenAIProvider(
+                base_url=custom_base,
+                api_key=key or _LOCAL_API_KEY_PLACEHOLDER,
+            ),
+        )
+
     return OpenRouterModel(
-        model_name or settings.AI_MODEL,
-        provider=OpenRouterProvider(api_key=settings.OPENROUTER_API_KEY),
+        name,
+        provider=OpenRouterProvider(api_key=key or settings.OPENROUTER_API_KEY),
     )
 
 
@@ -88,12 +112,16 @@ class AssistantAgent:
         todo_capability: "TodoCapability | None" = None,
         subagent_capability: "SubAgentCapability | None" = None,
         context_manager_capability: "ContextManagerCapability | None" = None,
+        base_url: str | None = None,
+        api_key: str | None = None,
     ):
         self.deep_research = deep_research
         self.todo_capability = todo_capability
         self.subagent_capability = subagent_capability
         self.context_manager_capability = context_manager_capability
         self.model_name = model_name or settings.AI_MODEL
+        self.base_url = (base_url or "").strip() or None
+        self.api_key = (api_key or "").strip() or None
         # ``temperature`` stays ``None`` when caller didn't set it — don't fall
         # back to settings.AI_TEMPERATURE here. Reasoning/o-series models
         # (gpt-5.5, o1, …) reject the parameter entirely, so we only forward
@@ -110,7 +138,11 @@ class AssistantAgent:
         self._agent: Agent[Deps, str] | None = None
 
     def _create_agent(self) -> Agent[Deps, str]:
-        model = _build_model(self.model_name)
+        model = _build_model(
+            self.model_name,
+            base_url=self.base_url,
+            api_key=self.api_key,
+        )
 
         capabilities: list[Any] = [ReinjectSystemPrompt()]
         if self.thinking_effort:
@@ -350,6 +382,8 @@ def get_agent(
     todo_capability: "TodoCapability | None" = None,
     subagent_capability: "SubAgentCapability | None" = None,
     context_manager_capability: "ContextManagerCapability | None" = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
 ) -> AssistantAgent:
     return AssistantAgent(
         model_name=model_name,
@@ -359,6 +393,8 @@ def get_agent(
         todo_capability=todo_capability,
         subagent_capability=subagent_capability,
         context_manager_capability=context_manager_capability,
+        base_url=base_url,
+        api_key=api_key,
     )
 
 

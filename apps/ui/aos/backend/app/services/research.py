@@ -170,13 +170,29 @@ class ResearchToolkit:
     WebSocket emitter and returns them to hand to the agent.
     """
 
-    def __init__(self, emit: EmitEvent, model_name: str | None = None) -> None:
+    def __init__(
+        self,
+        emit: EmitEvent,
+        model_name: str | None = None,
+        *,
+        base_url: str | None = None,
+        api_key: str | None = None,
+    ) -> None:
         self._emit = emit
         self._model_name = model_name or settings.AI_MODEL
+        self._base_url = (base_url or "").strip() or None
+        self._api_key = (api_key or "").strip() or None
         self._storage: Any = None
         self.subagent_capability: SubAgentCapability | None = None
         self.context_manager: ContextManagerCapability | None = None
         self._bg_tasks: set[asyncio.Task[Any]] = set()
+
+    def _model(self) -> Any:
+        return _build_model(
+            self._model_name,
+            base_url=self._base_url,
+            api_key=self._api_key,
+        )
 
     async def build(self, conversation_id: str) -> ResearchCapabilities:
         """Build typed capabilities for this turn.
@@ -222,7 +238,7 @@ class ResearchToolkit:
         cap = ContextManagerCapability(
             max_tokens=settings.DEEP_RESEARCH_MAX_TOKENS,
             compress_threshold=settings.DEEP_RESEARCH_COMPRESS_THRESHOLD,
-            summarization_model=_build_model(self._model_name),
+            summarization_model=self._model(),
             on_usage_update=on_usage_update,
             on_before_compress=on_before_compress,
             include_compact_tool=True,
@@ -238,7 +254,7 @@ class ResearchToolkit:
         """
         cap = SubAgentCapability(
             subagents=_subagent_configs(),
-            default_model=_build_model(self._model_name),
+            default_model=self._model(),
             include_general_purpose=False,
             max_nesting_depth=0,
             usage_limits=UsageLimits(request_limit=25),

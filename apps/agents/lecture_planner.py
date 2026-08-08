@@ -1,7 +1,7 @@
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import Lecture
-from llm_config import model_for, settings_for
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -19,7 +19,7 @@ For the Lorenz attractor, use scipy solve_ivp for the trajectory, plot it in 3D,
 """
 
 lecture_planner_agent = Agent(
-    model_for("planner"),
+    model_for_agent("planner"),
     name="Lecture Planner Agent",
     description="Generates a lecture plan for an AOS educational animation.",
     system_prompt=LECTURE_PROMPT,

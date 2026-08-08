@@ -25,9 +25,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useKnowledgeBases, useConversations } from "@/hooks";
 import { useConversationStore, useKBSelectionStore } from "@/stores";
-import { useChatModeStore } from "@/stores";
+import { useChatModeStore, useLlmProviderStore } from "@/stores";
+import { LlmProviderForm } from "@/components/settings/llm-provider-form";
 import { cn } from "@/lib/utils";
 import type { KBScope, KnowledgeBase } from "@/types";
+import Link from "next/link";
+import { ROUTES } from "@/lib/constants";
 
 type ThinkingEffort = "off" | "low" | "medium" | "high";
 type Tab = "kb" | "model" | "settings";
@@ -155,6 +158,10 @@ export function ChatControls({
   const settingsOverridden = temperature !== null || effort !== "off";
   const deepResearch = useChatModeStore((s) => s.deepResearch);
   const videoMode = useChatModeStore((s) => s.videoMode);
+  const llmBaseUrl = useLlmProviderStore((s) => s.baseUrl);
+  const llmModelId = useLlmProviderStore((s) => s.modelId);
+  const customProvider = Boolean(llmBaseUrl.trim());
+  const effectiveModelLabel = llmModelId.trim() || selectedModel.value;
 
   const triggerSummary = useMemo(() => {
     const parts: string[] = [];
@@ -162,16 +169,26 @@ export function ChatControls({
     if (videoMode === "animate") parts.push("Animate");
     if (videoMode === "lecture") parts.push("Lecture");
     if (activeCount > 0) parts.push(`${activeCount} KB${activeCount === 1 ? "" : "s"}`);
-    if (selectedModel.value) parts.push(selectedModel.value);
+    if (customProvider) parts.push("BYOK");
+    if (effectiveModelLabel) parts.push(effectiveModelLabel);
     if (settingsOverridden) parts.push("Custom");
     return parts.length ? parts.join(" · ") : "Controls";
-  }, [deepResearch, videoMode, activeCount, selectedModel, settingsOverridden]);
+  }, [
+    deepResearch,
+    videoMode,
+    activeCount,
+    customProvider,
+    effectiveModelLabel,
+    settingsOverridden,
+  ]);
 
   const hasOverrides =
     deepResearch ||
     videoMode !== "off" ||
     activeCount > 0 ||
     selectedModel.value !== "" ||
+    customProvider ||
+    Boolean(llmModelId.trim()) ||
     settingsOverridden;
 
   return (
@@ -235,6 +252,7 @@ export function ChatControls({
             <ModelPanel
               models={availableModels}
               selected={selectedModel}
+              customProvider={customProvider}
               onPick={(m) => {
                 setSelectedModel(m);
                 onModelChange?.(m.value || null);
@@ -403,40 +421,66 @@ function KBPanel({
 function ModelPanel({
   models,
   selected,
+  customProvider,
   onPick,
 }: {
   models: { value: string; label: string }[];
   selected: { value: string; label: string };
+  customProvider: boolean;
   onPick: (m: { value: string; label: string }) => void;
 }) {
   return (
-    <div>
-      <p className="text-foreground mb-1 text-sm font-semibold">Model</p>
-      <p className="text-foreground/55 mb-4 text-xs leading-relaxed">
-        Pick the model that handles this conversation.
-      </p>
-      <ul className="space-y-1">
-        {models.map((m) => {
-          const isActive = selected.value === m.value;
-          return (
-            <li key={m.value || "default"}>
-              <button
-                type="button"
-                onClick={() => onPick(m)}
-                className={cn(
-                  "flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-left text-xs transition-all",
-                  isActive
-                    ? "border-foreground/30 bg-accent text-foreground"
-                    : "border-border text-foreground/75 hover:border-foreground/25 hover:bg-accent/60 hover:text-foreground",
-                )}
-              >
-                <span className="truncate font-medium">{m.label}</span>
-                {isActive && <Check className="text-foreground h-3.5 w-3.5 shrink-0" />}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+    <div className="space-y-5">
+      <div>
+        <p className="text-foreground mb-1 text-sm font-semibold">Provider</p>
+        <p className="text-foreground/55 mb-3 text-xs leading-relaxed">
+          OpenAI-compatible endpoint for chat and Manim. Same fields as{" "}
+          <Link
+            href={ROUTES.SETTINGS_LLM}
+            className="text-foreground underline-offset-2 hover:underline"
+          >
+            Settings → LLM
+          </Link>
+          .
+        </p>
+        <LlmProviderForm compact />
+      </div>
+
+      {!customProvider && (
+        <div>
+          <p className="text-foreground mb-1 text-sm font-semibold">Model</p>
+          <p className="text-foreground/55 mb-4 text-xs leading-relaxed">
+            Pick the model that handles this conversation (server catalog).
+          </p>
+          <ul className="space-y-1">
+            {models.map((m) => {
+              const isActive = selected.value === m.value;
+              return (
+                <li key={m.value || "default"}>
+                  <button
+                    type="button"
+                    onClick={() => onPick(m)}
+                    className={cn(
+                      "flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-left text-xs transition-all",
+                      isActive
+                        ? "border-foreground/30 bg-accent text-foreground"
+                        : "border-border text-foreground/75 hover:border-foreground/25 hover:bg-accent/60 hover:text-foreground",
+                    )}
+                  >
+                    <span className="truncate font-medium">{m.label}</span>
+                    {isActive && <Check className="text-foreground h-3.5 w-3.5 shrink-0" />}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+      {customProvider && (
+        <p className="text-foreground/55 text-[11px] leading-relaxed">
+          Custom base URL is set — use the model id field above instead of the OpenRouter catalog.
+        </p>
+      )}
     </div>
   );
 }

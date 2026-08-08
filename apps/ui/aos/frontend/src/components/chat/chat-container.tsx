@@ -20,6 +20,12 @@ import { useConversationStore, useChatStore } from "@/stores";
 import { useResearchStore } from "@/stores";
 import { useConversations } from "@/hooks";
 import { useSlashCommands } from "@/hooks";
+import { apiClient } from "@/lib/api-client";
+import {
+  applyVideoStatusToMessage,
+  videoGenerationToChatMessage,
+  type VideoGenerationDto,
+} from "@/lib/video-status";
 
 const SCROLL_NEAR_BOTTOM_THRESHOLD_PX = 150;
 
@@ -32,6 +38,7 @@ export function ChatContainer() {
   const { addMessage: addChatMessage } = useChatStore();
   const { fetchConversations } = useConversations();
   const prevConversationIdRef = useRef<string | null | undefined>(undefined);
+  const hydratedVideosForRef = useRef<string | null>(null);
 
   const handleConversationCreated = useCallback(() => {
     fetchConversations();
@@ -91,6 +98,7 @@ export function ChatContainer() {
       // typed in the previous conversation's context, sending them into a
       // different conversation would surprise the user.
       clearQueued();
+      hydratedVideosForRef.current = null;
     }
 
     prevConversationIdRef.current = currId;
@@ -149,6 +157,63 @@ export function ChatContainer() {
       });
     }
   }, [currentMessages, addChatMessage, clearMessages]);
+
+  // Hydrate in-flight / completed video jobs so refresh mid-Animate keeps the card.
+  useEffect(() => {
+    if (!currentConversationId || isConversationLoading) return;
+    if (hydratedVideosForRef.current === currentConversationId) return;
+    // Wait until message sync for this conversation has settled (or is empty).
+    if (currentMessages.length === 0 && useChatStore.getState().messages.length > 0) {
+      // Messages still being cleared/rebuilt from previous conversation.
+      return;
+    }
+    hydratedVideosForRef.current = currentConversationId;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const data = await apiClient.get<{ items: VideoGenerationDto[] }>(
+          `/videos?conversation_id=${currentConversationId}&limit=50`,
+        );
+        if (cancelled) return;
+        const items = data.items ?? [];
+        if (!items.length) return;
+
+        const store = useChatStore.getState();
+        for (const video of items) {
+          const toolCallId = `generate_video_${video.id}`;
+          const existing = store.messages.find(
+            (m) =>
+              m.id === video.assistant_message_id ||
+              m.parts?.some((p) => p.type === "tool" && p.toolCall?.id === toolCallId) ||
+              m.toolCalls?.some((tc) => tc.id === toolCallId),
+          );
+          if (existing) {
+            store.updateMessage(existing.id, (m) => applyVideoStatusToMessage(m, video));
+          } else if (
+            video.status === "pending" ||
+            video.status === "running" ||
+            video.status === "completed" ||
+            video.status === "failed"
+          ) {
+            // Orphaned job (e.g. refresh before assistant message was saved).
+            addChatMessage(videoGenerationToChatMessage(video));
+          }
+        }
+      } catch {
+        // Non-fatal — live WS/poll still works for new jobs.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    currentConversationId,
+    currentMessages,
+    isConversationLoading,
+    addChatMessage,
+  ]);
 
   // Track whether the user has manually scrolled up so we don't hijack their position
   useEffect(() => {

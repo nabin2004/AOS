@@ -208,8 +208,76 @@ uv pip install \
 Always pass `--torch-backend cpu` for the vLLM wheel **and** the torch/torchvision/torchaudio
 triplet — otherwise uv may install CUDA `torchvision` alongside CPU `torch`.
 
-For Docker, TPU, or AMD deployment, see [vLLM's Gemma 4 docs](https://docs.vllm.ai/) and
+For TPU or AMD deployment, see [vLLM's Gemma 4 docs](https://docs.vllm.ai/) and
 [vLLM CPU install docs](https://docs.vllm.ai/en/stable/getting_started/installation/cpu/).
+For NVIDIA GPU Docker / RunPod, see [Docker (GPU / RunPod)](#docker-gpu--runpod) below.
+
+### Docker (GPU / RunPod)
+
+GPU serving uses a slim image based on `vllm/vllm-openai:v0.26.0`. Model weights are **not**
+baked in (~60GB bf16) — they download at runtime into `HF_HOME` (default
+`/workspace/hf-cache`). On RunPod, mount a **network volume** at `/workspace` so the cache
+persists across pods.
+
+Serves the merged Manim SFT checkpoint
+[`nabin2004/AOS-gemma4-31b-manim-merged`](https://huggingface.co/nabin2004/AOS-gemma4-31b-manim-merged)
+(no `--enable-lora`) with Gemma 4 tool calling and thinking parsers enabled.
+
+#### Build
+
+```bash
+# From repo root
+docker build -t aos-vllm:0.26.0 -f apps/server/Dockerfile apps/server
+
+# Push (example: GHCR)
+docker tag aos-vllm:0.26.0 ghcr.io/<org>/aos-vllm:0.26.0
+docker push ghcr.io/<org>/aos-vllm:0.26.0
+```
+
+#### Local run (NVIDIA GPU)
+
+```bash
+docker run --gpus all -p 8000:8000 \
+  -e HF_TOKEN \
+  -v aos-hf:/workspace/hf-cache \
+  aos-vllm:0.26.0
+```
+
+Point [`Gemma4Client`](gemma4_client.py) at `http://localhost:8000/v1` with
+`model="nabin2004/AOS-gemma4-31b-manim-merged"` (no LoRA adapter name).
+
+#### RunPod
+
+1. Build and push the image to a registry RunPod can pull.
+2. Create a **network volume** and mount it at `/workspace` on the pod.
+3. Deploy a GPU pod — **1× A100 80GB** for bf16 31B at `--max-model-len 16384`, or 2× GPUs
+   with `TENSOR_PARALLEL_SIZE=2`.
+4. Set environment variables (at least `HF_TOKEN`). Map container port **8000**.
+5. First boot downloads ~60GB into `/workspace/hf-cache`; later pods on the same volume skip
+   the download.
+
+| Env | Default | Notes |
+| --- | --- | --- |
+| `HF_TOKEN` | *(required)* | Accept Gemma license; needed to download the model |
+| `MODEL_ID` | `nabin2004/AOS-gemma4-31b-manim-merged` | Hugging Face repo id |
+| `HOST` / `PORT` | `0.0.0.0` / `8000` | Bind address |
+| `MAX_MODEL_LEN` | `16384` | Lower if you OOM |
+| `GPU_MEMORY_UTILIZATION` | `0.90` | vLLM KV / weight packing |
+| `TENSOR_PARALLEL_SIZE` | `1` | Set to GPU count on multi-GPU pods |
+| `LIMIT_MM_PER_PROMPT` | *(unset)* | e.g. `image=4` for vision |
+| `EXTRA_ARGS` | *(unset)* | Extra CLI flags, space-separated |
+
+Smoke test after the server is healthy:
+
+```bash
+curl http://<pod-ip>:8000/v1/models
+curl http://<pod-ip>:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"nabin2004/AOS-gemma4-31b-manim-merged","messages":[{"role":"user","content":"Hello"}]}'
+```
+
+Entrypoint: [`docker/entrypoint.sh`](docker/entrypoint.sh). Override flags with `EXTRA_ARGS` or
+extra `docker run` / template arguments.
 
 ### CPU-only dev (smoke tests)
 

@@ -1,0 +1,4 @@
+# Keep the build context tiny — only entrypoint.sh is needed.
+*
+!docker
+!docker/**

@@ -45,17 +45,26 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
         toolCall.status === "completed" &&
         parseChartResult(toolCall.result) !== null) ||
       (toolCall.name === "generate_video" &&
-        toolCall.status === "completed" &&
+        (toolCall.status === "completed" ||
+          toolCall.status === "running" ||
+          toolCall.status === "pending") &&
         parseVideoResult(toolCall.result) !== null),
   );
   const [showRaw, setShowRaw] = useState(false);
 
   // Short input hint shown in the collapsed bar — the query for search
-  // tools, the URL for fetch_url, etc. (any tool with a url/query arg).
+  // tools, the URL for fetch_url, the Manim prompt for generate_video, etc.
   const urlArg = toolCall.args?.url;
   const queryArg = toolCall.args?.query;
+  const promptArg = toolCall.args?.prompt;
   const inputHint =
-    typeof urlArg === "string" ? urlArg : typeof queryArg === "string" ? queryArg : null;
+    typeof urlArg === "string"
+      ? urlArg
+      : typeof queryArg === "string"
+        ? queryArg
+        : toolCall.name === "generate_video" && typeof promptArg === "string"
+          ? promptArg
+          : null;
 
   const resultText =
     toolCall.result !== undefined
@@ -95,14 +104,24 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
     [toolCall.name, toolCall.status, toolCall.result],
   );
   const isChart = chartSpec !== null;
-  const videoSpec = useMemo(
-    () =>
-      toolCall.name === "generate_video" &&
-      (toolCall.status === "completed" || toolCall.status === "error")
-        ? parseVideoResult(toolCall.result)
-        : null,
-    [toolCall.name, toolCall.status, toolCall.result],
-  );
+  const videoSpec = useMemo(() => {
+    if (
+      toolCall.name !== "generate_video" ||
+      (toolCall.status !== "completed" &&
+        toolCall.status !== "error" &&
+        toolCall.status !== "running" &&
+        toolCall.status !== "pending")
+    ) {
+      return null;
+    }
+    const parsed = parseVideoResult(toolCall.result);
+    if (!parsed) return null;
+    const argsPrompt = toolCall.args?.prompt;
+    if (!parsed.prompt && typeof argsPrompt === "string") {
+      return { ...parsed, prompt: argsPrompt };
+    }
+    return parsed;
+  }, [toolCall.name, toolCall.status, toolCall.result, toolCall.args]);
   const isVideo = videoSpec !== null;
   // A chart that finishes after this card mounted (live streaming) won't
   // have triggered the initial-state default — expand it on transition.
@@ -115,6 +134,10 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
 
   const hasSpecialRenderer =
     isDateTime || isRAGSearch || isWebSearch || isAskUser || isChart || isRunPython || isVideo;
+  const videoLiveMessage =
+    isVideo && (toolCall.status === "running" || toolCall.status === "pending")
+      ? videoSpec.message || videoSpec.stage || null
+      : null;
   const friendlyName = isDateTime
     ? "Current Date & Time"
     : isRAGSearch
@@ -124,7 +147,9 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
         : isChart
           ? "Chart"
           : isVideo
-            ? "Generated Video"
+            ? videoLiveMessage
+              ? "Generating Video"
+              : "Generated Video"
             : isAskUser
               ? "Question"
               : isLoadSkill
@@ -173,7 +198,7 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
   // and swap the chevron/raw toggle for a spinner — the header becomes a step caption.
   const isRunning = toolCall.status === "running" || toolCall.status === "pending";
   const isError = toolCall.status === "error";
-  const liveCaption = toolCaption(toolCall.name);
+  const liveCaption = videoLiveMessage || toolCaption(toolCall.name);
 
   return (
     <Card

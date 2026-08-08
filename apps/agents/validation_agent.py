@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from dotenv import load_dotenv
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -38,9 +39,10 @@ the JSON in the prompt.
 """
 
 validation_agent = Agent(
-    'openrouter:openai/gpt-4o-mini',
+    model_for_agent("planner"),
     name='Validation Agent',
     description='Validates the generated IR for correctness and completeness.',
     system_prompt=VALIDATION_PROMPT,
     output_type=ValidationResult,
+    model_settings=settings_for("planner"),
 )

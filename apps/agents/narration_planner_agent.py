@@ -1,6 +1,7 @@
 from pydantic_ai import Agent, ModelRetry
 from dotenv import load_dotenv
 from ir.manim_ir import Beat
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -59,11 +60,12 @@ Rules:
 """
 
 narration_planner_agent = Agent(
-    'openrouter:openai/gpt-4o-mini',
+    model_for_agent("planner"),
     name='Narration Planner Agent',
     description='Generates narration for Manim animation beats.',
     system_prompt=NARRATION_PROMPT,
     output_type=list[Beat],
+    model_settings=settings_for("planner"),
     retries=4,
 )
 

@@ -17,7 +17,13 @@ import type {
 import { WS_URL } from "@/lib/constants";
 import { setUrlParam } from "@/lib/utils";
 import { useConversationStore } from "@/stores";
-import { useResearchStore, useChatModeStore } from "@/stores";
+import { useResearchStore, useChatModeStore, useLlmProviderStore } from "@/stores";
+import { llmProviderToRequestPayload } from "@/stores/llm-provider-store";
+import { apiClient } from "@/lib/api-client";
+import {
+  applyVideoStatusToMessage,
+  type VideoGenerationDto,
+} from "@/lib/video-status";
 import type { ContextUsage, ResearchTodo, SubagentStatus } from "@/types";
 /** A message the user typed while the agent was busy / socket offline.
  *  Held outside the chat history until the drainer ships it. */
@@ -68,8 +74,64 @@ export function useChat(options: UseChatOptions = {}) {
   const modelRef = useRef<string | null>(null);
   const temperatureRef = useRef<number | null>(null);
   const thinkingEffortRef = useRef<"low" | "medium" | "high" | null>(null);
+  const lastVideoStageRef = useRef<string | null>(null);
+  const videoPollTimersRef = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map());
   const [pendingApproval, setPendingApproval] = useState<PendingApproval | null>(null);
   const [pendingQuestions, setPendingQuestions] = useState<AskUserQuestion[] | null>(null);
+
+  const stopVideoPoll = useCallback((videoId: string) => {
+    const handle = videoPollTimersRef.current.get(videoId);
+    if (handle) {
+      clearInterval(handle);
+      videoPollTimersRef.current.delete(videoId);
+    }
+  }, []);
+
+  const applyVideoDto = useCallback(
+    (video: VideoGenerationDto) => {
+      const toolCallId = `generate_video_${video.id}`;
+      const store = useChatStore.getState();
+      const msg = store.messages.find(
+        (m) =>
+          m.parts?.some((p) => p.type === "tool" && p.toolCall?.id === toolCallId) ||
+          m.toolCalls?.some((tc) => tc.id === toolCallId),
+      );
+      if (!msg) return;
+      store.updateMessage(msg.id, (m) => applyVideoStatusToMessage(m, video));
+      if (video.status === "completed" || video.status === "failed") {
+        stopVideoPoll(video.id);
+        setIsProcessing(false);
+        lastVideoStageRef.current = null;
+      }
+    },
+    [stopVideoPoll],
+  );
+
+  const startVideoPoll = useCallback(
+    (videoId: string) => {
+      if (!videoId || videoPollTimersRef.current.has(videoId)) return;
+      const tick = async () => {
+        try {
+          const data = await apiClient.get<VideoGenerationDto>(`/videos/${videoId}`);
+          applyVideoDto(data);
+        } catch {
+          // ignore transient poll errors
+        }
+      };
+      void tick();
+      const handle = setInterval(tick, 3000);
+      videoPollTimersRef.current.set(videoId, handle);
+    },
+    [applyVideoDto],
+  );
+
+  useEffect(() => {
+    const timers = videoPollTimersRef.current;
+    return () => {
+      timers.forEach((handle) => clearInterval(handle));
+      timers.clear();
+    };
+  }, []);
 
   const handleWebSocketMessage = useCallback(
     (event: MessageEvent) => {
@@ -197,6 +259,23 @@ export function useChat(options: UseChatOptions = {}) {
               args,
               status: "running",
             };
+            // Seed an in-progress video result so the card expands immediately.
+            if (tool_name === "generate_video") {
+              const gid =
+                typeof args.video_generation_id === "string"
+                  ? args.video_generation_id
+                  : tool_call_id.replace(/^generate_video_/, "");
+              toolCall.result = JSON.stringify({
+                kind: "video",
+                video_generation_id: gid,
+                mode: args.mode,
+                prompt: args.prompt,
+                status: "pending",
+                stage: "queued",
+                message: "Queued… preparing animation pipeline.",
+              });
+              startVideoPoll(gid);
+            }
             addToolCallPart(currentMessageIdRef.current, toolCall);
           }
           break;
@@ -223,24 +302,53 @@ export function useChat(options: UseChatOptions = {}) {
             status?: string;
             error?: string;
             mode?: string;
+            prompt?: string;
+            stage?: string;
+            message?: string;
           };
           if (!currentMessageIdRef.current || !data.video_generation_id) break;
           const toolCallId = `generate_video_${data.video_generation_id}`;
+          const msgId = currentMessageIdRef.current;
           if (data.status === "running" || data.status === "pending") {
-            updateToolCallPart(currentMessageIdRef.current, toolCallId, {
+            const progressMessage =
+              data.message ||
+              (data.status === "pending" ? "Queued…" : "Generating video…");
+            updateToolCallPart(msgId, toolCallId, {
               status: "running",
+              result: JSON.stringify({
+                kind: "video",
+                video_generation_id: data.video_generation_id,
+                mode: data.mode,
+                prompt: data.prompt,
+                status: data.status,
+                stage: data.stage,
+                message: progressMessage,
+              }),
             });
+            if (data.message && lastVideoStageRef.current !== data.message) {
+              lastVideoStageRef.current = data.message;
+              appendTextDelta(msgId, `\n${data.message}`);
+            }
+            startVideoPoll(data.video_generation_id);
           } else if (data.status === "failed") {
-            updateToolCallPart(currentMessageIdRef.current, toolCallId, {
+            updateToolCallPart(msgId, toolCallId, {
               status: "error",
               result: JSON.stringify({
                 kind: "video",
                 video_generation_id: data.video_generation_id,
                 mode: data.mode,
+                prompt: data.prompt,
                 status: "failed",
+                stage: data.stage,
+                message: data.message,
                 error: data.error,
               }),
             });
+            lastVideoStageRef.current = null;
+            stopVideoPoll(data.video_generation_id);
+          } else if (data.status === "completed") {
+            lastVideoStageRef.current = null;
+            stopVideoPoll(data.video_generation_id);
           }
           break;
         }
@@ -269,11 +377,13 @@ export function useChat(options: UseChatOptions = {}) {
         }
 
         case "error": {
-          // Handle error
+          // Handle error — always surface a bubble (early failures may arrive
+          // before model_request_start creates an assistant message).
+          const { message } = wsEvent.data as { message: string };
+          const errBody = `❌ Error: ${message || "Unknown error"}`;
           if (currentMessageIdRef.current) {
             const id = currentMessageIdRef.current;
-            const { message } = wsEvent.data as { message: string };
-            const errText = `\n\n❌ Error: ${message || "Unknown error"}`;
+            const errText = `\n\n${errBody}`;
             const cur = useChatStore.getState().messages.find((m) => m.id === id);
             if (cur?.parts) {
               appendTextDelta(id, errText);
@@ -281,6 +391,17 @@ export function useChat(options: UseChatOptions = {}) {
               updateMessage(id, (msg) => ({ ...msg, content: msg.content + errText }));
             }
             updateMessage(id, (msg) => ({ ...msg, isStreaming: false }));
+          } else {
+            const id = nanoid();
+            addMessage({
+              id,
+              role: "assistant",
+              content: errBody,
+              timestamp: new Date(),
+              conversationId: conversationId || undefined,
+              isStreaming: false,
+            });
+            setCurrentMessageId(id);
           }
           setIsProcessing(false);
           break;
@@ -386,6 +507,8 @@ export function useChat(options: UseChatOptions = {}) {
       onConversationCreated,
       currentConversationIdFromStore,
       conversationId,
+      startVideoPoll,
+      stopVideoPoll,
     ],
   );
 
@@ -461,7 +584,16 @@ export function useChat(options: UseChatOptions = {}) {
         conversation_id: conversationId || null,
       };
       if (fileIds?.length) payload.file_ids = fileIds;
-      if (modelRef.current) payload.model = modelRef.current;
+      const llm = llmProviderToRequestPayload({
+        baseUrl: useLlmProviderStore.getState().baseUrl,
+        apiKey: useLlmProviderStore.getState().apiKey,
+        modelId: useLlmProviderStore.getState().modelId,
+      });
+      if (llm.llm_base_url) payload.llm_base_url = llm.llm_base_url;
+      if (llm.llm_api_key) payload.llm_api_key = llm.llm_api_key;
+      // Store modelId wins over the Controls catalog picker when set.
+      const model = llm.model || modelRef.current;
+      if (model) payload.model = model;
       if (temperatureRef.current !== null) payload.temperature = temperatureRef.current;
       if (thinkingEffortRef.current !== null) payload.thinking_effort = thinkingEffortRef.current;
       const activeKBIds = useKBSelectionStore.getState().activeKBIds;

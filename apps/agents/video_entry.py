@@ -7,6 +7,7 @@ can parse a single stdout object.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from typing import Any, Literal
 
@@ -100,6 +101,8 @@ async def run_lecture(prompt: str, *, max_validation_attempts: int = 3) -> Video
             async for step in run:
                 if isinstance(step, EndMarker):
                     break
+                for task in step:
+                    print(f"-> {task.node_id}", file=sys.stderr, flush=True)
     except Exception as exc:
         return VideoArtifact(
             ok=False,

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from ir.manim_ir import LectureIR
 
 from tools import ToolDeps, aos_toolset
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -26,12 +27,13 @@ _REPAIR_TOOLS = {"validate_lecture_ir"}
 repair_toolset = aos_toolset.filtered(lambda _ctx, tool_def: tool_def.name in _REPAIR_TOOLS)
 
 repair_agent = Agent(
-    'openrouter:openai/gpt-4o-mini',
+    model_for_agent("planner"),
     name='Repair Agent',
     description='Repairs the generated IR for correctness and completeness.',
     system_prompt=REPAIR_PROMPT,
     output_type=LectureIR,
     toolsets=[repair_toolset],
     deps_type=ToolDeps,
+    model_settings=settings_for("planner"),
     retries=4,
 )

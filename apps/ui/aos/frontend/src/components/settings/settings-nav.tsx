@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Bell,
+  Cpu,
   Palette,
   Shield,
   Slash,
@@ -33,6 +34,12 @@ const ITEMS: NavItem[] = [
     href: ROUTES.SETTINGS_ACCOUNT,
     icon: Shield,
     description: "Password, two-factor, danger zone",
+  },
+  {
+    label: "LLM provider",
+    href: ROUTES.SETTINGS_LLM,
+    icon: Cpu,
+    description: "API base URL, key, model",
   },
   {
     label: "Slash commands",

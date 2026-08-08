@@ -1,5 +1,7 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+
 import { AppVideoPlayer } from "@/components/media/video-player";
 
 export interface VideoToolResult {
@@ -7,7 +9,10 @@ export interface VideoToolResult {
   video_generation_id: string;
   minio_key?: string | null;
   mode?: string;
+  prompt?: string | null;
   status?: string;
+  stage?: string | null;
+  message?: string | null;
   error?: string | null;
 }
 
@@ -40,17 +45,31 @@ export function getVideoStreamUrl(videoGenerationId: string): string {
 export function VideoResult({ data }: { data: VideoToolResult }) {
   if (data.status === "failed") {
     return (
-      <div className="text-destructive text-sm">
-        Video generation failed{data.error ? `: ${data.error}` : "."}
+      <div className="space-y-2">
+        {data.prompt ? (
+          <p className="text-muted-foreground text-sm whitespace-pre-wrap">{data.prompt}</p>
+        ) : null}
+        <div className="text-destructive text-sm">
+          Video generation failed{data.error ? `: ${data.error}` : "."}
+        </div>
       </div>
     );
   }
 
   if (data.status && data.status !== "completed") {
     return (
-      <div className="text-muted-foreground text-sm">
-        Video status: {data.status}
-        {data.mode ? ` (${data.mode})` : ""}
+      <div className="space-y-2">
+        {data.prompt ? (
+          <p className="text-muted-foreground text-sm whitespace-pre-wrap">{data.prompt}</p>
+        ) : null}
+        <div className="text-muted-foreground flex items-center gap-2 text-sm">
+          <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" aria-hidden />
+          <span>
+            {data.message ||
+              (data.stage ? `${data.stage}…` : `Video status: ${data.status}`)}
+            {data.mode && !data.message ? ` (${data.mode})` : ""}
+          </span>
+        </div>
       </div>
     );
   }
@@ -59,6 +78,9 @@ export function VideoResult({ data }: { data: VideoToolResult }) {
     <div className="space-y-2">
       {data.mode ? (
         <p className="text-muted-foreground text-xs uppercase tracking-wide">{data.mode} video</p>
+      ) : null}
+      {data.prompt ? (
+        <p className="text-foreground/90 text-sm whitespace-pre-wrap">{data.prompt}</p>
       ) : null}
       <AppVideoPlayer
         src={getVideoStreamUrl(data.video_generation_id)}

@@ -3,6 +3,7 @@ from pydantic_ai import Agent
 from typing import List, Optional, Literal, Union
 from enum import Enum
 from dotenv import load_dotenv
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -45,9 +46,10 @@ class NarrationPlan(BaseModel):
 
 
 narrator_agent = Agent(
-    'openrouter:openai/gpt-4o-mini',
+    model_for_agent("planner"),
     name='Narrator Agent',
     system_prompt="You generate a JSON narration plan with alternating plays and beats.",
     output_type=NarrationPlan,
+    model_settings=settings_for("planner"),
     retries=2,
 )

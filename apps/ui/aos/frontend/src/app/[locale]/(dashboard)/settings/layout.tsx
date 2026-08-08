@@ -21,7 +21,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       <PageHeader
         eyebrow="Settings"
         title="Settings"
-        description="Manage your account, appearance, notifications, and slash commands."
+        description="Manage your account, LLM provider, appearance, notifications, and slash commands."
       />
       <PageTabs tabs={SETTINGS_TABS} />
       <div className="min-w-0">{children}</div>

@@ -1,6 +1,7 @@
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import Storyboard
+from llm_config import model_for_agent, settings_for
 
 load_dotenv()
 
@@ -86,9 +87,10 @@ Now, given the following Lecture, produce a Storyboard that follows all the abov
 """
 
 storyboard_planner_agent = Agent(
-    'openrouter:openai/gpt-4o-mini',
+    model_for_agent("planner"),
     name='Storyboard Planner Agent',
     description='Generates a storyboard from a lecture plan.',
     system_prompt=STORYBOARD_PROMPT,
     output_type=Storyboard,
+    model_settings=settings_for("planner"),
 )

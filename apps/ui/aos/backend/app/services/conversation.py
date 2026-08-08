@@ -480,6 +480,15 @@ class ConversationService:
             )
         return tool_call
 
+    async def get_tool_call_by_external_id(self, external_id: str) -> ToolCall | None:
+        return await conversation_repo.get_tool_call_by_external_id(self.db, external_id)
+
+    async def update_message_content(self, message_id: UUID, content: str) -> Message:
+        message = await self.get_message(message_id)
+        return await conversation_repo.update_message_content(
+            self.db, message, content=content
+        )
+
     async def list_tool_calls(self, message_id: UUID) -> list[ToolCall]:
         await self.get_message(message_id)
         return await conversation_repo.get_tool_calls_by_message(self.db, message_id)

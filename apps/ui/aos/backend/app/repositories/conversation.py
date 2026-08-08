@@ -417,8 +417,32 @@ async def aggregate_tool_calls_for_org(
 
 
 async def get_tool_call_by_id(db: AsyncSession, tool_call_id: UUID) -> ToolCall | None:
-    """Get tool call by ID."""
+    """Get tool call by primary key ID."""
     return await db.get(ToolCall, tool_call_id)
+
+
+async def get_tool_call_by_external_id(db: AsyncSession, external_id: str) -> ToolCall | None:
+    """Get the most recent tool call by external ``tool_call_id`` string."""
+    query = (
+        select(ToolCall)
+        .where(ToolCall.tool_call_id == external_id)
+        .order_by(ToolCall.started_at.desc())
+        .limit(1)
+    )
+    result = await db.execute(query)
+    return result.scalar_one_or_none()
+
+
+async def update_message_content(
+    db: AsyncSession,
+    message: Message,
+    *,
+    content: str,
+) -> Message:
+    message.content = content
+    await db.flush()
+    await db.refresh(message)
+    return message
 
 
 async def get_tool_calls_by_message(

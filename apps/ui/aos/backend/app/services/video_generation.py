@@ -80,6 +80,19 @@ class VideoGenerationService:
             raise NotFoundError(message="Video generation not found", details={"id": str(generation_id)})
         return await video_repo.update(self.db, row, celery_task_id=task_id)
 
+    async def set_assistant_message(
+        self, generation_id: UUID, assistant_message_id: UUID
+    ) -> VideoGeneration:
+        row = await video_repo.get_by_id(self.db, generation_id)
+        if row is None:
+            raise NotFoundError(message="Video generation not found", details={"id": str(generation_id)})
+        return await video_repo.update(
+            self.db, row, assistant_message_id=assistant_message_id
+        )
+
+    async def get_by_id(self, generation_id: UUID) -> VideoGeneration | None:
+        return await video_repo.get_by_id(self.db, generation_id)
+
     async def mark_running(self, generation_id: UUID) -> VideoGeneration:
         row = await video_repo.get_by_id(self.db, generation_id)
         if row is None:
@@ -145,9 +158,24 @@ class VideoGenerationService:
         storage = get_video_storage()
         return storage.open_stream(row.minio_key)
 
-    def enqueue(self, generation_id: UUID) -> str:
-        """Enqueue Celery task; returns task id."""
+    def enqueue(
+        self,
+        generation_id: UUID,
+        *,
+        llm_base_url: str | None = None,
+        llm_api_key: str | None = None,
+        model_name: str | None = None,
+    ) -> str:
+        """Enqueue Celery task; returns task id.
+
+        LLM credentials are passed as Celery kwargs only (not persisted to DB).
+        """
         from app.worker.tasks.video_tasks import generate_video_task
 
-        async_result = generate_video_task.delay(str(generation_id))
+        async_result = generate_video_task.delay(
+            str(generation_id),
+            llm_base_url=llm_base_url,
+            llm_api_key=llm_api_key,
+            model_name=model_name,
+        )
         return str(async_result.id)

@@ -1,9 +1,11 @@
 
-# Development configuration (alias for docker-compose.yml)
-# Usage: docker-compose -f docker-compose.dev.yml up -d
+# Development configuration
+# Usage: docker compose -f docker-compose.dev.yml up -d
 #
-# This file is identical to docker-compose.yml for explicit naming preference.
-# Use docker-compose.yml for default development.
+# Default stack: app, db, redis, minio, milvus, flower (no Celery worker).
+# Animate uses HOST Celery via scripts/dev-refresh.ps1 (Docker image lacks uv/Manim).
+# Optional: docker compose --profile docker-celery up -d celery_worker
+# Differs from docker-compose.yml: agents mount, S3_VIDEO_ENDPOINT on app, MinIO curl healthcheck.
 
 services:
   app:
@@ -32,6 +34,8 @@ services:
       - MILVUS_PORT=19530
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      # Inside Docker, MinIO is reached by service name (host .env uses localhost:9010).
+      - S3_VIDEO_ENDPOINT=http://minio:9000
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - backend
@@ -114,7 +118,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -151,6 +155,7 @@ services:
       retries: 10
     restart: unless-stopped
   celery_worker:
+    profiles: ["docker-celery"]
     image: aos_backend:dev
     pull_policy: never
     container_name: aos_celery_worker
@@ -158,6 +163,9 @@ services:
       - ./backend/app:/app/app:ro
       - media_data:/app/media
       - ./emails:/app/emails:ro
+      # Manim / animate CLI (apps/agents relative to apps/ui/aos)
+      # Note: Docker worker lacks uv/Manim — prefer host Celery via scripts/dev-refresh.ps1
+      - ../../agents:/agents:ro
     command: celery -A app.worker.celery_app worker --loglevel=debug
     env_file:
       - ./backend/.env
@@ -169,6 +177,8 @@ services:
       - MILVUS_PORT=19530
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - AGENTS_DIR=/agents
+      - S3_VIDEO_ENDPOINT=http://minio:9000
     networks:
       - backend
     depends_on:
@@ -183,6 +193,7 @@ services:
     restart: unless-stopped
 
   celery_beat:
+    profiles: ["docker-celery"]
     image: aos_backend:dev
     pull_policy: never
     container_name: aos_celery_beat

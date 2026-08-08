@@ -3,6 +3,7 @@
 
 import asyncio
 import subprocess
+import sys
 
 import click
 import uvicorn
@@ -127,6 +128,8 @@ def celery_worker(loglevel: str, concurrency: int):
     """Start Celery worker."""
     subprocess.run(
         [
+            sys.executable,
+            "-m",
             "celery",
             "-A",
             "app.worker.celery_app",
