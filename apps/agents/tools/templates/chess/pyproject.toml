@@ -1,0 +1,20 @@
+[project]
+name = "manim-chess"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["manim>=0.18", "chess>=1.11.2"]
+
+[project.entry-points."manim.plugins"]
+manim_chess = "manim_chess"
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["manim_chess*"]
+
+[tool.setuptools.package-data]
+manim_chess = ["sounds/*"]
+
