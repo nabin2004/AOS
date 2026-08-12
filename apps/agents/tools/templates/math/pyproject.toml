@@ -1,0 +1,26 @@
+[project]
+name = "manim-math"
+version = "0.1.0"
+description = "Mathematics curriculum visualizers for Manim (AOS)"
+requires-python = ">=3.12"
+dependencies = [
+    "manim>=0.18",
+    "manim-viz",
+    "numpy>=2.0",
+    "scipy>=1.14",
+    "sympy>=1.13",
+]
+
+[project.entry-points."manim.plugins"]
+manim_math = "manim_math"
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["manim_math*"]
+
+[tool.uv.sources]
+manim-viz = { path = "../viz", editable = true }
