@@ -1,0 +1,20 @@
+[project]
+name = "manim-physics"
+version = "0.1.0"
+description = "High-school mechanics visualizers for Manim (AOS)"
+requires-python = ">=3.12"
+dependencies = ["manim>=0.18", "manim-viz", "numpy>=2.0", "scipy>=1.14"]
+
+[project.entry-points."manim.plugins"]
+manim_physics = "manim_physics"
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["manim_physics*"]
+
+[tool.uv.sources]
+manim-viz = { path = "../viz", editable = true }
