@@ -13,7 +13,7 @@ AGENTS_ROOT = Path(__file__).resolve().parent.parent.parent
 SFT_DIR = AGENTS_ROOT / "sft_data_gen"
 sys.path.insert(0, str(AGENTS_ROOT))
 
-from dbos_setup import dbos_enabled
+from apps.agents.dbos_setup import DBOS_enabled
 from observability import logfire_enabled, sft_batch_enabled
 
 

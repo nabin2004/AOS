@@ -7,7 +7,6 @@ from typing import Callable
 import scipy.io.wavfile
 
 from dbos_setup import DBOS
-
 from narrator import DEFAULT_VOICE, Narrator
 from tools.coder_workspace import (
     OutputDirError,

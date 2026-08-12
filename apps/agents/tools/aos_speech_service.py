@@ -2,9 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from manim_voiceover.helper import remove_bookmarks
+import numpy as np
+import scipy.io.wavfile
 from manim_voiceover.services.base import SpeechService
 from narrator import DEFAULT_VOICE, Narrator
+
+from .speech_markup import (
+    build_segment_word_boundaries,
+    parse_bookmarks,
+)
 
 _narrator: Narrator | None = None
 _narrator_voice: str | None = None
@@ -20,8 +26,26 @@ def _get_narrator(voice: str, language: str | None) -> Narrator:
     return _narrator
 
 
+def _write_concat_wav(
+    out_path: Path,
+    sample_rate: int,
+    chunks: list[np.ndarray],
+) -> None:
+    if not chunks:
+        scipy.io.wavfile.write(out_path, sample_rate, np.zeros(0, dtype=np.float32))
+        return
+    audio = np.concatenate([np.asarray(c).reshape(-1) for c in chunks], axis=0)
+    scipy.io.wavfile.write(out_path, sample_rate, audio)
+
+
 class AOSSpeechService(SpeechService):
-    """Manim Voiceover speech service backed by AOS Pocket TTS (audio_service)."""
+    """Manim Voiceover speech service backed by AOS Pocket TTS (audio_service).
+
+    Bookmarks use segment-split synthesis: text is split at
+    ``<bookmark mark='…'/>`` tags, each segment is synthesized with Pocket TTS,
+    audio is concatenated, and Manim-compatible ``word_boundaries`` are emitted
+    at segment edges so ``wait_until_bookmark`` works without Whisper.
+    """
 
     def __init__(
         self,
@@ -47,11 +71,15 @@ class AOSSpeechService(SpeechService):
         cache_path = Path(cache_dir)
         cache_path.mkdir(parents=True, exist_ok=True)
 
-        input_text = remove_bookmarks(text)
+        parsed = parse_bookmarks(text)
+        config: dict = {"voice": self.voice, "language": self.language}
+        if parsed.has_bookmarks:
+            config["alignment"] = "segment_split"
+
         input_data = {
-            "input_text": input_text,
+            "input_text": parsed.clean_text,
             "service": "aos",
-            "config": {"voice": self.voice, "language": self.language},
+            "config": config,
         }
 
         cached = self.get_cached_result(input_data, cache_path)
@@ -64,10 +92,35 @@ class AOSSpeechService(SpeechService):
             audio_path = path
 
         narrator = _get_narrator(self.voice, self.language)
-        narrator.synthesize(input_text, cache_path / audio_path)
+        out_file = cache_path / audio_path
+
+        if not parsed.has_bookmarks:
+            narrator.synthesize(parsed.clean_text, out_file)
+            return {
+                "input_text": text,
+                "input_data": input_data,
+                "original_audio": audio_path,
+            }
+
+        chunks: list[np.ndarray] = []
+        durations: list[float] = []
+        sample_rate = narrator.sample_rate
+
+        for segment in parsed.segments:
+            if not segment.strip():
+                durations.append(0.0)
+                continue
+            audio = narrator.synthesize(segment)
+            arr = np.asarray(audio).reshape(-1)
+            chunks.append(arr)
+            durations.append(float(arr.shape[0]) / float(sample_rate))
+
+        _write_concat_wav(out_file, sample_rate, chunks)
+        word_boundaries = build_segment_word_boundaries(parsed.segments, durations)
 
         return {
             "input_text": text,
             "input_data": input_data,
             "original_audio": audio_path,
+            "word_boundaries": word_boundaries,
         }

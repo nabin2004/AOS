@@ -118,6 +118,23 @@ Pass the voice name to both `AOSSpeechService(voice="alba")` and `synthesize_nar
 4. Manim Voiceover plays the audio and syncs animation timing via the tracker (`tracker.duration`).
 5. `compile_manim_code` runs `uv run manim` so `tools.aos_speech_service` is importable from the workspace.
 
+## Bookmarks (`wait_until_bookmark`)
+
+Use Manim’s bookmark tags to fire animations mid-narration:
+
+```python
+with self.voiceover(
+    text="Before we start our <bookmark mark='FOCUS'/>lecture One."
+):
+    title = Title("Lecture 1: Introduction", font_size=48, color=BLUE)
+    self.wait_until_bookmark("FOCUS")
+    self.play(Write(title))
+```
+
+Pocket TTS does not emit word timestamps, and AOS does **not** use Whisper. Instead, `AOSSpeechService` splits the text at each `<bookmark mark='…'/>`, synthesizes each segment with Pocket TTS, concatenates the audio, and returns Manim-compatible `word_boundaries` at segment edges. That makes `wait_until_bookmark` land on the measured end of the preceding speech.
+
+For clips with no bookmarks, synthesis stays a single Pocket TTS call (unchanged).
+
 ## Scope
 
 This integration is for the **coder agent workspace** only. The main lecture pipeline still uses post-render narration via `tools/narrate.py` and `tools/assemble.py`. Docker render (`tools/render.py`) does not run voiceover scenes in this pass.
