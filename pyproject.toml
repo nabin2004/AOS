@@ -11,6 +11,7 @@ dependencies = [
     "terminaltexteffects>=0.11.0",
     "pydantic-ai-slim[google]>=2.5.0",
     "pydantic-ai-harness[code-mode]>=0.6.0",
+    "pydantic-ai[dbos]>=2.5.0",
 ]
 
 [tool.uv.sources]
@@ -24,6 +25,10 @@ store = { workspace = true }
 "apps/agents/export_traces/tests/**" = ["E402"]
 "apps/agents/tools/templates/001_intro.py" = ["E402"]
 "apps/agents/tools/templates/deeplearning/**" = ["F841"]
+
+[tool.setuptools.packages.find]
+include = ["apps*", "packages*"]
+exclude = ["notes*"]
 
 [tool.uv.workspace]
 members = [

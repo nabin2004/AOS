@@ -85,6 +85,14 @@ scene_name rules:
 Canvas & layout (critical — keep the board readable):
 - Default to a flat 2D teaching board: subclass Scene or VoiceoverScene, NOT ThreeDScene,
   unless the concept truly needs depth (surfaces, 3D trajectories, Lorenz, etc.).
+- For chess lessons, prefer: `from manim_chess import ChessBoard, BoardTheme`
+  (2D SVG pieces via python-chess). Do not use ThreeDScene for chess boards.
+- For AI / deep learning lessons, prefer: `from manim_ai import get_concept, list_concepts, LinearLayer, Network`
+  and VoiceoverScene + `<bookmark mark='…'/>` / wait_until_bookmark (see manim_ai.reveal_with_bookmarks).
+- For maths lessons, prefer: `from manim_math import get_concept, list_concepts`.
+- For high-school mechanics, prefer: `from manim_physics import get_concept, list_concepts`.
+- For algorithms / data structures, prefer: `from manim_dsa import get_concept, list_concepts`.
+- Shared drawing primitives live in `manim_viz` (arrays, graphs, vectors, particles, plots).
 - For 2D board / list / equation scenes: do NOT call set_camera_orientation,
   begin_ambient_camera_rotation, or other 3D camera moves. No slanted "fake 3D" views.
 - Keep all content inside the frame: roughly |x| ≤ 6.5, |y| ≤ 3.5. Leave margins.

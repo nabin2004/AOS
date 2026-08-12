@@ -29,8 +29,16 @@ dependencies = [
     "uvicorn>=0.50.0",
     "manim-voiceover>=0.3.7",
     "manim-deeplearning",
+    "manim-chess",
+    "manim-ai",
+    "manim-viz",
+    "manim-math",
+    "manim-physics",
+    "manim-dsa",
     "ipython>=9.15.0",
     "torch>=2.12.1",
+    "distlib>=0.4.3",
+    "chess>=1.11.2",
 ]
 
 [build-system]
@@ -70,8 +78,20 @@ py-modules = [
     "validation_agent",
 ]
 
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [tool.uv.sources]
 ir = { workspace = true }
 audio-service = { workspace = true }
 mcpservers = { workspace = true }
 manim-deeplearning = { path = "tools/templates/deeplearning", editable = true }
+manim-chess = { path = "tools/templates/chess", editable = true }
+manim-ai = { path = "tools/templates/ai", editable = true }
+manim-viz = { path = "tools/templates/viz", editable = true }
+manim-math = { path = "tools/templates/math", editable = true }
+manim-physics = { path = "tools/templates/physics", editable = true }
+manim-dsa = { path = "tools/templates/dsa", editable = true }
+torch = { index = "pytorch-cpu" }
