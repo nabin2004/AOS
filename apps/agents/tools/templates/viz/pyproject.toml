@@ -1,0 +1,17 @@
+[project]
+name = "manim-viz"
+version = "0.1.0"
+description = "Shared Manim visualization primitives for AOS domain plugins"
+requires-python = ">=3.12"
+dependencies = ["manim>=0.18", "numpy>=2.0"]
+
+[project.entry-points."manim.plugins"]
+manim_viz = "manim_viz"
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["manim_viz*"]
