@@ -1,0 +1,25 @@
+[project]
+name = "manim-ai"
+version = "0.1.0"
+description = "Dive into Deep Learning curriculum visualizers for Manim"
+requires-python = ">=3.12"
+dependencies = ["manim>=0.18", "numpy>=2.0", "torch>=2.0", "scipy>=1.14", "sympy>=1.13"]
+
+[project.entry-points."manim.plugins"]
+manim_ai = "manim_ai"
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["manim_ai*"]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
