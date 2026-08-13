@@ -45,6 +45,50 @@ _STAGE_MESSAGES: dict[str, str] = {
 }
 
 
+def _resolve_scene_file_for_upload(
+    artifact: dict[str, Any],
+    run_dir: str | None,
+) -> Path | None:
+    """Locate Manim/Python source for S3 upload from artifact or run_dir."""
+    hint = artifact.get("scene_file")
+    if hint:
+        hint_path = Path(hint)
+        if hint_path.is_file():
+            return hint_path
+        if run_dir:
+            nested = Path(run_dir) / hint
+            if nested.is_file():
+                return nested
+
+    if not run_dir:
+        return None
+    root = Path(run_dir)
+    if not root.is_dir():
+        return None
+
+    mode = artifact.get("mode")
+    if mode == "lecture":
+        lecture_py = root / "lecture.py"
+        if lecture_py.is_file():
+            return lecture_py
+
+    manifest_path = root / "manifest.json"
+    if manifest_path.is_file():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            manifest = {}
+        scene_rel = manifest.get("scene_file")
+        if scene_rel:
+            scene_path = (
+                Path(scene_rel) if Path(scene_rel).is_absolute() else root / scene_rel
+            )
+            if scene_path.is_file():
+                return scene_path
+
+    return None
+
+
 def _friendly_stage_message(stage: str) -> str:
     if stage in _STAGE_MESSAGES:
         return _STAGE_MESSAGES[stage]
@@ -406,6 +450,7 @@ async def _run_generate_video(
         conversation_id = row.conversation_id
         existing_assistant_message_id = row.assistant_message_id
         object_key = svc.build_object_key(row)
+        code_key = svc.build_code_object_key(row)
 
     await _notify_video_status(
         {
@@ -481,6 +526,7 @@ async def _run_generate_video(
         return {"status": "failed", "error": error}
 
     video_path = artifact["video_path"]
+    code_minio_key: str | None = None
     try:
         await _notify_video_status(
             {
@@ -496,7 +542,26 @@ async def _run_generate_video(
             }
         )
         storage = get_video_storage()
-        storage.upload_file(video_path, object_key)
+        storage.upload_file(video_path, object_key, content_type="video/mp4")
+        scene_path = _resolve_scene_file_for_upload(artifact, run_dir)
+        if scene_path is not None:
+            try:
+                storage.upload_file(
+                    scene_path,
+                    code_key,
+                    content_type="text/x-python",
+                )
+                code_minio_key = code_key
+            except Exception:
+                logger.exception(
+                    "Scene source upload failed for %s (video upload succeeded)",
+                    generation_id,
+                )
+        else:
+            logger.warning(
+                "No scene_file found for generation %s; skipping code upload",
+                generation_id,
+            )
     except Exception as exc:
         error = f"minio_upload_failed: {exc}"
         logger.exception("MinIO upload failed for %s", generation_id)
@@ -549,6 +614,7 @@ async def _run_generate_video(
             minio_key=object_key,
             run_dir=run_dir,
             assistant_message_id=assistant_id,
+            code_minio_key=code_minio_key,
         )
 
     await _notify_video_status(
@@ -563,10 +629,15 @@ async def _run_generate_video(
             "mode": mode,
             "prompt": prompt,
             "minio_key": object_key,
+            "code_minio_key": code_minio_key,
             "assistant_message_id": str(assistant_id) if assistant_id else None,
         }
     )
-    return {"status": "completed", "minio_key": object_key}
+    return {
+        "status": "completed",
+        "minio_key": object_key,
+        "code_minio_key": code_minio_key,
+    }
 
 
 @shared_task(

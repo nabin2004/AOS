@@ -23,6 +23,7 @@ class VideoGenerationRead(BaseSchema):
     status: str
     minio_bucket: str | None = None
     minio_key: str | None = None
+    code_minio_key: str | None = None
     error_message: str | None = None
     run_dir: str | None = None
     celery_task_id: str | None = None

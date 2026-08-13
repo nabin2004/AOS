@@ -44,6 +44,7 @@ class VideoGeneration(Base, TimestampMixin):
     )  # pending | running | completed | failed
     minio_bucket: Mapped[str | None] = mapped_column(String(255), nullable=True)
     minio_key: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    code_minio_key: Mapped[str | None] = mapped_column(String(500), nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     run_dir: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     celery_task_id: Mapped[str | None] = mapped_column(String(255), nullable=True)

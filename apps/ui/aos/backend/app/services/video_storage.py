@@ -1,4 +1,4 @@
-"""MinIO / S3 storage for compiled Manim videos."""
+"""MinIO / S3 storage for compiled Manim videos and scene source."""
 
 from __future__ import annotations
 
@@ -25,6 +25,16 @@ def video_object_key(
 ) -> str:
     """Canonical object key for a generation MP4."""
     return f"videos/{user_id}/{conversation_id}/{generation_id}.mp4"
+
+
+def code_object_key(
+    *,
+    user_id: UUID | str,
+    conversation_id: UUID | str,
+    generation_id: UUID | str,
+) -> str:
+    """Canonical object key for a generation Manim/Python scene source."""
+    return f"videos/{user_id}/{conversation_id}/{generation_id}.py"
 
 
 class VideoStorage:
@@ -71,20 +81,26 @@ class VideoStorage:
             client.create_bucket(**create_kwargs)
         self._bucket_ready = True
 
-    def upload_file(self, local_path: str | Path, key: str) -> str:
-        """Upload a local MP4 and return the object key."""
+    def upload_file(
+        self,
+        local_path: str | Path,
+        key: str,
+        *,
+        content_type: str = "video/mp4",
+    ) -> str:
+        """Upload a local file and return the object key."""
         path = Path(local_path)
         if not path.is_file():
-            raise FileNotFoundError(f"Video file not found: {path}")
+            raise FileNotFoundError(f"File not found: {path}")
         self.ensure_bucket()
         client = self._get_client()
         client.upload_file(
             str(path),
             self.bucket,
             key,
-            ExtraArgs={"ContentType": "video/mp4"},
+            ExtraArgs={"ContentType": content_type},
         )
-        logger.info("Uploaded video to s3://%s/%s", self.bucket, key)
+        logger.info("Uploaded to s3://%s/%s (%s)", self.bucket, key, content_type)
         return key
 
     def open_stream(self, key: str) -> BinaryIO:

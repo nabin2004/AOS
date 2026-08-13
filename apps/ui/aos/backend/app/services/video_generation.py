@@ -13,7 +13,7 @@ from app.core.exceptions import BadRequestError, NotFoundError
 from app.db.models.video_generation import VideoGeneration
 from app.repositories import video_generation as video_repo
 from app.schemas.video_generation import VideoGenerationCreate, VideoGenerationList, VideoGenerationRead
-from app.services.video_storage import get_video_storage, video_object_key
+from app.services.video_storage import code_object_key, get_video_storage, video_object_key
 
 logger = logging.getLogger(__name__)
 
@@ -107,20 +107,22 @@ class VideoGenerationService:
         minio_bucket: str | None = None,
         run_dir: str | None = None,
         assistant_message_id: UUID | None = None,
+        code_minio_key: str | None = None,
     ) -> VideoGeneration:
         row = await video_repo.get_by_id(self.db, generation_id)
         if row is None:
             raise NotFoundError(message="Video generation not found", details={"id": str(generation_id)})
-        return await video_repo.update(
-            self.db,
-            row,
-            status="completed",
-            minio_key=minio_key,
-            minio_bucket=minio_bucket or settings.S3_VIDEO_BUCKET,
-            run_dir=run_dir,
-            assistant_message_id=assistant_message_id,
-            error_message=None,
-        )
+        fields: dict = {
+            "status": "completed",
+            "minio_key": minio_key,
+            "minio_bucket": minio_bucket or settings.S3_VIDEO_BUCKET,
+            "run_dir": run_dir,
+            "assistant_message_id": assistant_message_id,
+            "error_message": None,
+        }
+        if code_minio_key is not None:
+            fields["code_minio_key"] = code_minio_key
+        return await video_repo.update(self.db, row, **fields)
 
     async def mark_failed(
         self,
@@ -144,6 +146,13 @@ class VideoGenerationService:
 
     def build_object_key(self, row: VideoGeneration) -> str:
         return video_object_key(
+            user_id=row.user_id,
+            conversation_id=row.conversation_id,
+            generation_id=row.id,
+        )
+
+    def build_code_object_key(self, row: VideoGeneration) -> str:
+        return code_object_key(
             user_id=row.user_id,
             conversation_id=row.conversation_id,
             generation_id=row.id,
