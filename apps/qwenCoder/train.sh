@@ -24,7 +24,7 @@ GGUF_DIR="${GGUF_DIR:-${WORKSPACE}/qwen2.5-coder-7b-manim-gguf}"
 LLAMA_CPP_DIR="${LLAMA_CPP_DIR:-${WORKSPACE}/llama.cpp}"
 EPOCHS="${EPOCHS:-1}"
 DATA_PATH="${DATA_PATH:-${REPO_ROOT}/apps/agents/export_traces/coder_sft/tool_trace.train.jsonl}"
-REPORT_TO="${REPORT_TO:-none}"
+REPORT_TO="${REPORT_TO:-wandb}"
 
 if [[ -z "${HF_TOKEN:-}" ]]; then
   echo "ERROR: HF_TOKEN is required for Hub download/push." >&2

@@ -13,6 +13,8 @@ uv run python build_preference_pairs.py
 
 ## Train
 
+Defaults to **wandb** (`aos-dpo`) when `WANDB_API_KEY` is set via [`apps/training/.env`](../training/.env.example).
+
 ```bash
 cd apps/dpo
 uv sync
@@ -21,6 +23,8 @@ uv run python run.py \
   --data-path ../agents/export_traces/coder_sft/preference/train.jsonl \
   --push-to-hub
 ```
+
+Or run the full Qwen curriculum (SFT → DPO → GRPO): `bash apps/qwenCoder/train_stages.sh`.
 
 After DPO, merge + GGUF via the Qwen packaging scripts:
 
