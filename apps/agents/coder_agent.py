@@ -29,6 +29,11 @@ STRING RULES (CRITICAL):
 - Multi-line Manim source MUST use triple quotes ('''...''' or \"\"\"...\"\"\"). Never use "..." or '...' spanning multiple lines — that is invalid Python.
 - Never call run_code from inside code passed to run_code, manim_write, or compile_manim_code.
 
+Narration (required):
+- Scene MUST subclass VoiceoverScene, call set_speech_service(AOSSpeechService(...)),
+  and wrap beats in with self.voiceover(text="...") as tracker: with run_time=tracker.duration.
+- Plain Scene / silent self.play without voiceover will fail compile.
+
 Workflow: manim_write → compile_manim_code → fix (at most 3 compile attempts) → stop.
 """
 

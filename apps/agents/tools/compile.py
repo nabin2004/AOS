@@ -45,6 +45,18 @@ _TEX_HINT = (
     "(Debian). Do not thrash on string escaping — fix TeX or fall back to Text once."
 )
 
+_VOICEOVER_HINT = (
+    "Animate scenes must subclass VoiceoverScene and wrap beats in "
+    "with self.voiceover(text=...) as tracker: (use AOSSpeechService). "
+    "Silent Scene / self.play without voiceover is not allowed."
+)
+
+_AUDIO_HINT = (
+    "Rendered MP4 has no audio stream. Install SoX (manim-voiceover needs it), "
+    "confirm AOSSpeechService/Pocket TTS works, and ensure voiceover(...) runs "
+    "during construct()."
+)
+
 
 def _scene_class_name(scene_name: str) -> str:
     name = (scene_name or "scene").strip()
@@ -80,6 +92,110 @@ def _discover_scene_class(code: str, fallback: str) -> str:
         if isinstance(node, ast.ClassDef) and _is_scene_class(node):
             return node.name
     return fallback
+
+
+def _bases_include_voiceover(node: ast.ClassDef) -> bool:
+    for base in node.bases:
+        name = _base_name(base)
+        if name == "VoiceoverScene":
+            return True
+    return False
+
+
+def _call_name(node: ast.Call) -> str | None:
+    func = node.func
+    if isinstance(func, ast.Name):
+        return func.id
+    if isinstance(func, ast.Attribute):
+        return func.attr
+    return None
+
+
+def _has_voiceover_call(node: ast.AST) -> bool:
+    for child in ast.walk(node):
+        if isinstance(child, ast.Call) and _call_name(child) == "voiceover":
+            return True
+        if isinstance(child, ast.With):
+            for item in child.items:
+                ctx = item.context_expr
+                if isinstance(ctx, ast.Call) and _call_name(ctx) == "voiceover":
+                    return True
+    return False
+
+
+def validate_voiceover_scene(code: str) -> str | None:
+    """Return an error code if source is missing VoiceoverScene + voiceover()."""
+    try:
+        tree = ast.parse(code)
+    except SyntaxError as exc:
+        return f"syntax_error:{exc.msg}"
+
+    voiceover_classes: list[ast.ClassDef] = []
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and _bases_include_voiceover(node):
+            voiceover_classes.append(node)
+
+    if not voiceover_classes:
+        return "missing_voiceover_scene"
+
+    if not any(_has_voiceover_call(cls) for cls in voiceover_classes):
+        return "missing_voiceover_calls"
+    return None
+
+
+def _find_scene_mp4(workspace: Path, scene_class: str) -> Path | None:
+    """Prefer the final scene MP4 under media/, skipping partial_movie_files."""
+    media = workspace / "media"
+    if not media.is_dir():
+        return None
+
+    preferred: list[Path] = []
+    fallback: list[Path] = []
+    for path in media.rglob("*.mp4"):
+        if not path.is_file():
+            continue
+        if "partial_movie_files" in path.parts:
+            continue
+        if path.stem == scene_class:
+            preferred.append(path)
+        else:
+            fallback.append(path)
+
+    pool = preferred or fallback
+    if not pool:
+        return None
+    return max(pool, key=lambda p: p.stat().st_size)
+
+
+def mp4_has_audio_stream(mp4_path: Path) -> bool | None:
+    """Return True/False if ffprobe can tell; None if ffprobe is unavailable."""
+    try:
+        proc = subprocess.run(
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "a",
+                "-show_entries",
+                "stream=codec_type",
+                "-of",
+                "csv=p=0",
+                str(mp4_path),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=30,
+        )
+    except FileNotFoundError:
+        return None
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+
+    if proc.returncode != 0:
+        return False
+    return any(line.strip() == "audio" for line in proc.stdout.splitlines())
 
 
 def _output_indicates_failure(output: str) -> str | None:
@@ -164,6 +280,41 @@ def compile_manim_code(
         scene_class = _discover_scene_class(code, fallback_class)
         scene_path.write_text(code, encoding="utf-8")
 
+        voiceover_error = validate_voiceover_scene(code)
+        if voiceover_error is not None:
+            manifest = load_manifest(workspace)
+            manifest["output_dir"] = str(workspace)
+            manifest["scene_file"] = str(scene_path.relative_to(workspace))
+            manifest["last_compile"] = {
+                "ok": False,
+                "returncode": None,
+                "scene_name": scene_name,
+                "scene_class": scene_class,
+                "failure_marker": voiceover_error,
+                "tex_failure": False,
+            }
+            save_manifest(workspace, manifest)
+            record_step(
+                workspace,
+                "compile",
+                {
+                    "ok": False,
+                    "scene_file": manifest["scene_file"],
+                    "failure_marker": voiceover_error,
+                    "scene_class": scene_class,
+                },
+            )
+            return result_json(
+                ok=False,
+                step="compile",
+                output_dir=str(workspace),
+                scene_file=manifest["scene_file"],
+                scene_class=scene_class,
+                error=voiceover_error,
+                failure_marker=voiceover_error,
+                message=f"Compilation refused: {_VOICEOVER_HINT}",
+            )
+
         log_path = workspace / "logs" / "compile.log"
         quality = _manim_quality_flag()
         cmd = ["uv", "run", "manim", f"-q{quality}", scene_path.name, scene_class]
@@ -182,9 +333,25 @@ def compile_manim_code(
         failure_marker = _output_indicates_failure(output)
         ok = proc.returncode == 0 and failure_marker is None
         tex_failure = _is_tex_failure(failure_marker, output)
+        video_path: str | None = None
+        has_audio: bool | None = None
+
+        if ok:
+            mp4 = _find_scene_mp4(workspace, scene_class)
+            if mp4 is not None:
+                video_path = str(mp4.resolve())
+                has_audio = mp4_has_audio_stream(mp4)
+                if has_audio is False:
+                    ok = False
+                    failure_marker = "no_audio_stream"
+                    # Surface SoX / voiceover hints that often appear in manim logs.
+                    if "sox" in output.lower() and "not found" in output.lower():
+                        failure_marker = "no_audio_stream_sox_missing"
 
         if ok:
             message = "Compilation successful."
+        elif failure_marker in ("no_audio_stream", "no_audio_stream_sox_missing"):
+            message = f"Compilation failed: {_AUDIO_HINT}"
         elif tex_failure:
             message = f"Compilation failed: {_TEX_HINT}"
         elif failure_marker and proc.returncode == 0:
@@ -198,6 +365,8 @@ def compile_manim_code(
         manifest["output_dir"] = str(workspace)
         manifest["scene_file"] = str(scene_path.relative_to(workspace))
         manifest["compile_log"] = str(log_path.relative_to(workspace))
+        if video_path:
+            manifest["video_path"] = video_path
         manifest["last_compile"] = {
             "ok": ok,
             "returncode": proc.returncode,
@@ -205,6 +374,8 @@ def compile_manim_code(
             "scene_class": scene_class,
             "failure_marker": failure_marker,
             "tex_failure": tex_failure,
+            "video_path": video_path,
+            "has_audio": has_audio,
         }
         save_manifest(workspace, manifest)
         record_step(
@@ -218,6 +389,8 @@ def compile_manim_code(
                 "failure_marker": failure_marker,
                 "scene_class": scene_class,
                 "tex_failure": tex_failure,
+                "video_path": video_path,
+                "has_audio": has_audio,
             },
         )
 
@@ -232,6 +405,8 @@ def compile_manim_code(
             returncode=proc.returncode,
             failure_marker=failure_marker,
             tex_failure=tex_failure,
+            video_path=video_path,
+            has_audio=has_audio,
             log_excerpt=summarize_diagnostic_output(output, max_chars=1200),
             message=message,
         )
