@@ -55,7 +55,7 @@ class TrainingConfig:
     grad_accum: int = 8
     learning_rate: float = 5e-7
     beta: float = 0.1
-    report_to: str = "none"
+    report_to: str = "wandb"
     run_name: str = WANDB_DPO_RUN_NAME
     wandb_project: str = "aos-dpo"
     wandb_group: str = WANDB_RUN_GROUP
