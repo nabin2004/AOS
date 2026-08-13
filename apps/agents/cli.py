@@ -55,7 +55,9 @@ def _show_banner() -> None:
 def _show_command_help() -> None:
     console.print("Usage:")
     console.print('  animus generate "<request>" [--max-repairs N] [--no-banner] [--json]')
-    console.print('  animus animate "<request>" [--no-banner] [--json]')
+    console.print(
+        '  animus animate "<request>" [--no-banner] [--json] [--output-dir DIR]'
+    )
 
 
 def _emit_json(payload: dict) -> None:
@@ -180,12 +182,20 @@ def animate(
     fast: bool = typer.Option(
         False,
         "--fast",
-        help="Skip narration synthesis during coding (faster compile; sets AOS_SFT_BATCH=1)",
+        help=(
+            "Skip synthesize_narration preview tool only (sets AOS_SFT_BATCH=1). "
+            "Does NOT disable VoiceoverScene / in-scene voiceover."
+        ),
     ),
     as_json: bool = typer.Option(
         False,
         "--json",
-        help="Print a single JSON VideoArtifact to stdout (for UI/Celery)",
+        help="Print a single JSON VideoArtifact to stdout (for UI/Celery/OpenCode)",
+    ),
+    output_dir: str | None = typer.Option(
+        None,
+        "--output-dir",
+        help="Copy/symlink final video + scene into this directory when compile succeeds",
     ),
 ) -> None:
     """Run the animation pipeline (classify → plan → Manim coder → compile)."""
@@ -207,16 +217,25 @@ def animate(
                     "ok": False,
                     "mode": "animate",
                     "video_path": None,
+                    "scene_path": None,
                     "run_dir": None,
+                    "scene_file": None,
+                    "has_audio": None,
+                    "trajectory_path": None,
                     "error": str(exc),
                     "detail": {},
                 }
             )
             raise typer.Exit(code=1) from exc
 
-        artifact = asyncio.run(run_animate(request))
-        _emit_json(artifact.model_dump(mode="json"))
-        raise typer.Exit(code=0 if artifact.ok else 1)
+        artifact = asyncio.run(run_animate(request, output_dir=output_dir))
+        payload = artifact.model_dump(mode="json")
+        _emit_json(payload)
+        # Fail when compile failed, missing video, or MP4 has no audio stream.
+        ok = bool(artifact.ok and artifact.video_path)
+        if ok and artifact.has_audio is False:
+            ok = False
+        raise typer.Exit(code=0 if ok else 1)
 
     if banner:
         _show_banner()
@@ -242,9 +261,22 @@ def animate(
         console.print(f"[bold red]Pipeline failed:[/] {exc}")
         raise typer.Exit(code=1) from exc
 
+    if output_dir and result.get("compile_ok") and result.get("run_dir"):
+        from video_entry import _stage_output_dir, find_mp4
+
+        mp4 = find_mp4(result.get("run_dir"), scene_name=result.get("scene_name"))
+        staged = _stage_output_dir(
+            output_dir,
+            video_path=str(mp4) if mp4 else None,
+            scene_path=result.get("scene_file"),
+        )
+        console.print(f"[dim]Staged to {staged.get('output_dir')}[/]")
+
     _print_animate_result(result)
 
     if not result.get("compile_ok"):
+        raise typer.Exit(code=1)
+    if result.get("has_audio") is False:
         raise typer.Exit(code=1)
 
 
