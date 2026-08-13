@@ -167,7 +167,7 @@ uv run python sft_data_gen/collect_traces.py \
 
 Useful flags:
 
-- `--fast` — disable Logfire + DBOS, skip narration, preload RAG index (recommended for batch SFT)
+- `--fast` — skip `synthesize_narration` preview only (sets `AOS_SFT_BATCH=1`); does **not** disable VoiceoverScene / in-scene voiceover. Also disables Logfire+DBOS and preloads RAG in SFT collectors.
 - `--concurrency 2` — parallel runs (default: 2; use `1` if rate-limited)
 - `--dry-run --limit 3` — preview selected prompts without API calls
 - `--indices 0,3,7` — run specific prompt indices
@@ -207,7 +207,20 @@ uv run python export_local_sft.py
 - Output: `export_traces/coder_sft/`
 - Prefer **`tool_trace*.jsonl`** for tool-use / CodeMode finetuning
 - `final_answer*.jsonl` is a text-only collapse (secondary)
-- Dedup: one row per `user_prompt`; keeps the **shortest successful** trajectory
+- Dedup: one row per `user_prompt`; keeps the **shortest successful** trajectory (prefers `has_audio=true`)
+- `--require-audio` — video+audio gold only
+
+**Preference pairs (DPO)**
+
+```bash
+uv run python build_preference_pairs.py
+```
+
+**OpenCode + Qwen finetune**
+
+Expose this CLI to OpenCode via repo-root `.opencode/tools/aos.ts`, then train Qwen on trajectories:
+
+See [`apps/qwenCoder/README.md`](../qwenCoder/README.md) for SFT → DPO → GRPO → GGUF → Hugging Face → Ollama.
 
 **Step 4 — publish to Hugging Face (optional)**
 
@@ -217,9 +230,11 @@ Upload trajectories and tool_trace exports to the public dataset:
 export HF_TOKEN=hf_...   # write token; never commit
 cd ../sft
 uv run python upload_dataset.py
+# Qwen-oriented dataset (tool_trace + preference):
+cd ../qwenCoder && uv run python upload_dataset.py
 ```
 
-Dataset: [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories). Phase 1 SFT (`apps/sft/run.py`) loads from this Hub repo by default.
+Dataset: [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories). Phase 1 SFT (`apps/sft/run.py`) loads from this Hub repo by default. Qwen path uses [nabin2004/AOS-Qwen-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Qwen-Trajectories).
 
 **Optional — Logfire export**
 
@@ -240,6 +255,7 @@ uv run python export_coder_sft.py --skip-export --input export_traces/coder_trac
 
 - Start with `--limit 10` before large batches (each run = multiple LLM calls + Manim compile).
 - Filter on `"compile_ok": true` in `batch_runs.jsonl` or `run_result.json` for higher-quality SFT rows.
+- Prefer `has_audio=true` for narration-backed videos (`export_local_sft.py --require-audio`).
 - Loop caps per run: `request_limit=20`, `tool_calls_limit=40` (see `coder_run.py`).
 - Logfire = live debugging; `training_data/trajectories.jsonl` = local training gold; [nabin2004/AOS-Trajectories](https://huggingface.co/datasets/nabin2004/AOS-Trajectories) = published Hub copy.
 - More detail: [`sft_data_gen/README.md`](sft_data_gen/README.md)
