@@ -1,0 +1,36 @@
+[project]
+name = "qwen-coder-sft"
+version = "0.1.0"
+description = "Qwen2.5-Coder-7B LoRA SFT on AOS Manim agent trajectories"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "accelerate>=1.0.0",
+    "bitsandbytes>=0.45.0",
+    "datasets>=5.0.0",
+    "huggingface-hub>=0.27.0",
+    "peft>=0.19.1",
+    "torch>=2.5.0",
+    "transformers>=4.51.0",
+    "trl>=0.19.0",
+    "wandb>=0.19.0",
+]
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = [
+    "config",
+    "data",
+    "export_gguf",
+    "hub_upload",
+    "identity",
+    "merge_adapter",
+    "model",
+    "preflight_qwen",
+    "run",
+    "trainer",
+    "upload_dataset",
+]

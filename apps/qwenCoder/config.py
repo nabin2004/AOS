@@ -1,0 +1,146 @@
+from __future__ import annotations
+
+import argparse
+import os
+from dataclasses import dataclass, field, replace
+from pathlib import Path
+
+from peft import LoraConfig
+from trl import SFTConfig
+
+from identity import (
+    BASE_MODEL_ID,
+    HUB_SFT_REPO,
+    SFT_OUTPUT_DIR_NAME,
+    WANDB_RUN_GROUP,
+    WANDB_SFT_RUN_NAME,
+    WANDB_TAGS,
+)
+
+QWEN_ROOT = Path(__file__).resolve().parent
+
+# Qwen2 dense MLP LoRA targets
+LORA_TARGETS = (
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj",
+)
+
+
+@dataclass
+class TrainingConfig:
+    model_id: str = BASE_MODEL_ID
+    dataset_repo: str = "nabin2004/AOS-Qwen-Trajectories"
+    dataset_file: str = "tool_trace/train.jsonl"
+    data_path: Path | None = None
+    output_dir: Path = QWEN_ROOT / SFT_OUTPUT_DIR_NAME
+    use_4bit: bool = True
+    seq_len: int = 4096
+    epochs: int = 1
+    batch_size: int = 1
+    grad_accum: int = 8
+    learning_rate: float = 2e-4
+    num_proc: int = 4
+    report_to: str = "none"
+    run_name: str = WANDB_SFT_RUN_NAME
+    wandb_project: str = "aos-qwen-sft"
+    wandb_group: str = WANDB_RUN_GROUP
+    wandb_tags: tuple[str, ...] = field(default_factory=lambda: WANDB_TAGS)
+    packing: bool = False
+    assistant_only_loss: bool = True
+    push_to_hub: bool = False
+    hub_model_id: str = HUB_SFT_REPO
+    hub_private: bool = False
+
+    def resolve_paths(self) -> TrainingConfig:
+        data_path = self.data_path
+        if data_path is not None:
+            data_path = data_path.expanduser().resolve()
+        return replace(
+            self,
+            data_path=data_path,
+            output_dir=self.output_dir.expanduser().resolve(),
+        )
+
+    def lora_config(self) -> LoraConfig:
+        return LoraConfig(
+            r=32,
+            lora_alpha=64,
+            lora_dropout=0.05,
+            target_modules=list(LORA_TARGETS),
+            bias="none",
+            task_type="CAUSAL_LM",
+        )
+
+    def sft_config(self) -> SFTConfig:
+        return SFTConfig(
+            output_dir=str(self.output_dir),
+            num_train_epochs=self.epochs,
+            per_device_train_batch_size=self.batch_size,
+            gradient_accumulation_steps=self.grad_accum,
+            gradient_checkpointing=True,
+            gradient_checkpointing_kwargs={"use_reentrant": False},
+            learning_rate=self.learning_rate,
+            lr_scheduler_type="cosine",
+            warmup_ratio=0.03,
+            optim="adamw_torch_fused",
+            bf16=True,
+            logging_steps=10,
+            save_strategy="epoch",
+            packing=self.packing,
+            max_length=self.seq_len,
+            assistant_only_loss=self.assistant_only_loss,
+            dataset_kwargs={"add_special_tokens": False},
+            report_to=self.report_to,
+            run_name=self.run_name,
+        )
+
+    @classmethod
+    def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
+        config = cls().resolve_paths()
+        if args.data_path is not None:
+            config = replace(config, data_path=Path(args.data_path))
+        if args.dataset_repo is not None:
+            config = replace(config, dataset_repo=args.dataset_repo)
+        if args.dataset_file is not None:
+            config = replace(config, dataset_file=args.dataset_file)
+        if args.output_dir is not None:
+            config = replace(config, output_dir=Path(args.output_dir))
+        if args.model_id is not None:
+            config = replace(config, model_id=args.model_id)
+        if args.epochs is not None:
+            config = replace(config, epochs=args.epochs)
+        if args.seq_len is not None:
+            config = replace(config, seq_len=args.seq_len)
+        if args.no_4bit:
+            config = replace(config, use_4bit=False)
+        if args.report_to is not None:
+            config = replace(config, report_to=args.report_to)
+        if args.push_to_hub:
+            config = replace(config, push_to_hub=True)
+        if args.hub_model_id is not None:
+            config = replace(config, hub_model_id=args.hub_model_id)
+        return config.resolve_paths()
+
+
+def build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Qwen2.5-Coder-7B SFT on AOS tool-trace trajectories"
+    )
+    parser.add_argument("--data-path", type=Path, default=None)
+    parser.add_argument("--dataset-repo", default=None)
+    parser.add_argument("--dataset-file", default=None)
+    parser.add_argument("--output-dir", type=Path, default=None)
+    parser.add_argument("--model-id", default=None)
+    parser.add_argument("--epochs", type=int, default=None)
+    parser.add_argument("--seq-len", type=int, default=None)
+    parser.add_argument("--no-4bit", action="store_true")
+    parser.add_argument("--report-to", default=None)
+    parser.add_argument("--push-to-hub", action="store_true")
+    parser.add_argument("--hub-model-id", default=None)
+    parser.add_argument("--smoke", action="store_true", help="Tiny overfit smoke run")
+    return parser
