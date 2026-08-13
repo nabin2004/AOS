@@ -37,6 +37,7 @@ class TrajectoryRecord(BaseModel):
     user_prompt: str
     prompt_index: int | None = None
     success: bool
+    has_audio: bool | None = None
     final_code: str | None = None
     summary: str = ""
     trajectory: list[TrajectoryStep] = Field(default_factory=list)
@@ -160,6 +161,7 @@ class TrajectoryRecorder:
         summary: str,
         stopped_reason: str,
         usage: dict[str, Any],
+        has_audio: bool | None = None,
     ) -> TrajectoryRecord:
         run_path = Path(run_dir).resolve()
         prompt = (user_prompt or "").strip() or "unknown"
@@ -167,6 +169,7 @@ class TrajectoryRecorder:
             user_prompt=prompt,
             prompt_index=prompt_index,
             success=compile_ok,
+            has_audio=has_audio,
             final_code=code,
             summary=summary or stopped_reason,
             trajectory=steps_from_messages(messages),
@@ -188,6 +191,7 @@ class TrajectoryRecorder:
         summary: str = "",
         stopped_reason: str = "completed",
         usage: dict[str, Any] | None = None,
+        has_audio: bool | None = None,
     ) -> TrajectoryRecord:
         record = self.build_record(
             run_dir,
@@ -199,6 +203,7 @@ class TrajectoryRecorder:
             summary=summary,
             stopped_reason=stopped_reason,
             usage=usage or {},
+            has_audio=has_audio,
         )
         run_path = Path(run_dir).resolve()
         traces_dir = run_path / "traces"

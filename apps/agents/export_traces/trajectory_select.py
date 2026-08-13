@@ -28,13 +28,15 @@ def prompt_hash(record: dict[str, Any]) -> str | None:
     return hashlib.sha256(prompt.encode("utf-8")).hexdigest()
 
 
-def trajectory_score(record: dict[str, Any]) -> tuple[int, int, str]:
-    """Higher is better: (success, -tool_steps, timestamp)."""
+def trajectory_score(record: dict[str, Any]) -> tuple[int, int, int, str]:
+    """Higher is better: (success, has_audio, -tool_steps, timestamp)."""
     success = 1 if record.get("success") else 0
+    has_audio = record.get("has_audio")
+    audio_score = 1 if has_audio is True else 0
     trajectory = record.get("trajectory") or []
     tool_steps = -len(trajectory)
     timestamp = str(record.get("timestamp") or "")
-    return (success, tool_steps, timestamp)
+    return (success, audio_score, tool_steps, timestamp)
 
 
 def select_trajectories(
@@ -42,13 +44,22 @@ def select_trajectories(
     *,
     include_errors: bool = False,
     deduplicate: bool = True,
+    require_audio: bool = False,
 ) -> TrajectorySelectionResult:
-    """Keep the shortest successful trajectory per unique user_prompt."""
+    """Keep the shortest successful trajectory per unique user_prompt.
+
+    When ``require_audio`` is True, only keep runs with ``has_audio is True``
+    (video+audio gold for SFT).
+    """
     result = TrajectorySelectionResult()
     groups: dict[str, list[dict[str, Any]]] = {}
 
     for record in records:
         if not include_errors and not record.get("success"):
+            result.drop_stats.failed += 1
+            result.dropped.append(record)
+            continue
+        if require_audio and record.get("has_audio") is not True:
             result.drop_stats.failed += 1
             result.dropped.append(record)
             continue

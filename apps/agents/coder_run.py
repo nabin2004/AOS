@@ -29,6 +29,7 @@ class CoderRunResult(BaseModel):
     scene_file: str | None = None
     code: str | None = None
     compile_ok: bool = False
+    has_audio: bool | None = None
     compile_log_path: str | None = None
     audio_paths: list[str] = Field(default_factory=list)
     media_hint: str | None = None
@@ -84,6 +85,24 @@ def _compile_ok(manifest: dict) -> bool:
         if entry.get("step") == "compile" and "ok" in entry:
             return bool(entry["ok"])
     return False
+
+
+def _has_audio(manifest: dict) -> bool | None:
+    last = manifest.get("last_compile") or {}
+    if "has_audio" in last:
+        value = last.get("has_audio")
+        if isinstance(value, bool) or value is None:
+            return value
+    if "has_audio" in manifest:
+        value = manifest.get("has_audio")
+        if isinstance(value, bool) or value is None:
+            return value
+    for entry in reversed(manifest.get("history") or []):
+        if entry.get("step") == "compile" and "has_audio" in entry:
+            value = entry.get("has_audio")
+            if isinstance(value, bool) or value is None:
+                return value
+    return None
 
 
 def dump_messages(run_dir: Path, messages: list[ModelMessage] | None) -> Path | None:
@@ -149,6 +168,7 @@ def arrange_coder_artifacts(
     traces_path = dump_messages(run_path, messages)
     usage_data = _usage_dict(usage)
     compile_ok = _compile_ok(manifest)
+    has_audio = _has_audio(manifest)
 
     from trajectory_recorder import default_recorder
 
@@ -162,6 +182,7 @@ def arrange_coder_artifacts(
         summary=summary,
         stopped_reason=stopped_reason,
         usage=usage_data,
+        has_audio=has_audio,
     )
 
     meta = {
@@ -186,6 +207,7 @@ def arrange_coder_artifacts(
         scene_file=scene_file,
         code=code,
         compile_ok=compile_ok,
+        has_audio=has_audio,
         compile_log_path=compile_log,
         audio_paths=_collect_audio_paths(run_path),
         media_hint=media_hint,

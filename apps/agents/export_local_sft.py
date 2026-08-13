@@ -135,11 +135,13 @@ def convert_trajectories_to_sft(
     include_errors: bool = False,
     max_tool_result_chars: int | None = 8192,
     deduplicate: bool = True,
+    require_audio: bool = False,
 ) -> LocalConversionResult:
     selection = select_trajectories(
         records,
         include_errors=include_errors,
         deduplicate=deduplicate,
+        require_audio=require_audio,
     )
     result = LocalConversionResult(selection=selection)
 
@@ -240,6 +242,7 @@ def convert_local_file(
     include_errors: bool = False,
     max_tool_result_chars: int | None = 8192,
     deduplicate: bool = True,
+    require_audio: bool = False,
     train_split: float | None = 0.9,
     seed: int = 42,
     validate: bool = True,
@@ -262,6 +265,7 @@ def convert_local_file(
         include_errors=include_errors,
         max_tool_result_chars=max_tool_result_chars,
         deduplicate=deduplicate,
+        require_audio=require_audio,
     )
 
     written = write_local_sft_outputs(
@@ -326,6 +330,11 @@ def main() -> int:
     )
     parser.add_argument("--keep-thinking", action="store_true")
     parser.add_argument("--include-errors", action="store_true")
+    parser.add_argument(
+        "--require-audio",
+        action="store_true",
+        help="Keep only trajectories with has_audio=true (video+audio gold)",
+    )
     parser.add_argument("--max-tool-result-chars", type=int, default=8192)
     parser.add_argument("--no-deduplicate", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
@@ -347,6 +356,7 @@ def main() -> int:
             include_errors=args.include_errors,
             max_tool_result_chars=args.max_tool_result_chars,
             deduplicate=not args.no_deduplicate,
+            require_audio=args.require_audio,
             train_split=train_split,
             seed=args.seed,
             validate=not args.no_validate,
