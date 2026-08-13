@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import os
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
@@ -15,6 +14,8 @@ from identity import (
     WANDB_RUN_GROUP,
     WANDB_SFT_RUN_NAME,
     WANDB_TAGS,
+    stage_run_name,
+    stage_tags,
 )
 
 QWEN_ROOT = Path(__file__).resolve().parent
@@ -36,7 +37,12 @@ class TrainingConfig:
     model_id: str = BASE_MODEL_ID
     dataset_repo: str = "nabin2004/AOS-Qwen-Trajectories"
     dataset_file: str = "tool_trace/train.jsonl"
+    dataset_split: str = "train"
     data_path: Path | None = None
+    init_adapter: Path | None = None
+    max_samples: int | None = None
+    shuffle_seed: int = 42
+    stage: str | None = None
     output_dir: Path = QWEN_ROOT / SFT_OUTPUT_DIR_NAME
     use_4bit: bool = True
     seq_len: int = 4096
@@ -45,7 +51,7 @@ class TrainingConfig:
     grad_accum: int = 8
     learning_rate: float = 2e-4
     num_proc: int = 4
-    report_to: str = "none"
+    report_to: str = "wandb"
     run_name: str = WANDB_SFT_RUN_NAME
     wandb_project: str = "aos-qwen-sft"
     wandb_group: str = WANDB_RUN_GROUP
@@ -60,9 +66,13 @@ class TrainingConfig:
         data_path = self.data_path
         if data_path is not None:
             data_path = data_path.expanduser().resolve()
+        init_adapter = self.init_adapter
+        if init_adapter is not None:
+            init_adapter = init_adapter.expanduser().resolve()
         return replace(
             self,
             data_path=data_path,
+            init_adapter=init_adapter,
             output_dir=self.output_dir.expanduser().resolve(),
         )
 
@@ -108,6 +118,22 @@ class TrainingConfig:
             config = replace(config, dataset_repo=args.dataset_repo)
         if args.dataset_file is not None:
             config = replace(config, dataset_file=args.dataset_file)
+        if getattr(args, "dataset_split", None) is not None:
+            config = replace(config, dataset_split=args.dataset_split)
+        if getattr(args, "init_adapter", None) is not None:
+            config = replace(config, init_adapter=Path(args.init_adapter))
+        if getattr(args, "max_samples", None) is not None:
+            config = replace(config, max_samples=args.max_samples)
+        if getattr(args, "shuffle_seed", None) is not None:
+            config = replace(config, shuffle_seed=args.shuffle_seed)
+        if getattr(args, "stage", None) is not None:
+            stage = args.stage
+            config = replace(
+                config,
+                stage=stage,
+                run_name=stage_run_name(stage),
+                wandb_tags=stage_tags(stage),
+            )
         if args.output_dir is not None:
             config = replace(config, output_dir=Path(args.output_dir))
         if args.model_id is not None:
@@ -124,22 +150,49 @@ class TrainingConfig:
             config = replace(config, push_to_hub=True)
         if args.hub_model_id is not None:
             config = replace(config, hub_model_id=args.hub_model_id)
+        if getattr(args, "run_name", None) is not None:
+            config = replace(config, run_name=args.run_name)
         return config.resolve_paths()
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Qwen2.5-Coder-7B SFT on AOS tool-trace trajectories"
+        description="Qwen2.5-Coder-7B staged SFT (manim-sft / educlaw / traces)"
     )
     parser.add_argument("--data-path", type=Path, default=None)
     parser.add_argument("--dataset-repo", default=None)
     parser.add_argument("--dataset-file", default=None)
+    parser.add_argument(
+        "--dataset-split",
+        default=None,
+        help='Hub split for native datasets (default: "train")',
+    )
+    parser.add_argument(
+        "--init-adapter",
+        type=Path,
+        default=None,
+        help="Continue training an existing LoRA adapter (no new peft_config)",
+    )
+    parser.add_argument(
+        "--max-samples",
+        type=int,
+        default=None,
+        help="Optional shuffled subsample size (e.g. educlaw stage)",
+    )
+    parser.add_argument("--shuffle-seed", type=int, default=None)
+    parser.add_argument(
+        "--stage",
+        default=None,
+        choices=("manim", "educlaw", "traces"),
+        help="Curriculum stage (sets W&B run name/tags)",
+    )
     parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--model-id", default=None)
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--seq-len", type=int, default=None)
     parser.add_argument("--no-4bit", action="store_true")
     parser.add_argument("--report-to", default=None)
+    parser.add_argument("--run-name", default=None)
     parser.add_argument("--push-to-hub", action="store_true")
     parser.add_argument("--hub-model-id", default=None)
     parser.add_argument("--smoke", action="store_true", help="Tiny overfit smoke run")

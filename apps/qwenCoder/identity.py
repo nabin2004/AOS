@@ -23,4 +23,41 @@ WANDB_SFT_RUN_NAME = "qwen2.5-coder-7b-manim-sft"
 WANDB_DPO_RUN_NAME = "qwen2.5-coder-7b-manim-dpo"
 WANDB_GRPO_RUN_NAME = "qwen2.5-coder-7b-manim-grpo"
 WANDB_RUN_GROUP = "qwen2.5-coder-7b-manim"
-WANDB_TAGS = ("qwen2.5-coder-7b", "manim", "aos", "tool-trace")
+WANDB_TAGS = ("qwen2.5-coder-7b", "manim", "aos")
+
+# Staged curriculum identifiers used by train_stages.sh / --stage
+STAGE_MANIM = "manim"
+STAGE_EDUCLAW = "educlaw"
+STAGE_TRACES = "traces"
+STAGE_DPO = "dpo"
+STAGE_GRPO = "grpo"
+
+STAGE_RUN_NAMES: dict[str, str] = {
+    STAGE_MANIM: "qwen2.5-coder-7b-manim-sft-manim",
+    STAGE_EDUCLAW: "qwen2.5-coder-7b-manim-sft-educlaw",
+    STAGE_TRACES: "qwen2.5-coder-7b-manim-sft-traces",
+    STAGE_DPO: WANDB_DPO_RUN_NAME,
+    STAGE_GRPO: WANDB_GRPO_RUN_NAME,
+}
+
+STAGE_TAGS: dict[str, tuple[str, ...]] = {
+    STAGE_MANIM: ("sft", "manim-sft"),
+    STAGE_EDUCLAW: ("sft", "educlaw"),
+    STAGE_TRACES: ("sft", "tool-trace"),
+    STAGE_DPO: ("dpo", "preference"),
+    STAGE_GRPO: ("grpo", "manibench"),
+}
+
+
+def stage_run_name(stage: str | None) -> str:
+    if not stage:
+        return WANDB_SFT_RUN_NAME
+    return STAGE_RUN_NAMES.get(stage, f"qwen2.5-coder-7b-manim-sft-{stage}")
+
+
+def stage_tags(stage: str | None) -> tuple[str, ...]:
+    base = WANDB_TAGS
+    if not stage:
+        return (*base, "sft")
+    extra = STAGE_TAGS.get(stage, ("sft", stage))
+    return (*base, *extra)

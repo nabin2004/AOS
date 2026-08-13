@@ -6,6 +6,14 @@ from datasets import Dataset, load_dataset
 
 from config import TrainingConfig
 
+# Native Hub chat corpora (parquet / DatasetDict), not raw JSONL paths.
+_NATIVE_HF_REPOS = frozenset(
+    {
+        "nabin2004/manim-sft",
+        "nabin2004/educlaw-manim-sft",
+    }
+)
+
 
 def resolve_data_files(config: TrainingConfig) -> str:
     if config.data_path is not None:
@@ -67,15 +75,46 @@ def _is_trainable(sample: dict[str, Any]) -> bool:
     return bool(sample.get("final_code") or sample.get("trajectory"))
 
 
-def load_training_dataset(config: TrainingConfig) -> Dataset:
+def _load_raw_dataset(config: TrainingConfig) -> Dataset:
+    """Load from local JSONL, native Hub datasets, or hf:// JSON paths."""
+    if config.data_path is not None:
+        path = str(config.data_path)
+        print(f"Loading dataset from {path}")
+        return load_dataset("json", data_files=path, split="train")
+
+    repo = config.dataset_repo
+    split = config.dataset_split
+    if repo in _NATIVE_HF_REPOS:
+        print(f"Loading native Hub dataset {repo} split={split}")
+        try:
+            return load_dataset(repo, split=split)
+        except Exception as exc:
+            print(f"WARNING: native load failed ({exc}); falling back to json files")
+
     path = resolve_data_files(config)
     print(f"Loading dataset from {path}")
-    ds = load_dataset("json", data_files=path, split="train")
-    ds = ds.filter(_is_trainable)
-    ds = ds.map(_normalize_messages)
-    # SFTTrainer expects a messages column
-    drop = [c for c in ds.column_names if c != "messages"]
-    if drop:
-        ds = ds.remove_columns(drop)
+    return load_dataset("json", data_files=path, split="train")
+
+
+def _maybe_subsample(ds: Dataset, config: TrainingConfig) -> Dataset:
+    max_samples = config.max_samples
+    if max_samples is None or max_samples <= 0 or len(ds) <= max_samples:
+        return ds
+    print(
+        f"Subsampling {max_samples} of {len(ds)} rows "
+        f"(seed={config.shuffle_seed})"
+    )
+    return ds.shuffle(seed=config.shuffle_seed).select(range(max_samples))
+
+
+def load_training_dataset(config: TrainingConfig) -> Dataset:
+    ds = _load_raw_dataset(config)
+    ds = ds.filter(_is_trainable, num_proc=config.num_proc)
+    ds = ds.map(
+        _normalize_messages,
+        remove_columns=ds.column_names,
+        num_proc=config.num_proc,
+    )
+    ds = _maybe_subsample(ds, config)
     print(f"Trainable rows: {len(ds)}")
     return ds

@@ -13,12 +13,15 @@ def build_trainer(
     dataset: Dataset,
     config: TrainingConfig,
 ) -> SFTTrainer:
+    # When continuing an existing LoRA, the model is already a PeftModel —
+    # do not pass a fresh peft_config (that would create a second adapter).
+    peft_config = None if config.init_adapter is not None else config.lora_config()
     return SFTTrainer(
         model=model,
         args=config.sft_config(),
         train_dataset=dataset,
         processing_class=tokenizer,
-        peft_config=config.lora_config(),
+        peft_config=peft_config,
     )
 
 

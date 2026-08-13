@@ -46,4 +46,18 @@ def load_model(config: TrainingConfig):
 
     model = AutoModelForCausalLM.from_pretrained(config.model_id, **kwargs)
     model.config.use_cache = False
+
+    if config.init_adapter is not None:
+        from peft import PeftModel
+
+        adapter = config.init_adapter
+        if not adapter.is_dir():
+            raise FileNotFoundError(f"init-adapter not found: {adapter}")
+        print(f"Continuing from adapter: {adapter}")
+        model = PeftModel.from_pretrained(
+            model,
+            str(adapter),
+            is_trainable=True,
+        )
+
     return model
