@@ -21,4 +21,4 @@ requires = ["setuptools>=69.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["config", "manibench", "model", "rewards", "run", "trainer"]
+py-modules = ["config", "manibench", "model", "package_adapter", "rewards", "run", "trainer"]

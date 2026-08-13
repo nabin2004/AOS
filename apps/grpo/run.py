@@ -60,7 +60,8 @@ def main() -> int:
     config.apply_env()
     check_cuda_or_exit()
 
-    import unsloth  # noqa: F401 — must precede trl
+    if config.base_family != "qwen":
+        import unsloth  # noqa: F401 — must precede trl for Gemma/Unsloth path
 
     model, tokenizer = load_model(config)
     dataset = truncate_dataset_prompts(

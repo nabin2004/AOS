@@ -4,6 +4,9 @@ import json
 import sys
 from pathlib import Path
 
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+
 from config import (
     DEFAULT_BASE_MODEL,
     GRPO_ADAPTER,
@@ -13,11 +16,9 @@ from config import (
 
 
 def check_cuda_or_exit() -> None:
-    import torch
-
     if not torch.cuda.is_available():
         print(
-            "CUDA is required for Gemma-4 GRPO. Run on an NVIDIA GPU server:\n"
+            "CUDA is required for GRPO. Run on an NVIDIA GPU server:\n"
             "  cd apps/grpo && uv sync && uv run python run.py --smoke",
             file=sys.stderr,
         )
@@ -59,7 +60,60 @@ def _base_model_for_adapter(adapter_path: Path | str, fallback: str) -> str:
         return json.load(f).get("base_model_name_or_path", fallback)
 
 
-def load_model(config: TrainingConfig):
+def _load_qwen(config: TrainingConfig):
+    """Qwen path: transformers CausalLM + PEFT (no Unsloth FastVisionModel)."""
+    from peft import PeftModel
+
+    if config.grpo_only:
+        base = config.base_model or "Qwen/Qwen2.5-Coder-7B-Instruct"
+    else:
+        base = config.base_model or _base_model_for_adapter(
+            config.sft_lora_path,
+            "Qwen/Qwen2.5-Coder-7B-Instruct",
+        )
+    token = hub_token()
+    kwargs: dict = {
+        "trust_remote_code": True,
+        "token": token,
+        "device_map": "auto",
+        "torch_dtype": torch.bfloat16,
+    }
+    if config.load_in_4bit:
+        kwargs["quantization_config"] = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_use_double_quant=True,
+        )
+
+    tokenizer = AutoTokenizer.from_pretrained(base, trust_remote_code=True, token=token)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    model = AutoModelForCausalLM.from_pretrained(base, **kwargs)
+    model.config.use_cache = False
+    grpo_config = _grpo_lora_config()
+
+    if config.grpo_only:
+        model = PeftModel(model, grpo_config, adapter_name=GRPO_ADAPTER)
+    else:
+        model = PeftModel.from_pretrained(
+            model,
+            str(config.sft_lora_path),
+            adapter_name="sft",
+            token=token,
+        )
+        for name, param in model.named_parameters():
+            if "sft" in name:
+                param.requires_grad = False
+        model.add_adapter(GRPO_ADAPTER, grpo_config)
+
+    model.set_adapter(GRPO_ADAPTER)
+    model.train()
+    return model, tokenizer
+
+
+def _load_gemma(config: TrainingConfig):
     from peft import PeftModel
     from unsloth import FastVisionModel
 
@@ -102,3 +156,9 @@ def load_model(config: TrainingConfig):
     model.set_adapter(GRPO_ADAPTER)
     model.train()
     return model, tokenizer
+
+
+def load_model(config: TrainingConfig):
+    if config.base_family == "qwen":
+        return _load_qwen(config)
+    return _load_gemma(config)

@@ -30,8 +30,10 @@ GRPO_ADAPTER = "grpo"
 class TrainingConfig:
     sft_lora_path: Path = GRPO_ROOT / ".." / "sft" / SFT_OUTPUT_DIR_NAME
     base_model: str | None = None
+    base_family: str = "gemma"  # gemma | qwen
     dataset_repo: str = "nabin2004/ManiBench"
     dataset_path: Path | None = None
+    prompts_path: Path | None = None
     output_dir: Path = GRPO_ROOT / "grpo_manim"
     repeat_factor: int = 50
     max_seq_length: int = 2048
@@ -58,11 +60,15 @@ class TrainingConfig:
         dataset_path = self.dataset_path
         if dataset_path is not None:
             dataset_path = _resolve_path(dataset_path)
+        prompts_path = self.prompts_path
+        if prompts_path is not None:
+            prompts_path = _resolve_path(prompts_path)
         return replace(
             self,
             sft_lora_path=_resolve_path(self.sft_lora_path),
             output_dir=_resolve_path(self.output_dir),
             dataset_path=dataset_path,
+            prompts_path=prompts_path,
         )
 
     def apply_env(self) -> None:
@@ -85,11 +91,36 @@ class TrainingConfig:
         config = cls().resolve_paths()
         if args.sft_lora is not None:
             config = replace(config, sft_lora_path=_resolve_path(Path(args.sft_lora)))
+        if args.base is not None:
+            family = str(args.base).lower().strip()
+            if family not in ("gemma", "qwen"):
+                raise SystemExit(f"Unsupported --base {args.base!r}; use gemma|qwen")
+            config = replace(config, base_family=family)
+            if family == "qwen":
+                qwen_default = (
+                    GRPO_ROOT / ".." / "qwenCoder" / "qwen2.5-coder-7b-manim-ft"
+                )
+                updates: dict = {
+                    "run_name": "qwen2.5-coder-7b-manim-grpo",
+                }
+                if args.base_model is None:
+                    updates["base_model"] = "Qwen/Qwen2.5-Coder-7B-Instruct"
+                if args.sft_lora is None:
+                    updates["sft_lora_path"] = _resolve_path(qwen_default)
+                if args.output_dir is None:
+                    updates["output_dir"] = _resolve_path(
+                        GRPO_ROOT / "grpo_qwen_manim"
+                    )
+                config = replace(config, **updates)
         if args.base_model is not None:
             config = replace(config, base_model=args.base_model)
         if args.dataset_path is not None:
             config = replace(
                 config, dataset_path=_resolve_path(Path(args.dataset_path))
+            )
+        if args.prompts_path is not None:
+            config = replace(
+                config, prompts_path=_resolve_path(Path(args.prompts_path))
             )
         if args.output_dir is not None:
             config = replace(config, output_dir=_resolve_path(Path(args.output_dir)))
@@ -154,6 +185,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help=f"SFT LoRA path (default: ../sft/{SFT_OUTPUT_DIR_NAME})",
     )
     parser.add_argument(
+        "--base",
+        choices=("gemma", "qwen"),
+        default=None,
+        help="Base model family (default: gemma). qwen uses CausalLM + PEFT path.",
+    )
+    parser.add_argument(
         "--base-model",
         default=None,
         help="Override base model (default: read from SFT adapter_config.json)",
@@ -162,6 +199,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--dataset-path",
         default=None,
         help="Local ManiBench_Pilot_Dataset.json (default: download from HF)",
+    )
+    parser.add_argument(
+        "--prompts-path",
+        default=None,
+        help="Optional JSONL of {prompt|user_prompt} rows instead of ManiBench",
     )
     parser.add_argument(
         "--output-dir",

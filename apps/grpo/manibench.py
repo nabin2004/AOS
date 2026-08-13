@@ -255,9 +255,36 @@ def get_vcer_patterns(problem_id: str) -> list[str]:
 
 
 def build_dataset(config: TrainingConfig) -> Dataset:
+    if config.prompts_path is not None:
+        rows: list[dict[str, Any]] = []
+        with config.prompts_path.open(encoding="utf-8") as f:
+            for i, line in enumerate(f):
+                line = line.strip()
+                if not line:
+                    continue
+                obj = json.loads(line)
+                text = (
+                    obj.get("prompt")
+                    or obj.get("user_prompt")
+                    or obj.get("full_prompt")
+                    or ""
+                ).strip()
+                if not text:
+                    continue
+                row = {
+                    "prompt": format_user_prompt(text),
+                    "problem_id": obj.get("id") or f"traj_{i}",
+                    "full_prompt": text,
+                }
+                for _ in range(max(1, config.repeat_factor)):
+                    rows.append(dict(row))
+        if not rows:
+            raise ValueError(f"No prompts loaded from {config.prompts_path}")
+        return Dataset.from_list(rows)
+
     ensure_index(config)
     problems = load_pilot_problems(config)
-    rows: list[dict[str, Any]] = []
+    rows = []
 
     for problem in problems:
         row = {
