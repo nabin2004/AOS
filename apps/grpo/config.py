@@ -97,11 +97,20 @@ class TrainingConfig:
                 raise SystemExit(f"Unsupported --base {args.base!r}; use gemma|qwen")
             config = replace(config, base_family=family)
             if family == "qwen":
-                qwen_default = (
-                    GRPO_ROOT / ".." / "qwenCoder" / "qwen2.5-coder-7b-manim-ft"
-                )
+                qwen_sft = GRPO_ROOT / ".." / "qwenCoder" / "qwen2.5-coder-7b-manim-ft"
+                qwen_dpo = GRPO_ROOT / ".." / "dpo" / "qwen2.5-coder-7b-manim-dpo"
+                # Prefer DPO adapter as the frozen stack base when present.
+                qwen_default = qwen_dpo if qwen_dpo.is_dir() else qwen_sft
                 updates: dict = {
                     "run_name": "qwen2.5-coder-7b-manim-grpo",
+                    "wandb_group": "qwen2.5-coder-7b-manim",
+                    "wandb_tags": (
+                        "qwen2.5-coder-7b",
+                        "manim",
+                        "aos",
+                        "grpo",
+                        "manibench",
+                    ),
                 }
                 if args.base_model is None:
                     updates["base_model"] = "Qwen/Qwen2.5-Coder-7B-Instruct"
