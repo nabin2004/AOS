@@ -85,6 +85,18 @@ Legacy single-dataset e2e (tool_trace only): `bash train.sh`.
 
 ---
 
+## Kaggle (phase 1)
+
+GPU **P100** notebook for SFT-1 only (`nabin2004/manim-sft` → LoRA + W&B + Hub push). See **[KAGGLE.md](KAGGLE.md)**.
+
+```bash
+bash apps/qwenCoder/kaggle_sft_phase1.sh
+```
+
+Do not run DPO / GRPO / merge / GGUF on P100.
+
+---
+
 ## Weights & Biases
 
 Defaults to **wandb** when `WANDB_API_KEY` is set (via [`apps/training/wandb_env.py`](../training/wandb_env.py)).
@@ -173,6 +185,7 @@ ollama create aos-qwen2.5-coder-7b-manim -f apps/qwenCoder/qwen2.5-coder-7b-mani
 | Path | Role |
 |------|------|
 | `run.py` / `train_stages.sh` | Staged SFT curriculum + DPO/GRPO orchestrator |
+| `kaggle_sft_phase1.sh` / `KAGGLE.md` | Kaggle P100 phase-1 SFT (manim-sft + Hub + W&B) |
 | `train.sh` | Legacy single-dataset SFT → merge → GGUF |
 | `merge_adapter.py` / `export_gguf.py` | Deploy packaging |
 | `collect_and_export.sh` | Ollama data loop |
