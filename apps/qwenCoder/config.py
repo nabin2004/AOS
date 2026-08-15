@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import os
+import sys
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
@@ -61,6 +63,11 @@ class TrainingConfig:
     push_to_hub: bool = False
     hub_model_id: str = HUB_SFT_REPO
     hub_private: bool = False
+    use_bf16: bool = True
+    optim: str = "adamw_torch_fused"
+    save_strategy: str = "epoch"
+    save_steps: int = 200
+    save_total_limit: int | None = None
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -87,6 +94,7 @@ class TrainingConfig:
         )
 
     def sft_config(self) -> SFTConfig:
+        use_bf16 = effective_bf16(self.use_bf16)
         return SFTConfig(
             output_dir=str(self.output_dir),
             num_train_epochs=self.epochs,
@@ -97,10 +105,13 @@ class TrainingConfig:
             learning_rate=self.learning_rate,
             lr_scheduler_type="cosine",
             warmup_ratio=0.03,
-            optim="adamw_torch_fused",
-            bf16=True,
+            optim=self.optim,
+            bf16=use_bf16,
+            fp16=not use_bf16,
             logging_steps=10,
-            save_strategy="epoch",
+            save_strategy=self.save_strategy,
+            save_steps=self.save_steps,
+            save_total_limit=self.save_total_limit,
             packing=self.packing,
             max_length=self.seq_len,
             assistant_only_loss=self.assistant_only_loss,
@@ -112,6 +123,8 @@ class TrainingConfig:
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
         config = cls().resolve_paths()
+        if args.kaggle or os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
+            config = apply_kaggle_preset(config)
         if args.data_path is not None:
             config = replace(config, data_path=Path(args.data_path))
         if args.dataset_repo is not None:
@@ -155,6 +168,56 @@ class TrainingConfig:
         return config.resolve_paths()
 
 
+def effective_bf16(requested: bool) -> bool:
+    if not requested:
+        return False
+    try:
+        import torch
+
+        if torch.cuda.is_available() and not torch.cuda.is_bf16_supported():
+            return False
+    except Exception:
+        return requested
+    return True
+
+
+def default_kaggle_output_dir() -> Path:
+    override = os.environ.get("SFT_OUTPUT_DIR", "").strip()
+    if override:
+        return Path(override)
+    kaggle_working = Path("/kaggle/working")
+    if kaggle_working.is_dir() and os.access(kaggle_working, os.W_OK):
+        return kaggle_working / SFT_OUTPUT_DIR_NAME
+    return QWEN_ROOT / SFT_OUTPUT_DIR_NAME
+
+
+def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
+    """P100/T4-safe 4-bit LoRA: fp16, seq 2048, step checkpoints."""
+    print(
+        "NOTE: --kaggle targets Kaggle P100/T4 (16 GB). Using fp16 4-bit LoRA "
+        f"at seq_len=2048 for {config.model_id}.",
+        file=sys.stderr,
+    )
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    return replace(
+        config,
+        batch_size=1,
+        grad_accum=8,
+        seq_len=2048,
+        num_proc=2,
+        packing=False,
+        use_bf16=False,
+        optim="paged_adamw_8bit",
+        save_strategy="steps",
+        save_steps=200,
+        save_total_limit=2,
+        report_to=report_to,
+        output_dir=default_kaggle_output_dir(),
+    )
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Qwen2.5-Coder-7B staged SFT (manim-sft / educlaw / traces)"
@@ -191,6 +254,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--seq-len", type=int, default=None)
     parser.add_argument("--no-4bit", action="store_true")
+    parser.add_argument(
+        "--kaggle",
+        action="store_true",
+        help="P100/T4 preset: fp16, seq 2048, 4-bit LoRA, step checkpoints",
+    )
     parser.add_argument("--report-to", default=None)
     parser.add_argument("--run-name", default=None)
     parser.add_argument("--push-to-hub", action="store_true")

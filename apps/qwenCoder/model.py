@@ -10,7 +10,7 @@ from transformers import (
     PreTrainedTokenizerBase,
 )
 
-from config import TrainingConfig
+from config import TrainingConfig, effective_bf16
 
 
 def _hub_token() -> str | None:
@@ -29,18 +29,23 @@ def load_tokenizer(model_id: str) -> PreTrainedTokenizerBase:
     return tokenizer
 
 
+def _compute_dtype(config: TrainingConfig):
+    return torch.bfloat16 if effective_bf16(config.use_bf16) else torch.float16
+
+
 def load_model(config: TrainingConfig):
+    dtype = _compute_dtype(config)
     kwargs: dict = {
         "trust_remote_code": True,
         "token": _hub_token(),
         "device_map": "auto",
-        "torch_dtype": torch.bfloat16,
+        "torch_dtype": dtype,
     }
     if config.use_4bit:
         kwargs["quantization_config"] = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",
-            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_compute_dtype=dtype,
             bnb_4bit_use_double_quant=True,
         )
 
