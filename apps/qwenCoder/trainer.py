@@ -1,21 +1,10 @@
 from __future__ import annotations
 
-import torch
 from datasets import Dataset
 from transformers import PreTrainedTokenizerBase
 from trl import SFTTrainer
 
 from config import TrainingConfig, effective_bf16
-
-
-def _cast_trainable_fp16(model) -> None:
-    n = 0
-    for param in model.parameters():
-        if param.requires_grad and param.dtype == torch.bfloat16:
-            param.data = param.data.to(torch.float16)
-            n += 1
-    if n:
-        print(f"Cast {n} trainable tensors from bfloat16 to float16")
 
 
 def build_trainer(
@@ -37,8 +26,8 @@ def build_trainer(
     use_bf16 = effective_bf16(config.use_bf16)
     trainer.args.bf16 = bool(use_bf16)
     trainer.args.fp16 = bool(not use_bf16)
-    if not use_bf16:
-        _cast_trainable_fp16(trainer.model)
+    # Leave LoRA params as PEFT created them (typically fp32). Casting them to
+    # fp16 makes GradScaler raise "Attempting to unscale FP16 gradients."
     print(f"fp16: {trainer.args.fp16}  bf16: {trainer.args.bf16}")
     trainable = {str(p.dtype) for p in trainer.model.parameters() if p.requires_grad}
     print(f"trainable dtypes: {sorted(trainable)}")

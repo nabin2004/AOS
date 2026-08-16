@@ -103,4 +103,4 @@ ADAPTER_DIR=/kaggle/working/qwen2.5-coder-7b-manim-ft
 - **No W&B**: missing `WANDB_API_KEY`; script falls back to `REPORT_TO=none`.
 - **Hub push fails**: token needs write access to `HUB_MODEL_ID`.
 - If the CUDA smoke check passes but training still dies in bitsandbytes `ops.cu`, pin an older `bitsandbytes` in a follow-up.
-- **`_amp_foreach_non_finite_check_and_unscale_cuda` / BFloat16**: Transformers 5 can ignore `torch_dtype` and load Qwen as BF16. The trainer now sets `dtype=float16`, `bf16=False`, `fp16=True`, and casts trainable LoRA tensors to FP16 on GPUs below sm_80.
+- **`Attempting to unscale FP16 gradients`**: do not cast LoRA weights to FP16. Keep `fp16=True, bf16=False` and leave trainable adapters in FP32 so GradScaler can unscale.
