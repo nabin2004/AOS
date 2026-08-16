@@ -103,4 +103,4 @@ ADAPTER_DIR=/kaggle/working/qwen2.5-coder-7b-manim-ft
 - **No W&B**: missing `WANDB_API_KEY`; script falls back to `REPORT_TO=none`.
 - **Hub push fails**: token needs write access to `HUB_MODEL_ID`.
 - If the CUDA smoke check passes but training still dies in bitsandbytes `ops.cu`, pin an older `bitsandbytes` in a follow-up.
-- **`Attempting to unscale FP16 gradients`**: do not cast LoRA weights to FP16. Keep `fp16=True, bf16=False` and leave trainable adapters in FP32 so GradScaler can unscale.
+- **GradScaler / BF16 or `Attempting to unscale FP16 gradients`**: PEFT creates LoRA in Qwen's BF16 dtype. P100 cannot unscale BF16; casting LoRA to FP16 also fails. After the trainer wraps the model, adapters are cast to **FP32**. Keep `fp16=True, bf16=False` and 4-bit compute dtype FP16. Expect `trainable dtypes: ['torch.float32']`.
