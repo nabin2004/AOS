@@ -33,14 +33,21 @@ def _compute_dtype(config: TrainingConfig):
     return torch.bfloat16 if effective_bf16(config.use_bf16) else torch.float16
 
 
-def load_model(config: TrainingConfig):
-    dtype = _compute_dtype(config)
-    kwargs: dict = {
+def _from_pretrained_kwargs(dtype) -> dict:
+    return {
         "trust_remote_code": True,
         "token": _hub_token(),
         "device_map": "auto",
+        # Transformers 5 ignores torch_dtype; keep both for 4.x and 5.x.
         "torch_dtype": dtype,
+        "dtype": dtype,
     }
+
+
+def load_model(config: TrainingConfig):
+    dtype = _compute_dtype(config)
+    print(f"Model compute dtype: {dtype}")
+    kwargs = _from_pretrained_kwargs(dtype)
     if config.use_4bit:
         kwargs["quantization_config"] = BitsAndBytesConfig(
             load_in_4bit=True,
@@ -49,8 +56,14 @@ def load_model(config: TrainingConfig):
             bnb_4bit_use_double_quant=True,
         )
 
-    model = AutoModelForCausalLM.from_pretrained(config.model_id, **kwargs)
+    try:
+        model = AutoModelForCausalLM.from_pretrained(config.model_id, **kwargs)
+    except TypeError:
+        kwargs.pop("dtype", None)
+        model = AutoModelForCausalLM.from_pretrained(config.model_id, **kwargs)
     model.config.use_cache = False
+    if hasattr(model.config, "torch_dtype"):
+        model.config.torch_dtype = dtype
 
     if config.init_adapter is not None:
         from peft import PeftModel

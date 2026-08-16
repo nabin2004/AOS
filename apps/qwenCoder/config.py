@@ -106,8 +106,8 @@ class TrainingConfig:
             lr_scheduler_type="cosine",
             warmup_ratio=0.03,
             optim=self.optim,
-            bf16=use_bf16,
-            fp16=not use_bf16,
+            bf16=bool(use_bf16),
+            fp16=bool(not use_bf16),
             logging_steps=10,
             save_strategy=self.save_strategy,
             save_steps=self.save_steps,
@@ -165,20 +165,45 @@ class TrainingConfig:
             config = replace(config, hub_model_id=args.hub_model_id)
         if getattr(args, "run_name", None) is not None:
             config = replace(config, run_name=args.run_name)
-        return config.resolve_paths()
+        return apply_gpu_precision(config.resolve_paths())
 
 
 def effective_bf16(requested: bool) -> bool:
+    """Native BF16 needs Ampere+ (sm_80). P100 is sm_60; T4 is sm_75."""
     if not requested:
         return False
     try:
         import torch
 
-        if torch.cuda.is_available() and not torch.cuda.is_bf16_supported():
+        if not torch.cuda.is_available():
+            return False
+        major, _minor = torch.cuda.get_device_capability(0)
+        if major < 8:
+            return False
+        if not torch.cuda.is_bf16_supported():
             return False
     except Exception:
         return requested
     return True
+
+
+def apply_gpu_precision(config: TrainingConfig) -> TrainingConfig:
+    """Force FP16 on Pascal/Turing (Kaggle P100/T4) even if a preset was missed."""
+    try:
+        import torch
+
+        if not torch.cuda.is_available():
+            return config
+        major, minor = torch.cuda.get_device_capability(0)
+        if major < 8 and config.use_bf16:
+            print(
+                f"GPU sm_{major}{minor} detected -> forcing FP16 (bf16=False)",
+                file=sys.stderr,
+            )
+            return replace(config, use_bf16=False)
+    except Exception:
+        return config
+    return config
 
 
 def default_kaggle_output_dir() -> Path:

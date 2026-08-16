@@ -17,7 +17,7 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 
-from config import TrainingConfig, build_arg_parser
+from config import TrainingConfig, build_arg_parser, effective_bf16
 from data import load_training_dataset
 from model import load_model, load_tokenizer
 from trainer import build_trainer, train_and_save
@@ -78,6 +78,7 @@ def main() -> int:
     if config.init_adapter:
         print(f"Init LoRA:  {config.init_adapter}")
     print(f"report_to:  {config.report_to}")
+    print(f"use_bf16:   {config.use_bf16} (effective {effective_bf16(config.use_bf16)})")
 
     tokenizer = load_tokenizer(config.model_id)
     model = load_model(config)
