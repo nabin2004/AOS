@@ -51,7 +51,7 @@ cd AOS
 bash apps/qwenCoder/kaggle_sft_phase1.sh
 ```
 
-The script installs `uv` if needed, syncs [`apps/qwenCoder`](.), runs `preflight_qwen.py`, then:
+The script installs `uv` if needed, syncs [`apps/qwenCoder`](.), **reinstalls torch from cu118 (cu126 fallback) into that venv** so P100 `sm_60` works, runs `preflight_qwen.py`, then:
 
 ```bash
 uv run python run.py \
@@ -83,6 +83,9 @@ SEQ_LEN=1024          # if CUDA OOM
 MAX_SAMPLES=8000      # if one epoch will not finish in 9h (~38k rows)
 SKIP_PREFLIGHT=1
 SKIP_TRAIN=1          # reuse an existing adapter dir (no train/push)
+SKIP_TORCH_REINSTALL=1  # T4 only: keep PyPI torch
+TORCH_INDEX_URL=https://download.pytorch.org/whl/cu118
+KEEP_WANDB_ENV=1      # keep leftover WANDB_RUN_NAME from the notebook
 HUB_MODEL_ID=nabin2004/AOS-qwen2.5-coder-7b-manim-sft
 REPORT_TO=wandb       # or none
 ADAPTER_DIR=/kaggle/working/qwen2.5-coder-7b-manim-ft
@@ -92,7 +95,11 @@ ADAPTER_DIR=/kaggle/working/qwen2.5-coder-7b-manim-ft
 
 ## Troubleshooting
 
+- **P100 `sm_60` / `ops.cu` / “no kernel image”**: PyPI `torch` is CUDA 13 (`cu130`) and has no Pascal kernels. The script **reinstalls torch into `apps/qwenCoder/.venv`** from [cu118](https://download.pytorch.org/whl/cu118), then falls back to [cu126](https://download.pytorch.org/whl/cu126). Do **not** `!pip install` torch in the notebook kernel — training uses the uv venv, not that kernel.
+- **T4 (`sm_75`)**: skip the reinstall with `SKIP_TORCH_REINSTALL=1`.
+- **W&B run named `gemma4-…`**: leftover `WANDB_RUN_NAME` in the notebook. The script unsets it unless `KEEP_WANDB_ENV=1`.
 - **OOM**: `SEQ_LEN=1024` (keep batch size 1).
 - **Session timeout**: checkpoints every 200 steps; re-run with the same `ADAPTER_DIR` after lowering `MAX_SAMPLES`, or continue later with `--init-adapter` on a larger GPU via `train_stages.sh`.
 - **No W&B**: missing `WANDB_API_KEY`; script falls back to `REPORT_TO=none`.
 - **Hub push fails**: token needs write access to `HUB_MODEL_ID`.
+- If the CUDA smoke check passes but training still dies in bitsandbytes `ops.cu`, pin an older `bitsandbytes` in a follow-up (do not guess a pin until torch is confirmed Pascal-capable).

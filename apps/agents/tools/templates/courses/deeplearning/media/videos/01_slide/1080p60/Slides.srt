@@ -1,0 +1,8 @@
+1
+00:00:00,000 --> 00:00:03,609
+Welcome to CS231n, Deep Learning for Computer Vision. I'm your
+
+2
+00:00:03,709 --> 00:00:07,020
+instructor, and I'll be guiding you through this journey.
+

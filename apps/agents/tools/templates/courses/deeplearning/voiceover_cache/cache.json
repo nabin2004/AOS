@@ -1,0 +1,1702 @@
+[
+  {
+    "input_text": "This circle is drawn as I speak, Look this circle will be drawn until I speak.",
+    "input_data": {
+      "input_text": "This circle is drawn as I speak, Look this circle will be drawn until I speak.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "this-circle-is-drawn-as-i-speak-look-this-circle-0b57ed60.wav",
+    "final_audio": "this-circle-is-drawn-as-i-speak-look-this-circle-0b57ed60.wav"
+  },
+  {
+    "input_text": "This is CS231n, I am your instructor, and I will be your guide through this course.",
+    "input_data": {
+      "input_text": "This is CS231n, I am your instructor, and I will be your guide through this course.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "this-is-cs231n-i-am-your-instructor-and-i-will-be-0f204f63.wav",
+    "final_audio": "this-is-cs231n-i-am-your-instructor-and-i-will-be-0f204f63.wav"
+  },
+  {
+    "input_text": "This is CS231n, I am your instructor, and I will be your guide through this course.",
+    "input_data": {
+      "input_text": "This is CS231n, I am your instructor, and I will be your guide through this course.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "this-is-cs231n-i-am-your-instructor-and-i-will-be-0f204f63.wav",
+    "final_audio": "this-is-cs231n-i-am-your-instructor-and-i-will-be-0f204f63.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n, Deep Learning for Computer Vision. I'm your instructor, and I'll be guiding you through this journey.",
+    "input_data": {
+      "input_text": "Welcome to CS231n, Deep Learning for Computer Vision. I'm your instructor, and I'll be guiding you through this journey.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-deep-learning-for-computer-b125fdde.wav",
+    "final_audio": "welcome-to-cs231n-deep-learning-for-computer-b125fdde.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n, Deep Learning for Computer Vision. I'm your instructor, and I'll be guiding you through this journey.",
+    "input_data": {
+      "input_text": "Welcome to CS231n, Deep Learning for Computer Vision. I'm your instructor, and I'll be guiding you through this journey.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-deep-learning-for-computer-b125fdde.wav",
+    "final_audio": "welcome-to-cs231n-deep-learning-for-computer-b125fdde.wav"
+  },
+  {
+    "input_text": "In this lecture, we'll explore the foundations of deep learning\u2014starting with neural networks, then backpropagation, and finally convolutional neural networks. Let's get started!",
+    "input_data": {
+      "input_text": "In this lecture, we'll explore the foundations of deep learning\u2014starting with neural networks, then backpropagation, and finally convolutional neural networks. Let's get started!",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "in-this-lecture-we-ll-explore-the-foundations-of-3463eacb.wav",
+    "final_audio": "in-this-lecture-we-ll-explore-the-foundations-of-3463eacb.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+    "input_data": {
+      "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav",
+    "final_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+    "input_data": {
+      "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav",
+    "final_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+    "input_data": {
+      "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav",
+    "final_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+    "input_data": {
+      "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav",
+    "final_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. <bookmark mark='focus'/>We'll majorly be focusing on deep learning techniques for computer vision, <bookmark mark='advancements'/>including some of the latest advancements such as transformers and diffusion models, and <bookmark mark='conclusion'/>we'll be building practical skills that you can apply immediately.",
+    "input_data": {
+      "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We'll majorly be focusing on deep learning techniques for computer vision, including some of the latest advancements such as transformers and diffusion models, and we'll be building practical skills that you can apply immediately.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-4ce2e526.wav",
+    "final_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-4ce2e526.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. <bookmark mark='focus'/>We'll majorly be focusing on deep learning techniques for computer vision, <bookmark mark='advancements'/>including some of the latest advancements such as transformers and diffusion models, and <bookmark mark='conclusion'/>we'll be building practical skills that you can apply immediately.",
+    "input_data": {
+      "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We'll majorly be focusing on deep learning techniques for computer vision, including some of the latest advancements such as transformers and diffusion models, and we'll be building practical skills that you can apply immediately.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-4ce2e526.wav",
+    "final_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-4ce2e526.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. <bookmark mark='focus'/>We'll majorly be focusing on deep learning techniques for computer vision, <bookmark mark='advancements'/>including some of the latest advancements such as transformers and diffusion models, and <bookmark mark='conclusion'/>we'll be building practical skills that you can apply immediately.",
+    "input_data": {
+      "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We'll majorly be focusing on deep learning techniques for computer vision, including some of the latest advancements such as transformers and diffusion models, and we'll be building practical skills that you can apply immediately.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-4ce2e526.wav",
+    "final_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-4ce2e526.wav"
+  },
+  {
+    "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+    "input_data": {
+      "input_text": "Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav",
+    "final_audio": "welcome-to-cs231n-i-m-your-instructor-for-this-7b0e3f23.wav"
+  },
+  {
+    "input_text": "Hi, Nabin. How are you? And I just so excited to have you here. First of all, Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+    "input_data": {
+      "input_text": "Hi, Nabin. How are you? And I just so excited to have you here. First of all, Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "hi-nabin-how-are-you-and-i-just-so-excited-to-have-2eff8585.wav",
+    "final_audio": "hi-nabin-how-are-you-and-i-just-so-excited-to-have-2eff8585.wav"
+  },
+  {
+    "input_text": "Hellooo, Nabin. How are you? And I just so excited to have you here. First of all, Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+    "input_data": {
+      "input_text": "Hellooo, Nabin. How are you? And I just so excited to have you here. First of all, Welcome to CS231n. I'm your instructor for this course, and I'll be guiding you through this journey. We majorly will be focusing on deep learning techniques for computer vision including some of the latest advancements as well.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "hellooo-nabin-how-are-you-and-i-just-so-excited-to-877a46f6.wav",
+    "final_audio": "hellooo-nabin-how-are-you-and-i-just-so-excited-to-877a46f6.wav"
+  },
+  {
+    "input_text": "Before we start our <bookmark mark='book_lec_1'/>lecture One.",
+    "input_data": {
+      "input_text": "Before we start our lecture One.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "before-we-start-our-lecture-one-9981acd9.wav",
+    "final_audio": "before-we-start-our-lecture-one-9981acd9.wav"
+  },
+  {
+    "input_text": "Before we start our <bookmark mark='book_lec_1'/>lecture One.",
+    "input_data": {
+      "input_text": "Before we start our lecture One.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "before-we-start-our-lecture-one-9981acd9.wav",
+    "final_audio": "before-we-start-our-lecture-one-9981acd9.wav"
+  },
+  {
+    "input_text": "Before we start our <bookmark mark='book_lec_1'/>lecture One.",
+    "input_data": {
+      "input_text": "Before we start our lecture One.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "before-we-start-our-lecture-one-9981acd9.wav",
+    "final_audio": "before-we-start-our-lecture-one-9981acd9.wav"
+  },
+  {
+    "input_text": "Before we start our <bookmark mark='book_lec_1'/>lecture One.",
+    "input_data": {
+      "input_text": "Before we start our lecture One.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "before-we-start-our-lecture-one-9981acd9.wav",
+    "final_audio": "before-we-start-our-lecture-one-9981acd9.wav"
+  },
+  {
+    "input_text": "Before we start our <bookmark mark='book_lec_1'/>lecture One.",
+    "input_data": {
+      "input_text": "Before we start our lecture One.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "before-we-start-our-lecture-one-9981acd9.wav",
+    "final_audio": "before-we-start-our-lecture-one-9981acd9.wav"
+  },
+  {
+    "input_text": "Before we start our <bookmark mark='book_lec_1'/>lecture One.",
+    "input_data": {
+      "input_text": "Before we start our lecture One.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "before-we-start-our-lecture-one-9981acd9.wav",
+    "final_audio": "before-we-start-our-lecture-one-9981acd9.wav"
+  },
+  {
+    "input_text": "Before we start our <bookmark mark='book_lec_1'/>lecture One.",
+    "input_data": {
+      "input_text": "Before we start our lecture One.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "before-we-start-our-lecture-one-9981acd9.wav",
+    "final_audio": "before-we-start-our-lecture-one-9981acd9.wav"
+  },
+  {
+    "input_text": "Before we start our <bookmark mark='book_lec_1'/>lecture One.",
+    "input_data": {
+      "input_text": "Before we start our lecture One.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "before-we-start-our-lecture-one-9981acd9.wav",
+    "final_audio": "before-we-start-our-lecture-one-9981acd9.wav"
+  },
+  {
+    "input_text": "Before we start our <bookmark mark='FOCUS'/>lecture One.",
+    "input_data": {
+      "input_text": "Before we start our lecture One.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 16800000,
+        "text_offset": 20,
+        "word_length": 20,
+        "text": "Before we start our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 28000000,
+        "text_offset": 32,
+        "word_length": 12,
+        "text": "lecture One.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "before-we-start-our-lecture-one-1f70a34e.wav",
+    "final_audio": "before-we-start-our-lecture-one-1f70a34e.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "In this lecture, we will cover the following topics: <bookmark mark='TOPICS'/>1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+    "input_data": {
+      "input_text": "In this lecture, we will cover the following topics: 1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 28000000,
+        "text_offset": 53,
+        "word_length": 53,
+        "text": "In this lecture, we will cover the following topics: ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 134400000,
+        "text_offset": 169,
+        "word_length": 116,
+        "text": "1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav",
+    "final_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "In this lecture, we will cover the following topics: <bookmark mark='TOPICS'/>1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+    "input_data": {
+      "input_text": "In this lecture, we will cover the following topics: 1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 28000000,
+        "text_offset": 53,
+        "word_length": 53,
+        "text": "In this lecture, we will cover the following topics: ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 134400000,
+        "text_offset": 169,
+        "word_length": 116,
+        "text": "1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav",
+    "final_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "In this lecture, we will cover the following topics: <bookmark mark='TOPICS'/>1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+    "input_data": {
+      "input_text": "In this lecture, we will cover the following topics: 1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 28000000,
+        "text_offset": 53,
+        "word_length": 53,
+        "text": "In this lecture, we will cover the following topics: ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 134400000,
+        "text_offset": 169,
+        "word_length": 116,
+        "text": "1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav",
+    "final_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "In this lecture, we will cover the following topics: <bookmark mark='TOPICS'/>1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+    "input_data": {
+      "input_text": "In this lecture, we will cover the following topics: 1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 28000000,
+        "text_offset": 53,
+        "word_length": 53,
+        "text": "In this lecture, we will cover the following topics: ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 134400000,
+        "text_offset": 169,
+        "word_length": 116,
+        "text": "1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav",
+    "final_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "In this lecture, we will cover the following topics: <bookmark mark='TOPICS'/>1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+    "input_data": {
+      "input_text": "In this lecture, we will cover the following topics: 1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 28000000,
+        "text_offset": 53,
+        "word_length": 53,
+        "text": "In this lecture, we will cover the following topics: ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 134400000,
+        "text_offset": 169,
+        "word_length": 116,
+        "text": "1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav",
+    "final_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "In this lecture, we will cover the following topics: <bookmark mark='TOPICS'/>1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+    "input_data": {
+      "input_text": "In this lecture, we will cover the following topics: 1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 28000000,
+        "text_offset": 53,
+        "word_length": 53,
+        "text": "In this lecture, we will cover the following topics: ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 134400000,
+        "text_offset": 169,
+        "word_length": 116,
+        "text": "1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav",
+    "final_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "In this lecture, we will cover the following topics: <bookmark mark='TOPICS'/>1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+    "input_data": {
+      "input_text": "In this lecture, we will cover the following topics: 1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 28000000,
+        "text_offset": 53,
+        "word_length": 53,
+        "text": "In this lecture, we will cover the following topics: ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 134400000,
+        "text_offset": 169,
+        "word_length": 116,
+        "text": "1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav",
+    "final_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav"
+  },
+  {
+    "input_text": "So here is our <bookmark mark='FOCUS'/>lecture One Introduction.",
+    "input_data": {
+      "input_text": "So here is our lecture One Introduction.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 14400000,
+        "text_offset": 15,
+        "word_length": 15,
+        "text": "So here is our ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 32800000,
+        "text_offset": 40,
+        "word_length": 25,
+        "text": "lecture One Introduction.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav",
+    "final_audio": "so-here-is-our-lecture-one-introduction-dd9a5176.wav"
+  },
+  {
+    "input_text": "In this lecture, we will cover the following topics: <bookmark mark='TOPICS'/>1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+    "input_data": {
+      "input_text": "In this lecture, we will cover the following topics: 1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 28000000,
+        "text_offset": 53,
+        "word_length": 53,
+        "text": "In this lecture, we will cover the following topics: ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 134400000,
+        "text_offset": 169,
+        "word_length": 116,
+        "text": "1. What is Deep Learning? 2. Why Deep Learning for Computer Vision? 3. Overview of the Course Structure and Content.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav",
+    "final_audio": "in-this-lecture-we-will-cover-the-following-topics-b4bb1488.wav"
+  },
+  {
+    "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+    "input_data": {
+      "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null
+      }
+    },
+    "original_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav",
+    "final_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav"
+  },
+  {
+    "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+    "input_data": {
+      "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null
+      }
+    },
+    "original_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav",
+    "final_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav"
+  },
+  {
+    "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy <bookmark mark='NUMPY'/>and then import the torch library.<bookmark mark='TORCH'/>",
+    "input_data": {
+      "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy and then import the torch library.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 77600000,
+        "text_offset": 125,
+        "word_length": 125,
+        "text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 34,
+        "text": "and then import the torch library.",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav",
+    "final_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav"
+  },
+  {
+    "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+    "input_data": {
+      "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null
+      }
+    },
+    "original_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav",
+    "final_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav"
+  },
+  {
+    "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy <bookmark mark='NUMPY'/>and then import the torch library.<bookmark mark='TORCH'/>",
+    "input_data": {
+      "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy and then import the torch library.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 77600000,
+        "text_offset": 125,
+        "word_length": 125,
+        "text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 34,
+        "text": "and then import the torch library.",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav",
+    "final_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav"
+  },
+  {
+    "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+    "input_data": {
+      "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null
+      }
+    },
+    "original_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav",
+    "final_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav"
+  },
+  {
+    "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy <bookmark mark='NUMPY'/>and then import the torch library.<bookmark mark='TORCH'/>",
+    "input_data": {
+      "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy and then import the torch library.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 77600000,
+        "text_offset": 125,
+        "word_length": 125,
+        "text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 34,
+        "text": "and then import the torch library.",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav",
+    "final_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav"
+  },
+  {
+    "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+    "input_data": {
+      "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null
+      }
+    },
+    "original_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav",
+    "final_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav"
+  },
+  {
+    "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy <bookmark mark='NUMPY'/>and then import the torch library.<bookmark mark='TORCH'/>",
+    "input_data": {
+      "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy and then import the torch library.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 77600000,
+        "text_offset": 125,
+        "word_length": 125,
+        "text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 34,
+        "text": "and then import the torch library.",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav",
+    "final_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav"
+  },
+  {
+    "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+    "input_data": {
+      "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null
+      }
+    },
+    "original_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav",
+    "final_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav"
+  },
+  {
+    "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy <bookmark mark='NUMPY'/>and then import the torch library.<bookmark mark='TORCH'/>",
+    "input_data": {
+      "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy and then import the torch library.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 77600000,
+        "text_offset": 125,
+        "word_length": 125,
+        "text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 34,
+        "text": "and then import the torch library.",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav",
+    "final_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav"
+  },
+  {
+    "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+    "input_data": {
+      "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null
+      }
+    },
+    "original_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav",
+    "final_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav"
+  },
+  {
+    "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy <bookmark mark='NUMPY'/>and then import the torch library.<bookmark mark='TORCH'/>",
+    "input_data": {
+      "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy and then import the torch library.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 77600000,
+        "text_offset": 125,
+        "word_length": 125,
+        "text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 34,
+        "text": "and then import the torch library.",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav",
+    "final_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav"
+  },
+  {
+    "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+    "input_data": {
+      "input_text": "Let's walk through the code below. Generally, we use python language most of the time for deep learning. And most code in deep learning is easy to write if we understand the concepts.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null
+      }
+    },
+    "original_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav",
+    "final_audio": "let-s-walk-through-the-code-below-generally-we-use-210c9cab.wav"
+  },
+  {
+    "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy <bookmark mark='NUMPY'/>and then import the torch library.<bookmark mark='TORCH'/>",
+    "input_data": {
+      "input_text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy and then import the torch library.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 77600000,
+        "text_offset": 125,
+        "word_length": 125,
+        "text": "So let's start with the first line of code. We import the necessary libraries and modules required. Let's first import numpy ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 34,
+        "text": "and then import the torch library.",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 159,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav",
+    "final_audio": "so-let-s-start-with-the-first-line-of-code-we-f386eaf4.wav"
+  },
+  {
+    "input_text": "Now let me show you euler's formula. See carefully, e to the power of i x is equal to cos x plus i sin x.",
+    "input_data": {
+      "input_text": "Now let me show you euler's formula. See carefully, e to the power of i x is equal to cos x plus i sin x.",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null
+      }
+    },
+    "original_audio": "now-let-me-show-you-euler-s-formula-see-carefully-ea6de156.wav",
+    "final_audio": "now-let-me-show-you-euler-s-formula-see-carefully-ea6de156.wav"
+  },
+  {
+    "input_text": "Now let me show you Euler's formula. See carefully, e to the power of i x <bookmark mark='EXP'/> is equal to <bookmark mark='EQUALS'/> cos x <bookmark mark='COS'/> plus <bookmark mark='PLUS'/> i sine x <bookmark mark='SIN'/>",
+    "input_data": {
+      "input_text": "Now let me show you Euler's formula. See carefully, e to the power of i x  is equal to  cos x  plus  i sine x ",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 53600000,
+        "text_offset": 74,
+        "word_length": 74,
+        "text": "Now let me show you Euler's formula. See carefully, e to the power of i x ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 67200000,
+        "text_offset": 87,
+        "word_length": 13,
+        "text": " is equal to ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 76000000,
+        "text_offset": 94,
+        "word_length": 7,
+        "text": " cos x ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 85600000,
+        "text_offset": 100,
+        "word_length": 6,
+        "text": " plus ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 110,
+        "word_length": 10,
+        "text": " i sine x ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 110,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "now-let-me-show-you-euler-s-formula-see-carefully-a49c6b91.wav",
+    "final_audio": "now-let-me-show-you-euler-s-formula-see-carefully-a49c6b91.wav"
+  },
+  {
+    "input_text": "Now let me show you Euler's formula. See carefully, e to the power of i x <bookmark mark='EXP'/> is equal to <bookmark mark='EQUALS'/> cos x <bookmark mark='COS'/> plus <bookmark mark='PLUS'/> i sine x <bookmark mark='SIN'/>",
+    "input_data": {
+      "input_text": "Now let me show you Euler's formula. See carefully, e to the power of i x  is equal to  cos x  plus  i sine x ",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 53600000,
+        "text_offset": 74,
+        "word_length": 74,
+        "text": "Now let me show you Euler's formula. See carefully, e to the power of i x ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 67200000,
+        "text_offset": 87,
+        "word_length": 13,
+        "text": " is equal to ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 76000000,
+        "text_offset": 94,
+        "word_length": 7,
+        "text": " cos x ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 85600000,
+        "text_offset": 100,
+        "word_length": 6,
+        "text": " plus ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 110,
+        "word_length": 10,
+        "text": " i sine x ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 110,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "now-let-me-show-you-euler-s-formula-see-carefully-a49c6b91.wav",
+    "final_audio": "now-let-me-show-you-euler-s-formula-see-carefully-a49c6b91.wav"
+  },
+  {
+    "input_text": "Now let me show you Euler's formula. See carefully, e to the power of i x <bookmark mark='EXP'/> is equal to <bookmark mark='EQUALS'/> cos x <bookmark mark='COS'/> plus <bookmark mark='PLUS'/> i sine x <bookmark mark='SIN'/>",
+    "input_data": {
+      "input_text": "Now let me show you Euler's formula. See carefully, e to the power of i x  is equal to  cos x  plus  i sine x ",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 53600000,
+        "text_offset": 74,
+        "word_length": 74,
+        "text": "Now let me show you Euler's formula. See carefully, e to the power of i x ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 67200000,
+        "text_offset": 87,
+        "word_length": 13,
+        "text": " is equal to ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 76000000,
+        "text_offset": 94,
+        "word_length": 7,
+        "text": " cos x ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 85600000,
+        "text_offset": 100,
+        "word_length": 6,
+        "text": " plus ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 110,
+        "word_length": 10,
+        "text": " i sine x ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 98400000,
+        "text_offset": 110,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "now-let-me-show-you-euler-s-formula-see-carefully-a49c6b91.wav",
+    "final_audio": "now-let-me-show-you-euler-s-formula-see-carefully-a49c6b91.wav"
+  },
+  {
+    "input_text": "Now let me show you Euler's formula. See carefully, <bookmark mark='EXP'/>e to the power of i x<bookmark mark='EQUALS'/>is equal to <bookmark mark='COS'/>cos x<bookmark mark='PLUS'/>plus<bookmark mark='SIN'/>i sine x",
+    "input_data": {
+      "input_text": "Now let me show you Euler's formula. See carefully, e to the power of i xis equal to cos xplusi sine x",
+      "service": "aos",
+      "config": {
+        "voice": "jane",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 29600000,
+        "text_offset": 52,
+        "word_length": 52,
+        "text": "Now let me show you Euler's formula. See carefully, ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 53599999,
+        "text_offset": 73,
+        "word_length": 21,
+        "text": "e to the power of i x",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 66400000,
+        "text_offset": 85,
+        "word_length": 12,
+        "text": "is equal to ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 79200000,
+        "text_offset": 90,
+        "word_length": 5,
+        "text": "cos x",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 88000000,
+        "text_offset": 94,
+        "word_length": 4,
+        "text": "plus",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 104000000,
+        "text_offset": 102,
+        "word_length": 8,
+        "text": "i sine x",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "now-let-me-show-you-euler-s-formula-see-carefully-cd1f4494.wav",
+    "final_audio": "now-let-me-show-you-euler-s-formula-see-carefully-cd1f4494.wav"
+  }
+]

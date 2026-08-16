@@ -1,0 +1,8 @@
+1
+00:00:00,000 --> 00:00:05,666
+Now let me show you Euler's formula. See carefully, e to
+
+2
+00:00:05,766 --> 00:00:10,300
+the power of i xis equal to cos xplusi sine x
+

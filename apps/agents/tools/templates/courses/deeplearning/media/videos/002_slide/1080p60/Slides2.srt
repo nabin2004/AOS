@@ -1,0 +1,20 @@
+1
+00:00:00,000 --> 00:00:02,593
+Hellooo, Nabin. How are you? And I just so excited to
+
+2
+00:00:02,693 --> 00:00:05,438
+have you here. First of all, Welcome to CS231n. I'm your
+
+3
+00:00:05,538 --> 00:00:08,690
+instructor for this course, and I'll be guiding you through this
+
+4
+00:00:08,790 --> 00:00:12,146
+journey. We majorly will be focusing on deep learning techniques for
+
+5
+00:00:12,246 --> 00:00:15,500
+computer vision including some of the latest advancements as well.
+

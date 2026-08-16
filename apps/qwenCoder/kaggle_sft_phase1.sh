@@ -11,6 +11,9 @@
 #   MAX_SAMPLES=          # optional subsample (e.g. 8000 if the 9h session is tight)
 #   SKIP_PREFLIGHT=1
 #   SKIP_TRAIN=1
+#   SKIP_TORCH_REINSTALL=1   # T4: keep PyPI torch (cu130 is fine on sm_75)
+#   TORCH_INDEX_URL=https://download.pytorch.org/whl/cu118
+#   KEEP_WANDB_ENV=1         # keep leftover WANDB_RUN_NAME from the notebook
 #   HUB_MODEL_ID=nabin2004/AOS-qwen2.5-coder-7b-manim-sft
 #   REPORT_TO=wandb|none
 #   ADAPTER_DIR=          # default /kaggle/working/qwen2.5-coder-7b-manim-ft on Kaggle
@@ -20,6 +23,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "${SCRIPT_DIR}"
+
+if [[ "${KEEP_WANDB_ENV:-0}" != "1" ]]; then
+  unset WANDB_RUN_NAME WANDB_JOB_TYPE || true
+fi
 
 DATASET_REPO="${DATASET_REPO:-nabin2004/manim-sft}"
 HUB_MODEL_ID="${HUB_MODEL_ID:-nabin2004/AOS-qwen2.5-coder-7b-manim-sft}"
@@ -75,6 +82,58 @@ ensure_uv() {
 
 ensure_uv
 uv sync
+
+install_p100_torch() {
+  if [[ "${SKIP_TORCH_REINSTALL:-0}" == "1" ]]; then
+    echo "==> Skipping torch reinstall (SKIP_TORCH_REINSTALL=1)"
+    return 0
+  fi
+
+  local primary="${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cu118}"
+  local fallback="https://download.pytorch.org/whl/cu126"
+
+  echo "==> Reinstalling Pascal-capable torch (P100 sm_60; PyPI cu130 has no kernels)"
+  echo "    index=${primary}"
+  uv pip uninstall -y torch torchvision torchaudio || true
+
+  if ! uv pip install torch torchvision torchaudio --index-url "${primary}"; then
+    echo "WARNING: ${primary} failed; retrying ${fallback}" >&2
+    uv pip uninstall -y torch torchvision torchaudio || true
+    uv pip install torch torchvision torchaudio --index-url "${fallback}"
+  fi
+
+  uv pip install wrapt || true
+
+  echo "==> CUDA smoke check"
+  uv run python - <<'PY'
+import sys
+import torch
+
+print("torch", torch.__version__)
+print("cuda_available", torch.cuda.is_available())
+if not torch.cuda.is_available():
+    print("ERROR: CUDA is not available in the training venv.", file=sys.stderr)
+    sys.exit(1)
+
+name = torch.cuda.get_device_name(0)
+major, minor = torch.cuda.get_device_capability(0)
+print("device", name, f"sm_{major}{minor}")
+try:
+    x = torch.zeros(8, device="cuda")
+    y = x.sum()
+    torch.cuda.synchronize()
+    print("smoke_ok", float(y.item()))
+except Exception as exc:
+    print(
+        "ERROR: CUDA kernels cannot run on this GPU (need cu118/cu126, not PyPI cu130).",
+        file=sys.stderr,
+    )
+    print(exc, file=sys.stderr)
+    sys.exit(1)
+PY
+}
+
+install_p100_torch
 
 if [[ "${SKIP_PREFLIGHT:-0}" != "1" ]]; then
   echo "==> Preflight"

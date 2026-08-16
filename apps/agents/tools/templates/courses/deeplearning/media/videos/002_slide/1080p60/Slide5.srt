@@ -1,0 +1,12 @@
+1
+00:00:00,000 --> 00:00:03,867
+Let's walk through the code below. Generally, we use python language
+
+2
+00:00:03,967 --> 00:00:06,901
+most of the time for deep learning. And most code in
+
+3
+00:00:07,001 --> 00:00:10,460
+deep learning is easy to write if we understand the concepts.
+

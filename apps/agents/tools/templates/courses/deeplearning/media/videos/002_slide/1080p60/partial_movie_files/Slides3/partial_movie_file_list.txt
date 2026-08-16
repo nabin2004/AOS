@@ -1,0 +1,4 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides3/3544663784_1144060664_223132457.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides3/260329756_2720210540_1364431621.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides3/260329756_1432596116_2094652206.mp4'

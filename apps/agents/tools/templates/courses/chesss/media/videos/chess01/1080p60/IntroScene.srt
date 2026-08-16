@@ -1,0 +1,8 @@
+1
+00:00:00,000 --> 00:00:01,745
+This circle is drawn as I speak, Look
+
+2
+00:00:01,845 --> 00:00:03,740
+this circle will be drawn until I speak.
+

@@ -1,0 +1,24 @@
+1
+00:00:00,000 --> 00:00:03,867
+Let's walk through the code below. Generally, we use python language
+
+2
+00:00:03,967 --> 00:00:06,901
+most of the time for deep learning. And most code in
+
+3
+00:00:07,001 --> 00:00:10,460
+deep learning is easy to write if we understand the concepts.
+
+4
+00:00:11,560 --> 00:00:14,155
+So let's start with the first line of code.
+
+5
+00:00:14,255 --> 00:00:17,978
+We import the necessary libraries and modules required. Let's
+
+6
+00:00:18,078 --> 00:00:21,300
+first import numpy and then import the torch library.
+

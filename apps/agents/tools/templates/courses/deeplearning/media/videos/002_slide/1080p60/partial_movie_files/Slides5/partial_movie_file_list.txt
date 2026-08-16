@@ -1,0 +1,9 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides5/3544663784_1505457285_223132457.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides5/260329756_2954564202_148030502.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides5/260329756_1432596116_2483368434.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides5/260329756_579013593_829269375.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides5/260329756_3394445323_1672690492.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides5/260329756_3493786281_432869649.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides5/260329756_1385582244_1485174972.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/AOS/apps/agents/tools/templates/courses/deeplearning/media/videos/002_slide/1080p60/partial_movie_files/Slides5/260329756_1432596116_1806317955.mp4'
