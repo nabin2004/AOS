@@ -12,7 +12,8 @@
 # Env knobs:
 #   EPOCHS=1
 #   SEQ_LEN=2048          # 1024 if CUDA OOM on P100
-#   MAX_SAMPLES=          # optional subsample (e.g. 8000 if the 9h session is tight)
+#   MAX_SAMPLES=5000      # 0 or all = full ~38k (too slow on P100)
+#   PACKING=1             # 0 to disable sequence packing
 #   SKIP_PREFLIGHT=1
 #   SKIP_TRAIN=1
 #   SKIP_TORCH_REINSTALL=1   # T4: keep whatever torch is already on system Python
@@ -40,6 +41,7 @@ fi
 DATASET_REPO="${DATASET_REPO:-nabin2004/manim-sft}"
 HUB_MODEL_ID="${HUB_MODEL_ID:-nabin2004/AOS-qwen2.5-coder-7b-manim-sft}"
 EPOCHS="${EPOCHS:-1}"
+MAX_SAMPLES="${MAX_SAMPLES:-5000}"
 
 if [[ "${ON_KAGGLE}" == "1" ]]; then
   WORKSPACE="${WORKSPACE:-/kaggle/working}"
@@ -67,6 +69,8 @@ echo "==> Qwen phase-1 SFT"
 echo "    python=$(command -v "${PYTHON}")"
 echo "    kaggle=${ON_KAGGLE}"
 echo "    dataset=${DATASET_REPO}"
+echo "    max_samples=${MAX_SAMPLES}"
+echo "    packing=${PACKING:-1}"
 echo "    adapter=${ADAPTER_DIR}"
 echo "    hub=${HUB_MODEL_ID}"
 echo "    report_to=${REPORT_TO}"
@@ -199,8 +203,15 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   if [[ -n "${SEQ_LEN:-}" ]]; then
     TRAIN_ARGS+=(--seq-len "${SEQ_LEN}")
   fi
-  if [[ -n "${MAX_SAMPLES:-}" ]]; then
+  if [[ "${MAX_SAMPLES}" == "all" || "${MAX_SAMPLES}" == "0" ]]; then
+    TRAIN_ARGS+=(--max-samples 0)
+  else
     TRAIN_ARGS+=(--max-samples "${MAX_SAMPLES}")
+  fi
+  if [[ "${PACKING:-1}" == "0" ]]; then
+    TRAIN_ARGS+=(--no-packing)
+  else
+    TRAIN_ARGS+=(--packing)
   fi
   "${RUN_PY[@]}" run.py "${TRAIN_ARGS[@]}"
 fi

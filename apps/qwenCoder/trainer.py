@@ -18,6 +18,20 @@ def _cast_trainable_fp32(model) -> None:
         print(f"Cast {n} trainable tensors to float32 for GradScaler")
 
 
+def _assert_qlora(model) -> None:
+    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total = sum(p.numel() for p in model.parameters())
+    frac = trainable / total if total else 0.0
+    print(
+        f"QLoRA trainable {trainable:,} / {total:,} ({100.0 * frac:.2f}%)"
+    )
+    if frac > 0.05:
+        raise RuntimeError(
+            f"Trainable fraction {100.0 * frac:.1f}% > 5%; LoRA did not attach "
+            "(this looks like full fine-tuning)."
+        )
+
+
 def build_trainer(
     model,
     tokenizer: PreTrainedTokenizerBase,
@@ -40,6 +54,7 @@ def build_trainer(
     # PEFT copies Qwen's BF16 adapter dtype. GradScaler on P100 cannot unscale
     # BF16, and FP16 LoRA raises "Attempting to unscale FP16 gradients."
     _cast_trainable_fp32(trainer.model)
+    _assert_qlora(trainer.model)
     print(f"fp16: {trainer.args.fp16}  bf16: {trainer.args.bf16}")
     trainable = {str(p.dtype) for p in trainer.model.parameters() if p.requires_grad}
     print(f"trainable dtypes: {sorted(trainable)}")

@@ -64,6 +64,8 @@ class TrainingConfig:
     hub_model_id: str = HUB_SFT_REPO
     hub_private: bool = False
     use_bf16: bool = True
+    lora_r: int = 32
+    lora_alpha: int = 64
     optim: str = "adamw_torch_fused"
     save_strategy: str = "epoch"
     save_steps: int = 200
@@ -85,8 +87,8 @@ class TrainingConfig:
 
     def lora_config(self) -> LoraConfig:
         return LoraConfig(
-            r=32,
-            lora_alpha=64,
+            r=self.lora_r,
+            lora_alpha=self.lora_alpha,
             lora_dropout=0.05,
             target_modules=list(LORA_TARGETS),
             bias="none",
@@ -157,6 +159,14 @@ class TrainingConfig:
             config = replace(config, seq_len=args.seq_len)
         if args.no_4bit:
             config = replace(config, use_4bit=False)
+        if getattr(args, "lora_r", None) is not None:
+            config = replace(config, lora_r=args.lora_r)
+        if getattr(args, "lora_alpha", None) is not None:
+            config = replace(config, lora_alpha=args.lora_alpha)
+        if getattr(args, "packing", False):
+            config = replace(config, packing=True)
+        if getattr(args, "no_packing", False):
+            config = replace(config, packing=False)
         if args.report_to is not None:
             config = replace(config, report_to=args.report_to)
         if args.push_to_hub:
@@ -217,22 +227,26 @@ def default_kaggle_output_dir() -> Path:
 
 
 def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
-    """P100/T4-safe 4-bit LoRA: fp16, seq 2048, step checkpoints."""
+    """P100/T4 QLoRA: 4-bit NF4, LoRA r=16, 5k samples, packing, fp16."""
     print(
-        "NOTE: --kaggle targets Kaggle P100/T4 (16 GB). Using fp16 4-bit LoRA "
-        f"at seq_len=2048 for {config.model_id}.",
+        "NOTE: --kaggle QLoRA on P100/T4 (16 GB): fp16, 4-bit NF4, "
+        f"lora_r=16, packing, max_samples=5000, seq_len=2048 for {config.model_id}.",
         file=sys.stderr,
     )
     report_to = config.report_to
     if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
         report_to = "none"
+    max_samples = config.max_samples if config.max_samples is not None else 5000
     return replace(
         config,
         batch_size=1,
         grad_accum=8,
         seq_len=2048,
         num_proc=2,
-        packing=False,
+        packing=True,
+        lora_r=16,
+        lora_alpha=32,
+        max_samples=max_samples,
         use_bf16=False,
         optim="paged_adamw_8bit",
         save_strategy="steps",
@@ -279,10 +293,22 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--seq-len", type=int, default=None)
     parser.add_argument("--no-4bit", action="store_true")
+    parser.add_argument("--lora-r", type=int, default=None)
+    parser.add_argument("--lora-alpha", type=int, default=None)
+    parser.add_argument(
+        "--packing",
+        action="store_true",
+        help="Pack sequences to max_length (Kaggle default on)",
+    )
+    parser.add_argument(
+        "--no-packing",
+        action="store_true",
+        help="Disable packing (shorter examples, more steps)",
+    )
     parser.add_argument(
         "--kaggle",
         action="store_true",
-        help="P100/T4 preset: fp16, seq 2048, 4-bit LoRA, step checkpoints",
+        help="P100/T4 QLoRA: 4-bit, r=16, 5k samples, packing, seq 2048",
     )
     parser.add_argument("--report-to", default=None)
     parser.add_argument("--run-name", default=None)

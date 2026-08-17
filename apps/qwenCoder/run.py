@@ -79,6 +79,11 @@ def main() -> int:
         print(f"Init LoRA:  {config.init_adapter}")
     print(f"report_to:  {config.report_to}")
     print(f"use_bf16:   {config.use_bf16} (effective {effective_bf16(config.use_bf16)})")
+    print(
+        f"QLoRA:      r={config.lora_r} alpha={config.lora_alpha} "
+        f"4bit={config.use_4bit} packing={config.packing} "
+        f"max_samples={config.max_samples}"
+    )
 
     tokenizer = load_tokenizer(config.model_id)
     model = load_model(config)
