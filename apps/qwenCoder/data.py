@@ -15,6 +15,10 @@ _NATIVE_HF_REPOS = frozenset(
 )
 
 
+def native_sft_chat_repo(repo: str | None) -> bool:
+    return bool(repo) and repo in _NATIVE_HF_REPOS
+
+
 def resolve_data_files(config: TrainingConfig) -> str:
     if config.data_path is not None:
         return str(config.data_path)
@@ -30,6 +34,7 @@ def _normalize_messages(sample: dict[str, Any]) -> dict[str, list[dict[str, Any]
     if isinstance(chosen, dict) and isinstance(chosen.get("messages"), list):
         return {"messages": chosen["messages"]}
 
+    # Trajectory / tool-trace rows only (AOS-Trajectories), not manim-sft chat.
     prompt = sample.get("prompt") or sample.get("user_prompt") or ""
     final_code = sample.get("final_code") or ""
     out: list[dict[str, Any]] = [{"role": "user", "content": prompt}]
@@ -117,4 +122,11 @@ def load_training_dataset(config: TrainingConfig) -> Dataset:
     )
     ds = _maybe_subsample(ds, config)
     print(f"Trainable rows: {len(ds)}")
+    if len(ds) > 0:
+        roles = [
+            m.get("role")
+            for m in (ds[0].get("messages") or [])
+            if isinstance(m, dict)
+        ]
+        print(f"Sample roles: {roles}")
     return ds

@@ -18,7 +18,7 @@ from dataclasses import replace
 from pathlib import Path
 
 from config import TrainingConfig, build_arg_parser, effective_bf16
-from data import load_training_dataset
+from data import load_training_dataset, native_sft_chat_repo
 from model import load_model, load_tokenizer
 from trainer import build_trainer, train_and_save
 
@@ -72,7 +72,12 @@ def main() -> int:
     config.output_dir.mkdir(parents=True, exist_ok=True)
     print(f"Base model: {config.model_id}")
     print(f"Output:     {config.output_dir}")
-    print(f"Dataset:    {config.dataset_repo} ({config.dataset_file})")
+    if native_sft_chat_repo(config.dataset_repo):
+        print(f"Dataset:    {config.dataset_repo}  [SFT chat messages]")
+    elif config.data_path is not None:
+        print(f"Dataset:    {config.data_path}")
+    else:
+        print(f"Dataset:    {config.dataset_repo} ({config.dataset_file})")
     if config.stage:
         print(f"Stage:      {config.stage}")
     if config.init_adapter:

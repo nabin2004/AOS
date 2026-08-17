@@ -87,7 +87,7 @@ Legacy single-dataset e2e (tool_trace only): `bash train.sh`.
 
 ## Kaggle (phase 1)
 
-GPU **P100** notebook for SFT-1 QLoRA (`nabin2004/manim-sft` 5k subsample, packing, r=16). Uses **system Python + torch 2.7.1+cu118** (no uv `.venv`). See **[KAGGLE.md](KAGGLE.md)**.
+GPU **P100** notebook for SFT-1 QLoRA on chat `nabin2004/manim-sft` (5k subsample, packing off, r=16). Uses **system Python + torch 2.7.1+cu118**. See **[KAGGLE.md](KAGGLE.md)**.
 
 ```bash
 bash apps/qwenCoder/kaggle_sft_phase1.sh

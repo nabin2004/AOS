@@ -12,7 +12,7 @@ Later stages (educlaw, traces, DPO, GRPO, merge, GGUF) stay on [`train_stages.sh
 | Internet | On |
 | Session | ~9 hours |
 
-P100 has **no bf16**. Phase 1 is already **QLoRA** (4-bit NF4 frozen base + LoRA adapters), not full 7B fine-tuning. The `--kaggle` preset uses fp16 compute, **LoRA r=16 / alpha=32**, **packing**, **5k subsample**, `paged_adamw_8bit`, `seq_len=2048`, and step checkpoints so a 9h session can finish. Stop any 38k-row P100 run; that is ~60h/epoch. Scale to full `nabin2004/manim-sft` (~38k) on A100 or with `MAX_SAMPLES=0`.
+P100 has **no bf16** and **no Flash Attention**, so packing is **off** (avoids TRL cross-sample contamination). Phase 1 is **QLoRA** on chat SFT [`nabin2004/manim-sft`](https://huggingface.co/datasets/nabin2004/manim-sft) (`messages` with system/user/assistant), **not** agent trajectories. The `--kaggle` preset uses fp16 compute, **LoRA r=16 / alpha=32**, **5k subsample**, `paged_adamw_8bit`, `seq_len=2048`. Trajectories are SFT-3 on [`train_stages.sh`](train_stages.sh). Scale to full ~38k on A100 or with `MAX_SAMPLES=0`.
 
 ## Secrets
 
@@ -59,7 +59,7 @@ python3 run.py \
   --dataset-repo nabin2004/manim-sft \
   --stage manim \
   --max-samples 5000 \
-  --packing \
+  --no-packing \
   --output-dir /kaggle/working/qwen2.5-coder-7b-manim-ft \
   --epochs 1 \
   --report-to wandb \
@@ -83,7 +83,7 @@ Prefix the bash cell or export before the script:
 EPOCHS=1
 SEQ_LEN=1024          # if CUDA OOM
 MAX_SAMPLES=5000      # default; 0 or all = full ~38k (too slow on P100)
-PACKING=1             # 0 to disable packing
+PACKING=0             # 1 only if Flash Attention is available (not P100)
 SKIP_PREFLIGHT=1
 SKIP_TRAIN=1          # reuse an existing adapter dir (no train/push)
 SKIP_TORCH_REINSTALL=1  # T4 only: keep system torch
@@ -101,7 +101,7 @@ ADAPTER_DIR=/kaggle/working/qwen2.5-coder-7b-manim-ft
 - **Do not `uv run` on Kaggle** — that creates `.venv` with cu130 and overwrites the fix.
 - **T4 (`sm_75`)**: `SKIP_TORCH_REINSTALL=1`.
 - **W&B run named `gemma4-…`**: leftover `WANDB_RUN_NAME` in the notebook. The script unsets it unless `KEEP_WANDB_ENV=1`.
-- **OOM**: `SEQ_LEN=1024` and/or `PACKING=0` (keep batch size 1).
+- **OOM**: `SEQ_LEN=1024` (keep batch size 1). Do not turn packing on on P100.
 - **Session timeout / “60h epoch”**: default is **5k** shuffled rows, not 38k. Full corpus: `MAX_SAMPLES=0` (prefer A100). Checkpoints every 200 steps.
 - **No W&B**: missing `WANDB_API_KEY`; script falls back to `REPORT_TO=none`.
 - **Hub push fails**: token needs write access to `HUB_MODEL_ID`.

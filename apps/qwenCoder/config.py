@@ -227,10 +227,10 @@ def default_kaggle_output_dir() -> Path:
 
 
 def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
-    """P100/T4 QLoRA: 4-bit NF4, LoRA r=16, 5k samples, packing, fp16."""
+    """P100/T4 QLoRA: 4-bit NF4, LoRA r=16, 5k samples, no packing, fp16."""
     print(
         "NOTE: --kaggle QLoRA on P100/T4 (16 GB): fp16, 4-bit NF4, "
-        f"lora_r=16, packing, max_samples=5000, seq_len=2048 for {config.model_id}.",
+        f"lora_r=16, packing=off, max_samples=5000, seq_len=2048 for {config.model_id}.",
         file=sys.stderr,
     )
     report_to = config.report_to
@@ -243,7 +243,7 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
         grad_accum=8,
         seq_len=2048,
         num_proc=2,
-        packing=True,
+        packing=False,
         lora_r=16,
         lora_alpha=32,
         max_samples=max_samples,
@@ -298,7 +298,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--packing",
         action="store_true",
-        help="Pack sequences to max_length (Kaggle default on)",
+        help="Pack sequences (needs Flash Attention; off on Kaggle P100)",
     )
     parser.add_argument(
         "--no-packing",
@@ -308,7 +308,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--kaggle",
         action="store_true",
-        help="P100/T4 QLoRA: 4-bit, r=16, 5k samples, packing, seq 2048",
+        help="P100/T4 QLoRA: 4-bit, r=16, 5k samples, packing off, seq 2048",
     )
     parser.add_argument("--report-to", default=None)
     parser.add_argument("--run-name", default=None)

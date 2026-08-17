@@ -13,7 +13,7 @@
 #   EPOCHS=1
 #   SEQ_LEN=2048          # 1024 if CUDA OOM on P100
 #   MAX_SAMPLES=5000      # 0 or all = full ~38k (too slow on P100)
-#   PACKING=1             # 0 to disable sequence packing
+#   PACKING=0             # 1 to enable packing (needs Flash Attention; not on P100)
 #   SKIP_PREFLIGHT=1
 #   SKIP_TRAIN=1
 #   SKIP_TORCH_REINSTALL=1   # T4: keep whatever torch is already on system Python
@@ -70,7 +70,7 @@ echo "    python=$(command -v "${PYTHON}")"
 echo "    kaggle=${ON_KAGGLE}"
 echo "    dataset=${DATASET_REPO}"
 echo "    max_samples=${MAX_SAMPLES}"
-echo "    packing=${PACKING:-1}"
+echo "    packing=${PACKING:-0}"
 echo "    adapter=${ADAPTER_DIR}"
 echo "    hub=${HUB_MODEL_ID}"
 echo "    report_to=${REPORT_TO}"
@@ -208,10 +208,10 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
   else
     TRAIN_ARGS+=(--max-samples "${MAX_SAMPLES}")
   fi
-  if [[ "${PACKING:-1}" == "0" ]]; then
-    TRAIN_ARGS+=(--no-packing)
-  else
+  if [[ "${PACKING:-0}" == "1" ]]; then
     TRAIN_ARGS+=(--packing)
+  else
+    TRAIN_ARGS+=(--no-packing)
   fi
   "${RUN_PY[@]}" run.py "${TRAIN_ARGS[@]}"
 fi
