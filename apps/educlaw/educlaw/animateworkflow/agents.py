@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from rich.prompt import Prompt
 from pydantic_ai import Agent, AgentRunResult, ModelMessage, RunContext, RunUsage, UsageLimits
 from educlaw.animateworkflow import contracts
-from contracts import RequestClassification,NarrationPlan
+from contracts import RequestClassification,NarrationPlan,FinalCode,CompileResult
 from educlaw.animateworkflow.prompts import RAW_CODE_PROMPT
 
 
@@ -54,13 +54,16 @@ NarrationPlannerAgent = Agent(
 CodeGeneratorAgent = Agent(
     model="openrouter:openai/gpt-4o-mini",    
     name='CodeGeneratorAgent',
-    instructions="You are a helpful assistant that generates code to fulfill user requests for educational video content. "
+    instructions="You are a helpful assistant that generates code to fulfill user requests for educational video content. ",
+    output_type=FinalCode,
 )
 
-CompilerAgent = Agent(
+CompilerAgent: Agent[object, CompileResult] = Agent(
     model="openrouter:openai/gpt-4o-mini",
     name='CompilerAgent',
-    instructions="You are a helpful assistant that compiles code to fulfill user requests for educational video content. "
+    instructions="You are a helpful assistant that compiles code to fulfill user requests for educational video content. ",
+    output_type=CompileResult,
+
 )
 
 async def main():
@@ -74,15 +77,24 @@ async def main():
     print(f"[STEP-2] Raw Code Generated: \n{raw_code}")
 
     raw_code_prompt = raw_code.model_dump_json()
-    results: tuple[AgentRunResult[str], AgentRunResult[str]] = await asyncio.gather(
+    scene_result, narration_result: tuple[AgentRunResult[str], AgentRunResult[str]] = await asyncio.gather(
         ScenePlannerAgent.run(raw_code_prompt),
         NarrationPlannerAgent.run(raw_code_prompt)
     )
 
-    print(f"[STEP-3] Scene Planning Result: \n{results[0].output}")
-    print("="*50)
-    print(f"[STEP-3] Narration Planning Result: \n{results[1].output}")
+    final_code_prompt = (
+        f"Raw code plan:\n{raw_code_prompt}\n\n"
+        f"Scene plan:\n{scene_result.output}\n\n"
+        f"Narration plan:\n{narration_result.output}"
+    )
+    final_code: AgentRunResult[FinalCode] = await CodeGeneratorAgent.run(final_code_prompt)
 
+    print(f"[STEP-3] Scene Planning Result: \n{scene_result.output}")
+    print("="*50)
+    print(f"[STEP-3] Narration Planning Result: \n{narration_result.output}")
+
+    print("="*50)
+    print(f"[STEP-4] Final Code Generation Result: \n{final_code.output}")
 
 
 import asyncio
