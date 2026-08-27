@@ -103,14 +103,14 @@ USER: Teach me about the Lorenz attractor
     - NarrationPlan.steps:
         NarrationStep(scene_id="s0",
             narration="In 1963, a meteorologist trying to predict the weather stumbled onto one of math's strangest shapes.",
-            bookmarks=[BookMark(bookmark_id="B0", narration_fragment="stumbled onto")])
+            bookmarks=[VoiceoverBookMark(mark="B0", voiceover_text="stumbled onto")])
         NarrationStep(scene_id="s2",
             narration="This is the Lorenz attractor: a solution curve that never repeats, never settles, never escapes.",
-            bookmarks=[BookMark(bookmark_id="B1", narration_fragment="never repeats")],
+            bookmarks=[VoiceoverBookMark(mark="B1", voiceover_text="never repeats")],
             duration=6.0)
         NarrationStep(scene_id="s3",
             narration="Nudge the starting point by a hair, and the paths tear apart completely — this is the butterfly effect.",
-            bookmarks=[BookMark(bookmark_id="B2", narration_fragment="tear apart")])
+            bookmarks=[VoiceoverBookMark(mark="B2", voiceover_text="tear apart")])
 
 [5] CodeGeneratorAgent:
     - FinalCode.scene_name: "LorenzAttractorScene"
@@ -196,19 +196,20 @@ class VideoPlan(BaseModel):
 class LessonPlan(BaseModel):
     videos: list[VideoPlan]
     # steps: list[SceneStep]
-    no_of_videos: int = Field(default=1, description="Number of videos to generate")
-    duration_per_video: float | None = Field(default=None, description="Duration in minutes per video")
+    # no_of_videos: int = Field(default=1, description="Number of videos to generate")
+    # duration_per_video: float | None = Field(default=None, description="Duration in minutes per video")
 
 
-class BookMark(BaseModel):
-    bookmark_id: str  # <bookmark mark='T1'/>
-    narration_fragment: str
+class VoiceoverBookMark(BaseModel):
+    mark: str  # <bookmark mark='T1'/>
+    voiceover_text: str 
+    target_segment: str
 
 
 class NarrationStep(BaseModel):
     scene_id: str  # references SceneStep.scene_id
     narration: str
-    bookmarks: list[BookMark] = Field(default_factory=list)
+    bookmarks: list[VoiceoverBookMark] = Field(default_factory=list)
     duration: float | None = None
 
 

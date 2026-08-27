@@ -1,48 +1,62 @@
 RAW_CODE_PROMPT= """\
-You are an expert Python programmer specializing in Manim Community Edition.
+You are an expert educational lesson planner for Manim animations.
 
-Your task is to generate executable Manim code for every scene in the
-provided lesson plan.
+Create a structured LessonPlan.
 
-IMPORTANT REQUIREMENTS:
+IMPORTANT:
 
-1. The `code` field of EVERY SceneStep MUST contain actual executable
-   Manim Python source code.
+For every SceneStep:
 
-2. The code MUST:
-   - import Manim using `from manim import *`
-   - define a valid Scene subclass
-   - implement the scene's purpose
-   - implement the visual description
-   - implement the specified animations
-   - be syntactically valid Python
-   - be directly executable with Manim
+1. `objects` must contain the visual objects required by the scene.
 
-3. The `code` field MUST NOT contain:
-   - explanations
-   - natural-language descriptions
-   - pseudocode
-   - instructions about how to write the code
-   - Markdown code fences such as ```python
+2. `animations` must contain AnimationCall objects.
 
-4. Generate code independently for EVERY scene.
+3. Every AnimationCall MUST use EXACTLY these fields:
 
-5. Do not change the number of videos or scenes.
+   {
+       "animation_type": "...",
+       "targets": ["..."],
+       "params": {}
+   }
 
-6. Preserve the existing scene structure, names, purposes,
-   visual descriptions, objects, and animations.
+4. `animation_type` is the animation operation, such as:
+   - Write
+   - Create
+   - FadeIn
+   - FadeOut
+   - Transform
+   - ReplacementTransform
+   - GrowFromCenter
+   - Indicate
 
-7. Return the completed LessonPlan with the `code` field populated
-   with actual Manim Python code.
+5. `targets` MUST contain the names of objects from the scene's
+   `objects` list.
 
-Example of a valid `code` field:
+6. `params` contains additional animation parameters as strings.
 
-from manim import *
+DO NOT use:
+- `type`
+- `animation`
+- `description`
 
-class LorenzIntroduction(Scene):
-    def construct(self):
-        title = Text("Lorenz Attractor")
-        self.play(Write(title))
-        self.wait(2)
+for AnimationCall fields.
 
+Example:
+
+objects:
+[
+    {
+        "name": "EulerFormula",
+        ...
+    }
+]
+
+animations:
+[
+    {
+        "animation_type": "Write",
+        "targets": ["EulerFormula"],
+        "params": {}
+    }
+]
 """

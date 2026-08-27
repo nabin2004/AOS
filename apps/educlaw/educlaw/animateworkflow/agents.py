@@ -1,9 +1,9 @@
 from typing import Any, Literal
 from pydantic import BaseModel, Field
 from rich.prompt import Prompt
-from pydantic_ai import Agent, ModelMessage, RunContext, RunUsage, UsageLimits
+from pydantic_ai import Agent, AgentRunResult, ModelMessage, RunContext, RunUsage, UsageLimits
 from educlaw.animateworkflow import contracts
-from contracts import RequestClassification
+from contracts import RequestClassification,NarrationPlan
 from educlaw.animateworkflow.prompts import RAW_CODE_PROMPT
 
 
@@ -37,10 +37,17 @@ ScenePlannerAgent: Agent[object, str] = Agent(
     instructions="You are a helpful assistant that plans the scenes needed to fulfill user requests for educational video content. "
 )
 
+# library_kb_agent: Agent[object, contracts.KnowledgeResult] = Agent(
+#     model="openrouter:openai/gpt-4o-mini",
+#     name='library_kb_agent',
+#     output_type=contracts.KnowledgeResult,
+#     instructions="You are a helpful assistant that provides knowledge about the educational content library. "
+# )
+
 NarrationPlannerAgent = Agent(
     model="openrouter:openai/gpt-4o-mini",    
     name='NarrationPlannerAgent',
-    # output_type='NarrationPlan',
+    output_type=NarrationPlan,
     instructions="You are a helpful assistant that plans the narration needed to fulfill user requests for educational video content. "
 )
 
@@ -65,6 +72,16 @@ async def main():
     raw_code_result = await generate_raw_code.run(user_request)
     raw_code: contracts.LessonPlan = raw_code_result.output
     print(f"[STEP-2] Raw Code Generated: \n{raw_code}")
+
+    raw_code_prompt = raw_code.model_dump_json()
+    results: tuple[AgentRunResult[str], AgentRunResult[str]] = await asyncio.gather(
+        ScenePlannerAgent.run(raw_code_prompt),
+        NarrationPlannerAgent.run(raw_code_prompt)
+    )
+
+    print(f"[STEP-3] Scene Planning Result: \n{results[0].output}")
+    print("="*50)
+    print(f"[STEP-3] Narration Planning Result: \n{results[1].output}")
 
 
 
