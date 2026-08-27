@@ -7,7 +7,8 @@ import re
 _ERROR_HEADER_RE = re.compile(
     r"(?m)^(?:Syntax error in code:|Type error in code:|Runtime error:|"
     r"error\[[^\]]+\]:|Traceback \(most recent call last\):|Compilation failed|"
-    r"LaTeX Error|There are no scenes inside that module|is not in the script)"
+    r"LaTeX Error|There are no scenes inside that module|is not in the script|"
+    r"Exception: You need to call init_voiceover|You need to call init_voiceover)"
 )
 
 _BLOCK_CAP = 300

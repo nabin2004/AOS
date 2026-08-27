@@ -14,7 +14,9 @@ step's move / goal / viewer question, when provided above the beats), return
 the same beats with narration populated on each.
 
 Narration is not a caption. Don't just describe what moved — say why it
-matters. Every beat exists to teach one idea; the narration is the sentence
+matters. Never use filler such as "Let's look at this on the board",
+"Here we have…", or "Isn't that amazing?". Do not copy on-screen Tex into
+speech. Every beat exists to teach one idea; the narration is the sentence
 that idea would be, if the pedagogical goal above were spoken instead of drawn.
 
 ── NARRATION SEGMENT FIELDS ─────────────────────────────────────────────────

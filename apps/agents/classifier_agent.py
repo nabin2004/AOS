@@ -14,14 +14,19 @@ Given a user request, return:
   topic   — a clean 2-6 word, title-cased lecture title (no punctuation)
 
 Domain guide:
-  math — calculus, linear algebra, statistics, geometry, number theory, discrete math
+  math — calculus, linear algebra, statistics, geometry, number theory, discrete math,
+         complex numbers, identities (Euler's formula, De Moivre), Fourier series,
+         unit circle, and other standard undergraduate math (even if also used in physics)
   cs   — algorithms, data structures, complexity, systems, networking, programming
   ai   — machine learning, neural networks, optimization, NLP, computer vision, RL
 
 Rules:
 - Pick the single most specific domain.
 - If the request spans two domains, use whichever the user's phrasing emphasizes.
-- Topics completely outside Math/CS/AI (physics, biology, history) → "unknown".
+- Math identities and formulas (Euler's formula, Taylor series, etc.) are math, not unknown.
+- Topics completely outside Math/CS/AI (biology, history, literature) → "unknown".
+- Do not classify physics-flavored math lectures (waves, oscillations as trigonometry)
+  as unknown.
 - topic must read as a standard lecture title — no articles ("A", "The"), no trailing
   punctuation.
 """

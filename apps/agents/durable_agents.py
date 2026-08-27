@@ -12,6 +12,12 @@ from pydantic_ai.durable_exec.dbos import DBOSAgent
 from classifier_agent import classifier_agent
 from coder_agent import coder_agent
 from lecture_planner import lecture_planner_agent
+from teaching_script import teaching_script_agent
+
+durable_classifier = DBOSAgent(classifier_agent)
+durable_lecture_planner = DBOSAgent(lecture_planner_agent)
+durable_teaching_script = DBOSAgent(teaching_script_agent)
+durable_coder = DBOSAgent(coder_agent)
 
 durable_classifier = DBOSAgent(classifier_agent)
 durable_lecture_planner = DBOSAgent(lecture_planner_agent)

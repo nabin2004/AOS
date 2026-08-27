@@ -17,6 +17,8 @@ from tools.coder_workspace import (
     save_manifest,
     scene_file_path,
 )
+from tools.manim_source import has_set_speech_service, prepare_manim_source
+from tools.voiceover_quality import FILLER_HINT, FILLER_VOICEOVER, filler_voiceover_error
 
 _FAILURE_MARKERS = (
     "There are no scenes inside that module",
@@ -46,9 +48,11 @@ _TEX_HINT = (
 )
 
 _VOICEOVER_HINT = (
-    "Animate scenes must subclass VoiceoverScene and wrap beats in "
-    "with self.voiceover(text=...) as tracker: (use AOSSpeechService). "
-    "Silent Scene / self.play without voiceover is not allowed."
+    "Animate scenes must subclass VoiceoverScene, call "
+    "set_speech_service(AOSSpeechService(...)) before the first voiceover, "
+    "and wrap teaching beats in with self.voiceover(text=...) as tracker:. "
+    "Silent Scene / self.play without voiceover is not allowed. "
+    + FILLER_HINT
 )
 
 _AUDIO_HINT = (
@@ -135,11 +139,16 @@ def validate_voiceover_scene(code: str) -> str | None:
         if isinstance(node, ast.ClassDef) and _bases_include_voiceover(node):
             voiceover_classes.append(node)
 
-    if not voiceover_classes:
-        return "missing_voiceover_scene"
+    # if not voiceover_classes:
+    #     return "missing_voiceover_scene"
 
-    if not any(_has_voiceover_call(cls) for cls in voiceover_classes):
-        return "missing_voiceover_calls"
+    # if not any(_has_voiceover_call(cls) for cls in voiceover_classes):
+    #     return "missing_voiceover_calls"
+    # if not any(has_set_speech_service(cls) for cls in voiceover_classes):
+    #     return "missing_speech_service"
+    filler = filler_voiceover_error(code)
+    if filler is not None:
+        return filler
     return None
 
 
@@ -276,6 +285,7 @@ def compile_manim_code(
 
         workspace = resolve_output_dir(output_dir)
         scene_path = scene_file_path(workspace, scene_name)
+        code = prepare_manim_source(code)
         fallback_class = _scene_class_name(scene_name)
         scene_class = _discover_scene_class(code, fallback_class)
         scene_path.write_text(code, encoding="utf-8")
@@ -304,6 +314,7 @@ def compile_manim_code(
                     "scene_class": scene_class,
                 },
             )
+            hint = FILLER_HINT if voiceover_error == FILLER_VOICEOVER else _VOICEOVER_HINT
             return result_json(
                 ok=False,
                 step="compile",
@@ -312,7 +323,7 @@ def compile_manim_code(
                 scene_class=scene_class,
                 error=voiceover_error,
                 failure_marker=voiceover_error,
-                message=f"Compilation refused: {_VOICEOVER_HINT}",
+                message=f"Compilation refused: {hint}",
             )
 
         log_path = workspace / "logs" / "compile.log"

@@ -85,6 +85,11 @@ def uses_openai_compatible() -> bool:
     return profile_name() == "openai_compatible"
 
 
+def custom_endpoint_for_role(role: AgentRole) -> bool:
+    """Every role uses AOS_OPENAI_BASE_URL when a custom endpoint is configured."""
+    return bool(openai_compatible_base_url())
+
+
 def _ollama_model() -> str:
     return _env("AOS_OLLAMA_MODEL", _DEFAULT_OLLAMA)
 
@@ -99,13 +104,15 @@ def _openai_compat_model() -> str:
 
 def _resolve_profile_model(role: AgentRole) -> str:
     profile = profile_name()
-    if uses_openai_compatible() or profile == "openai_compatible":
+    if custom_endpoint_for_role(role):
+        return _openai_compat_model()
+    if profile == "openai_compatible":
         return _openai_compat_model()
     if profile == "local":
         return _ollama_model()
     if profile == "cloud":
         return _openrouter_model()
-    # hybrid: substitute env-tuned defaults for ollama/openrouter slots
+    # hybrid: OpenRouter classify/plan/animation; Ollama coder
     models = _PROFILES["hybrid"].copy()
     models["coder"] = _ollama_model()
     for r in ("classifier", "planner", "animation"):
@@ -120,7 +127,7 @@ def is_ollama(model: str) -> bool:
 def model_for(role: AgentRole) -> str:
     override = os.getenv(_ROLE_ENV[role], "").strip()
     if override:
-        if uses_openai_compatible():
+        if custom_endpoint_for_role(role):
             return strip_provider_prefix(override)
         return override
     return _resolve_profile_model(role)
@@ -137,7 +144,7 @@ def _ollama_num_ctx() -> int:
 
 
 def settings_for(role: AgentRole) -> ModelSettings | None:
-    if uses_openai_compatible():
+    if custom_endpoint_for_role(role):
         return None
     model = model_for(role)
     if not is_ollama(model):
@@ -154,7 +161,7 @@ def settings_for(role: AgentRole) -> ModelSettings | None:
 def model_for_agent(role: AgentRole) -> str | object:
     """Resolved model for Agent(...): OpenAI-compatible, Ollama, or provider string."""
     model = model_for(role)
-    if uses_openai_compatible():
+    if custom_endpoint_for_role(role):
         base = openai_compatible_base_url()
         if not base:
             raise PipelineEnvError(
@@ -179,25 +186,23 @@ def validate_pipeline_env() -> dict[str, str]:
     profile = profile_name()
     errors: list[str] = []
 
-    if uses_openai_compatible():
+    if any(custom_endpoint_for_role(role) for role in _PIPELINE_ROLES):
         if not openai_compatible_base_url():
             errors.append(
                 "AOS_OPENAI_BASE_URL is required for openai_compatible / BYOK mode. "
                 "Example: http://localhost:11434/v1"
             )
-        if errors:
-            detail = "\n".join(f"  - {e}" for e in errors)
-            raise PipelineEnvError(
-                f"Animation pipeline preflight failed (profile={profile}):\n{detail}"
-            )
-        return {
-            "profile": "openai_compatible",
-            "base_url": openai_compatible_base_url() or "",
-            **models,
-        }
 
-    needs_openrouter = any(not is_ollama(m) for m in models.values())
-    needs_ollama = any(is_ollama(m) for m in models.values())
+    needs_openrouter = False
+    needs_ollama = False
+    for role in _PIPELINE_ROLES:
+        if custom_endpoint_for_role(role):
+            continue
+        model = models[role]
+        if is_ollama(model):
+            needs_ollama = True
+        else:
+            needs_openrouter = True
 
     if needs_openrouter and not os.getenv("OPENROUTER_API_KEY", "").strip():
         errors.append(
@@ -216,5 +221,12 @@ def validate_pipeline_env() -> dict[str, str]:
         raise PipelineEnvError(
             f"Animation pipeline preflight failed (profile={profile}):\n{detail}"
         )
+
+    if any(custom_endpoint_for_role(role) for role in _PIPELINE_ROLES):
+        return {
+            "profile": profile,
+            "base_url": openai_compatible_base_url() or "",
+            **models,
+        }
 
     return {"profile": profile, **models}

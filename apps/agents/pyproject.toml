@@ -71,9 +71,11 @@ py-modules = [
     "manim_code_writer_agent",
     "narration_planner_agent",
     "observability",
+    "openai_compatible",
     "repair_agent",
     "scene_planner_agent",
     "storyboard_planner",
+    "teaching_script",
     "trajectory_recorder",
     "validation_agent",
 ]

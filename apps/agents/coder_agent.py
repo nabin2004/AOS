@@ -29,10 +29,17 @@ STRING RULES (CRITICAL):
 - Multi-line Manim source MUST use triple quotes ('''...''' or \"\"\"...\"\"\"). Never use "..." or '...' spanning multiple lines — that is invalid Python.
 - Never call run_code from inside code passed to run_code, manim_write, or compile_manim_code.
 
-Narration (required):
-- Scene MUST subclass VoiceoverScene, call set_speech_service(AOSSpeechService(...)),
-  and wrap beats in with self.voiceover(text="...") as tracker: with run_time=tracker.duration.
-- Plain Scene / silent self.play without voiceover will fail compile.
+Voiceover (required — copy Plan.teaching_script):
+- Scene MUST subclass VoiceoverScene, call set_speech_service(AOSSpeechService(...)).
+- Wrap EVERY teaching beat in with self.voiceover(text="...") as tracker:.
+- Use teaching_script narration VERBATIM. Do not invent filler.
+- Never say "Let's look at this on the board", "Here we have…", or copy Tex off the screen.
+- Speak math: "e to the i x", "cosine of x". tracker.duration is timing, not pedagogy.
+- Silent self.play without voiceover will fail compile.
+
+Example beat:
+        with self.voiceover(text="Euler's formula shows a complex exponential can be written using cosine and sine.") as tracker:
+            self.play(Write(euler_formula), run_time=tracker.duration)
 
 Workflow: manim_write → compile_manim_code → fix (at most 3 compile attempts) → stop.
 """
@@ -68,8 +75,10 @@ class MyScene(VoiceoverScene):
         self.set_speech_service(
             AOSSpeechService(voice="alba", cache_dir="voiceover_cache")
         )
-        with self.voiceover(text="Watch these two values — 5 and 2 are out of order, so we swap.") as tracker:
-            self.play(Swap(a, b), run_time=tracker.duration)
+        with self.voiceover(
+            text="Euler's formula shows a complex exponential can be written using cosine and sine."
+        ) as tracker:
+            self.play(Write(euler_formula), run_time=tracker.duration)
 '''
 await manim_write(code=code, scene_name='MyScene')
 await compile_manim_code(code=code, scene_name='MyScene')
@@ -127,19 +136,20 @@ Math:
 - Prefer MathTex / Tex for equations when TeX works.
 - Use raw strings: MathTex(r"A\\mathbf{v} = \\lambda \\mathbf{v}").
 
-Narration (do NOT go quiet during visuals):
-- Prefer VoiceoverScene for teaching lectures. Silent self.play(...) stretches with no
-  voiceover are a bug — every meaningful beat needs a short spoken line.
-- Wrap each visual beat in with self.voiceover(text="...") as tracker: and use
-  run_time=tracker.duration (or match hold to the tracker) so speech and motion stay in sync.
-- During process demos (sorting, searches, graph walks, iterations): narrate WHAT is
-  happening on screen in the moment, second person / present tense.
-  Bad: long silence while bars swap.
-  Good: "Watch 5 and 2 — they're out of order, so we swap them." / "Now 5 bubbles past 3."
-- Call out concrete values, comparisons, and outcomes as they appear; do not only narrate
-  the intro and the final takeaway.
-- Keep lines short (about one sentence per beat) for process demos. Prefer many small
-  voiceovers over one long monologue at the start.
+Voiceover policy (teacher, not a caption of the animation):
+- If Plan.teaching_script is present, implement those narration lines verbatim (or very
+  close). Map each beat's visual. Use bookmarks only where bookmark_marks are set.
+- VoiceoverScene + set_speech_service(AOSSpeechService(...)) is required. Silent
+  self.play without voiceover fails compile. tracker.duration is timing, not pedagogy.
+- Narration must teach a learning point. Never announce that an object appeared.
+  Banned: "Let's look at this on the board", "Here we have…", "As you can see",
+  "Let's explore this", "Isn't that amazing?", copying Tex/Title into speech.
+- Complement on-screen text: the screen is the label, the voice is the meaning.
+- Speak math for TTS: "e to the i x", "cosine of x", "sine of x".
+- Process demos: narrate comparisons and outcomes ("5 and 2 are out of order, so we
+  swap"), not geometry. One teaching idea per voiceover. Bookmarks for sequential
+  highlights, not every FadeIn.
+- Last beat: a conceptual takeaway, not empty praise.
 
 Equation pacing (do NOT race past math):
 - For dense equations / multi-step algebra: one concept per voiceover beat — do not rush

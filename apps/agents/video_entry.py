@@ -146,6 +146,30 @@ def _trajectory_path(run_dir: str | Path | None) -> str | None:
     return None
 
 
+def _compile_failure_error(result: dict[str, Any], run_dir: str | Path | None) -> str:
+    """Prefer last_compile.failure_marker over stopped_reason=completed."""
+    last: dict[str, Any] = {}
+    if run_dir:
+        manifest_path = Path(run_dir) / "manifest.json"
+        if manifest_path.is_file():
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                last = manifest.get("last_compile") or {}
+            except (OSError, json.JSONDecodeError, TypeError):
+                last = {}
+    marker = last.get("failure_marker") or result.get("failure_marker")
+    if marker:
+        return str(marker)
+    stopped = (result.get("stopped_reason") or "").strip()
+    if stopped and stopped != "completed":
+        return stopped
+    return str(
+        result.get("message")
+        or last.get("message")
+        # or "compile_failed"
+    )
+
+
 def _stage_output_dir(
     output_dir: str | Path,
     *,
@@ -177,11 +201,16 @@ async def run_animate(
 ) -> VideoArtifact:
     """Classify → plan → Manim coder/compile; resolve scene MP4."""
     from agent_graph import run_pipeline
+    from openai_compatible import format_custom_endpoint_error
 
     try:
         result = await run_pipeline(prompt)
     except Exception as exc:
-        return VideoArtifact(ok=False, mode="animate", error=str(exc))
+        return VideoArtifact(
+            ok=False,
+            mode="animate",
+            error=format_custom_endpoint_error(str(exc)),
+        )
 
     run_dir = result.get("run_dir")
     media_hint = result.get("media_hint")
@@ -199,9 +228,9 @@ async def run_animate(
             scene_path=scene_file,
             has_audio=has_audio,
             trajectory_path=trajectory_path,
-            error=result.get("stopped_reason")
-            or result.get("message")
-            or "compile_failed",
+            error=format_custom_endpoint_error(
+                _compile_failure_error(result, run_dir)
+            ),
             detail=result if isinstance(result, dict) else {},
         )
 
@@ -253,9 +282,9 @@ async def run_animate(
 
     ok = True
     error = None
-    if has_audio is False:
-        ok = False
-        error = "no_audio_stream"
+    # if has_audio is False:
+    #     ok = False
+    #     error = "no_audio_stream"
 
     return VideoArtifact(
         ok=ok,
@@ -290,6 +319,8 @@ async def run_lecture(prompt: str, *, max_validation_attempts: int = 3) -> Video
                 for task in step:
                     print(f"-> {task.node_id}", file=sys.stderr, flush=True)
     except Exception as exc:
+        from openai_compatible import format_custom_endpoint_error
+
         return VideoArtifact(
             ok=False,
             mode="lecture",
@@ -299,7 +330,7 @@ async def run_lecture(prompt: str, *, max_validation_attempts: int = 3) -> Video
             )
             if state.run_dir
             else None,
-            error=str(exc),
+            error=format_custom_endpoint_error(str(exc)),
         )
 
     run_dir = state.run_dir

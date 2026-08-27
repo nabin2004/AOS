@@ -42,3 +42,18 @@ def test_compile_log_tail_is_capped() -> None:
     summary = summarize_diagnostic_output(text, max_chars=400, max_errors=2)
     assert len(summary) <= 400
     assert "Compilation failed" in summary or "LaTeX Error" in summary
+
+
+def test_keeps_init_voiceover_exception() -> None:
+    text = (
+        "WARNING  SoX could not be found!\n"
+        "Animation 0: Partial movie file written\n"
+        "Traceback (most recent call last):\n"
+        "  File \"scene.py\", line 28, in construct\n"
+        "    with self.voiceover(text=\"Let's explore this identity further.\"):\n"
+        "Exception: You need to call init_voiceover() before adding a voiceover.\n"
+    )
+    summary = summarize_diagnostic_output(text, max_chars=1200, max_errors=3)
+    assert "init_voiceover" in summary
+    assert "You need to call init_voiceover" in summary
+

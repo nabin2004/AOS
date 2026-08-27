@@ -103,6 +103,7 @@ async def _run_animate_pipeline(user_request: str) -> dict:
         return {
             "stopped_reason": "classification_failed_or_unsupported",
             "compile_ok": False,
+            "error": "classification_failed_or_unsupported",
             "message": "Domain not supported or classification failed.",
         }
     return {

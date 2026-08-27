@@ -11,6 +11,7 @@ from tools.coder_workspace import (
     save_manifest,
     scene_file_path,
 )
+from tools.manim_source import prepare_manim_source
 
 
 @DBOS.step()
@@ -41,6 +42,7 @@ def manim_write(
 
         workspace = resolve_output_dir(output_dir)
         scene_path = scene_file_path(workspace, scene_name)
+        code = prepare_manim_source(code)
         scene_path.write_text(code, encoding="utf-8")
 
         manifest = load_manifest(workspace)
