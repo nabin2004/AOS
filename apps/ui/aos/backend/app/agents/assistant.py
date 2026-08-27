@@ -23,12 +23,17 @@ from pydantic_ai.messages import (
 from pydantic_ai.models.openrouter import OpenRouterModel
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
-from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.settings import ModelSettings
 from pydantic_ai_skills import SkillsToolset
 from pydantic_ai_summarization import ContextManagerCapability
 from pydantic_ai_todo import TodoCapability
 from subagents_pydantic_ai import SubAgentCapability
+
+from app.agents.openai_compatible_client import (
+    LOCAL_API_KEY_PLACEHOLDER,
+    build_openai_provider,
+    warmup_openai_compatible_endpoint_async,
+)
 
 from app.agents.prompts import (
     get_research_prompt,
@@ -42,9 +47,6 @@ from app.agents.utils import get_current_datetime
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
-
-# OpenAI client libraries often require a non-empty api_key even for keyless local servers.
-_LOCAL_API_KEY_PLACEHOLDER = "local"
 
 
 def _build_model(
@@ -61,9 +63,9 @@ def _build_model(
     if custom_base:
         return OpenAIChatModel(
             name,
-            provider=OpenAIProvider(
-                base_url=custom_base,
-                api_key=key or _LOCAL_API_KEY_PLACEHOLDER,
+            provider=build_openai_provider(
+                custom_base,
+                key or LOCAL_API_KEY_PLACEHOLDER,
             ),
         )
 
@@ -331,6 +333,15 @@ class AssistantAgent:
             self._agent = self._create_agent()
         return self._agent
 
+    async def prepare(self) -> None:
+        """Wake a scaled-to-zero custom endpoint before the first completion."""
+        if self.base_url:
+            await warmup_openai_compatible_endpoint_async(
+                self.base_url,
+                self.api_key or LOCAL_API_KEY_PLACEHOLDER,
+            )
+        _ = self.agent
+
     async def run(
         self,
         user_input: str,
@@ -340,6 +351,7 @@ class AssistantAgent:
         agent_deps = deps if deps is not None else Deps()
 
         logger.info("Running agent with user input: %s...", user_input[:100])
+        await self.prepare()
         result = await self.agent.run(
             user_input,
             deps=agent_deps,
@@ -365,6 +377,7 @@ class AssistantAgent:
     ) -> AsyncGenerator[Any, None]:
         agent_deps = deps if deps is not None else Deps()
 
+        await self.prepare()
         async with self.agent.iter(
             user_input,
             deps=agent_deps,

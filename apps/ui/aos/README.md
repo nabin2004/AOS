@@ -309,3 +309,7 @@ Migrations run automatically on `make prod`. For a fresh deploy on a new host, t
 ---
 
 *Generated with [Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template) v0.2.15.*
+
+```
+uv run celery -A app.worker.celery_app worker --loglevel=info --pool=solo --concurrency=1                                                                  
+```

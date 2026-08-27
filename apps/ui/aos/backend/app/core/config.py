@@ -122,12 +122,25 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str | None = None
     REDIS_DB: int = 0
 
+    @staticmethod
+    def _effective_redis_password(password: str | None) -> str | None:
+        """Ignore empty / template placeholders so local Compose Redis (no AUTH) works."""
+        if password is None:
+            return None
+        stripped = password.strip()
+        if not stripped or stripped == "change-me-in-production":
+            return None
+        return stripped
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def REDIS_URL(self) -> str:
         """Build Redis connection URL."""
-        if self.REDIS_PASSWORD:
-            return f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
+        password = self._effective_redis_password(self.REDIS_PASSWORD)
+        if password:
+            return (
+                f"redis://:{password}@{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
+            )
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
 
     RATE_LIMIT_REQUESTS: int = 100
@@ -135,6 +148,15 @@ class Settings(BaseSettings):
 
     CELERY_BROKER_URL: str = "redis://localhost:6379/0"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/0"
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def VIDEO_STATUS_REDIS_URL(self) -> str:
+        """Redis URL for video_status pub/sub — same broker Celery uses when possible."""
+        broker = (self.CELERY_BROKER_URL or "").strip()
+        if broker.startswith("redis://") or broker.startswith("rediss://"):
+            return broker
+        return self.REDIS_URL
     OPENROUTER_API_KEY: str = ""
     AI_MODEL: str = "anthropic/claude-opus-4-7"
     AI_TEMPERATURE: float = 0.7
@@ -224,7 +246,7 @@ class Settings(BaseSettings):
 
     # MinIO / S3 for compiled Manim videos (chat video generations)
     # Local compose maps MinIO API to host port 9010 (container 9000).
-    S3_VIDEO_ENDPOINT: str | None = None
+    S3_VIDEO_ENDPOINT: str | None = "http://localhost:9010"
     S3_VIDEO_ACCESS_KEY: str = "minioadmin"
     S3_VIDEO_SECRET_KEY: str = "minioadmin"
     S3_VIDEO_BUCKET: str = "aos-videos"

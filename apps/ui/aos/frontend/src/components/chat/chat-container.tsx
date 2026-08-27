@@ -61,6 +61,7 @@ export function ChatContainer() {
     sendResumeDecisions,
     pendingQuestions,
     sendAskUserResponses,
+    startVideoPoll,
   } = useChat({
     conversationId: currentConversationId,
     onConversationCreated: handleConversationCreated,
@@ -199,6 +200,9 @@ export function ChatContainer() {
             // Orphaned job (e.g. refresh before assistant message was saved).
             addChatMessage(videoGenerationToChatMessage(video));
           }
+          if (video.status === "pending" || video.status === "running") {
+            startVideoPoll(video.id);
+          }
         }
       } catch {
         // Non-fatal — live WS/poll still works for new jobs.
@@ -213,6 +217,7 @@ export function ChatContainer() {
     currentMessages,
     isConversationLoading,
     addChatMessage,
+    startVideoPoll,
   ]);
 
   // Track whether the user has manually scrolled up so we don't hijack their position

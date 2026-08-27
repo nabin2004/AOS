@@ -54,6 +54,10 @@ async def create(
         prompt=prompt,
         mode=mode,
         status=status,
+        progress_stage="queued" if status == "pending" else None,
+        progress_message=(
+            "Queued… preparing animation pipeline." if status == "pending" else None
+        ),
     )
     db.add(row)
     await db.flush()

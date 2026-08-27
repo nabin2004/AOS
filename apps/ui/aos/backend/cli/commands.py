@@ -123,9 +123,21 @@ def celery_cli():
 
 @celery_cli.command("worker")
 @click.option("--loglevel", default="info", help="Log level (debug, info, warning, error)")
-@click.option("--concurrency", default=4, type=int, help="Number of concurrent workers")
-def celery_worker(loglevel: str, concurrency: int):
+@click.option(
+    "--concurrency",
+    default=None,
+    type=int,
+    help="Number of concurrent workers (default: 1 on Windows, 4 elsewhere)",
+)
+@click.option(
+    "--pool",
+    default=None,
+    help="Celery pool (default: solo on Windows, prefork elsewhere)",
+)
+def celery_worker(loglevel: str, concurrency: int | None, pool: str | None):
     """Start Celery worker."""
+    resolved_pool = pool or ("solo" if sys.platform == "win32" else "prefork")
+    resolved_concurrency = concurrency if concurrency is not None else (1 if sys.platform == "win32" else 4)
     subprocess.run(
         [
             sys.executable,
@@ -135,7 +147,8 @@ def celery_worker(loglevel: str, concurrency: int):
             "app.worker.celery_app",
             "worker",
             f"--loglevel={loglevel}",
-            f"--concurrency={concurrency}",
+            f"--pool={resolved_pool}",
+            f"--concurrency={resolved_concurrency}",
         ]
     )
 

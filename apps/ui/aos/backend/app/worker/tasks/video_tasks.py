@@ -17,10 +17,16 @@ import redis
 import redis.asyncio as aioredis
 from celery import shared_task
 
+from app.agents.openai_compatible_client import format_custom_endpoint_error
 from app.core.config import settings
 from app.db.session import get_worker_db_context
 
 logger = logging.getLogger(__name__)
+
+
+def _pipeline_error_message(error: str, *, base_url: str | None = None) -> str:
+    return format_custom_endpoint_error(error, base_url=base_url)
+
 
 VIDEO_STATUS_CHANNEL = "video_status"
 
@@ -35,6 +41,7 @@ _ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 _STAGE_MESSAGES: dict[str, str] = {
     "ClassifyNode": "Classifying topic…",
     "PlanLectureNode": "Planning the lecture…",
+    "PlanTeachingScriptNode": "Writing the teaching script…",
     "CodeAgent": "Writing Manim code…",
     "CodeAgentNode": "Writing Manim code…",
     "starting": "Starting animation pipeline…",
@@ -120,18 +127,60 @@ def _resolve_agents_dir() -> Path:
     )
 
 
+def _persist_progress_sync(
+    generation_id: str | None,
+    *,
+    stage: str | None,
+    message: str | None,
+    status: str | None = None,
+) -> None:
+    """Write pipeline stage to Postgres from a sync worker thread."""
+    if not generation_id or not stage or not message:
+        return
+    try:
+        asyncio.run(
+            _persist_progress(
+                generation_id, stage=stage, message=message, status=status
+            )
+        )
+    except Exception as exc:
+        logger.warning("Failed to persist video progress (sync): %s", exc)
+
+
+async def _persist_progress(
+    generation_id: str,
+    *,
+    stage: str,
+    message: str,
+    status: str | None = None,
+) -> None:
+    from app.services.video_generation import VideoGenerationService
+
+    async with get_worker_db_context() as db:
+        await VideoGenerationService(db).set_progress(
+            UUID(generation_id),
+            stage=stage,
+            message=message,
+            status=status,
+        )
+
+
 def _notify_video_status_sync(payload: dict[str, Any]) -> None:
     """Publish from the sync CLI-reader thread (no event loop)."""
     try:
-        r = redis.from_url(
-            f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}"
-        )
+        r = redis.from_url(settings.VIDEO_STATUS_REDIS_URL)
         try:
             r.publish(VIDEO_STATUS_CHANNEL, json.dumps(payload, default=str))
         finally:
             r.close()
     except Exception as exc:
         logger.warning("Failed to publish video_status (sync): %s", exc)
+    _persist_progress_sync(
+        str(payload.get("video_generation_id") or ""),
+        stage=payload.get("stage"),
+        message=payload.get("message"),
+        status=payload.get("status"),
+    )
 
 
 def _parse_progress_stage(line: str) -> str | None:
@@ -183,21 +232,19 @@ def _run_agents_cli(
     custom_model = (model_name or "").strip()
 
     if custom_base:
-        # BYOK / local OpenAI-compatible endpoint for all pipeline roles.
+        # Frontend BYOK / OpenAI-compatible URL applies to every graph role.
+        env["AOS_MODEL_PROFILE"] = "openai_compatible"
         env["AOS_OPENAI_BASE_URL"] = custom_base
         env["AOS_OPENAI_API_KEY"] = custom_key or "local"
         if custom_model:
             env["AOS_OPENAI_MODEL"] = custom_model
-            # Keep role overrides aligned so lecture hardcodes via llm_config pick it up.
             for role_env in (
                 "AOS_CLASSIFIER_MODEL",
                 "AOS_PLANNER_MODEL",
                 "AOS_CODER_MODEL",
                 "AOS_ANIMATION_MODEL",
-                "AOS_OPENROUTER_MODEL",
             ):
                 env[role_env] = custom_model
-        env["AOS_MODEL_PROFILE"] = "openai_compatible"
     else:
         # UI Animate path: force OpenRouter for the full Classify→Plan→Code graph
         # (default agents profile is hybrid and expects Ollama for the coder).
@@ -251,6 +298,7 @@ def _run_agents_cli(
     stdout_chunks: list[str] = []
     stderr_chunks: list[str] = []
     seen_stages: set[str] = set()
+    last_stage_message = ""
 
     def _read_stream(
         stream: Any,
@@ -265,11 +313,16 @@ def _run_agents_cli(
                 on_line(line)
 
     def _on_progress_line(line: str) -> None:
+        nonlocal last_stage_message
         stage = _parse_progress_stage(line)
-        if not stage or stage in seen_stages:
+        if not stage:
+            return
+        message = _friendly_stage_message(stage)
+        if stage in seen_stages or message == last_stage_message:
             return
         seen_stages.add(stage)
-        publish_stage(stage)
+        last_stage_message = message
+        publish_stage(stage, message)
 
     stdout_thread = threading.Thread(
         target=_read_stream,
@@ -323,13 +376,24 @@ def _run_agents_cli(
 
 async def _notify_video_status(payload: dict[str, Any]) -> None:
     try:
-        r = aioredis.from_url(
-            f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}"
-        )  # type: ignore[no-untyped-call]
+        r = aioredis.from_url(settings.VIDEO_STATUS_REDIS_URL)  # type: ignore[no-untyped-call]
         await r.publish(VIDEO_STATUS_CHANNEL, json.dumps(payload, default=str))
         await r.aclose()
     except Exception as exc:
         logger.warning("Failed to publish video_status: %s", exc)
+    gid = payload.get("video_generation_id")
+    stage = payload.get("stage")
+    message = payload.get("message")
+    if gid and stage and message:
+        try:
+            await _persist_progress(
+                str(gid),
+                stage=str(stage),
+                message=str(message),
+                status=payload.get("status"),
+            )
+        except Exception as exc:
+            logger.warning("Failed to persist video progress: %s", exc)
 
 
 async def _persist_assistant_result(
@@ -492,6 +556,7 @@ async def _run_generate_video(
                 if summary
                 else "pipeline_finished_without_video"
             )
+        error = _pipeline_error_message(error, base_url=llm_base_url)
         assistant_id = await _persist_assistant_result(
             conversation_id=conversation_id,
             generation_id=gid,
@@ -640,11 +705,40 @@ async def _run_generate_video(
     }
 
 
+async def _mark_started(generation_id: str) -> None:
+    """Flip the DB row to running as soon as the worker process enters the task."""
+    from app.services.video_generation import VideoGenerationService
+
+    gid = UUID(generation_id)
+    async with get_worker_db_context() as db:
+        svc = VideoGenerationService(db)
+        row = await svc.mark_running(gid)
+        await svc.set_progress(
+            gid,
+            stage="starting",
+            message="Starting animation pipeline…",
+            status="running",
+        )
+        payload = {
+            "type": "video_status",
+            "video_generation_id": generation_id,
+            "conversation_id": str(row.conversation_id),
+            "user_id": str(row.user_id),
+            "status": "running",
+            "stage": "starting",
+            "message": "Starting animation pipeline…",
+            "mode": row.mode,
+            "prompt": row.prompt,
+        }
+    await _notify_video_status(payload)
+
+
 @shared_task(
     bind=True,
     max_retries=0,
     soft_time_limit=_SOFT_LIMIT,
     time_limit=_HARD_LIMIT,
+    track_started=True,
 )  # type: ignore[misc]
 def generate_video_task(
     self: Any,
@@ -655,6 +749,14 @@ def generate_video_task(
 ) -> dict[str, Any]:
     """Run Manim pipeline via agents CLI, upload MP4 to MinIO, update DB."""
     logger.info("generate_video_task start: %s", generation_id)
+    try:
+        self.update_state(state="STARTED")
+    except Exception:
+        logger.warning("Could not publish STARTED state for %s", generation_id)
+    try:
+        asyncio.run(_mark_started(generation_id))
+    except Exception:
+        logger.exception("Failed to mark video generation running: %s", generation_id)
     try:
         return asyncio.run(
             _run_generate_video(
@@ -668,7 +770,7 @@ def generate_video_task(
         logger.exception("generate_video_task failed: %s", generation_id)
         try:
             asyncio.run(
-                _fail_hard(generation_id, str(exc))
+                _fail_hard(generation_id, _pipeline_error_message(str(exc)))
             )
         except Exception:
             logger.exception("Failed to mark video generation failed after crash")
@@ -693,6 +795,8 @@ async def _fail_hard(generation_id: str, error: str) -> None:
                 "conversation_id": str(row.conversation_id),
                 "user_id": str(row.user_id),
                 "status": "failed",
+                "stage": "failed",
+                "message": f"Video generation failed: {error}",
                 "mode": row.mode,
                 "error": error,
             }

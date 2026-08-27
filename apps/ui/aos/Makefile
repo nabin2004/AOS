@@ -391,7 +391,7 @@ help:
 	@echo "  uv run aos rag-source-sync <id>                Trigger sync"
 	@echo ""
 	@echo "Celery (Animate = HOST via .\\scripts\\dev-refresh.ps1; Docker profile docker-celery is advanced):"
-	@echo "  make celery-worker  Start Celery worker on host"
+	@echo "  make celery-worker  Start host Celery (solo pool on Windows; required for Animate)"
 	@echo "  make celery-beat    Start Celery beat scheduler on host"
 	@echo "  make celery-flower  Start Flower monitoring UI on host"
 	@echo ""

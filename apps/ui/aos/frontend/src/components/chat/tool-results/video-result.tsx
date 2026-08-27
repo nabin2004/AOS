@@ -14,6 +14,7 @@ export interface VideoToolResult {
   stage?: string | null;
   message?: string | null;
   error?: string | null;
+  celery_task_id?: string | null;
 }
 
 /** Parse a `generate_video` tool result into a VideoToolResult, or null. */
@@ -70,6 +71,11 @@ export function VideoResult({ data }: { data: VideoToolResult }) {
             {data.mode && !data.message ? ` (${data.mode})` : ""}
           </span>
         </div>
+        {data.status === "pending" && data.celery_task_id ? (
+          <p className="text-muted-foreground/80 font-mono text-xs break-all">
+            Celery task {data.celery_task_id}
+          </p>
+        ) : null}
       </div>
     );
   }

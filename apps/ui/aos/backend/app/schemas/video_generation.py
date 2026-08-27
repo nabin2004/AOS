@@ -27,6 +27,8 @@ class VideoGenerationRead(BaseSchema):
     error_message: str | None = None
     run_dir: str | None = None
     celery_task_id: str | None = None
+    progress_stage: str | None = None
+    progress_message: str | None = None
     created_at: datetime
     updated_at: datetime | None = None
 

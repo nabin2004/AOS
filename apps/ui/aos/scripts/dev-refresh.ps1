@@ -184,8 +184,8 @@ try {
     if ($AgentsOnly) {
         Stop-DockerCelery
         Stop-HostCelery
-        $pid = Start-HostCelery
-        Write-StackBanner -CeleryPid $pid
+        $hostCeleryProcessId = Start-HostCelery
+        Write-StackBanner -CeleryPid $hostCeleryProcessId
         return
     }
 

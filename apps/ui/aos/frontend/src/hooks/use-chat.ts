@@ -22,6 +22,8 @@ import { llmProviderToRequestPayload } from "@/stores/llm-provider-store";
 import { apiClient } from "@/lib/api-client";
 import {
   applyVideoStatusToMessage,
+  findMessageIdForVideo,
+  videoProgressCopy,
   type VideoGenerationDto,
 } from "@/lib/video-status";
 import type { ContextUsage, ResearchTodo, SubagentStatus } from "@/types";
@@ -74,7 +76,7 @@ export function useChat(options: UseChatOptions = {}) {
   const modelRef = useRef<string | null>(null);
   const temperatureRef = useRef<number | null>(null);
   const thinkingEffortRef = useRef<"low" | "medium" | "high" | null>(null);
-  const lastVideoStageRef = useRef<string | null>(null);
+  const lastVideoStageRef = useRef<Map<string, string>>(new Map());
   const videoPollTimersRef = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map());
   const [pendingApproval, setPendingApproval] = useState<PendingApproval | null>(null);
   const [pendingQuestions, setPendingQuestions] = useState<AskUserQuestion[] | null>(null);
@@ -98,13 +100,20 @@ export function useChat(options: UseChatOptions = {}) {
       );
       if (!msg) return;
       store.updateMessage(msg.id, (m) => applyVideoStatusToMessage(m, video));
+      const progress = videoProgressCopy(video);
+      const prev = lastVideoStageRef.current.get(video.id);
+      if (!prev) {
+        lastVideoStageRef.current.set(video.id, progress);
+      } else if (progress && prev !== progress) {
+        lastVideoStageRef.current.set(video.id, progress);
+        appendTextDelta(msg.id, `\n${progress}`);
+      }
       if (video.status === "completed" || video.status === "failed") {
         stopVideoPoll(video.id);
-        setIsProcessing(false);
-        lastVideoStageRef.current = null;
+        lastVideoStageRef.current.delete(video.id);
       }
     },
-    [stopVideoPoll],
+    [appendTextDelta, stopVideoPoll],
   );
 
   const startVideoPoll = useCallback(
@@ -119,7 +128,7 @@ export function useChat(options: UseChatOptions = {}) {
         }
       };
       void tick();
-      const handle = setInterval(tick, 3000);
+      const handle = setInterval(tick, 1500);
       videoPollTimersRef.current.set(videoId, handle);
     },
     [applyVideoDto],
@@ -274,6 +283,7 @@ export function useChat(options: UseChatOptions = {}) {
                 stage: "queued",
                 message: "Queued… preparing animation pipeline.",
               });
+              lastVideoStageRef.current.set(gid, "Queued… preparing animation pipeline.");
               startVideoPoll(gid);
             }
             addToolCallPart(currentMessageIdRef.current, toolCall);
@@ -282,13 +292,19 @@ export function useChat(options: UseChatOptions = {}) {
         }
 
         case "tool_result": {
-          // Update tool call with result
-          if (currentMessageIdRef.current) {
-            const { tool_call_id, content } = wsEvent.data as {
-              tool_call_id: string;
-              content: string;
-            };
-            updateToolCallPart(currentMessageIdRef.current, tool_call_id, {
+          const { tool_call_id, content } = wsEvent.data as {
+            tool_call_id: string;
+            content: string;
+          };
+          const store = useChatStore.getState();
+          const fromTool = store.messages.find(
+            (m) =>
+              m.parts?.some((p) => p.type === "tool" && p.toolCall?.id === tool_call_id) ||
+              m.toolCalls?.some((tc) => tc.id === tool_call_id),
+          )?.id;
+          const msgId = fromTool || currentMessageIdRef.current;
+          if (msgId) {
+            updateToolCallPart(msgId, tool_call_id, {
               result: content,
               status: "completed",
             });
@@ -305,10 +321,16 @@ export function useChat(options: UseChatOptions = {}) {
             prompt?: string;
             stage?: string;
             message?: string;
+            minio_key?: string;
+            celery_task_id?: string;
           };
-          if (!currentMessageIdRef.current || !data.video_generation_id) break;
+          if (!data.video_generation_id) break;
           const toolCallId = `generate_video_${data.video_generation_id}`;
-          const msgId = currentMessageIdRef.current;
+          const store = useChatStore.getState();
+          const msgId =
+            findMessageIdForVideo(store.messages, data.video_generation_id) ||
+            currentMessageIdRef.current;
+          if (!msgId) break;
           if (data.status === "running" || data.status === "pending") {
             const progressMessage =
               data.message ||
@@ -323,11 +345,12 @@ export function useChat(options: UseChatOptions = {}) {
                 status: data.status,
                 stage: data.stage,
                 message: progressMessage,
+                celery_task_id: data.celery_task_id,
               }),
             });
-            if (data.message && lastVideoStageRef.current !== data.message) {
-              lastVideoStageRef.current = data.message;
-              appendTextDelta(msgId, `\n${data.message}`);
+            if (lastVideoStageRef.current.get(data.video_generation_id) !== progressMessage) {
+              lastVideoStageRef.current.set(data.video_generation_id, progressMessage);
+              appendTextDelta(msgId, `\n${progressMessage}`);
             }
             startVideoPoll(data.video_generation_id);
           } else if (data.status === "failed") {
@@ -344,10 +367,33 @@ export function useChat(options: UseChatOptions = {}) {
                 error: data.error,
               }),
             });
-            lastVideoStageRef.current = null;
+            const failMsg = data.message || `Video generation failed: ${data.error || "unknown error"}`;
+            if (lastVideoStageRef.current.get(data.video_generation_id) !== failMsg) {
+              lastVideoStageRef.current.delete(data.video_generation_id);
+              appendTextDelta(msgId, `\n${failMsg}`);
+            } else {
+              lastVideoStageRef.current.delete(data.video_generation_id);
+            }
             stopVideoPoll(data.video_generation_id);
           } else if (data.status === "completed") {
-            lastVideoStageRef.current = null;
+            updateToolCallPart(msgId, toolCallId, {
+              status: "completed",
+              result: JSON.stringify({
+                kind: "video",
+                video_generation_id: data.video_generation_id,
+                mode: data.mode,
+                prompt: data.prompt,
+                status: "completed",
+                stage: data.stage || "completed",
+                message: data.message || "Your video is ready.",
+                minio_key: data.minio_key,
+              }),
+            });
+            const doneMsg = data.message || "Your video is ready.";
+            if (lastVideoStageRef.current.get(data.video_generation_id) !== doneMsg) {
+              appendTextDelta(msgId, `\n${doneMsg}`);
+            }
+            lastVideoStageRef.current.delete(data.video_generation_id);
             stopVideoPoll(data.video_generation_id);
           }
           break;
@@ -738,5 +784,6 @@ export function useChat(options: UseChatOptions = {}) {
     sendResumeDecisions,
     pendingQuestions,
     sendAskUserResponses,
+    startVideoPoll,
   };
 }

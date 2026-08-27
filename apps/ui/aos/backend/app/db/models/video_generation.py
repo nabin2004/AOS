@@ -48,6 +48,8 @@ class VideoGeneration(Base, TimestampMixin):
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     run_dir: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     celery_task_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    progress_stage: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    progress_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     def __repr__(self) -> str:
         return (

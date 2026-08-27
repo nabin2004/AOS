@@ -9,6 +9,41 @@ export interface VideoGenerationDto {
   minio_key?: string | null;
   error_message?: string | null;
   assistant_message_id?: string | null;
+  celery_task_id?: string | null;
+  progress_stage?: string | null;
+  progress_message?: string | null;
+}
+
+export function videoProgressCopy(video: VideoGenerationDto): string {
+  if (video.progress_message) return video.progress_message;
+  if (video.status === "completed") return "Your video is ready.";
+  if (video.status === "failed") {
+    return `Video generation failed: ${video.error_message || "unknown error"}`;
+  }
+  if (video.status === "running") {
+    return video.progress_stage
+      ? `${video.progress_stage}…`
+      : "Generating video…";
+  }
+  if (video.celery_task_id) {
+    return `Queued in Celery (${video.celery_task_id}) — waiting for a worker…`;
+  }
+  return "Queued… preparing animation pipeline.";
+}
+
+function videoResultPayload(video: VideoGenerationDto) {
+  return {
+    kind: "video" as const,
+    video_generation_id: video.id,
+    mode: video.mode,
+    prompt: video.prompt,
+    status: video.status,
+    minio_key: video.minio_key,
+    error: video.error_message,
+    stage: video.progress_stage ?? video.status,
+    message: videoProgressCopy(video),
+    celery_task_id: video.celery_task_id,
+  };
 }
 
 /** Apply a video generation row to the matching generate_video tool part. */
@@ -17,23 +52,7 @@ export function applyVideoStatusToMessage(
   video: VideoGenerationDto,
 ): ChatMessage {
   const toolCallId = `generate_video_${video.id}`;
-  const resultPayload = {
-    kind: "video" as const,
-    video_generation_id: video.id,
-    mode: video.mode,
-    prompt: video.prompt,
-    status: video.status,
-    minio_key: video.minio_key,
-    error: video.error_message,
-    message:
-      video.status === "completed"
-        ? "Your video is ready."
-        : video.status === "failed"
-          ? `Video generation failed: ${video.error_message || "unknown error"}`
-          : video.status === "running"
-            ? "Generating video…"
-            : "Queued… preparing animation pipeline.",
-  };
+  const resultPayload = videoResultPayload(video);
   const toolStatus: ToolCall["status"] =
     video.status === "completed"
       ? "completed"
@@ -72,23 +91,7 @@ export function applyVideoStatusToMessage(
 /** Build a synthetic assistant bubble when a video row has no matching message. */
 export function videoGenerationToChatMessage(video: VideoGenerationDto): ChatMessage {
   const toolCallId = `generate_video_${video.id}`;
-  const resultPayload = {
-    kind: "video" as const,
-    video_generation_id: video.id,
-    mode: video.mode,
-    prompt: video.prompt,
-    status: video.status,
-    minio_key: video.minio_key,
-    error: video.error_message,
-    message:
-      video.status === "completed"
-        ? "Your video is ready."
-        : video.status === "failed"
-          ? `Video generation failed: ${video.error_message || "unknown error"}`
-          : video.status === "running"
-            ? "Generating video…"
-            : "Queued… preparing animation pipeline.",
-  };
+  const resultPayload = videoResultPayload(video);
   const toolStatus: ToolCall["status"] =
     video.status === "completed"
       ? "completed"
@@ -113,7 +116,7 @@ export function videoGenerationToChatMessage(video: VideoGenerationDto): ChatMes
       ? "Your video is ready."
       : video.status === "failed"
         ? `Video generation failed: ${video.error_message || "unknown error"}`
-        : `Starting ${video.mode} video generation…`;
+        : videoProgressCopy(video);
 
   return {
     id: video.assistant_message_id || `video-pending-${video.id}`,
@@ -128,4 +131,16 @@ export function videoGenerationToChatMessage(video: VideoGenerationDto): ChatMes
     ],
     isStreaming: video.status === "pending" || video.status === "running",
   };
+}
+
+export function findMessageIdForVideo(
+  messages: ChatMessage[],
+  videoGenerationId: string,
+): string | undefined {
+  const toolCallId = `generate_video_${videoGenerationId}`;
+  return messages.find(
+    (m) =>
+      m.parts?.some((p) => p.type === "tool" && p.toolCall?.id === toolCallId) ||
+      m.toolCalls?.some((tc) => tc.id === toolCallId),
+  )?.id;
 }

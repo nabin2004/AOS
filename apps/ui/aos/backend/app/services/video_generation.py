@@ -80,6 +80,26 @@ class VideoGenerationService:
             raise NotFoundError(message="Video generation not found", details={"id": str(generation_id)})
         return await video_repo.update(self.db, row, celery_task_id=task_id)
 
+    async def set_progress(
+        self,
+        generation_id: UUID,
+        *,
+        stage: str,
+        message: str,
+        status: str | None = None,
+    ) -> VideoGeneration | None:
+        row = await video_repo.get_by_id(self.db, generation_id)
+        if row is None:
+            logger.warning("set_progress skipped; generation %s not found", generation_id)
+            return None
+        fields: dict = {
+            "progress_stage": stage[:64] if stage else None,
+            "progress_message": message[:4000] if message else None,
+        }
+        if status is not None:
+            fields["status"] = status
+        return await video_repo.update(self.db, row, **fields)
+
     async def set_assistant_message(
         self, generation_id: UUID, assistant_message_id: UUID
     ) -> VideoGeneration:
@@ -97,7 +117,14 @@ class VideoGenerationService:
         row = await video_repo.get_by_id(self.db, generation_id)
         if row is None:
             raise NotFoundError(message="Video generation not found", details={"id": str(generation_id)})
-        return await video_repo.update(self.db, row, status="running", error_message=None)
+        return await video_repo.update(
+            self.db,
+            row,
+            status="running",
+            error_message=None,
+            progress_stage="starting",
+            progress_message="Starting animation pipeline…",
+        )
 
     async def mark_completed(
         self,
@@ -119,6 +146,8 @@ class VideoGenerationService:
             "run_dir": run_dir,
             "assistant_message_id": assistant_message_id,
             "error_message": None,
+            "progress_stage": "completed",
+            "progress_message": "Your video is ready.",
         }
         if code_minio_key is not None:
             fields["code_minio_key"] = code_minio_key
@@ -142,6 +171,8 @@ class VideoGenerationService:
             error_message=error_message[:4000],
             run_dir=run_dir,
             assistant_message_id=assistant_message_id,
+            progress_stage="failed",
+            progress_message=f"Video generation failed: {error_message[:4000]}",
         )
 
     def build_object_key(self, row: VideoGeneration) -> str:

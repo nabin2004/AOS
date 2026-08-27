@@ -1,5 +1,7 @@
 """Celery application configuration."""
 
+import sys
+
 from celery import Celery
 from celery.schedules import crontab
 
@@ -11,6 +13,8 @@ celery_app = Celery(
     backend=settings.CELERY_RESULT_BACKEND,
 )
 
+_win32 = sys.platform == "win32"
+
 celery_app.conf.update(
     task_serializer="json",
     accept_content=["json"],
@@ -18,9 +22,12 @@ celery_app.conf.update(
     timezone="UTC",
     task_acks_late=True,
     task_reject_on_worker_lost=True,
+    task_track_started=True,
     result_expires=3600,
     worker_prefetch_multiplier=1,
-    worker_concurrency=4,
+    # Prefork does not execute reserved tasks reliably on Windows (stuck RECEIVED).
+    worker_pool="solo" if _win32 else "prefork",
+    worker_concurrency=1 if _win32 else 4,
 )
 
 celery_app.autodiscover_tasks(["app.worker.tasks"])

@@ -36,6 +36,10 @@ from pydantic_ai_todo import (
 from subagents_pydantic_ai import SubAgentCapability, SubAgentConfig
 
 from app.agents.assistant import _build_model
+from app.agents.openai_compatible_client import (
+    LOCAL_API_KEY_PLACEHOLDER,
+    warmup_openai_compatible_endpoint_async,
+)
 from app.core.config import settings
 from app.db.todo_pool import get_todo_pool
 
@@ -201,6 +205,11 @@ class ResearchToolkit:
         :class:`ResearchCapabilities` dataclass so callers can pass each
         capability by name to ``get_agent()``.
         """
+        if self._base_url:
+            await warmup_openai_compatible_endpoint_async(
+                self._base_url,
+                self._api_key or LOCAL_API_KEY_PLACEHOLDER,
+            )
         return ResearchCapabilities(
             todo=await self._build_todo_capability(conversation_id),
             subagents=self._build_subagent_capability(),

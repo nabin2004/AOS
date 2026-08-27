@@ -27,6 +27,7 @@ from pydantic_ai.messages import (
 )
 
 from app.agents.assistant import Deps, get_agent
+from app.agents.openai_compatible_client import format_custom_endpoint_error
 from app.api.deps import get_conversation_service
 from app.core.config import settings
 from app.db.models.user import User
@@ -63,6 +64,7 @@ class AgentSession:
         self._ask_user_future: asyncio.Future[list[dict[str, Any]]] | None = None
         self._research: ResearchToolkit | None = None
         self._subagent_task_manager: Any | None = None
+        self._video_watch_tasks: set[asyncio.Task[None]] = set()
 
     async def handle_frame(self, data: dict[str, Any]) -> None:
         """Dispatch one incoming WebSocket frame.
@@ -130,8 +132,13 @@ class AgentSession:
             await task
 
     async def shutdown(self) -> None:
-        """Cancel any in-flight turn."""
+        """Cancel any in-flight turn and video status watchers."""
         await self._cancel_turn()
+        watchers = list(self._video_watch_tasks)
+        for task in watchers:
+            task.cancel()
+        if watchers:
+            await asyncio.gather(*watchers, return_exceptions=True)
 
     async def process_message(self, data: dict[str, Any]) -> None:
         """Process one user turn: persist input, run the agent, stream events, persist output."""
@@ -234,6 +241,7 @@ class AgentSession:
                 else None
             )
             try:
+                await assistant.prepare()
                 async with assistant.agent.iter(
                     user_input, deps=self.deps, message_history=model_history
                 ) as agent_run:
@@ -292,7 +300,15 @@ class AgentSession:
             raise
         except Exception as e:
             logger.exception("Error processing agent request")
-            await send_event(self.websocket, "error", {"message": str(e)})
+            await send_event(
+                self.websocket,
+                "error",
+                {
+                    "message": format_custom_endpoint_error(
+                        str(e), base_url=llm_base_url
+                    )
+                },
+            )
 
     async def _process_video_turn(
         self,
@@ -458,24 +474,79 @@ class AgentSession:
                     mode=video_mode,
                 )
             )
+            self._video_watch_tasks.add(watch_task)
+            watch_task.add_done_callback(self._video_watch_tasks.discard)
             try:
                 await asyncio.wait_for(subscribed.wait(), timeout=10.0)
             except TimeoutError:
                 logger.warning("Redis video_status subscribe timed out; enqueueing anyway")
 
             # 3) Enqueue Celery after the client has UI + Redis watcher is ready.
-            async with get_db_context() as db:
-                svc = VideoGenerationService(db)
-                task_id = svc.enqueue(
-                    generation_uuid,
-                    llm_base_url=llm_base_url,
-                    llm_api_key=llm_api_key,
-                    model_name=model_name,
+            try:
+                async with get_db_context() as db:
+                    svc = VideoGenerationService(db)
+                    task_id = svc.enqueue(
+                        generation_uuid,
+                        llm_base_url=llm_base_url,
+                        llm_api_key=llm_api_key,
+                        model_name=model_name,
+                    )
+                    await svc.set_celery_task(generation_uuid, task_id)
+                    enqueued_msg = (
+                        f"Queued in Celery ({task_id}) — waiting for a worker…"
+                    )
+                    await svc.set_progress(
+                        generation_uuid,
+                        stage="enqueued",
+                        message=enqueued_msg,
+                    )
+            except Exception as e:
+                logger.exception("Failed to enqueue video generation")
+                watch_task.cancel()
+                err = f"Failed to enqueue video job: {e}"
+                async with get_db_context() as db:
+                    await VideoGenerationService(db).mark_failed(
+                        generation_uuid, error_message=err
+                    )
+                await self._emit_video_terminal(
+                    generation_id=generation_id,
+                    tool_call_id=tool_call_id,
+                    prompt=user_message,
+                    status="failed",
+                    mode=video_mode,
+                    error=err,
+                    message=err,
+                    stage="enqueue_failed",
                 )
-                await svc.set_celery_task(generation_uuid, task_id)
+                await send_event(self.websocket, "final_result", {"output": ""})
+                await send_event(
+                    self.websocket,
+                    "complete",
+                    {"conversation_id": self.current_conversation_id},
+                )
+                return
 
-            await watch_task
+            await send_event(
+                self.websocket,
+                "video_status",
+                {
+                    "video_generation_id": generation_id,
+                    "conversation_id": self.current_conversation_id,
+                    "status": "pending",
+                    "stage": "enqueued",
+                    "message": enqueued_msg,
+                    "mode": video_mode,
+                    "prompt": user_message,
+                    "celery_task_id": task_id,
+                },
+            )
+            await send_event(
+                self.websocket,
+                "text_delta",
+                {"index": 0, "content": f"\n{enqueued_msg}"},
+            )
 
+            # Unlock the chat immediately; the watcher relays live stages in the background.
             await send_event(self.websocket, "final_result", {"output": ""})
             await send_event(
                 self.websocket,
@@ -500,6 +571,70 @@ class AgentSession:
         except Exception as exc:
             logger.warning("Celery worker ping failed: %s", exc)
             return False
+
+    @staticmethod
+    def _task_id_in_inspect_map(mapping: dict[str, Any] | None, task_id: str) -> list[str]:
+        workers: list[str] = []
+        if not mapping:
+            return workers
+        for worker, tasks in mapping.items():
+            for item in tasks or []:
+                if not isinstance(item, dict):
+                    continue
+                request = item.get("request") if isinstance(item.get("request"), dict) else {}
+                tid = item.get("id") or request.get("id")
+                if str(tid) == task_id:
+                    workers.append(str(worker))
+        return workers
+
+    @classmethod
+    def _describe_celery_task(cls, task_id: str | None) -> str:
+        """Explain whether Celery has this task active, reserved, or missing."""
+        if not task_id:
+            return (
+                "No Celery task id was stored. Re-send the prompt after restarting "
+                "the host worker with `--pool=solo`."
+            )
+        try:
+            from app.worker.celery_app import celery_app
+
+            inspector = celery_app.control.inspect(timeout=2.0)
+            if inspector is None:
+                return (
+                    f"Celery inspect is unavailable for task {task_id}. "
+                    "Restart the host worker with `--pool=solo --concurrency=1`."
+                )
+            active = cls._task_id_in_inspect_map(inspector.active(), task_id)
+            reserved = cls._task_id_in_inspect_map(inspector.reserved(), task_id)
+            scheduled = cls._task_id_in_inspect_map(inspector.scheduled(), task_id)
+            if active:
+                return (
+                    f"Celery is running this job on {', '.join(active)}. "
+                    "Waiting for pipeline progress…"
+                )
+            if reserved:
+                return (
+                    f"Worker reserved task {task_id} on {', '.join(reserved)} but has not "
+                    "started it (Flower RECEIVED). On Windows use `--pool=solo --concurrency=1`, "
+                    "stop extra workers (Docker celery_worker), and wait if another video job "
+                    "is occupying the solo slot."
+                )
+            if scheduled:
+                return (
+                    f"Task {task_id} is scheduled/ETA on {', '.join(scheduled)} "
+                    "and has not started yet."
+                )
+            return (
+                f"Task {task_id} is not in active, reserved, or scheduled queues. "
+                "The worker may have crashed or a different Redis broker is in use. "
+                "Restart `uv run aos celery worker` from apps/ui/aos/backend."
+            )
+        except Exception as exc:
+            logger.warning("Celery inspect failed for %s: %s", task_id, exc)
+            return (
+                f"Could not inspect Celery for task {task_id}: {exc}. "
+                "Restart the host worker with `--pool=solo`."
+            )
 
     async def _emit_video_terminal(
         self,
@@ -595,6 +730,7 @@ class AgentSession:
         channel: str,
         timeout_seconds: float = 60 * 60,
         pending_idle_seconds: float = 60.0,
+        reserved_inspect_seconds: float = 20.0,
         subscribed: asyncio.Event | None = None,
         mode: str | None = None,
     ) -> None:
@@ -606,9 +742,7 @@ class AgentSession:
 
         from app.services.video_generation import VideoGenerationService
 
-        r = aioredis.from_url(
-            f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}"
-        )  # type: ignore[no-untyped-call]
+        r = aioredis.from_url(settings.VIDEO_STATUS_REDIS_URL)  # type: ignore[no-untyped-call]
         pubsub = r.pubsub()
         await pubsub.subscribe(channel)
         if subscribed is not None:
@@ -617,9 +751,13 @@ class AgentSession:
         loop = asyncio.get_running_loop()
         deadline = loop.time() + timeout_seconds
         pending_deadline = loop.time() + pending_idle_seconds
+        inspect_deadline = loop.time() + reserved_inspect_seconds
         last_db_poll = 0.0
         last_emitted_status: str | None = "pending"
+        last_emitted_progress: str | None = None
         saw_running = False
+        did_reserved_inspect = False
+        last_inspect_hint: str | None = None
 
         try:
             while True:
@@ -642,18 +780,42 @@ class AgentSession:
                     )
                     break
 
-                # Idle while still pending → worker never picked up the job.
-                if not saw_running and now >= pending_deadline:
-                    err = (
-                        "Celery worker is not picking up video jobs. "
-                        "Ensure Redis is up and run `uv run aos celery worker` "
-                        "from apps/ui/aos/backend (with AGENTS_DIR set)."
-                    )
+                # Still pending after ~20s → explain reserved vs missing (don't fail yet).
+                if (
+                    not saw_running
+                    and not did_reserved_inspect
+                    and now >= inspect_deadline
+                ):
+                    did_reserved_inspect = True
                     async with get_db_context() as db:
                         row = await VideoGenerationService(db).get_by_id(
                             UUIDType(generation_id)
                         )
-                        if row is None or row.status == "pending":
+                        if row is not None and row.status == "pending":
+                            hint = await asyncio.to_thread(
+                                self._describe_celery_task, row.celery_task_id
+                            )
+                            last_inspect_hint = hint
+                            await VideoGenerationService(db).set_progress(
+                                UUIDType(generation_id),
+                                stage="reserved",
+                                message=hint,
+                            )
+
+                # Idle while still pending → worker never picked up the job.
+                if not saw_running and now >= pending_deadline:
+                    async with get_db_context() as db:
+                        row = await VideoGenerationService(db).get_by_id(
+                            UUIDType(generation_id)
+                        )
+                        if row is None:
+                            break
+                        if row.status == "pending":
+                            hint = last_inspect_hint or await asyncio.to_thread(
+                                self._describe_celery_task,
+                                row.celery_task_id if row else None,
+                            )
+                            err = hint
                             await VideoGenerationService(db).mark_failed(
                                 UUIDType(generation_id), error_message=err
                             )
@@ -671,56 +833,70 @@ class AgentSession:
                         # DB already advanced — treat as running and keep watching.
                         saw_running = True
 
-                # DB poll fallback every ~3s (covers missed Redis pubs).
-                if now - last_db_poll >= 3.0:
+                # DB poll fallback every ~1.5s (covers missed Redis pubs + persisted stages).
+                if now - last_db_poll >= 1.5:
                     last_db_poll = now
                     async with get_db_context() as db:
                         row = await VideoGenerationService(db).get_by_id(
                             UUIDType(generation_id)
                         )
-                    if row is not None and row.status != last_emitted_status:
-                        if row.status == "running":
-                            saw_running = True
-                            last_emitted_status = "running"
+                    if row is not None:
+                        progress_msg = row.progress_message
+                        if (
+                            progress_msg
+                            and progress_msg != last_emitted_progress
+                            and row.status in ("pending", "running")
+                        ):
+                            last_emitted_progress = progress_msg
                             await send_event(
                                 self.websocket,
                                 "video_status",
                                 {
                                     "video_generation_id": generation_id,
                                     "conversation_id": self.current_conversation_id,
-                                    "status": "running",
-                                    "stage": "starting",
-                                    "message": "Starting animation pipeline…",
+                                    "status": row.status,
+                                    "stage": row.progress_stage or row.status,
+                                    "message": progress_msg,
                                     "mode": row.mode,
                                     "prompt": row.prompt or prompt,
+                                    "celery_task_id": row.celery_task_id,
                                 },
                             )
-                        elif row.status in ("completed", "failed"):
-                            last_emitted_status = row.status
-                            await self._emit_video_terminal(
-                                generation_id=generation_id,
-                                tool_call_id=tool_call_id,
-                                prompt=prompt,
-                                status=row.status,
-                                mode=row.mode,
-                                error=row.error_message,
-                                message=(
-                                    "Your video is ready."
-                                    if row.status == "completed"
-                                    else (
-                                        f"Video generation failed: {row.error_message}"
-                                        if row.error_message
-                                        else "Video generation failed."
-                                    )
-                                ),
-                                minio_key=row.minio_key,
-                                assistant_message_id=(
-                                    str(row.assistant_message_id)
-                                    if row.assistant_message_id
-                                    else None
-                                ),
-                            )
-                            break
+                        if row.status == "running":
+                            saw_running = True
+                        if row.status != last_emitted_status:
+                            if row.status == "running":
+                                last_emitted_status = "running"
+                            elif row.status in ("completed", "failed"):
+                                last_emitted_status = row.status
+                                await self._emit_video_terminal(
+                                    generation_id=generation_id,
+                                    tool_call_id=tool_call_id,
+                                    prompt=prompt,
+                                    status=row.status,
+                                    mode=row.mode,
+                                    error=row.error_message,
+                                    message=(
+                                        row.progress_message
+                                        or (
+                                            "Your video is ready."
+                                            if row.status == "completed"
+                                            else (
+                                                f"Video generation failed: {row.error_message}"
+                                                if row.error_message
+                                                else "Video generation failed."
+                                            )
+                                        )
+                                    ),
+                                    minio_key=row.minio_key,
+                                    assistant_message_id=(
+                                        str(row.assistant_message_id)
+                                        if row.assistant_message_id
+                                        else None
+                                    ),
+                                    stage=row.progress_stage,
+                                )
+                                break
 
                 message = await pubsub.get_message(
                     ignore_subscribe_messages=True, timeout=1.0
@@ -744,6 +920,8 @@ class AgentSession:
                     saw_running = True
                 if status in ("pending", "running"):
                     last_emitted_status = status
+                    if payload.get("message"):
+                        last_emitted_progress = payload.get("message")
                     await send_event(self.websocket, "video_status", payload)
                     continue
 
