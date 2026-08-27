@@ -10,6 +10,7 @@ from config import TrainingConfig
 _NATIVE_HF_REPOS = frozenset(
     {
         "nabin2004/manim-sft",
+        "nabin2004/manim-sft-10k",
         "nabin2004/educlaw-manim-sft",
     }
 )

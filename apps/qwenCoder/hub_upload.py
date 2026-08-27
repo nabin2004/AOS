@@ -8,6 +8,8 @@ from pathlib import Path
 
 from huggingface_hub import HfApi, get_token
 
+TRAINER_CHECKPOINT_DIR = "last-trainer-checkpoint"
+
 
 def require_token() -> str:
     token = os.environ.get("HF_TOKEN", "").strip() or get_token()
@@ -20,6 +22,11 @@ def require_token() -> str:
     return token
 
 
+def optional_token() -> str | None:
+    token = os.environ.get("HF_TOKEN", "").strip() or get_token()
+    return token or None
+
+
 def push_model_folder(
     folder: Path,
     repo_id: str,
@@ -29,6 +36,7 @@ def push_model_folder(
     private: bool = False,
     revision: str | None = None,
     ignore_patterns: list[str] | None = None,
+    path_in_repo: str | None = None,
 ) -> str:
     folder = folder.resolve()
     if not folder.is_dir():
@@ -46,7 +54,8 @@ def push_model_folder(
         private=private,
         token=token,
     )
-    print(f"Uploading {folder} -> {repo_id}")
+    dest = f"{repo_id}/{path_in_repo}" if path_in_repo else repo_id
+    print(f"Uploading {folder} -> {dest}")
     api.upload_folder(
         folder_path=str(folder),
         repo_id=repo_id,
@@ -54,6 +63,7 @@ def push_model_folder(
         token=token,
         revision=revision,
         ignore_patterns=patterns or None,
+        path_in_repo=path_in_repo,
     )
     if readme is not None and readme.is_file():
         api.upload_file(

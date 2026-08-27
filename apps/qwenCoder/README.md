@@ -13,7 +13,7 @@ Gemma pipeline under [`apps/sft`](../sft/) is unchanged.
 ## Staged train order
 
 ```text
-SFT-1 manim-sft
+SFT-1 manim-sft-10k
   → SFT-2 educlaw-manim-sft (20k subsample, continue LoRA)
   → SFT-3 AOS-Trajectories tool_trace (continue LoRA)
   → DPO preference pairs
@@ -23,7 +23,7 @@ SFT-1 manim-sft
 
 | Stage | Dataset | Notes |
 |-------|---------|-------|
-| SFT-1 | [`nabin2004/manim-sft`](https://huggingface.co/datasets/nabin2004/manim-sft) | General Manim CE codegen (~38k) |
+| SFT-1 | [`nabin2004/manim-sft-10k`](https://huggingface.co/datasets/nabin2004/manim-sft-10k) | Curated 10k (lint + API/error/LaTeX mix). Full 38k: [`manim-sft`](https://huggingface.co/datasets/nabin2004/manim-sft) |
 | SFT-2 | [`nabin2004/educlaw-manim-sft`](https://huggingface.co/datasets/nabin2004/educlaw-manim-sft) | API/curriculum; default max **20k** |
 | SFT-3 | [`nabin2004/AOS-Trajectories`](https://huggingface.co/datasets/nabin2004/AOS-Trajectories) `tool_trace/train.jsonl` | Agent tool-calling traces |
 | DPO | local `export_traces/coder_sft/preference/*.jsonl` | Chosen/rejected pairs |
@@ -52,7 +52,7 @@ RUN_MERGE=1 RUN_GGUF=1 PUSH_TO_HUB=1 bash apps/qwenCoder/train_stages.sh
 cd apps/qwenCoder && uv sync
 
 # SFT-1
-uv run python run.py --dataset-repo nabin2004/manim-sft --stage manim
+uv run python run.py --dataset-repo nabin2004/manim-sft-10k --stage manim
 
 # SFT-2 (continue)
 uv run python run.py \
@@ -87,7 +87,7 @@ Legacy single-dataset e2e (tool_trace only): `bash train.sh`.
 
 ## Kaggle (phase 1)
 
-GPU **P100** notebook for SFT-1 QLoRA on chat `nabin2004/manim-sft` (5k subsample, packing off, r=16). Uses **system Python + torch 2.7.1+cu118**. See **[KAGGLE.md](KAGGLE.md)**.
+GPU **P100** notebook for SFT-1 QLoRA on chat `nabin2004/manim-sft-10k` (curated 10k, packing off, r=16, resume from Trainer checkpoints). Uses **system Python + torch 2.7.1+cu118**. See **[KAGGLE.md](KAGGLE.md)**. Rebuild the mix with `uv run python curate_sft_10k.py --push`.
 
 ```bash
 bash apps/qwenCoder/kaggle_sft_phase1.sh
@@ -168,7 +168,8 @@ ollama create aos-qwen2.5-coder-7b-manim -f apps/qwenCoder/qwen2.5-coder-7b-mani
 
 | Artifact | Repo |
 |----------|------|
-| SFT chat data | `nabin2004/manim-sft` |
+| SFT chat data | `nabin2004/manim-sft` (38k source) |
+| Curated 10k SFT | `nabin2004/manim-sft-10k` |
 | Curriculum data | `nabin2004/educlaw-manim-sft` |
 | Trajectories | `nabin2004/AOS-Trajectories` |
 | Qwen trajectories | `nabin2004/AOS-Qwen-Trajectories` |
@@ -185,7 +186,8 @@ ollama create aos-qwen2.5-coder-7b-manim -f apps/qwenCoder/qwen2.5-coder-7b-mani
 | Path | Role |
 |------|------|
 | `run.py` / `train_stages.sh` | Staged SFT curriculum + DPO/GRPO orchestrator |
-| `kaggle_sft_phase1.sh` / `KAGGLE.md` | Kaggle P100 phase-1 SFT (manim-sft + Hub + W&B) |
+| `kaggle_sft_phase1.sh` / `KAGGLE.md` | Kaggle P100 phase-1 SFT (manim-sft-10k + Hub + W&B) |
+| `curate_sft_10k.py` / `manim_api_lint.py` | Lint 38k + mix 10k Hub dataset |
 | `train.sh` | Legacy single-dataset SFT → merge → GGUF |
 | `merge_adapter.py` / `export_gguf.py` | Deploy packaging |
 | `collect_and_export.sh` | Ollama data loop |

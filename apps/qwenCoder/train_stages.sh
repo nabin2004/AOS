@@ -58,9 +58,9 @@ fi
 
 # --- SFT-1: general Manim codegen ---
 if [[ "${SKIP_SFT_MANIM:-0}" != "1" ]]; then
-  echo "==> SFT-1 manim-sft"
+  echo "==> SFT-1 manim-sft-10k"
   uv run python run.py \
-    --dataset-repo nabin2004/manim-sft \
+    --dataset-repo nabin2004/manim-sft-10k \
     --stage manim \
     "${COMMON_ARGS[@]}"
 fi

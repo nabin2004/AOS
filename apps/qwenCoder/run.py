@@ -3,7 +3,7 @@
 
 Usage (from apps/qwenCoder):
 
-    uv run python run.py --dataset-repo nabin2004/manim-sft --stage manim
+    uv run python run.py --dataset-repo nabin2004/manim-sft-10k --stage manim
     uv run python run.py --dataset-repo nabin2004/educlaw-manim-sft \\
       --max-samples 20000 --init-adapter ./qwen2.5-coder-7b-manim-ft --stage educlaw
     uv run python run.py --dataset-repo nabin2004/AOS-Trajectories \\
@@ -18,6 +18,7 @@ from dataclasses import replace
 from pathlib import Path
 
 from config import TrainingConfig, build_arg_parser, effective_bf16
+from checkpoints import resolve_resume_checkpoint
 from data import load_training_dataset, native_sft_chat_repo
 from model import load_model, load_tokenizer
 from trainer import build_trainer, train_and_save
@@ -48,6 +49,8 @@ def _apply_wandb(config: TrainingConfig) -> TrainingConfig:
                 "epochs": config.epochs,
                 "seq_len": config.seq_len,
                 "learning_rate": config.learning_rate,
+                "save_steps": config.save_steps,
+                "resume": config.resume,
             },
         )
         return replace(config, report_to=effective)
@@ -64,7 +67,10 @@ def main() -> int:
             epochs=1,
             seq_len=1024,
             report_to="none",
-            max_samples=8 if config.max_samples is None else min(config.max_samples, 8),
+            max_samples=(
+                8 if not config.max_samples else min(config.max_samples, 8)
+            ),
+            sync_trainer_checkpoint=False,
         )
 
     config = _apply_wandb(config)
@@ -87,17 +93,32 @@ def main() -> int:
     print(
         f"QLoRA:      r={config.lora_r} alpha={config.lora_alpha} "
         f"4bit={config.use_4bit} packing={config.packing} "
-        f"max_samples={config.max_samples}"
+        f"max_samples={config.max_samples} save_steps={config.save_steps} "
+        f"resume={config.resume}"
+    )
+
+    resume_ckpt = resolve_resume_checkpoint(
+        output_dir=config.output_dir,
+        resume=config.resume,
+        resume_from=config.resume_from,
+        hub_checkpoint_id=config.hub_checkpoint_id,
+        sync_trainer_checkpoint=config.sync_trainer_checkpoint,
     )
 
     tokenizer = load_tokenizer(config.model_id)
     model = load_model(config)
     dataset = load_training_dataset(config)
+    print(f"Train rows: {len(dataset)}")
     if args.smoke and len(dataset) > 8:
         dataset = dataset.select(range(8))
 
     trainer = build_trainer(model, tokenizer, dataset, config)
-    train_and_save(trainer, tokenizer, config)
+    train_and_save(
+        trainer,
+        tokenizer,
+        config,
+        resume_from_checkpoint=str(resume_ckpt) if resume_ckpt else None,
+    )
     return 0
 
 

@@ -70,6 +70,10 @@ class TrainingConfig:
     save_strategy: str = "epoch"
     save_steps: int = 200
     save_total_limit: int | None = None
+    resume: str = "auto"  # auto | always | never
+    resume_from: Path | None = None
+    hub_checkpoint_id: str | None = None
+    sync_trainer_checkpoint: bool = False
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -78,10 +82,14 @@ class TrainingConfig:
         init_adapter = self.init_adapter
         if init_adapter is not None:
             init_adapter = init_adapter.expanduser().resolve()
+        resume_from = self.resume_from
+        if resume_from is not None:
+            resume_from = resume_from.expanduser().resolve()
         return replace(
             self,
             data_path=data_path,
             init_adapter=init_adapter,
+            resume_from=resume_from,
             output_dir=self.output_dir.expanduser().resolve(),
         )
 
@@ -175,6 +183,28 @@ class TrainingConfig:
             config = replace(config, hub_model_id=args.hub_model_id)
         if getattr(args, "run_name", None) is not None:
             config = replace(config, run_name=args.run_name)
+        if getattr(args, "save_steps", None) is not None:
+            config = replace(config, save_steps=args.save_steps)
+        elif os.environ.get("SAVE_STEPS", "").strip():
+            config = replace(config, save_steps=int(os.environ["SAVE_STEPS"]))
+        if getattr(args, "no_resume", False):
+            config = replace(config, resume="never")
+        elif getattr(args, "resume", False):
+            config = replace(config, resume="always")
+        if getattr(args, "resume_from", None) is not None:
+            config = replace(config, resume_from=Path(args.resume_from))
+        elif os.environ.get("RESUME_FROM", "").strip():
+            config = replace(config, resume_from=Path(os.environ["RESUME_FROM"]))
+        if getattr(args, "hub_checkpoint_id", None) is not None:
+            config = replace(config, hub_checkpoint_id=args.hub_checkpoint_id)
+        elif os.environ.get("HUB_CHECKPOINT_ID", "").strip():
+            config = replace(
+                config, hub_checkpoint_id=os.environ["HUB_CHECKPOINT_ID"].strip()
+            )
+        if getattr(args, "no_sync_trainer_checkpoint", False):
+            config = replace(config, sync_trainer_checkpoint=False)
+        if not config.hub_checkpoint_id:
+            config = replace(config, hub_checkpoint_id=config.hub_model_id)
         return apply_gpu_precision(config.resolve_paths())
 
 
@@ -227,16 +257,21 @@ def default_kaggle_output_dir() -> Path:
 
 
 def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
-    """P100/T4 QLoRA: 4-bit NF4, LoRA r=16, 5k samples, no packing, fp16."""
+    """P100/T4 QLoRA: 4-bit NF4, LoRA r=16, full corpus, no packing, fp16."""
     print(
         "NOTE: --kaggle QLoRA on P100/T4 (16 GB): fp16, 4-bit NF4, "
-        f"lora_r=16, packing=off, max_samples=5000, seq_len=2048 for {config.model_id}.",
+        f"lora_r=16, packing=off, full dataset (max_samples unset/0), "
+        f"seq_len=2048 for {config.model_id}. Resume from checkpoint-* "
+        "across sessions; Hub stores last-trainer-checkpoint.",
         file=sys.stderr,
     )
     report_to = config.report_to
     if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
         report_to = "none"
-    max_samples = config.max_samples if config.max_samples is not None else 5000
+    save_steps = config.save_steps
+    env_steps = os.environ.get("SAVE_STEPS", "").strip()
+    if env_steps:
+        save_steps = int(env_steps)
     return replace(
         config,
         batch_size=1,
@@ -246,14 +281,14 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
         packing=False,
         lora_r=16,
         lora_alpha=32,
-        max_samples=max_samples,
         use_bf16=False,
         optim="paged_adamw_8bit",
         save_strategy="steps",
-        save_steps=200,
+        save_steps=save_steps,
         save_total_limit=2,
         report_to=report_to,
         output_dir=default_kaggle_output_dir(),
+        sync_trainer_checkpoint=True,
     )
 
 
@@ -279,7 +314,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--max-samples",
         type=int,
         default=None,
-        help="Optional shuffled subsample size (e.g. educlaw stage)",
+        help="Optional shuffled subsample size; 0 or negative = full split",
     )
     parser.add_argument("--shuffle-seed", type=int, default=None)
     parser.add_argument(
@@ -308,11 +343,44 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--kaggle",
         action="store_true",
-        help="P100/T4 QLoRA: 4-bit, r=16, 5k samples, packing off, seq 2048",
+        help="P100/T4 QLoRA: 4-bit, r=16, full dataset, packing off, seq 2048",
     )
     parser.add_argument("--report-to", default=None)
     parser.add_argument("--run-name", default=None)
     parser.add_argument("--push-to-hub", action="store_true")
     parser.add_argument("--hub-model-id", default=None)
+    parser.add_argument(
+        "--hub-checkpoint-id",
+        default=None,
+        help="Hub repo for Trainer checkpoints (default: --hub-model-id)",
+    )
+    parser.add_argument(
+        "--save-steps",
+        type=int,
+        default=None,
+        help="Checkpoint every N steps (Kaggle default 200; env SAVE_STEPS)",
+    )
+    resume = parser.add_mutually_exclusive_group()
+    resume.add_argument(
+        "--resume",
+        action="store_true",
+        help="Require a Trainer checkpoint and continue from it",
+    )
+    resume.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="Start from step 0 even if checkpoint-* exists",
+    )
+    parser.add_argument(
+        "--resume-from",
+        type=Path,
+        default=None,
+        help="Directory with checkpoint-* (or a checkpoint dir). Env RESUME_FROM",
+    )
+    parser.add_argument(
+        "--no-sync-trainer-checkpoint",
+        action="store_true",
+        help="Do not upload/download last-trainer-checkpoint on the Hub",
+    )
     parser.add_argument("--smoke", action="store_true", help="Tiny overfit smoke run")
     return parser

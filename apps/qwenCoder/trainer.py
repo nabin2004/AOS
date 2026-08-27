@@ -1,11 +1,29 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import torch
 from datasets import Dataset
-from transformers import PreTrainedTokenizerBase
+from transformers import PreTrainedTokenizerBase, TrainerCallback
 from trl import SFTTrainer
 
+from checkpoints import last_checkpoint_in, push_trainer_checkpoint
 from config import TrainingConfig, effective_bf16
+from hub_upload import TRAINER_CHECKPOINT_DIR
+
+
+class HubTrainerCheckpointCallback(TrainerCallback):
+    def __init__(self, repo_id: str | None, enabled: bool) -> None:
+        self.repo_id = repo_id
+        self.enabled = enabled
+
+    def on_save(self, args, state, control, **kwargs):
+        if not self.enabled or not self.repo_id:
+            return
+        found = last_checkpoint_in(Path(args.output_dir))
+        if not found:
+            return
+        push_trainer_checkpoint(found, self.repo_id)
 
 
 def _cast_trainable_fp32(model) -> None:
@@ -58,6 +76,12 @@ def build_trainer(
     print(f"fp16: {trainer.args.fp16}  bf16: {trainer.args.bf16}")
     trainable = {str(p.dtype) for p in trainer.model.parameters() if p.requires_grad}
     print(f"trainable dtypes: {sorted(trainable)}")
+    if config.sync_trainer_checkpoint:
+        trainer.add_callback(
+            HubTrainerCheckpointCallback(
+                config.hub_checkpoint_id, enabled=True
+            )
+        )
     return trainer
 
 
@@ -65,8 +89,9 @@ def train_and_save(
     trainer: SFTTrainer,
     tokenizer: PreTrainedTokenizerBase,
     config: TrainingConfig,
+    resume_from_checkpoint: str | Path | None = None,
 ) -> None:
-    trainer.train()
+    trainer.train(resume_from_checkpoint=resume_from_checkpoint)
     trainer.save_model(str(config.output_dir))
     tokenizer.save_pretrained(str(config.output_dir))
     print(f"Training complete! Model saved to {config.output_dir}")
@@ -79,4 +104,9 @@ def train_and_save(
             config.hub_model_id,
             token,
             private=config.hub_private,
+            ignore_patterns=[
+                "README.md",
+                "checkpoint-*",
+                f"{TRAINER_CHECKPOINT_DIR}/**",
+            ],
         )

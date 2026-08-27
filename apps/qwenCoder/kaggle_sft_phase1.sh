@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kaggle phase-1 SFT: Qwen2.5-Coder-7B LoRA on nabin2004/manim-sft.
+# Kaggle phase-1 SFT: Qwen2.5-Coder-7B LoRA on nabin2004/manim-sft-10k.
 # Logs to W&B (if WANDB_API_KEY is set) and pushes the adapter to Hugging Face.
 #
 # On Kaggle this script uses *system* Python (torch 2.7.1+cu118 for P100 sm_60).
@@ -12,13 +12,18 @@
 # Env knobs:
 #   EPOCHS=1
 #   SEQ_LEN=2048          # 1024 if CUDA OOM on P100
-#   MAX_SAMPLES=5000      # 0 or all = full ~38k (too slow on P100)
+#   MAX_SAMPLES=0         # 0 or all = full curated 10k; set 5000 to subsample
+#   SAVE_STEPS=200        # Trainer checkpoint cadence
+#   RESUME=auto           # auto | 1/always | 0/never
+#   RESUME_FROM=          # dir with checkpoint-* (e.g. /kaggle/input/...)
 #   PACKING=0             # 1 to enable packing (needs Flash Attention; not on P100)
 #   SKIP_PREFLIGHT=1
 #   SKIP_TRAIN=1
 #   SKIP_TORCH_REINSTALL=1   # T4: keep whatever torch is already on system Python
 #   KEEP_WANDB_ENV=1         # keep leftover WANDB_RUN_NAME from the notebook
 #   HUB_MODEL_ID=nabin2004/AOS-qwen2.5-coder-7b-manim-sft
+#   HUB_CHECKPOINT_ID=    # default = HUB_MODEL_ID (last-trainer-checkpoint/)
+#   SKIP_HUB_CHECKPOINT=1 # do not upload/download Trainer checkpoints
 #   REPORT_TO=wandb|none
 #   ADAPTER_DIR=          # default /kaggle/working/qwen2.5-coder-7b-manim-ft on Kaggle
 
@@ -38,10 +43,12 @@ if [[ "${KEEP_WANDB_ENV:-0}" != "1" ]]; then
   unset WANDB_RUN_NAME WANDB_JOB_TYPE || true
 fi
 
-DATASET_REPO="${DATASET_REPO:-nabin2004/manim-sft}"
+DATASET_REPO="${DATASET_REPO:-nabin2004/manim-sft-10k}"
 HUB_MODEL_ID="${HUB_MODEL_ID:-nabin2004/AOS-qwen2.5-coder-7b-manim-sft}"
 EPOCHS="${EPOCHS:-1}"
-MAX_SAMPLES="${MAX_SAMPLES:-5000}"
+MAX_SAMPLES="${MAX_SAMPLES:-0}"
+SAVE_STEPS="${SAVE_STEPS:-200}"
+RESUME="${RESUME:-auto}"
 
 if [[ "${ON_KAGGLE}" == "1" ]]; then
   WORKSPACE="${WORKSPACE:-/kaggle/working}"
@@ -70,6 +77,9 @@ echo "    python=$(command -v "${PYTHON}")"
 echo "    kaggle=${ON_KAGGLE}"
 echo "    dataset=${DATASET_REPO}"
 echo "    max_samples=${MAX_SAMPLES}"
+echo "    save_steps=${SAVE_STEPS}"
+echo "    resume=${RESUME}"
+echo "    resume_from=${RESUME_FROM:-}"
 echo "    packing=${PACKING:-0}"
 echo "    adapter=${ADAPTER_DIR}"
 echo "    hub=${HUB_MODEL_ID}"
@@ -199,7 +209,31 @@ if [[ "${SKIP_TRAIN:-0}" != "1" ]]; then
     --report-to "${REPORT_TO}"
     --push-to-hub
     --hub-model-id "${HUB_MODEL_ID}"
+    --save-steps "${SAVE_STEPS}"
   )
+  if [[ -n "${HUB_CHECKPOINT_ID:-}" ]]; then
+    TRAIN_ARGS+=(--hub-checkpoint-id "${HUB_CHECKPOINT_ID}")
+  fi
+  if [[ "${SKIP_HUB_CHECKPOINT:-0}" == "1" ]]; then
+    TRAIN_ARGS+=(--no-sync-trainer-checkpoint)
+  fi
+  case "${RESUME}" in
+    0|never|no)
+      TRAIN_ARGS+=(--no-resume)
+      ;;
+    1|always|yes)
+      TRAIN_ARGS+=(--resume)
+      ;;
+    auto|"")
+      ;;
+    *)
+      echo "ERROR: RESUME must be auto, 1/always, or 0/never (got ${RESUME})" >&2
+      exit 1
+      ;;
+  esac
+  if [[ -n "${RESUME_FROM:-}" ]]; then
+    TRAIN_ARGS+=(--resume-from "${RESUME_FROM}")
+  fi
   if [[ -n "${SEQ_LEN:-}" ]]; then
     TRAIN_ARGS+=(--seq-len "${SEQ_LEN}")
   fi
