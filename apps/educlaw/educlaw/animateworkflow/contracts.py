@@ -1,6 +1,5 @@
 from enum import Enum
-from anyio import current_time
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from uuid import UUID, uuid4
 
 
@@ -23,11 +22,13 @@ class OutputType(str, Enum):
 
 
 class FailureCategory(str, Enum):
+    ENVIRONMENT_ERROR = "environment_error"
     HALLUCINATED_KWARGS = "hallucinated_kwargs"
     MISSING_IMPORTS = "missing_imports"
     MALFORMED_POINT_ARRAYS = "malformed_point_arrays"
     LATEX_ERROR = "latex_error"
     SYNTAX_ERROR = "syntax_error"
+    RENDER_ERROR = "render_error"
     RENDER_TIMEOUT = "render_timeout"
 
 """
@@ -179,13 +180,30 @@ class AnimationCall(BaseModel):
 
 
 class SceneStep(BaseModel):
-    scene_id: str
+    scene_id: UUID = Field(default_factory=uuid4)
     name: str
     purpose: str
     code: str  # Manim code
     visual_description: str
     objects: list[SceneObject]
     animations: list[AnimationCall]
+
+    @model_validator(mode="after")
+    def validate_references(self) -> "SceneStep":
+        object_names = [obj.name for obj in self.objects]
+        if len(object_names) != len(set(object_names)):
+            raise ValueError("scene object names must be unique")
+        missing = sorted(
+            {
+                target
+                for animation in self.animations
+                for target in animation.targets
+                if target not in object_names
+            }
+        )
+        if missing:
+            raise ValueError(f"animation targets unknown scene objects: {missing}")
+        return self
 
 class VideoPlan(BaseModel):
     video_id: UUID
@@ -199,15 +217,27 @@ class LessonPlan(BaseModel):
     # no_of_videos: int = Field(default=1, description="Number of videos to generate")
     # duration_per_video: float | None = Field(default=None, description="Duration in minutes per video")
 
+    @model_validator(mode="after")
+    def validate_scene_ids(self) -> "LessonPlan":
+        scene_ids = [scene.scene_id for video in self.videos for scene in video.scenes]
+        if len(scene_ids) != len(set(scene_ids)):
+            raise ValueError("scene IDs must be unique across the lesson plan")
+        return self
+
+    def validate_video_ids(self, video_id: UUID) -> "LessonPlan":
+        if any(video.video_id != video_id for video in self.videos):
+            raise ValueError("all video IDs must match the request video ID")
+        return self
+
 
 class VoiceoverBookMark(BaseModel):
     mark: str  # <bookmark mark='T1'/>
     voiceover_text: str 
-    target_segment: str
+    target_code_segment: str = ""
 
 
 class NarrationStep(BaseModel):
-    scene_id: str  # references SceneStep.scene_id
+    scene_id: UUID  # references SceneStep.scene_id
     narration: str
     bookmarks: list[VoiceoverBookMark] = Field(default_factory=list)
     duration: float | None = None
@@ -215,6 +245,16 @@ class NarrationStep(BaseModel):
 
 class NarrationPlan(BaseModel):
     steps: list[NarrationStep]
+
+    def validate_scene_ids(self, lesson_plan: LessonPlan) -> "NarrationPlan":
+        scene_ids = {scene.scene_id for video in lesson_plan.videos for scene in video.scenes}
+        missing = sorted(
+            {step.scene_id for step in self.steps if step.scene_id not in scene_ids},
+            key=str,
+        )
+        if missing:
+            raise ValueError(f"narration references unknown scene IDs: {missing}")
+        return self
 
 
 class FinalCode(BaseModel):
@@ -232,6 +272,14 @@ class CompileResult(BaseModel):
     success: bool
     output_path: str | None = None
     errors: list[CompileError] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_result(self) -> "CompileResult":
+        if self.success and (self.output_path is None or self.errors):
+            raise ValueError("successful compilation requires an output path and no errors")
+        if not self.success and not self.errors:
+            raise ValueError("failed compilation requires at least one error")
+        return self
 
     @property
     def is_consistent(self) -> bool:
