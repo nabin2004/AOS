@@ -47,4 +47,6 @@ members = [
     "apps/sft",
     "apps/grpo",
     "apps/educlaw",
+    "apps/slidestemp/aos-manim-core",
+    "apps/slidestemp/aos-manim-slides",
 ]

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aos-manim-slides"
+version = "0.1.0"
+description = "Presentation and slide orchestration plugin for AOS Manim"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "manim>=0.18.0",
+    "aos-manim-core>=0.1.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+]
+voiceover = [
+    "manim-voiceover>=0.3.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.uv.sources]
+aos-manim-core = { workspace = true }

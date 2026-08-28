@@ -39,6 +39,10 @@ dependencies = [
     "torch>=2.12.1",
     "distlib>=0.4.3",
     "chess>=1.11.2",
+    "aos-manim-core",
+    "aos-manim-slides",
+    "educlaw",
+    "boto3>=1.42.0",
 ]
 
 [build-system]
@@ -97,3 +101,6 @@ manim-math = { path = "tools/templates/math", editable = true }
 manim-physics = { path = "tools/templates/physics", editable = true }
 manim-dsa = { path = "tools/templates/dsa", editable = true }
 torch = { index = "pytorch-cpu" }
+aos-manim-core = { workspace = true }
+aos-manim-slides = { workspace = true }
+educlaw = { workspace = true }
