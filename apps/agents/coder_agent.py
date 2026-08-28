@@ -30,7 +30,8 @@ STRING RULES (CRITICAL):
 - Never call run_code from inside code passed to run_code, manim_write, or compile_manim_code.
 
 Voiceover (required — copy Plan.teaching_script):
-- Scene MUST subclass VoiceoverScene, call set_speech_service(AOSSpeechService(...)).
+- Scene MUST subclass VoiceoverSlideScene (from aos_manim_slides), call set_speech_service(AOSSpeechService(...)).
+- Import layout slides from aos_manim_slides (TitleSlide, ContentSlide, TwoColumnSlide) to build professional slide layouts.
 - Wrap EVERY teaching beat in with self.voiceover(text="...") as tracker:.
 - Use teaching_script narration VERBATIM. Do not invent filler.
 - Never say "Let's look at this on the board", "Here we have…", or copy Tex off the screen.
@@ -67,10 +68,10 @@ CodeMode contract (CRITICAL — run_code is a sandbox, not a Manim file):
 
 code = '''
 from manim import *
-from manim_voiceover import VoiceoverScene
+from aos_manim_slides import Slide, VoiceoverSlideScene, TitleSlide, ContentSlide, TwoColumnSlide
 from tools.aos_speech_service import AOSSpeechService
 
-class MyScene(VoiceoverScene):
+class MyScene(VoiceoverSlideScene):
     def construct(self):
         self.set_speech_service(
             AOSSpeechService(voice="alba", cache_dir="voiceover_cache")
