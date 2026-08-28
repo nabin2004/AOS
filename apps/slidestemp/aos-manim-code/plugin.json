@@ -1,0 +1,35 @@
+{
+  "plugin": "aos-manim-code",
+  "version": "0.1.0",
+  "domain": "Reasoning",
+  "layer": "Layer C",
+  "description": "Code execution, memory layout, call stack, and recursion visualization plugin for AOS Manim",
+  "author": "AOS Manim Team",
+  "dependencies": [
+    "aos-manim-core"
+  ],
+  "capabilities": [
+    {
+      "name": "code_editor_window",
+      "category": "ide",
+      "description": "Renders modern code editor window with line numbering and execution highlight",
+      "backends": ["python"],
+      "mobjects": ["CodeWindow", "Rectangle", "Text"],
+      "animations": ["Create", "Transform"],
+      "validators": ["AstSyntaxValidator"],
+      "parameters": {"code": "def foo():\n    return 42", "filename": "solution.py"},
+      "tags": ["code", "editor", "ide", "syntax", "cueable"]
+    },
+    {
+      "name": "call_stack_visualization",
+      "category": "runtime",
+      "description": "Visualizes stack frame push/pop and local variable scopes during function execution",
+      "backends": ["python"],
+      "mobjects": ["StackFrameMobject", "CallStackMobject"],
+      "animations": ["Transform", "FadeIn"],
+      "validators": ["StackDepthValidator"],
+      "parameters": {"func_name": "factorial", "local_vars": {"n": 4}},
+      "tags": ["runtime", "memory", "stack", "recursion"]
+    }
+  ]
+}

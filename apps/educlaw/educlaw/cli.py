@@ -537,7 +537,7 @@ def doctor_command(
     docker_bin = shutil.which("docker")
     if docker_bin:
         try:
-            res = subprocess.run(["docker", "info"], capture_output=True, text=True, timeout=3)
+            res = subprocess.run(["docker", "info"], capture_output=True, text=True, timeout=3,encoding="utf-8",errors="replace",check=False)
             if res.returncode == 0:
                 table.add_row("Docker Daemon", "[bold green][OK] Running[/]", f"Sandbox image: {settings.manim_image}")
             else:

@@ -1,0 +1,8 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/ArchitectureExplaining/2526132241_3537577078_223132457.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/ArchitectureExplaining/427904922_171687624_3126191560.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/ArchitectureExplaining/427904922_3355492006_3052003434.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/ArchitectureExplaining/427904922_2645707024_3099528142.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/ArchitectureExplaining/427904922_2218175414_696115832.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/ArchitectureExplaining/427904922_326072686_2183723453.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/ArchitectureExplaining/427904922_2645707024_1559728227.mp4'

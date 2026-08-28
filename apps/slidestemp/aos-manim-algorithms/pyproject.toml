@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aos-manim-algorithms"
+version = "0.1.0"
+description = "Computational algorithms and data structure visualization plugin for AOS Manim"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "manim>=0.18.0",
+    "networkx>=3.0",
+    "numpy>=1.20.0",
+    "aos-manim-core>=0.1.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

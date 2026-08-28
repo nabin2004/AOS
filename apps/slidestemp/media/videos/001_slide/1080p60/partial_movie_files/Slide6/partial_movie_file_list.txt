@@ -1,0 +1,10 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide6/819936691_1422132545_223132457.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide6/2213807979_3197081273_1228824672.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide6/2213807979_416907096_3064509385.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide6/2213807979_3197081273_1598306795.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide6/2213807979_255361644_2059892706.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide6/2213807979_3197081273_1054450798.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide6/2213807979_1268847575_2847318930.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide6/2213807979_3197081273_3024399081.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide6/2213807979_2996696404_1011595475.mp4'

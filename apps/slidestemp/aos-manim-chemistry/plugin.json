@@ -1,0 +1,25 @@
+{
+  "plugin": "aos-manim-chemistry",
+  "version": "0.1.0",
+  "domain": "STEM",
+  "layer": "Layer B",
+  "description": "STEM chemistry, molecular geometry, and reaction mechanism visualization plugin for AOS Manim",
+  "author": "AOS Manim Team",
+  "dependencies": [
+    "aos-manim-core",
+    "numpy"
+  ],
+  "capabilities": [
+    {
+      "name": "molecular_geometry_2d",
+      "category": "molecular_structures",
+      "description": "Renders 2D molecular structures with CPK / theme colors, single/double/triple bonds",
+      "backends": ["numpy"],
+      "mobjects": ["AtomMobject", "BondMobject", "Molecule2DMobject"],
+      "animations": ["Create", "Rotate"],
+      "validators": ["ValenceValidator"],
+      "parameters": {"molecule": "water"},
+      "tags": ["chemistry", "molecules", "bonds", "atoms"]
+    }
+  ]
+}

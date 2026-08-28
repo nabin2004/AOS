@@ -1,0 +1,82 @@
+{
+  "plugin": "aos-manim-maths",
+  "version": "0.1.0",
+  "domain": "STEM",
+  "layer": "Layer B",
+  "description": "Flagship STEM mathematics computational visualization plugin backed by SymPy, SciPy, and NumPy",
+  "author": "AOS Manim Team",
+  "dependencies": [
+    "aos-manim-core",
+    "sympy",
+    "scipy",
+    "numpy"
+  ],
+  "capabilities": [
+    {
+      "name": "derivative_visualization",
+      "category": "calculus",
+      "description": "Computes symbolic derivatives, tangent slopes, and animates secant/tangent lines",
+      "backends": ["sympy.diff", "numpy.lambdify"],
+      "mobjects": ["Axes", "Dot", "Line", "MathTex"],
+      "animations": ["Create", "Transform", "Write"],
+      "validators": ["SymbolicEquivalenceValidator", "NumericalToleranceValidator"],
+      "parameters": {"expression_str": "x**2", "x_val": 2.0},
+      "tags": ["calculus", "derivatives", "tangents", "slopes"]
+    },
+    {
+      "name": "integral_visualization",
+      "category": "calculus",
+      "description": "Computes definite integrals, shaded area under curve, and Riemann sums",
+      "backends": ["sympy.integrate", "scipy.integrate.quad"],
+      "mobjects": ["Axes", "MathTex"],
+      "animations": ["Create", "FadeIn"],
+      "validators": ["IntegralConvergenceValidator"],
+      "parameters": {"expression_str": "x**2", "a": 0.0, "b": 2.0, "num_rectangles": 16},
+      "tags": ["calculus", "integrals", "riemann", "area"]
+    },
+    {
+      "name": "root_finding",
+      "category": "algebra",
+      "description": "Visualizes Newton-Raphson tangent iterations and numerical root convergence",
+      "backends": ["sympy.diff", "scipy.optimize"],
+      "mobjects": ["Axes", "Dot", "Line", "MathTex"],
+      "animations": ["Create", "FadeIn"],
+      "validators": ["RootPrecisionValidator"],
+      "parameters": {"expression_str": "x**3 - x - 2", "x0": 2.0},
+      "tags": ["algebra", "roots", "newton-raphson", "optimization", "cueable"]
+    },
+    {
+      "name": "matrix_transformation",
+      "category": "linear_algebra",
+      "description": "Visualizes 2D linear matrix transformations, basis vector mappings, and determinant areas",
+      "backends": ["numpy.linalg.det"],
+      "mobjects": ["NumberPlane", "Arrow", "Polygon", "MathTex"],
+      "animations": ["Create", "Transform"],
+      "validators": ["NumericalToleranceValidator"],
+      "parameters": {"matrix": [[2, 1], [1, 2]]},
+      "tags": ["linear_algebra", "matrices", "determinants", "vectors"]
+    },
+    {
+      "name": "vector_field",
+      "category": "linear_algebra",
+      "description": "Renders 2D vector fields with theme-aware gradient coloring",
+      "backends": ["numpy"],
+      "mobjects": ["ArrowVectorField", "MathTex"],
+      "animations": ["Create"],
+      "validators": [],
+      "parameters": {},
+      "tags": ["linear_algebra", "vector_fields", "flux"]
+    },
+    {
+      "name": "probability_distribution",
+      "category": "probability",
+      "description": "Renders continuous probability density functions and confidence intervals",
+      "backends": ["scipy.stats.norm"],
+      "mobjects": ["Axes", "MathTex", "Line"],
+      "animations": ["Create", "FadeIn"],
+      "validators": ["NumericalToleranceValidator"],
+      "parameters": {"mu": 0.0, "sigma": 1.0},
+      "tags": ["probability", "statistics", "gaussian", "normal_distribution"]
+    }
+  ]
+}

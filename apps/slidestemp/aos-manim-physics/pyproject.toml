@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aos-manim-physics"
+version = "0.1.0"
+description = "STEM physics simulation and computational visualization plugin for AOS Manim"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "manim>=0.18.0",
+    "scipy>=1.10.0",
+    "sympy>=1.12",
+    "numpy>=1.20.0",
+    "pint>=0.22",
+    "aos-manim-core>=0.1.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

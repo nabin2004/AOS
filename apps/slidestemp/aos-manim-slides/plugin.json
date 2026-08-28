@@ -1,0 +1,123 @@
+{
+  "plugin": "aos-manim-slides",
+  "version": "0.1.0",
+  "domain": "Presentation",
+  "layer": "Layer A",
+  "description": "Declarative presentation engine: semantic slide AST, deterministic layout, overflow fitting, and camera transitions for Manim",
+  "author": "AOS Manim Team",
+  "dependencies": [
+    "aos-manim-core"
+  ],
+  "capabilities": [
+    {
+      "name": "slide_presentation",
+      "category": "orchestration",
+      "description": "Manages presentation lifecycle, slide stepping, and transitions",
+      "backends": ["manim.Scene"],
+      "mobjects": ["SlideScene"],
+      "animations": ["fade_transition", "wipe_transition", "zoom_slide_transition"],
+      "validators": ["SlideOverflowValidator"],
+      "parameters": {"transition": "fade", "run_time": 0.8},
+      "tags": ["presentation", "slides", "scenes", "transitions"]
+    },
+    {
+      "name": "slide_layouts",
+      "category": "layout",
+      "description": "Pre-built responsive slide layouts (Title, Section, Content, TwoColumn, Quiz)",
+      "backends": ["manim.VGroup"],
+      "mobjects": ["TitleSlide", "SectionSlide", "ContentSlide", "TwoColumnSlide", "QuizSlide", "Card", "Badge", "CalloutBox", "Rectangle"],
+      "animations": [],
+      "validators": ["SlideOverflowValidator", "CanvasBoundsValidator"],
+      "parameters": {},
+      "tags": ["layouts", "templates", "cards", "ui"]
+    },
+    {
+      "name": "two_column_layout",
+      "category": "layout",
+      "description": "Declarative two-column recipe; engine assigns column widths and can collapse to a stack on 4:3",
+      "backends": ["aos_manim_slides.layout"],
+      "mobjects": ["HStack", "VStack", "Slide"],
+      "animations": [],
+      "validators": ["SlideOverflowValidator"],
+      "parameters": {"layout": "two-column", "ratios": [0.42, 0.58]},
+      "tags": ["layout", "two-column", "responsive"]
+    },
+    {
+      "name": "equation_slide",
+      "category": "layout",
+      "description": "Equation-focus template: large centered math with caption, no author coordinates",
+      "backends": ["aos_manim_slides.layout"],
+      "mobjects": ["Slide", "Equation"],
+      "animations": [],
+      "validators": ["SlideOverflowValidator"],
+      "parameters": {"layout": "equation-focus"},
+      "tags": ["layout", "equation", "math"]
+    },
+    {
+      "name": "diagram_slide",
+      "category": "layout",
+      "description": "Diagram-focus template plus named diagram registry (gradient_descent, newton_method, binary_search)",
+      "backends": ["aos_manim_slides.diagrams"],
+      "mobjects": ["Slide", "DiagramRef"],
+      "animations": [],
+      "validators": ["SlideOverflowValidator"],
+      "parameters": {"layout": "diagram-focus"},
+      "tags": ["layout", "diagram"]
+    },
+    {
+      "name": "code_slide",
+      "category": "layout",
+      "description": "Code-focus template that sizes a code block to the remaining content rect",
+      "backends": ["aos_manim_slides.layout"],
+      "mobjects": ["Slide", "CodeBlock"],
+      "animations": [],
+      "validators": ["SlideOverflowValidator"],
+      "parameters": {"layout": "code-focus"},
+      "tags": ["layout", "code"]
+    },
+    {
+      "name": "auto_overflow",
+      "category": "layout",
+      "description": "Priority overflow solver: drop decorations, shrink body, collapse columns, then scale diagrams/equations/title",
+      "backends": ["aos_manim_slides.layout.overflow"],
+      "mobjects": ["LayoutEngine", "OverflowSolver"],
+      "animations": [],
+      "validators": ["SlideOverflowValidator"],
+      "parameters": {"max_attempts": 8},
+      "tags": ["overflow", "fit", "responsive"]
+    },
+    {
+      "name": "markdown_slides",
+      "category": "authoring",
+      "description": "Parse Marp-like Markdown (frontmatter, math, diagram fences, callouts) into a SlideSpec AST",
+      "backends": ["aos_manim_slides.document.markdown"],
+      "mobjects": ["Slide", "Presentation", "SlideSpec"],
+      "animations": [],
+      "validators": [],
+      "parameters": {"separator": "---"},
+      "tags": ["markdown", "ast", "llm"]
+    },
+    {
+      "name": "voiceover_lecture",
+      "category": "orchestration",
+      "description": "Reveal, highlight, and step slide content on manim-voiceover bookmarks, with auto-cues from the slide AST when no script is given",
+      "backends": ["aos_manim_core.narration", "manim_voiceover"],
+      "mobjects": ["VoiceoverSlideScene"],
+      "animations": ["FadeIn", "Indicate"],
+      "validators": [],
+      "parameters": {"lecture": true, "gap": 0.35},
+      "tags": ["voiceover", "bookmarks", "lecture", "reveal", "highlight"]
+    },
+    {
+      "name": "lecture_templates",
+      "category": "authoring",
+      "description": "Reusable lecture templates: branding intro, quote, sequential bullets, two-column rows, copy-to-diagram, code reveal, disclaimer",
+      "backends": ["aos_manim_slides.lecture"],
+      "mobjects": ["BrandingIntro", "QuoteCard", "BulletBoard", "TwoColumnBullets", "CopyExplain", "CodeReveal", "DisclaimerCard"],
+      "animations": ["Write", "FadeIn", "TransformFromCopy", "Create", "GrowFromCenter"],
+      "validators": [],
+      "parameters": {},
+      "tags": ["lecture", "templates", "bullets", "quote", "branding"]
+    }
+  ]
+}

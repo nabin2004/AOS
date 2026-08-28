@@ -1,0 +1,12 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/2526132241_2333139164_223132457.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_847192958_422126912.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_2286604034_1263281240.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_3645105572_2184992459.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_2645707024_2251947365.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_649489886_750073439.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_847192958_2387852535.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_3614379882_1647360659.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_204035588_3491204340.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_847192958_1287773912.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Branding/427904922_2645707024_631829896.mp4'

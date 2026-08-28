@@ -1,0 +1,7 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide4/819936691_4237558775_223132457.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide4/2213807979_3197081273_38582558.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide4/2213807979_1104913734_3321581234.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide4/2213807979_941615173_1052834255.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide4/2213807979_3197081273_2119779317.mp4'
+file 'file:C:/Users/nabin/Desktop/myall/slidestemp/media/videos/001_slide/1080p60/partial_movie_files/Slide4/2213807979_2996344888_3323346236.mp4'

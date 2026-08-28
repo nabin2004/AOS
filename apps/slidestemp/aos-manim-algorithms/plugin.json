@@ -1,0 +1,48 @@
+{
+  "plugin": "aos-manim-algorithms",
+  "version": "0.1.0",
+  "domain": "Reasoning",
+  "layer": "Layer C",
+  "description": "Computational algorithms and data structure visualization plugin backed by NetworkX and Python runtime tracers",
+  "author": "AOS Manim Team",
+  "dependencies": [
+    "aos-manim-core",
+    "networkx",
+    "numpy"
+  ],
+  "capabilities": [
+    {
+      "name": "binary_search",
+      "category": "searching",
+      "description": "Visualizes binary search pointer halving on indexed arrays",
+      "backends": ["python"],
+      "mobjects": ["ArrayMobject", "Text", "Arrow"],
+      "animations": ["Transform", "FadeIn"],
+      "validators": [],
+      "parameters": {"arr": [1, 3, 5, 7, 9, 11], "target": 7},
+      "tags": ["algorithms", "search", "binary_search", "arrays", "cueable"]
+    },
+    {
+      "name": "bubble_sort",
+      "category": "sorting",
+      "description": "Visualizes stepped comparisons and cell swaps in sorting algorithms",
+      "backends": ["python"],
+      "mobjects": ["ArrayMobject"],
+      "animations": ["Transform"],
+      "validators": ["SortedInvariantValidator"],
+      "parameters": {"arr": [5, 2, 8, 1, 9]},
+      "tags": ["algorithms", "sorting", "bubble_sort"]
+    },
+    {
+      "name": "dijkstra_shortest_path",
+      "category": "graphs",
+      "description": "Visualizes priority queue visits and shortest paths on NetworkX graphs",
+      "backends": ["networkx"],
+      "mobjects": ["Graph", "Text"],
+      "animations": ["Create", "Transform"],
+      "validators": ["GraphPathValidator"],
+      "parameters": {"source": "A", "target": "D"},
+      "tags": ["algorithms", "graphs", "dijkstra", "shortest_path"]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "plugin": "aos-manim-beamer",
+  "version": "0.1.0",
+  "domain": "Presentation",
+  "layer": "Layer A",
+  "description": "LaTeX Beamer presentation paradigm, frames, blocks, alert blocks, and themes for AOS Manim",
+  "author": "AOS Manim Team",
+  "dependencies": [
+    "aos-manim-core",
+    "aos-manim-slides"
+  ],
+  "capabilities": [
+    {
+      "name": "beamer_presentation",
+      "category": "beamer_paradigm",
+      "description": "Renders LaTeX Beamer frames, colored title blocks, alert blocks, and example blocks",
+      "backends": ["manim.VGroup"],
+      "mobjects": ["BeamerPresentation", "BeamerFrame", "Block", "AlertBlock", "ExampleBlock", "BeamerColumns"],
+      "animations": ["FadeIn", "Write"],
+      "validators": ["BeamerFrameOverflowValidator"],
+      "parameters": {"theme": "academic_oxford"},
+      "tags": ["beamer", "latex", "frames", "blocks", "academic"]
+    },
+    {
+      "name": "lecture_templates",
+      "category": "authoring",
+      "description": "Beamer frames that play sequential bullets and quote cards",
+      "backends": ["aos_manim_slides.lecture"],
+      "mobjects": ["BeamerBulletFrame", "BeamerQuoteFrame"],
+      "animations": ["FadeIn", "Write", "GrowFromCenter"],
+      "validators": ["BeamerFrameOverflowValidator"],
+      "parameters": {},
+      "tags": ["lecture", "templates", "beamer", "quote", "bullets"]
+    }
+  ]
+}

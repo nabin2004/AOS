@@ -116,6 +116,11 @@ class DockerSandbox:
             text=True,
             timeout=timeout,
             check=False,
+            encoding="utf-8",
+            errors="replace",
+            # timeout=timeout,
+            # check=False,
+
         )
 
     def format_result(self, proc: subprocess.CompletedProcess[str], *, limit: int = 4000) -> str:

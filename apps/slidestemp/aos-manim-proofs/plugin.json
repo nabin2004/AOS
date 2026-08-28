@@ -1,0 +1,26 @@
+{
+  "plugin": "aos-manim-proofs",
+  "version": "0.1.0",
+  "domain": "Reasoning",
+  "layer": "Layer C",
+  "description": "Mathematical proof trees, derivations, and logical argumentation visualization plugin for AOS Manim",
+  "author": "AOS Manim Team",
+  "dependencies": [
+    "aos-manim-core",
+    "networkx",
+    "sympy"
+  ],
+  "capabilities": [
+    {
+      "name": "derivation_chain",
+      "category": "proof_presentation",
+      "description": "Renders structured step-by-step mathematical derivations with justifications",
+      "backends": ["sympy"],
+      "mobjects": ["DerivationChain", "MathTex", "Text"],
+      "animations": ["Write", "FadeIn"],
+      "validators": ["ProofStructureValidator"],
+      "parameters": {"theorem": "a^2 - b^2 = (a-b)(a+b)"},
+      "tags": ["proofs", "logic", "algebra", "derivation"]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "plugin": "aos-manim-physics",
+  "version": "0.1.0",
+  "domain": "STEM",
+  "layer": "Layer B",
+  "description": "STEM physics simulation and computational visualization plugin backed by SciPy solve_ivp and Pint units",
+  "author": "AOS Manim Team",
+  "dependencies": [
+    "aos-manim-core",
+    "scipy",
+    "sympy",
+    "numpy",
+    "pint"
+  ],
+  "capabilities": [
+    {
+      "name": "projectile_motion",
+      "category": "kinematics",
+      "description": "Visualizes parabolic projectile kinematics, peak height, and total range",
+      "backends": ["numpy", "scipy"],
+      "mobjects": ["Axes", "Arrow", "Dot", "MathTex"],
+      "animations": ["Create", "Write"],
+      "validators": [],
+      "parameters": {"v0": 20.0, "theta_deg": 45.0, "g": 9.81},
+      "tags": ["physics", "kinematics", "projectile", "mechanics"]
+    },
+    {
+      "name": "free_body_diagram",
+      "category": "dynamics",
+      "description": "Renders vector forces, normal forces, gravity, and net resultant force",
+      "backends": ["numpy"],
+      "mobjects": ["FreeBodyDiagram", "Arrow", "MathTex"],
+      "animations": ["Create"],
+      "validators": [],
+      "parameters": {"mass": 1.0},
+      "tags": ["physics", "dynamics", "forces", "free_body"]
+    },
+    {
+      "name": "nonlinear_pendulum",
+      "category": "dynamics",
+      "description": "Numerically simulates and animates exact nonlinear pendulum ODE with energy tracking",
+      "backends": ["scipy.integrate.solve_ivp"],
+      "mobjects": ["Dot", "Line", "MathTex"],
+      "animations": ["Rotate", "Transform"],
+      "validators": ["EnergyConservationValidator"],
+      "parameters": {"length": 2.5, "theta0_deg": 30.0},
+      "tags": ["physics", "oscillations", "pendulum", "simulation"]
+    }
+  ]
+}

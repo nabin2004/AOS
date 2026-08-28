@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+from asyncio import timeout
 import shutil
 import subprocess
 from pathlib import Path
@@ -42,6 +43,10 @@ class TyClient:
                     text=True,
                     timeout=30,
                     check=False,
+                    encoding="utf-8",
+                    errors="replace",
+                    # timeout=timeout,
+                    # check=False
                 )
         except FileNotFoundError:
             return "syntax ok (ty not installed)"
