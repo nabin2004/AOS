@@ -66,6 +66,9 @@ Offline: `EDUCLAW_TEST_MODEL=1 EDUCLAW_MEMORY_STUB=1` or `educlaw --model test -
 ```bash
 pytest
 python -m evals.smoke
+# Run Audio Test Suite (Pocket TTS, DSM Aligner, Server Status):
+python -m evals.audio_eval
 ```
 
 Live Docker render and live Kitaru replay need Docker and `educlaw[durable]` respectively.
+
