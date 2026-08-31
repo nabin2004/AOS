@@ -1,0 +1,127 @@
+data_dir: data
+quick_mode: false
+libraries:
+- name: manim
+  submodules:
+    - animation
+    - camera
+    - mobject
+    - scene
+    - utils
+    - utils.color
+    - utils.rate_functions
+    - utils.bezier
+    - utils.iterables
+    - utils.simple_functions
+    - constants
+    - config
+  exclude_patterns:
+    - tests
+    - testing
+    - _internals
+    - setup
+    - _config
+    - __pycache__
+  max_depth: 4
+  extract_sources: false
+  domain: mathematical_animation
+
+- name: scipy
+  submodules:
+  - optimize
+  - integrate
+  - interpolate
+  - linalg
+  - signal
+  - spatial
+  - special
+  exclude_patterns:
+  - tests
+  - testing
+  - _internals
+  - setup
+  max_depth: 3
+  extract_sources: false
+  domain: calculus
+- name: numpy
+  submodules:
+  - linalg
+  - fft
+  - random
+  exclude_patterns:
+  - tests
+  - testing
+  - _internals
+  - setup
+  - _cpython
+  max_depth: 2
+  extract_sources: false
+  domain: linear_algebra
+- name: sympy
+  submodules:
+  - solvers
+  - calculus
+  - matrices
+  - geometry
+  exclude_patterns:
+  - tests
+  - testing
+  - _internals
+  - setup
+  - _cpython
+  max_depth: 3
+  extract_sources: false
+  domain: symbolic_algebra
+- name: networkx
+  submodules:
+  - algorithms.shortest_paths
+  - algorithms.traversal
+  - algorithms.tree
+  - algorithms.community
+  - drawing
+  exclude_patterns:
+  - tests
+  - testing
+  - _internals
+  - setup
+  - _cpython
+  max_depth: 3
+  extract_sources: false
+  domain: graph_theory
+- name: shapely
+  submodules: null
+  exclude_patterns:
+  - tests
+  - testing
+  - _internals
+  - setup
+  - _cpython
+  max_depth: 2
+  extract_sources: false
+  domain: computational_geometry
+- name: mpmath
+  submodules: null
+  exclude_patterns:
+  - tests
+  - testing
+  - _internals
+  - setup
+  - _cpython
+  max_depth: 2
+  extract_sources: false
+  domain: special_functions
+- name: sklearn
+  submodules:
+  - cluster
+  - decomposition
+  exclude_patterns:
+  - tests
+  - testing
+  - _internals
+  - setup
+  - _cpython
+  max_depth: 3
+  extract_sources: false
+  domain: machine_learning
+embedding_provider: bm25
+
