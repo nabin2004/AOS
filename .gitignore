@@ -30,6 +30,10 @@ apps/agents/sft_data_gen/*.log
 # Local caches and media
 .aos/
 .cache/
+.pytest_cache/
 media/
 narration_demo.wav
 
+# Eval outputs and external reference clones
+apps/educlaw/eval_output/
+apps/audio_service/delayed-streams-modeling/
