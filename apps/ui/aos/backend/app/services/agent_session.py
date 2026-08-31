@@ -65,6 +65,7 @@ class AgentSession:
         self._research: ResearchToolkit | None = None
         self._subagent_task_manager: Any | None = None
         self._video_watch_tasks: set[asyncio.Task[None]] = set()
+        self._educlaw_service: Any | None = None
 
     async def handle_frame(self, data: dict[str, Any]) -> None:
         """Dispatch one incoming WebSocket frame.
@@ -77,6 +78,13 @@ class AgentSession:
 
         if msg_type == "stop":
             await self._cancel_turn()
+            return
+
+        if msg_type == "permission_response":
+            action_id = data.get("action_id")
+            approved = bool(data.get("approved", False))
+            if self._educlaw_service and action_id:
+                self._educlaw_service.handle_permission_response(action_id, approved)
             return
 
         if msg_type == "ask_user_response":
@@ -170,8 +178,18 @@ class AgentSession:
         await send_event(self.websocket, "user_prompt", {"content": user_message})
 
         video_mode = data.get("video_mode")
+        harness_mode = data.get("harness_mode")
         llm_base_url = (data.get("llm_base_url") or "").strip() or None
         llm_api_key = (data.get("llm_api_key") or "").strip() or None
+        if harness_mode == "educlaw" and self.current_conversation_id:
+            await self._process_educlaw_turn(
+                user_message=user_message,
+                data=data,
+                user_message_id=user_message_id,
+                organization_id=organization_id,
+            )
+            return
+
         if video_mode in ("animate", "lecture") and self.current_conversation_id:
             await self._process_video_turn(
                 user_message=user_message,
@@ -308,6 +326,85 @@ class AgentSession:
                         str(e), base_url=llm_base_url
                     )
                 },
+            )
+
+    async def _process_educlaw_turn(
+        self,
+        *,
+        user_message: str,
+        data: dict[str, Any],
+        user_message_id: str | None,
+        organization_id: UUID | None,
+    ) -> None:
+        """Run an EduClaw harness turn in headless / interactive mode."""
+        from app.services.educlaw_service import EduClawService
+
+        model_name = data.get("model")
+        headless = bool(data.get("headless", True))
+        auto_approve = bool(data.get("auto_approve", True))
+
+        educlaw = EduClawService(
+            websocket=self.websocket,
+            headless=headless,
+            auto_approve=auto_approve,
+            model_name=model_name,
+        )
+        self._educlaw_service = educlaw
+
+        await send_event(
+            self.websocket,
+            "status",
+            {"message": "EduClaw harness initialized. Executing sandboxed workflow..."},
+        )
+
+        try:
+            output = await educlaw.run_turn(user_message)
+            self.conversation_history.append({"role": "user", "content": user_message})
+            self.conversation_history.append({"role": "assistant", "content": output})
+
+            await send_event(
+                self.websocket,
+                "text_delta",
+                {"index": 0, "content": output},
+            )
+            await send_event(
+                self.websocket,
+                "final_result",
+                {"output": output},
+            )
+
+            assistant_msg_id: str | None = None
+            if self.current_conversation_id:
+                assistant_msg_id = await persist_assistant_turn(
+                    self.current_conversation_id,
+                    output,
+                    model_name or "educlaw",
+                    [],
+                )
+                await send_event(
+                    self.websocket,
+                    "message_saved",
+                    {
+                        "message_id": assistant_msg_id,
+                        "conversation_id": self.current_conversation_id,
+                    },
+                )
+            await send_event(
+                self.websocket,
+                "complete",
+                {"conversation_id": self.current_conversation_id},
+            )
+        except Exception as exc:
+            logger.exception("EduClaw turn failed")
+            await send_event(
+                self.websocket,
+                "error",
+                {"message": f"EduClaw harness error: {str(exc)}"},
+            )
+            await send_event(
+                self.websocket,
+                "complete",
+                {"conversation_id": self.current_conversation_id, "error": str(exc)},
             )
 
     async def _process_video_turn(

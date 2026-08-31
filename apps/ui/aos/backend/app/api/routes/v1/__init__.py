@@ -28,6 +28,7 @@ from app.api.routes.v1 import contact
 from app.api.routes.v1 import me_slash_commands
 from app.api.routes.v1 import admin_stats
 from app.api.routes.v1 import org_integrations
+from app.api.routes.v1 import educlaw
 
 v1_router = APIRouter()
 
@@ -80,3 +81,4 @@ v1_router.include_router(admin_stats.router, prefix="/admin", tags=["admin:stats
 v1_router.include_router(
     org_integrations.router, prefix="/org/integrations", tags=["org:integrations"]
 )
+v1_router.include_router(educlaw.router, tags=["educlaw"])

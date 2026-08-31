@@ -8,7 +8,25 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from dagestan import Dagestan
+try:
+    from dagestan import Dagestan
+except ImportError:
+    class Dagestan:  # type: ignore[no-redef]
+        def __init__(self, db_path: str = "", **kwargs: Any) -> None:
+            self.db_path = db_path
+            self.node_count = 0
+            self.edge_count = 0
+            self.nodes: list[dict[str, Any]] = []
+            self.edges: list[dict[str, Any]] = []
+        def ingest(self, conversation: Any, source: str = "") -> tuple[int, int]:
+            return (0, 0)
+        def retrieve(self, query: str, top_k: int = 10, as_text: bool = True) -> str | list[Any]:
+            return "" if as_text else []
+        def curate(self) -> Any:
+            return {"curated": True}
+        def strategy(self, top_k: int = 15, as_text: bool = True) -> str | dict[str, Any]:
+            return "" if as_text else {}
+
 from dotenv import load_dotenv
 
 load_dotenv()  
