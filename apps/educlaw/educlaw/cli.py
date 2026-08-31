@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -319,6 +320,24 @@ memory_app = typer.Typer(
 )
 app.add_typer(memory_app, name="memory")
 
+course_app = typer.Typer(
+    name="course",
+    help="Plan, generate, render, and inspect multi-lecture educational courses.",
+    no_args_is_help=True,
+    rich_markup_mode="rich",
+)
+app.add_typer(course_app, name="course")
+
+flashcards_app = typer.Typer(
+    name="flashcards",
+    help="Generate and export active-recall Anki decks and interactive flashcards.",
+    no_args_is_help=True,
+    rich_markup_mode="rich",
+)
+app.add_typer(flashcards_app, name="flashcards")
+
+
+
 
 def _apply_setting_overrides(
     settings: Settings,
@@ -492,6 +511,579 @@ def run_command(
         run_headless(resolved_cwd, settings, prompt, yes=yes, durable=durable, raw=raw)
     )
     raise typer.Exit(code=code)
+
+
+@app.command("animate", help="Generate educational Manim animations using single-video or full course series mode.")
+def animate_command(
+    prompt: Annotated[str, typer.Argument(help="Educational topic or prompt to animate.")],
+    mode: Annotated[
+        str,
+        typer.Option("--mode", "-M", help="Generation mode: 'single' (single topic video) or 'course' (multi-lecture series)."),
+    ] = "single",
+    lectures: Annotated[
+        int,
+        typer.Option("--lectures", "-n", help="Total lectures to generate when mode is 'course'."),
+    ] = 3,
+    render: Annotated[
+        bool,
+        typer.Option("--render/--no-render", help="Whether to compile and render videos in the Manim Docker sandbox."),
+    ] = True,
+    cwd: Annotated[
+        Optional[Path],
+        typer.Option("--cwd", "-C", help="Workspace root directory."),
+    ] = None,
+    model: Annotated[
+        Optional[str],
+        typer.Option("-m", "--model", help="Override the LLM model identifier."),
+    ] = None,
+    quality: Annotated[
+        str,
+        typer.Option("-q", "--quality", help="Manim render quality: l, m, h, or k."),
+    ] = "m",
+) -> None:
+    """Generate educational Manim animations using single-video or full course series mode."""
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    settings = Settings.from_env()
+    _apply_setting_overrides(settings, model=model)
+    settings.manim_quality = quality  # type: ignore[assignment]
+    configure_logfire(settings)
+
+    if mode == "course":
+        from educlaw.courses.contracts import Audience, RenderStatus
+        from educlaw.courses.orchestrator import CourseOrchestrator
+
+        console.print(
+            Panel(
+                f"[bold cyan]Course Topic:[/] {prompt}\n"
+                f"[bold cyan]Total Lectures:[/] {lectures}\n"
+                f"[bold cyan]Render in Sandbox:[/] {render}\n"
+                f"[bold cyan]Quality:[/] {quality}\n"
+                f"[bold cyan]Workspace:[/] {resolved_cwd}",
+                title="[bold magenta]Starting EduClaw Course Engine (Course Mode)[/]",
+                border_style="magenta",
+            )
+        )
+
+        orchestrator = CourseOrchestrator(settings=settings)
+        course = asyncio.run(
+            orchestrator.generate_course(
+                prompt,
+                num_lectures=lectures,
+                audience=Audience.EXPLORING,
+                render=render,
+                quality=quality,
+                workspace_dir=resolved_cwd,
+            )
+        )
+
+        _display_course_summary(course)
+        return
+
+    # Single-video mode
+    from educlaw.animateworkflow.loop import WorkflowOrchestrator
+
+    workspace_dir = resolved_cwd / "workspace" / "coder"
+    workspace_dir.mkdir(parents=True, exist_ok=True)
+
+    orchestrator_single = WorkflowOrchestrator(
+        settings=settings,
+    )
+
+    console.print(
+        Panel(
+            f"[bold cyan]Prompt:[/] {prompt}\n[bold cyan]Mode:[/] single\n[bold cyan]Quality:[/] {quality}\n[bold cyan]Output dir:[/] {workspace_dir}",
+            title="[bold magenta]Starting Animate Workflow (Single Mode)[/]",
+            border_style="magenta",
+        )
+    )
+
+    state = asyncio.run(orchestrator_single.run(prompt, workspace_dir=workspace_dir))
+
+    if state.compile_result and state.compile_result.success:
+        console.print(f"[bold green][SUCCESS][/] Video rendered at: [bold cyan]{state.compile_result.output_path}[/]")
+    else:
+        err_console.print("[bold red][FAIL][/] Video generation could not produce a valid render.")
+        raise typer.Exit(code=1)
+
+
+def _display_course_summary(course: Any) -> None:
+    """Helper to render a beautiful summary table for a course."""
+    console.print(
+        Panel(
+            f"[bold yellow]Title:[/] {course.title}\n"
+            f"[bold cyan]Slug:[/] {course.slug}\n"
+            f"[bold green]Subject:[/] {course.syllabus.subject} | [bold green]Audience:[/] {course.syllabus.target_audience.value if hasattr(course.syllabus.target_audience, 'value') else course.syllabus.target_audience}\n"
+            f"[bold white]Overview:[/] {course.syllabus.overview}",
+            title="[bold green]Course Curriculum Generated[/]",
+            border_style="green",
+        )
+    )
+
+    table = Table(
+        title=f"Lectures in '{course.title}'",
+        header_style="bold cyan",
+        border_style="dim cyan",
+        show_lines=True,
+    )
+    table.add_column("Lec #", style="bold yellow", justify="center", width=6)
+    table.add_column("Title", style="white", min_width=25)
+    table.add_column("Status", style="bold", justify="center", width=12)
+    table.add_column("Key Concepts", style="dim", min_width=25)
+    table.add_column("Artifacts", style="cyan")
+
+    for lec in course.lectures:
+        status_color = "green" if lec.status.value == "rendered" else ("yellow" if lec.status.value in {"planned", "coded"} else "red")
+        artifacts = []
+        if lec.video_path:
+            artifacts.append("video")
+        if lec.final_code:
+            artifacts.append("code")
+        if lec.study_notes:
+            artifacts.append("notes")
+
+        table.add_row(
+            str(lec.lecture_number),
+            lec.spec.title,
+            f"[{status_color}]{lec.status.value.upper()}[/{status_color}]",
+            ", ".join(lec.spec.key_concepts) if lec.spec.key_concepts else "N/A",
+            ", ".join(artifacts) if artifacts else "pending",
+        )
+
+    console.print(table)
+    console.print(f"\n[bold green]✓ Course saved at:[/] [bold cyan].educlaw/courses/{course.slug}/[/]\n")
+
+
+# =============================================================================
+# Course Sub-Commands
+# =============================================================================
+
+
+@course_app.command("new", help="Plan, generate, and optionally render a new multi-lecture course.")
+def course_new_command(
+    prompt: Annotated[str, typer.Argument(help="Course topic or thesis to plan.")],
+    lectures: Annotated[
+        int,
+        typer.Option("--lectures", "-n", help="Total number of lectures (1..N)."),
+    ] = 3,
+    audience: Annotated[
+        str,
+        typer.Option("--audience", "-a", help="Target audience: grade, self_learner, or exploring."),
+    ] = "exploring",
+    subject: Annotated[
+        str,
+        typer.Option("--subject", "-s", help="Subject category (e.g. Mathematics, Physics, CS)."),
+    ] = "General",
+    render: Annotated[
+        bool,
+        typer.Option("--render/--no-render", help="Whether to compile and render Manim videos in Docker sandbox."),
+    ] = True,
+    quality: Annotated[
+        str,
+        typer.Option("-q", "--quality", help="Manim render quality: l, m, h, or k."),
+    ] = "m",
+    cwd: Annotated[
+        Optional[Path],
+        typer.Option("--cwd", "-C", help="Workspace root directory."),
+    ] = None,
+    model: Annotated[
+        Optional[str],
+        typer.Option("-m", "--model", help="Override the LLM model identifier."),
+    ] = None,
+) -> None:
+    """Plan and generate a new multi-lecture educational course."""
+    from educlaw.courses.contracts import Audience
+    from educlaw.courses.orchestrator import CourseOrchestrator
+
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    settings = Settings.from_env()
+    _apply_setting_overrides(settings, model=model)
+    settings.manim_quality = quality  # type: ignore[assignment]
+    configure_logfire(settings)
+
+    audience_enum = Audience(audience) if audience in Audience._value2member_map_ else Audience.EXPLORING
+
+    console.print(
+        Panel(
+            f"[bold cyan]Topic:[/] {prompt}\n"
+            f"[bold cyan]Lectures:[/] {lectures}\n"
+            f"[bold cyan]Audience:[/] {audience_enum.value}\n"
+            f"[bold cyan]Subject:[/] {subject}\n"
+            f"[bold cyan]Render:[/] {render}\n"
+            f"[bold cyan]Quality:[/] {quality}",
+            title="[bold magenta]Creating New EduClaw Course[/]",
+            border_style="magenta",
+        )
+    )
+
+    orchestrator = CourseOrchestrator(settings=settings)
+    course = asyncio.run(
+        orchestrator.generate_course(
+            prompt,
+            num_lectures=lectures,
+            audience=audience_enum,
+            subject=subject,
+            render=render,
+            quality=quality,
+            workspace_dir=resolved_cwd,
+        )
+    )
+
+    _display_course_summary(course)
+
+
+@course_app.command("list", help="List all courses stored in the workspace.")
+def course_list_command(
+    cwd: Annotated[
+        Optional[Path],
+        typer.Option("--cwd", "-C", help="Workspace root directory."),
+    ] = None,
+) -> None:
+    """List all courses created in the workspace."""
+    from educlaw.courses.storage import list_courses
+
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    manifests = list_courses(workspace_dir=resolved_cwd)
+
+    if not manifests:
+        console.print("[yellow]No courses found in workspace. Create one with `educlaw course new <topic>`[/]")
+        return
+
+    table = Table(
+        title="EduClaw Courses in Workspace",
+        header_style="bold cyan",
+        border_style="dim cyan",
+        show_lines=True,
+    )
+    table.add_column("Slug", style="bold yellow")
+    table.add_column("Title", style="white", min_width=25)
+    table.add_column("Subject", style="cyan")
+    table.add_column("Audience", style="dim")
+    table.add_column("Lectures", justify="center")
+    table.add_column("Created", style="dim", justify="center")
+
+    for manifest in manifests:
+        table.add_row(
+            manifest.slug,
+            manifest.title,
+            manifest.subject,
+            manifest.target_audience,
+            f"{manifest.rendered_lectures}/{manifest.total_lectures} rendered",
+            manifest.created_at[:10] if manifest.created_at else "N/A",
+        )
+
+    console.print(table)
+
+
+@course_app.command("show", help="Display details, syllabus, and lecture breakdown for a course.")
+def course_show_command(
+    slug: Annotated[str, typer.Argument(help="Course slug or course ID.")],
+    cwd: Annotated[
+        Optional[Path],
+        typer.Option("--cwd", "-C", help="Workspace root directory."),
+    ] = None,
+) -> None:
+    """Display complete course syllabus, lecture breakdown, and rendering status."""
+    from educlaw.courses.storage import load_course
+
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    course = load_course(slug, workspace_dir=resolved_cwd)
+
+    if course is None:
+        err_console.print(f"[bold red]Error:[/] Course '{slug}' not found.")
+        raise typer.Exit(code=1)
+
+    _display_course_summary(course)
+
+
+@course_app.command("render", help="Render or re-render lectures in a course.")
+def course_render_command(
+    slug: Annotated[str, typer.Argument(help="Course slug or course ID.")],
+    lecture: Annotated[
+        Optional[int],
+        typer.Option("--lecture", "-l", help="Specific lecture number to render (e.g. 1, 2). If omitted, renders all unrendered."),
+    ] = None,
+    quality: Annotated[
+        str,
+        typer.Option("-q", "--quality", help="Manim render quality: l, m, h, or k."),
+    ] = "m",
+    cwd: Annotated[
+        Optional[Path],
+        typer.Option("--cwd", "-C", help="Workspace root directory."),
+    ] = None,
+    model: Annotated[
+        Optional[str],
+        typer.Option("-m", "--model", help="Override the LLM model identifier."),
+    ] = None,
+) -> None:
+    """Render one or all lectures of an existing course in Docker sandbox."""
+    from educlaw.courses.contracts import RenderStatus
+    from educlaw.courses.orchestrator import CourseOrchestrator
+    from educlaw.courses.storage import load_course
+
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    settings = Settings.from_env()
+    _apply_setting_overrides(settings, model=model)
+    settings.manim_quality = quality  # type: ignore[assignment]
+    configure_logfire(settings)
+
+    course = load_course(slug, workspace_dir=resolved_cwd)
+    if course is None:
+        err_console.print(f"[bold red]Error:[/] Course '{slug}' not found.")
+        raise typer.Exit(code=1)
+
+    orchestrator = CourseOrchestrator(settings=settings)
+
+    if lecture is not None:
+        target_lec = course.get_lecture(lecture)
+        if target_lec is None:
+            err_console.print(f"[bold red]Error:[/] Lecture {lecture} not found in course '{course.slug}'.")
+            raise typer.Exit(code=1)
+        console.print(f"[bold cyan]Rendering Lecture {lecture}:[/] {target_lec.spec.title}...")
+        asyncio.run(
+            orchestrator.generate_lecture(
+                course,
+                lecture,
+                render=True,
+                quality=quality,
+                workspace_dir=resolved_cwd,
+            )
+        )
+    else:
+        console.print(f"[bold cyan]Rendering all pending lectures for course '{course.slug}'...[/]")
+        asyncio.run(
+            orchestrator.resume_course(
+                course.slug,
+                render=True,
+                quality=quality,
+                workspace_dir=resolved_cwd,
+            )
+        )
+
+    # Reload updated course
+    updated_course = load_course(course.slug, workspace_dir=resolved_cwd)
+    if updated_course:
+        _display_course_summary(updated_course)
+
+
+@course_app.command("resume", help="Resume generation/rendering of an interrupted or failed course.")
+def course_resume_command(
+    slug: Annotated[str, typer.Argument(help="Course slug or course ID.")],
+    quality: Annotated[
+        str,
+        typer.Option("-q", "--quality", help="Manim render quality: l, m, h, or k."),
+    ] = "m",
+    cwd: Annotated[
+        Optional[Path],
+        typer.Option("--cwd", "-C", help="Workspace root directory."),
+    ] = None,
+    model: Annotated[
+        Optional[str],
+        typer.Option("-m", "--model", help="Override the LLM model identifier."),
+    ] = None,
+) -> None:
+    """Resume an interrupted or failed course generation."""
+    from educlaw.courses.orchestrator import CourseOrchestrator
+    from educlaw.courses.storage import load_course
+
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    settings = Settings.from_env()
+    _apply_setting_overrides(settings, model=model)
+    settings.manim_quality = quality  # type: ignore[assignment]
+    configure_logfire(settings)
+
+    orchestrator = CourseOrchestrator(settings=settings)
+    course = asyncio.run(
+        orchestrator.resume_course(
+            slug,
+            render=True,
+            quality=quality,
+            workspace_dir=resolved_cwd,
+        )
+    )
+    _display_course_summary(course)
+
+
+@course_app.command("export", help="Export complete course handbook (syllabus + all lecture notes) to a single Markdown file.")
+def course_export_command(
+    slug: Annotated[str, typer.Argument(help="Course slug or course ID.")],
+    output: Annotated[
+        Optional[Path],
+        typer.Option("--output", "-o", help="Destination Markdown file path."),
+    ] = None,
+    cwd: Annotated[
+        Optional[Path],
+        typer.Option("--cwd", "-C", help="Workspace root directory."),
+    ] = None,
+) -> None:
+    """Export the complete course handbook (syllabus + companion lecture study notes)."""
+    from educlaw.courses.storage import export_course_handbook, load_course
+
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    course = load_course(slug, workspace_dir=resolved_cwd)
+    if course is None:
+        err_console.print(f"[bold red]Error:[/] Course '{slug}' not found.")
+        raise typer.Exit(code=1)
+
+    dest_file = output or (resolved_cwd / ".educlaw" / "courses" / course.slug / f"{course.slug}_handbook.md")
+    export_course_handbook(course, output_file=dest_file)
+    console.print(f"[bold green]✓ Course handbook exported to:[/] [bold cyan]{dest_file}[/]")
+
+
+@course_app.command("flashcards", help="Generate Anki-compatible flashcards for a course or specific lecture.")
+def course_flashcards_command(
+    slug: Annotated[str, typer.Argument(help="Course slug or course ID.")],
+    lecture: Annotated[
+        Optional[int],
+        typer.Option("--lecture", "-l", help="Specific lecture number. If omitted, generates flashcards for all lectures."),
+    ] = None,
+    format: Annotated[
+        str,
+        typer.Option("--format", "-f", help="Export format: 'anki' (TSV/TXT), 'markdown' (interactive .md), or 'json'."),
+    ] = "anki",
+    output: Annotated[
+        Optional[Path],
+        typer.Option("--output", "-o", help="Custom output file destination."),
+    ] = None,
+    cwd: Annotated[
+        Optional[Path],
+        typer.Option("--cwd", "-C", help="Workspace root directory."),
+    ] = None,
+    model: Annotated[
+        Optional[str],
+        typer.Option("-m", "--model", help="Override the LLM model identifier."),
+    ] = None,
+) -> None:
+    """Generate active-recall Anki flashcards from course lecture materials."""
+    from educlaw.courses.storage import load_course
+    from educlaw.flashcards.contracts import ExportFormat
+    from educlaw.flashcards.exporters import export_deck
+    from educlaw.flashcards.generator import FlashcardGenerator
+
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    settings = Settings.from_env()
+    _apply_setting_overrides(settings, model=model)
+    configure_logfire(settings)
+
+    course = load_course(slug, workspace_dir=resolved_cwd)
+    if course is None:
+        err_console.print(f"[bold red]Error:[/] Course '{slug}' not found.")
+        raise typer.Exit(code=1)
+
+    export_fmt = ExportFormat.ANKI_TSV if format in {"anki", "tsv", "txt"} else (ExportFormat.MARKDOWN if format in {"md", "markdown"} else ExportFormat.JSON)
+    generator = FlashcardGenerator(settings=settings)
+
+    if lecture is not None:
+        console.print(f"[bold cyan]Generating flashcards for Lecture {lecture}...[/]")
+        deck = asyncio.run(generator.generate_from_lecture(course, lecture))
+        ext = "anki.txt" if export_fmt == ExportFormat.ANKI_TSV else ("md" if export_fmt == ExportFormat.MARKDOWN else "json")
+        dest_file = output or (resolved_cwd / ".educlaw" / "courses" / course.slug / f"lecture_{lecture:02d}" / f"flashcards.{ext}")
+        export_deck(deck, format_type=export_fmt, output_path=dest_file)
+        console.print(f"[bold green]✓ Generated {deck.total_cards} cards for Lecture {lecture}:[/] [bold cyan]{dest_file}[/]")
+    else:
+        console.print(f"[bold cyan]Generating flashcard decks for all lectures in '{course.title}'...[/]")
+        total_created = 0
+        for lec in course.lectures:
+            deck = asyncio.run(generator.generate_from_lecture(course, lec.lecture_number))
+            ext = "anki.txt" if export_fmt == ExportFormat.ANKI_TSV else ("md" if export_fmt == ExportFormat.MARKDOWN else "json")
+            dest_file = resolved_cwd / ".educlaw" / "courses" / course.slug / f"lecture_{lec.lecture_number:02d}" / f"flashcards.{ext}"
+            export_deck(deck, format_type=export_fmt, output_path=dest_file)
+            total_created += deck.total_cards
+            console.print(f"  - Lecture {lec.lecture_number}: {deck.total_cards} cards -> [dim]{dest_file.name}[/]")
+
+        if output:
+            # Also compile whole-course deck if output specified
+            ext = "anki.txt" if export_fmt == ExportFormat.ANKI_TSV else ("md" if export_fmt == ExportFormat.MARKDOWN else "json")
+            combined_dest = output
+            # Generate whole course deck from syllabus
+            course_deck = asyncio.run(
+                generator.generate_from_prompt(
+                    topic=course.title,
+                    title=f"{course.title} (Complete Deck)",
+                    context=f"Course Syllabus:\n{course.syllabus.model_dump_json()}",
+                )
+            )
+            export_deck(course_deck, format_type=export_fmt, output_path=combined_dest)
+            console.print(f"[bold green]✓ Course master deck exported to:[/] [bold cyan]{combined_dest}[/]")
+
+
+# =============================================================================
+# Standalone Flashcards Sub-Commands
+# =============================================================================
+
+
+@flashcards_app.command("new", help="Generate Anki-compatible flashcards for any educational topic.")
+def flashcards_new_command(
+    prompt: Annotated[str, typer.Argument(help="Educational concept or topic to generate cards for.")],
+    format: Annotated[
+        str,
+        typer.Option("--format", "-f", help="Export format: 'anki' (TSV/TXT), 'markdown' (interactive .md), or 'json'."),
+    ] = "anki",
+    output: Annotated[
+        Optional[Path],
+        typer.Option("--output", "-o", help="Custom output file destination."),
+    ] = None,
+    cwd: Annotated[
+        Optional[Path],
+        typer.Option("--cwd", "-C", help="Workspace root directory."),
+    ] = None,
+    model: Annotated[
+        Optional[str],
+        typer.Option("-m", "--model", help="Override the LLM model identifier."),
+    ] = None,
+) -> None:
+    """Generate high-yield active recall flashcards ready for Anki import."""
+    from educlaw.flashcards.contracts import ExportFormat
+    from educlaw.flashcards.exporters import export_deck
+    from educlaw.flashcards.generator import FlashcardGenerator
+
+    resolved_cwd = (cwd or Path.cwd()).resolve()
+    settings = Settings.from_env()
+    _apply_setting_overrides(settings, model=model)
+    configure_logfire(settings)
+
+    export_fmt = ExportFormat.ANKI_TSV if format in {"anki", "tsv", "txt"} else (ExportFormat.MARKDOWN if format in {"md", "markdown"} else ExportFormat.JSON)
+    generator = FlashcardGenerator(settings=settings)
+
+    console.print(
+        Panel(
+            f"[bold cyan]Topic:[/] {prompt}\n[bold cyan]Format:[/] {export_fmt.value}",
+            title="[bold magenta]Generating Active Recall Flashcards[/]",
+            border_style="magenta",
+        )
+    )
+
+    deck = asyncio.run(generator.generate_from_prompt(topic=prompt))
+
+    ext = "anki.txt" if export_fmt == ExportFormat.ANKI_TSV else ("md" if export_fmt == ExportFormat.MARKDOWN else "json")
+    slug = re.sub(r"[^\w\s-]", "", prompt.lower()).strip().replace(" ", "-") or "flashcards"
+    dest_file = output or (resolved_cwd / ".educlaw" / "flashcards" / f"{slug}.{ext}")
+
+    export_deck(deck, format_type=export_fmt, output_path=dest_file)
+
+    console.print(f"[bold green]✓ Generated {deck.total_cards} cards![/]")
+    console.print(f"[bold green]✓ Deck exported to:[/] [bold cyan]{dest_file}[/]")
+
+    # Print preview table
+    table = Table(
+        title=f"Flashcards Preview: {deck.title}",
+        header_style="bold cyan",
+        border_style="dim cyan",
+        show_lines=True,
+    )
+    table.add_column("#", justify="center", width=4)
+    table.add_column("Type", style="yellow", justify="center", width=12)
+    table.add_column("Front / Prompt", style="white", min_width=30)
+    table.add_column("Back / Answer", style="dim", min_width=30)
+
+    for idx, card in enumerate(deck.cards, start=1):
+        front_display = card.cloze_text if card.cloze_text else card.front
+        table.add_row(str(idx), card.card_type.value.upper(), front_display, card.back)
+
+    console.print(table)
+
+
+
+
 
 
 @app.command("doctor", help="Check system health, LLM keys, Docker daemon, and harness tools.")

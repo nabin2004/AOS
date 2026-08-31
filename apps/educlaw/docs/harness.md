@@ -20,12 +20,14 @@ Entry points: `educlaw` REPL, `educlaw tui`, `educlaw --headless -p "..."`.
 
 | Module | Doc |
 |--------|-----|
+| Capstone End-to-End | [end_to_end_harness.md](end_to_end_harness.md) |
+| Animate Workflow | [animate.md](animate.md) |
 | Memory | [memory.md](memory.md) |
 | Sandbox | [sandbox.md](sandbox.md) |
 | Permissions | [permissions.md](permissions.md) |
 | Durable / Kitaru | [durable.md](durable.md) |
 | Skills | `.decode/skills/*/SKILL.md` via `pydantic_ai_skills` |
-| LSP | `syntax_check` + `ty check` ([`educlaw/lsp/ty.py`](../educlaw/lsp/ty.py)) |
+| LSP | `syntax_check`, `lsp_definition`, `lsp_symbols` ([lsp.md](lsp.md)) |
 | Logfire | `EDUCLAW_LOGFIRE=1` or `LOGFIRE_TOKEN` |
 
 ## Compaction

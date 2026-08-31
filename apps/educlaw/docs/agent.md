@@ -4,6 +4,9 @@ Working harness: Pydantic AI loop, Dagestan memory, compaction, steering queue, 
 
 - Install and commands: [README.md](../README.md)
 - Loop and modules: [harness.md](harness.md)
+- Capstone E2E: [end_to_end_harness.md](end_to_end_harness.md)
+- Animate Workflow: [animate.md](animate.md)
+- LSP: [lsp.md](lsp.md)
 - Memory: [memory.md](memory.md)
 - Sandbox: [sandbox.md](sandbox.md)
 - Permissions: [permissions.md](permissions.md)

@@ -111,3 +111,29 @@ def register_tools(agent: Agent[AgentDeps, str]) -> None:
         if not host.is_file():
             return f"not a file: {path}"
         return ctx.deps.lsp.diagnostics(host)
+
+    @agent.tool
+    async def lsp_definition(ctx: RunContext[AgentDeps], symbol: str, path: str = "") -> str:
+        """Find the definition, line number, signature, and docstring of a Python symbol (class/func)."""
+        target_path = None
+        if path.strip():
+            try:
+                target_path = ctx.deps.sandbox.jail(path)
+            except PathJailError as exc:
+                return f"path rejected: {exc}"
+        _emit(ctx, "tool", {"name": "lsp_definition", "symbol": symbol, "path": path})
+        return ctx.deps.lsp.find_definition(symbol, target_path=target_path)
+
+    @agent.tool
+    async def lsp_symbols(ctx: RunContext[AgentDeps], path: str = "", query: str = "") -> str:
+        """List symbols in a specific file or search Python symbols across the workspace."""
+        if path.strip():
+            try:
+                host = ctx.deps.sandbox.jail(path)
+            except PathJailError as exc:
+                return f"path rejected: {exc}"
+            _emit(ctx, "tool", {"name": "lsp_symbols", "path": path})
+            return ctx.deps.lsp.file_symbols(host)
+
+        _emit(ctx, "tool", {"name": "lsp_symbols", "query": query})
+        return ctx.deps.lsp.workspace_symbols(query=query)

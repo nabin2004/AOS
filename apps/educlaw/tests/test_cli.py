@@ -175,3 +175,19 @@ def test_legacy_parser() -> None:
     assert args.headless is True
     assert args.prompt == "foo"
     assert args.yes is True
+
+
+def test_cli_animate_command(monkeypatch, tmp_path: Path) -> None:
+    from educlaw.animateworkflow.contracts import CompileResult, PipelineState
+
+    async def fake_run(self, prompt, workspace_dir=None):
+        return PipelineState(
+            compile_result=CompileResult(success=True, output_path=str(tmp_path / "test.mp4"))
+        )
+
+    monkeypatch.setattr("educlaw.animateworkflow.loop.WorkflowOrchestrator.run", fake_run)
+
+    result = runner.invoke(app, ["animate", "Teach Pythagoras theorem", "--cwd", str(tmp_path)])
+    assert result.exit_code == 0
+    assert "Starting Animate Workflow" in result.output
+    assert "Video rendered at" in result.output
