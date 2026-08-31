@@ -649,6 +649,12 @@ export function useChat(options: UseChatOptions = {}) {
       if (videoMode === "animate" || videoMode === "lecture") {
         payload.video_mode = videoMode;
       }
+      const harnessMode = useChatModeStore.getState().harnessMode;
+      if (harnessMode === "educlaw") {
+        payload.harness_mode = "educlaw";
+        payload.headless = useChatModeStore.getState().headless;
+        payload.auto_approve = useChatModeStore.getState().autoApprove;
+      }
       sendMessage(payload);
     },
     [addMessage, sendMessage, conversationId],

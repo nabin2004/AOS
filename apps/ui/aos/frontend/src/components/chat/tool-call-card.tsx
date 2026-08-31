@@ -11,6 +11,7 @@ import { AskUserResult } from "./tool-results/ask-user";
 import { GenericToolResult, RawToolView } from "./tool-results/generic";
 import { RunPythonResult } from "./tool-results/run-python";
 import { VideoResult, parseVideoResult } from "./tool-results/video-result";
+import { EduClawToolResult } from "./tool-results/educlaw-tools";
 import {
   Wrench,
   Clock,
@@ -132,8 +133,19 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
     if (isVideo) setExpanded(true);
   }, [isVideo]);
 
+  const isEduClawTool = [
+    "sandbox_read",
+    "sandbox_write",
+    "sandbox_bash",
+    "manim_render",
+    "syntax_check",
+    "lsp_diagnostics",
+    "lsp_definition",
+    "lsp_symbols",
+  ].includes(toolCall.name);
+
   const hasSpecialRenderer =
-    isDateTime || isRAGSearch || isWebSearch || isAskUser || isChart || isRunPython || isVideo;
+    isDateTime || isRAGSearch || isWebSearch || isAskUser || isChart || isRunPython || isVideo || isEduClawTool;
   const videoLiveMessage =
     isVideo && (toolCall.status === "running" || toolCall.status === "pending")
       ? videoSpec.message || videoSpec.stage || null
@@ -307,6 +319,13 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
             <RunPythonResult toolCall={toolCall} resultText={resultText} />
           ) : isLoadSkill ? (
             <LoadSkillResult resultText={resultText} status={toolCall.status} />
+          ) : isEduClawTool ? (
+            <EduClawToolResult
+              name={toolCall.name}
+              args={toolCall.args}
+              result={toolCall.result}
+              status={toolCall.status}
+            />
           ) : isListSkills ? null : (
             <GenericToolResult toolCall={toolCall} resultText={resultText} />
           )}
