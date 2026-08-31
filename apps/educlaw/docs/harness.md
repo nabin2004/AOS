@@ -26,7 +26,7 @@ Entry points: `educlaw` REPL, `educlaw tui`, `educlaw --headless -p "..."`.
 | Sandbox | [sandbox.md](sandbox.md) |
 | Permissions | [permissions.md](permissions.md) |
 | Durable / Kitaru | [durable.md](durable.md) |
-| Skills | `.decode/skills/*/SKILL.md` via `pydantic_ai_skills` |
+| Skills | `.decode/skills/*/SKILL.md` & `.agents/skills/*/SKILL.md` via `pydantic_ai_skills` ([skills.md](skills.md)) |
 | LSP | `syntax_check`, `lsp_definition`, `lsp_symbols` ([lsp.md](lsp.md)) |
 | Logfire | `EDUCLAW_LOGFIRE=1` or `LOGFIRE_TOKEN` |
 

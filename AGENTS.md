@@ -122,3 +122,18 @@ Configure models via `apps/agents/.env`:
 - `AOS_MODEL_PROFILE=hybrid`: OpenRouter for planning + Local Ollama for Manim coding
 - `AOS_MODEL_PROFILE=local`: Full local Ollama
 - `AOS_DBOS=1`: Enable DBOS durable workflow execution and checkpointing.
+
+---
+
+## 6. Agent Skills & Harness Capabilities
+
+AOS leverages the standard Agent Skills ecosystem located in `.agents/skills/`. See [SKILLS.md](file:///c:/Users/nabin/Desktop/myall/AOS/SKILLS.md) for full installation and extension instructions.
+
+### Available Skills
+- **`manimce-best-practices`**: Best practices, rules, and snippets for Manim Community Edition.
+- **`manimgl-best-practices`**: Best practices and templates for ManimGL (3Blue1Brown OpenGL version).
+- **`manim-composer`**: Pedagogical video composer and `scenes.md` planning.
+- **`manim-render`**: Docker rendering and ffmpeg assembly.
+- **`run-lecture-pipeline`**: End-to-end multi-agent lecture generation pipeline.
+- **`sft-trace-collection`**: SFT/DPO dataset generation and trajectory logging.
+
