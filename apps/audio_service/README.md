@@ -85,10 +85,50 @@ Pass `language=` to `Narrator(...)` to pick the underlying model:
 higher-quality, and slower — useful when narration quality matters more than
 generation speed.
 
+## Delayed Streams Modeling (DSM) & Kyutai STT / TTS
+
+In addition to Pocket TTS, `audio_service` integrates Kyutai's **Delayed Streams Modeling (DSM)** sequence-to-sequence framework (`delayed-streams-modeling`) for high-fidelity multi-speaker narration, speech-to-text (STT), and native word-level timestamp alignment.
+
+### Capabilities
+
+- **DSM Aligner (`dsm_aligner.py`)**: Converts native word timestamps into Manim Voiceover `word_boundaries` (`audio_offset` in 100ns units, `text_offset`, `word_length`) for syncing animations to spoken words.
+- **DSM Client (`dsm_client.py`)**: Async/sync client for streaming audio to and from a running Rust `moshi-server` or in-process PyTorch.
+
+### Using the DSM Client
+
+```python
+from dsm_client import DSMClient
+
+client = DSMClient(server_url="ws://127.0.0.1:8080")
+
+# Stream TTS from Rust moshi-server
+client.synthesize_ws("Hello, this is Kyutai DSM TTS.", "out.wav")
+
+# Stream STT and extract word-level timestamps
+words = client.transcribe_ws("audio_file.wav")
+for w in words:
+    print(f"{w.start_time:.2f}s - {w.end_time:.2f}s: {w.text}")
+
+# Generate Manim Voiceover boundaries
+boundaries = client.align_audio_for_manim("audio_file.wav", expected_text="Hello...")
+```
+
+### Running the Rust Server (`moshi-server`)
+
+To run the high-throughput Rust backend:
+```bash
+# 1. Install moshi-server crate
+cargo install --features cuda moshi-server
+
+# 2. Run TTS worker
+moshi-server worker --config apps/audio_service/delayed-streams-modeling/configs/config-tts.toml
+
+# 3. Or run STT worker (1B English/French model with VAD)
+moshi-server worker --config apps/audio_service/delayed-streams-modeling/configs/config-stt-en_fr-hf.toml
+```
+
 ## Notes
 
-- Requires PyTorch 2.5+ (CPU build is fine, no GPU needed).
-- The Pocket TTS CLI (`pocket-tts generate` / `pocket-tts serve`) is still available
-  for quick manual experimentation with voices and prompts outside this service.
-- Clean voice reference clips before using them for cloning — Pocket TTS reproduces
-  the reference audio's quality, noise included.
+- **Pocket TTS** remains the default lightweight CPU narration backend (100% offline, ~6x real-time).
+- **DSM STT/TTS** can run via Rust `moshi-server` for low-latency streaming or PyTorch/CUDA for high-throughput batching.
+- The Pocket TTS CLI (`pocket-tts generate` / `pocket-tts serve`) is still available for quick manual experimentation.

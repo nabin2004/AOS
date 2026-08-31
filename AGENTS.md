@@ -108,7 +108,9 @@ The primary lecture generation flow follows a structured `pydantic_graph`:
 - Use `manim -ql` for rapid development and testing; avoid high-res `-qk` unless specifically requested.
 
 ### Audio & Narration
-- Narration uses Pocket TTS via `apps/audio_service`.
+- **Pocket TTS (`apps/audio_service/narrator.py`)**: Default resident 100M CPU model for fast offline beat narration.
+- **Kyutai DSM (`apps/audio_service/dsm_client.py` & `dsm_aligner.py`)**: Delayed Streams Modeling client for streaming STT, high-fidelity TTS, and native millisecond-accurate word-level timestamp alignment for Manim Voiceover.
+- **Testing & Diagnostics**: Run `cd apps/educlaw && uv run python -m evals.audio_eval` to benchmark audio backends on local laptops.
 - Narration failure is designed to be non-blocking (best-effort); the pipeline will fall back gracefully to video-only rendering if audio synthesis fails.
 
 ---
