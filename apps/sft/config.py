@@ -22,6 +22,7 @@ from model_identity import (  # noqa: E402
     WANDB_SFT_RUN_NAME,
     WANDB_TAGS,
 )
+from wandb_env import load_training_dotenv  # noqa: E402
 
 LANGUAGE_MODEL_LORA_TARGETS = (
     r".*\.language_model.*\.(q_proj|k_proj|v_proj|o_proj|gate_proj|up_proj|down_proj)"
@@ -113,6 +114,7 @@ class TrainingConfig:
 
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
+        load_training_dotenv()
         config = cls().resolve_paths()
         if getattr(args, "rtx3060", False):
             config = apply_rtx3060_preset(config)
@@ -182,6 +184,7 @@ def _liger_kernel_available() -> bool:
 
 def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
     """NVIDIA RTX 3060 (12 GB VRAM) optimized preset (batch 1, grad accum 8, seq 2048, 4-bit QLoRA)."""
+    load_training_dotenv()
     report_to = config.report_to
     if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
         report_to = "none"

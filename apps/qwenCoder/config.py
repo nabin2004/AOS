@@ -22,6 +22,11 @@ from identity import (
 )
 
 QWEN_ROOT = Path(__file__).resolve().parent
+TRAINING_ROOT = QWEN_ROOT.parent / "training"
+if str(TRAINING_ROOT) not in sys.path:
+    sys.path.insert(0, str(TRAINING_ROOT))
+
+from wandb_env import load_training_dotenv  # noqa: E402
 
 # Qwen2 dense MLP LoRA targets
 LORA_TARGETS = (
@@ -138,6 +143,7 @@ class TrainingConfig:
 
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
+        load_training_dotenv()
         config = cls().resolve_paths()
         if getattr(args, "rtx3060", False):
             config = apply_rtx3060_preset(config)
@@ -291,6 +297,7 @@ def default_kaggle_output_dir() -> Path:
 
 def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
     """NVIDIA RTX 3060 (12 GB VRAM) preset: 4-bit NF4 QLoRA, paged_adamw_8bit, bf16, batch 1, accum 8."""
+    load_training_dotenv()
     report_to = config.report_to
     if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
         report_to = "none"
