@@ -1,0 +1,24 @@
+[
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 13.19,
+      "prompt_tokens": 252,
+      "completion_tokens": 503,
+      "code_length": 1705,
+      "code_lines": 53
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-005_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 151, in compute_all_metrics\n    cov_result = compute_coverage(code, coverage_reqs)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/coverage.py\", line 144, in compute_coverage\n    element = req.get(\"element\", \"\")\n              ^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  }
+]

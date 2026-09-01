@@ -73,15 +73,31 @@ uv run python run.py --rtx3060 --stage traces \
   uv run python run.py --rtx3060 --data-path ../agents/export_traces/coder_sft/sft/train.jsonl
   ```
 
-### 3.3 Training Gemma / General SFT (`apps/sft`)
+### 3.4 ManiBench Benchmark Evaluation & W&B Tracking
+
+To evaluate model quality on **ManiBench** pilot prompts after each training epoch and log metrics directly to Weights & Biases:
 
 ```bash
-cd apps/sft
-uv run python run.py --rtx3060
+cd apps/qwenCoder
+
+# Run fine-tuning with ManiBench evaluation on epoch end
+uv run python run.py --rtx3060 --stage manim --eval-manibench
+
+# Optional: Enable headless Manim rendering (with 20s scene timeout)
+uv run python run.py --rtx3060 --stage manim --eval-manibench --manibench-render --manibench-timeout 20
 ```
 
 > [!NOTE]
-> The `--rtx3060` preset automatically enforces:
+> **Tracked W&B Evaluation Metrics**:
+> - `eval/manibench_executability`: Percentage of generated code that compiles & executes without error.
+> - `eval/manibench_vcer`: Version-Conflict Error Rate (detects ManimGL vs. ManimCE API conflicts).
+> - `eval/manibench_alignment`: Weighted visual event presence score.
+> - `eval/manibench_coverage`: Pedagogical element density (labels, equations, numbers).
+> - `eval/manibench_overall`: Combined 4-tier benchmark score.
+
+---
+
+### 3.5 Training Preset Defaults
 > - `per_device_train_batch_size = 1`
 > - `gradient_accumulation_steps = 8` (effective batch size of 8)
 > - `use_4bit = True` (NF4 Double Quantization)

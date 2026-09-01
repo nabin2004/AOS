@@ -13,13 +13,31 @@ def build_trainer(
     dataset: Dataset,
     config: TrainingConfig,
 ) -> SFTTrainer:
-    return SFTTrainer(
+    trainer = SFTTrainer(
         model=model,
         args=config.sft_config(),
         train_dataset=dataset,
         processing_class=tokenizer,
         peft_config=config.lora_config(),
     )
+    if config.eval_manibench:
+        import sys
+        from pathlib import Path
+        training_root = Path(__file__).resolve().parent.parent / "training"
+        if str(training_root) not in sys.path:
+            sys.path.insert(0, str(training_root))
+        try:
+            from manibench_callback import ManiBenchEvalCallback
+            trainer.add_callback(
+                ManiBenchEvalCallback(
+                    render=config.manibench_render,
+                    timeout=config.manibench_timeout,
+                )
+            )
+            print("Attached ManiBenchEvalCallback for epoch evaluation")
+        except Exception as exc:
+            print(f"WARNING: Could not attach ManiBenchEvalCallback ({exc})")
+    return trainer
 
 
 def train_and_save(

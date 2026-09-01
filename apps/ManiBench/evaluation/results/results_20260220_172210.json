@@ -1,0 +1,794 @@
+[
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 30.89,
+      "prompt_tokens": 549,
+      "completion_tokens": 1280,
+      "code_length": 3565,
+      "code_lines": 95
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-001_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 35.0,
+      "prompt_tokens": 549,
+      "completion_tokens": 1472,
+      "code_length": 4189,
+      "code_lines": 126
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-001_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 35.12,
+      "prompt_tokens": 549,
+      "completion_tokens": 1472,
+      "code_length": 4189,
+      "code_lines": 126
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-001_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-002",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 25.1,
+      "prompt_tokens": 282,
+      "completion_tokens": 1029,
+      "code_length": 3194,
+      "code_lines": 92
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-002_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-002",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 24.65,
+      "prompt_tokens": 282,
+      "completion_tokens": 1029,
+      "code_length": 3194,
+      "code_lines": 92
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-002_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-002",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 24.57,
+      "prompt_tokens": 282,
+      "completion_tokens": 1029,
+      "code_length": 3194,
+      "code_lines": 92
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-002_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-003",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 18.94,
+      "prompt_tokens": 270,
+      "completion_tokens": 780,
+      "code_length": 2563,
+      "code_lines": 76
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-003_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-003",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 18.73,
+      "prompt_tokens": 270,
+      "completion_tokens": 780,
+      "code_length": 2563,
+      "code_lines": 76
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-003_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-003",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 18.84,
+      "prompt_tokens": 270,
+      "completion_tokens": 780,
+      "code_length": 2563,
+      "code_lines": 76
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-003_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-004",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 19.86,
+      "prompt_tokens": 284,
+      "completion_tokens": 830,
+      "code_length": 2776,
+      "code_lines": 67
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-004_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-004",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 19.86,
+      "prompt_tokens": 284,
+      "completion_tokens": 830,
+      "code_length": 2776,
+      "code_lines": 67
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-004_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-004",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 16.95,
+      "prompt_tokens": 284,
+      "completion_tokens": 694,
+      "code_length": 2262,
+      "code_lines": 58
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-004_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 13.25,
+      "prompt_tokens": 252,
+      "completion_tokens": 530,
+      "code_length": 1642,
+      "code_lines": 50
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-005_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 13.41,
+      "prompt_tokens": 252,
+      "completion_tokens": 527,
+      "code_length": 1768,
+      "code_lines": 57
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-005_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 11.99,
+      "prompt_tokens": 252,
+      "completion_tokens": 478,
+      "code_length": 1546,
+      "code_lines": 45
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-005_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-006",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 14.73,
+      "prompt_tokens": 250,
+      "completion_tokens": 608,
+      "code_length": 2216,
+      "code_lines": 66
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-006_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-006",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 14.84,
+      "prompt_tokens": 250,
+      "completion_tokens": 608,
+      "code_length": 2216,
+      "code_lines": 66
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-006_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-006",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 15.06,
+      "prompt_tokens": 250,
+      "completion_tokens": 608,
+      "code_length": 2216,
+      "code_lines": 66
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-006_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-007",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 28.81,
+      "prompt_tokens": 355,
+      "completion_tokens": 1213,
+      "code_length": 3606,
+      "code_lines": 69
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-007_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-007",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 26.26,
+      "prompt_tokens": 355,
+      "completion_tokens": 1100,
+      "code_length": 3437,
+      "code_lines": 68
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-007_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-007",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 25.8,
+      "prompt_tokens": 355,
+      "completion_tokens": 1004,
+      "code_length": 3149,
+      "code_lines": 63
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-007_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-008",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 32.56,
+      "prompt_tokens": 316,
+      "completion_tokens": 1348,
+      "code_length": 3444,
+      "code_lines": 88
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-008_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-008",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 28.56,
+      "prompt_tokens": 316,
+      "completion_tokens": 1187,
+      "code_length": 2949,
+      "code_lines": 75
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-008_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-008",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 32.35,
+      "prompt_tokens": 316,
+      "completion_tokens": 1324,
+      "code_length": 3252,
+      "code_lines": 82
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-008_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-009",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 22.62,
+      "prompt_tokens": 276,
+      "completion_tokens": 926,
+      "code_length": 2666,
+      "code_lines": 77
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-009_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-009",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 26.93,
+      "prompt_tokens": 276,
+      "completion_tokens": 1114,
+      "code_length": 3101,
+      "code_lines": 83
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-009_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-009",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 22.62,
+      "prompt_tokens": 276,
+      "completion_tokens": 926,
+      "code_length": 2666,
+      "code_lines": 77
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-009_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-010",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 17.71,
+      "prompt_tokens": 307,
+      "completion_tokens": 719,
+      "code_length": 2256,
+      "code_lines": 68
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-010_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-010",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 17.81,
+      "prompt_tokens": 307,
+      "completion_tokens": 719,
+      "code_length": 2256,
+      "code_lines": 68
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-010_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-010",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 17.61,
+      "prompt_tokens": 307,
+      "completion_tokens": 719,
+      "code_length": 2256,
+      "code_lines": 68
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-010_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-011",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 21.09,
+      "prompt_tokens": 280,
+      "completion_tokens": 863,
+      "code_length": 2687,
+      "code_lines": 60
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-011_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-011",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 19.35,
+      "prompt_tokens": 280,
+      "completion_tokens": 801,
+      "code_length": 2618,
+      "code_lines": 72
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-011_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-011",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 19.35,
+      "prompt_tokens": 280,
+      "completion_tokens": 801,
+      "code_length": 2618,
+      "code_lines": 72
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-011_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-012",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 13.51,
+      "prompt_tokens": 289,
+      "completion_tokens": 545,
+      "code_length": 1827,
+      "code_lines": 64
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-012_trial1.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-012",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 15.05,
+      "prompt_tokens": 289,
+      "completion_tokens": 611,
+      "code_length": 1984,
+      "code_lines": 70
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-012_trial2.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-012",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 15.05,
+      "prompt_tokens": 289,
+      "completion_tokens": 611,
+      "code_length": 1984,
+      "code_lines": 70
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-012_trial3.py",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 278, in run_evaluation\n    metrics = compute_all_metrics(\n        code, problem,\n        skip_render=config.skip_render,\n        manim_timeout=config.manim_timeout,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 129, in compute_all_metrics\n    exec_result = compute_executability(\n        code,\n        timeout=manim_timeout,\n        skip_render=skip_render,\n    )\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 299, in compute_executability\n    render = run_manim_code(code, timeout=timeout)\n  File \"/home/nabin2004/Downloads/files/evaluation/metrics/executability.py\", line 167, in run_manim_code\n    result = subprocess.run(\n        cmd,\n    ...<3 lines>...\n        cwd=tmpdir,\n    )\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 554, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1038, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...<5 lines>...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/nabin2004/.local/share/mise/installs/python/3.14.2/lib/python3.14/subprocess.py\", line 1989, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nFileNotFoundError: [Errno 2] No such file or directory: 'manim'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  }
+]

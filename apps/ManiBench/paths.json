@@ -1,0 +1,123 @@
+{
+  "videos": [
+    {
+      "id": "MB-001",
+      "title": "Colliding Blocks Compute π",
+      "difficulty_level": 4,
+      "domain": ["physics", "numerics"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2025/colliding_blocks_v2/blocks.py",
+        "/home/nabin2004/Desktop/videos/_2025/colliding_blocks_v2/supplements.py"
+      ]
+    },
+    {
+      "id": "MB-002",
+      "title": "Gradient Descent, How Neural Networks Learn",
+      "difficulty_level": 3,
+      "domain": ["ML", "Calculus"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2017/nn/part2.py",
+        "/home/nabin2004/Desktop/videos/_2017/nn/part3.py",
+        "/home/nabin2004/Desktop/videos/_2017/nn/network.py"
+      ]
+    },
+    {
+      "id": "MB-003",
+      "title": "But What Is a Convolution?",
+      "difficulty_level": 3,
+      "domain": ["Signal Processing", "Linear Algebra"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2022/convolutions/discrete.py",
+        "/home/nabin2004/Desktop/videos/_2022/convolutions/supplements.py"
+      ]
+    },
+    {
+      "id": "MB-004",
+      "title": "Eigenvectors & Eigenvalues",
+      "difficulty_level": 4,
+      "domain": ["Linear Algebra"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2016/eola/chapter10.py",
+        "/home/nabin2004/Desktop/videos/_2021/quick_eigen.py"
+      ]
+    },
+    {
+      "id": "MB-005",
+      "title": "The Determinant",
+      "difficulty_level": 2,
+      "domain": ["Linear Algebra"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2016/eola/chapter5.py"
+      ]
+    },
+    {
+      "id": "MB-006",
+      "title": "Central Limit Theorem",
+      "difficulty_level": 3,
+      "domain": ["Probability", "Statistics"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2023/clt/main.py",
+        "/home/nabin2004/Desktop/videos/_2023/clt/wordy_scenes.py",
+        "/home/nabin2004/Desktop/videos/_2023/clt/galton_board.py",
+        "/home/nabin2004/Desktop/videos/_2023/clt_proof/main.py"
+      ]
+    },
+    {
+      "id": "MB-007",
+      "title": "The Medical Test Paradox",
+      "difficulty_level": 2,
+      "domain": ["Probability", "Bayes"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2020/med_test.py"
+      ]
+    },
+    {
+      "id": "MB-008",
+      "title": "Visualizing the Chain Rule",
+      "difficulty_level": 3,
+      "domain": ["Calculus"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2017/eoc/chapter4.py"
+      ]
+    },
+    {
+      "id": "MB-009",
+      "title": "Fundamental Theorem of Calculus",
+      "difficulty_level": 3,
+      "domain": ["Calculus", "Integration"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2017/eoc/chapter8.py",
+        "/home/nabin2004/Desktop/videos/_2017/eoc/chapter9.py"
+      ]
+    },
+    {
+      "id": "MB-010",
+      "title": "Taylor Series",
+      "difficulty_level": 4,
+      "domain": ["Calculus", "Series"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2017/eoc/chapter10.py"
+      ]
+    },
+    {
+      "id": "MB-011",
+      "title": "The Hairy Ball Theorem",
+      "difficulty_level": 5,
+      "domain": ["Topology", "Vector Fields"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2026/hairy_ball/supplements.py",
+        "/home/nabin2004/Desktop/videos/_2026/hairy_ball/spheres.py",
+        "/home/nabin2004/Desktop/videos/_2026/hairy_ball/model3d.py"
+      ]
+    },
+    {
+      "id": "MB-012",
+      "title": "The Windmill Problem",
+      "difficulty_level": 4,
+      "domain": ["Geometry", "Combinatorics"],
+      "files": [
+        "/home/nabin2004/Desktop/videos/_2019/windmill.py"
+      ]
+    }
+  ]
+}

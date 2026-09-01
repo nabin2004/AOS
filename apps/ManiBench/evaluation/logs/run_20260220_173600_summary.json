@@ -1,0 +1,45 @@
+{
+  "config": {
+    "strategy": "zero_shot",
+    "trials": 1,
+    "n_models": 1,
+    "n_problems": 1
+  },
+  "global": {
+    "n_samples": 1,
+    "executability_mean": 0.0,
+    "version_conflict_mean": 0.0,
+    "alignment_mean": 1.0,
+    "coverage_mean": 0.1149
+  },
+  "per_model": {
+    "Gemma-3-27B": {
+      "n_samples": 1,
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.1149
+    }
+  },
+  "per_problem": {
+    "MB-005": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.1149
+    }
+  },
+  "grid": {
+    "Gemma-3-27B": {
+      "MB-005": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1149
+      }
+    }
+  }
+}

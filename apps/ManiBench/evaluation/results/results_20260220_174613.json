@@ -1,0 +1,211 @@
+[
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 35.72,
+      "prompt_tokens": 549,
+      "completion_tokens": 1472,
+      "code_length": 4189,
+      "code_lines": 126
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-001_trial1.py",
+    "metrics": {
+      "executability": 1,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.2341
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 1,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": true,
+        "error_type": null,
+        "error_message": null,
+        "scene_names": [
+          "ElasticCollision"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 15,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 13,
+        "events_total": 13,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Collision' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.5,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'ratios' found"
+          },
+          {
+            "event": "",
+            "weight": 0.5,
+            "detected": true,
+            "evidence": "'Text' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Circle' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.2341,
+        "dimension_scores": {
+          "math_annotations": 0.3333,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.1,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object",
+            "Text object",
+            "LaTeX math"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object"
+          ],
+          "structural_clarity": [
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 8,
+          "total": 8,
+          "details": [
+            {
+              "element": "Collision counter visible and updates in real-time",
+              "met": true,
+              "evidence": "keyword 'Collision' present"
+            },
+            {
+              "element": "Velocity labels or vectors shown (red arrows with numeric labels)",
+              "met": true,
+              "evidence": "keyword 'Velocity' present"
+            },
+            {
+              "element": "Mathematical annotations: mass values (kg labels on blocks), velocity values (DecimalNumber)",
+              "met": true,
+              "evidence": "keyword 'mass' present"
+            },
+            {
+              "element": "Conservation equations displayed with color-coded terms (mass=BLUE, velocity=RED)",
+              "met": true,
+              "evidence": "keyword 'Conservation' present"
+            },
+            {
+              "element": "Phase-space diagram with energy ellipse/circle and momentum line",
+              "met": true,
+              "evidence": "keyword 'Phase' present"
+            },
+            {
+              "element": "Clear start state (big block at rest, small block approaching) and end state (blocks separated)",
+              "met": true,
+              "evidence": "keyword 'start' present"
+            },
+            {
+              "element": "Multiple mass ratios demonstrating digit extraction pattern",
+              "met": true,
+              "evidence": "keyword 'mass' present"
+            },
+            {
+              "element": "Geometric circle-line argument with arc angles",
+              "met": true,
+              "evidence": "keyword 'circle' present"
+            }
+          ]
+        }
+      }
+    }
+  }
+]

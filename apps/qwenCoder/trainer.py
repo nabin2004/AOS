@@ -82,6 +82,22 @@ def build_trainer(
                 config.hub_checkpoint_id, enabled=True
             )
         )
+    if config.eval_manibench:
+        import sys
+        training_root = Path(__file__).resolve().parent.parent / "training"
+        if str(training_root) not in sys.path:
+            sys.path.insert(0, str(training_root))
+        try:
+            from manibench_callback import ManiBenchEvalCallback
+            trainer.add_callback(
+                ManiBenchEvalCallback(
+                    render=config.manibench_render,
+                    timeout=config.manibench_timeout,
+                )
+            )
+            print("Attached ManiBenchEvalCallback for epoch evaluation")
+        except Exception as exc:
+            print(f"WARNING: Could not attach ManiBenchEvalCallback ({exc})")
     return trainer
 
 

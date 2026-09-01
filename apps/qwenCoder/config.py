@@ -77,6 +77,9 @@ class TrainingConfig:
     sync_trainer_checkpoint: bool = False
     replay_ratio: float = 0.0
     replay_dataset: str = "nabin2004/manim-sft-10k"
+    eval_manibench: bool = False
+    manibench_render: bool = False
+    manibench_timeout: int = 20
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -179,6 +182,12 @@ class TrainingConfig:
             config = replace(config, replay_ratio=args.replay_ratio)
         if getattr(args, "replay_dataset", None) is not None:
             config = replace(config, replay_dataset=args.replay_dataset)
+        if getattr(args, "eval_manibench", False):
+            config = replace(config, eval_manibench=True)
+        if getattr(args, "manibench_render", False):
+            config = replace(config, manibench_render=True)
+        if getattr(args, "manibench_timeout", None) is not None:
+            config = replace(config, manibench_timeout=args.manibench_timeout)
         if args.output_dir is not None:
             config = replace(config, output_dir=Path(args.output_dir))
         if args.model_id is not None:
@@ -385,6 +394,22 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--replay-dataset",
         default=None,
         help='HF dataset for replay buffer (default: "nabin2004/manim-sft-10k")',
+    )
+    parser.add_argument(
+        "--eval-manibench",
+        action="store_true",
+        help="Evaluate on ManiBench benchmark dataset after each epoch and log to W&B",
+    )
+    parser.add_argument(
+        "--manibench-render",
+        action="store_true",
+        help="Enable headless Manim video rendering during ManiBench evaluation",
+    )
+    parser.add_argument(
+        "--manibench-timeout",
+        type=int,
+        default=None,
+        help="Per-scene rendering timeout in seconds (default: 20)",
     )
     parser.add_argument("--seq-len", type=int, default=None)
     parser.add_argument("--no-4bit", action="store_true")

@@ -1,0 +1,210 @@
+{
+  "config": {
+    "strategy": "zero_shot",
+    "trials": 3,
+    "n_models": 1,
+    "n_problems": 12
+  },
+  "global": {
+    "n_samples": 36,
+    "executability_mean": 0.0,
+    "version_conflict_mean": 1.0,
+    "alignment_mean": 0.0,
+    "coverage_mean": 0.0
+  },
+  "per_model": {
+    "Gemma-3-27B": {
+      "n_samples": 36,
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    }
+  },
+  "per_problem": {
+    "MB-001": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-002": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-003": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-004": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-005": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-006": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-007": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-008": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-009": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-010": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-011": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "MB-012": {
+      "n_samples": 3,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    }
+  },
+  "grid": {
+    "Gemma-3-27B": {
+      "MB-001": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-002": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-003": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-004": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-005": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-006": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-007": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-008": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-009": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-010": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-011": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-012": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      }
+    }
+  }
+}

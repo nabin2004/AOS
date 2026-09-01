@@ -56,6 +56,9 @@ class TrainingConfig:
     push_to_hub: bool = False
     hub_model_id: str = HUB_SFT_REPO
     hub_private: bool = False
+    eval_manibench: bool = False
+    manibench_render: bool = False
+    manibench_timeout: int = 20
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -157,6 +160,12 @@ class TrainingConfig:
             config = replace(config, hub_model_id=args.hub_model_id)
         if args.hub_private:
             config = replace(config, hub_private=True)
+        if getattr(args, "eval_manibench", False):
+            config = replace(config, eval_manibench=True)
+        if getattr(args, "manibench_render", False):
+            config = replace(config, manibench_render=True)
+        if getattr(args, "manibench_timeout", None) is not None:
+            config = replace(config, manibench_timeout=args.manibench_timeout)
         if args.run_name is not None:
             config = replace(config, run_name=args.run_name)
         return apply_vertex_env(config)
@@ -402,6 +411,22 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--hub-private",
         action="store_true",
         help="Create/upload the Hub model repo as private",
+    )
+    parser.add_argument(
+        "--eval-manibench",
+        action="store_true",
+        help="Evaluate on ManiBench benchmark dataset after each epoch and log to W&B",
+    )
+    parser.add_argument(
+        "--manibench-render",
+        action="store_true",
+        help="Enable headless Manim video rendering during ManiBench evaluation",
+    )
+    parser.add_argument(
+        "--manibench-timeout",
+        type=int,
+        default=None,
+        help="Per-scene rendering timeout in seconds (default: 20)",
     )
     parser.add_argument(
         "--run-name",

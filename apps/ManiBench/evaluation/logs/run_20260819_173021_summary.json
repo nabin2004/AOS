@@ -1,0 +1,210 @@
+{
+  "config": {
+    "strategy": "zero_shot",
+    "trials": 1,
+    "n_models": 1,
+    "n_problems": 12
+  },
+  "global": {
+    "n_samples": 12,
+    "executability_mean": 0.16666666666666666,
+    "version_conflict_mean": 0.0,
+    "alignment_mean": 0.9925083333333333,
+    "coverage_mean": 0.23190833333333336
+  },
+  "per_model": {
+    "aos-qwen2.5-coder-7b-manim": {
+      "n_samples": 12,
+      "executability_mean": 0.16666666666666666,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.9925083333333333,
+      "coverage_mean": 0.23190833333333336
+    }
+  },
+  "per_problem": {
+    "MB-001": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.9101,
+      "coverage_mean": 0.2741
+    },
+    "MB-002": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.2264
+    },
+    "MB-003": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 1.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.2186
+    },
+    "MB-004": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.203
+    },
+    "MB-005": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.1879
+    },
+    "MB-006": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.3666
+    },
+    "MB-007": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.2477
+    },
+    "MB-008": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.2677
+    },
+    "MB-009": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 1.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.2604
+    },
+    "MB-010": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.2715
+    },
+    "MB-011": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.1441
+    },
+    "MB-012": {
+      "n_samples": 1,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.1149
+    }
+  },
+  "grid": {
+    "aos-qwen2.5-coder-7b-manim": {
+      "MB-001": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.9101,
+        "cov": 0.2741
+      },
+      "MB-002": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2264
+      },
+      "MB-003": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2186
+      },
+      "MB-004": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.203
+      },
+      "MB-005": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1879
+      },
+      "MB-006": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.3666
+      },
+      "MB-007": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2477
+      },
+      "MB-008": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2677
+      },
+      "MB-009": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2604
+      },
+      "MB-010": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2715
+      },
+      "MB-011": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1441
+      },
+      "MB-012": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1149
+      }
+    }
+  }
+}

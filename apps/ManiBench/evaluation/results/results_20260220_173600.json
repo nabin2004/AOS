@@ -1,0 +1,143 @@
+[
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 12.92,
+      "prompt_tokens": 252,
+      "completion_tokens": 503,
+      "code_length": 1705,
+      "code_lines": 53
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-005_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1149
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "ValueError",
+        "error_message": "ValueError: could not broadcast input array from shape (1,2) into shape (1,3)",
+        "scene_names": [
+          "DeterminantVisualization"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1149,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "fill styling"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "arrange layout",
+            "paced wait",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Original area labeled as 1",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            },
+            {
+              "element": "New area computed and labeled with numeric value",
+              "met": true,
+              "evidence": "keyword 'area' present"
+            },
+            {
+              "element": "Matrix displayed with numeric entries",
+              "met": true,
+              "evidence": "keyword 'Matrix' present"
+            },
+            {
+              "element": "Determinant value numeric and visible",
+              "met": true,
+              "evidence": "keyword 'Determinant' present"
+            },
+            {
+              "element": "Parallelogram filled or shaded to make area visually apparent",
+              "met": true,
+              "evidence": "keyword 'Parallelogram' present"
+            }
+          ]
+        }
+      }
+    }
+  }
+]

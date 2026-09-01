@@ -1,0 +1,768 @@
+{
+  "config": {
+    "strategy": "few_shot",
+    "trials": 3,
+    "n_models": 7,
+    "n_problems": 12
+  },
+  "global": {
+    "n_samples": 252,
+    "executability_mean": 0.015873015873015872,
+    "version_conflict_mean": 0.8571428571428571,
+    "alignment_mean": 0.14285714285714285,
+    "coverage_mean": 0.028597222222222222
+  },
+  "per_model": {
+    "Gemma-3-27B": {
+      "n_samples": 36,
+      "executability_mean": 0.1111111111111111,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.20018055555555556
+    },
+    "Llama-3.3-70B": {
+      "n_samples": 36,
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "DeepSeek-R1-0528": {
+      "n_samples": 36,
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "DeepSeek-V3-0324": {
+      "n_samples": 36,
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "QwQ-32B": {
+      "n_samples": 36,
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "Qwen3-30B-A3B": {
+      "n_samples": 36,
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    },
+    "Mistral-Nemo-12B": {
+      "n_samples": 36,
+      "executability_mean": 0.0,
+      "version_conflict_mean": 1.0,
+      "alignment_mean": 0.0,
+      "coverage_mean": 0.0
+    }
+  },
+  "per_problem": {
+    "MB-001": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.036680952380952384
+    },
+    "MB-002": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.024485714285714284
+    },
+    "MB-003": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.03268571428571428
+    },
+    "MB-004": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.029271428571428573
+    },
+    "MB-005": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.024842857142857146
+    },
+    "MB-006": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.047619047619047616,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.022723809523809525
+    },
+    "MB-007": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.047619047619047616,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.03718095238095238
+    },
+    "MB-008": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.09523809523809523,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.04297142857142858
+    },
+    "MB-009": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.03127619047619048
+    },
+    "MB-010": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.03379047619047619
+    },
+    "MB-011": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.018357142857142857
+    },
+    "MB-012": {
+      "n_samples": 21,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.8571428571428571,
+      "alignment_mean": 0.14285714285714285,
+      "coverage_mean": 0.0089
+    }
+  },
+  "grid": {
+    "Gemma-3-27B": {
+      "MB-001": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.25676666666666664
+      },
+      "MB-002": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1714
+      },
+      "MB-003": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2288
+      },
+      "MB-004": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2049
+      },
+      "MB-005": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.17390000000000003
+      },
+      "MB-006": {
+        "n": 3,
+        "exec": 0.3333333333333333,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.15906666666666666
+      },
+      "MB-007": {
+        "n": 3,
+        "exec": 0.3333333333333333,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.26026666666666665
+      },
+      "MB-008": {
+        "n": 3,
+        "exec": 0.6666666666666666,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.3008
+      },
+      "MB-009": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.21893333333333334
+      },
+      "MB-010": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.23653333333333335
+      },
+      "MB-011": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1285
+      },
+      "MB-012": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.0623
+      }
+    },
+    "Llama-3.3-70B": {
+      "MB-001": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-002": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-003": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-004": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-005": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-006": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-007": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-008": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-009": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-010": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-011": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-012": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      }
+    },
+    "DeepSeek-R1-0528": {
+      "MB-001": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-002": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-003": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-004": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-005": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-006": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-007": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-008": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-009": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-010": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-011": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-012": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      }
+    },
+    "DeepSeek-V3-0324": {
+      "MB-001": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-002": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-003": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-004": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-005": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-006": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-007": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-008": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-009": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-010": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-011": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-012": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      }
+    },
+    "QwQ-32B": {
+      "MB-001": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-002": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-003": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-004": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-005": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-006": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-007": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-008": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-009": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-010": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-011": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-012": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      }
+    },
+    "Qwen3-30B-A3B": {
+      "MB-001": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-002": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-003": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-004": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-005": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-006": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-007": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-008": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-009": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-010": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-011": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-012": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      }
+    },
+    "Mistral-Nemo-12B": {
+      "MB-001": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-002": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-003": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-004": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-005": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-006": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-007": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-008": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-009": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-010": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-011": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-012": {
+        "n": 3,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      }
+    }
+  }
+}

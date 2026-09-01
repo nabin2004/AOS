@@ -1,0 +1,5518 @@
+[
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 29.89,
+      "prompt_tokens": 549,
+      "completion_tokens": 1189,
+      "code_length": 3389,
+      "code_lines": 98
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-001_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 0.9101,
+      "coverage_score": 0.2404
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: \nMobject.__init__() got an",
+        "scene_names": [
+          "ElasticCollision"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 15,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 0.9101,
+        "events_detected": 12,
+        "events_total": 13,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Collision' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.5,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": false,
+            "evidence": "not detected"
+          },
+          {
+            "event": "",
+            "weight": 0.5,
+            "detected": true,
+            "evidence": "'Text' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Circle' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.2404,
+        "dimension_scores": {
+          "math_annotations": 0.3333,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object",
+            "Text object",
+            "LaTeX math"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "paced wait",
+            "fade-out cleanup",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 8,
+          "total": 8,
+          "details": [
+            {
+              "element": "Collision counter visible and updates in real-time",
+              "met": true,
+              "evidence": "keyword 'Collision' present"
+            },
+            {
+              "element": "Velocity labels or vectors shown (red arrows with numeric labels)",
+              "met": true,
+              "evidence": "keyword 'Velocity' present"
+            },
+            {
+              "element": "Mathematical annotations: mass values (kg labels on blocks), velocity values (DecimalNumber)",
+              "met": true,
+              "evidence": "keyword 'mass' present"
+            },
+            {
+              "element": "Conservation equations displayed with color-coded terms (mass=BLUE, velocity=RED)",
+              "met": true,
+              "evidence": "keyword 'Conservation' present"
+            },
+            {
+              "element": "Phase-space diagram with energy ellipse/circle and momentum line",
+              "met": true,
+              "evidence": "keyword 'Phase' present"
+            },
+            {
+              "element": "Clear start state (big block at rest, small block approaching) and end state (blocks separated)",
+              "met": true,
+              "evidence": "keyword 'start' present"
+            },
+            {
+              "element": "Multiple mass ratios demonstrating digit extraction pattern",
+              "met": true,
+              "evidence": "keyword 'mass' present"
+            },
+            {
+              "element": "Geometric circle-line argument with arc angles",
+              "met": true,
+              "evidence": "keyword 'circle' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 34.34,
+      "prompt_tokens": 549,
+      "completion_tokens": 1323,
+      "code_length": 3783,
+      "code_lines": 103
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-001_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 0.9101,
+      "coverage_score": 0.2404
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: \nMobject.__init__() got an",
+        "scene_names": [
+          "ElasticCollision"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 15,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 0.9101,
+        "events_detected": 12,
+        "events_total": 13,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Collision' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.5,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": false,
+            "evidence": "not detected"
+          },
+          {
+            "event": "",
+            "weight": 0.5,
+            "detected": true,
+            "evidence": "'Text' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Circle' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.2404,
+        "dimension_scores": {
+          "math_annotations": 0.3333,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "MathTex object",
+            "Text object",
+            "LaTeX math"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "paced wait",
+            "fade-out cleanup",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 8,
+          "total": 8,
+          "details": [
+            {
+              "element": "Collision counter visible and updates in real-time",
+              "met": true,
+              "evidence": "keyword 'Collision' present"
+            },
+            {
+              "element": "Velocity labels or vectors shown (red arrows with numeric labels)",
+              "met": true,
+              "evidence": "keyword 'Velocity' present"
+            },
+            {
+              "element": "Mathematical annotations: mass values (kg labels on blocks), velocity values (DecimalNumber)",
+              "met": true,
+              "evidence": "keyword 'mass' present"
+            },
+            {
+              "element": "Conservation equations displayed with color-coded terms (mass=BLUE, velocity=RED)",
+              "met": true,
+              "evidence": "keyword 'Conservation' present"
+            },
+            {
+              "element": "Phase-space diagram with energy ellipse/circle and momentum line",
+              "met": true,
+              "evidence": "keyword 'Phase' present"
+            },
+            {
+              "element": "Clear start state (big block at rest, small block approaching) and end state (blocks separated)",
+              "met": true,
+              "evidence": "keyword 'start' present"
+            },
+            {
+              "element": "Multiple mass ratios demonstrating digit extraction pattern",
+              "met": true,
+              "evidence": "keyword 'mass' present"
+            },
+            {
+              "element": "Geometric circle-line argument with arc angles",
+              "met": true,
+              "evidence": "keyword 'circle' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 28.05,
+      "prompt_tokens": 549,
+      "completion_tokens": 1157,
+      "code_length": 3343,
+      "code_lines": 100
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-001_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 0.9101,
+      "coverage_score": 0.2404
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: \nMobject.__init__() got an",
+        "scene_names": [
+          "ElasticCollision"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 15,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 0.9101,
+        "events_detected": 12,
+        "events_total": 13,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Collision' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.5,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": false,
+            "evidence": "not detected"
+          },
+          {
+            "event": "",
+            "weight": 0.5,
+            "detected": true,
+            "evidence": "'Text' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Circle' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.2404,
+        "dimension_scores": {
+          "math_annotations": 0.3333,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object",
+            "Text object",
+            "LaTeX math"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "paced wait",
+            "fade-out cleanup",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 8,
+          "total": 8,
+          "details": [
+            {
+              "element": "Collision counter visible and updates in real-time",
+              "met": true,
+              "evidence": "keyword 'Collision' present"
+            },
+            {
+              "element": "Velocity labels or vectors shown (red arrows with numeric labels)",
+              "met": true,
+              "evidence": "keyword 'Velocity' present"
+            },
+            {
+              "element": "Mathematical annotations: mass values (kg labels on blocks), velocity values (DecimalNumber)",
+              "met": true,
+              "evidence": "keyword 'mass' present"
+            },
+            {
+              "element": "Conservation equations displayed with color-coded terms (mass=BLUE, velocity=RED)",
+              "met": true,
+              "evidence": "keyword 'Conservation' present"
+            },
+            {
+              "element": "Phase-space diagram with energy ellipse/circle and momentum line",
+              "met": true,
+              "evidence": "keyword 'Phase' present"
+            },
+            {
+              "element": "Clear start state (big block at rest, small block approaching) and end state (blocks separated)",
+              "met": true,
+              "evidence": "keyword 'start' present"
+            },
+            {
+              "element": "Multiple mass ratios demonstrating digit extraction pattern",
+              "met": true,
+              "evidence": "keyword 'mass' present"
+            },
+            {
+              "element": "Geometric circle-line argument with arc angles",
+              "met": true,
+              "evidence": "keyword 'circle' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-002",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 24.63,
+      "prompt_tokens": 282,
+      "completion_tokens": 1029,
+      "code_length": 3194,
+      "code_lines": 92
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-002_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1641
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: Mobject.__init__() got an unexpected keyword argument 'x_range'",
+        "scene_names": [
+          "GradientDescent"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 13,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Surface' (category: 3d)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1641,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.1,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "NumberPlane"
+          ],
+          "structural_clarity": [
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Axis labels present ('w\u2081', 'w\u2082', 'Loss')",
+              "met": true,
+              "evidence": "keyword 'labels' present"
+            },
+            {
+              "element": "Gradient arrows visible and pointing in \u2212\u2207L direction",
+              "met": true,
+              "evidence": "keyword 'Gradient' present"
+            },
+            {
+              "element": "Loss curve displayed and updating synchronously with dot",
+              "met": true,
+              "evidence": "keyword 'Loss' present"
+            },
+            {
+              "element": "Step count or iteration number displayed",
+              "met": true,
+              "evidence": "keyword 'Step' present"
+            },
+            {
+              "element": "Learning rate value or \u03b1 label shown",
+              "met": true,
+              "evidence": "keyword 'Learning' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-002",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 24.49,
+      "prompt_tokens": 282,
+      "completion_tokens": 1029,
+      "code_length": 3194,
+      "code_lines": 92
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-002_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1641
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: Mobject.__init__() got an unexpected keyword argument 'x_range'",
+        "scene_names": [
+          "GradientDescent"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 13,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Surface' (category: 3d)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1641,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.1,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "NumberPlane"
+          ],
+          "structural_clarity": [
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Axis labels present ('w\u2081', 'w\u2082', 'Loss')",
+              "met": true,
+              "evidence": "keyword 'labels' present"
+            },
+            {
+              "element": "Gradient arrows visible and pointing in \u2212\u2207L direction",
+              "met": true,
+              "evidence": "keyword 'Gradient' present"
+            },
+            {
+              "element": "Loss curve displayed and updating synchronously with dot",
+              "met": true,
+              "evidence": "keyword 'Loss' present"
+            },
+            {
+              "element": "Step count or iteration number displayed",
+              "met": true,
+              "evidence": "keyword 'Step' present"
+            },
+            {
+              "element": "Learning rate value or \u03b1 label shown",
+              "met": true,
+              "evidence": "keyword 'Learning' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-002",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 24.61,
+      "prompt_tokens": 282,
+      "completion_tokens": 1029,
+      "code_length": 3194,
+      "code_lines": 92
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-002_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1641
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: Mobject.__init__() got an unexpected keyword argument 'x_range'",
+        "scene_names": [
+          "GradientDescent"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 13,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Surface' (category: 3d)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.6,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1641,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.1,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "NumberPlane"
+          ],
+          "structural_clarity": [
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Axis labels present ('w\u2081', 'w\u2082', 'Loss')",
+              "met": true,
+              "evidence": "keyword 'labels' present"
+            },
+            {
+              "element": "Gradient arrows visible and pointing in \u2212\u2207L direction",
+              "met": true,
+              "evidence": "keyword 'Gradient' present"
+            },
+            {
+              "element": "Loss curve displayed and updating synchronously with dot",
+              "met": true,
+              "evidence": "keyword 'Loss' present"
+            },
+            {
+              "element": "Step count or iteration number displayed",
+              "met": true,
+              "evidence": "keyword 'Step' present"
+            },
+            {
+              "element": "Learning rate value or \u03b1 label shown",
+              "met": true,
+              "evidence": "keyword 'Learning' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-003",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 18.86,
+      "prompt_tokens": 270,
+      "completion_tokens": 780,
+      "code_length": 2563,
+      "code_lines": 76
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-003_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.225
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Axes object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "ConvolutionAnimation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 14,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Axes' (category: graph)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.225,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.5455
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Text object"
+          ],
+          "visual_mapping": [
+            "explicit color setter",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "arrange layout",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Signal, kernel, and output labeled with text ('Signal', 'Kernel', 'Convolution Output')",
+              "met": true,
+              "evidence": "keyword 'Signal' present"
+            },
+            {
+              "element": "Window visibly distinct from signal (different color, opacity, or border)",
+              "met": true,
+              "evidence": "keyword 'signal' present"
+            },
+            {
+              "element": "Output graph points added one by one, not all at once",
+              "met": true,
+              "evidence": "keyword 'Output' present"
+            },
+            {
+              "element": "Color coding or highlighting of product region at each step",
+              "met": true,
+              "evidence": "keyword 'Color' present"
+            },
+            {
+              "element": "Correspondence between window position and output point made visually clear",
+              "met": true,
+              "evidence": "keyword 'position' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-003",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 18.97,
+      "prompt_tokens": 270,
+      "completion_tokens": 780,
+      "code_length": 2563,
+      "code_lines": 76
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-003_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.225
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Axes object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "ConvolutionAnimation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 14,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Axes' (category: graph)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.225,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.5455
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Text object"
+          ],
+          "visual_mapping": [
+            "explicit color setter",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "arrange layout",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Signal, kernel, and output labeled with text ('Signal', 'Kernel', 'Convolution Output')",
+              "met": true,
+              "evidence": "keyword 'Signal' present"
+            },
+            {
+              "element": "Window visibly distinct from signal (different color, opacity, or border)",
+              "met": true,
+              "evidence": "keyword 'signal' present"
+            },
+            {
+              "element": "Output graph points added one by one, not all at once",
+              "met": true,
+              "evidence": "keyword 'Output' present"
+            },
+            {
+              "element": "Color coding or highlighting of product region at each step",
+              "met": true,
+              "evidence": "keyword 'Color' present"
+            },
+            {
+              "element": "Correspondence between window position and output point made visually clear",
+              "met": true,
+              "evidence": "keyword 'position' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-003",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 18.96,
+      "prompt_tokens": 270,
+      "completion_tokens": 780,
+      "code_length": 2563,
+      "code_lines": 76
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-003_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.225
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Axes object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "ConvolutionAnimation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 14,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Axes' (category: graph)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'shift' (category: move)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.225,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.5455
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Text object"
+          ],
+          "visual_mapping": [
+            "explicit color setter",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "arrange layout",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Signal, kernel, and output labeled with text ('Signal', 'Kernel', 'Convolution Output')",
+              "met": true,
+              "evidence": "keyword 'Signal' present"
+            },
+            {
+              "element": "Window visibly distinct from signal (different color, opacity, or border)",
+              "met": true,
+              "evidence": "keyword 'signal' present"
+            },
+            {
+              "element": "Output graph points added one by one, not all at once",
+              "met": true,
+              "evidence": "keyword 'Output' present"
+            },
+            {
+              "element": "Color coding or highlighting of product region at each step",
+              "met": true,
+              "evidence": "keyword 'Color' present"
+            },
+            {
+              "element": "Correspondence between window position and output point made visually clear",
+              "met": true,
+              "evidence": "keyword 'position' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-004",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 20.34,
+      "prompt_tokens": 284,
+      "completion_tokens": 830,
+      "code_length": 2776,
+      "code_lines": 67
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-004_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1563
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: NumberPlane object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "EigenvectorTransformation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 1,
+          "total_checked": 10,
+          "matched": [
+            "self.camera.frame manipulation \u2192 MovingCameraScene in CE"
+          ]
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Arrow' (category: arrow)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1563,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.1,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "NumberPlane"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Matrix A displayed with numeric entries (e.g., [[3,1],[0,2]])",
+              "met": true,
+              "evidence": "keyword 'Matrix' present"
+            },
+            {
+              "element": "Eigenvalue numbers shown (not just symbols)",
+              "met": true,
+              "evidence": "keyword 'Eigenvalue' present"
+            },
+            {
+              "element": "Eigenvector colors consistent before, during, and after transformation",
+              "met": true,
+              "evidence": "keyword 'Eigenvector' present"
+            },
+            {
+              "element": "Before/after transformation visible or comparable (showing grid deformation)",
+              "met": true,
+              "evidence": "keyword 'transformation' present"
+            },
+            {
+              "element": "At least one non-eigenvector shown rotating for contrast",
+              "met": true,
+              "evidence": "keyword 'eigenvector' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-004",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 19.99,
+      "prompt_tokens": 284,
+      "completion_tokens": 830,
+      "code_length": 2776,
+      "code_lines": 67
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-004_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1563
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: NumberPlane object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "EigenvectorTransformation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 1,
+          "total_checked": 10,
+          "matched": [
+            "self.camera.frame manipulation \u2192 MovingCameraScene in CE"
+          ]
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Arrow' (category: arrow)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1563,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.1,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "NumberPlane"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Matrix A displayed with numeric entries (e.g., [[3,1],[0,2]])",
+              "met": true,
+              "evidence": "keyword 'Matrix' present"
+            },
+            {
+              "element": "Eigenvalue numbers shown (not just symbols)",
+              "met": true,
+              "evidence": "keyword 'Eigenvalue' present"
+            },
+            {
+              "element": "Eigenvector colors consistent before, during, and after transformation",
+              "met": true,
+              "evidence": "keyword 'Eigenvector' present"
+            },
+            {
+              "element": "Before/after transformation visible or comparable (showing grid deformation)",
+              "met": true,
+              "evidence": "keyword 'transformation' present"
+            },
+            {
+              "element": "At least one non-eigenvector shown rotating for contrast",
+              "met": true,
+              "evidence": "keyword 'eigenvector' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-004",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 19.97,
+      "prompt_tokens": 284,
+      "completion_tokens": 830,
+      "code_length": 2776,
+      "code_lines": 67
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-004_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1563
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: NumberPlane object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "EigenvectorTransformation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 1,
+          "total_checked": 10,
+          "matched": [
+            "self.camera.frame manipulation \u2192 MovingCameraScene in CE"
+          ]
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Arrow' (category: arrow)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1563,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.1,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "NumberPlane"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Matrix A displayed with numeric entries (e.g., [[3,1],[0,2]])",
+              "met": true,
+              "evidence": "keyword 'Matrix' present"
+            },
+            {
+              "element": "Eigenvalue numbers shown (not just symbols)",
+              "met": true,
+              "evidence": "keyword 'Eigenvalue' present"
+            },
+            {
+              "element": "Eigenvector colors consistent before, during, and after transformation",
+              "met": true,
+              "evidence": "keyword 'Eigenvector' present"
+            },
+            {
+              "element": "Before/after transformation visible or comparable (showing grid deformation)",
+              "met": true,
+              "evidence": "keyword 'transformation' present"
+            },
+            {
+              "element": "At least one non-eigenvector shown rotating for contrast",
+              "met": true,
+              "evidence": "keyword 'eigenvector' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 12.7,
+      "prompt_tokens": 252,
+      "completion_tokens": 503,
+      "code_length": 1705,
+      "code_lines": 53
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-005_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1149
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "ValueError",
+        "error_message": "ValueError: could not broadcast input array from shape (1,2) into shape (1,3)",
+        "scene_names": [
+          "DeterminantVisualization"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1149,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "fill styling"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "arrange layout",
+            "paced wait",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Original area labeled as 1",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            },
+            {
+              "element": "New area computed and labeled with numeric value",
+              "met": true,
+              "evidence": "keyword 'area' present"
+            },
+            {
+              "element": "Matrix displayed with numeric entries",
+              "met": true,
+              "evidence": "keyword 'Matrix' present"
+            },
+            {
+              "element": "Determinant value numeric and visible",
+              "met": true,
+              "evidence": "keyword 'Determinant' present"
+            },
+            {
+              "element": "Parallelogram filled or shaded to make area visually apparent",
+              "met": true,
+              "evidence": "keyword 'Parallelogram' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 12.78,
+      "prompt_tokens": 252,
+      "completion_tokens": 503,
+      "code_length": 1705,
+      "code_lines": 53
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-005_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1149
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "ValueError",
+        "error_message": "ValueError: could not broadcast input array from shape (1,2) into shape (1,3)",
+        "scene_names": [
+          "DeterminantVisualization"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1149,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "fill styling"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "arrange layout",
+            "paced wait",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Original area labeled as 1",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            },
+            {
+              "element": "New area computed and labeled with numeric value",
+              "met": true,
+              "evidence": "keyword 'area' present"
+            },
+            {
+              "element": "Matrix displayed with numeric entries",
+              "met": true,
+              "evidence": "keyword 'Matrix' present"
+            },
+            {
+              "element": "Determinant value numeric and visible",
+              "met": true,
+              "evidence": "keyword 'Determinant' present"
+            },
+            {
+              "element": "Parallelogram filled or shaded to make area visually apparent",
+              "met": true,
+              "evidence": "keyword 'Parallelogram' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 12.41,
+      "prompt_tokens": 252,
+      "completion_tokens": 503,
+      "code_length": 1705,
+      "code_lines": 53
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-005_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1149
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "ValueError",
+        "error_message": "ValueError: could not broadcast input array from shape (1,2) into shape (1,3)",
+        "scene_names": [
+          "DeterminantVisualization"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Transform' (category: transform)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1149,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "fill styling"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "arrange layout",
+            "paced wait",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Original area labeled as 1",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            },
+            {
+              "element": "New area computed and labeled with numeric value",
+              "met": true,
+              "evidence": "keyword 'area' present"
+            },
+            {
+              "element": "Matrix displayed with numeric entries",
+              "met": true,
+              "evidence": "keyword 'Matrix' present"
+            },
+            {
+              "element": "Determinant value numeric and visible",
+              "met": true,
+              "evidence": "keyword 'Determinant' present"
+            },
+            {
+              "element": "Parallelogram filled or shaded to make area visually apparent",
+              "met": true,
+              "evidence": "keyword 'Parallelogram' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-006",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 14.89,
+      "prompt_tokens": 250,
+      "completion_tokens": 608,
+      "code_length": 2216,
+      "code_lines": 66
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-006_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1012
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "NameError",
+        "error_message": "NameError: name 'Histogram' is not defined",
+        "scene_names": [
+          "CentralLimitTheorem"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 11,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "description keyword 'Original' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Write' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Sample' found"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "description keyword 'Histogram' found"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Histogram' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "description keyword 'Normal' found"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1012,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Original distribution labeled (e.g., 'Uniform Distribution' or 'Bimodal Distribution')",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            },
+            {
+              "element": "Sampling process visually indicated (not just stated in text)",
+              "met": true,
+              "evidence": "keyword 'process' present"
+            },
+            {
+              "element": "Normal distribution labeled or overlaid as curve",
+              "met": true,
+              "evidence": "keyword 'Normal' present"
+            },
+            {
+              "element": "Text explanation of CLT present ('Distribution of sample means \u2192 Normal')",
+              "met": true,
+              "evidence": "keyword 'Text' present"
+            },
+            {
+              "element": "Sample size n labeled or indicated",
+              "met": true,
+              "evidence": "keyword 'Sample' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-006",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 14.94,
+      "prompt_tokens": 250,
+      "completion_tokens": 608,
+      "code_length": 2216,
+      "code_lines": 66
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-006_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1012
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "NameError",
+        "error_message": "NameError: name 'Histogram' is not defined",
+        "scene_names": [
+          "CentralLimitTheorem"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 11,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "description keyword 'Original' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Write' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Sample' found"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "description keyword 'Histogram' found"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Histogram' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "description keyword 'Normal' found"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1012,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Original distribution labeled (e.g., 'Uniform Distribution' or 'Bimodal Distribution')",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            },
+            {
+              "element": "Sampling process visually indicated (not just stated in text)",
+              "met": true,
+              "evidence": "keyword 'process' present"
+            },
+            {
+              "element": "Normal distribution labeled or overlaid as curve",
+              "met": true,
+              "evidence": "keyword 'Normal' present"
+            },
+            {
+              "element": "Text explanation of CLT present ('Distribution of sample means \u2192 Normal')",
+              "met": true,
+              "evidence": "keyword 'Text' present"
+            },
+            {
+              "element": "Sample size n labeled or indicated",
+              "met": true,
+              "evidence": "keyword 'Sample' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-006",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 14.87,
+      "prompt_tokens": 250,
+      "completion_tokens": 608,
+      "code_length": 2216,
+      "code_lines": 66
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-006_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1012
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "NameError",
+        "error_message": "NameError: name 'Histogram' is not defined",
+        "scene_names": [
+          "CentralLimitTheorem"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 11,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "description keyword 'Original' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Write' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Sample' found"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "description keyword 'Histogram' found"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Histogram' found"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "description keyword 'Normal' found"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1012,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Original distribution labeled (e.g., 'Uniform Distribution' or 'Bimodal Distribution')",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            },
+            {
+              "element": "Sampling process visually indicated (not just stated in text)",
+              "met": true,
+              "evidence": "keyword 'process' present"
+            },
+            {
+              "element": "Normal distribution labeled or overlaid as curve",
+              "met": true,
+              "evidence": "keyword 'Normal' present"
+            },
+            {
+              "element": "Text explanation of CLT present ('Distribution of sample means \u2192 Normal')",
+              "met": true,
+              "evidence": "keyword 'Text' present"
+            },
+            {
+              "element": "Sample size n labeled or indicated",
+              "met": true,
+              "evidence": "keyword 'Sample' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-007",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 28.8,
+      "prompt_tokens": 355,
+      "completion_tokens": 1213,
+      "code_length": 3606,
+      "code_lines": 69
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-007_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1304
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Rectangle object has no attribute 'bottom_left'",
+        "scene_names": [
+          "BayesTheoremAnimation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 11,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Rectangle' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1304,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.1818
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "fill styling",
+            "SurroundingRectangle",
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "paced wait",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "All four quadrants labeled with text and numeric counts",
+              "met": true,
+              "evidence": "keyword 'quadrants' present"
+            },
+            {
+              "element": "Numeric counts or percentages shown (e.g., 1 sick in 1000)",
+              "met": true,
+              "evidence": "keyword 'counts' present"
+            },
+            {
+              "element": "Formula displayed: P(sick | +) = ... with numeric substitution",
+              "met": true,
+              "evidence": "keyword 'sick' present"
+            },
+            {
+              "element": "Final probability number visible and highlighted as counterintuitive",
+              "met": true,
+              "evidence": "keyword 'Final' present"
+            },
+            {
+              "element": "Test accuracy (e.g., 95%) stated explicitly",
+              "met": true,
+              "evidence": "keyword 'Test' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-007",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 26.37,
+      "prompt_tokens": 355,
+      "completion_tokens": 1100,
+      "code_length": 3437,
+      "code_lines": 68
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-007_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1304
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Rectangle object has no attribute 'bottom_left'",
+        "scene_names": [
+          "BayesTheoremAnimation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 11,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Rectangle' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1304,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.1818
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "fill styling",
+            "SurroundingRectangle",
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "paced wait",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "All four quadrants labeled with text and numeric counts",
+              "met": true,
+              "evidence": "keyword 'quadrants' present"
+            },
+            {
+              "element": "Numeric counts or percentages shown (e.g., 1 sick in 1000)",
+              "met": true,
+              "evidence": "keyword 'counts' present"
+            },
+            {
+              "element": "Formula displayed: P(sick | +) = ... with numeric substitution",
+              "met": true,
+              "evidence": "keyword 'sick' present"
+            },
+            {
+              "element": "Final probability number visible and highlighted as counterintuitive",
+              "met": true,
+              "evidence": "keyword 'Final' present"
+            },
+            {
+              "element": "Test accuracy (e.g., 95%) stated explicitly",
+              "met": true,
+              "evidence": "keyword 'Test' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-007",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 26.35,
+      "prompt_tokens": 355,
+      "completion_tokens": 1100,
+      "code_length": 3437,
+      "code_lines": 68
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-007_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1304
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Rectangle object has no attribute 'bottom_left'",
+        "scene_names": [
+          "BayesTheoremAnimation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 11,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Rectangle' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1304,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.1818
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "fill styling",
+            "SurroundingRectangle",
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "paced wait",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "All four quadrants labeled with text and numeric counts",
+              "met": true,
+              "evidence": "keyword 'quadrants' present"
+            },
+            {
+              "element": "Numeric counts or percentages shown (e.g., 1 sick in 1000)",
+              "met": true,
+              "evidence": "keyword 'counts' present"
+            },
+            {
+              "element": "Formula displayed: P(sick | +) = ... with numeric substitution",
+              "met": true,
+              "evidence": "keyword 'sick' present"
+            },
+            {
+              "element": "Final probability number visible and highlighted as counterintuitive",
+              "met": true,
+              "evidence": "keyword 'Final' present"
+            },
+            {
+              "element": "Test accuracy (e.g., 95%) stated explicitly",
+              "met": true,
+              "evidence": "keyword 'Test' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-008",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 29.2,
+      "prompt_tokens": 316,
+      "completion_tokens": 1218,
+      "code_length": 3033,
+      "code_lines": 80
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-008_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1841
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Axes object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "ChainRuleAnimation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 7,
+        "events_total": 7,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1841,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 2,
+          "total": 5,
+          "details": [
+            {
+              "element": "Both function graphs labeled with function names",
+              "met": true,
+              "evidence": "keyword 'function' present"
+            },
+            {
+              "element": "Infinitesimal changes indicated visually (dx, du, dy) with brackets or segments",
+              "met": false,
+              "evidence": "not detected"
+            },
+            {
+              "element": "Arrows or animations showing causal propagation direction (x \u2192 u \u2192 y)",
+              "met": false,
+              "evidence": "not detected"
+            },
+            {
+              "element": "Derivative symbols shown (f', g', or d/dx notation)",
+              "met": true,
+              "evidence": "keyword 'Derivative' present"
+            },
+            {
+              "element": "Connection between graphs made explicit (output of g feeds into f)",
+              "met": false,
+              "evidence": "not detected"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-008",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 28.99,
+      "prompt_tokens": 316,
+      "completion_tokens": 1187,
+      "code_length": 2949,
+      "code_lines": 75
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-008_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1841
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Axes object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "ChainRuleAnimation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 7,
+        "events_total": 7,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1841,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 3,
+          "total": 5,
+          "details": [
+            {
+              "element": "Both function graphs labeled with function names",
+              "met": true,
+              "evidence": "keyword 'function' present"
+            },
+            {
+              "element": "Infinitesimal changes indicated visually (dx, du, dy) with brackets or segments",
+              "met": true,
+              "evidence": "keyword 'changes' present"
+            },
+            {
+              "element": "Arrows or animations showing causal propagation direction (x \u2192 u \u2192 y)",
+              "met": false,
+              "evidence": "not detected"
+            },
+            {
+              "element": "Derivative symbols shown (f', g', or d/dx notation)",
+              "met": true,
+              "evidence": "keyword 'Derivative' present"
+            },
+            {
+              "element": "Connection between graphs made explicit (output of g feeds into f)",
+              "met": false,
+              "evidence": "not detected"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-008",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 32.83,
+      "prompt_tokens": 316,
+      "completion_tokens": 1348,
+      "code_length": 3444,
+      "code_lines": 88
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-008_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1977
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Axes object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "ChainRuleAnimation"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 7,
+        "events_total": 7,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Text' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Text' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Text' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1977,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2143,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "Arrow indicator",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 4,
+          "total": 5,
+          "details": [
+            {
+              "element": "Both function graphs labeled with function names",
+              "met": true,
+              "evidence": "keyword 'function' present"
+            },
+            {
+              "element": "Infinitesimal changes indicated visually (dx, du, dy) with brackets or segments",
+              "met": true,
+              "evidence": "keyword 'changes' present"
+            },
+            {
+              "element": "Arrows or animations showing causal propagation direction (x \u2192 u \u2192 y)",
+              "met": true,
+              "evidence": "keyword 'Arrows' present"
+            },
+            {
+              "element": "Derivative symbols shown (f', g', or d/dx notation)",
+              "met": true,
+              "evidence": "keyword 'Derivative' present"
+            },
+            {
+              "element": "Connection between graphs made explicit (output of g feeds into f)",
+              "met": false,
+              "evidence": "not detected"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-009",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 22.66,
+      "prompt_tokens": 276,
+      "completion_tokens": 926,
+      "code_length": 2666,
+      "code_lines": 77
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-009_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.2488
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Axes object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "FundamentalTheoremOfCalculus"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 11,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'move_to' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.2488,
+        "dimension_scores": {
+          "math_annotations": 0.2222,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.3,
+          "structural_clarity": 0.4545
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "MathTex object",
+            "LaTeX math"
+          ],
+          "visual_mapping": [
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "area computation",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 4,
+          "total": 5,
+          "details": [
+            {
+              "element": "Both f and f' labeled clearly with function names",
+              "met": true,
+              "evidence": "keyword 'function' present"
+            },
+            {
+              "element": "Sweep line visibly distinct (different color or dashed)",
+              "met": true,
+              "evidence": "keyword 'line' present"
+            },
+            {
+              "element": "Area accumulation indicator: growing shaded region AND/OR numeric counter",
+              "met": true,
+              "evidence": "keyword 'Area' present"
+            },
+            {
+              "element": "Formula with integral symbol (\u222b) displayed",
+              "met": false,
+              "evidence": "not detected"
+            },
+            {
+              "element": "Correspondence between accumulated area and f(x) value made explicit",
+              "met": true,
+              "evidence": "keyword 'accumulated' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-009",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 23.94,
+      "prompt_tokens": 276,
+      "completion_tokens": 966,
+      "code_length": 2765,
+      "code_lines": 79
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-009_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.2488
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Axes object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "FundamentalTheoremOfCalculus"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 11,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'move_to' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.2488,
+        "dimension_scores": {
+          "math_annotations": 0.2222,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.3,
+          "structural_clarity": 0.4545
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "MathTex object",
+            "LaTeX math"
+          ],
+          "visual_mapping": [
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "area computation",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 4,
+          "total": 5,
+          "details": [
+            {
+              "element": "Both f and f' labeled clearly with function names",
+              "met": true,
+              "evidence": "keyword 'function' present"
+            },
+            {
+              "element": "Sweep line visibly distinct (different color or dashed)",
+              "met": true,
+              "evidence": "keyword 'line' present"
+            },
+            {
+              "element": "Area accumulation indicator: growing shaded region AND/OR numeric counter",
+              "met": true,
+              "evidence": "keyword 'Area' present"
+            },
+            {
+              "element": "Formula with integral symbol (\u222b) displayed",
+              "met": false,
+              "evidence": "not detected"
+            },
+            {
+              "element": "Correspondence between accumulated area and f(x) value made explicit",
+              "met": true,
+              "evidence": "keyword 'accumulated' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-009",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 24.94,
+      "prompt_tokens": 276,
+      "completion_tokens": 1007,
+      "code_length": 2872,
+      "code_lines": 79
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-009_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.2274
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "AttributeError",
+        "error_message": "AttributeError: Axes object has no attribute 'add_coordinate_labels'",
+        "scene_names": [
+          "FundamentalTheoremOfCalculus"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 11,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Tex' (category: label)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'move_to' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.2274,
+        "dimension_scores": {
+          "math_annotations": 0.2222,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.3,
+          "structural_clarity": 0.4545
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "MathTex object",
+            "LaTeX math"
+          ],
+          "visual_mapping": [
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "area computation",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 4,
+          "total": 5,
+          "details": [
+            {
+              "element": "Both f and f' labeled clearly with function names",
+              "met": true,
+              "evidence": "keyword 'function' present"
+            },
+            {
+              "element": "Sweep line visibly distinct (different color or dashed)",
+              "met": true,
+              "evidence": "keyword 'line' present"
+            },
+            {
+              "element": "Area accumulation indicator: growing shaded region AND/OR numeric counter",
+              "met": true,
+              "evidence": "keyword 'Area' present"
+            },
+            {
+              "element": "Formula with integral symbol (\u222b) displayed",
+              "met": false,
+              "evidence": "not detected"
+            },
+            {
+              "element": "Correspondence between accumulated area and f(x) value made explicit",
+              "met": true,
+              "evidence": "keyword 'accumulated' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-010",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 17.62,
+      "prompt_tokens": 307,
+      "completion_tokens": 719,
+      "code_length": 2256,
+      "code_lines": 68
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-010_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1549
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: Mobject.__init__() got an unexpected keyword argument 'label'",
+        "scene_names": [
+          "TaylorSeriesExpansion"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Axes' (category: graph)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Axes' (category: graph)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1549,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Numerical coefficients of Taylor series shown (e.g., 1, x, x\u00b2/2!, x\u00b3/3!, ...)",
+              "met": true,
+              "evidence": "keyword 'coefficients' present"
+            },
+            {
+              "element": "Term labels (P\u2080, P\u2081, P\u2082, ... or 'Order 0', 'Order 1', ...)",
+              "met": true,
+              "evidence": "keyword 'Term' present"
+            },
+            {
+              "element": "Color coding consistent \u2014 each order has its own color",
+              "met": true,
+              "evidence": "keyword 'Color' present"
+            },
+            {
+              "element": "Convergence explanation text present ('Higher-order terms improve approximation')",
+              "met": true,
+              "evidence": "keyword 'Convergence' present"
+            },
+            {
+              "element": "Original function visible throughout (not covered by partial sums)",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-010",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 17.08,
+      "prompt_tokens": 307,
+      "completion_tokens": 688,
+      "code_length": 2121,
+      "code_lines": 62
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-010_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1412
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: Mobject.__init__() got an unexpected keyword argument 'label'",
+        "scene_names": [
+          "TaylorSeriesExpansion"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Axes' (category: graph)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Axes' (category: graph)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1412,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.2,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "named color"
+          ],
+          "numeric_evidence": [
+            "Axes object",
+            "function plot"
+          ],
+          "structural_clarity": [
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Numerical coefficients of Taylor series shown (e.g., 1, x, x\u00b2/2!, x\u00b3/3!, ...)",
+              "met": true,
+              "evidence": "keyword 'coefficients' present"
+            },
+            {
+              "element": "Term labels (P\u2080, P\u2081, P\u2082, ... or 'Order 0', 'Order 1', ...)",
+              "met": true,
+              "evidence": "keyword 'Term' present"
+            },
+            {
+              "element": "Color coding consistent \u2014 each order has its own color",
+              "met": true,
+              "evidence": "keyword 'Color' present"
+            },
+            {
+              "element": "Convergence explanation text present ('Higher-order terms improve approximation')",
+              "met": true,
+              "evidence": "keyword 'Convergence' present"
+            },
+            {
+              "element": "Original function visible throughout (not covered by partial sums)",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-010",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 14.63,
+      "prompt_tokens": 307,
+      "completion_tokens": 568,
+      "code_length": 1783,
+      "code_lines": 49
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-010_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1012
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "NameError",
+        "error_message": "NameError: name 'x' is not defined",
+        "scene_names": [
+          "TaylorSeriesExpansion"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 10,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'Approximation' found"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "description keyword 'approximation' found"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1012,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.0714,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.2727
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Tex object"
+          ],
+          "visual_mapping": [
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 5,
+          "total": 5,
+          "details": [
+            {
+              "element": "Numerical coefficients of Taylor series shown (e.g., 1, x, x\u00b2/2!, x\u00b3/3!, ...)",
+              "met": true,
+              "evidence": "keyword 'coefficients' present"
+            },
+            {
+              "element": "Term labels (P\u2080, P\u2081, P\u2082, ... or 'Order 0', 'Order 1', ...)",
+              "met": true,
+              "evidence": "keyword 'Term' present"
+            },
+            {
+              "element": "Color coding consistent \u2014 each order has its own color",
+              "met": true,
+              "evidence": "keyword 'Color' present"
+            },
+            {
+              "element": "Convergence explanation text present ('Higher-order terms improve approximation')",
+              "met": true,
+              "evidence": "keyword 'Convergence' present"
+            },
+            {
+              "element": "Original function visible throughout (not covered by partial sums)",
+              "met": true,
+              "evidence": "keyword 'Original' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-011",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 20.38,
+      "prompt_tokens": 280,
+      "completion_tokens": 801,
+      "code_length": 2618,
+      "code_lines": 72
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-011_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1928
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "NameError",
+        "error_message": "NameError: name 'Z' is not defined",
+        "scene_names": [
+          "HairyBallTheorem"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 16,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Arrow' (category: arrow)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Rotate' (category: rotate)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Indicate' (category: indicate)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1928,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2857,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.4545
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Text object"
+          ],
+          "visual_mapping": [
+            "fill styling",
+            "Arrow indicator",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 6,
+          "total": 6,
+          "details": [
+            {
+              "element": "Sphere clearly 3D with proper perspective (not a flat circle projection)",
+              "met": true,
+              "evidence": "keyword 'Sphere' present"
+            },
+            {
+              "element": "Vector field dense enough to be meaningful (\u226530\u201350 visible arrows)",
+              "met": true,
+              "evidence": "keyword 'Vector' present"
+            },
+            {
+              "element": "Combing process shown progressively (not instant)",
+              "met": true,
+              "evidence": "keyword 'Combing' present"
+            },
+            {
+              "element": "Bald spot visually distinct from rest of sphere",
+              "met": true,
+              "evidence": "keyword 'Bald' present"
+            },
+            {
+              "element": "Title or text explanation of the theorem",
+              "met": true,
+              "evidence": "keyword 'text' present"
+            },
+            {
+              "element": "Camera rotation to show the sphere from multiple angles",
+              "met": true,
+              "evidence": "keyword 'rotation' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-011",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 19.31,
+      "prompt_tokens": 280,
+      "completion_tokens": 801,
+      "code_length": 2618,
+      "code_lines": 72
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-011_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1928
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "NameError",
+        "error_message": "NameError: name 'Z' is not defined",
+        "scene_names": [
+          "HairyBallTheorem"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 16,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Arrow' (category: arrow)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Rotate' (category: rotate)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Indicate' (category: indicate)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1928,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2857,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.4545
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Text object"
+          ],
+          "visual_mapping": [
+            "fill styling",
+            "Arrow indicator",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 6,
+          "total": 6,
+          "details": [
+            {
+              "element": "Sphere clearly 3D with proper perspective (not a flat circle projection)",
+              "met": true,
+              "evidence": "keyword 'Sphere' present"
+            },
+            {
+              "element": "Vector field dense enough to be meaningful (\u226530\u201350 visible arrows)",
+              "met": true,
+              "evidence": "keyword 'Vector' present"
+            },
+            {
+              "element": "Combing process shown progressively (not instant)",
+              "met": true,
+              "evidence": "keyword 'Combing' present"
+            },
+            {
+              "element": "Bald spot visually distinct from rest of sphere",
+              "met": true,
+              "evidence": "keyword 'Bald' present"
+            },
+            {
+              "element": "Title or text explanation of the theorem",
+              "met": true,
+              "evidence": "keyword 'text' present"
+            },
+            {
+              "element": "Camera rotation to show the sphere from multiple angles",
+              "met": true,
+              "evidence": "keyword 'rotation' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-011",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 19.39,
+      "prompt_tokens": 280,
+      "completion_tokens": 801,
+      "code_length": 2618,
+      "code_lines": 72
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-011_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1928
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "NameError",
+        "error_message": "NameError: name 'Z' is not defined",
+        "scene_names": [
+          "HairyBallTheorem"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 16,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 5,
+        "events_total": 5,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Arrow' (category: arrow)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Rotate' (category: rotate)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "'Indicate' (category: indicate)"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1928,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.2857,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.4545
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Text object"
+          ],
+          "visual_mapping": [
+            "fill styling",
+            "Arrow indicator",
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 6,
+          "total": 6,
+          "details": [
+            {
+              "element": "Sphere clearly 3D with proper perspective (not a flat circle projection)",
+              "met": true,
+              "evidence": "keyword 'Sphere' present"
+            },
+            {
+              "element": "Vector field dense enough to be meaningful (\u226530\u201350 visible arrows)",
+              "met": true,
+              "evidence": "keyword 'Vector' present"
+            },
+            {
+              "element": "Combing process shown progressively (not instant)",
+              "met": true,
+              "evidence": "keyword 'Combing' present"
+            },
+            {
+              "element": "Bald spot visually distinct from rest of sphere",
+              "met": true,
+              "evidence": "keyword 'Bald' present"
+            },
+            {
+              "element": "Title or text explanation of the theorem",
+              "met": true,
+              "evidence": "keyword 'text' present"
+            },
+            {
+              "element": "Camera rotation to show the sphere from multiple angles",
+              "met": true,
+              "evidence": "keyword 'rotation' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-012",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 13.57,
+      "prompt_tokens": 289,
+      "completion_tokens": 545,
+      "code_length": 1827,
+      "code_lines": 64
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-012_trial1.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.111
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: ManimColor only accepts int, str, list[int, int, int], list[int, int,",
+        "scene_names": [
+          "WindmillProblem"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 1,
+          "total_checked": 14,
+          "matched": [
+            "CONFIG dict pattern \u2192 __init__ parameters in CE"
+          ]
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'color' (category: color)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Rotate' (category: rotate)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Dot' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Dot' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "description keyword 'windmill' found"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.111,
+        "dimension_scores": {
+          "math_annotations": 0.0,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.4545
+        },
+        "dimension_details": {
+          "math_annotations": [],
+          "visual_mapping": [
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "fade-out cleanup",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 4,
+          "total": 5,
+          "details": [
+            {
+              "element": "Points labeled or visually distinct (different colors, sizes, or numbered)",
+              "met": true,
+              "evidence": "keyword 'Points' present"
+            },
+            {
+              "element": "Current pivot point highlighted (glow, larger size, or distinct color)",
+              "met": true,
+              "evidence": "keyword 'point' present"
+            },
+            {
+              "element": "Line clearly passes through current pivot point at all times",
+              "met": true,
+              "evidence": "keyword 'Line' present"
+            },
+            {
+              "element": "Rotation direction clear and consistent (clockwise or counterclockwise)",
+              "met": false,
+              "evidence": "not detected"
+            },
+            {
+              "element": "Pivot transition moments visually marked (flash, color change, or sound)",
+              "met": true,
+              "evidence": "keyword 'color' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-012",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 15.31,
+      "prompt_tokens": 289,
+      "completion_tokens": 611,
+      "code_length": 1984,
+      "code_lines": 70
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-012_trial2.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1363
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: ManimColor only accepts int, str, list[int, int, int], list[int, int,",
+        "scene_names": [
+          "WindmillProblem"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 14,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'next_to' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Rotate' (category: rotate)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Dot' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Dot' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "description keyword 'windmill' found"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1363,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Text object"
+          ],
+          "visual_mapping": [
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 4,
+          "total": 5,
+          "details": [
+            {
+              "element": "Points labeled or visually distinct (different colors, sizes, or numbered)",
+              "met": true,
+              "evidence": "keyword 'Points' present"
+            },
+            {
+              "element": "Current pivot point highlighted (glow, larger size, or distinct color)",
+              "met": true,
+              "evidence": "keyword 'point' present"
+            },
+            {
+              "element": "Line clearly passes through current pivot point at all times",
+              "met": true,
+              "evidence": "keyword 'Line' present"
+            },
+            {
+              "element": "Rotation direction clear and consistent (clockwise or counterclockwise)",
+              "met": false,
+              "evidence": "not detected"
+            },
+            {
+              "element": "Pivot transition moments visually marked (flash, color change, or sound)",
+              "met": true,
+              "evidence": "keyword 'color' present"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-012",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "generation": {
+      "latency_s": 15.08,
+      "prompt_tokens": 289,
+      "completion_tokens": 611,
+      "code_length": 1984,
+      "code_lines": 70
+    },
+    "code_path": "/home/nabin2004/Downloads/files/evaluation/generated_code/Gemma-3-27B/zero_shot/MB-012_trial3.py",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 0.0,
+      "alignment_score": 1.0,
+      "coverage_score": 0.1363
+    },
+    "metrics_detail": {
+      "executability": {
+        "executability": 0,
+        "syntax_valid": true,
+        "has_scene": true,
+        "has_manim_import": true,
+        "has_gl_import": false,
+        "render_success": false,
+        "error_type": "TypeError",
+        "error_message": "TypeError: ManimColor only accepts int, str, list[int, int, int], list[int, int,",
+        "scene_names": [
+          "WindmillProblem"
+        ]
+      },
+      "version_conflict": {
+        "version_conflict_rate": 0.0,
+        "total_patterns_checked": 35,
+        "conflicts_found": 0,
+        "conflict_details": [],
+        "conflict_categories": {},
+        "severity": "none",
+        "problem_specific": {
+          "problem_specific_conflicts": 0,
+          "total_checked": 14,
+          "matched": []
+        }
+      },
+      "alignment": {
+        "alignment_score": 1.0,
+        "events_detected": 6,
+        "events_total": 6,
+        "per_event": [
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'next_to' (category: move)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Create' (category: create)"
+          },
+          {
+            "event": "",
+            "weight": 0.9,
+            "detected": true,
+            "evidence": "'Rotate' (category: rotate)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Dot' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.8,
+            "detected": true,
+            "evidence": "'Dot' (category: shape)"
+          },
+          {
+            "event": "",
+            "weight": 0.7,
+            "detected": true,
+            "evidence": "description keyword 'windmill' found"
+          }
+        ]
+      },
+      "coverage": {
+        "coverage_score": 0.1363,
+        "dimension_scores": {
+          "math_annotations": 0.1111,
+          "visual_mapping": 0.1429,
+          "numeric_evidence": 0.0,
+          "structural_clarity": 0.3636
+        },
+        "dimension_details": {
+          "math_annotations": [
+            "Text object"
+          ],
+          "visual_mapping": [
+            "Dot marker",
+            "named color"
+          ],
+          "numeric_evidence": [],
+          "structural_clarity": [
+            "VGroup organization",
+            "paced wait",
+            "loop-based construction",
+            "method decomposition"
+          ]
+        },
+        "requirement_coverage": {
+          "met": 4,
+          "total": 5,
+          "details": [
+            {
+              "element": "Points labeled or visually distinct (different colors, sizes, or numbered)",
+              "met": true,
+              "evidence": "keyword 'Points' present"
+            },
+            {
+              "element": "Current pivot point highlighted (glow, larger size, or distinct color)",
+              "met": true,
+              "evidence": "keyword 'point' present"
+            },
+            {
+              "element": "Line clearly passes through current pivot point at all times",
+              "met": true,
+              "evidence": "keyword 'Line' present"
+            },
+            {
+              "element": "Rotation direction clear and consistent (clockwise or counterclockwise)",
+              "met": false,
+              "evidence": "not detected"
+            },
+            {
+              "element": "Pivot transition moments visually marked (flash, color change, or sound)",
+              "met": true,
+              "evidence": "keyword 'color' present"
+            }
+          ]
+        }
+      }
+    }
+  }
+]

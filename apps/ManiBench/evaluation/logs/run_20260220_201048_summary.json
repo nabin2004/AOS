@@ -1,0 +1,582 @@
+{
+  "config": {
+    "strategy": "zero_shot",
+    "trials": 1,
+    "n_models": 5,
+    "n_problems": 12
+  },
+  "global": {
+    "n_samples": 60,
+    "executability_mean": 0.26666666666666666,
+    "version_conflict_mean": 0.03843833333333333,
+    "alignment_mean": 0.85934,
+    "coverage_mean": 0.1775216666666667
+  },
+  "per_model": {
+    "Qwen3.5-Plus": {
+      "n_samples": 12,
+      "executability_mean": 0.3333333333333333,
+      "version_conflict_mean": 0.08501666666666667,
+      "alignment_mean": 0.9166666666666666,
+      "coverage_mean": 0.22571666666666668
+    },
+    "Llama-3.1-8B": {
+      "n_samples": 12,
+      "executability_mean": 0.08333333333333333,
+      "version_conflict_mean": 0.023841666666666667,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.13205
+    },
+    "Kimi-K2.5": {
+      "n_samples": 12,
+      "executability_mean": 0.6666666666666666,
+      "version_conflict_mean": 0.08333333333333333,
+      "alignment_mean": 0.9166666666666666,
+      "coverage_mean": 0.26545
+    },
+    "Qwen3-235B-A22B": {
+      "n_samples": 12,
+      "executability_mean": 0.25,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.9925083333333333,
+      "coverage_mean": 0.2507833333333333
+    },
+    "Qwen-2.5-Coder": {
+      "n_samples": 12,
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.4708583333333333,
+      "coverage_mean": 0.013608333333333333
+    }
+  },
+  "per_problem": {
+    "MB-001": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.2,
+      "version_conflict_mean": 0.013980000000000001,
+      "alignment_mean": 0.88988,
+      "coverage_mean": 0.24544000000000002
+    },
+    "MB-002": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.00404,
+      "alignment_mean": 0.8565200000000001,
+      "coverage_mean": 0.1498
+    },
+    "MB-003": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.6,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.9375,
+      "coverage_mean": 0.15672
+    },
+    "MB-004": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.2,
+      "version_conflict_mean": 0.2,
+      "alignment_mean": 0.6,
+      "coverage_mean": 0.09716
+    },
+    "MB-005": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.2,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.8800000000000001,
+      "coverage_mean": 0.15702
+    },
+    "MB-006": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.4,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.90434,
+      "coverage_mean": 0.176
+    },
+    "MB-007": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.6,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.92308,
+      "coverage_mean": 0.18997999999999998
+    },
+    "MB-008": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.4,
+      "version_conflict_mean": 0.2,
+      "alignment_mean": 0.68076,
+      "coverage_mean": 0.14342000000000002
+    },
+    "MB-009": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.2,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.8400000000000001,
+      "coverage_mean": 0.2503
+    },
+    "MB-010": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.2,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.91708,
+      "coverage_mean": 0.23944000000000001
+    },
+    "MB-011": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.0,
+      "version_conflict_mean": 0.0,
+      "alignment_mean": 0.88292,
+      "coverage_mean": 0.16544
+    },
+    "MB-012": {
+      "n_samples": 5,
+      "difficulty": "?",
+      "executability_mean": 0.2,
+      "version_conflict_mean": 0.04324,
+      "alignment_mean": 1.0,
+      "coverage_mean": 0.15954
+    }
+  },
+  "grid": {
+    "Qwen3.5-Plus": {
+      "MB-001": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2691
+      },
+      "MB-002": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0202,
+        "align": 1.0,
+        "cov": 0.1699
+      },
+      "MB-003": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1699
+      },
+      "MB-004": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-005": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2177
+      },
+      "MB-006": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2726
+      },
+      "MB-007": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2317
+      },
+      "MB-008": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.332
+      },
+      "MB-009": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.3769
+      },
+      "MB-010": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.3066
+      },
+      "MB-011": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2123
+      },
+      "MB-012": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1499
+      }
+    },
+    "Llama-3.1-8B": {
+      "MB-001": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0699,
+        "align": 1.0,
+        "cov": 0.1914
+      },
+      "MB-002": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1577
+      },
+      "MB-003": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1363
+      },
+      "MB-004": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.094
+      },
+      "MB-005": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.149
+      },
+      "MB-006": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1012
+      },
+      "MB-007": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1363
+      },
+      "MB-008": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1076
+      },
+      "MB-009": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1149
+      },
+      "MB-010": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2579
+      },
+      "MB-011": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.0974
+      },
+      "MB-012": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.2162,
+        "align": 1.0,
+        "cov": 0.0409
+      }
+    },
+    "Kimi-K2.5": {
+      "MB-001": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.4167
+      },
+      "MB-002": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2088
+      },
+      "MB-003": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2025
+      },
+      "MB-004": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2517
+      },
+      "MB-005": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2363
+      },
+      "MB-006": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2463
+      },
+      "MB-007": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.3231
+      },
+      "MB-008": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 1.0,
+        "align": 0.0,
+        "cov": 0.0
+      },
+      "MB-009": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.3555
+      },
+      "MB-010": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.3339
+      },
+      "MB-011": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2664
+      },
+      "MB-012": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.3442
+      }
+    },
+    "Qwen3-235B-A22B": {
+      "MB-001": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.9101,
+        "cov": 0.3364
+      },
+      "MB-002": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2126
+      },
+      "MB-003": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2613
+      },
+      "MB-004": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1265
+      },
+      "MB-005": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.1685
+      },
+      "MB-006": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2463
+      },
+      "MB-007": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2452
+      },
+      "MB-008": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2639
+      },
+      "MB-009": {
+        "n": 1,
+        "exec": 1.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.3906
+      },
+      "MB-010": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2715
+      },
+      "MB-011": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2375
+      },
+      "MB-012": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.2491
+      }
+    },
+    "Qwen-2.5-Coder": {
+      "MB-001": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.5393,
+        "cov": 0.0136
+      },
+      "MB-002": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.2826,
+        "cov": 0.0
+      },
+      "MB-003": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.6875,
+        "cov": 0.0136
+      },
+      "MB-004": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.0,
+        "cov": 0.0136
+      },
+      "MB-005": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.4,
+        "cov": 0.0136
+      },
+      "MB-006": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.5217,
+        "cov": 0.0136
+      },
+      "MB-007": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.6154,
+        "cov": 0.0136
+      },
+      "MB-008": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.4038,
+        "cov": 0.0136
+      },
+      "MB-009": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.2,
+        "cov": 0.0136
+      },
+      "MB-010": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.5854,
+        "cov": 0.0273
+      },
+      "MB-011": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 0.4146,
+        "cov": 0.0136
+      },
+      "MB-012": {
+        "n": 1,
+        "exec": 0.0,
+        "vc": 0.0,
+        "align": 1.0,
+        "cov": 0.0136
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+from manim import *
+
+class FTCAnimation(Scene):
+    def construct(self):
+        # Create axes
+        axes = Axes(
+            x_range=[0, 5, 1],
+            y_range=[0, 8, 2],
+            axis_config={"color": BLUE},
+        )
+        axes_labels = axes.get_axis_labels(x_label="x", y_label="y")
+
+        # Define function f(x) = x^2
+        func = lambda x: x**2
+        graph = axes.plot(func, color=GREEN)
+
+        # Label for f(x)
+        func_label = MathTex("f(x) = x^2").next_to(graph, UP, buff=0.2)
+
+        # Display axes, graph, and label
+        self.play(Create(axes), Write(axes_labels))
+        self.play(Create(graph), Write(func_label))
+
+        # Show derivative f'(x) = 2x
+        deriv_text = MathTex(r"f'(x) = 2x").to_edge(UP)
+        self.play(Write(deriv_text))
+
+        # Area under f'(x) from 0 to x
+        area = axes.get_area(graph, x_range=(0, 1), color=YELLOW, opacity=0.5)
+        self.play(FadeIn(area))
+
+        # Moving vertical line from left to right
+        dot = Dot(color=RED)
+        dot.move_to(axes.c2p(0, 0))
+        self.add(dot)
+
+        # Animation loop for different x values
+        for x in [0.5, 1, 1.5, 2]:
+            new_dot = Dot(color=RED).move_to(axes.c2p(x, 0))
+            new_area = axes.get_area(graph, x_range=(0, x), color=YELLOW, opacity=0.5)
+
+            # Update visuals
+            self.play(Transform(dot, new_dot), FadeOut(area), FadeIn(new_area))
+            self.wait(0.5)
+
+            # Show equation at each step
+            eq = MathTex(r"\int_0^x f'(t) \,dt = f(x) - f(0)").to_edge(DOWN)
+            self.play(Write(eq))
+            self.wait(0.5)
+
+            # Clear equation before next iteration
+            self.play(FadeOut(eq))

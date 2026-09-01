@@ -1,0 +1,3530 @@
+[
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-001",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-001",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-002",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-002",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-002",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-003",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-003",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-003",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-004",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-004",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-004",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-005",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-005",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-006",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-006",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-006",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-007",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-007",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-007",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-008",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-008",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-008",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-009",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-009",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-009",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-010",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-010",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-010",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-011",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-011",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-011",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-012",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-012",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.3-70B",
+    "model_id": "meta-llama/llama-3.3-70b-instruct-fp8",
+    "problem_id": "MB-012",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-001",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-001",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-002",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-002",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-002",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-003",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-003",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-003",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-004",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-004",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-004",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-005",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-005",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-006",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-006",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-006",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-007",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-007",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-007",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-008",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-008",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-008",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-009",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-009",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-009",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-010",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-010",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-010",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-011",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-011",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-011",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-012",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-012",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-8B",
+    "model_id": "meta-llama/llama-3.1-8b-instruct",
+    "problem_id": "MB-012",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-001",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-001",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-002",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-002",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-002",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-003",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-003",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-003",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-004",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-004",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-004",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-005",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-005",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-006",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-006",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-006",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-007",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-007",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-007",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-008",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-008",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-008",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-009",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-009",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-009",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-010",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-010",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-010",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-011",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-011",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-011",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-012",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-012",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Llama-3.1-70B",
+    "model_id": "meta-llama/llama-3.1-70b-instruct",
+    "problem_id": "MB-012",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-001",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-001",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-002",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-002",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-002",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-003",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-003",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-003",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-004",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-004",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-004",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-005",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-005",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-006",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-006",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-006",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-007",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-007",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-007",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-008",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-008",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-008",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-009",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-009",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-009",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-010",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-010",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-010",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-011",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-011",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-011",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-012",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-012",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Mistral-Nemo",
+    "model_id": "mistralai/mistral-nemo-instruct-2407",
+    "problem_id": "MB-012",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-001",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-001",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-002",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-002",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-002",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-003",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-003",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-003",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-004",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-004",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-004",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-005",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-005",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-006",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-006",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-006",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-007",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-007",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-007",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-008",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-008",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-008",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-009",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-009",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-009",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-010",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-010",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-010",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-011",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-011",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-011",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-012",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-012",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Nemotron-70B",
+    "model_id": "nvidia/llama-3.1-nemotron-70b-instruct-hf",
+    "problem_id": "MB-012",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-001",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-001",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-002",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-002",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-002",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-003",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-003",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-003",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-004",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-004",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-004",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-005",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-005",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-006",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-006",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-006",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-007",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-007",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-007",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-008",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-008",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-008",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-009",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-009",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-009",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-010",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-010",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-010",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-011",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-011",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-011",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-012",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-012",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Qwen-2.5-Coder-Inf",
+    "model_id": "qwen/qwen-2.5-coder-32b-instruct",
+    "problem_id": "MB-012",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-001",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-002",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-002",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-002",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-003",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-003",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-003",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-004",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-004",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-004",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-005",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-006",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-006",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-006",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-007",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-007",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-007",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-008",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-008",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-008",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-009",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-009",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-009",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-010",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-010",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-010",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-011",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-011",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-011",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-012",
+    "trial": 1,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-012",
+    "trial": 2,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  },
+  {
+    "model": "Gemma-3-27B",
+    "model_id": "google/gemma-3-27b-instruct/bf-16",
+    "problem_id": "MB-012",
+    "trial": 3,
+    "strategy": "zero_shot",
+    "error": "Traceback (most recent call last):\n  File \"/home/nabin2004/Downloads/files/evaluation/run.py\", line 240, in run_evaluation\n    result = client.generate(\n        model_id=model.id,\n    ...<3 lines>...\n        top_p=model.top_p,\n    )\nTypeError: InferenceNetClient.generate() got an unexpected keyword argument 'model_id'\n",
+    "metrics": {
+      "executability": 0,
+      "version_conflict_rate": 1.0,
+      "alignment_score": 0.0,
+      "coverage_score": 0.0
+    }
+  }
+]
