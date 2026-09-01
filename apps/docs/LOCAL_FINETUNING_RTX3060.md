@@ -29,6 +29,9 @@ cd AOS
 # Synchronize virtual environment & workspace dependencies
 uv sync
 
+# Ensure PyTorch CUDA 12.4 GPU acceleration wheel is installed:
+uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+
 # Set up API keys (.env file for W&B tracking & HF authentication)
 cp apps/training/.env.example apps/training/.env
 ```

@@ -57,9 +57,26 @@ def _apply_wandb(config: TrainingConfig) -> TrainingConfig:
     return replace(config, report_to=resolve_report_to(config.report_to))
 
 
+def _verify_cuda_environment(config: TrainingConfig) -> None:
+    if not torch.cuda.is_available():
+        print(
+            "\n========================================================================\n"
+            "❌ ERROR: PyTorch CUDA GPU acceleration is NOT detected!\n"
+            f"   Installed PyTorch version: {torch.__version__}\n\n"
+            "   You are attempting to fine-tune on RTX 3060, but PyTorch CPU-only wheel is installed.\n"
+            "   To fix this and enable GPU acceleration, run this command in your terminal:\n\n"
+            "      uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124\n"
+            "========================================================================\n",
+            file=sys.stderr,
+        )
+        if getattr(config, "rtx3060", False):
+            sys.exit(1)
+
+
 def main() -> int:
     args = build_arg_parser().parse_args()
     config = TrainingConfig.from_cli(args)
+    _verify_cuda_environment(config)
 
     if args.smoke:
         config = replace(
