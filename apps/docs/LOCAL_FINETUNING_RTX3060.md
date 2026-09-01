@@ -36,30 +36,44 @@ uv sync
 
 Supervised Fine-Tuning trains the model on paired text-to-code dataset trajectories (e.g. natural language prompts $\rightarrow$ executable ManimCE Python code).
 
-### 3.1 Training Qwen2.5-Coder (`apps/qwenCoder`)
+### 3.1 Two-Stage Curriculum Strategy (Domain SFT → Behavioral SFT)
 
-Navigate to the QwenCoder app directory:
+Training sequentially on both **`nabin2004/manim-sft-10k`** and **`nabin2004/AOS-Trajectories`** provides the optimal combination of ManimCE syntax mastery and multi-step reasoning.
 
+#### Phase 1: Knowledge Injection (`manim-sft-10k`)
+Train the model on the core 10k dataset to memorize ManimCE classes, vector positioning, and animation timing (3 epochs):
 ```bash
 cd apps/qwenCoder
+uv run python run.py --rtx3060 --stage manim --epochs 3
 ```
 
-#### Run 4-bit QLoRA Fine-Tuning with `--rtx3060` Preset:
+#### Phase 2: Agentic Reasoning (`AOS-Trajectories` + Replay Buffer)
+Chain the adapter from Phase 1 and train on trajectory step-by-step reasoning data (1 epoch):
+```bash
+uv run python run.py --rtx3060 --stage traces \
+  --init-adapter ./qwen2.5-coder-7b-manim-ft \
+  --epochs 1
+```
 
-- **For 7B models** (e.g. `Qwen2.5-Coder-7B-Instruct`):
-  ```bash
-  uv run python run.py --rtx3060 --stage manim
-  ```
+> [!TIP]
+> **Automatic Safeguards in Phase 2 (`--stage traces`)**:
+> - **Learning Rate Decay**: Automatically lowers learning rate to $5\times 10^{-5}$ ($4\times$ drop) to refine behavior without disrupting Phase 1 syntax weights.
+> - **10% Replay Buffer**: Automatically mixes a 10% random sample from `manim-sft-10k` into the training stream to prevent catastrophic forgetting.
+
+---
+
+### 3.2 Single-Stage & Custom Options
+
 - **For 1.5B or 3B models** (e.g. `Qwen2.5-Coder-1.5B-Instruct`):
   ```bash
   uv run python run.py --rtx3060 --model-id Qwen/Qwen2.5-Coder-1.5B-Instruct --seq-len 4096 --stage manim
   ```
-- **Using a local custom trajectory dataset**:
+- **Using a local custom trajectory file**:
   ```bash
   uv run python run.py --rtx3060 --data-path ../agents/export_traces/coder_sft/sft/train.jsonl
   ```
 
-### 3.2 Training Gemma / General SFT (`apps/sft`)
+### 3.3 Training Gemma / General SFT (`apps/sft`)
 
 ```bash
 cd apps/sft

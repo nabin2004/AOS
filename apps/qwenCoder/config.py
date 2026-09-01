@@ -75,6 +75,8 @@ class TrainingConfig:
     resume_from: Path | None = None
     hub_checkpoint_id: str | None = None
     sync_trainer_checkpoint: bool = False
+    replay_ratio: float = 0.0
+    replay_dataset: str = "nabin2004/manim-sft-10k"
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -168,11 +170,21 @@ class TrainingConfig:
                     stage_updates["dataset_repo"] = "nabin2004/AOS-Trajectories"
                     if args.dataset_file is None:
                         stage_updates["dataset_file"] = "tool_trace/train.jsonl"
+                    if getattr(args, "learning_rate", None) is None:
+                        stage_updates["learning_rate"] = 5e-5
+                    if getattr(args, "replay_ratio", None) is None:
+                        stage_updates["replay_ratio"] = 0.10
             config = replace(config, **stage_updates)
+        if getattr(args, "replay_ratio", None) is not None:
+            config = replace(config, replay_ratio=args.replay_ratio)
+        if getattr(args, "replay_dataset", None) is not None:
+            config = replace(config, replay_dataset=args.replay_dataset)
         if args.output_dir is not None:
             config = replace(config, output_dir=Path(args.output_dir))
         if args.model_id is not None:
             config = replace(config, model_id=args.model_id)
+        if getattr(args, "learning_rate", None) is not None:
+            config = replace(config, learning_rate=args.learning_rate)
         if args.epochs is not None:
             config = replace(config, epochs=args.epochs)
         if args.seq_len is not None:
@@ -362,6 +374,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-dir", type=Path, default=None)
     parser.add_argument("--model-id", default=None)
     parser.add_argument("--epochs", type=int, default=None)
+    parser.add_argument("--learning-rate", type=float, default=None)
+    parser.add_argument(
+        "--replay-ratio",
+        type=float,
+        default=None,
+        help="Fraction of Phase 1 replay dataset to mix into training (e.g. 0.10 for 10%% replay)",
+    )
+    parser.add_argument(
+        "--replay-dataset",
+        default=None,
+        help='HF dataset for replay buffer (default: "nabin2004/manim-sft-10k")',
+    )
     parser.add_argument("--seq-len", type=int, default=None)
     parser.add_argument("--no-4bit", action="store_true")
     parser.add_argument("--lora-r", type=int, default=None)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from datasets import Dataset, load_dataset
+from datasets import Dataset, concatenate_datasets, load_dataset
 
 from config import TrainingConfig
 
@@ -122,7 +122,32 @@ def load_training_dataset(config: TrainingConfig) -> Dataset:
         num_proc=config.num_proc,
     )
     ds = _maybe_subsample(ds, config)
-    print(f"Trainable rows: {len(ds)}")
+
+    if config.replay_ratio > 0.0 and config.replay_dataset:
+        num_replay = int(len(ds) * config.replay_ratio)
+        if num_replay > 0:
+            print(
+                f"Mixing {config.replay_ratio * 100:.0f}% replay buffer "
+                f"({num_replay} rows from {config.replay_dataset})..."
+            )
+            try:
+                if config.replay_dataset in _NATIVE_HF_REPOS:
+                    raw_replay = load_dataset(config.replay_dataset, split="train")
+                else:
+                    raw_replay = load_dataset("json", data_files=config.replay_dataset, split="train")
+                raw_replay = raw_replay.filter(_is_trainable, num_proc=config.num_proc)
+                num_replay = min(num_replay, len(raw_replay))
+                raw_replay = raw_replay.shuffle(seed=config.shuffle_seed).select(range(num_replay))
+                replay_ds = raw_replay.map(
+                    _normalize_messages,
+                    remove_columns=raw_replay.column_names,
+                    num_proc=config.num_proc,
+                )
+                ds = concatenate_datasets([ds, replay_ds]).shuffle(seed=config.shuffle_seed)
+            except Exception as exc:
+                print(f"WARNING: Failed to mix replay dataset ({exc})")
+
+    print(f"Trainable rows (total): {len(ds)}")
     if len(ds) > 0:
         roles = [
             m.get("role")
