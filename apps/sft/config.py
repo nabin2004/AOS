@@ -95,7 +95,7 @@ class TrainingConfig:
             "use_cache": False,
             "learning_rate": self.learning_rate,
             "lr_scheduler_type": "cosine",
-            "warmup_ratio": 0.03,
+            "warmup_steps": 10,
             "optim": "adamw_torch_fused",
             "bf16": True,
             "logging_steps": 10,

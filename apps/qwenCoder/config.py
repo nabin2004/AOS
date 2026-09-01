@@ -120,7 +120,7 @@ class TrainingConfig:
             gradient_checkpointing_kwargs={"use_reentrant": False},
             learning_rate=self.learning_rate,
             lr_scheduler_type="cosine",
-            warmup_ratio=0.03,
+            warmup_steps=10,
             optim=self.optim,
             bf16=bool(use_bf16),
             fp16=bool(not use_bf16),
