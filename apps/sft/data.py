@@ -1,11 +1,20 @@
-from __future__ import annotations
-
+import os
+import sys
 from typing import Any
 
 from datasets import Dataset, load_dataset
 
 from codemode_contract import messages_violate_codemode
 from config import TrainingConfig
+
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
+
+def _effective_num_proc(requested: int) -> int:
+    """Enforce single process on Windows to prevent multiprocessing spawn deadlocks."""
+    if sys.platform == "win32":
+        return 1
+    return max(1, requested)
 
 
 def resolve_data_files(config: TrainingConfig) -> str:
@@ -105,15 +114,16 @@ def _load_raw_dataset(config: TrainingConfig) -> Dataset:
 
 
 def load_training_dataset(config: TrainingConfig) -> Dataset:
+    num_proc = _effective_num_proc(config.num_proc)
     dataset = _load_raw_dataset(config)
-    dataset = dataset.filter(_is_trainable_record, num_proc=config.num_proc)
+    dataset = dataset.filter(_is_trainable_record, num_proc=num_proc)
     dataset = dataset.map(
         format_trajectory_messages,
         remove_columns=dataset.column_names,
-        num_proc=config.num_proc,
+        num_proc=num_proc,
     )
     before = len(dataset)
-    dataset = dataset.filter(_passes_codemode_contract, num_proc=config.num_proc)
+    dataset = dataset.filter(_passes_codemode_contract, num_proc=num_proc)
     dropped = before - len(dataset)
     if dropped:
         print(

@@ -113,6 +113,7 @@ uv run python run.py --rtx3060 --stage manim --eval-manibench --manibench-render
 > - `optim = "paged_adamw_8bit"`
 > - `gradient_checkpointing = True`
 > - `use_bf16 = True` (Ampere native precision)
+> - `num_proc = 1` on Windows (prevents `multiprocessing` spawn deadlocks during dataset mapping)
 
 ---
 

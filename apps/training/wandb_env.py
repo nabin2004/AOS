@@ -101,13 +101,18 @@ def configure_wandb(
     if tags and not os.environ.get("WANDB_TAGS", "").strip():
         os.environ["WANDB_TAGS"] = ",".join(tags)
 
+    os.environ.setdefault("WANDB_ANONYMOUS", "never")
     key = wandb_api_key()
     if not key:
         return "none"
 
     import wandb
 
-    wandb.login(key=key)
+    try:
+        wandb.login(key=key, relogin=False)
+    except Exception as exc:
+        print(f"WARNING: W&B login failed ({exc}); disabling W&B reporting.", file=sys.stderr)
+        return "none"
 
     if config is not None and wandb.run is None:
         wandb.init(

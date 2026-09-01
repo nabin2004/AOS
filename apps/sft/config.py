@@ -194,7 +194,7 @@ def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
         grad_accum=8,
         seq_len=2048 if config.seq_len == 8192 else config.seq_len,
         use_4bit=True,
-        num_proc=4,
+        num_proc=1 if sys.platform == "win32" else 4,
         device_map={"": 0},
         strip_multimodal_towers=True,
         packing=False,

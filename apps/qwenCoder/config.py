@@ -311,7 +311,7 @@ def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
         seq_len=seq_len,
         use_4bit=True,
         use_bf16=True,
-        num_proc=4,
+        num_proc=1 if sys.platform == "win32" else 4,
         packing=False,
         lora_r=16 if is_7b_or_larger else config.lora_r,
         lora_alpha=32 if is_7b_or_larger else config.lora_alpha,

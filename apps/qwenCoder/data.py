@@ -1,10 +1,19 @@
-from __future__ import annotations
-
+import os
+import sys
 from typing import Any
 
 from datasets import Dataset, concatenate_datasets, load_dataset
 
 from config import TrainingConfig
+
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
+
+def _effective_num_proc(requested: int) -> int:
+    """Enforce single process on Windows to prevent multiprocessing spawn deadlocks."""
+    if sys.platform == "win32":
+        return 1
+    return max(1, requested)
 
 # Native Hub chat corpora (parquet / DatasetDict), not raw JSONL paths.
 _NATIVE_HF_REPOS = frozenset(
@@ -114,12 +123,13 @@ def _maybe_subsample(ds: Dataset, config: TrainingConfig) -> Dataset:
 
 
 def load_training_dataset(config: TrainingConfig) -> Dataset:
+    num_proc = _effective_num_proc(config.num_proc)
     ds = _load_raw_dataset(config)
-    ds = ds.filter(_is_trainable, num_proc=config.num_proc)
+    ds = ds.filter(_is_trainable, num_proc=num_proc)
     ds = ds.map(
         _normalize_messages,
         remove_columns=ds.column_names,
-        num_proc=config.num_proc,
+        num_proc=num_proc,
     )
     ds = _maybe_subsample(ds, config)
 
@@ -135,13 +145,13 @@ def load_training_dataset(config: TrainingConfig) -> Dataset:
                     raw_replay = load_dataset(config.replay_dataset, split="train")
                 else:
                     raw_replay = load_dataset("json", data_files=config.replay_dataset, split="train")
-                raw_replay = raw_replay.filter(_is_trainable, num_proc=config.num_proc)
+                raw_replay = raw_replay.filter(_is_trainable, num_proc=num_proc)
                 num_replay = min(num_replay, len(raw_replay))
                 raw_replay = raw_replay.shuffle(seed=config.shuffle_seed).select(range(num_replay))
                 replay_ds = raw_replay.map(
                     _normalize_messages,
                     remove_columns=raw_replay.column_names,
-                    num_proc=config.num_proc,
+                    num_proc=num_proc,
                 )
                 ds = concatenate_datasets([ds, replay_ds]).shuffle(seed=config.shuffle_seed)
             except Exception as exc:
