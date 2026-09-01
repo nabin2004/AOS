@@ -133,6 +133,8 @@ class TrainingConfig:
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
         config = cls().resolve_paths()
+        if getattr(args, "rtx3060", False):
+            config = apply_rtx3060_preset(config)
         if args.kaggle or os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
             config = apply_kaggle_preset(config)
         if args.data_path is not None:
@@ -256,6 +258,30 @@ def default_kaggle_output_dir() -> Path:
     return QWEN_ROOT / SFT_OUTPUT_DIR_NAME
 
 
+def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
+    """NVIDIA RTX 3060 (12 GB VRAM) preset: 4-bit NF4 QLoRA, paged_adamw_8bit, bf16, batch 1, accum 8."""
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    is_7b_or_larger = any(tag in config.model_id.lower() for tag in ("7b", "8b", "6.7b", "13b"))
+    seq_len = 2048 if is_7b_or_larger else config.seq_len
+
+    return replace(
+        config,
+        batch_size=1,
+        grad_accum=8,
+        seq_len=seq_len,
+        use_4bit=True,
+        use_bf16=True,
+        num_proc=4,
+        packing=False,
+        lora_r=16 if is_7b_or_larger else config.lora_r,
+        lora_alpha=32 if is_7b_or_larger else config.lora_alpha,
+        optim="paged_adamw_8bit",
+        report_to=report_to,
+    )
+
+
 def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
     """P100/T4 QLoRA: 4-bit NF4, LoRA r=16, full corpus, no packing, fp16."""
     print(
@@ -339,6 +365,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--no-packing",
         action="store_true",
         help="Disable packing (shorter examples, more steps)",
+    )
+    parser.add_argument(
+        "--rtx3060",
+        action="store_true",
+        help="NVIDIA RTX 3060 12GB preset: 4-bit NF4, paged_adamw_8bit, bf16, seq 2048/4096",
     )
     parser.add_argument(
         "--kaggle",

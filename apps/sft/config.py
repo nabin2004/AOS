@@ -111,6 +111,8 @@ class TrainingConfig:
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
         config = cls().resolve_paths()
+        if getattr(args, "rtx3060", False):
+            config = apply_rtx3060_preset(config)
         if args.kaggle or os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
             config = apply_kaggle_preset(config)
         if args.runpod:
@@ -167,6 +169,25 @@ def _liger_kernel_available() -> bool:
         return True
     except ImportError:
         return False
+
+
+def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
+    """NVIDIA RTX 3060 (12 GB VRAM) optimized preset (batch 1, grad accum 8, seq 2048, 4-bit QLoRA)."""
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    return replace(
+        config,
+        batch_size=1,
+        grad_accum=8,
+        seq_len=2048 if config.seq_len == 8192 else config.seq_len,
+        use_4bit=True,
+        num_proc=4,
+        device_map={"": 0},
+        strip_multimodal_towers=True,
+        packing=False,
+        report_to=report_to,
+    )
 
 
 def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
@@ -313,6 +334,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--report-to",
         default=None,
         help='Logging backend (default: "wandb"; use "none" to disable)',
+    )
+    parser.add_argument(
+        "--rtx3060",
+        action="store_true",
+        help="Apply RTX 3060 12GB VRAM optimized defaults (batch 1, grad accum 8, seq 2048, 4-bit QLoRA)",
     )
     parser.add_argument(
         "--kaggle",

@@ -110,6 +110,8 @@ class TrainingConfig:
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
         config = cls().resolve_paths()
+        if getattr(args, "rtx3060", False):
+            config = apply_rtx3060_preset(config)
         if args.model_id:
             config = replace(config, model_id=args.model_id)
         if args.sft_lora:
@@ -135,8 +137,29 @@ class TrainingConfig:
         return config.resolve_paths()
 
 
+def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
+    """NVIDIA RTX 3060 (12 GB VRAM) DPO preset: batch 1, accum 8, seq 2048, 4-bit."""
+    import os
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    return replace(
+        config,
+        batch_size=1,
+        grad_accum=8,
+        seq_len=2048,
+        use_4bit=True,
+        report_to=report_to,
+    )
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="AOS DPO on trajectory preference pairs")
+    parser.add_argument(
+        "--rtx3060",
+        action="store_true",
+        help="NVIDIA RTX 3060 (12GB VRAM) preset (batch 1, grad accum 8, seq 2048, 4-bit)",
+    )
     parser.add_argument("--model-id", default=None)
     parser.add_argument("--sft-lora", type=Path, default=None)
     parser.add_argument("--data-path", type=Path, default=None)

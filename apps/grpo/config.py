@@ -89,6 +89,8 @@ class TrainingConfig:
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
         config = cls().resolve_paths()
+        if getattr(args, "rtx3060", False):
+            config = apply_rtx3060_preset(config)
         if args.sft_lora is not None:
             config = replace(config, sft_lora_path=_resolve_path(Path(args.sft_lora)))
         if args.base is not None:
@@ -166,6 +168,22 @@ class TrainingConfig:
         return apply_vertex_env(config)
 
 
+def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
+    """NVIDIA RTX 3060 (12 GB VRAM) GRPO preset: num_generations=2, max_prompt=512, max_completion=512, 4-bit."""
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    return replace(
+        config,
+        num_generations=2,
+        max_prompt_length=512,
+        max_completion_length=512,
+        max_seq_length=1024,
+        load_in_4bit=True,
+        report_to=report_to,
+    )
+
+
 def apply_vertex_env(config: TrainingConfig) -> TrainingConfig:
     model_dir = os.environ.get("AIP_MODEL_DIR", "").strip()
     if model_dir:
@@ -187,6 +205,11 @@ def _resolve_path(path: Path) -> Path:
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="GRPO Manim training on ManiBench (Unsloth Gemma-4 stacked LoRA)",
+    )
+    parser.add_argument(
+        "--rtx3060",
+        action="store_true",
+        help="NVIDIA RTX 3060 12GB preset (num_generations=2, max_prompt=512, max_completion=512, 4-bit)",
     )
     parser.add_argument(
         "--sft-lora",
