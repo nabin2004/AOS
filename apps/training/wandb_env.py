@@ -14,24 +14,35 @@ DEFAULT_PROJECT_GRPO = "aos-grpo"
 
 
 def load_training_dotenv(path: Path | None = None) -> None:
-    """Load KEY=VALUE pairs from apps/training/.env into os.environ."""
-    dotenv_path = path or DEFAULT_DOTENV
-    if not dotenv_path.is_file():
-        return
-
-    for line in dotenv_path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        key = key.strip()
-        value = value.strip().strip('"').strip("'")
-        if key and key not in os.environ:
-            os.environ[key] = value
+    """Load KEY=VALUE pairs from apps/training/.env or root .env into os.environ."""
+    candidate_paths = [
+        path,
+        DEFAULT_DOTENV,
+        TRAINING_ROOT.parent.parent / ".env",
+        Path.cwd() / ".env",
+    ]
+    for p in candidate_paths:
+        if p and p.is_file():
+            for line in p.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip().strip('"').strip("'")
+                if key and key not in os.environ:
+                    os.environ[key] = value
 
 
 def wandb_api_key() -> str | None:
+    load_training_dotenv()
     raw = os.environ.get("WANDB_API_KEY", "").strip()
+    return raw or None
+
+
+def hf_token() -> str | None:
+    load_training_dotenv()
+    raw = os.environ.get("HF_TOKEN", "").strip()
     return raw or None
 
 
@@ -44,7 +55,14 @@ def resolve_report_to(requested: str) -> str:
     if wandb_api_key():
         return "wandb"
     print(
-        "WARNING: report_to=wandb but WANDB_API_KEY is not set; disabling experiment tracking.",
+        "\n========================================================================\n"
+        "💡 NOTE: W&B Experiment Tracking is Disabled (WANDB_API_KEY not found).\n"
+        "To enable W&B logging & Hugging Face authentication, set up your .env file:\n\n"
+        "   1. Copy example file:  cp apps/training/.env.example apps/training/.env\n"
+        "   2. Fill in your keys in apps/training/.env:\n"
+        "        WANDB_API_KEY=your_wandb_key\n"
+        "        HF_TOKEN=your_huggingface_token\n"
+        "========================================================================\n",
         file=sys.stderr,
     )
     return "none"

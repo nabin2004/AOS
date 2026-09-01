@@ -28,6 +28,15 @@ cd AOS
 
 # Synchronize virtual environment & workspace dependencies
 uv sync
+
+# Set up API keys (.env file for W&B tracking & HF authentication)
+cp apps/training/.env.example apps/training/.env
+```
+
+Edit `apps/training/.env` and paste your secrets:
+```env
+WANDB_API_KEY=your_wandb_api_key_here
+HF_TOKEN=your_huggingface_access_token_here
 ```
 
 ---
