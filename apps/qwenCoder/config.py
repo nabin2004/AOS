@@ -5,6 +5,7 @@ import os
 import sys
 from dataclasses import dataclass, field, replace
 from pathlib import Path
+from typing import Any
 
 from peft import LoraConfig
 from trl import SFTConfig
@@ -37,8 +38,8 @@ LORA_TARGETS = (
 @dataclass
 class TrainingConfig:
     model_id: str = BASE_MODEL_ID
-    dataset_repo: str = "nabin2004/AOS-Qwen-Trajectories"
-    dataset_file: str = "tool_trace/train.jsonl"
+    dataset_repo: str = "nabin2004/manim-sft-10k"
+    dataset_file: str = "data/train.jsonl"
     dataset_split: str = "train"
     data_path: Path | None = None
     init_adapter: Path | None = None
@@ -153,12 +154,21 @@ class TrainingConfig:
             config = replace(config, shuffle_seed=args.shuffle_seed)
         if getattr(args, "stage", None) is not None:
             stage = args.stage
-            config = replace(
-                config,
-                stage=stage,
-                run_name=stage_run_name(stage),
-                wandb_tags=stage_tags(stage),
-            )
+            stage_updates: dict[str, Any] = {
+                "stage": stage,
+                "run_name": stage_run_name(stage),
+                "wandb_tags": stage_tags(stage),
+            }
+            if args.dataset_repo is None:
+                if stage == "manim":
+                    stage_updates["dataset_repo"] = "nabin2004/manim-sft-10k"
+                elif stage == "educlaw":
+                    stage_updates["dataset_repo"] = "nabin2004/educlaw-manim-sft"
+                elif stage == "traces":
+                    stage_updates["dataset_repo"] = "nabin2004/AOS-Trajectories"
+                    if args.dataset_file is None:
+                        stage_updates["dataset_file"] = "tool_trace/train.jsonl"
+            config = replace(config, **stage_updates)
         if args.output_dir is not None:
             config = replace(config, output_dir=Path(args.output_dir))
         if args.model_id is not None:
