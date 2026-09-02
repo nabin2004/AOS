@@ -53,27 +53,21 @@ except Exception:
 
 ---
 
-## One-Click Notebook Code
+## One-Click Super Simple Notebook Code
 
-Execute the pipeline in a Kaggle bash cell:
+In a Kaggle Notebook code cell (Bash or Python), simply run:
 
 ```python
-%%bash
-set -euo pipefail
-cd /kaggle/working
-if [[ ! -d AOS ]]; then
-  git clone https://github.com/nabin2004/AOS.git AOS
-else
-  git -C AOS pull --ff-only
-fi
-cd AOS
-
-# Step 1: Curate & Push Dataset (optional if already on Hub)
-# python3 apps/qwenCoder/curate_sft_5k_400.py --push --repo-id nabin2004/manim-aos-5k400
-
-# Step 2: Execute End-to-End Qwen3-8B Pipeline
-bash apps/qwenCoder/kaggle_qwen3_8b_e2e.sh
+!cd /kaggle/working && git clone https://github.com/nabin2004/AOS.git 2>/dev/null || git -C /kaggle/working/AOS pull
+!python3 /kaggle/working/AOS/apps/qwenCoder/run_kaggle.py
 ```
+
+> [!TIP]
+> `run_kaggle.py` automatically:
+> 1. Extracts `HF_TOKEN` from Kaggle Secrets (Add-ons → Secrets).
+> 2. Skips downloading 2.5 GB of PyTorch wheels if existing PyTorch already works on CUDA.
+> 3. Curates the 5.4k dataset automatically if not present.
+> 4. Runs QLoRA SFT, adapter merging, GGUF multi-quantization (`Q4_K_M` & `Q8_0`), and pushes all artifacts to HuggingFace!
 
 ---
 

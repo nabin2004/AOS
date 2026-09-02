@@ -45,9 +45,14 @@ MERGED_DIR="${MERGED_DIR:-${WORKSPACE}/qwen3-8b-manim-merged}"
 GGUF_DIR="${GGUF_DIR:-${WORKSPACE}/qwen3-8b-manim-gguf}"
 
 if [[ -z "${HF_TOKEN:-}" ]]; then
-  echo "ERROR: HF_TOKEN is required for Hugging Face uploads." >&2
-  echo "In a Kaggle notebook, export it from UserSecretsClient first." >&2
-  exit 1
+  echo "==> Checking Kaggle UserSecretsClient for HF_TOKEN..."
+  HF_TOKEN=$("${PYTHON}" -c 'from kaggle_secrets import UserSecretsClient; print(UserSecretsClient().get_secret("HF_TOKEN"))' 2>/dev/null || true)
+  if [[ -n "${HF_TOKEN}" ]]; then
+    export HF_TOKEN
+    echo "✔ Loaded HF_TOKEN from Kaggle UserSecrets."
+  else
+    echo "WARNING: HF_TOKEN is required for Hugging Face uploads." >&2
+  fi
 fi
 
 echo "================================================================="
@@ -60,9 +65,17 @@ echo "   Merged Repo:  ${HUB_MERGED_REPO}"
 echo "   GGUF Repo:    ${HUB_GGUF_REPO}"
 echo "================================================================="
 
+check_cuda_working() {
+  "${PYTHON}" -c "import torch; assert torch.cuda.is_available(); x=torch.randn(16, 16, device='cuda'); _=x@x; torch.cuda.synchronize()" 2>/dev/null
+}
+
 install_p100_torch_system() {
   if [[ "${SKIP_TORCH_REINSTALL:-0}" == "1" ]]; then
     echo "==> Skipping torch reinstall (SKIP_TORCH_REINSTALL=1)"
+    return 0
+  fi
+  if check_cuda_working; then
+    echo "==> Existing system PyTorch with CUDA is working. Skipping PyTorch re-installation!"
     return 0
   fi
 
