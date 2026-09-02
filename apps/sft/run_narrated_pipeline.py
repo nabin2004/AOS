@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """End-to-End Orchestrator Pipeline for AOS Narrated Manim Dataset.
 
-Converts standard Manim trajectories into manim-voiceover scripts using Gemini 2.5 Flash
-Batch API, and creates/uploads the resulting dataset to Hugging Face.
+Converts standard Manim trajectories into manim-voiceover scripts using
+gemini-2.5-flash-lite via the inference.net OpenAI-compatible endpoint,
+and publishes the resulting dataset to Hugging Face Hub.
 
 Usage:
-    export GEMINI_API_KEY=your_gemini_key
-    export HF_TOKEN=your_hf_token
     uv run python run_narrated_pipeline.py
 """
 
@@ -18,6 +17,7 @@ import sys
 from pathlib import Path
 
 from narrate_trajectories_batch import (
+    DEFAULT_BASE_URL,
     DEFAULT_INPUT_TRAJECTORIES,
     DEFAULT_MODEL_ID,
     DEFAULT_OUTPUT_DIR,
@@ -34,7 +34,7 @@ SFT_ROOT = Path(__file__).resolve().parent
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run full Manim Voiceover batch conversion and HuggingFace dataset upload pipeline"
+        description="Run full Manim Voiceover conversion and HuggingFace dataset upload pipeline"
     )
     parser.add_argument(
         "--input-path",
@@ -49,21 +49,30 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help=f"Output directory (default: {DEFAULT_OUTPUT_DIR})",
     )
     parser.add_argument(
-        "--model-id",
-        default=DEFAULT_MODEL_ID,
-        help=f"Gemini model ID (default: {DEFAULT_MODEL_ID})",
+        "--base-url",
+        default=os.getenv("INFERENCE_NET_BASE_URL", DEFAULT_BASE_URL),
+        help=f"OpenAI-compatible base URL (default: {DEFAULT_BASE_URL})",
     )
     parser.add_argument(
-        "--mode",
-        choices=["auto", "batch", "direct"],
-        default="auto",
-        help="Conversion mode: 'auto' (batch with direct fallback), 'batch', or 'direct' (default: auto)",
+        "--model-id",
+        default=DEFAULT_MODEL_ID,
+        help=f"Model ID (default: {DEFAULT_MODEL_ID})",
+    )
+    parser.add_argument(
+        "--api-key",
+        default=os.getenv("INFERENCE_NET_API_KEY") or os.getenv("OPENAI_API_KEY") or os.getenv("GEMINI_API_KEY", ""),
+        help="API Key (default: loaded from INFERENCE_NET_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY / .env)",
     )
     parser.add_argument(
         "--concurrency",
         type=int,
         default=5,
-        help="Number of concurrent API requests in direct mode (default: 5)",
+        help="Number of concurrent API requests (default: 5)",
+    )
+    parser.add_argument(
+        "--no-stream",
+        action="store_true",
+        help="Disable streaming mode",
     )
     parser.add_argument(
         "--repo-id",
@@ -71,20 +80,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help=f"HuggingFace dataset repository ID (default: {DEFAULT_REPO_ID})",
     )
     parser.add_argument(
-        "--skip-batch",
+        "--skip-conversion",
         action="store_true",
-        help="Skip batch generation step (use existing output file)",
+        help="Skip generation step (use existing output file)",
     )
     parser.add_argument(
         "--skip-hf",
         action="store_true",
         help="Skip HuggingFace repository upload step",
-    )
-    parser.add_argument(
-        "--poll-interval",
-        type=int,
-        default=30,
-        help="Batch job status polling interval in seconds (default: 30)",
     )
     return parser
 
@@ -96,32 +99,38 @@ def main() -> int:
     final_dataset_file = output_dir / "manim_narrated_400.jsonl"
 
     print("==========================================================================")
-    print("        AOS Narrated Manim Dataset Pipeline (Gemini Batch + HF)          ")
+    print("        AOS Narrated Manim Dataset Pipeline (Inference.net + HF)         ")
     print("==========================================================================")
 
     # 1. Conversion Step
-    if not args.skip_batch:
-        api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not args.skip_conversion:
+        api_key = (
+            args.api_key
+            or os.getenv("INFERENCE_NET_API_KEY")
+            or os.getenv("OPENAI_API_KEY")
+            or os.getenv("GEMINI_API_KEY", "")
+        ).strip()
+
         if not api_key:
-            print("ERROR: GEMINI_API_KEY is required for conversion.", file=sys.stderr)
+            print("ERROR: Set INFERENCE_NET_API_KEY or OPENAI_API_KEY in .env.", file=sys.stderr)
             return 1
 
-        print(f"\n[Phase 1] Starting Gemini 2.5 Flash Conversion (mode: {args.mode})...")
+        print(f"\n[Phase 1] Converting Trajectories via {args.base_url} ({args.model_id})...")
         try:
             final_dataset_file = run_conversion(
                 api_key=api_key,
+                base_url=args.base_url,
                 model_id=args.model_id,
                 input_path=args.input_path.resolve(),
                 output_dir=output_dir,
-                mode=args.mode,
                 concurrency=args.concurrency,
-                poll_interval=args.poll_interval,
+                stream=not args.no_stream,
             )
         except Exception as e:
             print(f"ERROR in conversion: {e}", file=sys.stderr)
             return 1
     else:
-        print(f"\n[Phase 1] Skipped batch generation (--skip-batch set). Using existing dataset: {final_dataset_file}")
+        print(f"\n[Phase 1] Skipped conversion (--skip-conversion set). Using existing dataset: {final_dataset_file}")
 
     # 2. HuggingFace Upload Step
     if not args.skip_hf:

@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
-"""Gemini 2.5 Flash Batch & Direct API pipeline for converting Manim scripts to manim-voiceover.
+"""Inference.net / OpenAI-compatible API pipeline for converting Manim trajectories to manim-voiceover.
 
 Converts standard Manim trajectories into executable manim-voiceover scripts using
-Gemini 2.5 Flash. Supports both asynchronous Batch API (50% token discount) and
-direct concurrent async conversion with automatic fallback and resume checkpointing.
+gemini-2.5-flash-lite via the inference.net OpenAI-compatible endpoint. Supports
+concurrent async processing, streaming responses, and resume checkpointing.
+
+Endpoint details:
+    Base URL: https://api.inference.net/v1
+    Model: gemini-2.5-flash-lite
+    Key: INFERENCE_NET_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY
 
 Usage:
     uv run python narrate_trajectories_batch.py
-    uv run python narrate_trajectories_batch.py --mode direct --concurrency 5
+    uv run python narrate_trajectories_batch.py --concurrency 8
 """
 
 from __future__ import annotations
@@ -18,7 +23,6 @@ import json
 import os
 import re
 import sys
-import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
@@ -28,12 +32,9 @@ except ImportError:
     load_dotenv = None
 
 try:
-    from google import genai
-    from google.genai import errors, types
+    from openai import AsyncOpenAI
 except ImportError:
-    genai = None
-    errors = None
-    types = None
+    AsyncOpenAI = None
 
 SFT_ROOT = Path(__file__).resolve().parent
 AGENTS_ROOT = SFT_ROOT.parent / "agents"
@@ -45,7 +46,8 @@ DEFAULT_INPUT_TRAJECTORIES = (
     else AGENTS_ROOT / "training_data" / "trajectories.jsonl"
 )
 DEFAULT_OUTPUT_DIR = SFT_ROOT / "dataset_narrated"
-DEFAULT_MODEL_ID = "gemini-2.5-flash"
+DEFAULT_BASE_URL = "https://api.inference.net/v1"
+DEFAULT_MODEL_ID = "gemini-2.5-flash-lite"
 
 
 def init_environment() -> None:
@@ -111,92 +113,50 @@ def _extract_code(data: Dict[str, Any]) -> Optional[str]:
     return None
 
 
-def prepare_batch_file(
-    input_path: Path,
-    batch_requests_file: Path,
-    only_andrej_400: bool = True,
-) -> int:
-    """Read input trajectories and format batch requests JSONL file."""
-    if not input_path.is_file():
-        raise FileNotFoundError(f"Input trajectories file not found: {input_path}")
-
-    count = 0
-    with open(input_path, "r", encoding="utf-8") as infile, open(
-        batch_requests_file, "w", encoding="utf-8"
-    ) as outfile:
-        for idx, line in enumerate(infile):
-            line_str = line.strip()
-            if not line_str:
-                continue
-
-            try:
-                data = json.loads(line_str)
-            except json.JSONDecodeError:
-                continue
-
-            metadata = data.get("metadata", {})
-            source = metadata.get("source", "")
-            # In mixed datasets like curated_sft_5k_400, isolate the 400 trajectories
-            if only_andrej_400 and source and source != "prompts_andrej_400":
-                continue
-
-            code = _extract_code(data)
-            if not code:
-                continue
-
-            sample_id = data.get("id") or data.get("user_prompt") or f"sample_{idx}"
-            clean_key = f"sample_{idx}"
-            prompt_content = f"Original Manim Code:\n```python\n{code}\n```"
-
-            req = {
-                "key": clean_key,
-                "request": {
-                    "system_instruction": {
-                        "parts": [{"text": SYSTEM_INSTRUCTION}]
-                    },
-                    "contents": [{"parts": [{"text": prompt_content}]}],
-                    "generation_config": {
-                        "temperature": 0.2,
-                        "max_output_tokens": 4096,
-                    },
-                },
-                "metadata": {
-                    "original_id": str(sample_id),
-                    "prompt": data.get("user_prompt") or data.get("prompt") or "",
-                },
-            }
-            outfile.write(json.dumps(req) + "\n")
-            count += 1
-
-    print(f"Prepared {count} batch requests in: {batch_requests_file}")
-    return count
-
-
 async def _convert_single_item(
-    client: genai.Client,
+    client: AsyncOpenAI,
     model_id: str,
     item_id: str,
     code: str,
     semaphore: asyncio.Semaphore,
+    stream: bool = True,
     max_retries: int = 5,
 ) -> Dict[str, Any]:
     """Convert a single Manim script to voiceover format with retry backoff."""
     prompt_content = f"Original Manim Code:\n```python\n{code}\n```"
-    config = types.GenerateContentConfig(
-        system_instruction=SYSTEM_INSTRUCTION,
-        temperature=0.2,
-        max_output_tokens=4096,
-    )
 
     async with semaphore:
         for attempt in range(1, max_retries + 1):
             try:
-                resp = await client.aio.models.generate_content(
-                    model=model_id,
-                    contents=prompt_content,
-                    config=config,
-                )
-                raw_text = resp.text or ""
+                if stream:
+                    completion = await client.chat.completions.create(
+                        model=model_id,
+                        messages=[
+                            {"role": "system", "content": SYSTEM_INSTRUCTION},
+                            {"role": "user", "content": prompt_content},
+                        ],
+                        temperature=0.2,
+                        max_tokens=4096,
+                        stream=True,
+                    )
+                    chunks = []
+                    async for chunk in completion:
+                        if chunk.choices and chunk.choices[0].delta.content:
+                            chunks.append(chunk.choices[0].delta.content)
+                    raw_text = "".join(chunks)
+                else:
+                    completion = await client.chat.completions.create(
+                        model=model_id,
+                        messages=[
+                            {"role": "system", "content": SYSTEM_INSTRUCTION},
+                            {"role": "user", "content": prompt_content},
+                        ],
+                        temperature=0.2,
+                        max_tokens=4096,
+                        stream=False,
+                    )
+                    raw_text = completion.choices[0].message.content or ""
+
                 match = re.search(r"```python\s*(.*?)\s*```", raw_text, re.DOTALL)
                 clean_code = match.group(1).strip() if match else raw_text.strip()
                 return {
@@ -206,11 +166,12 @@ async def _convert_single_item(
                 }
             except Exception as exc:
                 err_str = str(exc)
-                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                    wait_time = 2**attempt + 1
-                    print(f"  Rate limit encountered for {item_id}, retrying in {wait_time}s (attempt {attempt}/{max_retries})...")
+                if "429" in err_str or "rate limit" in err_str.lower():
+                    wait_time = 2**attempt + 2
+                    print(f"  [429 Rate Limit] {item_id}, retrying in {wait_time}s (attempt {attempt}/{max_retries})...")
                     await asyncio.sleep(wait_time)
                 else:
+                    print(f"  [Error] {item_id}: {err_str[:120]} (attempt {attempt}/{max_retries})")
                     if attempt == max_retries:
                         return {
                             "id": item_id,
@@ -223,16 +184,28 @@ async def _convert_single_item(
 
 
 async def run_direct_conversion(
-    client: genai.Client,
+    api_key: str,
+    base_url: str,
     model_id: str,
     input_path: Path,
     output_dir: Path,
     concurrency: int = 5,
     only_andrej_400: bool = True,
+    stream: bool = True,
 ) -> Path:
     """Convert trajectories directly via asynchronous parallel requests with resume checkpointing."""
+    if AsyncOpenAI is None:
+        raise ImportError(
+            "The 'openai' package is required. Install with `uv add openai`."
+        )
+
     output_dir.mkdir(parents=True, exist_ok=True)
     final_dataset_file = output_dir / "manim_narrated_400.jsonl"
+
+    client = AsyncOpenAI(
+        base_url=base_url,
+        api_key=api_key,
+    )
 
     # 1. Load existing results for resume capability
     completed_ids: Set[str] = set()
@@ -247,7 +220,7 @@ async def run_direct_conversion(
                     except json.JSONDecodeError:
                         continue
         if completed_ids:
-            print(f"Resuming: found {len(completed_ids)} already converted items in {final_dataset_file.name}")
+            print(f"Resume Checkpoint: Found {len(completed_ids)} already converted items in {final_dataset_file.name}")
 
     # 2. Collect items to convert
     tasks_to_run = []
@@ -275,19 +248,20 @@ async def run_direct_conversion(
 
             tasks_to_run.append((item_id, code))
 
-    total_tasks = len(tasks_to_run)
-    print(f"Starting direct async conversion for {total_tasks} trajectories (concurrency: {concurrency})...")
+    total_remaining = len(tasks_to_run)
+    total_dataset = len(completed_ids) + total_remaining
+    print(f"Targeting {total_dataset} trajectories total ({total_remaining} remaining to convert).")
+    print(f"Using endpoint: {base_url} | Model: {model_id} | Concurrency: {concurrency}")
 
-    if total_tasks == 0:
+    if total_remaining == 0:
         print(f"All items already completed in: {final_dataset_file}")
         return final_dataset_file
 
     semaphore = asyncio.Semaphore(concurrency)
     write_lock = asyncio.Lock()
     completed_count = len(completed_ids)
-    total_expected = completed_count + total_tasks
 
-    async def worker(item_id: str, code: str, current_idx: int) -> None:
+    async def worker(item_id: str, code: str) -> None:
         nonlocal completed_count
         result = await _convert_single_item(
             client=client,
@@ -295,160 +269,49 @@ async def run_direct_conversion(
             item_id=item_id,
             code=code,
             semaphore=semaphore,
+            stream=stream,
         )
         async with write_lock:
             with open(final_dataset_file, "a", encoding="utf-8") as out:
                 out.write(json.dumps(result) + "\n")
             completed_count += 1
             status_str = result.get("status", "unknown")
-            print(f"[{completed_count}/{total_expected}] {item_id}: {status_str}")
+            print(f"[{completed_count}/{total_dataset}] {item_id}: {status_str}")
 
-    tasks = [
-        worker(item_id, code, i + 1)
-        for i, (item_id, code) in enumerate(tasks_to_run)
-    ]
+    tasks = [worker(item_id, code) for item_id, code in tasks_to_run]
     await asyncio.gather(*tasks)
 
-    print(f"\nDirect conversion completed! Saved to: {final_dataset_file}")
+    print(f"\nNarration conversion completed! Saved to: {final_dataset_file}")
     return final_dataset_file
 
 
 def run_conversion(
     api_key: str,
-    model_id: str,
-    input_path: Path,
-    output_dir: Path,
-    mode: str = "auto",
+    model_id: str = DEFAULT_MODEL_ID,
+    base_url: str = DEFAULT_BASE_URL,
+    input_path: Path = DEFAULT_INPUT_TRAJECTORIES,
+    output_dir: Path = DEFAULT_OUTPUT_DIR,
     concurrency: int = 5,
-    poll_interval: int = 30,
+    stream: bool = True,
+    **kwargs,
 ) -> Path:
-    """Run narration conversion in batch, direct, or auto-fallback mode."""
-    if genai is None:
-        raise ImportError(
-            "The 'google-genai' package is required. Install with `uv add google-genai`."
+    """Run narration conversion via inference.net endpoint."""
+    return asyncio.run(
+        run_direct_conversion(
+            api_key=api_key,
+            base_url=base_url,
+            model_id=model_id,
+            input_path=input_path,
+            output_dir=output_dir,
+            concurrency=concurrency,
+            stream=stream,
         )
-
-    client = genai.Client(api_key=api_key)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    batch_input_file = output_dir / "manim_batch_input.jsonl"
-    batch_output_file = output_dir / "batch_output.jsonl"
-    final_dataset_file = output_dir / "manim_narrated_400.jsonl"
-
-    # If user explicitly requested direct mode
-    if mode == "direct":
-        return asyncio.run(
-            run_direct_conversion(
-                client=client,
-                model_id=model_id,
-                input_path=input_path,
-                output_dir=output_dir,
-                concurrency=concurrency,
-            )
-        )
-
-    # Otherwise attempt Batch API
-    print("Step 1: Preparing batch payload...")
-    request_count = prepare_batch_file(input_path, batch_input_file)
-    if request_count == 0:
-        raise RuntimeError("No valid code trajectories found in input file.")
-
-    print("Step 2: Uploading batch request payload to Google Files API...")
-    uploaded_file = client.files.upload(
-        file=str(batch_input_file),
-        config=types.UploadFileConfig(
-            display_name="manim-narration-batch",
-            mime_type="application/jsonl",
-        ),
     )
-    print(f"Uploaded file ID: {uploaded_file.name}")
-
-    print("Step 3: Initiating Gemini 2.5 Flash Batch Job...")
-    try:
-        batch_job = client.batches.create(
-            model=model_id,
-            src=uploaded_file.name,
-            config={"display_name": "manim-voiceover-conversion-400"},
-        )
-        print(f"Batch Job Created: {batch_job.name}")
-    except errors.APIError as err:
-        err_msg = str(err)
-        if mode == "auto" and ("FAILED_PRECONDITION" in err_msg or err.code == 400):
-            print("\n[Notice] Google AI Studio Batch API requires a Google Cloud project with billing enabled (Tier 1).")
-            print("[Notice] Your API key is currently in Free/Standard tier.")
-            print("[Notice] Automatically switching to Direct Async Conversion mode (with resume checkpointing)...\n")
-            return asyncio.run(
-                run_direct_conversion(
-                    client=client,
-                    model_id=model_id,
-                    input_path=input_path,
-                    output_dir=output_dir,
-                    concurrency=concurrency,
-                )
-            )
-        else:
-            raise
-
-    print("Step 4: Polling batch job status...")
-    while True:
-        job_status = client.batches.get(name=batch_job.name)
-        state = getattr(job_status.state, "name", str(job_status.state))
-        print(f"Job Status: {state}")
-
-        if state in ["JOB_STATE_SUCCEEDED", "JOB_STATE_FAILED", "JOB_STATE_CANCELLED"]:
-            break
-        time.sleep(poll_interval)
-
-    if state != "JOB_STATE_SUCCEEDED":
-        raise RuntimeError(f"Batch job failed with state: {state}")
-
-    print("Step 5: Downloading batch job results...")
-    client.files.download(file=job_status.output.name, destination=str(batch_output_file))
-
-    print("Step 6: Processing and compiling final dataset...")
-    final_dataset: List[Dict[str, Any]] = []
-
-    with open(batch_output_file, "r", encoding="utf-8") as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                res = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-
-            custom_id = res.get("key")
-            try:
-                raw_text = res["response"]["candidates"][0]["content"]["parts"][0]["text"]
-                match = re.search(r"```python\s*(.*?)\s*```", raw_text, re.DOTALL)
-                clean_code = match.group(1).strip() if match else raw_text.strip()
-
-                final_dataset.append(
-                    {
-                        "id": custom_id,
-                        "narrated_manim_code": clean_code,
-                        "status": "success",
-                    }
-                )
-            except (KeyError, IndexError, AttributeError) as parse_err:
-                final_dataset.append(
-                    {
-                        "id": custom_id,
-                        "error": str(parse_err),
-                        "status": "failed",
-                    }
-                )
-
-    with open(final_dataset_file, "w", encoding="utf-8") as out:
-        for item in final_dataset:
-            out.write(json.dumps(item) + "\n")
-
-    print(f"Successfully created narrated dataset ({len(final_dataset)} items): {final_dataset_file}")
-    return final_dataset_file
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Convert Manim trajectory dataset to manim-voiceover scripts using Gemini 2.5 Flash"
+        description="Convert Manim trajectory dataset to manim-voiceover scripts using inference.net (gemini-2.5-flash-lite)"
     )
     parser.add_argument(
         "--input-path",
@@ -463,27 +326,30 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help=f"Output directory (default: {DEFAULT_OUTPUT_DIR})",
     )
     parser.add_argument(
-        "--model-id",
-        default=DEFAULT_MODEL_ID,
-        help=f"Gemini model ID (default: {DEFAULT_MODEL_ID})",
+        "--base-url",
+        default=os.getenv("INFERENCE_NET_BASE_URL", DEFAULT_BASE_URL),
+        help=f"OpenAI-compatible base URL (default: {DEFAULT_BASE_URL})",
     )
     parser.add_argument(
-        "--mode",
-        choices=["auto", "batch", "direct"],
-        default="auto",
-        help="Conversion mode: 'auto' (batch with direct fallback), 'batch', or 'direct' (default: auto)",
+        "--model-id",
+        default=DEFAULT_MODEL_ID,
+        help=f"Model ID (default: {DEFAULT_MODEL_ID})",
+    )
+    parser.add_argument(
+        "--api-key",
+        default=os.getenv("INFERENCE_NET_API_KEY") or os.getenv("OPENAI_API_KEY") or os.getenv("GEMINI_API_KEY", ""),
+        help="API Key (default: loaded from INFERENCE_NET_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY / .env)",
     )
     parser.add_argument(
         "--concurrency",
         type=int,
         default=5,
-        help="Number of concurrent API requests in direct mode (default: 5)",
+        help="Number of concurrent API requests (default: 5)",
     )
     parser.add_argument(
-        "--poll-interval",
-        type=int,
-        default=30,
-        help="Batch polling interval in seconds (default: 30)",
+        "--no-stream",
+        action="store_true",
+        help="Disable streaming mode",
     )
     return parser
 
@@ -491,20 +357,26 @@ def build_arg_parser() -> argparse.ArgumentParser:
 def main() -> int:
     init_environment()
     args = build_arg_parser().parse_args()
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    api_key = (
+        args.api_key
+        or os.getenv("INFERENCE_NET_API_KEY")
+        or os.getenv("OPENAI_API_KEY")
+        or os.getenv("GEMINI_API_KEY", "")
+    ).strip()
+
     if not api_key:
-        print("ERROR: Set GEMINI_API_KEY in environment or .env file.", file=sys.stderr)
+        print("ERROR: Set INFERENCE_NET_API_KEY or OPENAI_API_KEY in environment or .env file.", file=sys.stderr)
         return 1
 
     try:
         run_conversion(
             api_key=api_key,
+            base_url=args.base_url,
             model_id=args.model_id,
             input_path=args.input_path.resolve(),
             output_dir=args.output_dir.resolve(),
-            mode=args.mode,
             concurrency=args.concurrency,
-            poll_interval=args.poll_interval,
+            stream=not args.no_stream,
         )
         return 0
     except Exception as e:
