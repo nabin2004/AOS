@@ -18,6 +18,7 @@ resolution-markers = [
 members = [
     "agents",
     "aos",
+    "aos-dpo",
     "aos-manim-core",
     "aos-manim-slides",
     "audio-service",
@@ -25,6 +26,7 @@ members = [
     "grpo",
     "ir",
     "mcpservers",
+    "qwen-coder-sft",
     "server",
     "sft",
     "store",
@@ -343,6 +345,33 @@ requires-dist = [
     { name = "store", editable = "packages/store" },
     { name = "terminaltexteffects", specifier = ">=0.11.0" },
     { name = "typer", specifier = ">=0.12.0" },
+]
+
+[[package]]
+name = "aos-dpo"
+version = "0.1.0"
+source = { editable = "apps/dpo" }
+dependencies = [
+    { name = "accelerate" },
+    { name = "bitsandbytes" },
+    { name = "datasets" },
+    { name = "huggingface-hub" },
+    { name = "peft" },
+    { name = "torch" },
+    { name = "transformers" },
+    { name = "trl" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "accelerate", specifier = ">=1.0.0" },
+    { name = "bitsandbytes", specifier = ">=0.45.0" },
+    { name = "datasets", specifier = ">=5.0.0" },
+    { name = "huggingface-hub", specifier = ">=0.27.0" },
+    { name = "peft", specifier = ">=0.19.1" },
+    { name = "torch", specifier = ">=2.5.0", index = "https://download.pytorch.org/whl/cu124" },
+    { name = "transformers", specifier = ">=4.51.0" },
+    { name = "trl", specifier = ">=0.19.0" },
 ]
 
 [[package]]
@@ -5029,6 +5058,35 @@ wheels = [
 [package.optional-dependencies]
 pil = [
     { name = "pillow" },
+]
+
+[[package]]
+name = "qwen-coder-sft"
+version = "0.1.0"
+source = { editable = "apps/qwenCoder" }
+dependencies = [
+    { name = "accelerate" },
+    { name = "bitsandbytes" },
+    { name = "datasets" },
+    { name = "huggingface-hub" },
+    { name = "peft" },
+    { name = "torch" },
+    { name = "transformers" },
+    { name = "trl" },
+    { name = "wandb" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "accelerate", specifier = ">=1.0.0" },
+    { name = "bitsandbytes", specifier = ">=0.45.0" },
+    { name = "datasets", specifier = ">=5.0.0" },
+    { name = "huggingface-hub", specifier = ">=0.27.0" },
+    { name = "peft", specifier = ">=0.19.1" },
+    { name = "torch", specifier = ">=2.5.0", index = "https://download.pytorch.org/whl/cu124" },
+    { name = "transformers", specifier = ">=4.51.0" },
+    { name = "trl", specifier = ">=0.19.0" },
+    { name = "wandb", specifier = ">=0.19.0" },
 ]
 
 [[package]]

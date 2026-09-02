@@ -46,4 +46,8 @@ py-modules = [
     "run",
     "trainer",
     "upload_dataset",
+    "prepare_narrated_datasets",
+    "run_narrated_sft",
+    "run_narrated_dpo",
+    "run_kaggle_narrated",
 ]

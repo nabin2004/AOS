@@ -57,4 +57,6 @@ members = [
     "apps/educlaw",
     "apps/slidestemp/aos-manim-core",
     "apps/slidestemp/aos-manim-slides",
+    "apps/qwenCoder",
+    "apps/dpo",
 ]
