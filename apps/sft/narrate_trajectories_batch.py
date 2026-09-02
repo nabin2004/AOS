@@ -47,7 +47,7 @@ DEFAULT_INPUT_TRAJECTORIES = (
 )
 DEFAULT_OUTPUT_DIR = SFT_ROOT / "dataset_narrated"
 DEFAULT_BASE_URL = "https://api.inference.net/v1"
-DEFAULT_MODEL_ID = "gemini-2.5-flash-lite"
+DEFAULT_MODEL_ID = "gemini-2.5-flash"
 
 
 def init_environment() -> None:
