@@ -52,8 +52,8 @@ def generate_dataset_card(repo_id: str, sample_count: int) -> str:
     return f"""---
 license: mit
 task_categories:
-- text2text-generation
-- code-generation
+- text-generation
+- text-to-speech
 language:
 - en
 tags:
@@ -100,6 +100,39 @@ Created for the **AOS (Agentic Orchestration System)** project fine-tuning pipel
 """
 
 
+def _resolve_valid_token(token: Optional[str] = None) -> str:
+    """Resolve a verified valid Hugging Face token from explicit arg, env, or CLI login."""
+    candidates = []
+    if token and token.strip():
+        candidates.append(token.strip())
+    env_tok = os.environ.get("HF_TOKEN", "").strip()
+    if env_tok and env_tok not in candidates:
+        candidates.append(env_tok)
+    if get_token:
+        try:
+            disk_tok = get_token()
+            if disk_tok and disk_tok not in candidates:
+                candidates.append(disk_tok)
+        except Exception:
+            pass
+
+    api = HfApi()
+    for cand in candidates:
+        try:
+            user_info = api.whoami(token=cand)
+            username = user_info.get("name") or user_info.get("fullname")
+            print(f"Authenticated as Hugging Face user: {username}")
+            return cand
+        except Exception:
+            continue
+
+    print(
+        "ERROR: No valid Hugging Face token found. Run `huggingface-cli login` or set HF_TOKEN.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+
 def upload_narrated_dataset(
     repo_id: str,
     dataset_path: Path,
@@ -112,13 +145,7 @@ def upload_narrated_dataset(
             "The 'huggingface-hub' package is required. Install with `uv add huggingface-hub`."
         )
 
-    resolved_token = token or os.environ.get("HF_TOKEN", "").strip() or (get_token() if get_token else None)
-    if not resolved_token:
-        print(
-            "ERROR: Set HF_TOKEN environment variable or run `huggingface-cli login`.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    resolved_token = _resolve_valid_token(token)
 
     if not dataset_path.is_file():
         raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
@@ -128,7 +155,7 @@ def upload_narrated_dataset(
     with open(dataset_path, "r", encoding="utf-8") as f:
         sample_count = sum(1 for line in f if line.strip())
 
-    api = HfApi()
+    api = HfApi(token=resolved_token)
 
     print(f"Creating repository on Hugging Face: https://huggingface.co/datasets/{repo_id}")
     api.create_repo(
