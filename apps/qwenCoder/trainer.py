@@ -55,6 +55,7 @@ def build_trainer(
     tokenizer: PreTrainedTokenizerBase,
     dataset: Dataset,
     config: TrainingConfig,
+    eval_dataset: Dataset | None = None,
 ) -> SFTTrainer:
     # When continuing an existing LoRA, the model is already a PeftModel —
     # do not pass a fresh peft_config (that would create a second adapter).
@@ -63,6 +64,7 @@ def build_trainer(
         model=model,
         args=config.sft_config(),
         train_dataset=dataset,
+        eval_dataset=eval_dataset,
         processing_class=tokenizer,
         peft_config=peft_config,
     )

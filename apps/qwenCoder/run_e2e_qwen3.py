@@ -66,6 +66,7 @@ def main() -> int:
     parser.add_argument("--seq-len", type=int, default=2048)
     parser.add_argument("--save-steps", type=int, default=200)
     parser.add_argument("--max-samples", type=int, default=0, help="0 = all samples")
+    parser.add_argument("--val-split", type=float, default=0.0, help="Validation split ratio e.g. 0.05")
     parser.add_argument("--kaggle", action="store_true", help="Apply Kaggle P100 hardware preset")
     parser.add_argument("--push-to-hub", action="store_true", help="Push outputs to Hugging Face Hub")
 
@@ -95,6 +96,7 @@ def main() -> int:
             "--seq-len", str(args.seq_len),
             "--save-steps", str(args.save_steps),
             "--max-samples", str(args.max_samples),
+            "--val-split", str(args.val_split),
             "--run-name", f"{args.model_id.split('/')[-1].lower()}-manim-sft",
             "--use-4bit",
             "--no-packing",

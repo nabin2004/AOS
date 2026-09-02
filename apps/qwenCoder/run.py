@@ -19,7 +19,7 @@ from pathlib import Path
 import torch 
 from config import TrainingConfig, build_arg_parser, effective_bf16
 from checkpoints import resolve_resume_checkpoint
-from data import load_training_dataset, native_sft_chat_repo
+from data import load_training_and_eval_datasets, native_sft_chat_repo
 from model import load_model, load_tokenizer
 from trainer import build_trainer, train_and_save
 
@@ -124,12 +124,14 @@ def main() -> int:
 
     tokenizer = load_tokenizer(config.model_id)
     model = load_model(config)
-    dataset = load_training_dataset(config)
+    dataset, eval_dataset = load_training_and_eval_datasets(config)
     print(f"Train rows: {len(dataset)}")
+    if eval_dataset is not None:
+        print(f"Eval rows:  {len(eval_dataset)}")
     if args.smoke and len(dataset) > 8:
         dataset = dataset.select(range(8))
 
-    trainer = build_trainer(model, tokenizer, dataset, config)
+    trainer = build_trainer(model, tokenizer, dataset, config, eval_dataset=eval_dataset)
     train_and_save(
         trainer,
         tokenizer,

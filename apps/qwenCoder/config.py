@@ -80,6 +80,7 @@ class TrainingConfig:
     resume_from: Path | None = None
     hub_checkpoint_id: str | None = None
     sync_trainer_checkpoint: bool = False
+    val_split: float = 0.0
     replay_ratio: float = 0.0
     replay_dataset: str = "nabin2004/manim-sft-10k"
     eval_manibench: bool = False
@@ -116,6 +117,11 @@ class TrainingConfig:
 
     def sft_config(self) -> SFTConfig:
         use_bf16 = effective_bf16(self.use_bf16)
+        eval_args: dict[str, Any] = {}
+        if self.val_split > 0.0:
+            eval_args["eval_strategy"] = "steps" if self.save_strategy == "steps" else "epoch"
+            eval_args["eval_steps"] = self.save_steps
+
         return SFTConfig(
             output_dir=str(self.output_dir),
             num_train_epochs=self.epochs,
@@ -136,9 +142,10 @@ class TrainingConfig:
             packing=self.packing,
             max_length=self.seq_len,
             assistant_only_loss=self.assistant_only_loss,
-            dataset_kwargs={"add_special_tokens": False},
+            dataset_kwargs={"add_specialtokens": False} if False else {"add_special_tokens": False},
             report_to=self.report_to,
             run_name=self.run_name,
+            **eval_args,
         )
 
     @classmethod
@@ -184,6 +191,8 @@ class TrainingConfig:
                     if getattr(args, "replay_ratio", None) is None:
                         stage_updates["replay_ratio"] = 0.10
             config = replace(config, **stage_updates)
+        if getattr(args, "val_split", None) is not None:
+            config = replace(config, val_split=args.val_split)
         if getattr(args, "replay_ratio", None) is not None:
             config = replace(config, replay_ratio=args.replay_ratio)
         if getattr(args, "replay_dataset", None) is not None:
@@ -402,6 +411,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--model-id", default=None)
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--learning-rate", type=float, default=None)
+    parser.add_argument(
+        "--val-split",
+        type=float,
+        default=None,
+        help="Validation split ratio e.g. 0.05 (protects 100% of trajectory samples in train)",
+    )
     parser.add_argument(
         "--replay-ratio",
         type=float,
