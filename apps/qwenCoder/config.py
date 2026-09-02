@@ -198,6 +198,9 @@ class TrainingConfig:
             config = replace(config, output_dir=Path(args.output_dir))
         if args.model_id is not None:
             config = replace(config, model_id=args.model_id)
+            if getattr(args, "run_name", None) is None:
+                model_slug = args.model_id.split("/")[-1].lower()
+                config = replace(config, run_name=f"{model_slug}-manim-sft")
         if getattr(args, "learning_rate", None) is not None:
             config = replace(config, learning_rate=args.learning_rate)
         if args.epochs is not None:

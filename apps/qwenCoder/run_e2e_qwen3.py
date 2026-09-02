@@ -95,6 +95,7 @@ def main() -> int:
             "--seq-len", str(args.seq_len),
             "--save-steps", str(args.save_steps),
             "--max-samples", str(args.max_samples),
+            "--run-name", f"{args.model_id.split('/')[-1].lower()}-manim-sft",
             "--use-4bit",
             "--no-packing",
         ]

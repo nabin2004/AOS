@@ -15,12 +15,15 @@ def _effective_num_proc(requested: int) -> int:
         return 1
     return max(1, requested)
 
+QWEN_ROOT = Path(__file__).resolve().parent
+
 # Native Hub chat corpora (parquet / DatasetDict), not raw JSONL paths.
 _NATIVE_HF_REPOS = frozenset(
     {
         "nabin2004/manim-sft",
         "nabin2004/manim-sft-10k",
         "nabin2004/educlaw-manim-sft",
+        "nabin2004/manim-aos-5k400",
     }
 )
 
@@ -110,16 +113,28 @@ def _load_raw_dataset(config: TrainingConfig) -> Dataset:
 
     repo = config.dataset_repo
     split = config.dataset_split
+
+    # Check for local file in QWEN_ROOT / repo_basename / train.jsonl
+    repo_slug = repo.split("/")[-1]
+    local_jsonl = QWEN_ROOT / repo_slug / "train.jsonl"
+    if local_jsonl.is_file():
+        print(f"Loading local dataset from {local_jsonl}")
+        return load_dataset("json", data_files=str(local_jsonl), split="train")
+
     if repo in _NATIVE_HF_REPOS:
         print(f"Loading native Hub dataset {repo} split={split}")
         try:
             return load_dataset(repo, split=split)
         except Exception as exc:
-            print(f"WARNING: native load failed ({exc}); falling back to json files")
+            print(f"WARNING: native load failed ({exc}); trying fallback")
 
-    path = resolve_data_files(config)
-    print(f"Loading dataset from {path}")
-    return load_dataset("json", data_files=path, split="train")
+    try:
+        print(f"Loading dataset {repo} split={split}")
+        return load_dataset(repo, split=split)
+    except Exception:
+        path = resolve_data_files(config)
+        print(f"Loading dataset from {path}")
+        return load_dataset("json", data_files=path, split="train")
 
 
 def _maybe_subsample(ds: Dataset, config: TrainingConfig) -> Dataset:
