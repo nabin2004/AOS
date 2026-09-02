@@ -27,6 +27,7 @@ apps/agents/tools/templates/media/
 
 # SFT data-gen runtime artifacts
 apps/agents/sft_data_gen/*.log
+apps/sft/dataset_narrated/
 # Local caches and media
 .aos/
 .cache/

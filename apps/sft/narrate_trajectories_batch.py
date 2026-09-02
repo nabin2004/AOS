@@ -36,7 +36,12 @@ except ImportError:
 SFT_ROOT = Path(__file__).resolve().parent
 AGENTS_ROOT = SFT_ROOT.parent / "agents"
 REPO_ROOT = SFT_ROOT.parent.parent
-DEFAULT_INPUT_TRAJECTORIES = AGENTS_ROOT / "training_data" / "trajectories.jsonl"
+QWEN_400_TRAJECTORIES = SFT_ROOT.parent / "qwenCoder" / "curated_sft_5k_400" / "train.jsonl"
+DEFAULT_INPUT_TRAJECTORIES = (
+    QWEN_400_TRAJECTORIES
+    if QWEN_400_TRAJECTORIES.is_file()
+    else AGENTS_ROOT / "training_data" / "trajectories.jsonl"
+)
 DEFAULT_OUTPUT_DIR = SFT_ROOT / "dataset_narrated"
 DEFAULT_MODEL_ID = "gemini-2.5-flash"
 
@@ -79,6 +84,19 @@ def _extract_code(data: Dict[str, Any]) -> Optional[str]:
         if isinstance(val, str) and val.strip():
             return val.strip()
 
+    # Check messages array (OpenAI / ShareGPT chat format)
+    messages = data.get("messages") or []
+    if isinstance(messages, list):
+        for msg in reversed(messages):
+            if isinstance(msg, dict) and msg.get("role") == "assistant":
+                content = msg.get("content", "")
+                if isinstance(content, str):
+                    match = re.search(r"```python\s*(.*?)\s*```", content, re.DOTALL)
+                    if match:
+                        return match.group(1).strip()
+                    if "class " in content and "Scene" in content:
+                        return content.strip()
+
     # Fallback: check nested trajectory steps
     trajectory = data.get("trajectory") or data.get("steps") or []
     if isinstance(trajectory, list):
@@ -94,6 +112,7 @@ def _extract_code(data: Dict[str, Any]) -> Optional[str]:
 def prepare_batch_file(
     input_path: Path,
     batch_requests_file: Path,
+    only_andrej_400: bool = True,
 ) -> int:
     """Read input trajectories and format batch requests JSONL file."""
     if not input_path.is_file():
@@ -111,6 +130,12 @@ def prepare_batch_file(
             try:
                 data = json.loads(line_str)
             except json.JSONDecodeError:
+                continue
+
+            metadata = data.get("metadata", {})
+            source = metadata.get("source", "")
+            # In mixed datasets like curated_sft_5k_400, isolate the 400 trajectories if requested
+            if only_andrej_400 and source and source != "prompts_andrej_400":
                 continue
 
             code = _extract_code(data)
@@ -175,7 +200,10 @@ def run_batch_conversion(
     print("Step 2: Uploading batch request payload to Google Files API...")
     uploaded_file = client.files.upload(
         file=str(batch_input_file),
-        config=types.UploadFileConfig(display_name="manim-narration-batch"),
+        config=types.UploadFileConfig(
+            display_name="manim-narration-batch",
+            mime_type="application/jsonl",
+        ),
     )
     print(f"Uploaded file ID: {uploaded_file.name}")
 
