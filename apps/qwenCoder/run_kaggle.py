@@ -128,6 +128,7 @@ def main() -> int:
     parser.add_argument("--epochs", type=int, default=1, help="Number of training epochs")
     parser.add_argument("--save-steps", type=int, default=200, help="Checkpoint save steps")
     parser.add_argument("--seq-len", type=int, default=2048, help="Sequence length")
+    parser.add_argument("--max-samples", type=int, default=0, help="Max samples to train (0 = full dataset)")
     parser.add_argument("--curate", action="store_true", help="Force dataset curation before training")
     parser.add_argument("--force-reinstall-torch", action="store_true", help="Force reinstall PyTorch cu118")
     parser.add_argument("--skip-train", action="store_true", help="Skip training step")
@@ -167,6 +168,8 @@ def main() -> int:
         str(args.save_steps),
         "--seq-len",
         str(args.seq_len),
+        "--max-samples",
+        str(args.max_samples),
     ]
     if args.skip_train:
         e2e_cmd.append("--skip-train")
