@@ -22,7 +22,7 @@ from narrate_trajectories_batch import (
     DEFAULT_MODEL_ID,
     DEFAULT_OUTPUT_DIR,
     init_environment,
-    run_batch_conversion,
+    run_conversion,
 )
 from upload_narrated_dataset import (
     DEFAULT_REPO_ID,
@@ -52,6 +52,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--model-id",
         default=DEFAULT_MODEL_ID,
         help=f"Gemini model ID (default: {DEFAULT_MODEL_ID})",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["auto", "batch", "direct"],
+        default="auto",
+        help="Conversion mode: 'auto' (batch with direct fallback), 'batch', or 'direct' (default: auto)",
+    )
+    parser.add_argument(
+        "--concurrency",
+        type=int,
+        default=5,
+        help="Number of concurrent API requests in direct mode (default: 5)",
     )
     parser.add_argument(
         "--repo-id",
@@ -87,24 +99,26 @@ def main() -> int:
     print("        AOS Narrated Manim Dataset Pipeline (Gemini Batch + HF)          ")
     print("==========================================================================")
 
-    # 1. Batch API Conversion Step
+    # 1. Conversion Step
     if not args.skip_batch:
         api_key = os.getenv("GEMINI_API_KEY", "").strip()
         if not api_key:
-            print("ERROR: GEMINI_API_KEY is required for batch conversion.", file=sys.stderr)
+            print("ERROR: GEMINI_API_KEY is required for conversion.", file=sys.stderr)
             return 1
 
-        print(f"\n[Phase 1] Starting Gemini 2.5 Flash Batch Conversion...")
+        print(f"\n[Phase 1] Starting Gemini 2.5 Flash Conversion (mode: {args.mode})...")
         try:
-            final_dataset_file = run_batch_conversion(
+            final_dataset_file = run_conversion(
                 api_key=api_key,
                 model_id=args.model_id,
                 input_path=args.input_path.resolve(),
                 output_dir=output_dir,
+                mode=args.mode,
+                concurrency=args.concurrency,
                 poll_interval=args.poll_interval,
             )
         except Exception as e:
-            print(f"ERROR in batch conversion: {e}", file=sys.stderr)
+            print(f"ERROR in conversion: {e}", file=sys.stderr)
             return 1
     else:
         print(f"\n[Phase 1] Skipped batch generation (--skip-batch set). Using existing dataset: {final_dataset_file}")
