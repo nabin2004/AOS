@@ -216,7 +216,7 @@ size_categories:
 
 Direct Preference Optimization (DPO) dataset pairing **400 narrated `VoiceoverScene` scripts** (`chosen`) against **un-narrated silent `Scene` scripts** (`rejected`).
 
-- **Chosen**: Executable `VoiceoverScene` with `self.set_speech_service(GTTSService())`, animation duration tracking, and phonetic math intuition.
+- **Chosen**: Executable `VoiceoverScene` with `self.set_speech_service(AOSSpeechService(...))`, fine-grained `<bookmark mark='...'/>` tags, `wait_until_bookmark` synchronization, and phonetic math intuition.
 - **Rejected**: Silent, un-narrated standard Manim `Scene` code.
 """
     readme_path = dpo_file.parent / "README.md"

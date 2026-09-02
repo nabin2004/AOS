@@ -64,21 +64,49 @@ def init_environment() -> None:
 
 
 SYSTEM_INSTRUCTION = """You are an expert Manim and manim-voiceover engineer.
-Convert the provided standard Manim CE Python code into an executable manim-voiceover script.
+Convert the provided standard Manim CE Python code into an executable manim-voiceover script using fine-grained voiceover narration and bookmark synchronization.
 
 CRITICAL RULES:
 1. Imports: Replace or augment imports with:
    from manim import *
    from manim_voiceover import VoiceoverScene
-   from manim_voiceover.services.gtts import GTTSService
+   from tools.aos_speech_service import AOSSpeechService
 2. Class Definition: Inherit strictly from VoiceoverScene (never Scene).
-3. Setup: Call `self.set_speech_service(GTTSService())` as the first line of construct().
-4. Voiceover Wrapping: Wrap visual animations inside `with self.voiceover(text="...") as tracker:` blocks. Use `run_time=tracker.duration` when synchronizing animations to spoken audio.
+3. Setup: Call `self.set_speech_service(AOSSpeechService(voice="alba", cache_dir="voiceover_cache"))` as the first line of construct().
+4. Voiceover Wrapping & Fine-Grained Bookmarks:
+   - Wrap visual animations inside `with self.voiceover(text="...") as tracker:` blocks.
+   - Use `<bookmark mark='MARK_NAME'/>` tags inside the narration text at major visual transition points (e.g. before showing a formula, creating axes, moving a dot, or revealing a title).
+   - Inside the `with self.voiceover(...)` block, call `self.wait_until_bookmark("MARK_NAME")` before playing the corresponding animation so visual actions trigger mid-narration exactly when spoken.
+   - For continuous or end-of-speech animations, use `run_time=tracker.duration`.
 5. Voiceover Text Guidelines:
-   - Voiceover text must explain mathematical intuition, not describe literal code operations.
-   - NEVER put raw LaTeX commands (\\frac, \\sqrt, \\int), underscores, or symbols inside voiceover strings. Spell them out phonetically (e.g., "the integral of x squared", "divided by two").
+   - Voiceover text must explain mathematical intuition and high-level concepts, NOT describe literal code variable names or operations.
+   - NEVER put raw LaTeX commands (\\frac, \\sqrt, \\int), underscores, or syntax symbols inside voiceover strings. Spell them out phonetically (e.g., "the integral of x squared", "divided by two", "sigma of x").
 6. Geometric Preservation: Do NOT alter coordinates, math transformations, colors, or object logic from the original code.
+
+EXAMPLE PATTERN WITH BOOKMARKS:
+```python
+from manim import *
+from manim_voiceover import VoiceoverScene
+from tools.aos_speech_service import AOSSpeechService
+
+class MyNarratedScene(VoiceoverScene):
+    def construct(self):
+        self.set_speech_service(AOSSpeechService(voice="alba", cache_dir="voiceover_cache"))
+        
+        title = Title("Sigmoid Function")
+        ax = Axes(x_range=[-3, 3, 1], y_range=[-1, 5, 1])
+        curve = ax.plot(lambda x: 1 / (1 + np.exp(-x)), color=BLUE)
+        
+        with self.voiceover(
+            text="Let us begin by creating our coordinate axes <bookmark mark='SHOW_CURVE'/> and then plotting the sigmoid activation curve."
+        ) as tracker:
+            self.play(Write(title), Create(ax))
+            self.wait_until_bookmark("SHOW_CURVE")
+            self.play(Create(curve), run_time=tracker.duration)
+```
+
 7. Output: Return ONLY executable Python code inside a single ```python code block. No explanations, no markdown outside the code block."""
+
 
 
 def _extract_code(data: Dict[str, Any]) -> Optional[str]:
