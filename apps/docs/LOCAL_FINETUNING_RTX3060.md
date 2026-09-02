@@ -109,14 +109,41 @@ uv run python run.py --rtx3060 --stage manim --eval-manibench --manibench-render
 
 ---
 
-### 3.5 Training Preset Defaults
+### 3.5 Training Preset Defaults & Checkpoint Resuming
 > - `per_device_train_batch_size = 1`
 > - `gradient_accumulation_steps = 8` (effective batch size of 8)
 > - `use_4bit = True` (NF4 Double Quantization)
 > - `optim = "paged_adamw_8bit"`
 > - `gradient_checkpointing = True`
 > - `use_bf16 = True` (Ampere native precision)
+> - `save_strategy = "steps"` (saves `checkpoint-XXX` every 100-200 steps)
 > - `num_proc = 1` on Windows (prevents `multiprocessing` spawn deadlocks during dataset mapping)
+
+### 3.6 Resuming Interrupted Fine-Tuning
+
+If fine-tuning was interrupted mid-run (e.g. power outage, manual stop, or pause):
+
+1. **Automatic Resume**:
+   Re-running the exact same training command automatically detects the latest `checkpoint-*` in `--output-dir` and resumes training from that global step:
+   ```bash
+   cd apps/qwenCoder
+   uv run python run.py --rtx3060 --stage manim --epochs 3
+   ```
+2. **Explicit Resume / Custom Checkpoint Path**:
+   To resume explicitly from a specific checkpoint folder or directory:
+   ```bash
+   uv run python run.py --rtx3060 --stage manim \
+     --resume-from ./qwen2.5-coder-7b-manim-ft/checkpoint-300
+   ```
+3. **Custom Checkpoint Frequency (`--save-steps`)**:
+   By default, `--rtx3060` saves checkpoints every 100 steps. To save more frequently (e.g., every 50 steps):
+   ```bash
+   uv run python run.py --rtx3060 --stage manim --save-steps 50
+   ```
+
+> [!NOTE]
+> **Why did training start from step 0 previously?**
+> Previously, default training relied on `--save-strategy epoch`. If training was stopped before completing 1 full epoch, no `checkpoint-*` directory was written to disk. The updated `--rtx3060` preset now uses `--save-strategy steps` (saving every 100 steps), ensuring progress is preserved even if interrupted mid-epoch.
 
 ---
 

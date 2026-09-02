@@ -296,13 +296,17 @@ def default_kaggle_output_dir() -> Path:
 
 
 def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
-    """NVIDIA RTX 3060 (12 GB VRAM) preset: 4-bit NF4 QLoRA, paged_adamw_8bit, bf16, batch 1, accum 8."""
+    """NVIDIA RTX 3060 (12 GB VRAM) preset: 4-bit NF4 QLoRA, paged_adamw_8bit, bf16, batch 1, accum 8, step checkpointing."""
     load_training_dotenv()
     report_to = config.report_to
     if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
         report_to = "none"
     is_7b_or_larger = any(tag in config.model_id.lower() for tag in ("7b", "8b", "6.7b", "13b"))
     seq_len = 2048 if is_7b_or_larger else config.seq_len
+    save_steps = config.save_steps
+    env_steps = os.environ.get("SAVE_STEPS", "").strip()
+    if env_steps:
+        save_steps = int(env_steps)
 
     return replace(
         config,
@@ -316,6 +320,8 @@ def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
         lora_r=16 if is_7b_or_larger else config.lora_r,
         lora_alpha=32 if is_7b_or_larger else config.lora_alpha,
         optim="paged_adamw_8bit",
+        save_strategy="steps",
+        save_steps=save_steps,
         report_to=report_to,
     )
 

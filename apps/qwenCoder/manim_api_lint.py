@@ -17,10 +17,16 @@ from functools import lru_cache
 from typing import Any, Iterable
 
 # Eval-log hallucinations (MB-004 / 006 / 011) — never valid CE constructor kwargs.
-BANNED_KWARGS = frozenset({"element_color", "max_value", "max_magnitude"})
+BANNED_KWARGS = frozenset({"element_color", "max_value", "max_magnitude", "center_point"})
 
 # manimgl / 3b1b leftovers
-BANNED_NAMES = frozenset({"ShowCreation", "ShowCreationThenDestruction"})
+BANNED_NAMES = frozenset({
+    "ShowCreation",
+    "ShowCreationThenDestruction",
+    "ShowCreationThenFadeOut",
+    "TextMobject",
+    "TexMobject",
+})
 
 AXES_TYPES = frozenset(
     {
