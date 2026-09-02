@@ -93,6 +93,17 @@ def _is_trainable(sample: dict[str, Any]) -> bool:
 def _load_raw_dataset(config: TrainingConfig) -> Dataset:
     """Load from local JSONL, native Hub datasets, or hf:// JSON paths."""
     if config.data_path is not None:
+        p = Path(config.data_path)
+        if not p.is_file():
+            if "5k" in str(p):
+                print(f"Local dataset {p} not found. Auto-curating 5k dataset now...")
+                try:
+                    from curate_sft_5k import curate_5k_dataset
+                    curate_5k_dataset(p.parent)
+                except Exception as exc:
+                    print(f"WARNING: Auto-curation failed: {exc}")
+            elif not p.is_file():
+                raise FileNotFoundError(f"Specified dataset file not found: {p}")
         path = str(config.data_path)
         print(f"Loading dataset from {path}")
         return load_dataset("json", data_files=path, split="train")
