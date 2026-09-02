@@ -137,3 +137,18 @@ AOS leverages the standard Agent Skills ecosystem located in `.agents/skills/`. 
 - **`run-lecture-pipeline`**: End-to-end multi-agent lecture generation pipeline.
 - **`sft-trace-collection`**: SFT/DPO dataset generation and trajectory logging.
 
+---
+
+## 7. Version Control & Remote Execution Rules (Git & Kaggle)
+
+1. **Commit & Push Workflow**:
+   - Every completed task, feature tweak, bug fix, or script update **MUST** be committed in clear, meaningful logical chunks and immediately pushed to GitHub (`git push origin master`).
+   - This enables remote runtime environments (such as Kaggle notebooks or cloud GPU instances) to pull the latest code seamlessly via `git pull`.
+2. **Commit Conventions**:
+   - Follow Conventional Commit format: `feat(...)`, `fix(...)`, `docs(...)`, `refactor(...)`.
+3. **Kaggle Execution & Training Rules**:
+   - **Smart PyTorch Setup**: Test PyTorch CUDA compatibility (`torch.cuda.is_available()`) before reinstalling to avoid unnecessary 2.5 GB downloads.
+   - **Auto Secrets**: Automatically pull `HF_TOKEN` and `WANDB_API_KEY` from Kaggle `UserSecretsClient`.
+   - **Protected Trajectories**: When using `--val-split`, 100% of high-quality trajectory dataset samples (`aos_agent_trajectories` / `prompts_andrej_400`) must be protected and retained in the training set.
+   - **W&B Naming**: Ensure W&B run names dynamically reflect the target model (e.g., `qwen3-8b-manim-sft`).
+

@@ -85,15 +85,17 @@ Legacy single-dataset e2e (tool_trace only): `bash train.sh`.
 
 ---
 
-## Kaggle (phase 1)
+## Kaggle Pipelines (Qwen3-8B & Phase 1)
 
-GPU **P100** notebook for SFT-1 QLoRA on chat `nabin2004/manim-sft-10k` (curated 10k, packing off, r=16, resume from Trainer checkpoints). Uses **system Python + torch 2.7.1+cu118**. See **[KAGGLE.md](KAGGLE.md)**. Rebuild the mix with `uv run python curate_sft_10k.py --push`.
+For **`Qwen/Qwen3-8B`** end-to-end SFT, adapter merging, GGUF multi-quantization (`Q4_K_M` & `Q8_0`), and HuggingFace uploads on Kaggle P100 GPUs:
 
 ```bash
-bash apps/qwenCoder/kaggle_sft_phase1.sh
+!cd /kaggle/working && git clone https://github.com/nabin2004/AOS.git 2>/dev/null || git -C /kaggle/working/AOS pull
+!python3 /kaggle/working/AOS/apps/qwenCoder/run_kaggle.py
 ```
 
-Do not run DPO / GRPO / merge / GGUF on P100.
+See **[KAGGLE_QWEN3_8B.md](KAGGLE_QWEN3_8B.md)** for full documentation.
+For Phase 1 SFT on `nabin2004/manim-sft-10k`, see **[KAGGLE.md](KAGGLE.md)**.
 
 ---
 
