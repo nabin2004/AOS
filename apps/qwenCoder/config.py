@@ -204,6 +204,8 @@ class TrainingConfig:
             config = replace(config, epochs=args.epochs)
         if args.seq_len is not None:
             config = replace(config, seq_len=args.seq_len)
+        if getattr(args, "use_4bit", False):
+            config = replace(config, use_4bit=True)
         if args.no_4bit:
             config = replace(config, use_4bit=False)
         if getattr(args, "lora_r", None) is not None:
@@ -425,7 +427,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Per-scene rendering timeout in seconds (default: 20)",
     )
     parser.add_argument("--seq-len", type=int, default=None)
-    parser.add_argument("--no-4bit", action="store_true")
+    parser.add_argument("--use-4bit", action="store_true", help="Enable 4-bit QLoRA")
+    parser.add_argument("--no-4bit", action="store_true", help="Disable 4-bit quantization")
     parser.add_argument("--lora-r", type=int, default=None)
     parser.add_argument("--lora-alpha", type=int, default=None)
     parser.add_argument(
