@@ -16,13 +16,42 @@ class ProblemRow:
 
 def load_problem_rows(data_root: Path) -> list[ProblemRow]:
     problems_dir = data_root / "problems"
+    curated_path = data_root.parent / "scripts" / "curated_scenes.json"
+    curated_map: dict[str, dict] = {}
+    if curated_path.is_file():
+        try:
+            items = json.loads(curated_path.read_text(encoding="utf-8"))
+            for item in items:
+                curated_map[item["id"]] = item
+        except Exception:
+            pass
+
     rows: list[ProblemRow] = []
-    for problem_json in sorted(problems_dir.glob("*/problem.json")):
-        payload = json.loads(problem_json.read_text(encoding="utf-8"))
+    for problem_dir in sorted(problems_dir.glob("*/")):
+        if not problem_dir.is_dir():
+            continue
+        pid = problem_dir.name
+        problem_json = problem_dir / "problem.json"
+        prompt = ""
+        
+        if problem_json.is_file() and problem_json.stat().st_size > 0:
+            try:
+                payload = json.loads(problem_json.read_text(encoding="utf-8"))
+                pid = payload.get("id", pid)
+                prompt = payload.get("full_prompt", "")
+            except Exception:
+                pass
+
+        if not prompt and pid in curated_map:
+            c = curated_map[pid]
+            prompt = f"Write a Manim visualization for {c.get('class_name')} covering {c.get('topic', 'mathematics')}."
+        elif not prompt:
+            prompt = f"Write a Manim visualization for {pid}."
+
         rows.append(
             ProblemRow(
-                problem_id=payload["id"],
-                prompt=payload["full_prompt"],
+                problem_id=pid,
+                prompt=prompt,
                 path=str(problem_json.as_posix()),
             )
         )
