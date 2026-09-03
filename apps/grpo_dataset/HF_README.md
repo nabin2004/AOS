@@ -85,11 +85,9 @@ Topics include cross-entropy, print gallery / conformal maps, spheres, cosmic di
 
 ## Narration and Multi-Modal Reward Integration
 
-The reward pipeline includes a specialized **Narration Scoring** component (`reward_model/narration.py`) designed for Manim Voiceover GRPO fine-tuning. It provides dense rewards for:
-- `VoiceoverScene` structure and lifecycle methods
-- Speech service binding via `self.set_speech_service(...)`
-- Multi-beat `self.voiceover(...)` blocks
-- SSML bookmarks (`<bookmark mark="..." />`) and synchronization points (`self.wait_until_bookmark(...)`)
+The reward pipeline includes specialized multi-modal components for GRPO reinforcement learning:
+- **Narration Scoring (`reward_model/narration.py`)**: Evaluates `VoiceoverScene` structure, speech service initialization (`self.set_speech_service(...)`), multi-beat `self.voiceover(...)` blocks, and fine-grained SSML bookmarks (`<bookmark mark="..." />`) with synchronization points (`self.wait_until_bookmark(...)`).
+- **Live OpenCLIP Visual Alignment (`reward_model/clip_reward.py`)**: Renders candidate scripts to MP4, extracts frames at 2 FPS, and computes cosine similarity against natural-language `clip_query` strings within `expected_time_range` temporal windows.
 
 ## License and attribution
 

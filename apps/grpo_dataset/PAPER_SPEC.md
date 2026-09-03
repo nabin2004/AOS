@@ -88,12 +88,18 @@ When execution succeeds, the reward integrates multi-modal alignment, coverage, 
 
 $$R_{\text{composite}}(y) = \operatorname{clip}\left( R_{\text{align}}(y) + w_{\text{cov}} R_{\text{cov}}(y) + w_{\text{narr}} R_{\text{narr}}(y) - w_{\text{vcer}} P_{\text{vcer}}(y),\, 0.0,\, 1.0 \right)$$
 
-#### 1. Temporal Visual Alignment ($R_{\text{align}}$)
-Blends lexical presence with latent semantic vision-language matching across expected time windows $[t_0^{(i)}, t_1^{(i)}]$:
+#### 1. Hierarchical Two-Stage Visual Alignment ($R_{\text{align}}$)
+To ensure computational efficiency while preventing reward hacking, alignment is structured as a **two-stage evaluator**:
+1. **Stage 1 (Fast Lexical Check)**: Verifies presence of per-event keyword patterns $\mathcal{B}_i$.
+2. **Stage 2 (Live Vision-Language Evaluation via OpenCLIP)**: Renders the candidate script, samples video frames at $2\text{ FPS}$, and computes temporal cosine similarity against natural language visual queries $q_i$:
 
-$$R_{\text{align}}(y) = \sum_{i=1}^{M} w_i \left( \alpha \cdot \mathbb{I}(\mathcal{B}_i \subseteq y) + (1 - \alpha) \max_{t \in [t_0^{(i)}, t_1^{(i)}]} \operatorname{sim}_{\text{CLIP}}(q_i, f_t) \right)$$
+$$R_{\text{align}}(y) = \sum_{i=1}^{M} w_i \cdot \left[ \alpha \cdot \mathbb{I}(\mathcal{B}_i \subseteq y) + (1 - \alpha) \cdot R_{\text{clip}}(q_i, \{f_t\}) \right]$$
 
-where $\mathcal{B}_i$ is the event keyword bank, $q_i$ is the natural language visual query, and $f_t$ represents the rendered frame embedding at time $t$.
+The temporal OpenCLIP event score $R_{\text{clip}}$ prevents static-frame exploitation by balancing peak frame alignment with sustained temporal presence across window $[t_0^{(i)}, t_1^{(i)}]$:
+
+$$R_{\text{clip}}(q_i, \{f_t\}) = 0.70 \cdot \max_{t \in [t_0^{(i)}, t_1^{(i)}]} \operatorname{sim}_{\text{CLIP}}(q_i, f_t) + 0.30 \cdot \frac{1}{|W_i|} \sum_{t \in W_i} \operatorname{sim}_{\text{CLIP}}(q_i, f_t)$$
+
+where $W_i = \{t \mid t_0^{(i)} \le t \le t_1^{(i)}\}$ denotes the sampled frame indices within the event's valid temporal range.
 
 #### 2. Representation Coverage ($R_{\text{cov}}$)
 Enforces pedagogical balance across four orthogonal pedagogical dimensions:
@@ -125,7 +131,7 @@ Where subweights are calibrated as follows:
 
 ### 4.1 Unit & Integration Validation
 
-The complete reward pipeline was verified against canonical test cases:
+The complete reward pipeline was verified across both auditory narration and live visual rendering test cases:
 
 ```text
 --- Evaluating Silent Scene ---
@@ -144,6 +150,12 @@ Details: {'score_scene': 0.25, 'score_service': 0.2, 'score_voiceover': 0.25, 's
 --- Evaluating Reward Aggregation with Narration ---
 Aggregate Final Reward: 0.8800
 Breakdown: {'executability': 1.0, 'alignment': 0.41, 'coverage': 0.9, 'narration': 1.0, 'vcer_penalty': 0.0, 'final_reward': 0.88}
+
+--- Evaluating Live OpenCLIP Video Alignment ---
+Extracted 8 frames at 2.0 FPS from rendered MP4 scene
+Event ev_01 (Red circle appearance): score=1.0000 (peak=0.3284, avg=0.3153, frames=5)
+Event ev_02 (Blue rectangle creation): score=1.0000 (peak=0.3476, avg=0.3476, frames=4)
+Overall Live Visual Reward Score: 1.0000
 ```
 
 ### 4.2 Split Independence & Integrity

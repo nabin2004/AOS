@@ -54,16 +54,23 @@ uv run python package_adapter.py --base qwen --adapter-dir ./grpo_qwen_manim --p
 | [`manibench.py`](manibench.py) | ManiBench pilot **or** trajectory prompt JSONL |
 | [`model.py`](model.py) | Gemma Unsloth path / Qwen CausalLM+PEFT path |
 | [`trainer.py`](trainer.py) | GRPO trainer |
-| [`rewards.py`](rewards.py) | exec / align / vcer / coverage |
+| [`rewards.py`](rewards.py) | exec / align (blended lexical + live OpenCLIP) / vcer / coverage |
 | [`package_adapter.py`](package_adapter.py) | Shared merge + GGUF + HF push |
 | [`run.py`](run.py) | CLI entrypoint |
 
-## Dataset
+## Dataset & Reward Pipeline
 
-- Default: `ManiBench_Pilot_Dataset.json` from HF (`nabin2004/ManiBench`)
-- Alternate: `--prompts-path` JSONL with `prompt` / `user_prompt` fields (AOS trajectory bank)
+- Default: `ManiBench_Pilot_Dataset.json` from HF (`nabin2004/ManiBench`) or `data/splits/train.jsonl` from `nabin2004/Manim-grpo-dataset-200`.
+- Alternate: `--prompts-path` JSONL with `prompt` / `user_prompt` fields (AOS trajectory bank).
 
-Reward mix: executability 50%, alignment 25%, VCER 15%, coverage 10% (minus length penalty).
+### Reward Mix & Two-Stage Vision Pipeline:
+- **Executability (50%)**: Syntax verification + Scene class inheritance; hard gate ($R=0.0$ if unexecutable). When `MANIBENCH_GRPO_RENDER=1`, renders headless Manim video.
+- **Alignment (25%)**: 
+  - *Stage 1*: Fast AST lexical pattern match against `visual_events.json`.
+  - *Stage 2*: When `MANIBENCH_GRPO_CLIP_REWARD=1`, executes live **OpenCLIP ViT-B-32** frame extraction at 2 FPS on rendered video, scoring temporal event windows against `clip_query` strings.
+- **VCER (15%)**: Penalty for deprecated ManimGL constructs breaking in Manim CE.
+- **Coverage (10%)**: Multi-dimensional term density across Math, Visual, Numeric, and Structural axes.
+- **Length penalty**: Subtracted from combined score.
 
 ## Weights & Biases
 

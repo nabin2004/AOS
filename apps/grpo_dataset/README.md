@@ -33,7 +33,8 @@ manibench-grpo/
 │   ├── extract_and_embed_frames.py
 │   ├── build_dataset.py
 │   ├── validate_dataset.py
-│   └── test_narration_reward.py
+│   ├── test_narration_reward.py
+│   └── test_clip_reward.py
 ├── configs/
 │   └── reward_weights.yaml
 └── rollouts/
@@ -44,11 +45,18 @@ Notes:
 - Raw `.mp4`/frame assets are intentionally excluded from dataset artifacts.
 - `ref_embeddings.npy` is the portable reference artifact for clip alignment.
 
-## Bootstrapping Commands
+## Bootstrapping & Validation Commands
 
 ```bash
+# Build deterministic splits from problem bundles
 python scripts/build_dataset.py --data-root data --seed 20260817
+
+# Validate 0-overlap split integrity and schema compliance
 python scripts/validate_dataset.py --data-root data
+
+# Test Narration and Live OpenCLIP visual reward modules
+python scripts/test_narration_reward.py
+python scripts/test_clip_reward.py
 ```
 
 ## `data/problems/MB-XXX/problem.json`
