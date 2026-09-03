@@ -60,6 +60,14 @@ def setup_kaggle_secrets() -> None:
         except Exception:
             pass
 
+    if os.environ.get("WANDB_API_KEY"):
+        try:
+            import wandb
+            wandb.login(key=os.environ["WANDB_API_KEY"], relogin=True)
+            print("✔ Authenticated Weights & Biases (W&B) session.")
+        except Exception as e:
+            print(f"Notice: W&B login encountered: {e}")
+
 
 def detect_gpu_hardware() -> tuple[int, str]:
     """Detect available CUDA GPUs and return device count and primary device name."""

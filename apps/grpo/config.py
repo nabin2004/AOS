@@ -76,8 +76,10 @@ class TrainingConfig:
 
         if self.render:
             os.environ["MANIBENCH_GRPO_RENDER"] = "1"
+            os.environ.setdefault("MANIBENCH_GRPO_CLIP_REWARD", "1")
         elif self.no_render:
             os.environ["MANIBENCH_GRPO_RENDER"] = "0"
+            os.environ["MANIBENCH_GRPO_CLIP_REWARD"] = "0"
         elif "MANIBENCH_GRPO_RENDER" not in os.environ:
             os.environ["MANIBENCH_GRPO_RENDER"] = "0"
 
@@ -85,6 +87,12 @@ class TrainingConfig:
             os.environ["MANIBENCH_GRPO_REWARD_DEBUG"] = "1"
 
         os.environ["MANIBENCH_LENGTH_PENALTY_COEF"] = str(self.length_penalty)
+
+        if self.report_to == "wandb":
+            os.environ["WANDB_PROJECT"] = self.wandb_project
+            os.environ["WANDB_RUN_GROUP"] = self.wandb_group
+            if self.wandb_tags:
+                os.environ["WANDB_TAGS"] = ",".join(self.wandb_tags)
 
     @classmethod
     def from_cli(cls, args: argparse.Namespace) -> TrainingConfig:
@@ -104,14 +112,24 @@ class TrainingConfig:
             config = replace(config, base_family=family)
             if family == "qwen":
                 qwen_sft = GRPO_ROOT / ".." / "qwenCoder" / "qwen2.5-coder-7b-manim-ft"
-                qwen_dpo = GRPO_ROOT / ".." / "dpo" / "qwen2.5-coder-7b-manim-dpo"
-                # Prefer DPO adapter as the frozen stack base when present.
-                qwen_default = qwen_dpo if qwen_dpo.is_dir() else qwen_sft
+                qwen_dpo_local = GRPO_ROOT / ".." / "dpo" / "qwen2.5-coder-7b-manim-dpo"
+                qwen_dpo_narrated = GRPO_ROOT / ".." / "qwenCoder" / "data_narrated_dpo"
+                
+                # Priority: local narrated DPO -> local DPO -> remote DPO hub -> local SFT
+                if qwen_dpo_narrated.is_dir():
+                    qwen_default = qwen_dpo_narrated
+                elif qwen_dpo_local.is_dir():
+                    qwen_default = qwen_dpo_local
+                else:
+                    qwen_default = qwen_sft
+
                 updates: dict = {
-                    "run_name": "qwen2.5-coder-7b-manim-grpo",
-                    "wandb_group": "qwen2.5-coder-7b-manim",
+                    "run_name": "qwen3-8b-manim-dpo-grpo",
+                    "wandb_project": "aos-grpo",
+                    "wandb_group": "qwen3-8b-manim-dpo",
                     "wandb_tags": (
-                        "qwen2.5-coder-7b",
+                        "qwen3-8b",
+                        "dpo-stacked",
                         "manim",
                         "aos",
                         "grpo",
@@ -119,7 +137,7 @@ class TrainingConfig:
                     ),
                 }
                 if args.base_model is None:
-                    updates["base_model"] = "Qwen/Qwen2.5-Coder-7B-Instruct"
+                    updates["base_model"] = "Qwen/Qwen3-8B"
                 if args.sft_lora is None:
                     updates["sft_lora_path"] = _resolve_path(qwen_default)
                 if args.output_dir is None:

@@ -31,7 +31,15 @@ def _grpo_lora_config():
     return LoraConfig(
         r=16,
         lora_alpha=32,
-        target_modules=["q_proj", "v_proj"],
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
         lora_dropout=0.05,
         bias="none",
         task_type=TaskType.CAUSAL_LM,
@@ -49,15 +57,18 @@ def _base_model_for_adapter(adapter_path: Path | str, fallback: str) -> str:
 
     from huggingface_hub import hf_hub_download
 
-    cfg_path = Path(
-        hf_hub_download(
-            str(adapter_path),
-            "adapter_config.json",
-            token=hub_token(),
-        ),
-    )
-    with cfg_path.open(encoding="utf-8") as f:
-        return json.load(f).get("base_model_name_or_path", fallback)
+    try:
+        cfg_path = Path(
+            hf_hub_download(
+                str(adapter_path),
+                "adapter_config.json",
+                token=hub_token(),
+            ),
+        )
+        with cfg_path.open(encoding="utf-8") as f:
+            return json.load(f).get("base_model_name_or_path", fallback)
+    except Exception:
+        return fallback
 
 
 def _load_qwen(config: TrainingConfig):
