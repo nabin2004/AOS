@@ -1,8 +1,10 @@
 # GRPO — ManiBench Phase 2
 
-Reinforcement fine-tuning (GRPO) on [ManiBench](https://huggingface.co/datasets/nabin2004/ManiBench) after Phase 1 SFT (and optional DPO). Stacks a trainable GRPO LoRA on top of a frozen policy adapter.
+Reinforcement fine-tuning (GRPO) on [ManiBench](https://huggingface.co/datasets/nabin2004/ManiBench) / [Manim-grpo-dataset-200](https://huggingface.co/datasets/nabin2004/Manim-grpo-dataset-200) after Phase 1 SFT and DPO. Stacks a trainable GRPO LoRA on top of a frozen policy adapter.
 
-Supports **Gemma 4** (Unsloth FastVisionModel) and **Qwen2.5-Coder-7B** (transformers CausalLM).
+👉 **[Read the Step-by-Step Execution Guide (Kaggle Dual T4 & Local GPU)](HOW_TO_RUN.md)**
+
+Supports **Qwen3-8B / Qwen2.5-Coder-7B** (transformers CausalLM + PEFT) and **Gemma 4** (Unsloth FastVisionModel).
 
 ManiBench is the **structure reference** for GRPO: each problem supplies `full_prompt`, `required_visual_events`, `coverage_requirements`, and `version_conflict_notes` used by [`rewards.py`](rewards.py).
 
