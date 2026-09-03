@@ -91,6 +91,10 @@ class TrainingConfig:
         config = cls().resolve_paths()
         if getattr(args, "rtx3060", False):
             config = apply_rtx3060_preset(config)
+        if getattr(args, "dual_t4", False):
+            config = apply_dual_t4_preset(config)
+        if getattr(args, "p100", False):
+            config = apply_p100_preset(config)
         if args.sft_lora is not None:
             config = replace(config, sft_lora_path=_resolve_path(Path(args.sft_lora)))
         if args.base is not None:
@@ -184,6 +188,38 @@ def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
     )
 
 
+def apply_dual_t4_preset(config: TrainingConfig) -> TrainingConfig:
+    """Kaggle Dual NVIDIA T4 (2x 16 GB = 32 GB VRAM) GRPO preset."""
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    return replace(
+        config,
+        num_generations=4,
+        max_prompt_length=1024,
+        max_completion_length=1024,
+        max_seq_length=2048,
+        load_in_4bit=True,
+        report_to=report_to,
+    )
+
+
+def apply_p100_preset(config: TrainingConfig) -> TrainingConfig:
+    """Kaggle Single NVIDIA Tesla P100 (16 GB VRAM) GRPO preset."""
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    return replace(
+        config,
+        num_generations=2,
+        max_prompt_length=768,
+        max_completion_length=768,
+        max_seq_length=1536,
+        load_in_4bit=True,
+        report_to=report_to,
+    )
+
+
 def apply_vertex_env(config: TrainingConfig) -> TrainingConfig:
     model_dir = os.environ.get("AIP_MODEL_DIR", "").strip()
     if model_dir:
@@ -210,6 +246,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--rtx3060",
         action="store_true",
         help="NVIDIA RTX 3060 12GB preset (num_generations=2, max_prompt=512, max_completion=512, 4-bit)",
+    )
+    parser.add_argument(
+        "--dual-t4",
+        action="store_true",
+        help="Kaggle Dual NVIDIA T4 (2x 16GB) preset (num_generations=4, max_prompt=1024, max_completion=1024, 4-bit)",
+    )
+    parser.add_argument(
+        "--p100",
+        action="store_true",
+        help="Kaggle Single NVIDIA Tesla P100 (16GB) preset (num_generations=2, max_prompt=768, max_completion=768, 4-bit)",
     )
     parser.add_argument(
         "--sft-lora",
