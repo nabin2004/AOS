@@ -2,7 +2,7 @@
 
 Maps ManiBench metrics to scalar rewards:
   - executability (50%): syntax + Scene class; optional manim render
-  - alignment (25%): required_visual_events pattern presence
+  - alignment (25%): blended lexical presence + live OpenCLIP frame similarity (when rendered)
   - vcer (15%): ManimGL / deprecated API penalty
   - coverage (10%): pedagogical term density
   - length penalty: subtracted from combined score
@@ -11,15 +11,28 @@ Maps ManiBench metrics to scalar rewards:
 from __future__ import annotations
 
 import ast
+import json
 import os
 import re
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from config import DEFAULT_LENGTH_PENALTY_COEF
 from manibench import get_alignment_events, get_coverage_terms, get_vcer_patterns
+
+# Try importing live OpenCLIP reward module from grpo_dataset
+GRPO_ROOT = Path(__file__).resolve().parents[1]
+GRPO_DATASET_ROOT = GRPO_ROOT / "grpo_dataset"
+if str(GRPO_DATASET_ROOT) not in sys.path:
+    sys.path.insert(0, str(GRPO_DATASET_ROOT))
+
+try:
+    from reward_model.clip_reward import compute_video_clip_reward
+except Exception:
+    compute_video_clip_reward = None
 
 _CODE_FENCE = re.compile(r"```(?:python)?\s*([\s\S]*?)```", re.IGNORECASE)
 
@@ -64,9 +77,9 @@ def _has_manim_scene(source: str) -> bool:
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
             for base in node.bases:
-                if isinstance(base, ast.Name) and base.id == "Scene":
+                if isinstance(base, ast.Name) and base.id in ("Scene", "VoiceoverScene", "ThreeDScene", "MovingCameraScene"):
                     return True
-                if isinstance(base, ast.Attribute) and base.attr == "Scene":
+                if isinstance(base, ast.Attribute) and base.attr in ("Scene", "VoiceoverScene", "ThreeDScene", "MovingCameraScene"):
                     return True
     return False
 
@@ -122,28 +135,59 @@ def _reward_debug_enabled() -> bool:
     return os.environ.get("MANIBENCH_GRPO_REWARD_DEBUG", "0") == "1"
 
 
+def _find_visual_events_path(problem_id: str) -> Optional[Path]:
+    """Locate visual_events.json file for problem_id."""
+    if not problem_id:
+        return None
+    data_root = os.environ.get("MANIBENCH_DATA_ROOT")
+    if data_root:
+        candidate = Path(data_root) / "problems" / problem_id / "visual_events.json"
+        if candidate.is_file():
+            return candidate
+    candidate = GRPO_DATASET_ROOT / "data" / "problems" / problem_id / "visual_events.json"
+    if candidate.is_file():
+        return candidate
+    return None
+
+
 def executability_reward(completions: list[object], **kwargs) -> list[float]:
     texts = _normalize_completions(completions)
     run_render = os.environ.get("MANIBENCH_GRPO_RENDER", "0") == "1"
     rewards = []
+    rendered_videos = []
+    
     for code in texts:
         if not run_render:
             rewards.append(_heuristic_exec_score(code))
+            rendered_videos.append(None)
             continue
         try:
             with tempfile.TemporaryDirectory() as tmpdir:
                 script = Path(tmpdir) / "scene.py"
                 script.write_text(_extract_python(code), encoding="utf-8")
                 result = subprocess.run(
-                    ["manim", "-pql", str(script)],
+                    ["manim", "-pql", "--media_dir", str(tmpdir), str(script)],
                     capture_output=True,
                     text=True,
                     timeout=60,
                     cwd=tmpdir,
                 )
-                rewards.append(1.0 if result.returncode == 0 else 0.0)
+                if result.returncode == 0:
+                    rewards.append(1.0)
+                    mp4s = list(Path(tmpdir).rglob("*.mp4"))
+                    rendered_videos.append(str(mp4s[0]) if mp4s else None)
+                else:
+                    rewards.append(0.0)
+                    rendered_videos.append(None)
         except Exception:
             rewards.append(0.0)
+            rendered_videos.append(None)
+            
+    # Stash rendered videos in kwargs for visual reward if passed as dict
+    if "rendered_videos" in kwargs and isinstance(kwargs["rendered_videos"], list):
+        kwargs["rendered_videos"].clear()
+        kwargs["rendered_videos"].extend(rendered_videos)
+        
     return rewards
 
 
@@ -159,12 +203,8 @@ def vcer_reward(completions: list[object], **kwargs) -> list[float]:
     return rewards
 
 
-def alignment_reward(completions: list[object], **kwargs) -> list[float]:
-    """
-    Weighted presence check for ManiBench required_visual_events.
-    Score = Σ(weight_i × present_i) / Σ(weight_i)
-    Events without detectable patterns receive 0.0 (no partial credit).
-    """
+def lexical_alignment_reward(completions: list[object], **kwargs) -> list[float]:
+    """First-stage fast lexical presence check for ManiBench required_visual_events."""
     texts = _normalize_completions(completions)
     problem_ids = kwargs.get("problem_id", [""] * len(texts))
     rewards = []
@@ -182,6 +222,52 @@ def alignment_reward(completions: list[object], **kwargs) -> list[float]:
                 score += weight
         rewards.append(score / total_w)
     return rewards
+
+
+def clip_visual_reward(
+    completions: list[object],
+    rendered_videos: Optional[list[Optional[str]]] = None,
+    **kwargs,
+) -> list[float]:
+    """Second-stage live OpenCLIP visual reward on rendered video frames."""
+    texts = _normalize_completions(completions)
+    problem_ids = kwargs.get("problem_id", [""] * len(texts))
+    rewards = []
+    
+    if compute_video_clip_reward is None:
+        return [0.0] * len(texts)
+
+    for idx, (code, pid) in enumerate(zip(texts, problem_ids)):
+        video_path = rendered_videos[idx] if rendered_videos and idx < len(rendered_videos) else None
+        ve_path = _find_visual_events_path(pid)
+
+        if not video_path or not Path(video_path).is_file() or not ve_path:
+            rewards.append(0.0)
+            continue
+
+        try:
+            res = compute_video_clip_reward(video_path, ve_path, fps=2.0)
+            rewards.append(float(res.score))
+        except Exception:
+            rewards.append(0.0)
+
+    return rewards
+
+
+def alignment_reward(completions: list[object], **kwargs) -> list[float]:
+    """Composite alignment combining fast lexical filter and live OpenCLIP visual reward."""
+    lexical_r = lexical_alignment_reward(completions, **kwargs)
+    use_clip = os.environ.get("MANIBENCH_GRPO_CLIP_REWARD", "0") == "1"
+    
+    if not use_clip:
+        return lexical_r
+        
+    rendered_videos = kwargs.get("rendered_videos")
+    clip_r = clip_visual_reward(completions, rendered_videos=rendered_videos, **kwargs)
+    
+    # Blend: 50% lexical presence + 50% semantic OpenCLIP temporal alignment
+    blended = [0.50 * lex + 0.50 * vis for lex, vis in zip(lexical_r, clip_r)]
+    return blended
 
 
 _FALLBACK_PATTERNS = {
@@ -233,15 +319,21 @@ def coverage_reward(completions: list[object], **kwargs) -> list[float]:
 
 
 def combined_reward(completions: list[object], **kwargs) -> list[float]:
-    exec_r = executability_reward(completions, **kwargs)
+    rendered_videos: list[Optional[str]] = []
+    exec_r = executability_reward(completions, rendered_videos=rendered_videos, **kwargs)
     vcer_r = vcer_reward(completions, **kwargs)
-    align_r = alignment_reward(completions, **kwargs)
+    align_r = alignment_reward(completions, rendered_videos=rendered_videos, **kwargs)
     cover_r = coverage_reward(completions, **kwargs)
+    
     w = REWARD_WEIGHTS
     n = len(completions)
     penalties = _length_penalty(kwargs.get("completion_ids"), n)
     combined = []
     for e, v, a, c, pen in zip(exec_r, vcer_r, align_r, cover_r, penalties):
+        # Hard executability gate: if code cannot execute, reward is 0.0
+        if e < 0.2:
+            combined.append(0.0)
+            continue
         score = w["exec"] * e + w["align"] * a + w["vcer"] * v + w["cover"] * c - pen
         combined.append(max(0.0, min(1.0, score)))
 
