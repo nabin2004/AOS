@@ -29,7 +29,7 @@ DATA_DIR = GRPO_DATASET_DIR / "data"
 HF_README = GRPO_DATASET_DIR / "HF_README.md"
 CURATED_PATH = SCRIPT_DIR / "curated_scenes.json"
 
-DEFAULT_REPO_ID = "nabin2004/manibench-grpo"
+DEFAULT_REPO_ID = "nabin2004/Manim-grpo-dataset-200"
 
 
 def push_dataset(repo_id: str, token: str | None = None) -> None:
