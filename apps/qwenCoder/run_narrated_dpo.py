@@ -268,36 +268,59 @@ def main() -> int:
         train_dataset = train_dataset.select(range(min(4, len(train_dataset))))
         args.epochs = 1
 
-    dpo_config = DPOConfig(
-        output_dir=str(output_dir),
-        num_train_epochs=args.epochs,
-        per_device_train_batch_size=args.batch_size,
-        gradient_accumulation_steps=args.grad_accum,
-        gradient_checkpointing=True,
-        gradient_checkpointing_kwargs={"use_reentrant": False},
-        learning_rate=args.lr,
-        lr_scheduler_type="cosine",
-        warmup_steps=10,
-        logging_steps=5,
-        save_strategy="epoch",
-        beta=args.beta,
-        max_length=args.max_length,
-        max_prompt_length=args.max_prompt_length,
-        optim="paged_adamw_8bit",
-        fp16=not torch.cuda.is_bf16_supported(),
-        bf16=torch.cuda.is_bf16_supported(),
-        report_to="none",
-        remove_unused_columns=False,
-    )
+    import inspect
 
-    trainer = DPOTrainer(
-        model=model,
-        ref_model=None,  # TRL automatically freezes reference adapter for PEFT
-        peft_config=peft_config,
-        args=dpo_config,
-        train_dataset=train_dataset,
-        processing_class=tokenizer,
-    )
+    dpo_kwargs = {
+        "output_dir": str(output_dir),
+        "num_train_epochs": args.epochs,
+        "per_device_train_batch_size": args.batch_size,
+        "gradient_accumulation_steps": args.grad_accum,
+        "gradient_checkpointing": True,
+        "gradient_checkpointing_kwargs": {"use_reentrant": False},
+        "learning_rate": args.lr,
+        "lr_scheduler_type": "cosine",
+        "warmup_steps": 10,
+        "logging_steps": 5,
+        "save_strategy": "epoch",
+        "beta": args.beta,
+        "optim": "paged_adamw_8bit",
+        "fp16": not torch.cuda.is_bf16_supported(),
+        "bf16": torch.cuda.is_bf16_supported(),
+        "report_to": "none",
+        "remove_unused_columns": False,
+    }
+
+    dpo_config_params = inspect.signature(DPOConfig.__init__).parameters
+    trainer_extra_kwargs = {}
+
+    if "max_length" in dpo_config_params:
+        dpo_kwargs["max_length"] = args.max_length
+    else:
+        trainer_extra_kwargs["max_length"] = args.max_length
+
+    if "max_prompt_length" in dpo_config_params:
+        dpo_kwargs["max_prompt_length"] = args.max_prompt_length
+    else:
+        trainer_extra_kwargs["max_prompt_length"] = args.max_prompt_length
+
+    dpo_config = DPOConfig(**dpo_kwargs)
+
+    dpo_trainer_params = inspect.signature(DPOTrainer.__init__).parameters
+    trainer_kwargs = {
+        "model": model,
+        "ref_model": None,
+        "peft_config": peft_config,
+        "args": dpo_config,
+        "train_dataset": train_dataset,
+        **trainer_extra_kwargs,
+    }
+
+    if "processing_class" in dpo_trainer_params:
+        trainer_kwargs["processing_class"] = tokenizer
+    elif "tokenizer" in dpo_trainer_params:
+        trainer_kwargs["tokenizer"] = tokenizer
+
+    trainer = DPOTrainer(**trainer_kwargs)
 
     _cast_trainable_fp32(trainer.model)
 
