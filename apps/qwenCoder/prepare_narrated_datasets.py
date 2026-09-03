@@ -59,7 +59,24 @@ def prepare_datasets(
 ) -> tuple[Path, Path, int]:
     """Align narrated codes with original prompts and output SFT & DPO datasets."""
     if not narrated_path.is_file():
-        raise FileNotFoundError(f"Narrated file not found: {narrated_path}")
+        # Fallback: attempt to download from Hugging Face Hub
+        try:
+            from huggingface_hub import hf_hub_download
+
+            print(f"Notice: Narrated file not found locally at {narrated_path}. Attempting to download from HF Hub...")
+            token = os.environ.get("HF_TOKEN") or (get_token() if get_token else None)
+            downloaded = hf_hub_download(
+                repo_id="nabin2004/AOS-Narrated-Manim-400",
+                filename="manim_narrated_400.jsonl",
+                repo_type="dataset",
+                token=token,
+            )
+            narrated_path = Path(downloaded)
+            print(f"Successfully downloaded narrated dataset to: {narrated_path}")
+        except Exception as dl_err:
+            raise FileNotFoundError(
+                f"Narrated file not found: {narrated_path} (Failed to download from HF Hub nabin2004/AOS-Narrated-Manim-400: {dl_err})"
+            )
     if not curated_path.is_file():
         raise FileNotFoundError(f"Curated file not found: {curated_path}")
 
