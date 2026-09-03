@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-153",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The camera reorients to a perspective view while the wave machine's arms are progressively created along the shaft.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "frame",
+        "reorient",
+        "LaggedStartMap",
+        "ShowCreation",
+        "machine",
+        "arms"
+      ],
+      "clip_query": "A 3D wave machine with grey arms appearing sequentially along a central shaft as the camera pans."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The entire wave machine rotates continuously around its longitudinal axis, demonstrating a helical wave pattern.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        9.0,
+        29.0
+      ],
+      "keyword_bank": [
+        "Rotating",
+        "machine",
+        "5 * TAU",
+        "RIGHT"
+      ],
+      "clip_query": "A 3D torsion wave machine rotating to show a propagating wave pattern."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The camera adjusts, and the arms of the wave machine smoothly transform into a higher-density configuration with a smaller delta angle.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        29.0,
+        34.0
+      ],
+      "keyword_bank": [
+        "Transform",
+        "machine2",
+        "path_arc",
+        "path_arc_axis"
+      ],
+      "clip_query": "The arms of a 3D wave machine morphing into a denser helical arrangement."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The denser wave machine rotates, followed by a final transformation to an even higher-density wave machine.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        34.0,
+        74.0
+      ],
+      "keyword_bank": [
+        "Rotating",
+        "machine3",
+        "Transform"
+      ],
+      "clip_query": "A highly dense 3D wave machine rotating to show a smooth wave motion."
+    }
+  ]
+}

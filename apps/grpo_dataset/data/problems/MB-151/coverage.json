@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-151",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Snell's Law formula implementation",
+        "Trigonometric calculation of refracted angle using arcsin and sin",
+        "Dynamic Arc creation for theta_1 and theta_2"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "FullScreenRectangle representing the medium",
+        "Refracting light beam with varying stroke widths",
+        "GlowDot following the beam path",
+        "SVGMobject representing a tank"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for dynamic angle control",
+        "Refractive index constant",
+        "Angle values in degrees converted to radians"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene or Scene structure",
+        "always_redraw updaters for dynamic arcs",
+        "Custom updaters for positioning theta labels",
+        "Camera frame animations for zooming"
+      ]
+    }
+  }
+}

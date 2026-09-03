@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-180",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "sinc function definition",
+        "integral of sinc(x) from -inf to inf",
+        "substitution x -> pi * x",
+        "integral of sinc(pi * x) from -inf to inf equals 1.0"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Axes with custom range and tick labels",
+        "Riemann rectangles with positive/negative colors (BLUE_E, RED_E)",
+        "Horizontal stretching/squishing of graph and area",
+        "Surrounding rectangles for formula highlights",
+        "Squish arrows pointing inwards"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "dx = 0.01 for Riemann rectangles",
+        "stretch factor of 1 / PI",
+        "axes width and height scaling"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene or Scene class structure",
+        "Use of save_state and restore for animation reset",
+        "LaggedStart and TransformMatchingShapes for smooth transitions"
+      ]
+    }
+  }
+}

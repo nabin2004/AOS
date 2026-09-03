@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-191",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Complex square root mapping",
+        "Winding number / branch point visualization",
+        "Newton's method or algebraic root calculation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Dual side-by-side ComplexPlanes",
+        "Distinct color coding for roots vs coefficients",
+        "Smooth continuous tracer paths"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Accurate complex coordinate mapping using plane.n2p and plane.p2n",
+        "Optimal transport sorting to prevent discontinuous root jumps"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Use of updaters or continuous redrawing for dynamic tracking",
+        "Clean object-oriented scene structure with configurable parameters"
+      ]
+    }
+  }
+}

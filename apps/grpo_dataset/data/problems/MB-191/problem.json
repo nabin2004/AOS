@@ -1,0 +1,64 @@
+{
+  "id": "MB-191",
+  "title": "Visualizing Complex Square Roots and Root-Coefficient Mapping",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Complex Analysis",
+    "Algebra"
+  ],
+  "full_prompt": "Write a Manim scene named `StudySqrt` (inheriting from a base `RootCoefScene` or implementing it directly) that visualizes the relationship between complex numbers and their square roots. Create two side-by-side complex planes: one representing the 'Root' plane (or output plane) and the other representing the 'Coefficient' or input plane. Place a dot on the input plane that moves in a continuous circular path around the origin. On the root plane, display the corresponding square roots of this moving value. Because every non-zero complex number has two square roots, show both roots as distinct, color-coded dots. As the input dot completes one full 360-degree rotation, animate the two root dots to show them swapping positions (each completing a 180-degree half-rotation), beautifully illustrating the branch structure and multi-valued nature of the complex square root function. Use continuous tracer lines to show the paths of all dots, and clear text labels to identify the planes and coordinates.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-191/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "StudySqrt",
+      "RootCoefScene"
+    ],
+    "visual_techniques": [
+      "Dual ComplexPlane layout",
+      "Dynamic dot tracking with updaters",
+      "Tracer paths for continuous history",
+      "Optimal transport sorting to prevent discontinuous jumps in root tracking"
+    ],
+    "manim_api_patterns": [
+      "ComplexPlane",
+      "always_redraw",
+      "add_updater",
+      "VGroup",
+      "arrange"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Discontinuous jumping of root dots due to branch cuts during sorting",
+      "severity": "high",
+      "note": "Must use a tracking/sorting algorithm like optimal_transport to pair the closest roots to their previous positions instead of sorting by raw angle."
+    },
+    {
+      "pattern": "Mismatched coordinate systems between the two complex planes",
+      "severity": "medium",
+      "note": "Ensure points are mapped correctly using plane.n2p (number to point) and plane.p2n (point to number)."
+    }
+  ]
+}

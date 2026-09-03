@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-073",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the s-plane, exp-plane, and dynamic graph axes on screen.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "s_plane",
+        "exp_plane",
+        "axes",
+        "s_dot",
+        "output_dot"
+      ],
+      "clip_query": "Two complex coordinate planes and a set of graph axes are displayed on screen with tracker dots."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animation of the s-tracker dot moving through complex values from -1 to 0.2, then 0, and finally to 1j.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "s_tracker",
+        "animate",
+        "set_value",
+        "1j"
+      ],
+      "clip_query": "A yellow dot moves across the complex s-plane, updating its coordinate label dynamically."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Time evolution of the t-tracker tracing the exponential trajectory on the exp-plane and plotting on the graph axes.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "play_time_forward",
+        "t_tracker",
+        "frame.animate"
+      ],
+      "clip_query": "A trajectory is traced out on the right complex plane while a wave is plotted on the bottom axes as the camera pans."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Transition of s to 2j, updating the exponential label and morphing the derivative equation step-by-step.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "deriv_expression",
+        "ReplacementTransform",
+        "FadeTransform",
+        "2j"
+      ],
+      "clip_query": "The derivative equation of e^{2it} is written out with terms morphing and transforming from the original expression."
+    }
+  ]
+}

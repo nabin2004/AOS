@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-200",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "slope calculation",
+        "5/2 and 7/3 slopes",
+        "dissection paradox geometry"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "camera zoom on corner",
+        "curved path transformation",
+        "grid overlay",
+        "right triangle slope legs"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "unit size 0.5",
+        "path_arc factor 60 degrees",
+        "camera scale 0.15"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene or MovingCameraScene",
+        "NumberPlane",
+        "Transform with path_arc",
+        "frame save and restore"
+      ]
+    }
+  }
+}

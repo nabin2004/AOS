@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-036",
+  "conflicts": [
+    {
+      "category": "Base Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame",
+      "ce_equivalent": "self.camera.frame",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Replication",
+      "gl_construct": "mobject.replicate(n)",
+      "ce_equivalent": "VGroup(*[mobject.copy() for _ in range(n)])",
+      "severity": "high"
+    },
+    {
+      "category": "UI/Frame Pinning",
+      "gl_construct": "mobject.fix_in_frame()",
+      "ce_equivalent": "Adding to a fixed canvas or using self.add_background_mobject (or standard camera-fixed UI techniques)",
+      "severity": "medium"
+    },
+    {
+      "category": "Proportion Point",
+      "gl_construct": "mobject.pfp(alpha)",
+      "ce_equivalent": "mobject.point_from_proportion(alpha)",
+      "severity": "medium"
+    },
+    {
+      "category": "Creation Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    }
+  ]
+}

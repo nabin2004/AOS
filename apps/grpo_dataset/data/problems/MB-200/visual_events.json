@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-200",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Grid and initial dissection triangle setup with vertex dots",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "NumberPlane",
+        "group1",
+        "vertex_dots",
+        "unit"
+      ],
+      "clip_query": "A geometric grid with a dissected triangle shape and dots at its vertices"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Piecewise transformation of the sub-shapes with curved paths to rearrange them",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "Transform",
+        "path_arc",
+        "space_out_submobjects",
+        "targets"
+      ],
+      "clip_query": "The pieces of the dissected triangle fly apart and rearrange along curved paths"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Camera zooms in closely on the hypotenuse boundary to show the gap/overlap",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "frame.animate.scale",
+        "lines",
+        "get_corner"
+      ],
+      "clip_query": "Close-up zoom on the hypotenuse of the triangle showing a yellow line and a slight gap"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Slope comparison showing right-triangle legs and slope labels (5/2 and 7/3)",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "lil_lines",
+        "slope_labels",
+        "Arrow",
+        "x_line",
+        "y_line"
+      ],
+      "clip_query": "Labels showing 'Slope = 5/2' and 'Slope = 7/3' with arrows pointing to the slopes of the sub-triangles"
+    }
+  ]
+}

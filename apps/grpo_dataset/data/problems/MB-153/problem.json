@@ -1,0 +1,70 @@
+{
+  "id": "MB-153",
+  "title": "Wave Machine Demo",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    74.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a 3D visualization of a torsion wave machine using ManimGL. First, define a custom 3D Group class called `WaveMachine` that constructs a central shaft (using a Cylinder capped with Circles) and a series of radial arms (using Cylinders with Sphere caps) distributed evenly along the shaft's length. Each arm should be rotated by a progressively increasing angle (controlled by `delta_angle`) to form a helical pattern. In the main scene `WaveMachineDemo` (which should inherit from both `InteractiveScene` and `ThreeDScene`), instantiate this wave machine. Position the camera in a perspective view and animate the creation of the machine's arms using a lagged creation animation. Then, rotate the entire machine continuously around its longitudinal axis to demonstrate wave propagation. Next, smoothly transform the machine's arms into a higher-density configuration (smaller delta angle) using a curved path transformation (`path_arc`), and rotate it again. Finally, perform one more transformation to an even denser configuration and rotate it to show a highly smooth wave motion.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-153/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "WaveMachineDemo"
+    ],
+    "visual_techniques": [
+      "3D Camera Control",
+      "Custom 3D Mobject Grouping",
+      "Lagged Animations",
+      "Rotational Path Transformations"
+    ],
+    "manim_api_patterns": [
+      "Cylinder",
+      "Sphere",
+      "ThreeDScene",
+      "InteractiveScene",
+      "Rotating",
+      "Transform",
+      "LaggedStartMap"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incompatibility between ManimGL's self.frame and Manim Community's self.camera",
+      "severity": "high",
+      "note": "The reference code uses ManimGL's InteractiveScene frame manipulation (e.g., frame.reorient). In Manim Community, this must be translated to camera orientation methods."
+    },
+    {
+      "pattern": "Missing Cylinder or Sphere 3D primitives in older Manim versions",
+      "severity": "medium",
+      "note": "Ensure the rendering environment supports 3D Cylinder and Sphere mobjects."
+    },
+    {
+      "pattern": "Incorrect path_arc_axis orientation during Transform",
+      "severity": "medium",
+      "note": "The transformation of arms uses path_arc and path_arc_axis=RIGHT to ensure they rotate cleanly around the shaft during morphing. Incorrect axis will cause arms to distort."
+    }
+  ]
+}

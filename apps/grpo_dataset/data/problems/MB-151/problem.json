@@ -1,0 +1,71 @@
+{
+  "id": "MB-151",
+  "title": "Snell's Law and Refraction Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a Manim scene named `SnellsLaw` using ManimGL/InteractiveScene. The scene should visualize Snell's Law of refraction at a boundary. Create a medium representing water/glass in the bottom half of the screen using a blue rectangle. An incident light beam should shine from the top-left, hitting the boundary at a specific point, and refract into the bottom medium. Use a ValueTracker to control the incident angle, and dynamically calculate the refracted angle using Snell's Law (with a refractive index). Add a normal line at the boundary, along with dynamic arcs and LaTeX labels for theta_1 and theta_2 that update automatically as the angle changes. Animate the incident angle sweeping through multiple values (e.g., 70, -50, and 40 degrees) to show how the refraction angle adapts. Additionally, implement a tank analogy where an SVGMobject representing a tank moves along the incident beam, rotates at the boundary to align with the refracted angle, and continues along the refracted path while the camera frame dynamically zooms in and out.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-151/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "SnellsLaw"
+    ],
+    "visual_techniques": [
+      "Dynamic Updaters",
+      "ValueTracker-driven geometry",
+      "SVG path animation",
+      "Camera frame zooming and panning"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "always_redraw",
+      "ValueTracker",
+      "FullScreenRectangle",
+      "GlowDot",
+      "pfp",
+      "self.frame.animate"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Use of self.frame instead of self.camera.frame in Manim Community Edition",
+      "severity": "high",
+      "note": "ManimGL uses self.frame to control the camera, whereas ManimCE requires MovingCameraScene and self.camera.frame."
+    },
+    {
+      "pattern": "Missing definition of get_beam method",
+      "severity": "high",
+      "note": "The reference code snippet calls self.get_beam, which must be fully implemented to construct the incident and refracted line segments."
+    },
+    {
+      "pattern": "Use of pfp shorthand",
+      "severity": "medium",
+      "note": "pfp is a ManimGL shorthand for point_from_proportion. In CE, point_from_proportion must be spelled out."
+    }
+  ]
+}

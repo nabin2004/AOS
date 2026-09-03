@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-174",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The inner red rectangle representing the pool table cushion is drawn while the ball moves along its perimeter.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "inner_rect",
+        "ShowCreation",
+        "UpdateFromFunc",
+        "ball"
+      ],
+      "clip_query": "A red rectangle is drawn on a pool table with a grey ball moving along its edge"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The camera frame shifts, and a copy of the pool table is rotated 180 degrees around its right edge to show a horizontal reflection.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "Rotate",
+        "axis=UP",
+        "about_point",
+        "table_group2"
+      ],
+      "clip_query": "A pool table is rotated horizontally to create a reflected copy next to it"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A second copy is rotated vertically around the top edge of the reflected table to show a double reflection.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "Rotate",
+        "axis=LEFT",
+        "table_group3"
+      ],
+      "clip_query": "A pool table is rotated vertically to create another reflected copy above"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The main ball moves, and the reflected balls mirror its movement via updaters. A straight line and its folded trajectory are shown.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        14.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "add_updater",
+        "get_reflection",
+        "line_to_trajectory",
+        "straight_line",
+        "trajectory"
+      ],
+      "clip_query": "Balls in multiple reflected pool tables move in perfect synchronization with a straight line and folded trajectory shown"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-153",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "helical angle progression",
+        "delta angle calculation",
+        "path arc rotation axis"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D Cylinder shaft",
+        "3D Cylinder arms",
+        "Sphere caps",
+        "3D camera reorientation",
+        "smooth rotation animation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "n_arms parameter",
+        "run_time parameters",
+        "rotation angle in radians"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "WaveMachine custom Group class",
+        "WaveMachineDemo scene class",
+        "InteractiveScene or ThreeDScene inheritance",
+        "nested loops for arm generation"
+      ]
+    }
+  }
+}

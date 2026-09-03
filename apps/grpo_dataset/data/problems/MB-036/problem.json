@@ -1,0 +1,69 @@
+{
+  "id": "MB-036",
+  "title": "Hyperbola Square and High-Dimensional Sphere Packing",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Topology"
+  ],
+  "full_prompt": "Write a ManimGL script to visualize the high-dimensional sphere packing paradox (often called the 'spheres in a box' or 'hypercube packing' problem). Create a scene named `HyperbolaSquare` inheriting from `InteractiveScene` (or standard `Scene` if adapting to CE). \n\n1. **Initial Square & Labels**: Draw a 2D square of height 4 centered at the origin. Create a 'shadow' effect by generating 20 nested copies of the square, each scaled down slightly (e.g., by 0.95^n) and shifted slightly in the DR direction with decreasing opacity. Add a center dot. Draw a horizontal line from the center to the right edge (labeled '1') and a diagonal line from the center to the upper-right corner (labeled '\\sqrt{N}').\n\n2. **Warping**: Implement a warping method `get_warp_square` that transforms a square (or its lines) into a curved/warped shape representing high-dimensional projection distortion. Animate the transformation of the square, its shadows, and the side/diagonal lines into this warped state. The side line should now end at the midpoint of the warped right edge, and the diagonal line should end at the warped upper-right corner. Update the labels accordingly.\n\n3. **Corner and Central Spheres**: Place 4 small circles (radius 0.6) at the four corners of the warped square. Then, draw a larger central circle whose radius is dynamically calculated as the length of the diagonal line minus the corner circle's radius (representing the central sphere that grows as dimension N increases). Animate the camera zooming out (increasing frame height) to accommodate the growing geometry.\n\n4. **High-Dimensional Projection (Rotational Replication)**: To represent $2^N$ corners in higher dimensions, replicate the warped square and corner circles 12 times, rotating them at fractional angles between 0 and 90 degrees. Animate these copies fading in and sweeping along circular arcs. Add a text label in the upper-right corner reading '2^N \\text{ corners}' and fix it to the camera frame.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-036/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "HyperbolaSquare"
+    ],
+    "visual_techniques": [
+      "Nested shadow layers for depth",
+      "Custom coordinate warping",
+      "Rotational replication for high-dimensional projection",
+      "Dynamic camera frame scaling"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "pfp",
+      "replicate",
+      "fix_in_frame",
+      "LaggedStartMap",
+      "TransformFromCopy"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing get_warp_square implementation",
+      "severity": "high",
+      "note": "The reference code snippet cuts off before defining get_warp_square. The model must implement a reasonable warping function that maps linear segments to curved/warped paths."
+    },
+    {
+      "pattern": "Using CE camera syntax in ManimGL",
+      "severity": "medium",
+      "note": "Using self.camera.frame instead of self.frame will fail in ManimGL, and vice versa."
+    },
+    {
+      "pattern": "Mobject.replicate() method missing in ManimCE",
+      "severity": "high",
+      "note": "replicate() is a ManimGL-specific method; in CE, a VGroup of copies must be constructed manually."
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "problem_id": "MB-036",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation of the initial square, its nested shadow layers, the center dot, and the side/diagonal lines with labels '1' and '\\sqrt{N}'.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "square",
+        "square_shadows",
+        "side_line",
+        "diag_line",
+        "side_label",
+        "diag_label"
+      ],
+      "clip_query": "A square with nested shadow lines, a horizontal blue line labeled 1, and a diagonal yellow line labeled square root of N."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Warping animation where the square, shadows, and lines transform into curved, hyperbolic-like shapes.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "warp_square",
+        "warp_square_shadows",
+        "Transform",
+        "MoveToTarget"
+      ],
+      "clip_query": "The square and its shadows warping into curved, hyperbolic shapes while the lines stretch to follow."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Addition of 4 corner circles at the warped square's vertices, followed by the expansion of a central circle touching them.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "circles",
+        "big_circle",
+        "lil_radius",
+        "big_radius"
+      ],
+      "clip_query": "Four small blue circles appearing at the corners of the warped square, followed by a large green circle expanding from the center."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Rotational replication of the warped square and corner circles to represent 2^N corners, accompanied by a camera zoom-out.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "alt_groups",
+        "corner_label",
+        "2^N \\text{ corners}",
+        "frame.animate.set_height"
+      ],
+      "clip_query": "Multiple rotated copies of the warped square and circles sweeping into view to form a dense multi-dimensional projection with a label reading 2^N corners."
+    }
+  ]
+}

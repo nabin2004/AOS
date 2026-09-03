@@ -1,0 +1,74 @@
+{
+  "id": "MB-180",
+  "title": "Replace X with Pi X in Sinc Integral",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Analysis"
+  ],
+  "full_prompt": "Write a complete Manim script using ManimGL (or compatible Manim Community syntax) that visualizes the coordinate scaling transformation of the sinc integral from sinc(x) to sinc(pi * x). \n\nYour scene should:\n1. Set up a coordinate system (Axes) spanning from -8*pi to 8*pi on the x-axis, and -0.5 to 1.0 on the y-axis. Add integer labels to the axes.\n2. Plot the sinc function graph (sinc(x) = sin(x)/x, with sinc(0) = 1) in blue.\n3. Generate Riemann rectangles approximating the area under the sinc curve with a small dx (e.g., 0.01). Use dark blue for positive areas and dark red for negative areas. Sort these rectangles by their distance from the origin so they can animate outwards.\n4. Display the formula for the integral of sinc(x) from -infinity to infinity equaling pi, and label it with 'Instead of'. Highlight the 'pi' result with a surrounding rectangle and a label 'want to show'.\n5. Introduce the substitution x -> pi * x and the corresponding scaled integral formula equaling 1.0, labeled with 'Focus on'.\n6. Animate a horizontal compression ('squish') of both the sinc graph and its Riemann rectangles by a factor of 1/pi towards the y-axis, accompanied by inward-pointing arrows.\n7. Highlight the new integral result (1.0) with a surrounding rectangle, and then restore the graph and area to their original uncompressed states while updating the focus back to the original integral.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-180/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 105,
+    "scene_classes": [
+      "ReplaceXWithPiX"
+    ],
+    "visual_techniques": [
+      "Riemann rectangles approximation",
+      "Horizontal stretching/scaling of Mobjects",
+      "Formula transformation and highlighting",
+      "State saving and restoration for animations"
+    ],
+    "manim_api_patterns": [
+      "Axes",
+      "get_graph",
+      "get_riemann_rectangles",
+      "stretch",
+      "SurroundingRectangle",
+      "TransformMatchingShapes",
+      "FadeTransform",
+      "ShowCreation",
+      "save_state",
+      "restore"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using InteractiveScene in Manim Community environment without fallback",
+      "severity": "high",
+      "note": "InteractiveScene is exclusive to ManimGL. For Manim Community, Scene must be used instead."
+    },
+    {
+      "pattern": "Incorrect argument signature for stretch method",
+      "severity": "medium",
+      "note": "In Manim Community, stretch requires keyword arguments like 'factor' and 'dim', whereas ManimGL allows positional arguments."
+    },
+    {
+      "pattern": "Missing custom np.sinc definition or division by zero handling",
+      "severity": "medium",
+      "note": "Ensure the sinc function is defined correctly, keeping in mind that numpy's np.sinc includes a factor of pi, so normalization is required."
+    }
+  ]
+}

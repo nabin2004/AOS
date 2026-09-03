@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-174",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "reflection coordinate transformation",
+        "line-plane intersection calculation",
+        "trajectory folding logic"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "ImageMobject rendering",
+        "3D rotation of 2D groups",
+        "synchronized multi-ball movement",
+        "opacity fading for reflected tables"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "table dimensions and cushion buffer offset",
+        "rotation angles (180 degrees / PI)",
+        "coordinate reflection signs"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene structure",
+        "custom updater functions",
+        "trajectory generation helper function"
+      ]
+    }
+  }
+}

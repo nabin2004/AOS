@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-073",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame",
+      "ce_equivalent": "self.camera.frame",
+      "severity": "high"
+    },
+    {
+      "category": "Value Trackers",
+      "gl_construct": "ComplexValueTracker",
+      "ce_equivalent": "ValueTracker (using complex numbers or custom updaters)",
+      "severity": "high"
+    },
+    {
+      "category": "Animation Methods",
+      "gl_construct": "play_time_forward",
+      "ce_equivalent": "Custom play loop with value tracker animation",
+      "severity": "medium"
+    }
+  ]
+}

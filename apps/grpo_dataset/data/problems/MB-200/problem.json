@@ -1,0 +1,72 @@
+{
+  "id": "MB-200",
+  "title": "Visual Proof Paradox: Fake Area Manipulation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Mathematics"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class that visualizes a classic geometric dissection paradox (the 'fake area' or Curry's paradox). The scene should set up a coordinate grid using NumberPlane with a custom unit scale of 0.5. It should display a dissected triangle composed of multiple sub-shapes (represented by two groups of diagrams, group1 and group2). The script must perform the following visual sequence:\n1. Initialize a background grid and place the first dissection configuration (group1) along with vertex dots at its corners.\n2. Animate a piecewise transformation (using Transform with a curved path_arc) that rearranges the sub-shapes from the first configuration to the second configuration, showing how they seem to form the same overall triangle but with a missing/extra unit of area.\n3. Zoom the camera frame in closely onto the hypotenuse boundary of the shape to reveal that the boundary is not a straight line, but rather a slight bend.\n4. Restore the camera frame, perform another swap, and zoom in on another critical junction.\n5. Draw helper lines representing the actual slopes of the individual sub-triangles (e.g., slopes of 5/2 and 7/3), and label them with text and arrows pointing to the respective slopes to mathematically explain the visual illusion.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-200/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 120,
+    "scene_classes": [
+      "FakeAreaManipulation"
+    ],
+    "visual_techniques": [
+      "Camera frame zooming and panning",
+      "Piecewise sub-mobject transformation with path_arc",
+      "Grid-aligned geometric dissection",
+      "Slope visualization with helper right-triangles"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "NumberPlane",
+      "self.camera.frame",
+      "Transform",
+      "path_arc",
+      "space_out_submobjects",
+      "OldTexText",
+      "Arrow",
+      "ShowCreation"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing definition of get_diagrams helper method",
+      "severity": "high",
+      "note": "The reference code relies on self.get_diagrams() which is defined elsewhere in the source file. A complete standalone generation must mock or fully implement the dissection shapes."
+    },
+    {
+      "pattern": "Using ManimCE camera syntax instead of ManimGL frame syntax",
+      "severity": "high",
+      "note": "ManimGL uses self.camera.frame to zoom and pan, whereas ManimCE uses MovingCameraScene with self.camera.frame. Mixing these up causes runtime crashes."
+    },
+    {
+      "pattern": "Incorrect path_arc syntax in Transform",
+      "severity": "medium",
+      "note": "Using path_arc with invalid angles or incorrect zip unpacking can break the piecewise transition animation."
+    }
+  ]
+}

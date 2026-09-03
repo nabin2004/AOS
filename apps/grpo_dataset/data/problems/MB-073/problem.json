@@ -1,0 +1,67 @@
+{
+  "id": "MB-073",
+  "title": "Visualizing the Complex s-Plane and Exponential Trajectories",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Linear Algebra",
+    "Physics"
+  ],
+  "full_prompt": "Create a Manim scene named `SPlane` using ManimGL that visualizes the relationship between the complex s-plane, the output space of the complex exponential function $e^{st}$, and its dynamic graph over time. \n\nYour visualization must include:\n1. **Three Main Visual Components**:\n   - An **s-plane** (a complex coordinate plane) on the left, featuring a tracker dot representing the complex variable $s$ and a dynamic label showing its current value.\n   - An **exp-plane** (another complex coordinate plane) in the center/right, showing the trajectory of $e^{st}$ as time $t$ varies. It should feature a tracker dot, a dynamic label, and a path tracing the output trajectory.\n   - A **graph axes** system at the bottom, plotting the real or imaginary part of $e^{st}$ over time, complete with a dynamic curve and a vertical line tracking the current time $t$.\n\n2. **Animation Sequence**:\n   - Initialize $s = -1$ and $t = 0$.\n   - Animate the complex tracker $s$ moving smoothly from $-1$ to $0.2$, then to $0$, and finally to $1j$ (pure imaginary unit $i$).\n   - Let time $t$ tick forward dynamically (e.g., using a custom time-forward method or updater), causing the trajectory on the exp-plane to trace out a circle and the graph axes to show a sinusoidal wave. Simultaneously, animate the camera frame to shift and scale to capture the evolving trajectory.\n   - Reset $t$ to $0$, move $s$ to $2j$, and update the label to $e^{2it}$.\n   - Shift the exp-plane and introduce the derivative equation: $\\frac{d}{dt} e^{2it} = 2i \\cdot e^{2it}$. Use precise LaTeX morphing animations (like `ReplacementTransform` and `FadeTransform`) to show how the terms in the derivative are derived from the original exponential expression.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-073/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "SPlane"
+    ],
+    "visual_techniques": [
+      "Complex Value Tracking",
+      "Dual Coordinate Planes",
+      "Dynamic Graph Plotting",
+      "LaTeX Morphing",
+      "Camera Frame Reorientation"
+    ],
+    "manim_api_patterns": [
+      "ComplexValueTracker",
+      "ValueTracker",
+      "InteractiveScene",
+      "frame.animate",
+      "ReplacementTransform",
+      "FadeTransform"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE camera controls instead of ManimGL's InteractiveScene frame controls",
+      "severity": "high",
+      "note": "ManimGL uses self.frame to control camera orientation and position, whereas ManimCE uses self.camera.frame."
+    },
+    {
+      "pattern": "Missing ComplexValueTracker implementation in standard ManimCE",
+      "severity": "high",
+      "note": "ComplexValueTracker is native to ManimGL. In ManimCE, a standard ValueTracker with complex numbers or two separate trackers for real and imaginary parts must be used."
+    }
+  ]
+}

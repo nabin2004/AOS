@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-188",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Generating function polynomial representation",
+        "Subset sum calculations",
+        "Fibonacci sequence coefficients"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Vertical stacking of subsets under coefficients",
+        "Surrounding highlighting rectangles",
+        "Custom stroke-width underline",
+        "Color-coded coefficients"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Correct subset generation logic up to degree 10",
+        "Accurate counting of subsets matching each coefficient"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "Helper function get_set_tex for formatting LaTeX sets",
+        "Helper function get_subsets for combinatorics",
+        "Sequential animation loop matching coefficients to subsets"
+      ]
+    }
+  }
+}

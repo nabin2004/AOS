@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-191",
+  "conflicts": [
+    {
+      "category": "Coordinate Mapping",
+      "gl_construct": "ComplexPlane.n2p / ComplexPlane.p2n",
+      "ce_equivalent": "ComplexPlane.number_to_point / ComplexPlane.point_to_number",
+      "severity": "high"
+    },
+    {
+      "category": "Updaters",
+      "gl_construct": "Mobject.add_updater(lambda m: ...)",
+      "ce_equivalent": "Mobject.add_updater(lambda m, dt: ...)",
+      "severity": "medium"
+    },
+    {
+      "category": "Vector Math",
+      "gl_construct": "get_norm(vector)",
+      "ce_equivalent": "np.linalg.norm(vector)",
+      "severity": "medium"
+    }
+  ]
+}

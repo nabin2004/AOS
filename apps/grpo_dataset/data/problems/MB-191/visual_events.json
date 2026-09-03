@@ -1,0 +1,85 @@
+{
+  "problem_id": "MB-191",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render two side-by-side complex planes with distinct background grid colors and labels ('Root Plane' and 'Input/Coefficient Plane').",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "arrange",
+        "planes"
+      ],
+      "clip_query": "Two side-by-side complex coordinate grids appearing on screen with labels."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Spawn interactive/moving dots on both planes: one input dot on the right plane, and two root dots on the left plane.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "Dot",
+        "root_color",
+        "coef_color"
+      ],
+      "clip_query": "Colored dots appearing on both the left and right complex planes."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animate the input dot tracing a continuous circular path around the origin of its complex plane.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "add_updater",
+        "cos",
+        "sin"
+      ],
+      "clip_query": "A red dot tracing a circular path on the right complex plane."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate the two root dots on the left plane tracing out semi-circular paths, demonstrating they swap places as the input completes a full loop.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "optimal_transport",
+        "roots",
+        "swap"
+      ],
+      "clip_query": "Two yellow dots tracing semi-circles on the left complex plane, swapping positions."
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Display continuous tracer lines (paths) behind all moving dots to clearly show the geometry of their trajectories.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        4.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "Tracer",
+        "always_redraw",
+        "VMobject"
+      ],
+      "clip_query": "Fading or solid trail lines following the paths of the moving dots on both planes."
+    }
+  ]
+}

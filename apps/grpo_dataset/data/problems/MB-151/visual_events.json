@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-151",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The blue medium rectangle is added, and a yellow glow dot moves along the incoming light beam to the boundary.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "FullScreenRectangle",
+        "GlowDot",
+        "beam",
+        "hit_point"
+      ],
+      "clip_query": "A light beam shines down onto a blue boundary with a glowing yellow dot moving along it."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A vertical normal line appears at the boundary, and dynamic angle arcs with theta_1 and theta_2 labels are displayed.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "normal_line",
+        "Arc",
+        "theta1_label",
+        "theta2_label",
+        "ineq"
+      ],
+      "clip_query": "Angle arcs and theta labels appear around a vertical normal line at the refraction boundary."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The incident angle sweeps through multiple values (70, -50, 40 degrees), showing dynamic updates of the refracted beam and angle labels.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "angle_tracker",
+        "animate",
+        "set_value"
+      ],
+      "clip_query": "The incident light beam sweeps back and forth, dynamically changing its refraction angle."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A tank SVGMobject moves along the beam, rotates at the boundary interface, and continues moving while the camera zooms in and out.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "SVGMobject",
+        "tank",
+        "self.frame",
+        "pfp"
+      ],
+      "clip_query": "A small tank vehicle moves along the light beam, pivoting as it crosses the boundary."
+    }
+  ]
+}

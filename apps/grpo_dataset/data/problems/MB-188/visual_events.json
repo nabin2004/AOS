@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-188",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Title 'Generating functions!' is written on screen with a blue underline expanding outwards.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "Text",
+        "Underline",
+        "ShowCreation",
+        "Write"
+      ],
+      "clip_query": "Title 'Generating functions!' written with a blue underline"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The polynomial f(x) representing subset sums fades in below the title.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "OldTex",
+        "FadeIn",
+        "poly"
+      ],
+      "clip_query": "Polynomial f(x) fades in below the title"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Subsets of {1, ..., 10} are revealed sequentially under their corresponding polynomial coefficients using SurroundingRectangle and ShowIncreasingSubsets.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "get_set_tex",
+        "ShowIncreasingSubsets",
+        "SurroundingRectangle",
+        "subset_groups"
+      ],
+      "clip_query": "Subsets appearing sequentially under polynomial coefficients"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The Fibonacci generating function F(x) is introduced, highlighting the Fibonacci coefficients in red.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "fib_poly",
+        "coefs",
+        "RED"
+      ],
+      "clip_query": "Fibonacci polynomial F(x) with red coefficients"
+    }
+  ]
+}

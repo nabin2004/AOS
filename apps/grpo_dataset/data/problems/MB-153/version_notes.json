@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-153",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "camera_control",
+      "gl_construct": "self.frame.reorient",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    },
+    {
+      "category": "animation_api",
+      "gl_construct": "LaggedStartMap",
+      "ce_equivalent": "LaggedStart",
+      "severity": "medium"
+    },
+    {
+      "category": "mobject_3d",
+      "gl_construct": "Cylinder",
+      "ce_equivalent": "Cylinder (from manim.mobject.three_dimensions)",
+      "severity": "medium"
+    }
+  ]
+}

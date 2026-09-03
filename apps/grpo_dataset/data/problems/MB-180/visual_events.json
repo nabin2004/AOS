@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-180",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Axes and sinc graph are displayed, and partial Riemann rectangles are written onto the screen.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "axes",
+        "sinc_graph",
+        "partial_area",
+        "sinc_label",
+        "instead_of"
+      ],
+      "clip_query": "A blue sinc function graph on axes with partial Riemann rectangles filled in blue and red."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A surrounding rectangle highlights the pi result of the sinc integral, with a 'want to show' label.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        5.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "pi_rect",
+        "want_to_show"
+      ],
+      "clip_query": "A surrounding rectangle highlighting the pi symbol in the sinc integral formula."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The formula transforms to show the substitution x -> pi * x, and the 'Focus on' label appears.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "x_to_pix",
+        "sinc_pi_label",
+        "focus_on"
+      ],
+      "clip_query": "The formula transforms to show the sinc integral with pi x, resulting in 1.0."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The sinc graph and its Riemann rectangles are horizontally squished (stretched by 1/pi) with arrows indicating the compression.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "sinc_pi_graph",
+        "sinc_pi_area",
+        "squish_arrows",
+        "one_rect"
+      ],
+      "clip_query": "The sinc graph and its Riemann rectangles horizontally compress towards the y-axis with arrows."
+    }
+  ]
+}

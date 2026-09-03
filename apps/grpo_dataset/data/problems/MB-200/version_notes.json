@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-200",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "MovingCameraScene",
+      "severity": "high"
+    },
+    {
+      "category": "camera_manipulation",
+      "gl_construct": "self.camera.frame",
+      "ce_equivalent": "self.camera.frame (requires MovingCameraScene)",
+      "severity": "high"
+    },
+    {
+      "category": "text_mobject",
+      "gl_construct": "OldTexText",
+      "ce_equivalent": "Tex or Text",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_name",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "MB-174",
+  "title": "Pool Table Reflections and Trajectories",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Physics"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes pool table reflections. First, display a pool table image with a ball at the center. Draw a red boundary rectangle representing the inner cushion of the pool table. Then, demonstrate the concept of reflecting the table to analyze trajectories. Shift the camera frame and create two reflected copies of the pool table: one reflected horizontally (by rotating 180 degrees around the right edge) and one reflected vertically (by rotating 180 degrees around the top edge). Add updaters to the balls in the reflected tables so that they mirror the movement of the main ball. Animate the main ball moving around to show the synchronized mirrored movement. Finally, draw a straight line from the ball to a corner in the reflected space, and show how this straight line corresponds to a folded, reflected trajectory on the original table.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-174/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "PoolTableReflections"
+    ],
+    "visual_techniques": [
+      "ImageMobject rendering",
+      "3D-like rotations for reflection visualization",
+      "Updaters for synchronized movement",
+      "Custom trajectory mapping via intersection calculations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TrueDot",
+      "ImageMobject",
+      "Rotate",
+      "add_updater",
+      "UpdateFromFunc",
+      "find_intersection"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing 'pool_table' image asset causing runtime error",
+      "severity": "high",
+      "note": "The code relies on ImageMobject('pool_table'). If the asset is missing, it will fail. A fallback vector rectangle should be used if the image is not found."
+    },
+    {
+      "pattern": "Incorrect rotation axis or about_point in Rotate",
+      "severity": "medium",
+      "note": "Using 3D rotation axes (UP, LEFT) in ManimGL requires correct 3D coordinate handling."
+    }
+  ]
+}

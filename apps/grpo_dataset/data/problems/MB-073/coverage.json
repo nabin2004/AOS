@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-073",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "s-plane complex coordinates",
+        "exponential function e^{st}",
+        "derivative of complex exponential"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Dual complex planes",
+        "Dynamic trajectory tracing",
+        "Moving coordinate tracker dot",
+        "LaTeX equation morphing"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Complex value tracking",
+        "Time parameter tracking",
+        "Dynamic graph plotting"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene structure",
+        "Camera frame animation",
+        "LaggedStart animations"
+      ]
+    }
+  }
+}

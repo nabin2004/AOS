@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-180",
+  "conflicts": [
+    {
+      "category": "InteractiveScene",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "ShowCreation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "stretch",
+      "gl_construct": "mobject.stretch(factor, dim, about_point=...)",
+      "ce_equivalent": "mobject.stretch(factor, dim, about_point=...)",
+      "severity": "medium"
+    },
+    {
+      "category": "FadeTransform",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform",
+      "severity": "medium"
+    }
+  ]
+}
