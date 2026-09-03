@@ -78,18 +78,6 @@ def load_dpo_model(
     token = _resolve_hf_token()
     compute_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
 
-    # Auto-detect Pascal P100 (sm_60) or GPUs without Tensor Cores for 4-bit
-    if torch.cuda.is_available():
-        major, minor = torch.cuda.get_device_capability(0)
-        if major < 7 and use_4bit and not use_8bit:
-            device_name = torch.cuda.get_device_name(0)
-            print(
-                f"✔ Pascal GPU detected ({device_name}, sm_{major}{minor}). "
-                f"Auto-switching from 4-bit to 8-bit for native sm_60 DP4A compatibility."
-            )
-            use_4bit = False
-            use_8bit = True
-
     bnb_config = None
     if use_4bit:
         bnb_config = BitsAndBytesConfig(
@@ -236,8 +224,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--batch-size", type=int, default=1, help="Per-device batch size (default: 1)")
     parser.add_argument("--grad-accum", type=int, default=4, help="Gradient accumulation steps (default: 4)")
     parser.add_argument("--max-length", type=int, default=2048, help="Max total sequence length (default: 2048)")
-    parser.add_argument("--max-prompt-length", type=int, default=512, help="Max prompt length (default: 512)")
-    parser.add_argument("--use-8bit", action="store_true", help="Use 8-bit quantization (recommended for Pascal P100 sm_60)")
+    parser.add_argument("--use-4bit", action="store_true", default=True, help="Use 4-bit NF4 QLoRA (default: True)")
+    parser.add_argument("--use-8bit", action="store_true", default=False, help="Use 8-bit quantization")
     parser.add_argument("--no-4bit", action="store_true", help="Disable 4-bit quantization")
     parser.add_argument("--push-to-hub", action="store_true", help="Push DPO adapter to Hugging Face")
     parser.add_argument("--smoke", action="store_true", help="Smoke test (1 step, small dataset)")

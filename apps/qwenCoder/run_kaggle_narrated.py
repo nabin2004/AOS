@@ -72,8 +72,8 @@ def is_cuda_working() -> bool:
         return False
 
 
-def check_gpu_compatibility() -> bool:
-    """Verify GPU compute capability. Returns True if 8-bit mode should be used (e.g. Pascal P100 sm_60)."""
+def check_gpu_compatibility() -> None:
+    """Detect and display GPU environment information."""
     try:
         import torch
 
@@ -84,21 +84,8 @@ def check_gpu_compatibility() -> bool:
         device_name = torch.cuda.get_device_name(0)
         major, minor = torch.cuda.get_device_capability(0)
         print(f"✔ Detected GPU: {device_name} (Compute Capability: {major}.{minor})")
-
-        if major < 7:
-            print(
-                f"\n========================================================================\n"
-                f"✔ Pascal GPU Detected: {device_name} (sm_{major}{minor})\n"
-                f"   Configuring 8-bit QLoRA mode (~9 GB VRAM, native DP4A on Pascal P100).\n"
-                f"   (If you prefer 4-bit NF4 QLoRA, switch Accelerator to 'GPU T4 x2').\n"
-                f"========================================================================\n"
-            )
-            return True
-        else:
-            print(f"✔ Turing/Ampere/Hopper GPU Detected ({device_name}): Using 4-bit NF4 QLoRA mode.")
-            return False
     except ImportError:
-        return False
+        pass
 
 
 def setup_environment(force_reinstall_torch: bool = False) -> None:
@@ -156,7 +143,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--sft-lr", type=float, default=5e-5, help="SFT learning rate (default: 5e-5)")
     parser.add_argument("--dpo-lr", type=float, default=5e-6, help="DPO learning rate (default: 5e-6)")
     parser.add_argument("--dpo-beta", type=float, default=0.1, help="DPO beta (default: 0.1)")
-    parser.add_argument("--use-8bit", action="store_true", help="Force 8-bit QLoRA mode (default auto-detected for Pascal P100)")
+    parser.add_argument("--use-4bit", action="store_true", default=True, help="Use 4-bit NF4 QLoRA (default: True)")
+    parser.add_argument("--use-8bit", action="store_true", default=False, help="Use 8-bit quantization")
     parser.add_argument("--skip-sft", action="store_true", help="Skip Continued SFT stage")
     parser.add_argument("--skip-dpo", action="store_true", help="Skip DPO stage")
     parser.add_argument("--no-push", action="store_true", help="Do not push models to Hugging Face Hub")
@@ -175,8 +163,7 @@ def main() -> int:
     print("=================================================================")
 
     setup_kaggle_secrets()
-    auto_8bit = check_gpu_compatibility()
-    use_8bit = args.use_8bit or auto_8bit
+    check_gpu_compatibility()
     setup_environment()
 
     # Step 1: Prepare datasets
@@ -210,8 +197,10 @@ def main() -> int:
             "--lr",
             str(args.sft_lr),
         ]
-        if use_8bit:
+        if args.use_8bit:
             sft_cmd.append("--use-8bit")
+        else:
+            sft_cmd.append("--use-4bit")
         if not args.no_push and os.environ.get("HF_TOKEN"):
             sft_cmd.append("--push-to-hub")
         subprocess.run(sft_cmd, check=True)
@@ -244,8 +233,10 @@ def main() -> int:
             "--beta",
             str(args.dpo_beta),
         ]
-        if use_8bit:
+        if args.use_8bit:
             dpo_cmd.append("--use-8bit")
+        else:
+            dpo_cmd.append("--use-4bit")
         if not args.no_push and os.environ.get("HF_TOKEN"):
             dpo_cmd.append("--push-to-hub")
         subprocess.run(dpo_cmd, check=True)
