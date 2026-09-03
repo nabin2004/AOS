@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-026",
+  "conflicts": [
+    {
+      "category": "Pi Creature Library",
+      "gl_construct": "Randolph",
+      "ce_equivalent": "Requires community-maintained PiCreature class or custom SVG mobject",
+      "severity": "high"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Bubble Generation",
+      "gl_construct": "randy.get_bubble",
+      "ce_equivalent": "ThoughtBubble or SpeechBubble from manim community",
+      "severity": "high"
+    }
+  ]
+}

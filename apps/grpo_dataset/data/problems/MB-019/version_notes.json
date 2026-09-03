@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-019",
+  "conflicts": [
+    {
+      "category": "camera_control",
+      "gl_construct": "self.camera.frame",
+      "ce_equivalent": "self.camera.frame (requires inheriting from MovingCameraScene)",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_types",
+      "gl_construct": "ParametricCurve",
+      "ce_equivalent": "ParametricFunction",
+      "severity": "medium"
+    },
+    {
+      "category": "animations",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "frame_anchoring",
+      "gl_construct": "fix_in_frame()",
+      "ce_equivalent": "Adding mobjects to a separate canvas or manually updating position relative to camera",
+      "severity": "high"
+    }
+  ]
+}

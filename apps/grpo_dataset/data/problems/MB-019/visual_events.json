@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-019",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Plotting the main coordinate axes and the cubic curve with its label.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "Axes",
+        "ParametricCurve",
+        "f_of_x",
+        "ShowCreation"
+      ],
+      "clip_query": "A blue cubic curve is plotted on a set of grey coordinate axes with a label in the upper right corner."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Adding a tiny set of local axes at a specific point on the curve.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        7.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "localAxes",
+        "points_index",
+        "FadeIn"
+      ],
+      "clip_query": "A tiny, barely visible set of local axes appears on the blue curve."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The camera zooms in dramatically on the local axes, making the curve look like a straight line.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "camera.frame.animate",
+        "scale",
+        "move_to"
+      ],
+      "clip_query": "The camera zooms in extremely close to a point on the curve until the curve appears linear and the local axes fill the screen."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Micro-braces for delta x and delta f(x) are drawn and labeled.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "Brace",
+        "delta_x",
+        "delta_f_of_x",
+        "GrowFromEdge"
+      ],
+      "clip_query": "Yellow and pink braces appear showing small horizontal and vertical changes labeled delta x and delta f(x)."
+    }
+  ]
+}

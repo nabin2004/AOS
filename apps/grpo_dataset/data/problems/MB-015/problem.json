@@ -1,0 +1,70 @@
+{
+  "id": "MB-015",
+  "title": "The Natural Log Complex Mapping and Droste Effect",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Calculus",
+    "Complex Analysis",
+    "Geometry"
+  ],
+  "full_prompt": "Write a complete ManimGL script using the InteractiveScene class that visualizes the complex mapping of the natural logarithm and the exponential function, culminating in the Droste effect. \n\nYour script should:\n1. Set up two complex planes side-by-side: a z-plane on the left and a w-plane on the right, both with coordinate labels.\n2. Draw a series of vertical lines on the z-plane with a color gradient (e.g., from yellow to red) and map them to concentric circles on the w-plane using the exponential function $w = e^z$.\n3. Implement helper functions to load a textured image (`TexturedSurface` over a `Square3D`), slice it, and apply complex transformations between the two planes.\n4. Recreate the Droste effect by taking a log-transformed image, tiling it horizontally, and applying the complex exponential function to wrap it into a seamless, recursive spiral structure.\n\nEnsure all custom texture loading functions handle paths gracefully, defaulting to a placeholder or standard texture if the specific 'PiHouseLog.png' is missing.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-015/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 250,
+    "scene_classes": [
+      "TheNaturalLog"
+    ],
+    "visual_techniques": [
+      "Complex plane mapping",
+      "Textured surface deformation",
+      "Droste effect generation",
+      "UV coordinate mapping"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ComplexPlane",
+      "TexturedSurface",
+      "Square3D",
+      "apply_complex_function",
+      "set_image_coords_by_uv_func"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing texture files causing runtime crashes",
+      "severity": "high",
+      "note": "The code relies on local PNG files like 'PiHouseLog.png'. If these are missing, the script will crash unless fallback textures or mock surfaces are used."
+    },
+    {
+      "pattern": "Incompatibility of TexturedSurface with ManimCE",
+      "severity": "high",
+      "note": "TexturedSurface and Square3D are specific to ManimGL/Manim3B1B and do not exist in Manim Community (ManimCE)."
+    },
+    {
+      "pattern": "Incorrect complex mapping scaling",
+      "severity": "medium",
+      "note": "Failing to normalize coordinates relative to the source plane's origin and unit size before applying the complex function results in distorted mappings."
+    }
+  ]
+}

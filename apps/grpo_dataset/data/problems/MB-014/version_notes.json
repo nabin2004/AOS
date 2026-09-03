@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-014",
+  "conflicts": [
+    {
+      "category": "Imports",
+      "gl_construct": "manim_imports_ext",
+      "ce_equivalent": "manim",
+      "severity": "high"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject",
+      "gl_construct": "Clock",
+      "ce_equivalent": "Custom VGroup representing a clock",
+      "severity": "high"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "ClockPassesTime",
+      "ce_equivalent": "ValueTracker updating hand angles",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "cycle_animation",
+      "ce_equivalent": "AlwaysRedraw or custom updater",
+      "severity": "medium"
+    }
+  ]
+}

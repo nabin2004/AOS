@@ -1,0 +1,471 @@
+1
+00:00:11,240 --> 00:00:12,760
+Hey everyone, I've got another quick
+
+2
+00:00:12,760 --> 00:00:15,200
+footnote for you between chapters today.
+
+3
+00:00:15,200 --> 00:00:16,040
+When I've talked about linear
+
+4
+00:00:16,040 --> 00:00:17,840
+transformation so far, I've only really
+
+5
+00:00:17,840 --> 00:00:19,560
+talked about transformations from 2D
+
+6
+00:00:19,560 --> 00:00:21,840
+vectors to other 2D vectors represented
+
+7
+00:00:21,840 --> 00:00:24,600
+with 2 by 2 matrices or from 3D vectors
+
+8
+00:00:24,600 --> 00:00:27,000
+to other 3D vectors represented with 3
+
+9
+00:00:27,000 --> 00:00:29,000
+by 3 matrices.
+
+10
+00:00:29,000 --> 00:00:30,640
+But several commenters have asked about
+
+11
+00:00:30,640 --> 00:00:32,360
+non-square matrices, so I thought I'd
+
+12
+00:00:32,360 --> 00:00:33,680
+take a moment to just show what those
+
+13
+00:00:33,680 --> 00:00:35,280
+mean geometrically.
+
+14
+00:00:35,280 --> 00:00:37,040
+By now in the series, you actually have
+
+15
+00:00:37,040 --> 00:00:38,600
+most of the background you need to start
+
+16
+00:00:38,600 --> 00:00:40,120
+pondering a question like this on your
+
+17
+00:00:40,120 --> 00:00:41,640
+own, but I'll start talking through it
+
+18
+00:00:41,640 --> 00:00:44,040
+just to give a little mental momentum.
+
+19
+00:00:44,040 --> 00:00:45,640
+It's perfectly reasonable to talk about
+
+20
+00:00:45,640 --> 00:00:48,520
+transformations between dimensions, such
+
+21
+00:00:48,520 --> 00:00:50,760
+as one that takes 2D vectors to 3D
+
+22
+00:00:50,760 --> 00:00:53,280
+vectors. Again, what makes one of these
+
+23
+00:00:53,280 --> 00:00:55,200
+linear is that grid lines remain
+
+24
+00:00:55,200 --> 00:00:57,440
+parallel and evenly spaced and that the
+
+25
+00:00:57,440 --> 00:01:00,000
+origin maps to the origin.
+
+26
+00:01:00,000 --> 00:01:01,520
+What I have pictured here is the input
+
+27
+00:01:01,520 --> 00:01:03,200
+space on the left, which is just 2D
+
+28
+00:01:03,200 --> 00:01:04,839
+space, and the output of the
+
+29
+00:01:04,839 --> 00:01:06,960
+transformation shown on the right.
+
+30
+00:01:06,960 --> 00:01:08,440
+The reason I'm not showing the inputs
+
+31
+00:01:08,440 --> 00:01:10,280
+move over to the outputs like I usually
+
+32
+00:01:10,280 --> 00:01:12,840
+do is not just animation laziness. It's
+
+33
+00:01:12,840 --> 00:01:15,160
+worth emphasizing that 2D vector inputs
+
+34
+00:01:15,160 --> 00:01:17,200
+are very different animals from these 3D
+
+35
+00:01:17,200 --> 00:01:19,240
+vector outputs living in a completely
+
+36
+00:01:19,240 --> 00:01:21,720
+separate unconnected space.
+
+37
+00:01:21,720 --> 00:01:23,200
+Encoding one of these transformations
+
+38
+00:01:23,200 --> 00:01:25,440
+with a matrix is really just the same
+
+39
+00:01:25,440 --> 00:01:27,360
+thing as what we've done before. You
+
+40
+00:01:27,360 --> 00:01:29,440
+look at where each basis vector lands
+
+41
+00:01:29,440 --> 00:01:31,160
+and write the coordinates of the landing
+
+42
+00:01:31,160 --> 00:01:33,760
+spots as the columns of a matrix. For
+
+43
+00:01:33,760 --> 00:01:35,840
+example, what you're looking at here is
+
+44
+00:01:35,840 --> 00:01:37,920
+an output of a transformation that takes
+
+45
+00:01:37,920 --> 00:01:42,360
+I hat to the coordinates 2 -1 -2 and J
+
+46
+00:01:42,360 --> 00:01:47,240
+hat to the coordinates 0 1 1.
+
+47
+00:01:47,880 --> 00:01:49,800
+Notice, this means the matrix encoding
+
+48
+00:01:49,800 --> 00:01:52,200
+our transformation has three rows and
+
+49
+00:01:52,200 --> 00:01:54,160
+two columns, which to use standard
+
+50
+00:01:54,160 --> 00:01:57,760
+terminology makes it a 3 by 2 matrix.
+
+51
+00:01:57,760 --> 00:01:59,640
+In the language of last video, the
+
+52
+00:01:59,640 --> 00:02:01,920
+column space of this matrix, the place
+
+53
+00:02:01,920 --> 00:02:04,120
+where all the vectors land, is a 2D
+
+54
+00:02:04,120 --> 00:02:06,320
+plane slicing through the origin of 3D
+
+55
+00:02:06,320 --> 00:02:07,360
+space.
+
+56
+00:02:07,360 --> 00:02:09,679
+But the matrix is still full rank since
+
+57
+00:02:09,679 --> 00:02:11,560
+the number of dimensions in this column
+
+58
+00:02:11,560 --> 00:02:13,440
+space is the same as the number of
+
+59
+00:02:13,440 --> 00:02:17,400
+dimensions of the input space.
+
+60
+00:02:17,400 --> 00:02:19,360
+So, if you see a 3 by 2 matrix out in
+
+61
+00:02:19,360 --> 00:02:21,160
+the wild, you can know that it has the
+
+62
+00:02:21,160 --> 00:02:23,480
+geometric interpretation of mapping two
+
+63
+00:02:23,480 --> 00:02:26,040
+dimensions to three dimensions since the
+
+64
+00:02:26,040 --> 00:02:27,760
+two columns indicate that the input
+
+65
+00:02:27,760 --> 00:02:30,040
+space has two basis vectors and the
+
+66
+00:02:30,040 --> 00:02:32,240
+three rows indicate that the landing
+
+67
+00:02:32,240 --> 00:02:34,760
+spots for each of those basis vectors is
+
+68
+00:02:34,760 --> 00:02:36,240
+described with three separate
+
+69
+00:02:36,240 --> 00:02:37,840
+coordinates.
+
+70
+00:02:37,840 --> 00:02:40,120
+Likewise, if you see a 2 by 3 matrix
+
+71
+00:02:40,120 --> 00:02:42,200
+with two rows and three columns, what do
+
+72
+00:02:42,200 --> 00:02:43,640
+you think that means?
+
+73
+00:02:43,640 --> 00:02:45,640
+Well, the three columns indicate that
+
+74
+00:02:45,640 --> 00:02:46,960
+you're starting in a space that has
+
+75
+00:02:46,960 --> 00:02:48,880
+three basis vectors, so we're starting
+
+76
+00:02:48,880 --> 00:02:51,200
+in three dimensions. And the two rows
+
+77
+00:02:51,200 --> 00:02:53,120
+indicate that the landing spot for each
+
+78
+00:02:53,120 --> 00:02:55,120
+of those three basis vectors is
+
+79
+00:02:55,120 --> 00:02:57,600
+described with only two coordinates, so
+
+80
+00:02:57,600 --> 00:03:00,440
+they must be landing in two dimensions.
+
+81
+00:03:00,440 --> 00:03:02,920
+So, it's a transformation from 3D space
+
+82
+00:03:02,920 --> 00:03:05,400
+onto the 2D plane.
+
+83
+00:03:05,400 --> 00:03:07,200
+A transformation that should feel very
+
+84
+00:03:07,200 --> 00:03:08,800
+uncomfortable if you imagine going
+
+85
+00:03:08,800 --> 00:03:11,360
+through it.
+
+86
+00:03:13,880 --> 00:03:15,160
+You could also have a transformation
+
+87
+00:03:15,160 --> 00:03:17,800
+from two dimensions to one dimension.
+
+88
+00:03:17,800 --> 00:03:19,440
+One-dimensional space is really just the
+
+89
+00:03:19,440 --> 00:03:21,280
+number line, so a transformation like
+
+90
+00:03:21,280 --> 00:03:24,320
+this takes in 2D vectors and spits out
+
+91
+00:03:24,320 --> 00:03:25,720
+numbers.
+
+92
+00:03:25,720 --> 00:03:27,400
+Thinking about grid lines remaining
+
+93
+00:03:27,400 --> 00:03:29,160
+parallel and evenly spaced is a little
+
+94
+00:03:29,160 --> 00:03:30,560
+bit messy due to all of the
+
+95
+00:03:30,560 --> 00:03:32,480
+squishification happening here. So, in
+
+96
+00:03:32,480 --> 00:03:34,560
+this case, the visual understanding for
+
+97
+00:03:34,560 --> 00:03:36,800
+what linearity means is that if you have
+
+98
+00:03:36,800 --> 00:03:39,320
+a line of evenly spaced dots, it would
+
+99
+00:03:39,320 --> 00:03:41,360
+remain evenly spaced once they're mapped
+
+100
+00:03:41,360 --> 00:03:43,680
+onto the number line.
+
+101
+00:03:43,680 --> 00:03:45,520
+One of these transformations is encoded
+
+102
+00:03:45,520 --> 00:03:48,160
+with a 1 by 2 matrix, each of whose two
+
+103
+00:03:48,160 --> 00:03:51,080
+columns has just a single entry. The two
+
+104
+00:03:51,080 --> 00:03:52,520
+columns represent where the basis
+
+105
+00:03:52,520 --> 00:03:54,320
+vectors land and each one of those
+
+106
+00:03:54,320 --> 00:03:56,440
+columns requires just one number, the
+
+107
+00:03:56,440 --> 00:03:59,200
+number that that basis vector landed on.
+
+108
+00:03:59,200 --> 00:04:00,640
+This is actually a surprisingly
+
+109
+00:04:00,640 --> 00:04:02,520
+meaningful type of transformation with
+
+110
+00:04:02,520 --> 00:04:04,280
+close ties to the dot product and I'll
+
+111
+00:04:04,280 --> 00:04:06,280
+be talking about that next video.
+
+112
+00:04:06,280 --> 00:04:07,920
+Until then, I encourage you to play
+
+113
+00:04:07,920 --> 00:04:09,640
+around with this idea on your own
+
+114
+00:04:09,640 --> 00:04:11,000
+contemplating the meanings of things
+
+115
+00:04:11,000 --> 00:04:12,840
+like matrix multiplication and linear
+
+116
+00:04:12,840 --> 00:04:15,000
+systems of equations in the context of
+
+117
+00:04:15,000 --> 00:04:16,959
+transformations between different
+
+118
+00:04:16,959 --> 00:04:20,560
+dimensions. Have fun.

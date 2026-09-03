@@ -1,0 +1,42 @@
+{
+  "problem_id": "MB-024",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "complex logarithm mapping",
+        "complex exponential mapping",
+        "conformal mapping properties",
+        "complex scaling and rotation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "four distinct coordinate planes in 2x2 layout",
+        "nested recursive square grid",
+        "curved grid lines after non-linear mapping",
+        "arrows indicating mapping direction between planes",
+        "glowing dot at the singularity/origin"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "scale factor of 16 or similar power of 2",
+        "TAU constant for complex rotation",
+        "grid recursion depth of at least 5",
+        "resolution parameters for textured surfaces"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "subclass of InteractiveScene or Scene",
+        "custom helper function for mapping between planes",
+        "use of ComplexValueTracker or ValueTracker",
+        "proper setup and construct method separation"
+      ]
+    }
+  }
+}

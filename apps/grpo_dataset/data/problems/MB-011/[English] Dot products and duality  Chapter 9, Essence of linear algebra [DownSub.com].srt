@@ -1,0 +1,1495 @@
+1
+00:00:20,840 --> 00:00:22,200
+Traditionally, dot products are
+
+2
+00:00:22,200 --> 00:00:23,720
+something that's introduced really early
+
+3
+00:00:23,720 --> 00:00:25,480
+on in a linear algebra course, typically
+
+4
+00:00:25,480 --> 00:00:27,240
+right at the start. So, it might seem
+
+5
+00:00:27,240 --> 00:00:28,760
+strange that I've pushed them back this
+
+6
+00:00:28,760 --> 00:00:30,160
+far in the series.
+
+7
+00:00:30,160 --> 00:00:31,840
+I did this because there's a standard
+
+8
+00:00:31,840 --> 00:00:33,160
+way to introduce the topic which
+
+9
+00:00:33,160 --> 00:00:34,640
+requires nothing more than a basic
+
+10
+00:00:34,640 --> 00:00:36,680
+understanding of vectors, but a fuller
+
+11
+00:00:36,680 --> 00:00:38,120
+understanding of the role that dot
+
+12
+00:00:38,120 --> 00:00:40,120
+products play in math can only really be
+
+13
+00:00:40,120 --> 00:00:41,640
+found under the light of linear
+
+14
+00:00:41,640 --> 00:00:43,360
+transformations.
+
+15
+00:00:43,360 --> 00:00:44,880
+Before that, though, let me just briefly
+
+16
+00:00:44,880 --> 00:00:46,640
+cover the standard way that dot products
+
+17
+00:00:46,640 --> 00:00:48,520
+are introduced, which I'm assuming is at
+
+18
+00:00:48,520 --> 00:00:50,160
+least partially review for a number of
+
+19
+00:00:50,160 --> 00:00:51,240
+viewers.
+
+20
+00:00:51,240 --> 00:00:53,520
+Numerically, if you have two vectors of
+
+21
+00:00:53,520 --> 00:00:55,960
+the same dimension, two lists of numbers
+
+22
+00:00:55,960 --> 00:00:58,120
+with the same lengths, taking their dot
+
+23
+00:00:58,120 --> 00:01:00,480
+product means pairing up all of the
+
+24
+00:01:00,480 --> 00:01:02,840
+coordinates, multiplying those pairs
+
+25
+00:01:02,840 --> 00:01:06,680
+together, and adding the result.
+
+26
+00:01:06,680 --> 00:01:10,440
+So, the vector 1 2 dotted with 3 4 would
+
+27
+00:01:10,440 --> 00:01:14,520
+be 1 * 3 + 2 * 4.
+
+28
+00:01:14,520 --> 00:01:18,680
+The vector 6 2 8 3 dotted with 1 8 5 3
+
+29
+00:01:18,680 --> 00:01:24,840
+would be 6 * 1 + 2 * 8 + 8 * 5 + 3 * 3.
+
+30
+00:01:24,840 --> 00:01:27,160
+Luckily, this computation has a really
+
+31
+00:01:27,160 --> 00:01:29,480
+nice geometric interpretation. To think
+
+32
+00:01:29,480 --> 00:01:30,920
+about the dot product between two
+
+33
+00:01:30,920 --> 00:01:34,600
+vectors V and W, imagine projecting W
+
+34
+00:01:34,600 --> 00:01:36,480
+onto the line that passes through the
+
+35
+00:01:36,480 --> 00:01:38,640
+origin and the tip of V.
+
+36
+00:01:38,640 --> 00:01:39,960
+Multiplying the length of this
+
+37
+00:01:39,960 --> 00:01:42,520
+projection by the length of V, you have
+
+38
+00:01:42,520 --> 00:01:46,440
+the dot product V.W.
+
+39
+00:01:46,440 --> 00:01:48,080
+Except when this projection of W is
+
+40
+00:01:48,080 --> 00:01:49,720
+pointing in the opposite direction from
+
+41
+00:01:49,720 --> 00:01:51,560
+V, that dot product will actually be
+
+42
+00:01:51,560 --> 00:01:53,960
+negative.
+
+43
+00:01:53,960 --> 00:01:55,200
+So, when two vectors are generally
+
+44
+00:01:55,200 --> 00:01:56,760
+pointing in the same direction, their
+
+45
+00:01:56,760 --> 00:01:59,520
+dot product is positive.
+
+46
+00:01:59,520 --> 00:02:01,240
+When they're perpendicular, meaning the
+
+47
+00:02:01,240 --> 00:02:03,240
+projection of one onto the other is the
+
+48
+00:02:03,240 --> 00:02:06,000
+zero vector, their dot product is zero.
+
+49
+00:02:06,000 --> 00:02:07,360
+And if they point in generally the
+
+50
+00:02:07,360 --> 00:02:09,160
+opposite direction, their dot product is
+
+51
+00:02:09,160 --> 00:02:11,679
+negative.
+
+52
+00:02:11,720 --> 00:02:13,800
+Now, this interpretation is weirdly
+
+53
+00:02:13,800 --> 00:02:15,760
+asymmetric. It treats the two vectors
+
+54
+00:02:15,760 --> 00:02:17,440
+very differently. So, when I first
+
+55
+00:02:17,440 --> 00:02:19,320
+learned this, I was surprised that order
+
+56
+00:02:19,320 --> 00:02:21,320
+doesn't matter.
+
+57
+00:02:21,320 --> 00:02:23,959
+You could instead project V onto W,
+
+58
+00:02:23,959 --> 00:02:25,720
+multiply the length of the projected V
+
+59
+00:02:25,720 --> 00:02:27,720
+by the length of W, and get the same
+
+60
+00:02:27,720 --> 00:02:30,280
+result.
+
+61
+00:02:30,280 --> 00:02:31,840
+I mean, doesn't that feel like a really
+
+62
+00:02:31,840 --> 00:02:34,880
+different process?
+
+63
+00:02:35,480 --> 00:02:37,040
+Here's the intuition for why order
+
+64
+00:02:37,040 --> 00:02:38,480
+doesn't matter.
+
+65
+00:02:38,480 --> 00:02:40,440
+If V and W happen to have the same
+
+66
+00:02:40,440 --> 00:02:43,000
+length, we could leverage some symmetry.
+
+67
+00:02:43,000 --> 00:02:45,320
+Since projecting W onto V, then
+
+68
+00:02:45,320 --> 00:02:46,440
+multiplying the length of that
+
+69
+00:02:46,440 --> 00:02:48,680
+projection by the length of V, is a
+
+70
+00:02:48,680 --> 00:02:51,080
+complete mirror image of projecting V
+
+71
+00:02:51,080 --> 00:02:53,360
+onto W, then multiplying the length of
+
+72
+00:02:53,360 --> 00:02:57,160
+that projection by the length of W.
+
+73
+00:02:57,160 --> 00:02:59,640
+Now, if you scale one of them, say V, by
+
+74
+00:02:59,640 --> 00:03:01,560
+some constant like two, so that they
+
+75
+00:03:01,560 --> 00:03:03,920
+don't have equal length, the symmetry is
+
+76
+00:03:03,920 --> 00:03:04,959
+broken.
+
+77
+00:03:04,959 --> 00:03:06,560
+But let's think through how to interpret
+
+78
+00:03:06,560 --> 00:03:08,480
+the dot product between this new vector,
+
+79
+00:03:08,480 --> 00:03:10,920
+two times V, and W.
+
+80
+00:03:10,920 --> 00:03:12,640
+If you think of W is getting projected
+
+81
+00:03:12,640 --> 00:03:16,400
+onto V, then the dot product 2V dot W
+
+82
+00:03:16,400 --> 00:03:19,080
+will be exactly twice the dot product V
+
+83
+00:03:19,080 --> 00:03:20,360
+dot W.
+
+84
+00:03:20,360 --> 00:03:23,200
+This is because when you scale V by two,
+
+85
+00:03:23,200 --> 00:03:24,680
+it doesn't change the length of the
+
+86
+00:03:24,680 --> 00:03:27,040
+projection of W, but it doubles the
+
+87
+00:03:27,040 --> 00:03:28,519
+length of the vector that you're
+
+88
+00:03:28,519 --> 00:03:30,360
+projecting onto.
+
+89
+00:03:30,360 --> 00:03:31,720
+But on the other hand, let's say you
+
+90
+00:03:31,720 --> 00:03:33,519
+were thinking about V getting projected
+
+91
+00:03:33,519 --> 00:03:34,920
+onto W.
+
+92
+00:03:34,920 --> 00:03:36,440
+Well, in that case, the length of the
+
+93
+00:03:36,440 --> 00:03:38,280
+projection is the thing that gets scaled
+
+94
+00:03:38,280 --> 00:03:40,320
+when we multiply V by two, but the
+
+95
+00:03:40,320 --> 00:03:41,280
+length of the vector that you're
+
+96
+00:03:41,280 --> 00:03:43,720
+projecting onto stays constant. So, the
+
+97
+00:03:43,720 --> 00:03:45,840
+overall effect is still to just double
+
+98
+00:03:45,840 --> 00:03:47,640
+the dot product. So, even though
+
+99
+00:03:47,640 --> 00:03:49,600
+symmetry is broken in this case, the
+
+100
+00:03:49,600 --> 00:03:51,440
+effect that this scaling has on the
+
+101
+00:03:51,440 --> 00:03:53,720
+value of the dot product is the same
+
+102
+00:03:53,720 --> 00:03:56,760
+under both interpretations.
+
+103
+00:03:56,760 --> 00:03:58,520
+There's also one other big question that
+
+104
+00:03:58,520 --> 00:03:59,880
+confused me when I first learned this
+
+105
+00:03:59,880 --> 00:04:02,400
+stuff. Why on Earth does this numerical
+
+106
+00:04:02,400 --> 00:04:04,320
+process of matching coordinates,
+
+107
+00:04:04,320 --> 00:04:06,040
+multiplying pairs, and adding them
+
+108
+00:04:06,040 --> 00:04:08,200
+together have anything to do with
+
+109
+00:04:08,200 --> 00:04:10,840
+projection?
+
+110
+00:04:10,840 --> 00:04:13,120
+Well, to give a satisfactory answer, and
+
+111
+00:04:13,120 --> 00:04:14,480
+also to do full justice to the
+
+112
+00:04:14,480 --> 00:04:16,680
+significance of the dot product, we need
+
+113
+00:04:16,680 --> 00:04:18,200
+to unearth something a little bit deeper
+
+114
+00:04:18,200 --> 00:04:20,160
+going on here, which often goes by the
+
+115
+00:04:20,160 --> 00:04:21,959
+name duality.
+
+116
+00:04:21,959 --> 00:04:23,680
+But before getting into that, I need to
+
+117
+00:04:23,680 --> 00:04:25,280
+spend some time talking about linear
+
+118
+00:04:25,280 --> 00:04:27,680
+transformations from multiple dimensions
+
+119
+00:04:27,680 --> 00:04:29,360
+to one dimension, which is just the
+
+120
+00:04:29,360 --> 00:04:32,000
+number line.
+
+121
+00:04:32,520 --> 00:04:34,160
+These are functions that take in a 2D
+
+122
+00:04:34,160 --> 00:04:36,280
+vector and spit out some number. But
+
+123
+00:04:36,280 --> 00:04:38,080
+linear transformations are of course
+
+124
+00:04:38,080 --> 00:04:39,360
+much more restricted than your
+
+125
+00:04:39,360 --> 00:04:41,320
+run-of-the-mill function with a 2D input
+
+126
+00:04:41,320 --> 00:04:44,040
+and a 1D output. As with transformations
+
+127
+00:04:44,040 --> 00:04:45,560
+in higher dimensions, like the ones I
+
+128
+00:04:45,560 --> 00:04:47,440
+talked about in chapter three, there are
+
+129
+00:04:47,440 --> 00:04:49,000
+some formal properties that make these
+
+130
+00:04:49,000 --> 00:04:50,680
+functions linear. But I'm going to
+
+131
+00:04:50,680 --> 00:04:52,560
+purposely ignore those here so as to not
+
+132
+00:04:52,560 --> 00:04:54,560
+distract from our end goal, and instead
+
+133
+00:04:54,560 --> 00:04:56,480
+focus on a certain visual property
+
+134
+00:04:56,480 --> 00:04:57,760
+that's equivalent to all the formal
+
+135
+00:04:57,760 --> 00:04:59,000
+stuff.
+
+136
+00:04:59,000 --> 00:05:02,040
+If you take a line of evenly spaced dots
+
+137
+00:05:02,040 --> 00:05:04,240
+and apply a transformation,
+
+138
+00:05:04,240 --> 00:05:06,640
+a linear transformation will keep those
+
+139
+00:05:06,640 --> 00:05:09,120
+dots evenly spaced once they land in the
+
+140
+00:05:09,120 --> 00:05:12,160
+output space, which is the number line.
+
+141
+00:05:12,160 --> 00:05:14,000
+Otherwise, if there's some line of dots
+
+142
+00:05:14,000 --> 00:05:15,720
+that gets unevenly spaced, then your
+
+143
+00:05:15,720 --> 00:05:19,160
+transformation is not linear.
+
+144
+00:05:19,200 --> 00:05:21,280
+As with the cases we've seen before, one
+
+145
+00:05:21,280 --> 00:05:23,160
+of these linear transformations is
+
+146
+00:05:23,160 --> 00:05:25,080
+completely determined by where it takes
+
+147
+00:05:25,080 --> 00:05:27,800
+i-hat and j-hat. But this time, each one
+
+148
+00:05:27,800 --> 00:05:29,680
+of those basis vectors just lands on a
+
+149
+00:05:29,680 --> 00:05:31,720
+number. So, when we record where they
+
+150
+00:05:31,720 --> 00:05:34,480
+land as the columns of a matrix, each of
+
+151
+00:05:34,480 --> 00:05:38,280
+those columns just has a single number.
+
+152
+00:05:38,280 --> 00:05:41,680
+This is a 1 by 2 matrix.
+
+153
+00:05:41,680 --> 00:05:43,160
+Let's walk through an example of what it
+
+154
+00:05:43,160 --> 00:05:44,280
+means to apply one of these
+
+155
+00:05:44,280 --> 00:05:46,560
+transformations to a vector. Let's say
+
+156
+00:05:46,560 --> 00:05:48,080
+you have a linear transformation that
+
+157
+00:05:48,080 --> 00:05:52,400
+takes I hat to 1 and J hat to -2.
+
+158
+00:05:52,400 --> 00:05:53,640
+To follow where a vector with
+
+159
+00:05:53,640 --> 00:05:57,040
+coordinates, say 4 3, ends up, think of
+
+160
+00:05:57,040 --> 00:06:00,200
+breaking up this vector as 4 * I hat + 3
+
+161
+00:06:00,200 --> 00:06:01,760
+* J hat.
+
+162
+00:06:01,760 --> 00:06:04,040
+A consequence of linearity is that after
+
+163
+00:06:04,040 --> 00:06:06,520
+the transformation, the vector will be 4
+
+164
+00:06:06,520 --> 00:06:10,040
+* the place where I hat lands, 1, + 3 *
+
+165
+00:06:10,040 --> 00:06:12,840
+the place where J hat lands, -2,
+
+166
+00:06:12,840 --> 00:06:14,400
+which in this case implies that it lands
+
+167
+00:06:14,400 --> 00:06:17,360
+on -2.
+
+168
+00:06:18,080 --> 00:06:19,680
+When you do this calculation purely
+
+169
+00:06:19,680 --> 00:06:21,600
+numerically, it's matrix-vector
+
+170
+00:06:21,600 --> 00:06:24,480
+multiplication.
+
+171
+00:06:26,000 --> 00:06:27,760
+Now, this numerical operation of
+
+172
+00:06:27,760 --> 00:06:30,480
+multiplying a 1x2 matrix by a vector
+
+173
+00:06:30,480 --> 00:06:32,120
+feels just like taking the dot product
+
+174
+00:06:32,120 --> 00:06:34,640
+of two vectors. Doesn't that 1x2 matrix
+
+175
+00:06:34,640 --> 00:06:36,200
+just look like a vector that we tipped
+
+176
+00:06:36,200 --> 00:06:37,919
+on its side?
+
+177
+00:06:37,919 --> 00:06:39,280
+In fact, we could say right now that
+
+178
+00:06:39,280 --> 00:06:41,720
+there's a nice association between 1x2
+
+179
+00:06:41,720 --> 00:06:44,440
+matrices and 2D vectors defined by
+
+180
+00:06:44,440 --> 00:06:46,360
+tilting the numerical representation of
+
+181
+00:06:46,360 --> 00:06:48,080
+a vector on its side to get the
+
+182
+00:06:48,080 --> 00:06:50,640
+associated matrix, or to tip the matrix
+
+183
+00:06:50,640 --> 00:06:53,480
+back up to get the associated vector.
+
+184
+00:06:53,480 --> 00:06:54,840
+Since we're just looking at numerical
+
+185
+00:06:54,840 --> 00:06:56,720
+expressions right now, going back and
+
+186
+00:06:56,720 --> 00:06:59,240
+forth between vectors and 1x2 matrices
+
+187
+00:06:59,240 --> 00:07:01,720
+might feel like a silly thing to do.
+
+188
+00:07:01,720 --> 00:07:03,520
+But this suggests something that's truly
+
+189
+00:07:03,520 --> 00:07:05,800
+awesome from the geometric view. There's
+
+190
+00:07:05,800 --> 00:07:07,720
+some kind of connection between linear
+
+191
+00:07:07,720 --> 00:07:09,400
+transformations that take vectors to
+
+192
+00:07:09,400 --> 00:07:13,840
+numbers and vectors themselves.
+
+193
+00:07:15,480 --> 00:07:16,880
+Let me show an example that clarifies
+
+194
+00:07:16,880 --> 00:07:18,680
+the significance, and which just so
+
+195
+00:07:18,680 --> 00:07:20,400
+happens to also answer the dot product
+
+196
+00:07:20,400 --> 00:07:22,000
+puzzle from earlier.
+
+197
+00:07:22,000 --> 00:07:23,560
+Unlearn what you have learned, and
+
+198
+00:07:23,560 --> 00:07:25,280
+imagine that you don't already know that
+
+199
+00:07:25,280 --> 00:07:29,040
+the dot product relates to projection.
+
+200
+00:07:29,040 --> 00:07:30,760
+What I'm going to do here is take a copy
+
+201
+00:07:30,760 --> 00:07:32,320
+of the number line and place it
+
+202
+00:07:32,320 --> 00:07:34,440
+diagonally in space somehow, with the
+
+203
+00:07:34,440 --> 00:07:36,800
+number zero sitting at the origin.
+
+204
+00:07:36,800 --> 00:07:38,400
+Now, think of the two-dimensional unit
+
+205
+00:07:38,400 --> 00:07:40,560
+vector whose tip sits where the number
+
+206
+00:07:40,560 --> 00:07:42,720
+one on the number line is. I want to
+
+207
+00:07:42,720 --> 00:07:45,680
+give that guy a name, u hat.
+
+208
+00:07:45,680 --> 00:07:47,200
+This little guy plays an important role
+
+209
+00:07:47,200 --> 00:07:48,920
+in what's about to happen, so just keep
+
+210
+00:07:48,920 --> 00:07:51,000
+him in the back of your mind.
+
+211
+00:07:51,000 --> 00:07:53,400
+If we project 2D vectors straight onto
+
+212
+00:07:53,400 --> 00:07:55,680
+this diagonal number line, in effect,
+
+213
+00:07:55,680 --> 00:07:57,440
+we've just defined a function that takes
+
+214
+00:07:57,440 --> 00:07:59,600
+2D vectors to numbers.
+
+215
+00:07:59,600 --> 00:08:01,280
+What's more, this function is actually
+
+216
+00:08:01,280 --> 00:08:03,800
+linear since it passes our visual test
+
+217
+00:08:03,800 --> 00:08:06,200
+that any line of evenly spaced dots
+
+218
+00:08:06,200 --> 00:08:08,240
+remains evenly spaced once it lands on
+
+219
+00:08:08,240 --> 00:08:10,960
+the number line.
+
+220
+00:08:11,840 --> 00:08:13,480
+Just to be clear, even though I've
+
+221
+00:08:13,480 --> 00:08:15,600
+embedded the number line in 2D space
+
+222
+00:08:15,600 --> 00:08:17,400
+like this, the outputs of the function
+
+223
+00:08:17,400 --> 00:08:19,880
+are numbers, not 2D vectors.
+
+224
+00:08:19,880 --> 00:08:20,840
+You should think of a function that
+
+225
+00:08:20,840 --> 00:08:22,760
+takes in two coordinates and outputs a
+
+226
+00:08:22,760 --> 00:08:25,000
+single coordinate.
+
+227
+00:08:25,000 --> 00:08:26,560
+But that vector u hat is a
+
+228
+00:08:26,560 --> 00:08:28,240
+two-dimensional vector living in the
+
+229
+00:08:28,240 --> 00:08:30,600
+input space. It's just situated in such
+
+230
+00:08:30,600 --> 00:08:32,320
+a way that overlaps with the embedding
+
+231
+00:08:32,320 --> 00:08:34,599
+of the number line.
+
+232
+00:08:34,599 --> 00:08:36,640
+With this projection, we just defined a
+
+233
+00:08:36,640 --> 00:08:39,200
+linear transformation from 2D vectors to
+
+234
+00:08:39,200 --> 00:08:40,960
+numbers. So, we're going to be able to
+
+235
+00:08:40,960 --> 00:08:43,159
+find some kind of 1 by 2 matrix that
+
+236
+00:08:43,159 --> 00:08:45,440
+describes that transformation.
+
+237
+00:08:45,440 --> 00:08:47,800
+To find that 1 by 2 matrix, let's zoom
+
+238
+00:08:47,800 --> 00:08:49,960
+in on this diagonal number line setup
+
+239
+00:08:49,960 --> 00:08:52,440
+and think about where i hat and j hat
+
+240
+00:08:52,440 --> 00:08:54,600
+each land since those landing spots are
+
+241
+00:08:54,600 --> 00:08:58,480
+going to be the columns of the matrix.
+
+242
+00:08:58,560 --> 00:09:00,120
+This part's super cool. We can reason
+
+243
+00:09:00,120 --> 00:09:01,800
+through it with a really elegant piece
+
+244
+00:09:01,800 --> 00:09:04,560
+of symmetry. Since i hat and u hat are
+
+245
+00:09:04,560 --> 00:09:07,280
+both unit vectors, projecting i hat onto
+
+246
+00:09:07,280 --> 00:09:09,440
+the line passing through u hat looks
+
+247
+00:09:09,440 --> 00:09:11,960
+totally symmetric to projecting u hat
+
+248
+00:09:11,960 --> 00:09:13,720
+onto the x-axis.
+
+249
+00:09:13,720 --> 00:09:15,440
+So, when we ask what number does i hat
+
+250
+00:09:15,440 --> 00:09:17,480
+land on when it gets projected, the
+
+251
+00:09:17,480 --> 00:09:18,839
+answer's going to be the same as
+
+252
+00:09:18,839 --> 00:09:20,760
+whatever u hat lands on when it's
+
+253
+00:09:20,760 --> 00:09:22,839
+projected onto the x-axis.
+
+254
+00:09:22,839 --> 00:09:25,720
+But projecting u hat onto the x-axis
+
+255
+00:09:25,720 --> 00:09:28,160
+just means taking the x-coordinate of u
+
+256
+00:09:28,160 --> 00:09:31,000
+hat. So, by symmetry, the number where i
+
+257
+00:09:31,000 --> 00:09:32,960
+hat lands when it's projected onto that
+
+258
+00:09:32,960 --> 00:09:35,000
+diagonal number line is going to be the
+
+259
+00:09:35,000 --> 00:09:39,200
+x-coordinate of u hat. Isn't that cool?
+
+260
+00:09:39,200 --> 00:09:40,920
+The reasoning is almost identical for
+
+261
+00:09:40,920 --> 00:09:42,720
+the j hat case. Think about it for a
+
+262
+00:09:42,720 --> 00:09:45,280
+moment.
+
+263
+00:09:49,320 --> 00:09:51,160
+For all the same reasons, the y
+
+264
+00:09:51,160 --> 00:09:53,200
+coordinate of u hat gives us the number
+
+265
+00:09:53,200 --> 00:09:55,320
+where j hat lands when it's projected
+
+266
+00:09:55,320 --> 00:09:57,480
+onto the number line copy.
+
+267
+00:09:57,480 --> 00:09:58,760
+Pause and ponder that for a moment. I
+
+268
+00:09:58,760 --> 00:10:01,000
+just think that's really cool.
+
+269
+00:10:01,000 --> 00:10:02,800
+So, the entries of the 1 by 2 matrix
+
+270
+00:10:02,800 --> 00:10:05,040
+describing the projection transformation
+
+271
+00:10:05,040 --> 00:10:06,960
+are going to be the coordinates of u
+
+272
+00:10:06,960 --> 00:10:07,840
+hat.
+
+273
+00:10:07,840 --> 00:10:09,280
+And computing this projection
+
+274
+00:10:09,280 --> 00:10:11,200
+transformation for arbitrary vectors in
+
+275
+00:10:11,200 --> 00:10:13,280
+space, which requires multiplying that
+
+276
+00:10:13,280 --> 00:10:15,240
+matrix by those vectors, is
+
+277
+00:10:15,240 --> 00:10:17,640
+computationally identical to taking a
+
+278
+00:10:17,640 --> 00:10:20,920
+dot product with u hat.
+
+279
+00:10:21,760 --> 00:10:23,880
+This is why taking the dot product with
+
+280
+00:10:23,880 --> 00:10:25,920
+a unit vector can be interpreted as
+
+281
+00:10:25,920 --> 00:10:28,400
+projecting a vector onto the span of
+
+282
+00:10:28,400 --> 00:10:32,560
+that unit vector and taking the length.
+
+283
+00:10:34,160 --> 00:10:36,320
+So, what about non-unit vectors? For
+
+284
+00:10:36,320 --> 00:10:37,840
+example, let's say we take that unit
+
+285
+00:10:37,840 --> 00:10:39,760
+vector u hat, but we scale it up by a
+
+286
+00:10:39,760 --> 00:10:41,200
+factor of three.
+
+287
+00:10:41,200 --> 00:10:43,400
+Numerically, each of its components gets
+
+288
+00:10:43,400 --> 00:10:45,520
+multiplied by three. So, looking at the
+
+289
+00:10:45,520 --> 00:10:47,960
+matrix associated with that vector, it
+
+290
+00:10:47,960 --> 00:10:50,920
+takes i hat and j hat to three times the
+
+291
+00:10:50,920 --> 00:10:54,440
+values where they landed before.
+
+292
+00:10:55,480 --> 00:10:57,480
+Since this is all linear, it implies
+
+293
+00:10:57,480 --> 00:10:59,640
+more generally that the new matrix can
+
+294
+00:10:59,640 --> 00:11:01,600
+be interpreted as projecting any vector
+
+295
+00:11:01,600 --> 00:11:03,120
+onto the number line copy and
+
+296
+00:11:03,120 --> 00:11:05,240
+multiplying where it lands by three.
+
+297
+00:11:05,240 --> 00:11:07,000
+This is why the dot product with a
+
+298
+00:11:07,000 --> 00:11:09,480
+non-unit vector can be interpreted as
+
+299
+00:11:09,480 --> 00:11:11,720
+first projecting onto that vector, then
+
+300
+00:11:11,720 --> 00:11:13,720
+scaling up the length of that projection
+
+301
+00:11:13,720 --> 00:11:16,960
+by the length of the vector.
+
+302
+00:11:17,760 --> 00:11:18,880
+Take a moment to think about what
+
+303
+00:11:18,880 --> 00:11:20,560
+happened here. We had a linear
+
+304
+00:11:20,560 --> 00:11:22,320
+transformation from 2D space to the
+
+305
+00:11:22,320 --> 00:11:24,240
+number line, which was not defined in
+
+306
+00:11:24,240 --> 00:11:26,120
+terms of numerical vectors or numerical
+
+307
+00:11:26,120 --> 00:11:27,880
+dot products. It was just defined by
+
+308
+00:11:27,880 --> 00:11:30,080
+projecting space onto a diagonal copy of
+
+309
+00:11:30,080 --> 00:11:31,520
+the number line.
+
+310
+00:11:31,520 --> 00:11:32,840
+But because the transformation is
+
+311
+00:11:32,840 --> 00:11:35,560
+linear, it was necessarily described by
+
+312
+00:11:35,560 --> 00:11:37,560
+some 1 by 2 matrix. And since
+
+313
+00:11:37,560 --> 00:11:39,680
+multiplying a 1 by 2 matrix by a 2D
+
+314
+00:11:39,680 --> 00:11:41,480
+vector is the same as turning that
+
+315
+00:11:41,480 --> 00:11:43,040
+matrix on its side and taking a dot
+
+316
+00:11:43,040 --> 00:11:45,080
+product, this transformation was
+
+317
+00:11:45,080 --> 00:11:49,720
+inescapably related to some 2D vector.
+
+318
+00:11:49,720 --> 00:11:51,680
+The lesson here is that anytime you have
+
+319
+00:11:51,680 --> 00:11:53,600
+one of these linear transformations
+
+320
+00:11:53,600 --> 00:11:55,720
+whose output space is the number line,
+
+321
+00:11:55,720 --> 00:11:57,440
+no matter how it was defined, there's
+
+322
+00:11:57,440 --> 00:11:59,400
+going to be some unique vector V
+
+323
+00:11:59,400 --> 00:12:01,480
+corresponding to that transformation in
+
+324
+00:12:01,480 --> 00:12:02,480
+the sense that applying the
+
+325
+00:12:02,480 --> 00:12:04,280
+transformation is the same thing as
+
+326
+00:12:04,280 --> 00:12:08,360
+taking a dot product with that vector.
+
+327
+00:12:09,880 --> 00:12:12,760
+To me, this is utterly beautiful.
+
+328
+00:12:12,760 --> 00:12:14,120
+It's an example of something in math
+
+329
+00:12:14,120 --> 00:12:16,120
+called duality.
+
+330
+00:12:16,120 --> 00:12:18,320
+Duality shows up in many different ways
+
+331
+00:12:18,320 --> 00:12:20,200
+and forms throughout math, and it's
+
+332
+00:12:20,200 --> 00:12:22,920
+super tricky to actually define. Loosely
+
+333
+00:12:22,920 --> 00:12:24,840
+speaking, it refers to situations where
+
+334
+00:12:24,840 --> 00:12:26,880
+you have a natural but surprising
+
+335
+00:12:26,880 --> 00:12:29,160
+correspondence between two types of
+
+336
+00:12:29,160 --> 00:12:31,000
+mathematical thing.
+
+337
+00:12:31,000 --> 00:12:32,240
+For the linear algebra case that you
+
+338
+00:12:32,240 --> 00:12:34,000
+just learned about, you'd say that the
+
+339
+00:12:34,000 --> 00:12:36,080
+dual of a vector is the linear
+
+340
+00:12:36,080 --> 00:12:38,640
+transformation that it encodes.
+
+341
+00:12:38,640 --> 00:12:40,520
+And the dual of a linear transformation
+
+342
+00:12:40,520 --> 00:12:42,760
+from some space to one dimension is a
+
+343
+00:12:42,760 --> 00:12:46,680
+certain vector in that space.
+
+344
+00:12:47,040 --> 00:12:49,120
+So, to sum up, on the surface, the dot
+
+345
+00:12:49,120 --> 00:12:51,560
+product is a very useful geometric tool
+
+346
+00:12:51,560 --> 00:12:53,400
+for understanding projections and for
+
+347
+00:12:53,400 --> 00:12:55,040
+testing whether or not vectors tend to
+
+348
+00:12:55,040 --> 00:12:57,120
+point in the same direction. And that's
+
+349
+00:12:57,120 --> 00:12:58,880
+probably the most important thing for
+
+350
+00:12:58,880 --> 00:13:01,240
+you to remember about the dot product.
+
+351
+00:13:01,240 --> 00:13:03,240
+But, at a deeper level, dotting two
+
+352
+00:13:03,240 --> 00:13:05,480
+vectors together is a way to translate
+
+353
+00:13:05,480 --> 00:13:06,880
+one of them into the world of
+
+354
+00:13:06,880 --> 00:13:08,400
+transformations.
+
+355
+00:13:08,400 --> 00:13:10,280
+Again, numerically, this might feel like
+
+356
+00:13:10,280 --> 00:13:12,360
+a silly point to emphasize. It's just
+
+357
+00:13:12,360 --> 00:13:14,000
+two computations that happen to look
+
+358
+00:13:14,000 --> 00:13:16,040
+similar. But, the reason I find this so
+
+359
+00:13:16,040 --> 00:13:18,200
+important is that throughout math, when
+
+360
+00:13:18,200 --> 00:13:20,040
+you're dealing with a vector, once you
+
+361
+00:13:20,040 --> 00:13:22,080
+really get to know its personality,
+
+362
+00:13:22,080 --> 00:13:23,760
+sometimes you realize that it's easier
+
+363
+00:13:23,760 --> 00:13:25,800
+to understand it not as an arrow in
+
+364
+00:13:25,800 --> 00:13:28,880
+space, but as the physical embodiment of
+
+365
+00:13:28,880 --> 00:13:31,160
+a linear transformation. It's as if the
+
+366
+00:13:31,160 --> 00:13:32,840
+vector is really just a conceptual
+
+367
+00:13:32,840 --> 00:13:35,400
+shorthand for a certain transformation,
+
+368
+00:13:35,400 --> 00:13:37,120
+since it's easier for us to think about
+
+369
+00:13:37,120 --> 00:13:39,560
+arrows in space rather than moving all
+
+370
+00:13:39,560 --> 00:13:42,960
+of that space to the number line.
+
+371
+00:13:42,960 --> 00:13:44,600
+In the next video, you'll see another
+
+372
+00:13:44,600 --> 00:13:46,840
+really cool example of this duality in
+
+373
+00:13:46,840 --> 00:13:48,640
+action as I talk about the cross
+
+374
+00:13:48,640 --> 00:13:51,320
+product.

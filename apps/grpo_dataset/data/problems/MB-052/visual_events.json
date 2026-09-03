@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-052",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Timeline initialization with BCE labels formatted and camera positioned at -175",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "NumberLine",
+        "add_numbers",
+        "BCE",
+        "frame"
+      ],
+      "clip_query": "A horizontal timeline showing negative numbers labeled with BCE"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Aristotle's lifespan line and label fade in",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "Aristotle",
+        "FadeIn",
+        "character_labels"
+      ],
+      "clip_query": "Aristotle's name and lifespan line appearing on the timeline"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Eratosthenes' lifespan, label, and portrait fade in while the camera frame expands",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "Eratosthenes",
+        "FadeIn",
+        "frame.animate.set_height"
+      ],
+      "clip_query": "Eratosthenes' portrait and lifespan line appearing with camera zooming out"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Aristarchus' lifespan fades in while Eratosthenes' portrait fades out",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "Aristarchus",
+        "FadeOut",
+        "images"
+      ],
+      "clip_query": "Aristarchus' name appearing while Eratosthenes' portrait disappears"
+    }
+  ]
+}

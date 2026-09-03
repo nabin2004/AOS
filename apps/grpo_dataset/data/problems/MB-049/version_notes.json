@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-049",
+  "conflicts": [
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient(phi, theta, gamma, target, focal_distance)",
+      "ce_equivalent": "self.set_camera_orientation(phi=..., theta=..., distance=...)",
+      "severity": "high"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with custom glow using multiple overlapping transparent circles or PMobject",
+      "severity": "medium"
+    },
+    {
+      "category": "3D Rendering",
+      "gl_construct": "SurfaceMesh",
+      "ce_equivalent": "Surface(..., show_vector=True) or custom grid lines using ParametricFunction",
+      "severity": "high"
+    },
+    {
+      "category": "Depth Sorting",
+      "gl_construct": "mobject.always_sort_to_camera(self.camera)",
+      "ce_equivalent": "Not directly available; CE relies on default three-d renderer sorting which can sometimes cause transparency artifacts",
+      "severity": "medium"
+    }
+  ]
+}

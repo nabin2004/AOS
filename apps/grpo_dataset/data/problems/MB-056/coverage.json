@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-056",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Ket notation |\\rangle",
+        "Bitstring representation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "GlowDot animation along wires",
+        "Dynamic gate highlighting via updater",
+        "Teal surrounding rectangle"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "4-qubit circuit",
+        "25 repetitions of execution"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene usage",
+        "Custom Ket and BitString VGroup subclasses",
+        "Updater-based animation"
+      ]
+    }
+  }
+}

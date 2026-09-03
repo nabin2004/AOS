@@ -1,0 +1,65 @@
+{
+  "id": "MB-001",
+  "title": "Robot Encodings and Cross Entropy Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Computer Science",
+    "ML",
+    "Calculus"
+  ],
+  "full_prompt": "Create a Manim visualization demonstrating the concept of cross-entropy and information theory using a robot encoding metaphor. Implement a custom `EntropyChart` class inheriting from `VGroup`. This class must visualize a probability distribution as a horizontal stacked bar (using a custom or simulated `StackedProbDistribution`) where each segment's width corresponds to its probability. Above each segment, draw a vertical bar whose height represents the information content of that event, calculated as $-\\log_2(p_i)$ bits. Use `ValueTracker`s to drive the probabilities dynamically, ensuring that as the probability of a segment changes, both its horizontal width and the height of its corresponding vertical information bar update smoothly in real-time. Include a vertical axis with reference lines and labels indicating the information content in bits. The colors of the vertical bars should interpolate smoothly across a gradient (e.g., from blue to teal).",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-001/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 350,
+    "scene_classes": [
+      "RobotEncodings"
+    ],
+    "visual_techniques": [
+      "Dynamic bar charts",
+      "ValueTracker-driven updates",
+      "Stacked probability distributions",
+      "Custom mathematical labels"
+    ],
+    "manim_api_patterns": [
+      "ValueTracker",
+      "add_updater",
+      "StackedProbDistribution",
+      "interpolate_color",
+      "Rectangle",
+      "VGroup"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community StackedProbDistribution which might not exist or have different parameters",
+      "severity": "high",
+      "note": "Ensure StackedProbDistribution is either custom-implemented using standard Rectangles or correctly imported from manim_imports_ext"
+    },
+    {
+      "pattern": "ValueTracker updater syntax mismatch between ManimGL and ManimCE",
+      "severity": "medium",
+      "note": "ManimGL uses inline updaters or add_updater(lambda m: ...) which can behave differently in CE if not handled carefully"
+    }
+  ]
+}

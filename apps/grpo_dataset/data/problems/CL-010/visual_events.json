@@ -1,0 +1,204 @@
+{
+  "problem_id": "CL-010",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Second derivative shown as rate of change of slope (curvature)",
+      "weight": 0.0638,
+      "critical": false,
+      "expected_time_range": [
+        0.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "second_derivative",
+        "slope",
+        "curvature",
+        "concave"
+      ],
+      "clip_query": "graphs showing positive and negative curvature"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Position-velocity-acceleration-jerk analogy",
+      "weight": 0.0638,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "position",
+        "velocity",
+        "acceleration",
+        "jerk"
+      ],
+      "clip_query": "car motion graphs showing derivatives"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Constant term approximation for cos(x) at x=0",
+      "weight": 0.0851,
+      "critical": true,
+      "expected_time_range": [
+        14.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "Taylor",
+        "constant",
+        "cos(0)",
+        "approximation"
+      ],
+      "clip_query": "horizontal line at y=1 approximating cosine"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Adding linear term to match slope at 0",
+      "weight": 0.0851,
+      "critical": true,
+      "expected_time_range": [
+        22.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "linear",
+        "derivative",
+        "slope",
+        "tangent"
+      ],
+      "clip_query": "tangent line approximation to cosine"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Adding quadratic term to match curvature at 0",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        30.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "quadratic",
+        "second_derivative",
+        "curvature"
+      ],
+      "clip_query": "parabola matching cosine curvature"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "Cubic and quartic terms improve approximation",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        40.0,
+        52.0
+      ],
+      "keyword_bank": [
+        "cubic",
+        "quartic",
+        "Taylor_polynomial"
+      ],
+      "clip_query": "higher-degree polynomials getting closer to cosine"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Factorial denominators from repeated differentiation",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        52.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "factorial",
+        "derivative",
+        "x^n"
+      ],
+      "clip_query": "derivative of monomial showing factorial coefficients"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "Taylor polynomial formula: P(x) = \u03a3 f^(n)(a)/n! \u00b7 (x-a)^n",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        60.0,
+        68.0
+      ],
+      "keyword_bank": [
+        "Taylor_polynomial",
+        "formula",
+        "f^(n)",
+        "n!"
+      ],
+      "clip_query": "Taylor polynomial formula appearing"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Taylor series as infinite sum for cosine",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        68.0,
+        76.0
+      ],
+      "keyword_bank": [
+        "Taylor_series",
+        "infinite",
+        "sum",
+        "cos"
+      ],
+      "clip_query": "infinite series for cosine appearing"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "e^x series converges for all x",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        76.0,
+        84.0
+      ],
+      "keyword_bank": [
+        "convergence",
+        "e^x",
+        "all_x"
+      ],
+      "clip_query": "exponential graph with improving approximations"
+    },
+    {
+      "event_id": "ev_11",
+      "description": "ln(x) series diverges beyond radius 1",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        84.0,
+        92.0
+      ],
+      "keyword_bank": [
+        "divergence",
+        "radius",
+        "convergence",
+        "ln(x)"
+      ],
+      "clip_query": "ln(x) approximations diverging beyond x=2"
+    },
+    {
+      "event_id": "ev_12",
+      "description": "Radius of convergence labeled",
+      "weight": 0.0639,
+      "critical": false,
+      "expected_time_range": [
+        92.0,
+        98.0
+      ],
+      "keyword_bank": [
+        "radius",
+        "convergence",
+        "interval"
+      ],
+      "clip_query": "radius of convergence shown"
+    }
+  ]
+}

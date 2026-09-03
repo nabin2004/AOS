@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-001",
+  "conflicts": [
+    {
+      "category": "API Mismatch",
+      "gl_construct": "StackedProbDistribution",
+      "ce_equivalent": "Custom VGroup of Rectangles with width proportional to probabilities",
+      "severity": "high"
+    },
+    {
+      "category": "Updater Syntax",
+      "gl_construct": "m.add_updater(update_segments)",
+      "ce_equivalent": "m.add_updater(lambda mob: mob.set_distribution(...))",
+      "severity": "medium"
+    }
+  ]
+}

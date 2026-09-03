@@ -1,0 +1,17 @@
+{
+  "problem_id": "DE-001",
+  "conflicts": [
+    {
+      "category": "Mobject Creation",
+      "gl_construct": "Tex",
+      "ce_equivalent": "MathTex",
+      "severity": "medium"
+    },
+    {
+      "category": "Color Specifications",
+      "gl_construct": "COLOR",
+      "ce_equivalent": "VMobject.set_color()",
+      "severity": "low"
+    }
+  ]
+}

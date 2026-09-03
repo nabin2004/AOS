@@ -1,0 +1,182 @@
+{
+  "problem_id": "CL-004",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Graphs of sine(x) and x\u00b2 shown with vertical bars representing their heights at x=0.5",
+      "weight": 0.0833,
+      "critical": false,
+      "expected_time_range": [
+        0.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "FunctionGraph",
+        "sine",
+        "x\u00b2",
+        "vertical_line",
+        "bar"
+      ],
+      "clip_query": "two graphs with vertical bars indicating heights"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Sum rule shown: stacked vertical bars representing the sum of the two functions",
+      "weight": 0.1042,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "sum",
+        "stacked",
+        "vertical_line",
+        "height",
+        "derivative"
+      ],
+      "clip_query": "vertical bars stacked on top of each other showing sum"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Nudge by dx shown, with d(sin) and d(x\u00b2) labeled as changes in heights",
+      "weight": 0.1042,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "dx",
+        "d(sin)",
+        "d(x\u00b2)",
+        "nudge",
+        "change"
+      ],
+      "clip_query": "bars showing small changes with d(sin) and d(x\u00b2) labels"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Derivative of sum derived: df/dx = cos(x) + 2x",
+      "weight": 0.0625,
+      "critical": false,
+      "expected_time_range": [
+        30.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "sum_rule",
+        "derivative",
+        "cos(x)",
+        "2x",
+        "equation"
+      ],
+      "clip_query": "equation showing derivative of sum equals sum of derivatives"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Product rule introduced with adjustable box, side lengths = sine(x) and x\u00b2",
+      "weight": 0.1042,
+      "critical": true,
+      "expected_time_range": [
+        35.0,
+        48.0
+      ],
+      "keyword_bank": [
+        "rectangle",
+        "area",
+        "product",
+        "sine",
+        "x\u00b2"
+      ],
+      "clip_query": "adjustable box with side lengths labeled as functions"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "Nudge by dx showing three new area pieces: bottom rectangle, side rectangle, corner square",
+      "weight": 0.125,
+      "critical": true,
+      "expected_time_range": [
+        48.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "df",
+        "d(sin)",
+        "d(x\u00b2)",
+        "rectangle",
+        "area"
+      ],
+      "clip_query": "box expanding with highlighted area pieces"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Product rule derived: d(f\u00b7g) = f\u00b7dg + g\u00b7df",
+      "weight": 0.0833,
+      "critical": false,
+      "expected_time_range": [
+        60.0,
+        68.0
+      ],
+      "keyword_bank": [
+        "product_rule",
+        "left d right",
+        "right d left"
+      ],
+      "clip_query": "equation showing product rule with mnemonics"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "Chain rule introduced with three number lines: x \u2192 x\u00b2 \u2192 sin(x\u00b2)",
+      "weight": 0.1042,
+      "critical": true,
+      "expected_time_range": [
+        68.0,
+        80.0
+      ],
+      "keyword_bank": [
+        "number_line",
+        "composition",
+        "x\u00b2",
+        "sin",
+        "chain"
+      ],
+      "clip_query": "three number lines showing values moving in sequence"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Nudge dx propagates through layers: dx \u2192 d(x\u00b2) = dh \u2192 d(sin(h))",
+      "weight": 0.125,
+      "critical": true,
+      "expected_time_range": [
+        80.0,
+        92.0
+      ],
+      "keyword_bank": [
+        "dx",
+        "dh",
+        "d(sin)",
+        "propagation",
+        "nudge"
+      ],
+      "clip_query": "nudges propagating through three number lines"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Chain rule derived: d(g(h))/dx = dg/dh \u00b7 dh/dx with dh cancellation",
+      "weight": 0.1041,
+      "critical": false,
+      "expected_time_range": [
+        92.0,
+        100.0
+      ],
+      "keyword_bank": [
+        "chain_rule",
+        "dh",
+        "cancellation",
+        "composition"
+      ],
+      "clip_query": "chain rule equation showing dh cancellation"
+    }
+  ]
+}

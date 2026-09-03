@@ -1,0 +1,44 @@
+{
+  "problem_id": "CL-005",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Exponential property: a^(t+dt) = a^t \u00b7 a^(dt)",
+        "Derivative derivation: d(a^t)/dt = a^t \u00b7 ln(a)",
+        "e defined by d(e^t)/dt = e^t",
+        "Chain rule for exponentials: d(e^(c\u00b7t))/dt = c\u00b7e^(c\u00b7t)",
+        "a^t = e^(ln(a)\u00b7t)",
+        "Natural log as inverse of e"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Population doubling visualization",
+        "Exponential property visualization",
+        "Limit process numerical examples",
+        "Graph of e^t with slopes",
+        "Real-world application examples"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ln(2) \u2248 0.6931 shown",
+        "2^(0.001) - 1 / 0.001 approximations",
+        "e \u2248 2.71828 shown",
+        "Specific derivative values"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: population \u2192 derivative derivation \u2192 e \u2192 chain rule \u2192 real-world",
+        "Clear transitions between concepts",
+        "Geometric and algebraic representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

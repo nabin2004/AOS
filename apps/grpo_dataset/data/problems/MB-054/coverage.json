@@ -1,0 +1,43 @@
+{
+  "problem_id": "MB-054",
+  "requirements": {
+    "Math": {
+      "weight": 0.15,
+      "expected": [
+        "Ket notation representation",
+        "Binary conversion and zero-padding logic",
+        "Proximity-based exponential decay function"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "Four parallel horizontal lines representing quantum wires",
+        "CNOT gate symbols with control dot and target cross",
+        "Labeled box gates (X, Z, generic)",
+        "Measurement gate symbols",
+        "Teal surrounding rectangle with a quantum computer icon",
+        "Glowing dots (GlowDot) traversing the wires",
+        "Dynamic stroke width changes on gates during traversal"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Random integer generation between 0 and 15",
+        "Binary string parsing to update individual bit mobjects",
+        "Proximity distance calculations using x-coordinates"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "Custom BitString VGroup class",
+        "Custom Ket Tex class",
+        "InteractiveScene structure",
+        "Updaters attached to gate glows",
+        "Animation loop repeating the execution and measurement phase"
+      ]
+    }
+  }
+}

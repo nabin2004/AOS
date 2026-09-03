@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-007",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "$-\\log_2 p_i$",
+        "probability distribution",
+        "information content formula"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Stacked horizontal segments",
+        "Dynamic vertical bars",
+        "Color interpolation between bars",
+        "Reference grid lines"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker values bounded above 0",
+        "Logarithmic height scaling",
+        "Segment widths summing to total width"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "EntropyChart custom VGroup class",
+        "always_redraw for dynamic updates",
+        "Updaters linked to ValueTrackers"
+      ]
+    }
+  }
+}

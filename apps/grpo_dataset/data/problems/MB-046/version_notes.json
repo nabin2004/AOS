@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-046",
+  "conflicts": [
+    {
+      "category": "Framework Architecture",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "GlowDots / GlowDot",
+      "ce_equivalent": "PMGroup / Dot3D with custom glow or standard Dots",
+      "severity": "medium"
+    },
+    {
+      "category": "Animations",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    }
+  ]
+}

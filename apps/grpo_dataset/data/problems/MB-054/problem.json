@@ -1,0 +1,70 @@
+{
+  "id": "MB-054",
+  "title": "Dissecting a Quantum Computer Circuit Simulation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Computer Science",
+    "Physics"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes a quantum computer circuit executing multiple runs. The visualization must include:\n1. A 4-wire quantum circuit layout with various gates (CNOTs, single-qubit gates like X and Z, and generic boxes) placed at specific intervals along the wires, followed by measurement gates at the end of each wire.\n2. A surrounding teal rectangle enclosing the circuit, labeled with a quantum computer symbol at the top.\n3. An animation of a program running through the wires: glowing dots (GlowDot) should travel from left to right along the wires.\n4. Dynamic gate highlighting: as the glowing dots pass through the gates, the gates should dynamically light up (increase stroke width/intensity) using an updater that depends on the horizontal proximity of the glow dots.\n5. A random sampling output display: at the end of each run, a 4-bit binary string (using a custom BitString class) should display a random integer from 0 to 15, representing the measured state.\n6. The execution loop should repeat multiple times (e.g., 25 repetitions) to simulate the probabilistic sampling of a quantum computer.\n\nEnsure you define helper classes like `BitString` (for displaying binary values as individual Integer mobjects) and `Ket` (for quantum state notation) to support the visualization.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-054/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "DisectAQuantumComputer"
+    ],
+    "visual_techniques": [
+      "Dynamic proximity-based updaters for glowing gates",
+      "GlowDot translation along parallel paths",
+      "Custom VGroup-based BitString representation",
+      "Repeated animation loop simulating real-time sampling"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "GlowDot",
+      "SurroundingRectangle",
+      "add_updater",
+      "replicate",
+      "arrange",
+      "match_x"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom helper methods like get_cnot, get_labeled_box, or get_measurement",
+      "severity": "high",
+      "note": "The reference code relies on helper methods to construct the quantum gates. If these are not implemented or mocked, the scene will fail to compile."
+    },
+    {
+      "pattern": "Incorrect updater logic causing division by zero or NaN in exponent",
+      "severity": "medium",
+      "note": "The proximity-based glow updater uses np.exp with a squared distance. Ensure the distance calculation is robust and doesn't cause overflow or NaN."
+    },
+    {
+      "pattern": "Infinite loops or extremely slow rendering due to high repetition count",
+      "severity": "medium",
+      "note": "Running 25 repetitions of a 1-second animation can make rendering very slow. Consider reducing the repetition count or optimizing the run_time for non-interactive rendering."
+    }
+  ]
+}

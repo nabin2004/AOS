@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-021",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "custom_mobject",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot",
+      "severity": "medium"
+    },
+    {
+      "category": "custom_mobject",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with a larger, low-opacity outer Dot or custom glow shader",
+      "severity": "medium"
+    },
+    {
+      "category": "method",
+      "gl_construct": "insert_n_curves",
+      "ce_equivalent": "No direct equivalent; use higher resolution grid or manually subdivide VMobject points",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-012",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the 3D scene with 10 strings on the floor and an open box, followed by camera reorientation.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "get_open_box",
+        "get_floor_strings",
+        "reorient",
+        "FadeIn"
+      ],
+      "clip_query": "A 3D scene showing an open box and several strings with dots on the floor"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Dropping animation of strings and dots onto the floor with staggered time spans.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "drop_anims",
+        "animate.restore",
+        "rush_into",
+        "reorient"
+      ],
+      "clip_query": "Strings and dots dropping down to the floor in a 3D environment"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Highlighting and lifting of selected string endpoints to the top of the box.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "highlight_endpoints",
+        "make_pull_lift_anim",
+        "pin_dots_to_endpoints",
+        "lift_height"
+      ],
+      "clip_query": "Two endpoints of strings being highlighted and pulled upwards above a box"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Joining of endpoints and updating the state of the string pieces.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "forms_loop",
+        "remove_updaters",
+        "piece_map"
+      ],
+      "clip_query": "Connecting two string endpoints together above a box"
+    }
+  ]
+}

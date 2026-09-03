@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-040",
+  "conflicts": [
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient()",
+      "ce_equivalent": "self.set_camera_orientation()",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.add_ambient_rotation()",
+      "ce_equivalent": "self.begin_ambient_camera_rotation()",
+      "severity": "high"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "FadeTransformPieces",
+      "ce_equivalent": "TransformMatchingShapes or ReplacementTransform",
+      "severity": "medium"
+    }
+  ]
+}

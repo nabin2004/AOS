@@ -1,0 +1,118 @@
+{
+  "problem_id": "CL-006",
+  "conflicts": [
+    {
+      "category": "Import system",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "auto-fail if used",
+      "impact": "Module not found error",
+      "lines_affected": [1]
+    },
+    {
+      "category": "Animation renames",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "auto-fail if used",
+      "impact": "Animation not recognized in CE",
+      "lines_affected": ["Multiple animation calls"]
+    },
+    {
+      "category": "Animation renames",
+      "gl_construct": "ApplyMethod",
+      "ce_equivalent": "animate method (e.g., mobject.animate.shift())",
+      "severity": "auto-fail if used",
+      "impact": "Syntax error; ApplyMethod deprecated in CE",
+      "lines_affected": ["Various transform calls"]
+    },
+    {
+      "category": "Animation patterns",
+      "gl_construct": "UpdateFromAlphaFunc, UpdateFromFunc, MaintainPositionRelativeTo",
+      "ce_equivalent": "ValueTracker with updater or custom animation",
+      "severity": "warning",
+      "impact": "Updater API differs",
+      "lines_affected": ["Multiple updater calls"]
+    },
+    {
+      "category": "Text rendering",
+      "gl_construct": "OldTex / OldTexText",
+      "ce_equivalent": "Tex / TexText",
+      "severity": "auto-fail if used",
+      "impact": "OldTex not recognized; use Tex instead",
+      "lines_affected": ["All text and math displays"]
+    },
+    {
+      "category": "Class configuration",
+      "gl_construct": "CONFIG dictionary",
+      "ce_equivalent": "__init__ parameters and super().__init__()",
+      "severity": "auto-fail if used",
+      "impact": "Syntax error; CONFIG pattern not supported in CE",
+      "lines_affected": ["Multiple class definitions"]
+    },
+    {
+      "category": "Custom classes",
+      "gl_construct": "GraphScene, PiCreatureScene, TeacherStudentsScene, ZoomedScene, ThreeDScene",
+      "ce_equivalent": "Scene with custom methods or Axes for graphing",
+      "severity": "manual-check",
+      "impact": "GraphScene doesn't exist in CE; use Axes and NumberPlane",
+      "lines_affected": ["Inheritance chain"]
+    },
+    {
+      "category": "Custom mobjects",
+      "gl_construct": "PiCreature and subclasses (Randolph, Mortimer)",
+      "ce_equivalent": "PiCreature (different API)",
+      "severity": "warning",
+      "impact": "PiCreature API differs",
+      "lines_affected": ["Character creation"]
+    },
+    {
+      "category": "Custom mobjects",
+      "gl_construct": "Ladder (custom VMobject), Prism (3D wall)",
+      "ce_equivalent": "Custom implementation needed",
+      "severity": "warning",
+      "impact": "Ladder and Prism classes don't exist in CE",
+      "lines_affected": ["RelatedRatesExample"]
+    },
+    {
+      "category": "Helper functions",
+      "gl_construct": "get_graph_label, get_vertical_line_to_graph, get_secant_slope_group",
+      "ce_equivalent": "Custom implementation needed",
+      "severity": "warning",
+      "impact": "These helpers don't exist in CE",
+      "lines_affected": ["Various function calls"]
+    },
+    {
+      "category": "Coordinate systems",
+      "gl_construct": "FRAME_X_RADIUS, FRAME_Y_RADIUS, FRAME_WIDTH, FRAME_HEIGHT constants",
+      "ce_equivalent": "config.frame_width, config.frame_height",
+      "severity": "auto-fail if used",
+      "impact": "Constants not defined in CE",
+      "lines_affected": ["Setup methods"]
+    },
+    {
+      "category": "3D rendering",
+      "gl_construct": "RelatedRatesExample with ThreeDScene",
+      "ce_equivalent": "ThreeDScene with 3D operations",
+      "severity": "manual-check",
+      "impact": "Requires ThreeDScene; different API for 3D",
+      "lines_affected": ["Ladder visualization"]
+    },
+    {
+      "category": "Custom animations",
+      "gl_construct": "Indicate, FocusOn",
+      "ce_equivalent": "Custom implementation or alternative animations",
+      "severity": "warning",
+      "impact": "These animations may not exist in CE",
+      "lines_affected": ["Multiple scenes"]
+    },
+    {
+      "category": "Graphing",
+      "gl_construct": "NumberPlane with custom coordinates",
+      "ce_equivalent": "NumberPlane in CE (similar)",
+      "severity": "manual-check",
+      "impact": "API may differ slightly",
+      "lines_affected": ["SlopeOfCircleExample"]
+    }
+  ],
+  "notes": "This is the sixth chapter of the Essence of Calculus series, covering implicit differentiation. Major issues: GraphScene doesn't exist in CE; use Axes and custom graphing methods. PiCreature API differs significantly. Helper functions need custom implementation. ZoomedScene needs custom implementation. 3D ladder visualization requires ThreeDScene. Ladder and Prism custom mobjects need reimplementation. The S = x² + y² function of two variables requires careful implementation of the multi-variable function concept."
+}

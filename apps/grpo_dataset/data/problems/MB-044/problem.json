@@ -1,0 +1,68 @@
+{
+  "id": "MB-044",
+  "title": "Astronomical Unit and Nearby Stars Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    15.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Astronomy"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the concept of an Astronomical Unit (A.U.) and nearby stars. Create a 3D scene using InteractiveScene. Define helper functions to generate a textured Sun (using Sphere and TexturedSurface with custom glow effects), a textured Earth, and a celestial sphere background. In the main scene, set up the Sun at the center, a circular orbit of radius 3.5, and a glowing dot representing Earth. Draw a line from the Sun to the Earth's orbit representing 1 Astronomical Unit, labeled with the text 'Astronomical\\nUnit'. Animate the orbit's rotation while fading in the line and label. Next, transform the 'Astronomical Unit' label into 'A.U.' using a character-by-character ReplacementTransform. Finally, reorient the camera frame to shift the view to the side, preparing for a transition to a larger cosmic scale.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-044/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "NearbyStars"
+    ],
+    "visual_techniques": [
+      "3D Texturing",
+      "Camera Reorientation",
+      "Custom Updaters",
+      "Character Morphing / ReplacementTransform"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TexturedSurface",
+      "GlowDot",
+      "f_always",
+      "frame.animate.reorient"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE camera controls instead of ManimGL frame.animate.reorient",
+      "severity": "high",
+      "note": "ManimGL uses self.frame for camera manipulation, which is incompatible with ManimCE's self.camera."
+    },
+    {
+      "pattern": "Missing custom textures for TexturedSurface",
+      "severity": "medium",
+      "note": "The code relies on specific textures like 'SunTexture' and 'hiptyc_2020_8k'. If missing, fallback colors or placeholders should be used."
+    },
+    {
+      "pattern": "Incorrect updater syntax for f_always",
+      "severity": "high",
+      "note": "f_always is a ManimGL-specific shorthand for adding continuous updaters. Standard add_updater must be used if translating to CE."
+    }
+  ]
+}

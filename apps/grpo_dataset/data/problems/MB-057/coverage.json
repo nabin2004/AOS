@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-057",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "ValueTracker for theta angle tracking",
+        "Projection of 3D wave coordinates onto 2D plane axes",
+        "Rotation transformations using angles in radians (e.g., 45 * DEG)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "3D camera reorientation with self.frame.reorient",
+        "Semi-transparent 3D Cube representing the beam splitter",
+        "Dynamic vector updating its length and direction in real-time",
+        "Wave propagation visualization along the beam"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Correct coordinate values for camera orientation",
+        "Wave amplitude scaling and frequency parameters",
+        "Beam splitter rotation angle of exactly 45 degrees"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "Inheritance from InteractiveScene",
+        "Use of updaters (add_updater) for real-time vector tracking",
+        "Fixing coordinate planes in frame using fix_in_frame"
+      ]
+    }
+  }
+}

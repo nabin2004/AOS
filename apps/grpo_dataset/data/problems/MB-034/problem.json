@@ -1,0 +1,72 @@
+{
+  "id": "MB-034",
+  "title": "Sphere Volume Derivative Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the derivative of a sphere's volume with respect to its radius, building upon a 2D circle area derivative visualization. First, create a base class `ShowCircleAreaDerivative` inheriting from `InteractiveScene`. In this class, render a 2D circle of radius $r=2$ labeled 'A' with a radial line and 'r' label. Use a `ValueTracker` for $dr$ (initially 0.5) to dynamically draw an outer annulus representing $dA$ with thickness $dr$. Animate $dr$ shrinking from 0.5 to 0, then to 0.5, and then to 0.1. Second, create a subclass `ShowSphereVolumeDerivative` that transitions this concept to 3D. Set the floor plane to 'xz' and reorient the camera frame. Render a 3D inner sphere of radius $r=3$ (colored teal with a white `SurfaceMesh` overlay) and apply a clipping plane. Create a dynamically redrawn outer sphere of radius $r + dr$ (colored semi-transparent red) representing the volume increment $dV$. Animate the camera reorienting while opening up the clipping plane, then animate the outer sphere expanding as $dr$ goes to 0.5, shrinking to 0.1, and finally smoothly shrinking to 0.0 while fading out the labels.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-034/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 105,
+    "scene_classes": [
+      "ShowCircleAreaDerivative",
+      "ShowSphereVolumeDerivative"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "Dynamic Updaters",
+      "Clipping Planes",
+      "Surface Mesh Rendering",
+      "ValueTracker Animation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "always_redraw",
+      "Sphere",
+      "SurfaceMesh",
+      "set_clip_plane",
+      "sort_faces_back_to_front",
+      "frame.reorient"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community (CE) syntax for camera control instead of ManimGL's self.frame.reorient",
+      "severity": "high",
+      "note": "The script relies heavily on ManimGL's InteractiveScene camera frame manipulation."
+    },
+    {
+      "pattern": "Missing SurfaceMesh or set_clip_plane support in non-GL environments",
+      "severity": "high",
+      "note": "SurfaceMesh and set_clip_plane are specific to ManimGL/modern OpenGL renderers and will fail in standard CE."
+    },
+    {
+      "pattern": "Incorrect coordinate system orientation",
+      "severity": "medium",
+      "note": "Failing to set the floor plane to 'xz' will cause the 3D sphere and 2D circle overlays to align incorrectly."
+    }
+  ]
+}

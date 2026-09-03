@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-058",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Manipulation",
+      "gl_construct": "self.frame.animate",
+      "ce_equivalent": "self.play(self.camera.frame.animate...)",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Replication",
+      "gl_construct": "Mobject.replicate(n)",
+      "ce_equivalent": "VGroup(*[mobject.copy() for _ in range(n)])",
+      "severity": "medium"
+    },
+    {
+      "category": "Coloring",
+      "gl_construct": "set_submobject_colors_by_gradient",
+      "ce_equivalent": "set_color_by_gradient",
+      "severity": "medium"
+    }
+  ]
+}

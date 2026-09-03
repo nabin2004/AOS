@@ -1,0 +1,72 @@
+{
+  "id": "MB-013",
+  "title": "Subsets Collision Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Combinatorics",
+    "Computer Science",
+    "Discrete Mathematics"
+  ],
+  "full_prompt": "Write a ManimGL script using `InteractiveScene` that visualizes a subset sum collision problem. First, initialize two PiCreatures (Randolph and Mortimer) at the bottom of the screen. Create a 10x10 grid of integers from 1 to 100, positioned at the top. Fade in the grid and have the PiCreatures look at it. Next, randomly select 10 numbers from the grid, highlight them with teal surrounding rectangles, and dim the rest of the grid. Rearrange these 10 selected numbers into a neat 2x5 grid above the PiCreatures, fading out the original grid. Finally, highlight two distinct subsets of these 10 numbers that sum to the same value (a collision) using colored rectangles, and display an equation at the top showing that the sum of the first subset equals the sum of the second subset. Ensure smooth transitions, custom PiCreature expressions (e.g., 'pondering', 'tease', 'happy', 'hesitant'), and precise layout alignment.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-013/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "Subsets"
+    ],
+    "visual_techniques": [
+      "PiCreatures animations",
+      "Grid layout arrangement",
+      "Random sampling and highlighting",
+      "Equation transformation from copy"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Randolph",
+      "Mortimer",
+      "arrange_in_grid",
+      "VFadeIn",
+      "Blink",
+      "set_anim_args",
+      "MoveToTarget"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing PiCreature assets or classes (Randolph, Mortimer)",
+      "severity": "high",
+      "note": "The code relies on custom PiCreature classes which must be imported or mocked if running in standard Manim Community."
+    },
+    {
+      "pattern": "Use of arrange_in_grid",
+      "severity": "medium",
+      "note": "arrange_in_grid is a ManimGL-specific method; standard Manim Community uses arrange_in_grid with different arguments or requires manual grid layout."
+    },
+    {
+      "pattern": "Missing helper methods find_a_match, get_group_rects, get_top_sum",
+      "severity": "high",
+      "note": "These helper methods are called on self but not fully defined in the snippet; they must be implemented or mocked to avoid AttributeError."
+    }
+  ]
+}

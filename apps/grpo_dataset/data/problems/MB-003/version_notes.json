@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-003",
+  "conflicts": [
+    {
+      "category": "Imports and Custom Classes",
+      "gl_construct": "StackedProbDistribution",
+      "ce_equivalent": "Must be manually implemented using a VGroup of Rectangles with widths proportional to probabilities.",
+      "severity": "high"
+    },
+    {
+      "category": "Redraw mechanism",
+      "gl_construct": "always_redraw",
+      "ce_equivalent": "always_redraw (supported in CE, but behavior with custom updaters can sometimes differ slightly in performance)",
+      "severity": "medium"
+    },
+    {
+      "category": "Color interpolation",
+      "gl_construct": "interpolate_color",
+      "ce_equivalent": "interpolate_color",
+      "severity": "low"
+    }
+  ]
+}

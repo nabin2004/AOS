@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-054",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Quantum circuit layout is rendered, showing 4 parallel wires, multiple quantum gates (CNOT, X, Z), measurement gates, and a surrounding teal box with a quantum computer label.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "wires",
+        "gates",
+        "mes_gates",
+        "machine_rect",
+        "qc_label"
+      ],
+      "clip_query": "A quantum circuit diagram with four wires, various logic gates, and measurement symbols enclosed in a teal box."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Glowing dots begin to travel from left to right along the quantum wires, simulating signal propagation.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "wire_glows",
+        "GlowDot",
+        "animate",
+        "match_x"
+      ],
+      "clip_query": "Glowing dots moving horizontally across parallel lines in a circuit diagram."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "As the glowing dots pass through the gates, the gates dynamically light up and increase their stroke width based on proximity.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        2.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "gate_glows",
+        "add_updater",
+        "set_stroke",
+        "np.exp"
+      ],
+      "clip_query": "Circuit gates glowing brighter as a light pulse passes through them."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The glowing dots reach the measurement gates, triggering a random 4-bit binary string output to update on the right side of the circuit.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "output",
+        "BitString",
+        "set_value",
+        "random.randint"
+      ],
+      "clip_query": "A binary bitstring updating its values at the output of a quantum circuit simulation."
+    }
+  ]
+}

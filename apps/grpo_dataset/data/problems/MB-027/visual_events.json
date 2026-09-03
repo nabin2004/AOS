@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-027",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render side-by-side coordinate planes with input/output labels and the initial grid overlay.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "NumberPlane",
+        "in_plane",
+        "out_plane",
+        "f_of_x_y"
+      ],
+      "clip_query": "Two coordinate planes side-by-side with a grid of white squares on the left plane."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Highlight a single grid square in blue on the input plane.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "square_index",
+        "set_stroke",
+        "BLUE"
+      ],
+      "clip_query": "A single square in the grid turns blue."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animate the grid transforming and moving to the output plane.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "MoveToTarget",
+        "apply_function",
+        "func"
+      ],
+      "clip_query": "The grid of squares warps and transforms into the right coordinate plane."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Zoom in deeply on the highlighted square while finer grids dynamically fade in.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "zoomed_in_planes",
+        "add_updater",
+        "camera.frame.animate.scale"
+      ],
+      "clip_query": "Camera zooms in deeply on a warped blue square as finer grid lines fade into view."
+    }
+  ]
+}

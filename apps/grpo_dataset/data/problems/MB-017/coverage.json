@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-017",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Complex logarithm mapping (log(z))",
+        "Complex exponential mapping (exp(z))",
+        "Conformal mapping and scaling/rotation via complex multiplication",
+        "Periodic boundary conditions in the complex plane"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "TexturedSurface mapping of images",
+        "Four-quadrant/four-plane layout display",
+        "Smooth grid transformations and morphing animations",
+        "Dynamic parameter updates using value trackers"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Complex constant calculations (e.g., complex(0, TAU) / complex(log(scale), TAU))",
+        "Grid resolution parameters (e.g., 21x41, 51x101)",
+        "Scale factors (e.g., 16, 256)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inheritance from InteractiveScene",
+        "Setup of multiple coordinate planes and dark background planes",
+        "Use of ComplexValueTracker for dynamic updates",
+        "Clipping of surfaces to plane boundaries"
+      ]
+    }
+  }
+}

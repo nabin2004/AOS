@@ -1,0 +1,219 @@
+{
+  "id": "NN-003",
+  "title": "Neural Networks | Chapter 3: Backpropagation Intuition",
+  "youtube_video_id": "aircAruvnKk",
+  "video_timestamp_range": [1920, 2880],
+  "category": ["algorithm-visualization", "concept-exposition", "math-intensive"],
+  "difficulty_level": 4,
+  "domain": ["Machine Learning", "Neural Networks", "Calculus"],
+  "full_prompt": "Create an animation explaining backpropagation, the algorithm that computes the gradient of the cost function. Start with a brief recap of the network architecture (784 input neurons, hidden layers with 16 neurons each, 10 output neurons) and gradient descent. Introduce backpropagation as the algorithm for computing the gradient efficiently. Walk through the intuitive effects of a single training example on weights and biases. Start with an example image of a '2' and show the desired output layer: the neuron for 2 should be nudged up, all others nudged down, with nudge sizes proportional to how far each is from its target. Show that we can't directly change activations - only weights and biases. Then focus on a single output neuron (the one for 2) and show the three ways to increase its activation: increase bias, increase weights (with those connected to brighter previous-layer neurons having more influence), and change previous layer activations (in proportion to weights). Show the 'fire together, wire together' analogy. Demonstrate that all output neurons' desires are added together to determine changes to the previous layer. Show the recursive propagation backward through the network. Explain that this gives desired changes for one training example, and we average these across all training examples to get the gradient. Introduce mini-batches and stochastic gradient descent as a computational efficiency technique. End with a summary of the backpropagation algorithm in plain language.",
+  "raw_code_status": "collected",
+  "raw_code_path": "nn/video3.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "LayOutPlan",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TODOInsertFeedForwardAnimations",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TODOInsertStepsDownCostSurface",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TODOInsertDefinitionOfCostFunction",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TODOInsertGradientNudging",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "InterpretGradientComponents",
+        "key_methods": ["construct", "setup_network", "add_cost", "change_weights_repeatedly", "ask_about_high_dimensions", "circle_magnitudes", "isolate_particular_weights", "shift_cost_expression", "tweak_individual_weights", "move_grad_terms_into_position", "get_weight_adjustment_anims"]
+      },
+      {
+        "name": "GetLostInNotation",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TODOInsertPreviewLearning",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ShowAveragingCost",
+        "key_methods": ["construct", "setup_network", "setup_diff_words", "show_many_examples", "show_one_example"]
+      },
+      {
+        "name": "FocusOnOneExample",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "WalkThroughTwoExample",
+        "key_methods": ["setup", "construct", "show_single_example", "single_example_influencing_weights", "expand_last_layer", "show_activation_formula", "three_ways_to_increase", "note_connections_to_brightest_neurons", "fire_together_wire_together", "show_desired_increase_to_previous_neurons", "only_keeping_track_of_changes", "show_other_output_neurons", "show_recursion", "get_neuron_nudge_arrow", "get_edge_value"]
+      },
+      {
+        "name": "WriteHebbian",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NotANeuroScientist",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ConstructGradientFromAllTrainingExamples",
+        "key_methods": ["construct", "setup_grid", "setup_weights", "show_two_requesting_changes", "show_all_examples_requesting_changes", "average_together", "collapse_into_gradient_vector", "get_example", "get_grid_position", "get_requested_change_bubble", "get_random_decimal", "get_colored_decimal", "get_look_at_anims", "blink"]
+      },
+      {
+        "name": "WatchPreviousScene",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "OpenCloseSGD",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "OrganizeDataIntoMiniBatches",
+        "key_methods": ["construct", "seed_random_libraries", "add_examples", "shuffle_examples", "divide_into_minibatches", "one_step_per_batch", "get_examples", "arrange_examples_in_grid"]
+      },
+      {
+        "name": "SGDSteps",
+        "key_methods": []
+      },
+      {
+        "name": "GradientDescentSteps",
+        "key_methods": []
+      },
+      {
+        "name": "SwimmingInTerms",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "BackpropCode",
+        "key_methods": []
+      },
+      {
+        "name": "BackpropCodeAddOn",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "CannotFollowCode",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "EOCWrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SimplestNetworkExample",
+        "key_methods": ["construct", "seed_random_libraries", "collapse_ordinary_network", "show_weights_and_biases", "focus_just_on_last_two_layers", "label_neurons", "show_desired_output", "show_cost", "show_activation_formula", "introduce_z", "break_into_computational_graph", "show_preceding_layer_in_computational_graph", "show_number_lines", "ask_about_w_sensitivity", "show_derivative_wrt_w", "show_chain_of_events", "show_chain_rule", "name_chain_rule", "indicate_everything_on_screen", "prepare_for_derivatives", "compute_derivatives", "get_lost_in_formulas", "fire_together_wire_together", "organize_chain_rule_rhs", "show_average_derivative", "show_gradient", "transition_to_derivative_wrt_b", "show_derivative_wrt_b", "show_derivative_wrt_a", "show_previous_weight_and_bias", "animate_long_path", "get_neuron_activation_decimal", "get_all_comp_graph_parts"]
+      },
+      {
+        "name": "IsntThatOverSimplified",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GeneralFormulas",
+        "key_methods": ["setup", "construct", "setup_network_mob", "show_all_a_labels", "only_show_abstract_a_labels", "add_desired_output", "show_cost", "show_example_weight", "show_values_between_weight_and_cost", "show_weight_chain_rule", "show_derivative_wrt_prev_activation", "show_multiple_paths_from_prev_layer_neuron", "show_previous_layer", "replace_subscript", "get_chain_rule"]
+      },
+      {
+        "name": "ThatsPrettyMuchIt",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PatYourselfOnTheBack",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ThatsALotToThinkAbout",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "LayersOfComplexity",
+        "key_methods": ["construct", "get_chain_rule_equations"]
+      },
+      {
+        "name": "SponsorFrame",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NN3PatreonThanks",
+        "key_methods": []
+      },
+      {
+        "name": "Thumbnail",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SupplementThumbnail",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Network architecture visualization with labeled layers",
+      "Cost function visualization",
+      "Gradient as vector with components",
+      "Single neuron focus with activation decimal display",
+      "Desired output layer with nudge arrows",
+      "Weight importance visualization (brightness of connected neurons)",
+      "Hebbian 'fire together wire together' analogy",
+      "Backward propagation arrows through network",
+      "Grid visualization of training examples",
+      "Average of desired changes across examples",
+      "Gradient vector construction from averaged changes",
+      "Mini-batch visualization",
+      "Chain rule formula display",
+      "Computational graph with partial derivatives"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc", "UpdateFromFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "FocusOn", "ReplacementTransform", "MoveToTarget", "ShowPassingFlash", "LaggedStartMap", "ChangingDecimal", "Swap"],
+      "mobject_classes": ["Circle", "Dot", "Line", "Arrow", "Brace", "Rectangle", "Square", "NumberPlane", "FunctionGraph", "DoubleArrow", "DashedLine", "Vector", "Tex", "OldTex", "OldTexText", "DecimalNumber", "SurroundingRectangle", "UnitInterval", "BulletedList", "ScreenRectangle"],
+      "custom_classes": ["PiCreatureScene", "TeacherStudentsScene", "NetworkScene", "PreviewLearning", "MNistNetworkMobject", "PixelsAsSquares", "WrappedImage", "MNistMobject", "ContinualEdgeUpdate", "Eyes", "SpeechBubble", "NetworkMobject", "Network"],
+      "helpers": ["get_organized_images", "load_data_wrapper", "get_training_image_group", "get_decimal_vector"],
+      "custom_imports": ["from manim_imports_ext import *", "from _2017.nn.network import *", "from _2017.nn.part1 import *", "from _2017.nn.part2 import *"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses backpropagation with gradient descent itself",
+      "severity": "high",
+      "note": "backprop computes gradient, gradient descent uses it"
+    },
+    {
+      "pattern": "fails to show the recursive backward propagation through layers",
+      "severity": "high",
+      "note": "misses the core mechanism"
+    },
+    {
+      "pattern": "doesn't explain why weights connected to brighter neurons have more influence",
+      "severity": "medium",
+      "note": "misses the 'proportional to activation' insight"
+    },
+    {
+      "pattern": "doesn't show averaging across training examples",
+      "severity": "medium",
+      "note": "misses how full gradient is computed"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "id": "MB-055",
+  "title": "Grover's Algorithm State Vector Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Quantum Computing",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Create a Manim visualization demonstrating the state vector representation of Grover's Algorithm using ManimGL. \n\n1. Define custom helper classes:\n   - `Ket(Tex)`: A class that wraps a given mobject with ket notation brackets '|' and '\\rangle'. It should scale the brackets relative to the mobject's height and position them to the left and right.\n   - `KetGroup(VGroup)`: A VGroup containing a `Ket` and its inner mobject.\n\n2. Set up a 2D coordinate plane (`NumberPlane`) with a range of (-1, 1) on both axes, styled with subtle blue background and faded lines.\n\n3. Create and animate the following vectors and labels:\n   - A vertical yellow vector representing the target state $|k\\rangle$ pointing to (0, 1).\n   - A teal vector $|b\\rangle$ representing the initial uniform superposition state, rotated from the vertical axis by an angle of arccos(1/sqrt(3)) clockwise.\n   - Label both vectors using the custom `KetGroup` class, adding a small key icon next to the $|k\\rangle$ label.\n   - Highlight the $|k\\rangle$ label with a flash animation.\n\n4. Introduce the horizontal axis vector:\n   - Draw a white vector pointing to (1, 0) representing the superposition of all non-target states.\n   - Display LaTeX labels for this axis: a general formula representing the sum over all $n \\ne k$, and a specific example for $N=2$.\n   - Animate the transition of these labels, fading the general formula down as the example formula appears.\n\n5. Show the projection of the state vector $|b\\rangle$:\n   - Draw a projection vector along the vertical axis and a dashed line connecting the tip of $|b\\rangle$ to its vertical projection.\n   - Display the expanded LaTeX equation for $|b\\rangle$ showing the components, and highlight the target state component $|2\\rangle$ using a flash animation and a color change to yellow.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-055/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "GroversAlgorithm"
+    ],
+    "visual_techniques": [
+      "Vector projection",
+      "Mathematical label transformations",
+      "Coordinate plane mapping",
+      "Custom LaTeX formatting"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "NumberPlane",
+      "Vector",
+      "KetGroup",
+      "FlashAround",
+      "TransformFromCopy"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community imports instead of ManimGL/3b1b style imports",
+      "severity": "high",
+      "note": "The code relies on InteractiveScene and specific ManimGL features like make_number_changeable."
+    },
+    {
+      "pattern": "Incorrect rotation math for b_vect",
+      "severity": "medium",
+      "note": "The rotation angle must be calculated precisely using np.arccos(1 / math.sqrt(3)) relative to the vertical axis."
+    },
+    {
+      "pattern": "Missing custom Ket or KetGroup helper classes",
+      "severity": "high",
+      "note": "The labels depend directly on the custom Ket and KetGroup implementations."
+    }
+  ]
+}

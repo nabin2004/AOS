@@ -1,0 +1,183 @@
+{
+  "problem_id": "CL-007",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Formal derivative definition shown: f'(x) = lim_{h\u21920} (f(x+h)-f(x))/h",
+      "weight": 0.0833,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "derivative",
+        "limit",
+        "h",
+        "f(x+h)",
+        "definition"
+      ],
+      "clip_query": "equation showing derivative as limit of difference quotient"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Graph with secant line approaching tangent line as h\u21920",
+      "weight": 0.1042,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "secant",
+        "tangent",
+        "h",
+        "approach",
+        "slope"
+      ],
+      "clip_query": "secant lines getting closer to tangent line"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "dx replaced with h (or \u0394x) in formal definition, showing dx is finite non-zero nudge",
+      "weight": 0.0833,
+      "critical": false,
+      "expected_time_range": [
+        18.0,
+        26.0
+      ],
+      "keyword_bank": [
+        "dx",
+        "h",
+        "\u0394x",
+        "finite",
+        "nudge"
+      ],
+      "clip_query": "symbols changing from dx to h"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Function with hole at x=0: ( (2+h)\u00b3 - 2\u00b3 ) / h, limit approaches 12",
+      "weight": 0.1042,
+      "critical": true,
+      "expected_time_range": [
+        26.0,
+        38.0
+      ],
+      "keyword_bank": [
+        "hole",
+        "0/0",
+        "limit",
+        "approach",
+        "12"
+      ],
+      "clip_query": "graph with hole at x=0 approaching value 12"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Counterexample: function with jump discontinuity where limit does not exist",
+      "weight": 0.0833,
+      "critical": false,
+      "expected_time_range": [
+        38.0,
+        46.0
+      ],
+      "keyword_bank": [
+        "jump",
+        "discontinuity",
+        "limit",
+        "not_exist"
+      ],
+      "clip_query": "graph with jump at x=0 from 1 to 2"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "Epsilon-delta definition: for any \u03b5, there exists \u03b4 such that |x-a|<\u03b4 implies |f(x)-L|<\u03b5",
+      "weight": 0.125,
+      "critical": true,
+      "expected_time_range": [
+        46.0,
+        58.0
+      ],
+      "keyword_bank": [
+        "epsilon",
+        "delta",
+        "\u03b5",
+        "\u03b4",
+        "range"
+      ],
+      "clip_query": "epsilon and delta ranges on graph"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Epsilon-delta example: as \u03b4 shrinks, output range shrinks within \u03b5 of limit",
+      "weight": 0.1042,
+      "critical": true,
+      "expected_time_range": [
+        58.0,
+        68.0
+      ],
+      "keyword_bank": [
+        "epsilon",
+        "delta",
+        "shrinks",
+        "range",
+        "limit"
+      ],
+      "clip_query": "input and output ranges shrinking together"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "L'H\u00f4pital's rule introduced: lim f/g = lim f'/g' when 0/0",
+      "weight": 0.1042,
+      "critical": true,
+      "expected_time_range": [
+        68.0,
+        78.0
+      ],
+      "keyword_bank": [
+        "L'H\u00f4pital",
+        "0/0",
+        "derivative",
+        "ratio",
+        "limit"
+      ],
+      "clip_query": "L'H\u00f4pital's rule equation appearing"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Zoom in showing f and g approximated by tangent lines, ratio f/g \u2248 f'/g'",
+      "weight": 0.125,
+      "critical": true,
+      "expected_time_range": [
+        78.0,
+        90.0
+      ],
+      "keyword_bank": [
+        "tangent",
+        "linear_approximation",
+        "ratio",
+        "derivative"
+      ],
+      "clip_query": "zoomed view with tangent lines approximating functions"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Example: lim_{x\u21921} sin(\u03c0x)/(x\u00b2-1) = -\u03c0/2 using L'H\u00f4pital",
+      "weight": 0.0833,
+      "critical": false,
+      "expected_time_range": [
+        90.0,
+        98.0
+      ],
+      "keyword_bank": [
+        "sin",
+        "\u03c0x",
+        "x\u00b2-1",
+        "-\u03c0/2",
+        "example"
+      ],
+      "clip_query": "specific example with sin and polynomial"
+    }
+  ]
+}

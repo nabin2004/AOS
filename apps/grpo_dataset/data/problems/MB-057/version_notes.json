@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-057",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    },
+    {
+      "category": "Animations",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Animations",
+      "gl_construct": "VFadeIn",
+      "ce_equivalent": "FadeIn",
+      "severity": "medium"
+    }
+  ]
+}

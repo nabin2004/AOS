@@ -1,0 +1,2163 @@
+1
+00:00:00,420 --> 00:00:04,440
+[Music]
+
+2
+00:00:04,440 --> 00:00:06,480
+last video I laid out the structure of a
+
+3
+00:00:06,480 --> 00:00:08,559
+neural network I'll give a quick recap
+
+4
+00:00:08,559 --> 00:00:09,920
+here just so that it's fresh in our
+
+5
+00:00:09,920 --> 00:00:12,080
+minds and then I have two main goals for
+
+6
+00:00:12,080 --> 00:00:14,400
+this video the first is to introduce the
+
+7
+00:00:14,400 --> 00:00:16,880
+idea of gradient descent which underlies
+
+8
+00:00:16,880 --> 00:00:18,640
+not only how neural networks learn but
+
+9
+00:00:18,640 --> 00:00:19,920
+how a lot of other machine learning
+
+10
+00:00:19,920 --> 00:00:21,680
+works as well then after that we're
+
+11
+00:00:21,680 --> 00:00:23,080
+going to dig in a little more to how
+
+12
+00:00:23,080 --> 00:00:25,119
+this particular Network performs and
+
+13
+00:00:25,119 --> 00:00:26,679
+what those hidden layers of neurons end
+
+14
+00:00:26,679 --> 00:00:28,359
+up actually looking
+
+15
+00:00:28,359 --> 00:00:31,279
+for as a reminder our goal here is the
+
+16
+00:00:31,279 --> 00:00:33,520
+classic example of handwritten digit
+
+17
+00:00:33,520 --> 00:00:35,879
+recognition the hello world of neural
+
+18
+00:00:35,879 --> 00:00:38,239
+networks these digits are rendered on a
+
+19
+00:00:38,239 --> 00:00:41,120
+28x 28 pixel grid each pixel with some
+
+20
+00:00:41,120 --> 00:00:44,239
+grayscale value between 0 and 1 those
+
+21
+00:00:44,239 --> 00:00:46,399
+are what determine the activations of
+
+22
+00:00:46,399 --> 00:00:50,039
+784 neurons in the input layer of the
+
+23
+00:00:50,039 --> 00:00:52,359
+network and then the activation for each
+
+24
+00:00:52,359 --> 00:00:54,719
+neuron in the following layers is based
+
+25
+00:00:54,719 --> 00:00:57,520
+on a weighted sum of all the activations
+
+26
+00:00:57,520 --> 00:00:59,680
+in the previous layer plus some special
+
+27
+00:00:59,680 --> 00:01:01,039
+number called a
+
+28
+00:01:01,039 --> 00:01:03,719
+bias then you compose that sum with some
+
+29
+00:01:03,719 --> 00:01:05,600
+other function like the sigmoid squish
+
+30
+00:01:05,600 --> 00:01:08,080
+ification or aayu the way that I walked
+
+31
+00:01:08,080 --> 00:01:10,560
+through last video in total given the
+
+32
+00:01:10,560 --> 00:01:12,400
+somewhat arbitrary choice of two hidden
+
+33
+00:01:12,400 --> 00:01:14,960
+layers here with 16 neurons each the
+
+34
+00:01:14,960 --> 00:01:17,479
+network has about 13,000 weights and
+
+35
+00:01:17,479 --> 00:01:20,320
+biases that we can adjust and it's these
+
+36
+00:01:20,320 --> 00:01:22,400
+values that determine what exactly the
+
+37
+00:01:22,400 --> 00:01:25,439
+network you know actually does then what
+
+38
+00:01:25,439 --> 00:01:27,040
+we mean when we say that this network
+
+39
+00:01:27,040 --> 00:01:29,200
+classifies a given digit is that the
+
+40
+00:01:29,200 --> 00:01:31,200
+brightest of those 10 neurons into the
+
+41
+00:01:31,200 --> 00:01:33,960
+final layer corresponds to that digit
+
+42
+00:01:33,960 --> 00:01:35,600
+and remember the motivation that we had
+
+43
+00:01:35,600 --> 00:01:37,640
+in mind here for the layered structure
+
+44
+00:01:37,640 --> 00:01:40,320
+was that maybe the second layer could
+
+45
+00:01:40,320 --> 00:01:42,640
+pick up on the edges and the third layer
+
+46
+00:01:42,640 --> 00:01:44,439
+might pick up on patterns like loops and
+
+47
+00:01:44,439 --> 00:01:46,680
+lines and the last one could just piece
+
+48
+00:01:46,680 --> 00:01:48,680
+together those patterns to recognize
+
+49
+00:01:48,680 --> 00:01:51,759
+digits so here we learn how the network
+
+50
+00:01:51,759 --> 00:01:54,439
+learns what we want is an algorithm
+
+51
+00:01:54,439 --> 00:01:56,280
+where you can show this network a whole
+
+52
+00:01:56,280 --> 00:01:58,079
+bunch of training data which comes in
+
+53
+00:01:58,079 --> 00:02:00,000
+the form of a bunch of different images
+
+54
+00:02:00,000 --> 00:02:02,240
+of handwritten digits along with labels
+
+55
+00:02:02,240 --> 00:02:04,200
+for what they're supposed to be and
+
+56
+00:02:04,200 --> 00:02:06,560
+it'll adjust those 13,000 weights and
+
+57
+00:02:06,560 --> 00:02:09,039
+biases so as to improve its performance
+
+58
+00:02:09,039 --> 00:02:11,760
+on the training data hopefully this
+
+59
+00:02:11,760 --> 00:02:13,319
+layered structure will mean that what it
+
+60
+00:02:13,319 --> 00:02:16,120
+learns generalizes to images beyond that
+
+61
+00:02:16,120 --> 00:02:18,760
+training data and the way we test that
+
+62
+00:02:18,760 --> 00:02:20,720
+is that after you train the network you
+
+63
+00:02:20,720 --> 00:02:22,519
+show it more labeled data that it's
+
+64
+00:02:22,519 --> 00:02:24,560
+never seen before and you see how
+
+65
+00:02:24,560 --> 00:02:26,200
+accurately it classifies those new
+
+66
+00:02:26,200 --> 00:02:29,200
+images
+
+67
+00:02:31,000 --> 00:02:32,599
+fortunately for us and what makes this
+
+68
+00:02:32,599 --> 00:02:34,560
+such a common example to start with is
+
+69
+00:02:34,560 --> 00:02:36,239
+that the good people behind the Mist
+
+70
+00:02:36,239 --> 00:02:38,200
+database have put together a collection
+
+71
+00:02:38,200 --> 00:02:40,319
+of tens of thousands of handwritten
+
+72
+00:02:40,319 --> 00:02:42,599
+digit images each one labeled with the
+
+73
+00:02:42,599 --> 00:02:45,080
+numbers that they're supposed to be and
+
+74
+00:02:45,080 --> 00:02:46,800
+as provocative as it is to describe a
+
+75
+00:02:46,800 --> 00:02:48,800
+machine as learning once you actually
+
+76
+00:02:48,800 --> 00:02:50,760
+see how it works it feels a lot less
+
+77
+00:02:50,760 --> 00:02:53,040
+like some crazy sci-fi premise and a lot
+
+78
+00:02:53,040 --> 00:02:56,159
+more like well a calculus exercise I
+
+79
+00:02:56,159 --> 00:02:57,959
+mean basically it comes down to finding
+
+80
+00:02:57,959 --> 00:03:01,840
+the minimum of a certain function
+
+81
+00:03:01,840 --> 00:03:03,680
+remember conceptually we're thinking of
+
+82
+00:03:03,680 --> 00:03:06,360
+each neuron as being connected to all of
+
+83
+00:03:06,360 --> 00:03:08,400
+the neurons in the previous layer and
+
+84
+00:03:08,400 --> 00:03:10,239
+the weights in the weighted sum defining
+
+85
+00:03:10,239 --> 00:03:12,440
+its activation are kind of like the
+
+86
+00:03:12,440 --> 00:03:14,720
+strengths of those connections and the
+
+87
+00:03:14,720 --> 00:03:16,640
+bias is some indication of whether that
+
+88
+00:03:16,640 --> 00:03:19,640
+neuron tends to be active or inactive
+
+89
+00:03:19,640 --> 00:03:21,000
+and to start things off we're just going
+
+90
+00:03:21,000 --> 00:03:22,680
+to initialize all of those weights and
+
+91
+00:03:22,680 --> 00:03:25,760
+biases totally randomly needless to say
+
+92
+00:03:25,760 --> 00:03:27,200
+this network is going to perform pretty
+
+93
+00:03:27,200 --> 00:03:29,040
+horribly on a given training example
+
+94
+00:03:29,040 --> 00:03:31,040
+since it's just doing something random
+
+95
+00:03:31,040 --> 00:03:32,840
+for example you feed in this image of a
+
+96
+00:03:32,840 --> 00:03:35,360
+three and the output layer it just looks
+
+97
+00:03:35,360 --> 00:03:38,159
+like a mess so what you do is you define
+
+98
+00:03:38,159 --> 00:03:40,400
+a cost function a way of telling the
+
+99
+00:03:40,400 --> 00:03:43,920
+computer no bad computer that output
+
+100
+00:03:43,920 --> 00:03:46,040
+should have activations which are zero
+
+101
+00:03:46,040 --> 00:03:48,840
+for most neurons but one for this neuron
+
+102
+00:03:48,840 --> 00:03:51,959
+what you gave me is utter trash to say
+
+103
+00:03:51,959 --> 00:03:53,799
+that a little more mathematically what
+
+104
+00:03:53,799 --> 00:03:55,959
+you do is add up the squares of the
+
+105
+00:03:55,959 --> 00:03:58,079
+differences between each of those trash
+
+106
+00:03:58,079 --> 00:04:00,200
+output activations and the value that
+
+107
+00:04:00,200 --> 00:04:02,239
+you want them to have and this is what
+
+108
+00:04:02,239 --> 00:04:04,920
+we'll call the cost of a single training
+
+109
+00:04:04,920 --> 00:04:07,959
+example notice this sum is small when
+
+110
+00:04:07,959 --> 00:04:09,920
+the network confidently classifies the
+
+111
+00:04:09,920 --> 00:04:11,519
+image
+
+112
+00:04:11,519 --> 00:04:13,720
+correctly but it's large when the
+
+113
+00:04:13,720 --> 00:04:15,079
+network seems like it doesn't really
+
+114
+00:04:15,079 --> 00:04:17,519
+know what it's
+
+115
+00:04:17,639 --> 00:04:20,079
+doing so then what you do is consider
+
+116
+00:04:20,079 --> 00:04:23,280
+the average cost over all of the tens of
+
+117
+00:04:23,280 --> 00:04:26,440
+thousands of training examples at your
+
+118
+00:04:26,440 --> 00:04:28,800
+disposal this average cost is our
+
+119
+00:04:28,800 --> 00:04:30,919
+measure for how how lousy the network is
+
+120
+00:04:30,919 --> 00:04:33,440
+and how bad the computer should feel and
+
+121
+00:04:33,440 --> 00:04:35,520
+that's a complicated thing remember how
+
+122
+00:04:35,520 --> 00:04:37,320
+the network itself was basically a
+
+123
+00:04:37,320 --> 00:04:40,440
+function one that takes in 784 numbers
+
+124
+00:04:40,440 --> 00:04:43,360
+as inputs the pixel values and spits out
+
+125
+00:04:43,360 --> 00:04:45,960
+10 numbers as its output and in a since
+
+126
+00:04:45,960 --> 00:04:48,120
+it's parameterized by all these weights
+
+127
+00:04:48,120 --> 00:04:50,759
+and biases well the cost function is a
+
+128
+00:04:50,759 --> 00:04:53,320
+layer of complexity on top of that it
+
+129
+00:04:53,320 --> 00:04:56,120
+takes as its input those 13,000 or so
+
+130
+00:04:56,120 --> 00:04:58,479
+weights and biases and it spits out a
+
+131
+00:04:58,479 --> 00:05:00,720
+single number describing how bad those
+
+132
+00:05:00,720 --> 00:05:03,320
+weights and biases are and the way it's
+
+133
+00:05:03,320 --> 00:05:05,160
+defined depends on the Network's
+
+134
+00:05:05,160 --> 00:05:07,560
+Behavior over all the tens of thousands
+
+135
+00:05:07,560 --> 00:05:09,919
+of pieces of training data that's a lot
+
+136
+00:05:09,919 --> 00:05:11,320
+to think
+
+137
+00:05:11,320 --> 00:05:13,520
+about but just telling the computer what
+
+138
+00:05:13,520 --> 00:05:15,400
+a crappy job it's doing isn't very
+
+139
+00:05:15,400 --> 00:05:17,240
+helpful you want to tell it how to
+
+140
+00:05:17,240 --> 00:05:19,319
+change those weights and biases so that
+
+141
+00:05:19,319 --> 00:05:22,240
+it gets better to make it easier rather
+
+142
+00:05:22,240 --> 00:05:23,919
+than struggling to imagine a function
+
+143
+00:05:23,919 --> 00:05:26,720
+with 13,000 inputs just imagine a simple
+
+144
+00:05:26,720 --> 00:05:29,080
+function that has one number as an input
+
+145
+00:05:29,080 --> 00:05:31,759
+and one number as an output how do you
+
+146
+00:05:31,759 --> 00:05:34,520
+find an input that minimizes the value
+
+147
+00:05:34,520 --> 00:05:37,280
+of this function calculus students will
+
+148
+00:05:37,280 --> 00:05:38,759
+know that you can sometimes figure out
+
+149
+00:05:38,759 --> 00:05:41,600
+that minimum explicitly but that's not
+
+150
+00:05:41,600 --> 00:05:43,520
+always feasible for really complicated
+
+151
+00:05:43,520 --> 00:05:46,280
+functions certainly not in the 13,000
+
+152
+00:05:46,280 --> 00:05:48,759
+input version of this situation for our
+
+153
+00:05:48,759 --> 00:05:50,720
+crazy complicated neural network cost
+
+154
+00:05:50,720 --> 00:05:53,319
+function a more flexible tactic is to
+
+155
+00:05:53,319 --> 00:05:56,080
+start at any all input and figure out
+
+156
+00:05:56,080 --> 00:05:58,240
+which direction you should step to make
+
+157
+00:05:58,240 --> 00:06:01,080
+that output lower specifically if you
+
+158
+00:06:01,080 --> 00:06:03,199
+can figure out the slope of the function
+
+159
+00:06:03,199 --> 00:06:05,800
+where you are then shift to the left if
+
+160
+00:06:05,800 --> 00:06:07,800
+that slope is positive and shift the
+
+161
+00:06:07,800 --> 00:06:11,520
+input to the right if that slope is
+
+162
+00:06:11,599 --> 00:06:14,199
+negative if you do this repeatedly at
+
+163
+00:06:14,199 --> 00:06:15,680
+each point checking the new slope and
+
+164
+00:06:15,680 --> 00:06:17,360
+taking the appropriate step you're going
+
+165
+00:06:17,360 --> 00:06:19,520
+to approach some local minimum of the
+
+166
+00:06:19,520 --> 00:06:21,520
+function and the image you might have in
+
+167
+00:06:21,520 --> 00:06:24,479
+mind here is a ball rolling down a hill
+
+168
+00:06:24,479 --> 00:06:26,160
+and notice even for this really
+
+169
+00:06:26,160 --> 00:06:28,280
+simplified single input function there
+
+170
+00:06:28,280 --> 00:06:30,440
+are many possible valleys that you might
+
+171
+00:06:30,440 --> 00:06:32,840
+land in depending on which random input
+
+172
+00:06:32,840 --> 00:06:34,880
+you start at and there's no guarantee
+
+173
+00:06:34,880 --> 00:06:36,639
+that the local minimum you land in is
+
+174
+00:06:36,639 --> 00:06:38,440
+going to be the smallest possible value
+
+175
+00:06:38,440 --> 00:06:40,360
+of the cost function that's going to
+
+176
+00:06:40,360 --> 00:06:42,240
+carry over to our neural network case as
+
+177
+00:06:42,240 --> 00:06:44,560
+well and I also want you to notice how
+
+178
+00:06:44,560 --> 00:06:46,759
+if you make your step sizes proportional
+
+179
+00:06:46,759 --> 00:06:48,840
+to the slope then when the slope is
+
+180
+00:06:48,840 --> 00:06:50,960
+flattening out towards the minimum your
+
+181
+00:06:50,960 --> 00:06:53,000
+steps get smaller and smaller and that
+
+182
+00:06:53,000 --> 00:06:54,840
+kind of helps you from
+
+183
+00:06:54,840 --> 00:06:57,199
+overshooting bumping up the complexity a
+
+184
+00:06:57,199 --> 00:06:59,639
+bit imagine instead a function with two
+
+185
+00:06:59,639 --> 00:07:02,000
+inputs and one output you might think of
+
+186
+00:07:02,000 --> 00:07:04,520
+the input space as the XY plane and the
+
+187
+00:07:04,520 --> 00:07:06,759
+cost function as being graphed as a
+
+188
+00:07:06,759 --> 00:07:09,520
+surface above it now instead of asking
+
+189
+00:07:09,520 --> 00:07:11,599
+about the slope of the function you have
+
+190
+00:07:11,599 --> 00:07:14,080
+to ask which direction should you step
+
+191
+00:07:14,080 --> 00:07:16,720
+in this input space so is to decrease
+
+192
+00:07:16,720 --> 00:07:19,639
+the output of the function most quickly
+
+193
+00:07:19,639 --> 00:07:21,280
+in other words what's the downhill
+
+194
+00:07:21,280 --> 00:07:23,280
+Direction and again it's helpful to
+
+195
+00:07:23,280 --> 00:07:26,599
+think of a ball rolling down that Hill
+
+196
+00:07:26,599 --> 00:07:28,599
+those of you familiar with multivariable
+
+197
+00:07:28,599 --> 00:07:30,280
+Calculus will know know that the
+
+198
+00:07:30,280 --> 00:07:32,759
+gradient of a function gives you the
+
+199
+00:07:32,759 --> 00:07:35,360
+direction of steepest Ascent basically
+
+200
+00:07:35,360 --> 00:07:37,000
+which direction should you step to
+
+201
+00:07:37,000 --> 00:07:39,400
+increase the function most quickly
+
+202
+00:07:39,400 --> 00:07:41,639
+naturally enough taking the negative of
+
+203
+00:07:41,639 --> 00:07:43,400
+that gradient gives you the direction to
+
+204
+00:07:43,400 --> 00:07:46,120
+step that decreases the function most
+
+205
+00:07:46,120 --> 00:07:48,360
+quickly and even more than that the
+
+206
+00:07:48,360 --> 00:07:50,039
+length of this gradient Vector is
+
+207
+00:07:50,039 --> 00:07:51,879
+actually an indication for just how
+
+208
+00:07:51,879 --> 00:07:54,680
+steep that steepest slope is now if
+
+209
+00:07:54,680 --> 00:07:56,159
+you're unfamiliar with multivariable
+
+210
+00:07:56,159 --> 00:07:57,759
+Calculus and you want to learn more
+
+211
+00:07:57,759 --> 00:07:58,919
+check out some of the work that I did
+
+212
+00:07:58,919 --> 00:08:02,240
+for k on the topic Honestly though all
+
+213
+00:08:02,240 --> 00:08:04,520
+that matters for you and me right now is
+
+214
+00:08:04,520 --> 00:08:06,879
+that in principle there exists a way to
+
+215
+00:08:06,879 --> 00:08:08,840
+compute this Vector this Vector that
+
+216
+00:08:08,840 --> 00:08:10,759
+tells you what the downhill direction is
+
+217
+00:08:10,759 --> 00:08:13,360
+and how steep it is you'll be okay if
+
+218
+00:08:13,360 --> 00:08:15,000
+that's all you know and you're not rock
+
+219
+00:08:15,000 --> 00:08:16,120
+solid on the
+
+220
+00:08:16,120 --> 00:08:18,560
+details cuz if you can get that the
+
+221
+00:08:18,560 --> 00:08:20,879
+algorithm for minimizing the function is
+
+222
+00:08:20,879 --> 00:08:23,120
+to compute this gradient Direction then
+
+223
+00:08:23,120 --> 00:08:25,360
+take a small step downhill and just
+
+224
+00:08:25,360 --> 00:08:27,120
+repeat that over and
+
+225
+00:08:27,120 --> 00:08:29,639
+over it's the same basic idea for
+
+226
+00:08:29,639 --> 00:08:31,960
+function that has 13,000 inputs instead
+
+227
+00:08:31,960 --> 00:08:35,000
+of two inputs imagine organizing all
+
+228
+00:08:35,000 --> 00:08:37,719
+13,000 weights and biases of our Network
+
+229
+00:08:37,719 --> 00:08:40,919
+into a giant column Vector the negative
+
+230
+00:08:40,919 --> 00:08:43,599
+gradient of the cost function is just a
+
+231
+00:08:43,599 --> 00:08:46,519
+vector it's some direction inside this
+
+232
+00:08:46,519 --> 00:08:49,200
+insanely huge input space that tells you
+
+233
+00:08:49,200 --> 00:08:51,680
+which nudges to all of those numbers is
+
+234
+00:08:51,680 --> 00:08:53,880
+going to cause the most rapid decrease
+
+235
+00:08:53,880 --> 00:08:56,600
+to the cost function and of course with
+
+236
+00:08:56,600 --> 00:08:58,600
+our specially designed cost function
+
+237
+00:08:58,600 --> 00:09:00,399
+changing the weights of and biases to
+
+238
+00:09:00,399 --> 00:09:02,920
+decrease it means making the output of
+
+239
+00:09:02,920 --> 00:09:04,760
+the network on each piece of training
+
+240
+00:09:04,760 --> 00:09:07,480
+data look less like a random array of 10
+
+241
+00:09:07,480 --> 00:09:09,760
+values and more like an actual decision
+
+242
+00:09:09,760 --> 00:09:11,880
+that we want it to make it's important
+
+243
+00:09:11,880 --> 00:09:13,760
+to remember this cost function involves
+
+244
+00:09:13,760 --> 00:09:16,720
+an average over all of the training data
+
+245
+00:09:16,720 --> 00:09:18,600
+so if you minimize it it means it's a
+
+246
+00:09:18,600 --> 00:09:22,440
+better performance on all of those
+
+247
+00:09:23,200 --> 00:09:25,839
+samples the algorithm for computing this
+
+248
+00:09:25,839 --> 00:09:27,600
+gradient efficiently which is
+
+249
+00:09:27,600 --> 00:09:29,120
+effectively the heart of how a neural
+
+250
+00:09:29,120 --> 00:09:30,920
+network learns is called back
+
+251
+00:09:30,920 --> 00:09:32,560
+propagation and it's what I'm going to
+
+252
+00:09:32,560 --> 00:09:34,920
+be talking about next video there I
+
+253
+00:09:34,920 --> 00:09:36,560
+really want to take the time to walk
+
+254
+00:09:36,560 --> 00:09:38,760
+through what exactly happens to each
+
+255
+00:09:38,760 --> 00:09:40,760
+weight and each bias for a given piece
+
+256
+00:09:40,760 --> 00:09:42,800
+of training data trying to give an
+
+257
+00:09:42,800 --> 00:09:44,440
+intuitive feel for what's happening
+
+258
+00:09:44,440 --> 00:09:46,880
+beyond the pile of relevant calculus and
+
+259
+00:09:46,880 --> 00:09:49,320
+formulas Right Here Right Now the main
+
+260
+00:09:49,320 --> 00:09:51,120
+thing I want you to know independent of
+
+261
+00:09:51,120 --> 00:09:53,519
+implementation details is that what we
+
+262
+00:09:53,519 --> 00:09:55,160
+mean when we talk about a network
+
+263
+00:09:55,160 --> 00:09:57,640
+learning is that it's just minimizing a
+
+264
+00:09:57,640 --> 00:10:00,360
+cost function and notice one consequence
+
+265
+00:10:00,360 --> 00:10:02,040
+of that is that it's important for this
+
+266
+00:10:02,040 --> 00:10:04,040
+cost function to have a nice smooth
+
+267
+00:10:04,040 --> 00:10:06,000
+output so that we can find a local
+
+268
+00:10:06,000 --> 00:10:08,200
+minimum by taking little steps
+
+269
+00:10:08,200 --> 00:10:10,399
+downhill this is why by the way
+
+270
+00:10:10,399 --> 00:10:12,440
+artificial neurons have continuously
+
+271
+00:10:12,440 --> 00:10:14,600
+ranging activations rather than simply
+
+272
+00:10:14,600 --> 00:10:16,959
+being active or inactive in a binary way
+
+273
+00:10:16,959 --> 00:10:19,320
+the way that biological neurons
+
+274
+00:10:19,320 --> 00:10:22,040
+are this process of repeatedly nudging
+
+275
+00:10:22,040 --> 00:10:24,000
+an input of a function by some multiple
+
+276
+00:10:24,000 --> 00:10:25,880
+of the negative gradient is called
+
+277
+00:10:25,880 --> 00:10:28,360
+gradient descent it's a way to converge
+
+278
+00:10:28,360 --> 00:10:30,160
+towards some local minimum of a cost
+
+279
+00:10:30,160 --> 00:10:32,360
+function basically a valley in this
+
+280
+00:10:32,360 --> 00:10:34,680
+graph I'm still showing the picture of a
+
+281
+00:10:34,680 --> 00:10:36,279
+function with two inputs of course
+
+282
+00:10:36,279 --> 00:10:38,519
+because nudges in a 13,000 dimensional
+
+283
+00:10:38,519 --> 00:10:40,240
+inut space are a little hard to wrap
+
+284
+00:10:40,240 --> 00:10:42,120
+your mind around but there is actually a
+
+285
+00:10:42,120 --> 00:10:45,000
+nice non-spatial way to think about this
+
+286
+00:10:45,000 --> 00:10:47,240
+each component of the negative gradient
+
+287
+00:10:47,240 --> 00:10:50,079
+tells us two things the sign of course
+
+288
+00:10:50,079 --> 00:10:51,800
+tells us whether the corresponding
+
+289
+00:10:51,800 --> 00:10:53,800
+component of the input Vector should be
+
+290
+00:10:53,800 --> 00:10:56,920
+nudged up or down but importantly the
+
+291
+00:10:56,920 --> 00:10:58,880
+relative magnitudes of all these
+
+292
+00:10:58,880 --> 00:11:00,120
+components
+
+293
+00:11:00,120 --> 00:11:04,399
+kind of tells you which changes matter
+
+294
+00:11:04,480 --> 00:11:06,959
+more you see in our Network an
+
+295
+00:11:06,959 --> 00:11:08,880
+adjustment to one of the weights might
+
+296
+00:11:08,880 --> 00:11:10,880
+have a much greater impact on the cost
+
+297
+00:11:10,880 --> 00:11:12,560
+function than the adjustment to some
+
+298
+00:11:12,560 --> 00:11:13,720
+other
+
+299
+00:11:13,720 --> 00:11:16,240
+weight some of these connections just
+
+300
+00:11:16,240 --> 00:11:19,560
+matter more for our training data so a
+
+301
+00:11:19,560 --> 00:11:20,680
+way that you can think about this
+
+302
+00:11:20,680 --> 00:11:22,839
+gradient Vector of our mind-warping
+
+303
+00:11:22,839 --> 00:11:25,639
+massive cost function is that it encodes
+
+304
+00:11:25,639 --> 00:11:27,560
+the relative importance of each weight
+
+305
+00:11:27,560 --> 00:11:30,360
+and bias that is which of these changes
+
+306
+00:11:30,360 --> 00:11:32,959
+is going to carry the most bang for your
+
+307
+00:11:32,959 --> 00:11:35,480
+buck this really is just another way of
+
+308
+00:11:35,480 --> 00:11:37,600
+thinking about direction to take a
+
+309
+00:11:37,600 --> 00:11:39,160
+simpler example if you have some
+
+310
+00:11:39,160 --> 00:11:41,519
+function with two variables as an input
+
+311
+00:11:41,519 --> 00:11:43,720
+and you compute that its gradient at
+
+312
+00:11:43,720 --> 00:11:46,800
+some particular Point comes out as
+
+313
+00:11:46,800 --> 00:11:49,000
+31 then on the one hand you can
+
+314
+00:11:49,000 --> 00:11:50,639
+interpret that as saying that when
+
+315
+00:11:50,639 --> 00:11:52,560
+you're standing at that input moving
+
+316
+00:11:52,560 --> 00:11:54,440
+along this direction increases the
+
+317
+00:11:54,440 --> 00:11:56,519
+function most quickly that when you
+
+318
+00:11:56,519 --> 00:11:58,320
+graph the function above the plane of
+
+319
+00:11:58,320 --> 00:12:00,440
+input points that Vector is what's
+
+320
+00:12:00,440 --> 00:12:02,920
+giving you the straight uphill Direction
+
+321
+00:12:02,920 --> 00:12:04,839
+but another way to read that is to say
+
+322
+00:12:04,839 --> 00:12:07,399
+that changes to this first variable have
+
+323
+00:12:07,399 --> 00:12:09,480
+three times the importance as changes to
+
+324
+00:12:09,480 --> 00:12:11,839
+the second variable that at least in the
+
+325
+00:12:11,839 --> 00:12:13,720
+neighborhood of the relevant input
+
+326
+00:12:13,720 --> 00:12:15,920
+nudging the x value carries a lot more
+
+327
+00:12:15,920 --> 00:12:18,519
+bang for your
+
+328
+00:12:18,720 --> 00:12:21,399
+buck all right let's zoom out and sum up
+
+329
+00:12:21,399 --> 00:12:24,000
+where we are so far the network itself
+
+330
+00:12:24,000 --> 00:12:26,880
+is this function with 784 inputs and 10
+
+331
+00:12:26,880 --> 00:12:29,199
+outputs defined in terms of all of these
+
+332
+00:12:29,199 --> 00:12:31,959
+weighted sums the cost function is a
+
+333
+00:12:31,959 --> 00:12:34,199
+layer of complexity on top of that it
+
+334
+00:12:34,199 --> 00:12:36,839
+takes the 13,000 weights and biases as
+
+335
+00:12:36,839 --> 00:12:39,279
+inputs and spits out a single measure of
+
+336
+00:12:39,279 --> 00:12:42,399
+lousiness based on the training examples
+
+337
+00:12:42,399 --> 00:12:45,040
+and the gradient of the cost function is
+
+338
+00:12:45,040 --> 00:12:47,519
+one more layer of complexity still it
+
+339
+00:12:47,519 --> 00:12:49,760
+tells us what nudges to all of these
+
+340
+00:12:49,760 --> 00:12:52,079
+weights and biases cause the fastest
+
+341
+00:12:52,079 --> 00:12:54,279
+change to the value of the cost function
+
+342
+00:12:54,279 --> 00:12:55,720
+which you might interpret as saying
+
+343
+00:12:55,720 --> 00:12:57,320
+which changes to which weights matter
+
+344
+00:12:57,320 --> 00:13:00,519
+the most
+
+345
+00:13:02,959 --> 00:13:05,000
+so when you initialize the network with
+
+346
+00:13:05,000 --> 00:13:06,760
+random weights and biases and adjust
+
+347
+00:13:06,760 --> 00:13:08,519
+them many times based on this gradient
+
+348
+00:13:08,519 --> 00:13:10,560
+descent process how well does it
+
+349
+00:13:10,560 --> 00:13:12,320
+actually perform on images that it's
+
+350
+00:13:12,320 --> 00:13:14,639
+never seen before well the one that I've
+
+351
+00:13:14,639 --> 00:13:16,320
+described here with the two hidden
+
+352
+00:13:16,320 --> 00:13:18,920
+layers of 16 neurons each chosen mostly
+
+353
+00:13:18,920 --> 00:13:22,079
+for aesthetic reasons well it's not bad
+
+354
+00:13:22,079 --> 00:13:24,399
+it classifies about 96% of the new
+
+355
+00:13:24,399 --> 00:13:26,880
+images that it sees correctly and
+
+356
+00:13:26,880 --> 00:13:28,360
+honestly if you look at some of the
+
+357
+00:13:28,360 --> 00:13:30,480
+examples that it messes up on you kind
+
+358
+00:13:30,480 --> 00:13:33,959
+of feel compelled to cut it a little
+
+359
+00:13:35,079 --> 00:13:37,240
+slack now if you play around with the
+
+360
+00:13:37,240 --> 00:13:38,800
+hidden layer structure and make a couple
+
+361
+00:13:38,800 --> 00:13:42,000
+tweaks you can get this up to 98% and
+
+362
+00:13:42,000 --> 00:13:44,199
+that's pretty good it's not the best you
+
+363
+00:13:44,199 --> 00:13:45,760
+can certainly get better performance by
+
+364
+00:13:45,760 --> 00:13:47,360
+getting more sophisticated than this
+
+365
+00:13:47,360 --> 00:13:49,880
+plain vanilla network but given how
+
+366
+00:13:49,880 --> 00:13:52,160
+daunting the initial task is I just
+
+367
+00:13:52,160 --> 00:13:53,880
+think there's something incredible about
+
+368
+00:13:53,880 --> 00:13:55,959
+any network doing this well on images
+
+369
+00:13:55,959 --> 00:13:57,959
+that it's never seen before given that
+
+370
+00:13:57,959 --> 00:13:59,959
+we never specifically told it what
+
+371
+00:13:59,959 --> 00:14:01,600
+patterns to look
+
+372
+00:14:01,600 --> 00:14:04,279
+for originally the way that I motivated
+
+373
+00:14:04,279 --> 00:14:06,440
+this structure was by describing a hope
+
+374
+00:14:06,440 --> 00:14:08,440
+that we might have that the second layer
+
+375
+00:14:08,440 --> 00:14:10,440
+might pick up on little edges that the
+
+376
+00:14:10,440 --> 00:14:12,079
+third layer would piece together those
+
+377
+00:14:12,079 --> 00:14:13,880
+edges to recognize loops and longer
+
+378
+00:14:13,880 --> 00:14:15,880
+lines and that those might be pieced
+
+379
+00:14:15,880 --> 00:14:19,000
+together to recognize digits so is this
+
+380
+00:14:19,000 --> 00:14:21,959
+what our network is actually doing well
+
+381
+00:14:21,959 --> 00:14:24,720
+for this one at least not at all
+
+382
+00:14:24,720 --> 00:14:26,399
+remember how last video we looked at how
+
+383
+00:14:26,399 --> 00:14:28,480
+the weights of the connections from all
+
+384
+00:14:28,480 --> 00:14:30,560
+of the neurons in the first layer to a
+
+385
+00:14:30,560 --> 00:14:32,639
+given neuron in the second layer can be
+
+386
+00:14:32,639 --> 00:14:35,040
+visualized as a given pixel pattern that
+
+387
+00:14:35,040 --> 00:14:36,800
+that second layer neuron is picking up
+
+388
+00:14:36,800 --> 00:14:39,720
+on well when we actually do that for the
+
+389
+00:14:39,720 --> 00:14:41,240
+weights associated with these
+
+390
+00:14:41,240 --> 00:14:43,040
+transitions from the first layer to the
+
+391
+00:14:43,040 --> 00:14:45,560
+next instead of picking up on isolated
+
+392
+00:14:45,560 --> 00:14:48,519
+little edges here and there they look
+
+393
+00:14:48,519 --> 00:14:51,800
+well almost random just with some very
+
+394
+00:14:51,800 --> 00:14:54,199
+loose patterns in the middle there it
+
+395
+00:14:54,199 --> 00:14:56,199
+would seem that in the unfathomably
+
+396
+00:14:56,199 --> 00:14:58,360
+large 13,000 dimensional space of
+
+397
+00:14:58,360 --> 00:15:00,279
+possible weights and and biases our
+
+398
+00:15:00,279 --> 00:15:01,880
+Network found itself a happy little
+
+399
+00:15:01,880 --> 00:15:04,079
+local minimum that despite successfully
+
+400
+00:15:04,079 --> 00:15:06,639
+classifying most images doesn't exactly
+
+401
+00:15:06,639 --> 00:15:08,040
+pick up on the patterns that we might
+
+402
+00:15:08,040 --> 00:15:10,639
+have hoped for and to really drive this
+
+403
+00:15:10,639 --> 00:15:12,440
+point home watch what happens when you
+
+404
+00:15:12,440 --> 00:15:15,320
+input a random image if the system was
+
+405
+00:15:15,320 --> 00:15:17,600
+smart you might expect it to either feel
+
+406
+00:15:17,600 --> 00:15:19,800
+uncertain maybe not really activating
+
+407
+00:15:19,800 --> 00:15:21,600
+any of those 10 output neurons or
+
+408
+00:15:21,600 --> 00:15:24,560
+activating them all evenly but instead
+
+409
+00:15:24,560 --> 00:15:26,600
+it confidently gives you some nonsense
+
+410
+00:15:26,600 --> 00:15:29,199
+answer as if it feels as sure that this
+
+411
+00:15:29,199 --> 00:15:31,519
+random noise as a five as it does that
+
+412
+00:15:31,519 --> 00:15:34,360
+an actual image of a five is a five
+
+413
+00:15:34,360 --> 00:15:36,680
+phrased differently even if this network
+
+414
+00:15:36,680 --> 00:15:39,199
+can recognize digits pretty well it has
+
+415
+00:15:39,199 --> 00:15:42,319
+no idea how to draw them a lot of this
+
+416
+00:15:42,319 --> 00:15:43,800
+is because it's such a tightly
+
+417
+00:15:43,800 --> 00:15:46,199
+constrained training setup I mean put
+
+418
+00:15:46,199 --> 00:15:48,040
+yourself in the Network's shoes here
+
+419
+00:15:48,040 --> 00:15:50,040
+from its point of view the entire
+
+420
+00:15:50,040 --> 00:15:52,279
+universe consists of nothing but clearly
+
+421
+00:15:52,279 --> 00:15:54,319
+defined unmoving digits centered in a
+
+422
+00:15:54,319 --> 00:15:56,720
+tiny grid and its cost function just
+
+423
+00:15:56,720 --> 00:15:58,560
+never gave it any incentive to be
+
+424
+00:15:58,560 --> 00:16:01,000
+anything but utterly confident in its
+
+425
+00:16:01,000 --> 00:16:03,240
+decisions so with this as the image of
+
+426
+00:16:03,240 --> 00:16:04,560
+what those second layer neurons are
+
+427
+00:16:04,560 --> 00:16:06,360
+really doing you might wonder why I
+
+428
+00:16:06,360 --> 00:16:07,880
+would introduce this network with the
+
+429
+00:16:07,880 --> 00:16:09,519
+motivation of picking up on edges and
+
+430
+00:16:09,519 --> 00:16:11,360
+patterns I mean that's just not at all
+
+431
+00:16:11,360 --> 00:16:14,360
+what it ends up doing well this is not
+
+432
+00:16:14,360 --> 00:16:16,480
+meant to be our end goal but instead a
+
+433
+00:16:16,480 --> 00:16:18,720
+starting point frankly this is old
+
+434
+00:16:18,720 --> 00:16:20,519
+technology the kind researched in the '
+
+435
+00:16:20,519 --> 00:16:23,120
+80s and '90s and you do need to
+
+436
+00:16:23,120 --> 00:16:24,480
+understand it before you can understand
+
+437
+00:16:24,480 --> 00:16:26,560
+more detailed modern variants and it
+
+438
+00:16:26,560 --> 00:16:28,240
+clearly is capable of solving some
+
+439
+00:16:28,240 --> 00:16:30,279
+interesting problems s but the more you
+
+440
+00:16:30,279 --> 00:16:31,920
+dig into what those hidden layers are
+
+441
+00:16:31,920 --> 00:16:35,920
+really doing the less intelligent it
+
+442
+00:16:37,600 --> 00:16:39,959
+seems Shifting the focus for a moment
+
+443
+00:16:39,959 --> 00:16:42,800
+from how networks learn to how you learn
+
+444
+00:16:42,800 --> 00:16:44,319
+that'll only happen if you engage
+
+445
+00:16:44,319 --> 00:16:46,959
+actively with the material here somehow
+
+446
+00:16:46,959 --> 00:16:48,480
+one pretty simple thing that I want you
+
+447
+00:16:48,480 --> 00:16:51,440
+to do is just pause right now and think
+
+448
+00:16:51,440 --> 00:16:53,959
+deeply for a moment about what changes
+
+449
+00:16:53,959 --> 00:16:56,160
+you might make to this system and how it
+
+450
+00:16:56,160 --> 00:16:58,319
+perceives images if you wanted it to
+
+451
+00:16:58,319 --> 00:17:00,720
+better pick up on things like edges and
+
+452
+00:17:00,720 --> 00:17:02,959
+patterns but better than that to
+
+453
+00:17:02,959 --> 00:17:05,199
+actually engage with the material I
+
+454
+00:17:05,199 --> 00:17:06,919
+highly recommend the book by Michael
+
+455
+00:17:06,919 --> 00:17:08,640
+neelen on deep learning and neural
+
+456
+00:17:08,640 --> 00:17:11,240
+networks in it you can find the code and
+
+457
+00:17:11,240 --> 00:17:13,640
+the data to download and play with for
+
+458
+00:17:13,640 --> 00:17:15,640
+this exact example and the book will
+
+459
+00:17:15,640 --> 00:17:17,520
+walk you through step by step what that
+
+460
+00:17:17,520 --> 00:17:20,199
+code is doing what's awesome is that
+
+461
+00:17:20,199 --> 00:17:22,679
+this book is free and publicly available
+
+462
+00:17:22,679 --> 00:17:24,400
+so if you do get something out of it
+
+463
+00:17:24,400 --> 00:17:26,400
+consider joining me in making a donation
+
+464
+00:17:26,400 --> 00:17:28,960
+towards neel's efforts I've also linked
+
+465
+00:17:28,960 --> 00:17:30,520
+a couple other resources that I like a
+
+466
+00:17:30,520 --> 00:17:32,440
+lot in the description including the
+
+467
+00:17:32,440 --> 00:17:34,280
+phenomenal and beautiful blog post by
+
+468
+00:17:34,280 --> 00:17:37,559
+Chris Ola and the articles in
+
+469
+00:17:37,559 --> 00:17:39,760
+distill to close things off here for the
+
+470
+00:17:39,760 --> 00:17:41,240
+last few minutes I want to jump back
+
+471
+00:17:41,240 --> 00:17:42,840
+into a snippet of the interview that I
+
+472
+00:17:42,840 --> 00:17:45,080
+had with Lea Lee you might remember her
+
+473
+00:17:45,080 --> 00:17:47,000
+from the last video she did her PhD work
+
+474
+00:17:47,000 --> 00:17:48,840
+in deep learning and in this little
+
+475
+00:17:48,840 --> 00:17:50,480
+snippet she talks about two recent
+
+476
+00:17:50,480 --> 00:17:52,200
+papers that really dig into to how some
+
+477
+00:17:52,200 --> 00:17:54,039
+of the more modern image recognition
+
+478
+00:17:54,039 --> 00:17:56,440
+networks are actually learning just to
+
+479
+00:17:56,440 --> 00:17:58,159
+set up where we were in the conversation
+
+480
+00:17:58,159 --> 00:17:59,720
+the first paper took one of these
+
+481
+00:17:59,720 --> 00:18:01,799
+particularly deep neural networks that's
+
+482
+00:18:01,799 --> 00:18:03,760
+really good at image recognition and
+
+483
+00:18:03,760 --> 00:18:05,320
+instead of training it on a properly
+
+484
+00:18:05,320 --> 00:18:07,360
+labeled data set it shuffled all of the
+
+485
+00:18:07,360 --> 00:18:09,840
+labels around before training obviously
+
+486
+00:18:09,840 --> 00:18:11,600
+the testing accuracy here was going to
+
+487
+00:18:11,600 --> 00:18:13,200
+be no better than random since
+
+488
+00:18:13,200 --> 00:18:15,280
+everything's just randomly labeled but
+
+489
+00:18:15,280 --> 00:18:17,360
+it was still able to achieve the same
+
+490
+00:18:17,360 --> 00:18:19,679
+training accuracy as you would on a
+
+491
+00:18:19,679 --> 00:18:22,440
+properly labeled data set basically the
+
+492
+00:18:22,440 --> 00:18:24,400
+millions of weights for this particular
+
+493
+00:18:24,400 --> 00:18:26,240
+Network were enough for it to just
+
+494
+00:18:26,240 --> 00:18:28,520
+memorize the random data which kind of
+
+495
+00:18:28,520 --> 00:18:29,960
+Reon is the question for whether
+
+496
+00:18:29,960 --> 00:18:32,120
+minimizing this cost function actually
+
+497
+00:18:32,120 --> 00:18:33,960
+corresponds to any sort of structure in
+
+498
+00:18:33,960 --> 00:18:36,280
+the image or is it just you know
+
+499
+00:18:36,280 --> 00:18:38,480
+memorization the entire data set of what
+
+500
+00:18:38,480 --> 00:18:40,720
+the correct classification is and so a
+
+501
+00:18:40,720 --> 00:18:42,720
+couple of you know half a year later at
+
+502
+00:18:42,720 --> 00:18:45,760
+icml this year um there was not exactly
+
+503
+00:18:45,760 --> 00:18:48,000
+rebuttal paper paper that addressed some
+
+504
+00:18:48,000 --> 00:18:50,039
+aspects of like hey actually these
+
+505
+00:18:50,039 --> 00:18:51,200
+networks are doing something a little
+
+506
+00:18:51,200 --> 00:18:53,679
+bit smarter than that if you look at
+
+507
+00:18:53,679 --> 00:18:56,760
+that accuracy curve if you were just
+
+508
+00:18:56,760 --> 00:18:59,799
+training on a random data set that curve
+
+509
+00:18:59,799 --> 00:19:03,159
+sort of went down very you know very
+
+510
+00:19:03,159 --> 00:19:05,039
+slowly in almost kind of a linear
+
+511
+00:19:05,039 --> 00:19:07,120
+fashion so you're really struggling to
+
+512
+00:19:07,120 --> 00:19:09,640
+find that local Minima of possible you
+
+513
+00:19:09,640 --> 00:19:11,320
+know the right weights that would get
+
+514
+00:19:11,320 --> 00:19:12,760
+you that accuracy whereas if you're
+
+515
+00:19:12,760 --> 00:19:14,360
+actually training on a structured data
+
+516
+00:19:14,360 --> 00:19:16,640
+set one that has the right labels you
+
+517
+00:19:16,640 --> 00:19:18,000
+know you fiddle around a little bit in
+
+518
+00:19:18,000 --> 00:19:19,120
+the beginning but then you kind of
+
+519
+00:19:19,120 --> 00:19:22,159
+dropped very fast to get to that uh
+
+520
+00:19:22,159 --> 00:19:24,159
+accuracy level and so in some sense it
+
+521
+00:19:24,159 --> 00:19:28,520
+was easier to find that local Maxima and
+
+522
+00:19:28,520 --> 00:19:30,159
+so so was also interesting about that is
+
+523
+00:19:30,159 --> 00:19:32,679
+it it brings into light another paper
+
+524
+00:19:32,679 --> 00:19:34,440
+from actually a couple of years ago
+
+525
+00:19:34,440 --> 00:19:38,000
+which has a lot more uh simplifications
+
+526
+00:19:38,000 --> 00:19:39,679
+about the network layers but one of the
+
+527
+00:19:39,679 --> 00:19:41,679
+results was saying how if you look at
+
+528
+00:19:41,679 --> 00:19:44,320
+the optimization landscape the local
+
+529
+00:19:44,320 --> 00:19:47,159
+Minima that these networks tend to learn
+
+530
+00:19:47,159 --> 00:19:49,720
+are actually of equal quality so in some
+
+531
+00:19:49,720 --> 00:19:52,080
+sense if your data set is structured you
+
+532
+00:19:52,080 --> 00:19:55,880
+should be able to find that much more
+
+533
+00:19:57,400 --> 00:20:00,039
+easily my thanks as always to those of
+
+534
+00:20:00,039 --> 00:20:01,799
+you supporting on patreon I've said
+
+535
+00:20:01,799 --> 00:20:03,720
+before just what a game changer patreon
+
+536
+00:20:03,720 --> 00:20:05,880
+is but these videos really would not be
+
+537
+00:20:05,880 --> 00:20:08,120
+possible without you I also want to give
+
+538
+00:20:08,120 --> 00:20:10,320
+a special thanks to the VC firm amplify
+
+539
+00:20:10,320 --> 00:20:11,799
+Partners in their support of these
+
+540
+00:20:11,799 --> 00:20:15,760
+initial videos in the series
+
+541
+00:20:16,570 --> 00:20:28,740
+[Music]

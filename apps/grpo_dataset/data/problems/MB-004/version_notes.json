@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-004",
+  "conflicts": [
+    {
+      "category": "framework_fork",
+      "gl_construct": "manim_imports_ext / StackedProbDistribution",
+      "ce_equivalent": "Implement StackedProbDistribution manually in Manim Community using a VGroup of Rectangles, updating their widths and positions dynamically in an updater function.",
+      "severity": "high"
+    },
+    {
+      "category": "math_functions",
+      "gl_construct": "math.log2",
+      "ce_equivalent": "Standard python math.log2 is fully compatible, but ensure inputs are strictly positive to avoid ValueError.",
+      "severity": "low"
+    }
+  ]
+}

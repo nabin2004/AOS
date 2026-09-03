@@ -1,0 +1,43 @@
+{
+  "problem_id": "MB-041",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "R_S",
+        "D_S",
+        "ratio formula",
+        "division representation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D Earth sphere",
+        "Glowing Sun",
+        "Moon sphere",
+        "Orbit circle",
+        "Camera reorientation",
+        "Brace"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Earth tilt angle 23.3 degrees",
+        "Sun radius",
+        "Earth radius",
+        "Moon orbit radius"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene",
+        "get_earth function",
+        "get_sun function",
+        "get_moon function"
+      ]
+    }
+  }
+}

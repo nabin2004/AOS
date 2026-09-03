@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-028",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "exponential mapping",
+        "logarithmic scaling",
+        "scale factor of 256",
+        "complex function np.exp"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Droste effect image",
+        "red bounding box",
+        "dynamic scale label",
+        "camera zoom animation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for frame exponent",
+        "ValueTracker for box exponent",
+        "decimal value updating to 256.0"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene",
+        "updaters for box and label",
+        "clip_to_box constraint"
+      ]
+    }
+  }
+}

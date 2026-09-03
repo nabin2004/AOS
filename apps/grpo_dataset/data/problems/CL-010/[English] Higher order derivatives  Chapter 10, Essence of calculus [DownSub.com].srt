@@ -1,0 +1,313 @@
+1
+00:00:00,000 --> 00:00:04,020
+[Submit subtitle corrections at criblate.com]
+
+2
+00:00:04,020 --> 00:00:06,711
+In the next chapter about Taylor series, I make
+
+3
+00:00:06,711 --> 00:00:09,460
+frequent reference to higher order derivatives.
+
+4
+00:00:10,100 --> 00:00:12,469
+And if you're already comfortable with second derivatives,
+
+5
+00:00:12,469 --> 00:00:13,980
+third derivatives, and so on, great!
+
+6
+00:00:14,420 --> 00:00:16,660
+Feel free to just skip ahead to the main event now.
+
+7
+00:00:16,880 --> 00:00:17,800
+You won't hurt my feelings.
+
+8
+00:00:18,960 --> 00:00:21,490
+But somehow, I've managed not to bring up higher
+
+9
+00:00:21,490 --> 00:00:24,020
+order derivatives at all so far in this series.
+
+10
+00:00:24,520 --> 00:00:26,779
+So for the sake of completeness, I thought I'd give you
+
+11
+00:00:26,779 --> 00:00:29,080
+this little footnote just to go over them very quickly.
+
+12
+00:00:29,640 --> 00:00:34,126
+I'll focus mainly on the second derivative, showing what it looks like in the context
+
+13
+00:00:34,126 --> 00:00:38,560
+of graphs and motion, and leave you to think about the analogies for higher orders.
+
+14
+00:00:40,100 --> 00:00:43,922
+Given some function f of x, the derivative can be interpreted
+
+15
+00:00:43,922 --> 00:00:47,180
+as the slope of this graph above some point, right?
+
+16
+00:00:47,760 --> 00:00:50,254
+A steep slope means a high value for the derivative,
+
+17
+00:00:50,254 --> 00:00:52,460
+a downward slope means a negative derivative.
+
+18
+00:00:53,240 --> 00:00:57,319
+So the second derivative, whose notation I'll explain in just a moment,
+
+19
+00:00:57,319 --> 00:01:02,260
+is the derivative of the derivative, meaning it tells you how that slope is changing.
+
+20
+00:01:03,280 --> 00:01:07,460
+The way to see that at a glance is to think about how the graph of f of x curves.
+
+21
+00:01:08,140 --> 00:01:11,961
+At points where it curves upwards, the slope is increasing,
+
+22
+00:01:11,961 --> 00:01:15,200
+and that means the second derivative is positive.
+
+23
+00:01:17,800 --> 00:01:21,100
+At points where it's curving downwards, the slope is decreasing,
+
+24
+00:01:21,100 --> 00:01:23,060
+so the second derivative is negative.
+
+25
+00:01:26,000 --> 00:01:32,086
+For example, a graph like this one has a very positive second derivative at the point 4,
+
+26
+00:01:32,086 --> 00:01:36,027
+since the slope is rapidly increasing around that point,
+
+27
+00:01:36,027 --> 00:01:42,113
+whereas a graph like this one still has a positive second derivative at the same point,
+
+28
+00:01:42,113 --> 00:01:45,640
+but it's smaller, the slope only increases slowly.
+
+29
+00:01:46,500 --> 00:01:50,900
+At points where there's not really any curvature, the second derivative is just 0.
+
+30
+00:01:53,380 --> 00:01:57,417
+As far as notation goes, you could try writing it like this,
+
+31
+00:01:57,417 --> 00:02:01,252
+indicating some small change to the derivative function,
+
+32
+00:02:01,252 --> 00:02:06,366
+divided by some small change to x, where as always the use of this letter d
+
+33
+00:02:06,366 --> 00:02:12,018
+suggests that what you really want to consider is what this ratio approaches as dx,
+
+34
+00:02:12,018 --> 00:02:14,440
+both dx's in this case, approach 0.
+
+35
+00:02:15,540 --> 00:02:19,395
+That's pretty awkward and clunky, so the standard is to
+
+36
+00:02:19,395 --> 00:02:23,180
+abbreviate this as d squared f divided by dx squared.
+
+37
+00:02:24,360 --> 00:02:28,455
+And even though it's not terribly important for getting an intuition for the second
+
+38
+00:02:28,455 --> 00:02:32,500
+derivative, I think it might be worth showing you how you can read this notation.
+
+39
+00:02:33,160 --> 00:02:36,353
+To start off, think of some input to your function,
+
+40
+00:02:36,353 --> 00:02:40,860
+and then take two small steps to the right, each one with a size of dx.
+
+41
+00:02:42,000 --> 00:02:45,765
+I'm choosing rather big steps here so we'll be able to see what's going on,
+
+42
+00:02:45,765 --> 00:02:49,680
+but in principle keep in the back of your mind that dx should be rather tiny.
+
+43
+00:02:50,900 --> 00:02:55,680
+The first step causes some change to the function, which I'll call df1,
+
+44
+00:02:55,680 --> 00:03:01,066
+and the second step causes some similar but possibly slightly different change,
+
+45
+00:03:01,066 --> 00:03:02,480
+which I'll call df2.
+
+46
+00:03:03,330 --> 00:03:08,918
+The difference between these changes, the change in how the function changes,
+
+47
+00:03:08,918 --> 00:03:10,660
+is what we'll call ddf.
+
+48
+00:03:12,020 --> 00:03:17,460
+You should think of this as really small, typically proportional to the size of dx2.
+
+49
+00:03:18,400 --> 00:03:23,004
+So if, for example, you substituted in 0.01 for dx,
+
+50
+00:03:23,004 --> 00:03:28,600
+you would expect this ddf to be about proportional to 0.0001.
+
+51
+00:03:29,700 --> 00:03:34,372
+The second derivative is the size of this change to the change,
+
+52
+00:03:34,372 --> 00:03:37,858
+divided by the size of dx2, or more precisely,
+
+53
+00:03:37,858 --> 00:03:41,640
+whatever that ratio approaches as dx approaches 0.
+
+54
+00:03:43,000 --> 00:03:47,575
+Even though it's not like this letter d is a variable multiplied by f,
+
+55
+00:03:47,575 --> 00:03:53,326
+for the sake of more compact notation, you'd write it as d squared f, divided by (dx)²,
+
+56
+00:03:53,326 --> 00:03:57,705
+and you don't typically bother with any parenthesis on the bottom.
+
+57
+00:03:57,705 --> 00:04:01,887
+Maybe the most visceral understanding of the second derivative,
+
+58
+00:04:01,887 --> 00:04:04,240
+is that it represents acceleration.
+58
+
+59
+00:04:05,180 --> 00:04:04,691
+Maybe the most visceral understanding of the second
+59
+
+60
+00:04:04,691 --> 00:04:04,240
+derivative is that it represents acceleration.
+
+61
+00:04:05,180 --> 00:04:08,841
+Given some movement along a line, suppose you have some function
+
+62
+00:04:08,841 --> 00:04:11,587
+that records the distance traveled versus time,
+
+63
+00:04:11,587 --> 00:04:15,820
+maybe its graph looks something like this, steadily increasing over time.
+
+64
+00:04:16,740 --> 00:04:19,944
+Then its derivative tells you velocity at each point in time,
+
+65
+00:04:19,944 --> 00:04:22,886
+right, for example the graph might look like this bump,
+
+66
+00:04:22,886 --> 00:04:26,300
+increasing up to some maximum, and then decreasing back to zero.
+
+67
+00:04:27,200 --> 00:04:32,094
+So the second derivative tells you the rate of change for the velocity,
+
+68
+00:04:32,094 --> 00:04:38,160
+which is the acceleration at each point in time. In this example, the second derivative
+
+69
+00:04:38,160 --> 00:04:41,543
+is positive for the first half of the journey, which indicates speeding up,
+
+70
+00:04:41,543 --> 00:04:44,429
+that's the sensation of being pushed back into your car's seat,
+
+71
+00:04:44,429 --> 00:04:46,820
+or rather having the car's seat pushing you forward.
+
+72
+00:04:47,540 --> 00:04:52,520
+A negative second derivative indicates slowing down, negative acceleration.
+
+73
+00:04:54,000 --> 00:04:57,080
+The third derivative, and this is not a joke, is called jerk.
+
+74
+00:04:57,840 --> 00:05:00,751
+So if the jerk is not zero, it means that the
+
+75
+00:05:00,751 --> 00:05:03,920
+strength of the acceleration itself is changing.
+
+76
+00:05:06,280 --> 00:05:09,604
+One of the most useful things about higher order derivatives is
+
+77
+00:05:09,604 --> 00:05:13,085
+how they help us in approximating functions, which is exactly the
+
+78
+00:05:13,085 --> 00:05:16,620
+topic of the next chapter on Taylor series, so I'll see you there.

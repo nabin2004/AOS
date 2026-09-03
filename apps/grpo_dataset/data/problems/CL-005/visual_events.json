@@ -1,0 +1,177 @@
+{
+  "problem_id": "CL-005",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Population of PiCreatures doubling each day (2^t) shown growing exponentially",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "PiCreature",
+        "doubling",
+        "population",
+        "2^t",
+        "mass"
+      ],
+      "clip_query": "PiCreature population doubling every day"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Growth over full day equals population size at start (2^t) showing proportional relationship",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "growth_rate",
+        "proportional",
+        "doubling",
+        "day"
+      ],
+      "clip_query": "new creatures appearing equal to existing population"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Derivative derivation: (2^(t+dt) - 2^t)/dt = 2^t \u00b7 (2^dt - 1)/dt",
+      "weight": 0.1277,
+      "critical": true,
+      "expected_time_range": [
+        22.0,
+        34.0
+      ],
+      "keyword_bank": [
+        "dt",
+        "2^(t+dt)",
+        "exponential_property",
+        "limit"
+      ],
+      "clip_query": "equation showing exponential property and factorization"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "As dt \u2192 0, (2^dt - 1)/dt approaches ln(2) \u2248 0.6931",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        34.0,
+        44.0
+      ],
+      "keyword_bank": [
+        "ln(2)",
+        "constant",
+        "0.6931",
+        "limit"
+      ],
+      "clip_query": "numerical values approaching 0.6931"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "d(2^t)/dt = 2^t \u00b7 ln(2) shown as final derivative formula",
+      "weight": 0.0638,
+      "critical": false,
+      "expected_time_range": [
+        44.0,
+        48.0
+      ],
+      "keyword_bank": [
+        "derivative",
+        "ln(2)",
+        "2^t"
+      ],
+      "clip_query": "equation showing derivative of 2^t"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "e introduced as special base where derivative constant = 1: d(e^t)/dt = e^t",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        48.0,
+        56.0
+      ],
+      "keyword_bank": [
+        "e",
+        "2.71828",
+        "derivative",
+        "itself"
+      ],
+      "clip_query": "e appearing with property d(e^t)/dt = e^t"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Graph of e^t shown with tangent slopes equal to height at each point",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        56.0,
+        64.0
+      ],
+      "keyword_bank": [
+        "graph",
+        "e^t",
+        "slope",
+        "height",
+        "tangent"
+      ],
+      "clip_query": "exponential graph with slope lines equal to height"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "Chain rule applied: d(e^(3t))/dt = 3\u00b7e^(3t)",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        64.0,
+        72.0
+      ],
+      "keyword_bank": [
+        "chain_rule",
+        "e^(3t)",
+        "3",
+        "derivative"
+      ],
+      "clip_query": "chain rule equation for e^(3t)"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "2 expressed as e^(ln(2)), showing derivative constant is ln(2)",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        72.0,
+        82.0
+      ],
+      "keyword_bank": [
+        "ln(2)",
+        "e",
+        "2",
+        "constant",
+        "proportionality"
+      ],
+      "clip_query": "2 = e^(ln(2)) appearing"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Real-world applications: population growth, cooling, compound interest all follow e^(c\u00b7t)",
+      "weight": 0.1063,
+      "critical": false,
+      "expected_time_range": [
+        82.0,
+        92.0
+      ],
+      "keyword_bank": [
+        "population",
+        "cooling",
+        "interest",
+        "exponential"
+      ],
+      "clip_query": "real-world examples with exponential functions"
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "problem_id": "NN-003",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Recap of neural network architecture: 784 input neurons, two hidden layers of 16 neurons each, 10 output neurons",
+      "weight": 0.05,
+      "critical": false,
+      "expected_time_range": [
+        0.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "recap",
+        "network",
+        "784",
+        "hidden",
+        "16",
+        "output",
+        "10"
+      ],
+      "clip_query": "neural network architecture with layers labeled"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Cost function recap: average of squared differences between actual and desired outputs over all training examples",
+      "weight": 0.05,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        16.0
+      ],
+      "keyword_bank": [
+        "cost function",
+        "average",
+        "squared differences",
+        "training examples"
+      ],
+      "clip_query": "cost function equation with average over examples"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Gradient descent recap: negative gradient tells how to change weights and biases to decrease cost",
+      "weight": 0.05,
+      "critical": false,
+      "expected_time_range": [
+        16.0,
+        24.0
+      ],
+      "keyword_bank": [
+        "gradient descent",
+        "negative gradient",
+        "weights",
+        "biases",
+        "decrease cost"
+      ],
+      "clip_query": "gradient vector pointing downhill on cost surface"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Single training example (image of a '2') fed into network, output layer shows random activations",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        24.0,
+        34.0
+      ],
+      "keyword_bank": [
+        "training example",
+        "2",
+        "random",
+        "output",
+        "activations"
+      ],
+      "clip_query": "digit 2 image feeding into network with random output"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Desired output layer: neuron for 2 should be nudged up, all others nudged down, proportional to distance from target",
+      "weight": 0.1,
+      "critical": true,
+      "expected_time_range": [
+        34.0,
+        46.0
+      ],
+      "keyword_bank": [
+        "desired",
+        "nudged",
+        "up",
+        "down",
+        "proportional",
+        "target"
+      ],
+      "clip_query": "output neurons with arrows showing desired direction"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "Focus on single output neuron (for digit 2): three ways to increase its activation - bias, weights, previous layer activations",
+      "weight": 0.1,
+      "critical": true,
+      "expected_time_range": [
+        46.0,
+        58.0
+      ],
+      "keyword_bank": [
+        "single neuron",
+        "bias",
+        "weights",
+        "activations",
+        "previous layer"
+      ],
+      "clip_query": "single neuron zoomed in with three arrows pointing to it"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Weights connected to brighter previous-layer neurons have more influence; 'fire together, wire together' analogy",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        58.0,
+        70.0
+      ],
+      "keyword_bank": [
+        "brightest",
+        "neurons",
+        "influence",
+        "fire together",
+        "wire together"
+      ],
+      "clip_query": "connections to bright neurons highlighted"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "All output neurons' desires added together to determine changes to previous layer, propagating backward",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        70.0,
+        82.0
+      ],
+      "keyword_bank": [
+        "added together",
+        "previous layer",
+        "propagating",
+        "backward"
+      ],
+      "clip_query": "arrows moving backward through network layers"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Recursive application: same process repeated for each previous layer moving backward through the network",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        82.0,
+        92.0
+      ],
+      "keyword_bank": [
+        "recursive",
+        "backward",
+        "layers",
+        "repeated"
+      ],
+      "clip_query": "animation of propagation moving from output back to input"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Single training example's desired changes recorded, then averaged across all training examples",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        92.0,
+        104.0
+      ],
+      "keyword_bank": [
+        "average",
+        "all training examples",
+        "desired changes",
+        "gradient"
+      ],
+      "clip_query": "grid of examples with changes being averaged"
+    },
+    {
+      "event_id": "ev_11",
+      "description": "Averaged nudges form the negative gradient vector of the cost function",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        104.0,
+        114.0
+      ],
+      "keyword_bank": [
+        "negative gradient",
+        "vector",
+        "cost function",
+        "averaged nudges"
+      ],
+      "clip_query": "vector with components representing gradient"
+    },
+    {
+      "event_id": "ev_12",
+      "description": "Mini-batches: randomly shuffle training data and divide into batches (e.g., 100 examples each) for computational efficiency",
+      "weight": 0.06,
+      "critical": false,
+      "expected_time_range": [
+        114.0,
+        126.0
+      ],
+      "keyword_bank": [
+        "mini-batches",
+        "shuffle",
+        "computational",
+        "efficiency"
+      ],
+      "clip_query": "training data divided into batches"
+    },
+    {
+      "event_id": "ev_13",
+      "description": "Stochastic gradient descent: each mini-batch gives approximate gradient step, faster than full batch",
+      "weight": 0.06,
+      "critical": false,
+      "expected_time_range": [
+        126.0,
+        136.0
+      ],
+      "keyword_bank": [
+        "stochastic gradient descent",
+        "approximate",
+        "faster",
+        "mini-batch"
+      ],
+      "clip_query": "cost surface with noisy gradient steps"
+    },
+    {
+      "event_id": "ev_14",
+      "description": "Summary: backpropagation computes gradient efficiently, mini-batches make training practical",
+      "weight": 0.05,
+      "critical": false,
+      "expected_time_range": [
+        136.0,
+        144.0
+      ],
+      "keyword_bank": [
+        "summary",
+        "backpropagation",
+        "gradient",
+        "efficient",
+        "mini-batches"
+      ],
+      "clip_query": "summary text with backpropagation definition"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-058",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initial split screen showing classical and quantum computer symbols separated by a vertical line.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "get_classical_computer_symbol",
+        "get_quantum_computer_symbol",
+        "v_line"
+      ],
+      "clip_query": "split screen with classical and quantum computer symbols"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Transition focusing on the classical side, fading out the quantum side and dividing line while shifting the camera frame.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "frame.animate.match_x",
+        "FadeOut",
+        "boxed_bits"
+      ],
+      "clip_query": "camera shifts to focus on classical computer bits"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Display of stacked layers of abstraction (Hardware, Bits, Data types) with gradient colors.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "layers",
+        "replicate",
+        "set_submobject_colors_by_gradient",
+        "layers_name"
+      ],
+      "clip_query": "stacked colored rectangles representing layers of abstraction"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Addition of layer labels (Hardware, Bits, Data types) and corresponding representations (circuitry, integer, character).",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "layer_names",
+        "num_mob",
+        "character",
+        "circuitry"
+      ],
+      "clip_query": "labels and icons appearing next to abstraction layers"
+    }
+  ]
+}

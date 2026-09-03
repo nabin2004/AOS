@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-047",
+  "conflicts": [
+    {
+      "category": "InteractiveScene",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "TexturedSurface",
+      "gl_construct": "TexturedSurface(Sphere(...), texture)",
+      "ce_equivalent": "ThreeDScene with custom mesh or standard Sphere (TexturedSurface is not natively supported in CE without complex custom shaders)",
+      "severity": "high"
+    },
+    {
+      "category": "GlowDot",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with custom glow/opacity layers or PMobject",
+      "severity": "medium"
+    },
+    {
+      "category": "LaTeX Preamble",
+      "gl_construct": "Tex(..., additional_preamble='\\\\usepackage{wasysym}')",
+      "ce_equivalent": "Tex(..., tex_template=TexTemplate().add_to_preamble('\\\\usepackage{wasysym}'))",
+      "severity": "medium"
+    }
+  ]
+}

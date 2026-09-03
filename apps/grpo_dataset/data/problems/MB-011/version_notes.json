@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-011",
+  "conflicts": [
+    {
+      "category": "framework_api",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "Clock",
+      "ce_equivalent": "Custom clock implementation using Circle and Lines",
+      "severity": "high"
+    },
+    {
+      "category": "assets",
+      "gl_construct": "SVGMobject('ladybug')",
+      "ce_equivalent": "Group of Dot and Ellipse objects representing a bug",
+      "severity": "high"
+    }
+  ]
+}

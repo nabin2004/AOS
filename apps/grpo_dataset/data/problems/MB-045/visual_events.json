@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-045",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The Earth unflattens from a 2D disk into a 3D sphere while the camera rotates to a side view.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "stretch",
+        "Restore",
+        "reorient"
+      ],
+      "clip_query": "A flat circular map of Earth inflating into a 3D sphere as the camera rotates."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Parallel yellow sun rays fade in, projecting from a distant light source to the Earth's surface.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "GlowDot",
+        "rays",
+        "update_rays"
+      ],
+      "clip_query": "Parallel yellow lines representing sun rays hitting the side of a 3D Earth."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The camera performs a wide orbit around the Earth and sun, showing the day/night texture transition.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "reorient",
+        "sun",
+        "move_to"
+      ],
+      "clip_query": "Camera orbiting around a 3D Earth showing the illuminated day side and dark night side."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The Earth is sliced in half along its axis, revealing a grey interior and a red dot at the center.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "slice_tracker",
+        "set_clip_plane",
+        "center_dot"
+      ],
+      "clip_query": "A 3D Earth being sliced in half to reveal its inner cross-section and center point."
+    }
+  ]
+}

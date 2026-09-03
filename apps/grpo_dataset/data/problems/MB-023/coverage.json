@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-023",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "linear interpolation",
+        "scaling factor",
+        "corner coordinates",
+        "vector shifting"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "always_redraw",
+        "connecting lines",
+        "color-coded squares (blue, green, yellow)",
+        "canvas border"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "side length 6",
+        "side length 0.25",
+        "scale factor 4",
+        "lines per side 4"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene",
+        "sequential animations",
+        "bring_to_back layering",
+        "lambda closure for corner index"
+      ]
+    }
+  }
+}

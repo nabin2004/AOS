@@ -1,0 +1,70 @@
+{
+  "id": "MB-004",
+  "title": "Perfect Encodings and Entropy Definition",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Information Theory",
+    "Calculus",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a Manim visualization that defines and animates an 'Entropy Chart' representing a probability distribution and its corresponding information content (-log2(p_i) bits) for each event. \n\nYour visualization should implement a custom VGroup subclass called `EntropyChart`. This chart must consist of:\n1. A horizontal base bar representing a stacked probability distribution (where the total width represents 1.0, partitioned into segments proportional to each event's probability p_i).\n2. Vertical bars rising upwards from each horizontal segment. The height of each vertical bar must represent the information content of that event, calculated dynamically as -log2(p_i).\n3. Dynamic updating: Use ValueTrackers to manage the probability distribution. When the ValueTrackers change, both the horizontal segment widths and the vertical bar heights must update smoothly and automatically via updaters.\n4. A vertical axis or set of horizontal reference lines indicating integer bit levels (0, 1, 2, 3, etc.) with corresponding text labels.\n5. Color interpolation across the bars to visually distinguish the different events (e.g., interpolating from BLUE_E to TEAL_E).\n\nEnsure your code handles potential division-by-zero or log-of-zero errors by enforcing a minimum probability threshold (e.g., 1/16 or 0.01) for each event. The final scene should demonstrate the chart initializing with a random or uniform distribution, and then smoothly animating the probabilities changing to show how the information bars stretch and shrink in response.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-004/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "PerfectEncodingsAndEntropyDefinition"
+    ],
+    "visual_techniques": [
+      "Dynamic ValueTrackers",
+      "Custom Stacked Probability Distribution",
+      "Logarithmic Bar Scaling",
+      "Interpolated Color Gradients"
+    ],
+    "manim_api_patterns": [
+      "ValueTracker",
+      "VGroup",
+      "Rectangle",
+      "Line",
+      "Tex",
+      "interpolate_color"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Logarithm of zero or negative probability values during dynamic updates",
+      "severity": "high",
+      "note": "Ensure ValueTrackers are clamped or initialized with a strict positive lower bound (e.g., epsilon = 0.01) to prevent math domain errors."
+    },
+    {
+      "pattern": "Missing StackedProbDistribution class in standard Manim Community",
+      "severity": "high",
+      "note": "If porting to Manim Community, StackedProbDistribution must be manually implemented using adjacent Rectangles whose widths and positions are updated dynamically."
+    },
+    {
+      "pattern": "Updater lag or misalignment between horizontal segments and vertical bars",
+      "severity": "medium",
+      "note": "Ensure the vertical bars' positions are updated relative to the active, updated positions of the horizontal segments within a single frame render loop."
+    }
+  ]
+}

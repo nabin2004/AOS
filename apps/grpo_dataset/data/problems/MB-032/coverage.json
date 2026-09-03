@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-032",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Dot product projection calculation using np.dot",
+        "Vector interpolation for projection line",
+        "Cross product to determine orientation of the brace"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "ValueTracker-driven vector angles",
+        "Dynamic projection group using always_redraw",
+        "LineBrace with dynamic direction",
+        "Dashed line connecting vector tip to projection line"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Random seed set to 2",
+        "50 random iterations for vector positions",
+        "Specific angle tracker values (0.4, 0.2, 0.25, -0.23)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inherits from InteractiveScene",
+        "Updaters attached to vectors using put_start_and_end_on",
+        "Proper handling of label rotation and positioning relative to the brace"
+      ]
+    }
+  }
+}

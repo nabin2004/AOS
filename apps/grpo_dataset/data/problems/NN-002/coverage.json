@@ -1,0 +1,50 @@
+{
+  "problem_id": "NN-002",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Cost function as sum of squared differences between actual and desired outputs",
+        "Cost function takes 13,000 weights/biases as inputs",
+        "Gradient vector components for each parameter",
+        "Derivative/slope in single-variable case",
+        "Gradient in multi-variable case as direction of steepest increase",
+        "Negative gradient as direction of steepest decrease",
+        "Local minima in high-dimensional optimization"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Single-variable cost function graph with slope visualization",
+        "Two-variable cost surface with gradient arrows",
+        "Ball rolling downhill analogy",
+        "Network architecture visualization",
+        "Cost decreasing over training time",
+        "Gradient as vector with components",
+        "Weight importance as relative magnitudes"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "13,000 weights and biases",
+        "784 input neurons (28\u00d728 pixels)",
+        "16 neurons in hidden layers",
+        "10 output neurons (digits 0-9)",
+        "96% testing accuracy",
+        "Cost function outputs a single number"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: recap \u2192 cost function \u2192 single-variable gradient descent \u2192 multi-variable \u2192 13,000-dimensional \u2192 learning \u2192 results \u2192 limitations",
+        "Clear transitions between scalar and vector cases",
+        "Analogy connects to actual algorithm",
+        "Practical performance demonstration",
+        "Honest discussion of limitations"
+      ]
+    }
+  }
+}

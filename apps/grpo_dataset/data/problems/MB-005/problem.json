@@ -1,0 +1,72 @@
+{
+  "id": "MB-005",
+  "title": "More Complicated Cross Entropy Example and KL Divergence",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "drift-sensitive"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes a dynamic entropy chart representing a probability distribution and its corresponding information content (surprisal). The visualization must define a custom VGroup subclass, `EntropyChart`, which takes an initial probability distribution and renders a stacked probability distribution at the bottom. Above each segment of this distribution, a vertical bar must be drawn whose height is proportional to the information content of that event, calculated as $-\\log_2(p_i)$ bits. The width of each bar must match the width of its corresponding probability segment. The chart must support dynamic updates using ValueTrackers so that when the underlying probabilities change, both the segment widths and the information bar heights/positions update smoothly and automatically. Include reference grid lines and text labels indicating the information bits on the vertical axis. Use a smooth color gradient (e.g., interpolating between blue and teal) across the bars.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-005/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 150,
+    "scene_classes": [
+      "MoreComplicatedCrossEntropyExampleAndKLDivergence"
+    ],
+    "visual_techniques": [
+      "Dynamic Updaters",
+      "Stacked Probability Distributions",
+      "ValueTracker-driven animations",
+      "Custom coordinate mapping for information bars"
+    ],
+    "manim_api_patterns": [
+      "VGroup",
+      "ValueTracker",
+      "add_updater",
+      "Rectangle",
+      "Line",
+      "Tex",
+      "interpolate_color"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom StackedProbDistribution class or dependency in standard ManimCE",
+      "severity": "high",
+      "note": "The reference code relies on a custom 3b1b class StackedProbDistribution. In standard Manim, this must be manually implemented using adjacent Rectangles."
+    },
+    {
+      "pattern": "Incorrect height scaling of information bars during dynamic updates",
+      "severity": "medium",
+      "note": "When updating the height of a Rectangle in an updater, simply setting .height can cause distortion or incorrect alignment if not repositioned relative to the base segment."
+    },
+    {
+      "pattern": "Logarithm domain error when probability tracker approaches zero",
+      "severity": "medium",
+      "note": "If a probability tracker value becomes 0 or negative, math.log2 will raise a ValueError. A small epsilon guard is required."
+    }
+  ]
+}

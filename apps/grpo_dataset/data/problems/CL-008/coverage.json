@@ -1,0 +1,45 @@
+{
+  "problem_id": "CL-008",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Integral as limit of Riemann sums: \u222b v(t) dt = lim \u03a3 v(t)\u00b7dt",
+        "Area under velocity graph equals distance traveled",
+        "Area function A(T) with A'(T) = v(T)",
+        "Antiderivative: F'(t) = v(t)",
+        "Fundamental Theorem of Calculus: \u222b_a^b v(t) dt = F(b) - F(a)",
+        "Signed area (negative for graph below axis)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Car speedometer view",
+        "Velocity graph with Riemann rectangles",
+        "Rectangles approaching area under curve",
+        "Area function with variable endpoint",
+        "Sliver of area dA",
+        "Negative area visualization"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "v(t) = t(8-t) specific function",
+        "Numerical values: v(1)=7, v(1.25)=8.4375",
+        "dt = 0.25 example",
+        "Distance = 85.33 meters"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: speedometer \u2192 velocity graph \u2192 approximation \u2192 integral \u2192 area function \u2192 FTC \u2192 signed area",
+        "Clear transitions between concepts",
+        "Geometric and algebraic representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

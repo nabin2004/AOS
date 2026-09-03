@@ -1,0 +1,89 @@
+{
+  "problem_id": "MB-048",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the 3D star field with a central Sun and rotating camera perspective.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "GlowDot",
+        "GlowDots",
+        "frame.reorient",
+        "add_updater"
+      ],
+      "clip_query": "A 3D field of glowing white stars rotating around a central bright sun"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Sequential drawing of measurement lines from the Sun to stars with dynamic billboard distance labels.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "Line",
+        "DecimalNumber",
+        "get_phi",
+        "get_theta",
+        "ShowCreation"
+      ],
+      "clip_query": "Lines connecting the center to individual stars with distance labels facing the camera"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Stars transition from solid white to a spectrum of colors based on their color index.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "set_rgba_array",
+        "rgbas",
+        "color_index"
+      ],
+      "clip_query": "The white stars in the 3D field change color to shades of blue, white, and red"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Camera returns to 2D, axes fade in, and stars morph into a random 2D scatter plot.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        23.0
+      ],
+      "keyword_bank": [
+        "Axes",
+        "to_default_state",
+        "random_points",
+        "set_points"
+      ],
+      "clip_query": "The 3D star field collapses into a flat 2D scatter plot on coordinate axes"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Stars morph from random positions to sorted by color, and finally into a Hertzsprung-Russell diagram.",
+      "weight": 0.15,
+      "critical": true,
+      "expected_time_range": [
+        23.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "sorted_by_color",
+        "fully_sorted",
+        "path_arc"
+      ],
+      "clip_query": "Scatter plot points morphing smoothly to form a Hertzsprung-Russell diagram main sequence"
+    }
+  ]
+}

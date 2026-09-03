@@ -1,0 +1,75 @@
+{
+  "id": "MB-041",
+  "title": "Distance to the Sun Cosmic Scale Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Astronomy",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the scale and distance from the Earth to the Sun. Create a 3D scene using `InteractiveScene`. Define helper functions to generate textured 3D spheres for the Earth, Moon, and Sun. The Sun should have multiple layers of glowing effects using `GlowDot` to represent its intense brightness. Position the Earth on the left and the Sun on the right, and use camera reorientation (`self.frame.reorient`) to smoothly transition from a close-up on Earth to a wide view showing both celestial bodies. Add a brace to indicate the Sun's radius ($R_S$) and a dashed/fading line between the Earth and Sun to represent the distance ($D_S$). Animate the creation of these elements and then transform their labels into a ratio formula ($R_S / D_S$) in the top-left corner. Finally, zoom back in on the Earth to show the Moon's orbit as a grey circle with a small Moon model positioned on it.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-041/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 150,
+    "scene_classes": [
+      "DistanceToSun"
+    ],
+    "visual_techniques": [
+      "3D Textured Spheres",
+      "Dynamic Camera Reorientation",
+      "Glow Effects",
+      "Mathematical Formula Derivation",
+      "Orbit Visualization"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TexturedSurface",
+      "GlowDot",
+      "frame.reorient",
+      "f_always.move_to",
+      "TransformFromCopy",
+      "Brace",
+      "Line",
+      "Circle"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE camera methods instead of ManimGL frame reorientation",
+      "severity": "high",
+      "note": "ManimGL uses self.frame.reorient() and self.frame.animate for camera movements, which differs significantly from ManimCE's ThreeDScene camera controls."
+    },
+    {
+      "pattern": "Missing textures or shader errors for TexturedSurface",
+      "severity": "high",
+      "note": "TexturedSurface requires specific texture assets ('SunTexture', 'EarthTextureMap', 'MoonTexture'). If assets are missing, fallback colors or procedural textures must be used."
+    },
+    {
+      "pattern": "Incorrect glow implementation",
+      "severity": "medium",
+      "note": "GlowDot is a specific ManimGL class. In other versions, it must be simulated using multiple semi-transparent overlapping circles or dots."
+    }
+  ]
+}

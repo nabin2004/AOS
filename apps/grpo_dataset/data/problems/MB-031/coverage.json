@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-031",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "x^2 + y^2 \\le 1",
+        "probability",
+        "sum of squares",
+        "interval [-1, 1]"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "NumberLine with sliding markers",
+        "DecimalNumber updaters",
+        "GlowDots trail",
+        "Checkmark and Exmark indicators"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker updates",
+        "dynamic sum calculation",
+        "decimal formatting"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene inheritance",
+        "Custom Group subclasses",
+        "Updaters for real-time synchronization"
+      ]
+    }
+  }
+}

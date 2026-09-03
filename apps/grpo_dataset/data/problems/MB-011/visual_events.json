@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-011",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Clock face is rendered with 12 ticks and numbers, and a ladybug lands on the 12 o'clock position.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "Clock",
+        "ladybug",
+        "ticks",
+        "MoveAlongPath"
+      ],
+      "clip_query": "A clock face with a ladybug landing on the top 12 o'clock position"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The ladybug begins a random walk, moving step-by-step along the clock perimeter with curved yellow arrows indicating the direction.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "Arrow",
+        "path_arc",
+        "VFadeInThenOut",
+        "random.choice"
+      ],
+      "clip_query": "A ladybug stepping between clock numbers with curved yellow arrows showing the path"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Visited numbers turn red, and the final remaining unvisited number turns teal when reached.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "covered_numbers",
+        "RED",
+        "TEAL",
+        "animate.set_color"
+      ],
+      "clip_query": "Clock numbers turning red as they are visited, with the last one turning teal"
+    }
+  ]
+}

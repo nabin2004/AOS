@@ -1,0 +1,639 @@
+1
+00:00:00,000 --> 00:00:12,040
+[Submit subtitle corrections at criblate.com]
+
+2
+00:00:12,040 --> 00:00:12,920
+Hey everyone!
+
+3
+00:00:13,320 --> 00:00:16,232
+If I had to choose just one topic that makes all of the others in
+
+4
+00:00:16,232 --> 00:00:19,189
+linear algebra start to click, and which too often goes unlearned
+
+5
+00:00:19,189 --> 00:00:22,280
+the first time a student takes linear algebra, it would be this one.
+
+6
+00:00:22,700 --> 00:00:26,200
+The idea of a linear transformation and its relation to matrices.
+
+7
+00:00:26,950 --> 00:00:30,935
+For this video, I'm just going to focus on what these transformations look like in the
+
+8
+00:00:30,935 --> 00:00:35,060
+case of two dimensions, and how they relate to the idea of matrix-vector multiplication.
+
+9
+00:00:35,880 --> 00:00:38,717
+In particular, I want to show you a way to think about
+
+10
+00:00:38,717 --> 00:00:42,080
+matrix-vector multiplication that doesn't rely on memorization.
+
+11
+00:00:43,160 --> 00:00:46,580
+To start, let's just parse this term, linear transformation.
+
+12
+00:00:47,420 --> 00:00:49,880
+Transformation is essentially a fancy word for function.
+
+13
+00:00:50,260 --> 00:00:53,980
+It's something that takes in inputs and spits out an output for each one.
+
+14
+00:00:53,980 --> 00:00:56,364
+Specifically, in the context of linear algebra,
+
+15
+00:00:56,364 --> 00:00:59,812
+we like to think about transformations that take in some vector and
+
+16
+00:00:59,812 --> 00:01:01,080
+spit out another vector.
+
+17
+00:01:02,500 --> 00:01:06,380
+So why use the word transformation instead of function if they mean the same thing?
+
+18
+00:01:07,120 --> 00:01:11,340
+Well, it's to be suggestive of a certain way to visualize this input-output relation.
+
+19
+00:01:11,860 --> 00:01:15,800
+You see, a great way to understand functions of vectors is to use movement.
+
+20
+00:01:16,780 --> 00:01:20,914
+If a transformation takes some input vector to some output vector,
+
+21
+00:01:20,914 --> 00:01:24,860
+we imagine that input vector moving over to the output vector.
+
+22
+00:01:25,680 --> 00:01:28,442
+Then to understand the transformation as a whole,
+
+23
+00:01:28,442 --> 00:01:32,445
+we might imagine watching every possible input vector move over to its
+
+24
+00:01:32,445 --> 00:01:34,080
+corresponding output vector.
+
+25
+00:01:34,980 --> 00:01:38,119
+It gets really crowded to think about all of the vectors all at once,
+
+26
+00:01:38,119 --> 00:01:39,120
+each one as an arrow.
+
+27
+00:01:39,500 --> 00:01:43,570
+So as I mentioned last video, a nice trick is to conceptualize each vector
+
+28
+00:01:43,570 --> 00:01:47,420
+not as an arrow, but as a single point, the point where its tip sits.
+
+29
+00:01:48,030 --> 00:01:52,211
+That way, to think about a transformation taking every possible input vector to
+
+30
+00:01:52,211 --> 00:01:56,340
+some output vector, we watch every point in space moving to some other point.
+
+31
+00:01:57,220 --> 00:01:59,617
+In the case of transformations in two dimensions,
+
+32
+00:01:59,617 --> 00:02:02,747
+to get a better feel for the whole shape of the transformation,
+
+33
+00:02:02,747 --> 00:02:05,780
+I like to do this with all of the points on an infinite grid.
+
+34
+00:02:06,560 --> 00:02:09,403
+I also sometimes like to keep a copy of the grid in the background,
+
+35
+00:02:09,403 --> 00:02:12,840
+just to help keep track of where everything ends up relative to where it starts.
+
+36
+00:02:14,460 --> 00:02:19,238
+The effect for various transformations moving around all of the points in space is,
+
+37
+00:02:19,238 --> 00:02:21,080
+you've got to admit, beautiful.
+
+38
+00:02:21,880 --> 00:02:24,640
+It gives the feeling of squishing and morphing space itself.
+
+39
+00:02:25,600 --> 00:02:29,920
+As you can imagine though, arbitrary transformations can look pretty complicated.
+
+40
+00:02:30,380 --> 00:02:34,630
+But luckily, linear algebra limits itself to a special type of transformation,
+
+41
+00:02:34,630 --> 00:02:38,280
+ones that are easier to understand, called linear transformations.
+
+42
+00:02:39,120 --> 00:02:43,060
+Visually speaking, a transformation is linear if it has two properties.
+
+43
+00:02:43,700 --> 00:02:46,901
+All lines must remain lines without getting curved,
+
+44
+00:02:46,901 --> 00:02:49,600
+and the origin must remain fixed in place.
+
+45
+00:02:50,620 --> 00:02:53,968
+For example, this right here would not be a linear transformation,
+
+46
+00:02:53,968 --> 00:02:55,540
+since the lines get all curvy.
+
+47
+00:02:56,100 --> 00:02:59,003
+And this one right here, although it keeps the lines straight,
+
+48
+00:02:59,003 --> 00:03:01,860
+is not a linear transformation, because it moves the origin.
+
+49
+00:03:02,680 --> 00:03:05,919
+This one here fixes the origin, and it might look like it keeps lines straight,
+
+50
+00:03:05,919 --> 00:03:09,240
+but that's just because I'm only showing the horizontal and vertical grid lines.
+
+51
+00:03:09,540 --> 00:03:12,362
+When you see what it does to a diagonal line, it becomes clear
+
+52
+00:03:12,362 --> 00:03:15,320
+that it's not at all linear, since it turns that line all curvy.
+
+53
+00:03:16,760 --> 00:03:19,605
+In general, you should think of linear transformations
+
+54
+00:03:19,605 --> 00:03:22,240
+as keeping grid lines parallel and evenly spaced.
+
+55
+00:03:23,400 --> 00:03:27,540
+Some linear transformations are simple to think about, like rotations about the origin.
+
+56
+00:03:28,120 --> 00:03:30,600
+Others are a little trickier to describe with words.
+
+57
+00:03:32,040 --> 00:03:35,480
+So, how do you think you could describe these transformations numerically?
+
+58
+00:03:35,480 --> 00:03:39,604
+If you were, say, programming some animations to make a video teaching the topic,
+
+59
+00:03:39,604 --> 00:03:43,524
+what formula do you give the computer so that if you give it the coordinates
+
+60
+00:03:43,524 --> 00:03:47,240
+of a vector, it can give you the coordinates of where that vector lands?
+
+61
+00:03:48,480 --> 00:03:52,511
+It turns out that you only need to record where the two basis vectors,
+
+62
+00:03:52,511 --> 00:03:56,600
+i-hat and j-hat, each land, and everything else will follow from that.
+
+63
+00:03:57,500 --> 00:04:01,669
+For example, consider the vector v with coordinates (-1, 2),
+
+64
+00:04:01,669 --> 00:04:05,700
+meaning that it equals −1 times i-hat plus 2 times j-hat.
+
+65
+00:04:08,680 --> 00:04:12,919
+If we play some transformation and follow where all three of these vectors go,
+
+66
+00:04:12,919 --> 00:04:17,593
+the property that grid lines remain parallel and evenly spaced has a really important
+
+67
+00:04:17,593 --> 00:04:18,300
+consequence.
+
+68
+00:04:19,100 --> 00:04:22,250
+The place where v lands will be -1 times the vector where
+
+69
+00:04:22,250 --> 00:04:25,400
+i-hat landed plus 2 times the vector where j-hat landed.
+
+70
+00:04:25,980 --> 00:04:30,280
+In other words, it started off as a certain linear combination of i-hat and j-hat,
+
+71
+00:04:30,280 --> 00:04:34,580
+and it ends up as that same linear combination of where those two vectors landed.
+
+72
+00:04:35,620 --> 00:04:40,920
+This means you can deduce where v must go based only on where i-hat and j-hat each land.
+
+73
+00:04:41,580 --> 00:04:44,540
+This is why I like keeping a copy of the original grid in the background.
+
+74
+00:04:45,080 --> 00:04:49,727
+For the transformation shown here, we can read off that i-hat lands on the
+
+75
+00:04:49,727 --> 00:04:54,940
+coordinates (1, -2), and j-hat lands on the x-axis over at the coordinates (3, 0).
+
+76
+00:04:55,540 --> 00:05:00,764
+This means that the vector represented by -1 i-hat plus 2 times j-hat
+
+77
+00:05:00,764 --> 00:05:06,140
+ends up at -1 times the vector (1, -2) plus 2 times the vector (3, 0).
+
+78
+00:05:07,100 --> 00:05:11,680
+Adding that all together, you can deduce that it has to land on the vector (5, 2).
+
+79
+00:05:14,260 --> 00:05:17,240
+This is a good point to pause and ponder, because it's pretty important.
+
+80
+00:05:18,520 --> 00:05:21,799
+Now, given that I'm actually showing you the full transformation,
+
+81
+00:05:21,799 --> 00:05:25,280
+you could have just looked to see that v has the coordinates (5, 2).
+
+82
+00:05:25,760 --> 00:05:29,519
+But the cool part here is that this gives us a technique to deduce
+
+83
+00:05:29,519 --> 00:05:33,279
+where any vectors land so long as we have a record of where i-hat
+
+84
+00:05:33,279 --> 00:05:37,380
+and j-hat each land without needing to watch the transformation itself.
+
+85
+00:05:38,600 --> 00:05:42,462
+Write the vector with more general coordinates, x and y,
+
+86
+00:05:42,462 --> 00:05:47,083
+and it will land on x times the vector where i-hat lands, (1, -2),
+
+87
+00:05:47,083 --> 00:05:50,600
+plus y times the vector where j-hat lands, (3, 0).
+
+88
+00:05:51,860 --> 00:05:58,100
+Carrying out that sum, you see that it lands at (1x + 3y, -2x + 0y).
+
+89
+00:05:58,740 --> 00:06:03,580
+I give you any vector, and you can tell me where that vector lands using this formula.
+
+90
+00:06:04,860 --> 00:06:08,981
+What all of this is saying is that a two-dimensional linear transformation
+
+91
+00:06:08,981 --> 00:06:11,543
+is completely described by just four numbers,
+
+92
+00:06:11,543 --> 00:06:16,500
+the two coordinates for where i-hat lands and the two coordinates for where j-hat lands.
+
+93
+00:06:17,080 --> 00:06:17,640
+Isn't that cool?
+
+94
+00:06:18,380 --> 00:06:23,765
+It's common to package these coordinates into a 2x2 grid of numbers called a 2x2 matrix,
+
+95
+00:06:23,765 --> 00:06:27,621
+where you can interpret the columns as the two special vectors
+
+96
+00:06:27,621 --> 00:06:29,640
+where i-hat and j-hat each land.
+
+97
+00:06:30,380 --> 00:06:35,479
+If you're given a 2x2 matrix describing a linear transformation and some specific vector,
+
+98
+00:06:35,479 --> 00:06:39,662
+and you want to know where that linear transformation takes that vector,
+
+99
+00:06:39,662 --> 00:06:44,189
+you can take the coordinates of the vector, multiply them by the corresponding
+
+100
+00:06:44,189 --> 00:06:47,340
+columns of the matrix, then add together what you get.
+
+101
+00:06:48,180 --> 00:06:52,720
+This corresponds with the idea of adding the scaled versions of our new basis vectors.
+
+102
+00:06:54,720 --> 00:06:57,795
+Let's see what this looks like in the most general case,
+
+103
+00:06:57,795 --> 00:07:00,540
+where your matrix has entries "a", "b", "c", "d".
+
+104
+00:07:01,100 --> 00:07:03,670
+And remember, this matrix is just a way of packaging the
+
+105
+00:07:03,670 --> 00:07:06,240
+information needed to describe a linear transformation.
+
+106
+00:07:06,240 --> 00:07:09,256
+Always remember to interpret that first column, (a, c),
+
+107
+00:07:09,256 --> 00:07:13,259
+as the place where the first basis vector lands, and that second column,
+
+108
+00:07:13,259 --> 00:07:16,440
+(b, d), as the place where the second basis vector lands.
+
+109
+00:07:17,500 --> 00:07:21,000
+When we apply this transformation to some vector (x, y), what do you get?
+
+110
+00:07:22,060 --> 00:07:26,980
+Well, it'll be x times (a, c) plus y times (b, d).
+
+111
+00:07:28,060 --> 00:07:33,300
+Putting this together, you get a vector (ax + by, cx + dy).
+
+112
+00:07:33,980 --> 00:07:37,115
+You could even define this as matrix vector multiplication,
+
+113
+00:07:37,115 --> 00:07:40,940
+when you put the matrix on the left of the vector like it's a function.
+
+114
+00:07:41,660 --> 00:07:44,076
+Then, you could make high schoolers memorize this without
+
+115
+00:07:44,076 --> 00:07:46,620
+showing them the crucial part that makes it feel intuitive.
+
+116
+00:07:48,300 --> 00:07:51,280
+But, isn't it more fun to think about these columns as the
+
+117
+00:07:51,280 --> 00:07:54,517
+transformed versions of your basis vectors, and to think about
+
+118
+00:07:54,517 --> 00:07:57,960
+the result as the appropriate linear combination of those vectors?
+
+119
+00:08:00,720 --> 00:08:03,780
+Let's practice describing a few linear transformations with matrices.
+
+120
+00:08:04,580 --> 00:08:09,204
+For example, if we rotate all of space 90 degrees counterclockwise,
+
+121
+00:08:09,204 --> 00:08:12,240
+then i-hat lands on the coordinates (0, 1).
+
+122
+00:08:13,980 --> 00:08:17,180
+And j-hat lands on the coordinates (-1, 0).
+
+123
+00:08:17,980 --> 00:08:21,960
+So the matrix we end up with has columns (0, 1), (-1, 0).
+
+124
+00:08:22,880 --> 00:08:26,576
+To figure out what happens to any vector after a 90-degree rotation,
+
+125
+00:08:26,576 --> 00:08:29,620
+you could just multiply its coordinates by this matrix.
+
+126
+00:08:31,560 --> 00:08:34,300
+Here's a fun transformation with a special name, called a shear.
+
+127
+00:08:35,000 --> 00:08:39,160
+In it, i-hat remains fixed, so the first column of the matrix is (1, 0).
+
+128
+00:08:39,600 --> 00:08:42,481
+But j-hat moves over to the coordinates (1, 1),
+
+129
+00:08:42,481 --> 00:08:45,300
+which become the second column of the matrix.
+
+130
+00:08:45,300 --> 00:08:49,902
+And at the risk of being redundant here, figuring out how a shear transforms
+
+131
+00:08:49,902 --> 00:08:54,080
+a given vector comes down to multiplying this matrix by that vector.
+
+132
+00:08:55,760 --> 00:08:59,468
+Let's say we want to go the other way around, starting with a matrix,
+
+133
+00:08:59,468 --> 00:09:03,875
+say with columns (1, 2) and (3, 1), and we want to deduce what its transformation
+
+134
+00:09:03,875 --> 00:09:04,520
+looks like.
+
+135
+00:09:04,960 --> 00:09:07,440
+Pause and take a moment to see if you can imagine it.
+
+136
+00:09:08,420 --> 00:09:15,100
+One way to do this is to first move i-hat to (1, 2), then move j-hat to (3, 1).
+
+137
+00:09:15,100 --> 00:09:17,551
+Always moving the rest of space in such a way
+
+138
+00:09:17,551 --> 00:09:20,220
+that keeps gridlines parallel and evenly spaced.
+
+139
+00:09:21,680 --> 00:09:26,168
+If the vectors that i-hat and j-hat land on are linearly dependent, which,
+
+140
+00:09:26,168 --> 00:09:31,019
+if you recall from last video, means that one is a scaled version of the other,
+
+141
+00:09:31,019 --> 00:09:36,174
+it means that the linear transformation squishes all of 2D space onto the line where
+
+142
+00:09:36,174 --> 00:09:41,268
+those two vectors sit, also known as the one-dimensional span of those two linearly
+
+143
+00:09:41,268 --> 00:09:42,420
+dependent vectors.
+
+144
+00:09:44,420 --> 00:09:48,851
+To sum up, linear transformations are a way to move around space such that
+
+145
+00:09:48,851 --> 00:09:53,940
+gridlines remain parallel and evenly spaced, and such that the origin remains fixed.
+
+146
+00:09:54,540 --> 00:09:58,941
+Delightfully, these transformations can be described using only a handful of numbers,
+
+147
+00:09:58,941 --> 00:10:01,530
+the coordinates of where each basis vector lands.
+
+148
+00:10:02,760 --> 00:10:06,176
+Matrices give us a language to describe these transformations,
+
+149
+00:10:06,176 --> 00:10:08,765
+where the columns represent those coordinates,
+
+150
+00:10:08,765 --> 00:10:12,511
+and matrix-vector multiplication is just a way to compute what that
+
+151
+00:10:12,511 --> 00:10:14,660
+transformation does to a given vector.
+
+152
+00:10:15,360 --> 00:10:18,753
+The important takeaway here is that every time you see a matrix,
+
+153
+00:10:18,753 --> 00:10:21,880
+you can interpret it as a certain transformation of space.
+
+154
+00:10:22,580 --> 00:10:24,779
+Once you really digest this idea, you're in a
+
+155
+00:10:24,779 --> 00:10:27,320
+great position to understand linear algebra deeply.
+
+156
+00:10:27,660 --> 00:10:32,230
+Almost all of the topics coming up, from matrix multiplication to determinants,
+
+157
+00:10:32,230 --> 00:10:36,626
+change of basis, eigenvalues, all of these will become easier to understand
+
+158
+00:10:36,626 --> 00:10:40,560
+once you start thinking about matrices as transformations of space.
+
+159
+00:10:41,300 --> 00:10:43,740
+Most immediately, in the next video, I'll be talking
+
+160
+00:10:43,740 --> 00:10:46,320
+about multiplying two matrices together. See you then!

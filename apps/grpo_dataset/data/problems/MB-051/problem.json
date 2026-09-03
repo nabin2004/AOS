@@ -1,0 +1,69 @@
+{
+  "id": "MB-051",
+  "title": "Earth-Moon Line of Sight and Orbit Rotation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    18.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Astronomy"
+  ],
+  "full_prompt": "Write a ManimGL script to visualize the line of sight between Earth and the Moon, demonstrating their relative scales, orbit, and synchronized rotation over a 24-hour period. \n\n1. **Setup & Scaling**:\n   - Define constants: `EARTH_RADIUS = 6371`, `MOON_RADIUS = 1737.4`, `MOON_ORBIT_RADIUS = 384400`, and `EARTH_TILT_ANGLE = 23.3 * DEG`.\n   - Use a conversion factor of `1 / EARTH_RADIUS` to scale all 3D objects.\n   - Create a 3D Earth using a textured sphere (`TexturedSurface` with `EarthTextureMap` and `NightEarthTextureMap`). Rotate it to account for its axial tilt.\n   - Create a 3D Moon using a textured sphere (`TexturedSurface` with `MoonTexture` and `DarkMoonTexture`).\n   - Create a circular orbit for the Moon scaled by the orbit radius.\n\n2. **Initial Scene & Line of Sight**:\n   - Position the camera close to Earth initially, showing the Earth in detail.\n   - Draw a line of sight (`Line`) from the Earth's surface to the Moon's center. Label it \"Line of sight\" using a blue text label.\n   - Animate the camera zooming out (`self.frame.animate.set_height`) to reveal the entire Moon orbit while simultaneously drawing the line of sight and fading in the label.\n\n3. **Moon Zoom & Sweep**:\n   - Zoom the camera directly into the Moon (`self.frame.animate.reorient`).\n   - Rotate the line of sight slightly across the Moon's diameter to show the angular sweep, then zoom back out to the full orbit view.\n\n4. **24-Hour Rotation Simulation**:\n   - Add a 24-hour timer in the upper right corner using `DecimalNumber` and a \"hours\" text label. Fix them in the camera frame.\n   - Animate a 24-hour passage: \n     - Earth rotates a full 360 degrees (`-TAU`).\n     - The Moon and its orbit rotate by a fraction of their monthly orbit (`TAU / 28`).\n     - The line of sight and label rotate in sync with the Earth's rotation.\n     - The timer counts from 0 to 24.\n   - Finally, fade out the UI elements and let the system rotate ambiently.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-051/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "LineOfSight"
+    ],
+    "visual_techniques": [
+      "3D Textured Surfaces",
+      "Camera Frame Zooming and Reorientation",
+      "Synchronized Rotations",
+      "Updaters with DecimalNumber"
+    ],
+    "manim_api_patterns": [
+      "TexturedSurface",
+      "Sphere",
+      "InteractiveScene",
+      "self.frame.animate",
+      "Rotate",
+      "ChangeDecimalToValue"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing texture assets for EarthTextureMap or MoonTexture",
+      "severity": "high",
+      "note": "The scene relies on external texture maps. If run in a standard environment without these assets, it will crash unless fallback colors or procedural textures are used."
+    },
+    {
+      "pattern": "Using self.camera instead of self.frame",
+      "severity": "high",
+      "note": "In ManimGL, camera manipulation is done via self.frame. Attempting to use self.camera.animate will fail."
+    },
+    {
+      "pattern": "Incorrect conversion of InteractiveScene to Scene",
+      "severity": "medium",
+      "note": "If porting to Manim Community, InteractiveScene must be replaced with ThreeDScene, and frame animations must be translated to move_camera calls."
+    }
+  ]
+}

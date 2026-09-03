@@ -1,0 +1,43 @@
+{
+  "problem_id": "MB-021",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "ComplexPlane",
+        "p2n",
+        "n2p",
+        "apply_function",
+        "z^2"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "TrueDot",
+        "GlowDot",
+        "path_arc",
+        "ComplexPlane",
+        "grid"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "x_max = 4",
+        "insert_n_curves",
+        "font_size=16"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene",
+        "construct",
+        "TransformFromCopy",
+        "FadeIn",
+        "FadeOut"
+      ]
+    }
+  }
+}

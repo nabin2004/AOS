@@ -1,0 +1,69 @@
+{
+  "id": "MB-032",
+  "title": "Dot Product of Unit Vectors Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Linear Algebra",
+    "Geometry"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL that visualizes the dot product of two unit vectors as a projection. First, set up a coordinate plane with custom blue grid lines and a grey unit circle centered at the origin. Create two unit vectors, v (pink) and w (yellow), starting at the origin and ending on the unit circle. Use ValueTrackers to control their angles as proportions of the circle, and attach updaters so the vectors and their labels dynamically follow these angles. Animate vector v rotating to a new position. Next, introduce a projection group consisting of a dashed line from the tip of v to the line of w, a thick white projection line along w, a LineBrace indicating the length of this projection, and a dot product label 'v \\cdot w'. Enable dynamic updating on this projection group so that as the vectors wander to new angles, the projection line, brace, and label update in real-time. Finally, remove the projection group and rapidly jump the vectors to 50 random pairs of angles to show the distribution of dot products.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-032/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "DotProductOfUnitVectors"
+    ],
+    "visual_techniques": [
+      "Dynamic Updaters",
+      "ValueTracker-driven animations",
+      "Projection geometry calculation",
+      "Coordinate plane scaling"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "always_redraw",
+      "LineBrace",
+      "pfp",
+      "interpolate"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community Brace instead of ManimGL LineBrace, causing layout errors.",
+      "severity": "high",
+      "note": "LineBrace is specific to ManimGL and handles arbitrary line orientations directly."
+    },
+    {
+      "pattern": "Incorrectly calling circle.pfp() in Manim Community where point_from_proportion() is required.",
+      "severity": "high",
+      "note": "pfp is a shorthand alias in ManimGL."
+    },
+    {
+      "pattern": "Updater lag or circular dependency when updating the projection group relative to moving vectors.",
+      "severity": "medium",
+      "note": "Ensure the projection group is redrawn using always_redraw and references the current positions of the vectors."
+    }
+  ]
+}

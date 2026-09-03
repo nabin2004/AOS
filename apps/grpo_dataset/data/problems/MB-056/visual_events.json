@@ -1,0 +1,57 @@
+{
+  "problem_id": "MB-056",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Quantum circuit layout initialization with 4 wires, gates, and surrounding teal rectangle.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "wires",
+        "gates",
+        "mes_gates",
+        "machine_rect",
+        "qc_label"
+      ],
+      "clip_query": "quantum circuit with four wires and gates inside a teal box"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Glow dots traveling along the wires from left to right representing execution.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "wire_glows",
+        "gate_glows",
+        "add_updater",
+        "match_x"
+      ],
+      "clip_query": "glowing dots moving along horizontal lines in a quantum circuit"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Output qubits/bitstrings updating at the end of the circuit execution.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        5.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "output",
+        "BitString",
+        "KetGroup",
+        "random.randint"
+      ],
+      "clip_query": "binary bitstrings or quantum ket states updating next to a quantum circuit"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "id": "MB-017",
+  "title": "Creating the Droste Spiral",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Calculus",
+    "Complex Analysis",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script using the `InteractiveScene` class that visualizes the creation of a Droste spiral using complex conformal mappings. The visualization must set up a four-plane layout (representing the original Droste plane, the log-transformed plane, the sheared/scaled log-plane, and the final exponential spiral plane). Load a textured surface representing a Droste image, map it to the log-plane using the complex logarithm, apply a complex linear transformation (scaling and rotation via multiplication by a complex constant), and then map it back to the exponential plane to form a continuous, seamless Droste spiral. Use `ComplexValueTracker` to animate the transition and transformation parameters dynamically, and include arrows and labels indicating the mathematical operations (e.g., 'log(z)', 'w * c', 'exp(w)') between the planes.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-017/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 280,
+    "scene_classes": [
+      "CreatingTheSpiral"
+    ],
+    "visual_techniques": [
+      "TexturedSurface mapping",
+      "Complex conformal transformations",
+      "Multi-plane coordinate layouts",
+      "Dynamic value tracking with ComplexValueTracker"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TexturedSurface",
+      "Square3D",
+      "apply_complex_function",
+      "ComplexValueTracker",
+      "clip_to_box"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing texture files or incorrect texture paths for TexturedSurface",
+      "severity": "high",
+      "note": "The code relies on external PNG textures ('PiHouseLog.png'). If these are missing, the scene will fail to render. Fallbacks or procedural textures should be used if assets are unavailable."
+    },
+    {
+      "pattern": "Attempting to run ManimGL code in a ManimCE environment",
+      "severity": "high",
+      "note": "Classes like TexturedSurface, Square3D, and InteractiveScene are exclusive to ManimGL and will raise ImportErrors in ManimCE."
+    },
+    {
+      "pattern": "Extremely slow rendering due to high-resolution TexturedSurfaces",
+      "severity": "medium",
+      "note": "Using high-resolution grids (e.g., 51x101) for complex transformations can cause severe rendering lag or memory exhaustion."
+    }
+  ]
+}

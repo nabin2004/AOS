@@ -1,0 +1,48 @@
+{
+  "problem_id": "CL-009",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Average of finite set: sum/count",
+        "Continuous average as limit of sample averages",
+        "Average formula: (1/(b-a)) \u222b_a^b f(x) dx",
+        "Antiderivative of sin(x): -cos(x)",
+        "Integral of sin from 0 to \u03c0 = 2",
+        "Average height = 2/\u03c0",
+        "Average value = average slope of antiderivative",
+        "FTC connection: average slope = (F(b)-F(a))/(b-a)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Sine graph from 0 to \u03c0",
+        "Finite average example",
+        "Sampling points on curve",
+        "Riemann sum approximation",
+        "Antiderivative graph",
+        "Secant line as average slope",
+        "Signed area for negative values"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "sin(0)=0, sin(\u03c0/2)=1, sin(\u03c0)=0",
+        "Integral = 2",
+        "Average = 2/\u03c0 \u2248 0.64",
+        "Numerical examples with samples"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: finite average \u2192 continuous \u2192 sampling \u2192 integral \u2192 FTC \u2192 general formula",
+        "Clear transitions between concepts",
+        "Geometric and algebraic representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

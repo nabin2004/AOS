@@ -1,0 +1,110 @@
+{
+  "problem_id": "CL-004",
+  "conflicts": [
+    {
+      "category": "Import system",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "auto-fail if used",
+      "impact": "Module not found error",
+      "lines_affected": [1]
+    },
+    {
+      "category": "Animation renames",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "auto-fail if used",
+      "impact": "Animation not recognized in CE",
+      "lines_affected": ["Multiple animation calls"]
+    },
+    {
+      "category": "Animation renames",
+      "gl_construct": "ApplyMethod",
+      "ce_equivalent": "animate method (e.g., mobject.animate.shift())",
+      "severity": "auto-fail if used",
+      "impact": "Syntax error; ApplyMethod deprecated in CE",
+      "lines_affected": ["Various transform calls"]
+    },
+    {
+      "category": "Animation patterns",
+      "gl_construct": "UpdateFromAlphaFunc, MaintainPositionRelativeTo",
+      "ce_equivalent": "ValueTracker with updater or custom animation",
+      "severity": "warning",
+      "impact": "Updater API differs",
+      "lines_affected": ["Multiple updater calls"]
+    },
+    {
+      "category": "Text rendering",
+      "gl_construct": "OldTex / OldTexText",
+      "ce_equivalent": "Tex / TexText",
+      "severity": "auto-fail if used",
+      "impact": "OldTex not recognized; use Tex instead",
+      "lines_affected": ["All text and math displays"]
+    },
+    {
+      "category": "Class configuration",
+      "gl_construct": "CONFIG dictionary",
+      "ce_equivalent": "__init__ parameters and super().__init__()",
+      "severity": "auto-fail if used",
+      "impact": "Syntax error; CONFIG pattern not supported in CE",
+      "lines_affected": ["Multiple class definitions"]
+    },
+    {
+      "category": "Custom classes",
+      "gl_construct": "GraphScene, PiCreatureScene, TeacherStudentsScene, ReconfigurableScene",
+      "ce_equivalent": "Scene with custom methods or Axes for graphing",
+      "severity": "manual-check",
+      "impact": "GraphScene doesn't exist in CE; use Axes and NumberPlane",
+      "lines_affected": ["Inheritance chain"]
+    },
+    {
+      "category": "Custom mobjects",
+      "gl_construct": "PiCreature and subclasses (Randolph, Mortimer)",
+      "ce_equivalent": "PiCreature (different API)",
+      "severity": "warning",
+      "impact": "PiCreature API differs",
+      "lines_affected": ["Character creation"]
+    },
+    {
+      "category": "Helper functions",
+      "gl_construct": "get_graph_label, get_vertical_lines_to_graph",
+      "ce_equivalent": "Custom implementation needed",
+      "severity": "warning",
+      "impact": "These helpers don't exist in CE",
+      "lines_affected": ["Various function calls"]
+    },
+    {
+      "category": "Coordinate systems",
+      "gl_construct": "FRAME_X_RADIUS, FRAME_Y_RADIUS, FRAME_WIDTH, FRAME_HEIGHT constants",
+      "ce_equivalent": "config.frame_width, config.frame_height",
+      "severity": "auto-fail if used",
+      "impact": "Constants not defined in CE",
+      "lines_affected": ["Setup methods"]
+    },
+    {
+      "category": "Graphing",
+      "gl_construct": "GraphScene with get_graph, get_vertical_lines_to_graph",
+      "ce_equivalent": "Axes with ParametricFunction or custom graph",
+      "severity": "manual-check",
+      "impact": "GraphScene API differs significantly",
+      "lines_affected": ["Graph creation methods"]
+    },
+    {
+      "category": "Custom animations",
+      "gl_construct": "FocusOn, Indicate",
+      "ce_equivalent": "Custom implementation or alternative animations",
+      "severity": "warning",
+      "impact": "These animations may not exist in CE",
+      "lines_affected": ["Multiple scenes"]
+    },
+    {
+      "category": "Number line",
+      "gl_construct": "NumberLine with add_numbers, big_tick_numbers",
+      "ce_equivalent": "NumberLine in CE (similar)",
+      "severity": "manual-check",
+      "impact": "API may differ slightly",
+      "lines_affected": ["ThreeLinesChainRule"]
+    }
+  ],
+  "notes": "This is the fourth chapter of the Essence of Calculus series, covering the sum, product, and chain rules. Major issues: GraphScene doesn't exist in CE; use Axes and custom graphing methods. PiCreature API differs significantly. Helper functions need custom implementation. ReconfigurableScene needs custom implementation. The adjustable box for the product rule and three number lines for the chain rule require careful implementation of custom mobjects and updaters."
+}

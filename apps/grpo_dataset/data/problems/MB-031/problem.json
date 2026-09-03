@@ -1,0 +1,72 @@
+{
+  "id": "MB-031",
+  "title": "Sum of Two Squares Probability Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Probability",
+    "Geometry"
+  ],
+  "full_prompt": "Create a Manim visualization demonstrating the probability puzzle of the sum of two squares ($x^2 + y^2 \\le 1$) using ManimGL. \n\n1. Define a custom `DotHistory` class inheriting from `GlowDots` that tracks the history of a 2D point $(x, y)$ over time, fading out older points using a configurable fade rate.\n2. Define an `IntervalWithSample` class inheriting from `Group` that represents a horizontal number line from -1 to 1. It should feature a sliding marker and a dynamic `DecimalNumber` label that tracks a `ValueTracker` representing the current sample value.\n3. Create a scene `RandomSumsOfSquares` (inheriting from `InteractiveScene`) that displays two of these interval lines (labeled 'x' and 'y') on the left side of the screen.\n4. On the right side, display a 2D coordinate plane with a unit circle boundary. Plot the point $(x, y)$ dynamically on this plane, using `DotHistory` to show a glowing trail of past samples.\n5. Display the dynamic equation $x^2 + y^2 = \\text{value}$ at the top right. The terms for $x$ and $y$ should dynamically update their values and match the colors of the respective interval labels. The sum should update in real-time, accompanied by a green checkmark if the sum is $\\le 1$, or a red cross mark if it is $> 1$.\n6. Animate the values of $x$ and $y$ changing smoothly or randomly to demonstrate how the point moves inside and outside the unit circle, updating all visual components in perfect synchronization.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-031/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "RandomSumsOfSquares",
+      "SumOfTwoSquares"
+    ],
+    "visual_techniques": [
+      "Dynamic Updaters",
+      "ValueTrackers",
+      "Custom GlowDots for history tracing",
+      "Coordinate mapping with NumberLine and DecimalNumber"
+    ],
+    "manim_api_patterns": [
+      "ValueTracker",
+      "NumberLine",
+      "DecimalNumber",
+      "GlowDots",
+      "f_always",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard ManimCE Scene instead of InteractiveScene, causing missing interactive/updater features.",
+      "severity": "high",
+      "note": "The reference code relies heavily on ManimGL's InteractiveScene and custom updater patterns."
+    },
+    {
+      "pattern": "Missing GlowDots class or failing to implement the fading history trail.",
+      "severity": "medium",
+      "note": "GlowDots is a specialized ManimGL class. If porting to CE, a custom PMobject or VGroup of dots with manual opacity decay must be implemented."
+    },
+    {
+      "pattern": "Incorrect implementation of make_number_changeable.",
+      "severity": "high",
+      "note": "make_number_changeable is a custom method in 3b1b's ManimGL fork. Standard Manim does not support this; it must be bypassed by constructing the equation with separate DecimalNumber mobjects."
+    }
+  ]
+}

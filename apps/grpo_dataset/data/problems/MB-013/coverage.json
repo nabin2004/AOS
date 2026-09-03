@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-013",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Integer grid from 1 to 100",
+        "Subset selection",
+        "Sum equation with plus and equal signs"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Randolph and Mortimer PiCreatures",
+        "Teal surrounding rectangles",
+        "Grid layout transitions",
+        "PiCreature eye tracking and expressions"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "10x10 grid dimensions",
+        "10 selected numbers",
+        "2x5 organized grid"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene usage",
+        "Target-based animations (MoveToTarget)",
+        "LaggedStart and custom run times"
+      ]
+    }
+  }
+}

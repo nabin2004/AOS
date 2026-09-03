@@ -1,0 +1,319 @@
+{
+  "id": "NN-002",
+  "title": "Neural Networks | Chapter 2: Gradient Descent and Backpropagation",
+  "youtube_video_id": "aircAruvnKk",
+  "video_timestamp_range": [960, 1920],
+  "category": ["concept-exposition", "algorithm-visualization", "math-intensive"],
+  "difficulty_level": 4,
+  "domain": ["Machine Learning", "Neural Networks", "Calculus"],
+  "full_prompt": "Create an animation explaining how neural networks learn through gradient descent. Start with a recap of the neural network structure for handwritten digit recognition: 784 input neurons, two hidden layers of 16 neurons each, and 10 output neurons. Introduce the cost function as a measure of how lousy the network's performance is on training data - compute the squared differences between actual and desired output activations. Show that the cost function takes 13,000 weights and biases as input and outputs a single number. Explain that minimizing this cost function is the goal, and gradient descent is the algorithm. Visualize gradient descent first with a single-variable function (showing slope, stepping downhill toward a minimum), then with a two-variable function (showing the gradient vector pointing in the direction of steepest increase, and the negative gradient as the direction of steepest decrease). Connect this to the 13,000-dimensional case - the negative gradient tells us how to nudge every weight and bias to decrease the cost function most rapidly. Show that the relative magnitudes of gradient components indicate which weights matter most. Demonstrate the network learning on training examples, with the cost function decreasing over time. Show testing performance on unseen data (96% accuracy) and note that while it works, the hidden layers don't actually learn interpretable edge detectors - they're just minimizing a cost function. End with the idea that gradient descent finds local minima in a high-dimensional landscape, and that this is the core learning algorithm.",
+  "raw_code_status": "collected",
+  "raw_code_path": "nn/video2.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "ShowLastVideo",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ShowPlan",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "BeginAndEndRecap",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PreviewLearning",
+        "key_methods": ["construct", "initialize_network", "add_training_words", "show_training", "activate_network", "backprop_one_example", "get_adjusted_first_matrix", "color_network_edges", "get_edge_animation"]
+      },
+      {
+        "name": "BackpropComingLaterWords",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TrainingVsTestData",
+        "key_methods": ["construct", "initialize_data", "get_examples", "introduce_all_data", "subdivide_into_training_and_testing", "scroll_through_much_data"]
+      },
+      {
+        "name": "MNistDescription",
+        "key_methods": ["construct", "get_digit_pair"]
+      },
+      {
+        "name": "NotSciFi",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "FunctionMinmization",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ChangingDecimalWithColor",
+        "key_methods": ["interpolate_mobject"]
+      },
+      {
+        "name": "IntroduceCostFunction",
+        "key_methods": ["construct", "isolate_one_neuron", "reminder_of_weights_and_bias", "bring_back_rest_of_network", "feed_in_example", "make_fun_of_output", "need_a_cost_function", "fade_all_but_last_layer", "break_down_cost_function", "show_small_cost_output", "average_over_all_training_data", "color_edge_randomly", "layer_to_num_vect", "num_vect_to_decimals", "num_vect_to_column_vector"]
+      },
+      {
+        "name": "YellAtNetwork",
+        "key_methods": ["setup", "construct", "get_network_and_eyes", "create_pi_creature"]
+      },
+      {
+        "name": "ThisIsVeryComplicated",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "EmphasizeComplexityOfCostFunction",
+        "key_methods": ["construct", "setup_sides", "show_network_as_a_function", "show_cost_function", "get_function_description_words", "get_training_pair_mob"]
+      },
+      {
+        "name": "NetworkGrowthMindset",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SingleVariableCostFunction",
+        "key_methods": ["construct", "reduce_full_function_to_single_variable", "show_graph", "find_exact_solution", "make_function_more_complicated", "take_steps", "take_steps_based_on_slope", "ball_rolling_down_hill", "note_step_sizes", "get_tangent_line", "make_line_tangent"]
+      },
+      {
+        "name": "LocalVsGlobal",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TwoVariableInputSpace",
+        "key_methods": ["construct", "add_plane", "ask_about_direction", "show_gradient"]
+      },
+      {
+        "name": "CostSurface",
+        "key_methods": []
+      },
+      {
+        "name": "KhanAcademyMVCWrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "KAGradientPreview",
+        "key_methods": []
+      },
+      {
+        "name": "GradientDescentAlgorithm",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GradientDescentName",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ShowFullCostFunctionGradient",
+        "key_methods": ["construct", "organize_weights_as_column_vector", "show_gradient"]
+      },
+      {
+        "name": "DotsInsert",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "HowMinimizingCostMeansBetterTrainingPerformance",
+        "key_methods": ["construct", "improve_last_layer"]
+      },
+      {
+        "name": "CostSurfaceSteps",
+        "key_methods": []
+      },
+      {
+        "name": "ConfusedAboutHighDimension",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NonSpatialGradientIntuition",
+        "key_methods": ["construct", "add_vector", "add_gradient", "show_sign_interpretation", "show_magnitude_interpretation"]
+      },
+      {
+        "name": "SomeConnectionsMatterMoreThanOthers",
+        "key_methods": ["setup", "construct", "fade_edges", "show_important_connection", "show_unimportant_connection", "get_edge"]
+      },
+      {
+        "name": "SpinningVectorWithLabel",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TwoGradientInterpretationsIn2D",
+        "key_methods": ["construct", "setup_plane", "add_function_definitions", "point_out_direction", "point_out_relative_importance", "wiggle_in_neighborhood"]
+      },
+      {
+        "name": "ParaboloidGraph",
+        "key_methods": []
+      },
+      {
+        "name": "TODOInsertEmphasizeComplexityOfCostFunctionCopy",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GradientNudging",
+        "key_methods": ["construct", "setup_network_mob", "add_gradient", "change_weights_repeatedly", "get_edge_change_anim", "get_decimal_change_anims"]
+      },
+      {
+        "name": "BackPropWrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TODOInsertCostSurfaceSteps",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ContinuouslyRangingNeuron",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AskHowItDoes",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TestPerformance",
+        "key_methods": ["construct", "setup_network_mob", "init_testing_data", "add_title", "add_fraction", "run_through_examples", "add_network", "get_frac", "activate_layers"]
+      },
+      {
+        "name": "ReactToPerformance",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NoticeWhereItMessesUp",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "WrongExamples",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TODOBreakUpNineByPatterns",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NotAtAll",
+        "key_methods": ["setup", "construct"]
+      },
+      {
+        "name": "InterpretFirstWeightMatrixRows",
+        "key_methods": ["construct", "slide_network_to_side", "prepare_pixel_arrays", "show_all_pixel_array"]
+      },
+      {
+        "name": "InputRandomData",
+        "key_methods": ["construct", "show_random_image", "show_expected_outcomes", "feed_in_random_data", "network_speaks"]
+      },
+      {
+        "name": "CannotDraw",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TODOShowCostFunctionDef",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TODOBreakUpNineByPatterns2",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SomethingToImproveUpon",
+        "key_methods": ["setup", "construct", "show_path", "old_news", "recognizing_digits", "hidden_layers"]
+      },
+      {
+        "name": "ShiftingFocus",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PauseAndPonder",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ConvolutionalNetworkPreview",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "RandomlyLabeledImageData",
+        "key_methods": ["construct", "get_training_group"]
+      },
+      {
+        "name": "TrainOnImages",
+        "key_methods": ["construct", "setup_network_mob"]
+      },
+      {
+        "name": "IntroduceDeepNetwork",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AskNetworkAboutMemorizing",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "CompareLearningCurves",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ManyMinimaWords",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NNPart2PatreonThanks",
+        "key_methods": []
+      }
+    ],
+    "visual_techniques": [
+      "Network architecture visualization",
+      "Cost function as surface/curve",
+      "Gradient as vector direction",
+      "Slope/derivative visualization",
+      "Ball rolling down hill analogy",
+      "Step-by-step gradient descent",
+      "Weight matrix to pixel pattern visualization",
+      "Training vs testing performance display",
+      "Random image input showing overconfidence",
+      "Weight importance visualization"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc", "UpdateFromFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "FocusOn", "ReplacementTransform", "MoveToTarget", "ShowPassingFlash", "LaggedStartMap", "ChangingDecimal", "Rotate"],
+      "mobject_classes": ["Circle", "Dot", "Line", "Arrow", "Brace", "Rectangle", "Square", "NumberPlane", "FunctionGraph", "GraphScene", "DoubleArrow", "DashedLine", "Vector"],
+      "custom_classes": ["PiCreatureScene", "TeacherStudentsScene", "NetworkScene", "MNistNetworkMobject", "PixelsAsSquares", "WrappedImage", "MNistMobject", "ContinualEdgeUpdate", "Eyes", "SpeechBubble", "ScreenRectangle"],
+      "helpers": ["get_organized_images", "layer_to_image_array", "make_transparent", "load_data_wrapper", "get_training_image_group", "get_decimal_vector"],
+      "custom_imports": ["from manim_imports_ext import *", "from _2017.nn.network import *", "from _2017.nn.part1 import *"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses gradient with cost function",
+      "severity": "high",
+      "note": "fundamental misunderstanding of optimization"
+    },
+    {
+      "pattern": "fails to show the cost function decreasing over time",
+      "severity": "medium",
+      "note": "misses the learning process visualization"
+    },
+    {
+      "pattern": "doesn't explain the difference between local and global minima",
+      "severity": "medium",
+      "note": "misses an important limitation"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    },
+    {
+      "pattern": "doesn't connect gradient components to weight importance",
+      "severity": "medium",
+      "note": "misses the intuition about which weights matter most"
+    }
+  ]
+}

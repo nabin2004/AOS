@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-037",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A blue sphere is shown, and 50 horizontal rings of latitude fade in sequentially from bottom to top.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "Sphere",
+        "Circle",
+        "LaggedStartMap",
+        "FadeIn",
+        "rings"
+      ],
+      "clip_query": "A 3D blue sphere with multiple horizontal rings fading in"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The middle ring (equator) is highlighted in yellow, while the other rings are dimmed.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "YELLOW",
+        "set_stroke",
+        "opacity"
+      ],
+      "clip_query": "The middle ring of a sphere turns yellow while other rings fade"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The highlighted ring slides up to z=0.5, down to z=-0.5, and back to z=0, dynamically resizing its radius.",
+      "weight": 0.5,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "add_updater",
+        "set_width",
+        "math.sqrt"
+      ],
+      "clip_query": "A yellow ring slides up and down a sphere, changing its size to fit the sphere"
+    }
+  ]
+}

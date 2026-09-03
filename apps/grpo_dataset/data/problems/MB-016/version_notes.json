@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-016",
+  "conflicts": [
+    {
+      "category": "Mobject Types",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot",
+      "severity": "medium"
+    },
+    {
+      "category": "Dynamic Text",
+      "gl_construct": "make_number_changeable",
+      "ce_equivalent": "DecimalNumber with add_updater or always_redraw",
+      "severity": "high"
+    },
+    {
+      "category": "Updaters and Bindings",
+      "gl_construct": "f_always.set_value / always.next_to",
+      "ce_equivalent": "add_updater(lambda m: m.next_to(...))",
+      "severity": "high"
+    },
+    {
+      "category": "Rendering Effects",
+      "gl_construct": "set_glow_factor / deactivate_depth_test",
+      "ce_equivalent": "None (requires custom shader or can be omitted in CE)",
+      "severity": "low"
+    }
+  ]
+}

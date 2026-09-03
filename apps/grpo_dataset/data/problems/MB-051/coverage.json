@@ -1,0 +1,46 @@
+{
+  "problem_id": "MB-051",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "EARTH_RADIUS",
+        "MOON_RADIUS",
+        "MOON_ORBIT_RADIUS",
+        "EARTH_TILT_ANGLE",
+        "conversion_factor",
+        "angle calculation using MOON_RADIUS and MOON_ORBIT_RADIUS"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "TexturedSurface",
+        "Sphere",
+        "EarthTextureMap",
+        "MoonTexture",
+        "Line of sight label",
+        "self.frame.animate.reorient",
+        "self.frame.animate.set_height"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "DecimalNumber timer",
+        "ChangeDecimalToValue to 24",
+        "hours label"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene",
+        "add_updater",
+        "Rotate",
+        "VFadeIn",
+        "FadeOut"
+      ]
+    }
+  }
+}

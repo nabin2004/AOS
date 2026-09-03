@@ -1,0 +1,190 @@
+{
+  "id": "CL-010",
+  "title": "The Essence of Calculus | Chapter 10: Taylor Series",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [8640, 9600],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 5,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation explaining Taylor series. Start with higher order derivatives: show second derivative as rate of change of slope (curvature), with positive second derivative meaning concave up and negative meaning concave down. Use the analogy of position, velocity, acceleration, jerk for derivatives. Then show Taylor polynomials: approximate a function near a point by matching derivatives at that point. For f(x) = cos(x), show the constant term (matches value), linear term (matches first derivative), quadratic term (matches second derivative), etc. Demonstrate how adding more terms improves the approximation. Explain that the Taylor series is the infinite sum, with factorial denominators coming from repeated differentiation of power terms. Show examples of convergence (e^x) and divergence (ln(x) beyond radius of convergence).",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter10.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "Chapter10OpeningQuote",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ExampleApproximation",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ExampleApproximationWithSine",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ExampleApproximationWithExp",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "Pendulum",
+        "key_methods": ["construct", "draw_pendulum", "show_oscillation", "show_height", "get_angry_at_cosine", "substitute_approximation", "show_confusion"]
+      },
+      {
+        "name": "ExampleApproximationWithCos",
+        "key_methods": ["construct", "setup_axes"]
+      },
+      {
+        "name": "ConstructQuadraticApproximation",
+        "key_methods": ["construct", "add_cosine_graph", "add_quadratic_graph", "introduce_quadratic_constants", "show_value_at_zero", "set_c0_to_one", "let_c1_and_c2_vary", "show_tangent_slope", "compute_cosine_derivative", "compute_polynomial_derivative", "let_c2_vary", "point_out_negative_concavity", "compute_cosine_second_derivative", "show_matching_curvature", "show_matching_tangent_lines", "compute_polynomial_second_derivative", "box_final_answer"]
+      },
+      {
+        "name": "ReflectOnQuadraticApproximation",
+        "key_methods": ["construct", "show_example_approximation"]
+      },
+      {
+        "name": "SimilarityOfChangeBehavior",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "MoreTerms",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "CubicAndQuarticApproximations",
+        "key_methods": ["construct", "add_background", "take_third_derivative_of_cubic", "show_third_derivative_of_cosine", "set_c3_to_zero", "show_cubic_curves", "add_quartic_term", "show_fourth_derivative_of_cosine", "take_fourth_derivative_of_quartic", "solve_for_c4", "show_quartic_approximation"]
+      },
+      {
+        "name": "NoticeAFewThings",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "FactorialTerms",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "HigherTermsDontMessUpLowerTerms",
+        "key_methods": ["construct", "add_polynomial", "show_second_derivative"]
+      },
+      {
+        "name": "EachTermControlsOneDerivative",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ApproximateNearNewPoint",
+        "key_methods": ["construct", "add_cosine_graph", "shift_approximation_center", "show_polynomials"]
+      },
+      {
+        "name": "OnAPhilosophicalLevel",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TranslationOfInformation",
+        "key_methods": ["construct", "add_background", "mention_information_exchange", "show_derivative_pattern", "show_polynomial", "name_taylor_polynomial", "draw_new_function_graph", "write_general_function_derivative", "replace_coefficients_in_generality", "walk_through_terms", "show_polynomial_around_a"]
+      },
+      {
+        "name": "ThisIsAStandardFormula",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ExpPolynomial",
+        "key_methods": ["construct", "add_graph", "show_derivatives", "show_polynomial", "setup_axes"]
+      },
+      {
+        "name": "ShowSecondTerm",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SecondTermIntuition",
+        "key_methods": ["setup", "construct", "introduce_area", "write_derivative", "nudge_end_point", "point_out_triangle", "relabel_start_and_end", "compute_triangle_area", "walk_through_taylor_terms"]
+      },
+      {
+        "name": "EachTermHasMeaning",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AskAboutInfiniteSum",
+        "key_methods": ["construct", "ask_question", "name_taylor_series", "be_careful"]
+      },
+      {
+        "name": "ConvergenceExample",
+        "key_methods": ["construct", "get_partial_sum_braces"]
+      },
+      {
+        "name": "ExpConvergenceExample",
+        "key_methods": ["construct", "get_series"]
+      },
+      {
+        "name": "ExpGraphConvergence",
+        "key_methods": ["construct", "add_series", "get_approx_graphs"]
+      },
+      {
+        "name": "SecondExpGraphConvergence",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "BoundedRadiusOfConvergence",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "RadiusOfConvergenceForLnX",
+        "key_methods": ["construct", "add_graph", "add_series", "show_bounds", "show_converging_point", "show_diverging_point", "write_divergence", "write_radius_of_convergence"]
+      },
+      {
+        "name": "MoreToBeSaid",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Second derivative as curvature",
+      "Position-velocity-acceleration analogy",
+      "Term-by-term Taylor polynomial construction",
+      "Quadratic, cubic, quartic approximations",
+      "Factorial denominators from repeated differentiation",
+      "Convergence and divergence examples"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "FocusOn", "ReplacementTransform", "MoveToTarget", "Rotate"],
+      "mobject_classes": ["Dot", "Line", "Arrow", "Brace", "Rectangle", "Circle", "Polygon", "FunctionGraph"],
+      "custom_classes": ["GraphScene", "PiCreatureScene", "TeacherStudentsScene", "ReconfigurableScene", "AreaIsDerivative", "Pendulum"],
+      "helpers": ["derivative", "taylor_approximation", "get_graph_label", "get_vertical_line_to_graph"],
+      "custom_imports": ["from manim_imports_ext import *"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses Taylor polynomial with Taylor series",
+      "severity": "high",
+      "note": "fundamental misunderstanding"
+    },
+    {
+      "pattern": "fails to show term-by-term construction",
+      "severity": "high",
+      "note": "misses the key pedagogical approach"
+    },
+    {
+      "pattern": "doesn't demonstrate factorial denominators",
+      "severity": "medium",
+      "note": "misses an important insight"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

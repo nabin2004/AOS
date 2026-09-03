@@ -1,0 +1,75 @@
+{
+  "problem_id": "MB-051",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Camera zooms out from Earth to reveal the entire Moon orbit while drawing the blue line of sight and fading in the 'Line of sight' label.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "frame.animate.set_height",
+        "ShowCreation",
+        "line",
+        "words",
+        "FadeIn"
+      ],
+      "clip_query": "Camera zooms out from Earth to show the full orbit of the Moon with a blue line of sight"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Camera zooms in close to the Moon, and the line of sight sweeps across the Moon's surface.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "frame.animate.reorient",
+        "Rotate",
+        "line",
+        "angle"
+      ],
+      "clip_query": "Camera zooms in on the Moon as a line sweeps across its surface"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Camera zooms back out to show the full orbit view.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        13.0
+      ],
+      "keyword_bank": [
+        "frame.animate.set_height",
+        "center"
+      ],
+      "clip_query": "Camera zooms out to show the entire Earth-Moon orbit system again"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A 24-hour timer counts up while the Earth rotates a full turn, and the Moon, orbit, and line of sight rotate in sync.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        13.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "DecimalNumber",
+        "ChangeDecimalToValue",
+        "Rotate",
+        "earth",
+        "line",
+        "moon",
+        "orbit"
+      ],
+      "clip_query": "Earth rotates 360 degrees with a 24-hour timer counting up in the corner"
+    }
+  ]
+}

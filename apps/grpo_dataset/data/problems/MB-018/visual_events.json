@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-018",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A horizontal number line is displayed with a glowing yellow dot tracking values. The dot moves sequentially to 4.137, 2.961, -0.984, -1.652, and 3.230, with its decimal label updating dynamically above it.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "NumberLine",
+        "ValueTracker",
+        "GlowDot",
+        "xDotGroup",
+        "xLabel"
+      ],
+      "clip_query": "A yellow dot moving along a horizontal number line with a changing decimal label above it."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The vertical imaginary axis and coordinate labels of a complex plane fade in, transitioning the 1D line into a 2D coordinate system.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "coordinate_labels",
+        "FadeIn",
+        "get_y_axis"
+      ],
+      "clip_query": "A vertical imaginary axis fading in to form a 2D complex coordinate plane."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The camera zooms in on the imaginary unit 'i' label on the vertical axis, highlights it with a circle indication, and writes the formula '= sqrt(-1)' next to it.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        14.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "CircleIndicate",
+        "camera.frame.animate.reorient",
+        "sqrt_of_negative_1"
+      ],
+      "clip_query": "Camera zooming in on the imaginary unit 'i' on the vertical axis, showing a square root of negative one formula."
+    }
+  ]
+}

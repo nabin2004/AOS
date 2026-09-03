@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-040",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "4D hypercube projection math",
+        "Pythagorean theorem in 4D space",
+        "Basis vector linear combinations",
+        "Square root labels (\\sqrt{3}, \\sqrt{3+1})"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "3D camera reorientation",
+        "Ambient camera rotation",
+        "Color-coded vector highlights (RED, TEAL, YELLOW)",
+        "3D rotated text labels"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Basis coordinates: [1.5, 1.0, 0.5]",
+        "Stroke width configurations",
+        "Rotation angles (90 * DEG)",
+        "Animation run times"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "get_cube helper method using itertools.product",
+        "InteractiveScene class inheritance",
+        "VGroup grouping for transformations"
+      ]
+    }
+  }
+}

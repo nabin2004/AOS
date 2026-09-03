@@ -1,0 +1,66 @@
+{
+  "id": "MB-007",
+  "title": "Naive Encoding Bits and Two Meanings in Cross Entropy",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Computer Science",
+    "ML"
+  ],
+  "full_prompt": "Create a Manim visualization demonstrating the concept of information entropy and naive encoding. Implement a custom `EntropyChart` class that inherits from `VGroup`. The chart must display a stacked probability distribution at the bottom (using a custom or manual implementation of stacked horizontal segments) and vertical bars on top of each segment representing the information content ($-\\log_2 p_i$ bits). The width of each bar must match the width of its corresponding probability segment, and its height must dynamically scale with the negative log-probability. Use `ValueTracker`s to animate changes in the probability distribution, showing how the segments and information bars dynamically resize and adjust. Add appropriate labels, reference grid lines, and smooth color interpolation between the bars.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-007/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "NaiveEncodingBitsTwoMeanings"
+    ],
+    "visual_techniques": [
+      "Dynamic bar charts with updaters",
+      "ValueTracker-based animations",
+      "Stacked probability distribution segments",
+      "Mathematical alignment of labels",
+      "Color interpolation for visual distinction"
+    ],
+    "manim_api_patterns": [
+      "always_redraw",
+      "ValueTracker",
+      "StackedProbDistribution",
+      "interpolate_color",
+      "VGroup",
+      "Rectangle",
+      "Tex"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing StackedProbDistribution class in standard Manim community edition",
+      "severity": "high",
+      "note": "StackedProbDistribution is a custom 3b1b class. If porting to ManimCE, it must be manually implemented using standard VGroups and Rectangles."
+    },
+    {
+      "pattern": "Division by zero or log of zero in dynamic bar height calculation",
+      "severity": "medium",
+      "note": "If a ValueTracker goes to 0, -log2(p) will approach infinity. Ensure trackers are bounded away from 0."
+    }
+  ]
+}

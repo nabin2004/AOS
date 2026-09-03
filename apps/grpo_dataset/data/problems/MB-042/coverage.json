@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-042",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Orbital scale factors",
+        "Elliptical orbit rotation and stretch",
+        "Astronomical coordinate mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D Spheres for planets",
+        "Glow effects for the Sun and planets",
+        "Celestial sphere background",
+        "Dynamic camera zoom and reorientation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Earth orbit radius (1.473e8 scaled)",
+        "Mars orbit radius (2.280e8 scaled)",
+        "Earth tilt angle (23.3 degrees)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or ThreeDScene structure",
+        "Dynamic updaters for tracking labels",
+        "Preamble configuration for custom LaTeX packages"
+      ]
+    }
+  }
+}

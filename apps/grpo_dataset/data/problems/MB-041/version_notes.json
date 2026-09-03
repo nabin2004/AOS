@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-041",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "3D Surfaces & Textures",
+      "gl_construct": "TexturedSurface(Sphere(...), texture)",
+      "ce_equivalent": "ThreeDVMobject or custom shader-based surface mapping",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient(phi, theta, gamma, target, focal_distance)",
+      "ce_equivalent": "self.set_camera_orientation(phi, theta) and self.camera.frame.animate.move_to()",
+      "severity": "high"
+    },
+    {
+      "category": "Special Effects",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with multiple concentric low-opacity circles",
+      "severity": "medium"
+    },
+    {
+      "category": "Updaters",
+      "gl_construct": "f_always.move_to",
+      "ce_equivalent": "add_updater(lambda m: m.move_to(...))",
+      "severity": "medium"
+    }
+  ]
+}

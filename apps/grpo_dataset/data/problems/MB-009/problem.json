@@ -1,0 +1,73 @@
+{
+  "id": "MB-009",
+  "title": "KL Divergence and Entropy Chart Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Information Theory",
+    "ML",
+    "Calculus"
+  ],
+  "full_prompt": "Create a Manim scene named `KLDivergenceDemo` that visualizes probability distributions and their corresponding information content (entropy/cross-entropy) using a custom dynamic chart. \n\nYour implementation must include:\n1. A helper function `random_distribution(n, thresh)` to generate valid probability distributions summing to 1 with a minimum threshold.\n2. A custom flash animation class `FancyCircumscribe` inheriting from `VShowPassingFlash` (or equivalent passing flash in your framework) that draws a yellow highlighted border around a target mobject.\n3. A custom `EntropyChart` class (inheriting from `VGroup`) that visualizes a probability distribution. The chart must feature:\n   - A horizontal stacked probability distribution bar (`StackedProbDistribution` or a custom horizontal layout of adjacent rectangles) where the width of each segment represents its probability $p_i$.\n   - Dynamic updaters linked to `ValueTracker`s so that as the distribution changes, the widths of the segments update smoothly.\n   - Vertical bars rising from each segment, where the height of each bar represents the information content $-\\log_2(p_i)$ (or a custom height if specified, e.g., for cross-entropy $-\\log_2(q_i)$).\n   - A vertical axis with reference lines indicating information bits.\n4. An animation sequence in `KLDivergenceDemo` that instantiates this chart, dynamically morphs the underlying probability distribution using `ValueTracker`s, and highlights specific bars using `FancyCircumscribe` to demonstrate how information changes as probabilities shift.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-009/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 280,
+    "scene_classes": [
+      "KLDivergenceDemo"
+    ],
+    "visual_techniques": [
+      "Dynamic Updaters",
+      "ValueTrackers",
+      "Stacked Probability Distributions",
+      "Information Bars",
+      "Custom Surrounding Rectangles"
+    ],
+    "manim_api_patterns": [
+      "VGroup",
+      "ValueTracker",
+      "VShowPassingFlash",
+      "SurroundingRectangle",
+      "Rectangle",
+      "Line",
+      "Tex",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Division by zero or log of zero when probability tracker approaches 0",
+      "severity": "high",
+      "note": "Ensure the random distribution generator and value trackers enforce a minimum threshold (e.g., 1/16 or 0.01) to prevent log2(0) errors."
+    },
+    {
+      "pattern": "Misalignment of vertical information bars with horizontal segments during updates",
+      "severity": "high",
+      "note": "The vertical bars must dynamically query the updated positions and widths of the horizontal stacked segments inside their updater function."
+    },
+    {
+      "pattern": "Missing custom StackedProbDistribution class in standard Manim",
+      "severity": "medium",
+      "note": "If StackedProbDistribution is not built-in, it must be manually constructed using a VGroup of adjacent Rectangles whose widths are updated proportionally."
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "problem_id": "MB-006",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation and side-by-side arrangement of Document A (pink/magenta blocks) and Document B (green blocks) with their respective labels.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "document1",
+        "document2",
+        "LIGHT_PINK",
+        "PURE_MAGENTA",
+        "GREEN_B",
+        "GREEN_E",
+        "TexText"
+      ],
+      "clip_query": "Two documents labeled Document A and Document B made of stacked colored rectangles appear side by side."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A snippet of Document B is copied and combined with a copy of Document A to form a combined document on the right using curved paths.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "TransformFromCopy",
+        "path_arc",
+        "snippet",
+        "new_doc"
+      ],
+      "clip_query": "A portion of the green document and the pink document fly together along curved paths to form a combined document."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The combined document is visually compressed (shrunk and flattened) and labeled 'GZIP(AB)'.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "stretch",
+        "GZIP(AB)",
+        "MoveToTarget",
+        "gzip_ab"
+      ],
+      "clip_query": "The combined document shrinks and flattens into a compressed block labeled GZIP(AB)."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Document A is copied, compressed individually, labeled 'GZIP(A)', and both compressed blocks are centered side-by-side with vertical lines.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "gzip_a",
+        "compressed_docs_group",
+        "Line",
+        "difference_equation"
+      ],
+      "clip_query": "Two compressed blocks labeled GZIP(AB) and GZIP(A) are aligned side-by-side with vertical lines next to them."
+    }
+  ]
+}

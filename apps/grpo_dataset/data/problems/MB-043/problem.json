@@ -1,0 +1,65 @@
+{
+  "id": "MB-043",
+  "title": "Parallax Measurement from Earth",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Astronomy",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class to visualize parallax measurement from Earth.\n\n1. Create a 2D representation of Earth on the left side of the screen using a Circle of radius 3, filled with a semi-transparent blue color and a white stroke. Overlay an SVG map of Earth (using SVGMobject('earth')) styled with a dark green/brown fill.\n2. Create two observers using PiCreatures (Randolph and Mortimer) initially positioned on the right side of the screen, labeled 'Observer 1' and 'Observer 2'.\n3. Define two angles on the Earth's surface: 45 degrees and -55 degrees.\n4. Animate the observers scaling down and moving to their respective target positions on the Earth's surface corresponding to these angles. The observers should be rotated so they stand perpendicular to the Earth's surface at their respective locations.\n5. Place colored dots (using TrueDot) at their feet and position their labels appropriately near them.\n\nEnsure the code is compatible with ManimGL and handles the custom PiCreatures and SVG assets gracefully.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-043/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "ParalaxMeasurmentFromEarth"
+    ],
+    "visual_techniques": [
+      "2D/3D Hybrid",
+      "PiCreatures Integration",
+      "SVG Mapping",
+      "Coordinate Transformations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "SVGMobject",
+      "TrueDot",
+      "pfp",
+      "generate_target",
+      "MoveToTarget"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom assets like 'earth' SVG or PiCreature classes (Randolph, Mortimer)",
+      "severity": "high",
+      "note": "If run in standard Manim Community, Randolph/Mortimer and SVGMobject('earth') will fail. Must use ManimGL with appropriate asset paths or mock them."
+    },
+    {
+      "pattern": "Incorrect coordinate transformation for observers on the circle boundary",
+      "severity": "medium",
+      "note": "Using pfp() on a Circle requires correct orientation and scaling to align the characters perpendicular to the surface."
+    }
+  ]
+}

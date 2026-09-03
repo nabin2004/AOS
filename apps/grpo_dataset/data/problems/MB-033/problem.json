@@ -1,0 +1,72 @@
+{
+  "id": "MB-033",
+  "title": "Introductory Sphere and 4D Latitude Spheres Animation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    28.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Geometry",
+    "Topology",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class that visualizes the transition from a 2D circle to a 3D sphere, and then to a family of 4D-projected latitude spheres. \n\n1. **Setup and Initial Circle**:\n   - Set the camera frame height to 4.\n   - Create a 2D `Circle` of radius 1 with a TEAL stroke of width 2.\n   - Create a set of 50 latitude lines (3D circles) stacked along the z-axis from z = -0.99 to 0.99, where each circle's radius is calculated as `sqrt(1 - z^2)`. Set their stroke to TEAL with width 1 and opacity 0.5.\n\n2. **First Transition (Circle to Sphere Shell)**:\n   - Play a `ShowCreation` animation of the initial 2D circle.\n   - Remove the initial circle and transition it into the 50 latitude lines using a `LaggedStart` of `TransformFromCopy` with a lag ratio of 0.05.\n   - Simultaneously reorient the camera frame to coordinates `(-2, 56, 0)` with a target/focus point near `(0.02, -0.09, -0.07)` and a frame scale/distance of 2.83 over 6 seconds.\n   - Add an ambient rotation of 4 degrees to the frame.\n\n3. **Sphere Mesh and 4D Latitude Spheres Setup**:\n   - Create a `SurfaceMesh` of a unit `Sphere` with a resolution of (101, 201). Extract its vectorized components into a single `VMobject` and set its stroke to BLUE with width 0.1.\n   - Construct a family of 20 \"latitude spheres\" representing 4D slices. For each slice $w$ spaced linearly from -0.99 to 0.99, scale the 3D coordinates of the sphere mesh by `sqrt(1 - w^2)` and store the 4D coordinates `(x, y, z, w)` directly on the object (e.g., as a custom attribute `points_4d`). Set their stroke opacity to 0.1.\n   - Create a `ValueTracker` initialized to 0 to track the rotation angle.\n   - Define an updater for these latitude spheres that rotates their 4D coordinates in the YZ-W space using a 3D rotation matrix transposed (rotating around the `UR` axis by the tracker's angle), then projects them back to 3D by taking the first 3 coordinates.\n\n4. **Second Transition and 4D Rotation**:\n   - Fade in the solid sphere mesh while fading out the latitude lines.\n   - Transform the solid sphere mesh into the 20 nested 4D latitude spheres using a lagged `ReplacementTransform` while fading out the original sphere mesh and animating the angle tracker to 80 degrees over 6 seconds.\n   - Finally, animate the angle tracker to 360 degrees over 12 seconds to show a full, smooth 4D rotation of the nested spheres.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-033/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 75,
+    "scene_classes": [
+      "IntroSphereAnimation"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "SurfaceMesh Extraction",
+      "4D to 3D Projection",
+      "Custom Updaters",
+      "ValueTracker-driven rotation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame.animate.reorient",
+      "SurfaceMesh",
+      "ShowCreation",
+      "LaggedStart",
+      "ReplacementTransform",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.8,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community Edition (CE) imports or classes like ThreeDScene instead of ManimGL's InteractiveScene",
+      "severity": "high",
+      "note": "The script relies heavily on ManimGL-specific features like `self.frame.animate.reorient`, `SurfaceMesh`, and direct manipulation of `points_4d` attributes on VMobjects."
+    },
+    {
+      "pattern": "Incorrect matrix multiplication dimensions in the 4D rotation updater",
+      "severity": "high",
+      "note": "The rotation matrix is 3x3, applied to the last 3 coordinates of the 4D points. Ensure slicing `pre_proj[:, 1:]` matches the shape of the rotation matrix."
+    },
+    {
+      "pattern": "Missing or incorrect implementation of the custom updater on the latitude spheres",
+      "severity": "high",
+      "note": "The updater must dynamically read from the ValueTracker and update the 3D points of the VMobject using `set_points`."
+    }
+  ]
+}

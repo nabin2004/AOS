@@ -1,0 +1,45 @@
+{
+  "problem_id": "CL-010",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Second derivative as rate of change of slope",
+        "Higher order derivatives notation",
+        "Taylor polynomial: match derivatives",
+        "Taylor series: infinite sum",
+        "Factorial denominators",
+        "Radius of convergence",
+        "Convergence and divergence examples"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Graphs showing curvature",
+        "Position-velocity-acceleration analogy",
+        "Term-by-term Taylor polynomial construction",
+        "Approximation improving with more terms",
+        "Convergence vs divergence"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "cos(0)=1, cos'(0)=0, cos''(0)=-1",
+        "Taylor coefficients shown",
+        "Factorial values: 2!, 3!, 4!",
+        "Radius of convergence = 1 for ln(x)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: higher derivatives \u2192 Taylor polynomial \u2192 series \u2192 convergence",
+        "Clear transitions",
+        "Geometric and algebraic representations linked",
+        "Proper pacing"
+      ]
+    }
+  }
+}

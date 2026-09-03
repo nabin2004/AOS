@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-016",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup of parallel input and output number lines with an arrow pointing from 0 to 1 labeled with e^x.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "NumberLine",
+        "Arrow",
+        "Tex",
+        "e^{x}"
+      ],
+      "clip_query": "Two parallel horizontal number lines, one on top and one on the bottom, with a diagonal arrow pointing from 0 on the top line to 1 on the bottom line, labeled e^x."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Lagged fade-in of yellow-to-blue gradient dots on the top line, followed by their transformation to the bottom line.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "TrueDot",
+        "LaggedStartMap",
+        "TransformFromCopy",
+        "set_submobject_colors_by_gradient"
+      ],
+      "clip_query": "A sequence of colored dots appearing on the top number line and then transforming into corresponding mapped dots on the bottom number line."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Transition to dynamic tracker mode with a dynamic arrow and an updating Tex label showing e^{+0.00} = 1.000.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "add_updater",
+        "make_number_changeable",
+        "FadeTransformPieces"
+      ],
+      "clip_query": "The static arrow and label are replaced by a dynamic arrow and a decimal label showing e to a power equals a value."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Flash effect around the active dots and introduction of static output labels for integer powers of e.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "FlashAround",
+        "TransformFromCopy",
+        "output_labels",
+        "path_arc"
+      ],
+      "clip_query": "A bright flash around a dot on the number line, followed by a curved animation path and static labels appearing above the bottom line."
+    }
+  ]
+}

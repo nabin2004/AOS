@@ -1,0 +1,2002 @@
+[
+  {
+    "id": "MB-001",
+    "source_relpath": "_2026/cross_entropy/robot.py",
+    "class_name": "RobotEncodings",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 888,
+    "play_count": 71,
+    "score": 293
+  },
+  {
+    "id": "MB-002",
+    "source_relpath": "_2026/cross_entropy/robot.py",
+    "class_name": "CrossEntropyDefinition",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 357,
+    "play_count": 33,
+    "score": 153
+  },
+  {
+    "id": "MB-003",
+    "source_relpath": "_2026/cross_entropy/robot.py",
+    "class_name": "KLDivergenceDefinition",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 276,
+    "play_count": 20,
+    "score": 103
+  },
+  {
+    "id": "MB-004",
+    "source_relpath": "_2026/cross_entropy/robot.py",
+    "class_name": "PerfectEncodingsAndEntropyDefinition",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 364,
+    "play_count": 14,
+    "score": 85
+  },
+  {
+    "id": "MB-005",
+    "source_relpath": "_2026/cross_entropy/robot.py",
+    "class_name": "MoreComplicatedCrossEntropyExampleAndKLDivergence",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 250,
+    "play_count": 12,
+    "score": 67
+  },
+  {
+    "id": "MB-006",
+    "source_relpath": "_2026/cross_entropy/language_tree_visualization/language_tree.py",
+    "class_name": "BasicIdea",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 103,
+    "play_count": 12,
+    "score": 66
+  },
+  {
+    "id": "MB-007",
+    "source_relpath": "_2026/cross_entropy/robot.py",
+    "class_name": "NaiveEncodingBitsTwoMeanings",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 53,
+    "play_count": 6,
+    "score": 42
+  },
+  {
+    "id": "MB-008",
+    "source_relpath": "_2026/cross_entropy/language_tree_visualization/language_tree.py",
+    "class_name": "DistancesBetweenDocuments",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 296,
+    "play_count": 5,
+    "score": 40
+  },
+  {
+    "id": "MB-009",
+    "source_relpath": "_2026/cross_entropy/robot.py",
+    "class_name": "KLDivergenceDemo",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 209,
+    "play_count": 4,
+    "score": 39
+  },
+  {
+    "id": "MB-010",
+    "source_relpath": "_2026/cross_entropy/robot.py",
+    "class_name": "CrossEntropyIsAsymmetric",
+    "year": 2026,
+    "topic": "cross_entropy",
+    "nlines": 84,
+    "play_count": 4,
+    "score": 37
+  },
+  {
+    "id": "MB-011",
+    "source_relpath": "_2026/monthly_mindbenders/ladybug.py",
+    "class_name": "ProbabilityCalculation",
+    "year": 2026,
+    "topic": "monthly_mindbenders",
+    "nlines": 283,
+    "play_count": 15,
+    "score": 85
+  },
+  {
+    "id": "MB-012",
+    "source_relpath": "_2026/monthly_mindbenders/strings.py",
+    "class_name": "Strings",
+    "year": 2026,
+    "topic": "monthly_mindbenders",
+    "nlines": 824,
+    "play_count": 15,
+    "score": 75
+  },
+  {
+    "id": "MB-013",
+    "source_relpath": "_2026/monthly_mindbenders/subsets.py",
+    "class_name": "Subsets",
+    "year": 2026,
+    "topic": "monthly_mindbenders",
+    "nlines": 205,
+    "play_count": 13,
+    "score": 72
+  },
+  {
+    "id": "MB-014",
+    "source_relpath": "_2026/monthly_mindbenders/ladybug.py",
+    "class_name": "Ladybug",
+    "year": 2026,
+    "topic": "monthly_mindbenders",
+    "nlines": 85,
+    "play_count": 3,
+    "score": 24
+  },
+  {
+    "id": "MB-015",
+    "source_relpath": "_2026/print_gallery/exponential.py",
+    "class_name": "TheNaturalLog",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 779,
+    "play_count": 78,
+    "score": 339
+  },
+  {
+    "id": "MB-016",
+    "source_relpath": "_2026/print_gallery/exponential.py",
+    "class_name": "TheExponential",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 822,
+    "play_count": 57,
+    "score": 266
+  },
+  {
+    "id": "MB-017",
+    "source_relpath": "_2026/print_gallery/exponential.py",
+    "class_name": "CreatingTheSpiral",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 808,
+    "play_count": 60,
+    "score": 258
+  },
+  {
+    "id": "MB-018",
+    "source_relpath": "_2026/print_gallery/conformal_maps.py",
+    "class_name": "Warmup",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 449,
+    "play_count": 42,
+    "score": 197
+  },
+  {
+    "id": "MB-019",
+    "source_relpath": "_2026/print_gallery/conformal_maps.py",
+    "class_name": "DerivativeMeaning",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 471,
+    "play_count": 36,
+    "score": 178
+  },
+  {
+    "id": "MB-020",
+    "source_relpath": "_2026/print_gallery/exponential.py",
+    "class_name": "FourPannelsWithPrintGallery",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 242,
+    "play_count": 18,
+    "score": 103
+  },
+  {
+    "id": "MB-021",
+    "source_relpath": "_2026/print_gallery/conformal_maps.py",
+    "class_name": "MoreComplicatedExamples1",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 212,
+    "play_count": 19,
+    "score": 101
+  },
+  {
+    "id": "MB-022",
+    "source_relpath": "_2026/print_gallery/supplements.py",
+    "class_name": "SimplifyFormula",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 69,
+    "play_count": 16,
+    "score": 84
+  },
+  {
+    "id": "MB-023",
+    "source_relpath": "_2026/print_gallery/misc_scenes.py",
+    "class_name": "NaiveLinearScaling",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 290,
+    "play_count": 15,
+    "score": 83
+  },
+  {
+    "id": "MB-024",
+    "source_relpath": "_2026/print_gallery/exponential.py",
+    "class_name": "FourStepsWithGrid",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 219,
+    "play_count": 13,
+    "score": 72
+  },
+  {
+    "id": "MB-025",
+    "source_relpath": "_2026/print_gallery/exponential.py",
+    "class_name": "PalleteOfFunctions",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 164,
+    "play_count": 5,
+    "score": 47
+  },
+  {
+    "id": "MB-026",
+    "source_relpath": "_2026/print_gallery/supplements.py",
+    "class_name": "AppreciatingWithMath",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 41,
+    "play_count": 8,
+    "score": 41
+  },
+  {
+    "id": "MB-027",
+    "source_relpath": "_2026/print_gallery/conformal_maps.py",
+    "class_name": "WhyComplexNumbers",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 101,
+    "play_count": 4,
+    "score": 38
+  },
+  {
+    "id": "MB-028",
+    "source_relpath": "_2026/print_gallery/exponential.py",
+    "class_name": "NoteThe256",
+    "year": 2026,
+    "topic": "print_gallery",
+    "nlines": 46,
+    "play_count": 2,
+    "score": 36
+  },
+  {
+    "id": "MB-029",
+    "source_relpath": "_2026/spheres_talk/volumes.py",
+    "class_name": "VolumeGrid",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 605,
+    "play_count": 44,
+    "score": 192
+  },
+  {
+    "id": "MB-030",
+    "source_relpath": "_2026/spheres_talk/volumes.py",
+    "class_name": "CrossLineWithCircle",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 217,
+    "play_count": 27,
+    "score": 143
+  },
+  {
+    "id": "MB-031",
+    "source_relpath": "_2026/spheres_talk/random_puzzles.py",
+    "class_name": "SumOfTwoSquares",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 252,
+    "play_count": 22,
+    "score": 127
+  },
+  {
+    "id": "MB-032",
+    "source_relpath": "_2026/spheres_talk/random_puzzles.py",
+    "class_name": "DotProductOfUnitVectors",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 120,
+    "play_count": 5,
+    "score": 60
+  },
+  {
+    "id": "MB-033",
+    "source_relpath": "_2026/spheres_talk/supplements.py",
+    "class_name": "IntroSphereAnimation",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 77,
+    "play_count": 5,
+    "score": 51
+  },
+  {
+    "id": "MB-034",
+    "source_relpath": "_2026/spheres_talk/volumes.py",
+    "class_name": "ShowSphereVolumeDerivative",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 57,
+    "play_count": 5,
+    "score": 49
+  },
+  {
+    "id": "MB-035",
+    "source_relpath": "_2026/spheres_talk/supplements.py",
+    "class_name": "AreaCircleOverAreaSquareThenVolume",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 116,
+    "play_count": 6,
+    "score": 47
+  },
+  {
+    "id": "MB-036",
+    "source_relpath": "_2026/spheres_talk/supplements.py",
+    "class_name": "HyperbolaSquare",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 121,
+    "play_count": 6,
+    "score": 46
+  },
+  {
+    "id": "MB-037",
+    "source_relpath": "_2026/spheres_talk/volumes.py",
+    "class_name": "SeparateRingsOfLatitude",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 41,
+    "play_count": 5,
+    "score": 46
+  },
+  {
+    "id": "MB-038",
+    "source_relpath": "_2026/spheres_talk/volumes.py",
+    "class_name": "ZAxisWithCircle",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 44,
+    "play_count": 3,
+    "score": 45
+  },
+  {
+    "id": "MB-039",
+    "source_relpath": "_2026/spheres_talk/volumes.py",
+    "class_name": "ShowNumericalValues",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 128,
+    "play_count": 3,
+    "score": 44
+  },
+  {
+    "id": "MB-040",
+    "source_relpath": "_2026/spheres_talk/supplements.py",
+    "class_name": "Hypercube",
+    "year": 2026,
+    "topic": "spheres_talk",
+    "nlines": 66,
+    "play_count": 4,
+    "score": 39
+  },
+  {
+    "id": "MB-041",
+    "source_relpath": "_2025/cosmic_distance/planets.py",
+    "class_name": "DistanceToSun",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 579,
+    "play_count": 60,
+    "score": 271
+  },
+  {
+    "id": "MB-042",
+    "source_relpath": "_2025/cosmic_distance/planets.py",
+    "class_name": "KeplersMethod",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 437,
+    "play_count": 34,
+    "score": 161
+  },
+  {
+    "id": "MB-043",
+    "source_relpath": "_2025/cosmic_distance/paralax.py",
+    "class_name": "ParalaxMeasurmentFromEarth",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 407,
+    "play_count": 32,
+    "score": 146
+  },
+  {
+    "id": "MB-044",
+    "source_relpath": "_2025/cosmic_distance/paralax.py",
+    "class_name": "NearbyStars",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 293,
+    "play_count": 24,
+    "score": 122
+  },
+  {
+    "id": "MB-045",
+    "source_relpath": "_2025/cosmic_distance/planets.py",
+    "class_name": "SizeOfEarthRenewed",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 276,
+    "play_count": 22,
+    "score": 122
+  },
+  {
+    "id": "MB-046",
+    "source_relpath": "_2025/cosmic_distance/supplements2.py",
+    "class_name": "MeasuringNearbyStars",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 275,
+    "play_count": 20,
+    "score": 113
+  },
+  {
+    "id": "MB-047",
+    "source_relpath": "_2025/cosmic_distance/planets.py",
+    "class_name": "NearestPlanets",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 368,
+    "play_count": 19,
+    "score": 112
+  },
+  {
+    "id": "MB-048",
+    "source_relpath": "_2025/cosmic_distance/part2.py",
+    "class_name": "MeasuringNearbyStars",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 272,
+    "play_count": 19,
+    "score": 109
+  },
+  {
+    "id": "MB-049",
+    "source_relpath": "_2025/cosmic_distance/part2.py",
+    "class_name": "InverseSquareLaw",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 132,
+    "play_count": 10,
+    "score": 82
+  },
+  {
+    "id": "MB-050",
+    "source_relpath": "_2025/cosmic_distance/supplements2.py",
+    "class_name": "InverseSquareLaw",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 132,
+    "play_count": 10,
+    "score": 82
+  },
+  {
+    "id": "MB-051",
+    "source_relpath": "_2025/cosmic_distance/planets.py",
+    "class_name": "LineOfSight",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 158,
+    "play_count": 12,
+    "score": 77
+  },
+  {
+    "id": "MB-052",
+    "source_relpath": "_2025/cosmic_distance/supplements.py",
+    "class_name": "MainCharacterTimeline",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 242,
+    "play_count": 17,
+    "score": 76
+  },
+  {
+    "id": "MB-053",
+    "source_relpath": "_2025/cosmic_distance/planets.py",
+    "class_name": "AlBiruniEarthMeasurement",
+    "year": 2025,
+    "topic": "cosmic_distance",
+    "nlines": 134,
+    "play_count": 14,
+    "score": 74
+  },
+  {
+    "id": "MB-054",
+    "source_relpath": "_2025/grover/state_vectors.py",
+    "class_name": "DisectAQuantumComputer",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 942,
+    "play_count": 69,
+    "score": 292
+  },
+  {
+    "id": "MB-055",
+    "source_relpath": "_2025/grover/state_vectors.py",
+    "class_name": "GroversAlgorithm",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 595,
+    "play_count": 42,
+    "score": 201
+  },
+  {
+    "id": "MB-056",
+    "source_relpath": "_2025/grover/state_vectors.py",
+    "class_name": "Qubit",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 419,
+    "play_count": 38,
+    "score": 186
+  },
+  {
+    "id": "MB-057",
+    "source_relpath": "_2025/grover/polarization.py",
+    "class_name": "BeamSplitter",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 386,
+    "play_count": 23,
+    "score": 159
+  },
+  {
+    "id": "MB-058",
+    "source_relpath": "_2025/grover/state_vectors.py",
+    "class_name": "ContrstClassicalAndQuantum",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 367,
+    "play_count": 25,
+    "score": 131
+  },
+  {
+    "id": "MB-059",
+    "source_relpath": "_2025/grover/state_vectors.py",
+    "class_name": "ThreeDSample",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 205,
+    "play_count": 19,
+    "score": 120
+  },
+  {
+    "id": "MB-060",
+    "source_relpath": "_2025/grover/qc_supplements.py",
+    "class_name": "PythagoreanIntuition",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 190,
+    "play_count": 14,
+    "score": 98
+  },
+  {
+    "id": "MB-061",
+    "source_relpath": "_2025/grover/runtime.py",
+    "class_name": "QuantumCompilation",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 176,
+    "play_count": 18,
+    "score": 94
+  },
+  {
+    "id": "MB-062",
+    "source_relpath": "_2025/grover/runtime.py",
+    "class_name": "NeedleInAHaystackProblem",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 192,
+    "play_count": 18,
+    "score": 85
+  },
+  {
+    "id": "MB-063",
+    "source_relpath": "_2025/grover/state_vectors.py",
+    "class_name": "ComplexComponents",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 246,
+    "play_count": 10,
+    "score": 80
+  },
+  {
+    "id": "MB-064",
+    "source_relpath": "_2025/grover/qc_supplements.py",
+    "class_name": "TryingToDescribeComputing",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 111,
+    "play_count": 16,
+    "score": 72
+  },
+  {
+    "id": "MB-065",
+    "source_relpath": "_2025/grover/runtime.py",
+    "class_name": "Quiz",
+    "year": 2025,
+    "topic": "grover",
+    "nlines": 165,
+    "play_count": 12,
+    "score": 71
+  },
+  {
+    "id": "MB-066",
+    "source_relpath": "_2025/guest_videos/burnside.py",
+    "class_name": "IncompleteSquares",
+    "year": 2025,
+    "topic": "guest_videos",
+    "nlines": 273,
+    "play_count": 24,
+    "score": 121
+  },
+  {
+    "id": "MB-067",
+    "source_relpath": "_2025/guest_videos/euclid.py",
+    "class_name": "FlattenCone",
+    "year": 2025,
+    "topic": "guest_videos",
+    "nlines": 105,
+    "play_count": 5,
+    "score": 53
+  },
+  {
+    "id": "MB-068",
+    "source_relpath": "_2025/guest_videos/euclid.py",
+    "class_name": "SquareOnASphere",
+    "year": 2025,
+    "topic": "guest_videos",
+    "nlines": 79,
+    "play_count": 4,
+    "score": 36
+  },
+  {
+    "id": "MB-069",
+    "source_relpath": "_2025/guest_videos/misc_animations.py",
+    "class_name": "SubManifolds",
+    "year": 2025,
+    "topic": "guest_videos",
+    "nlines": 99,
+    "play_count": 3,
+    "score": 31
+  },
+  {
+    "id": "MB-070",
+    "source_relpath": "_2025/laplace/derivatives.py",
+    "class_name": "DerivativeFormula",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 504,
+    "play_count": 56,
+    "score": 243
+  },
+  {
+    "id": "MB-071",
+    "source_relpath": "_2025/laplace/derivatives.py",
+    "class_name": "WalkThroughEquationSolution",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 568,
+    "play_count": 49,
+    "score": 212
+  },
+  {
+    "id": "MB-072",
+    "source_relpath": "_2025/laplace/integration.py",
+    "class_name": "IntegrateRealExponential",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 458,
+    "play_count": 35,
+    "score": 177
+  },
+  {
+    "id": "MB-073",
+    "source_relpath": "_2025/laplace/exponentials.py",
+    "class_name": "SPlane",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 446,
+    "play_count": 28,
+    "score": 152
+  },
+  {
+    "id": "MB-074",
+    "source_relpath": "_2025/laplace/shm.py",
+    "class_name": "SolveDampedSpringEquation",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 433,
+    "play_count": 34,
+    "score": 152
+  },
+  {
+    "id": "MB-075",
+    "source_relpath": "_2025/laplace/prequel_equations.py",
+    "class_name": "GeneralLinearEquation",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 289,
+    "play_count": 24,
+    "score": 135
+  },
+  {
+    "id": "MB-076",
+    "source_relpath": "_2025/laplace/supplements.py",
+    "class_name": "GeneralLinearEquation",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 289,
+    "play_count": 24,
+    "score": 135
+  },
+  {
+    "id": "MB-077",
+    "source_relpath": "_2025/laplace/main_equations.py",
+    "class_name": "LaplaceTransformOfCosineSymbolically",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 326,
+    "play_count": 25,
+    "score": 122
+  },
+  {
+    "id": "MB-078",
+    "source_relpath": "_2025/laplace/shm.py",
+    "class_name": "ShowFamilyOfComplexSolutions",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 264,
+    "play_count": 19,
+    "score": 118
+  },
+  {
+    "id": "MB-079",
+    "source_relpath": "_2025/laplace/derivatives.py",
+    "class_name": "PartialFractionDecomposition",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 289,
+    "play_count": 23,
+    "score": 114
+  },
+  {
+    "id": "MB-080",
+    "source_relpath": "_2025/laplace/shm.py",
+    "class_name": "DampedSpringSolutionsOnSPlane",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 181,
+    "play_count": 20,
+    "score": 112
+  },
+  {
+    "id": "MB-081",
+    "source_relpath": "_2025/laplace/exponentials.py",
+    "class_name": "DefineSPlane",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 149,
+    "play_count": 17,
+    "score": 99
+  },
+  {
+    "id": "MB-082",
+    "source_relpath": "_2025/laplace/main_equations.py",
+    "class_name": "TranslateToNewLanguage",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 268,
+    "play_count": 16,
+    "score": 97
+  },
+  {
+    "id": "MB-083",
+    "source_relpath": "_2025/laplace/exponentials.py",
+    "class_name": "ImaginaryInputsToTheTaylorSeries",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 194,
+    "play_count": 13,
+    "score": 91
+  },
+  {
+    "id": "MB-084",
+    "source_relpath": "_2025/laplace/exponentials.py",
+    "class_name": "IntroduceEulersFormula",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 205,
+    "play_count": 13,
+    "score": 84
+  },
+  {
+    "id": "MB-085",
+    "source_relpath": "_2025/laplace/exponentials.py",
+    "class_name": "ForcedOscillatorSolutionForm",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 217,
+    "play_count": 11,
+    "score": 82
+  },
+  {
+    "id": "MB-086",
+    "source_relpath": "_2025/laplace/main_equations.py",
+    "class_name": "RealExtension",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 111,
+    "play_count": 11,
+    "score": 79
+  },
+  {
+    "id": "MB-087",
+    "source_relpath": "_2025/laplace/derivative_supplements.py",
+    "class_name": "KeyProperties",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 117,
+    "play_count": 13,
+    "score": 74
+  },
+  {
+    "id": "MB-088",
+    "source_relpath": "_2025/laplace/main_equations.py",
+    "class_name": "DesiredMachine",
+    "year": 2025,
+    "topic": "laplace",
+    "nlines": 142,
+    "play_count": 13,
+    "score": 72
+  },
+  {
+    "id": "MB-089",
+    "source_relpath": "_2025/zeta/play.py",
+    "class_name": "ZetaSum",
+    "year": 2025,
+    "topic": "zeta",
+    "nlines": 124,
+    "play_count": 2,
+    "score": 36
+  },
+  {
+    "id": "MB-090",
+    "source_relpath": "_2025/zeta/play.py",
+    "class_name": "ZetaLogDerivSum",
+    "year": 2025,
+    "topic": "zeta",
+    "nlines": 44,
+    "play_count": 5,
+    "score": 35
+  },
+  {
+    "id": "MB-091",
+    "source_relpath": "_2024/antp/main.py",
+    "class_name": "SieveWithMod",
+    "year": 2024,
+    "topic": "antp",
+    "nlines": 156,
+    "play_count": 7,
+    "score": 47
+  },
+  {
+    "id": "MB-092",
+    "source_relpath": "_2024/antp/main.py",
+    "class_name": "EuclidProof",
+    "year": 2024,
+    "topic": "antp",
+    "nlines": 114,
+    "play_count": 5,
+    "score": 38
+  },
+  {
+    "id": "MB-093",
+    "source_relpath": "_2024/antp/main.py",
+    "class_name": "NewGapsInPrimes",
+    "year": 2024,
+    "topic": "antp",
+    "nlines": 69,
+    "play_count": 4,
+    "score": 33
+  },
+  {
+    "id": "MB-094",
+    "source_relpath": "_2024/antp/main.py",
+    "class_name": "PrimesNearMillion",
+    "year": 2024,
+    "topic": "antp",
+    "nlines": 106,
+    "play_count": 2,
+    "score": 31
+  },
+  {
+    "id": "MB-095",
+    "source_relpath": "_2024/antp/main.py",
+    "class_name": "SieveOfEratosthenes",
+    "year": 2024,
+    "topic": "antp",
+    "nlines": 52,
+    "play_count": 2,
+    "score": 20
+  },
+  {
+    "id": "MB-096",
+    "source_relpath": "_2024/holograms/diffraction.py",
+    "class_name": "FullDiffractionGrating",
+    "year": 2024,
+    "topic": "holograms",
+    "nlines": 720,
+    "play_count": 56,
+    "score": 264
+  },
+  {
+    "id": "MB-097",
+    "source_relpath": "_2024/holograms/diffraction.py",
+    "class_name": "PlaneWaveThroughZonePlate",
+    "year": 2024,
+    "topic": "holograms",
+    "nlines": 661,
+    "play_count": 52,
+    "score": 238
+  },
+  {
+    "id": "MB-098",
+    "source_relpath": "_2024/holograms/diffraction.py",
+    "class_name": "DoubleSlit",
+    "year": 2024,
+    "topic": "holograms",
+    "nlines": 423,
+    "play_count": 44,
+    "score": 197
+  },
+  {
+    "id": "MB-099",
+    "source_relpath": "_2024/holograms/diffraction.py",
+    "class_name": "LightExposingFilm",
+    "year": 2024,
+    "topic": "holograms",
+    "nlines": 311,
+    "play_count": 29,
+    "score": 158
+  },
+  {
+    "id": "MB-100",
+    "source_relpath": "_2024/holograms/diffraction.py",
+    "class_name": "CreateZonePlate",
+    "year": 2024,
+    "topic": "holograms",
+    "nlines": 488,
+    "play_count": 30,
+    "score": 157
+  },
+  {
+    "id": "MB-101",
+    "source_relpath": "_2024/holograms/diffraction.py",
+    "class_name": "ComplexWaves",
+    "year": 2024,
+    "topic": "holograms",
+    "nlines": 297,
+    "play_count": 23,
+    "score": 129
+  },
+  {
+    "id": "MB-102",
+    "source_relpath": "_2024/holograms/diffraction.py",
+    "class_name": "SuperpositionOfPoints",
+    "year": 2024,
+    "topic": "holograms",
+    "nlines": 294,
+    "play_count": 25,
+    "score": 126
+  },
+  {
+    "id": "MB-103",
+    "source_relpath": "_2024/holograms/supplements.py",
+    "class_name": "ComplexAlgebra",
+    "year": 2024,
+    "topic": "holograms",
+    "nlines": 219,
+    "play_count": 15,
+    "score": 82
+  },
+  {
+    "id": "MB-104",
+    "source_relpath": "_2024/holograms/supplements.py",
+    "class_name": "Outline",
+    "year": 2024,
+    "topic": "holograms",
+    "nlines": 195,
+    "play_count": 16,
+    "score": 74
+  },
+  {
+    "id": "MB-105",
+    "source_relpath": "_2024/inscribed_rect/loops.py",
+    "class_name": "ParameterizeTheLoop",
+    "year": 2024,
+    "topic": "inscribed_rect",
+    "nlines": 726,
+    "play_count": 73,
+    "score": 334
+  },
+  {
+    "id": "MB-106",
+    "source_relpath": "_2024/inscribed_rect/loops.py",
+    "class_name": "ShowTheSurface",
+    "year": 2024,
+    "topic": "inscribed_rect",
+    "nlines": 455,
+    "play_count": 38,
+    "score": 201
+  },
+  {
+    "id": "MB-107",
+    "source_relpath": "_2024/inscribed_rect/loops.py",
+    "class_name": "MapTheStripOntoTheSurface",
+    "year": 2024,
+    "topic": "inscribed_rect",
+    "nlines": 213,
+    "play_count": 15,
+    "score": 96
+  },
+  {
+    "id": "MB-108",
+    "source_relpath": "_2024/inscribed_rect/loops.py",
+    "class_name": "ReframeToPairsOfPoints",
+    "year": 2024,
+    "topic": "inscribed_rect",
+    "nlines": 163,
+    "play_count": 14,
+    "score": 87
+  },
+  {
+    "id": "MB-109",
+    "source_relpath": "_2024/inscribed_rect/loops.py",
+    "class_name": "ConstructKleinBottle",
+    "year": 2024,
+    "topic": "inscribed_rect",
+    "nlines": 254,
+    "play_count": 16,
+    "score": 84
+  },
+  {
+    "id": "MB-110",
+    "source_relpath": "_2024/inscribed_rect/loops.py",
+    "class_name": "StateThePuzzle",
+    "year": 2024,
+    "topic": "inscribed_rect",
+    "nlines": 163,
+    "play_count": 12,
+    "score": 74
+  },
+  {
+    "id": "MB-111",
+    "source_relpath": "_2024/inscribed_rect/loops.py",
+    "class_name": "DiscussOrderOfPoints",
+    "year": 2024,
+    "topic": "inscribed_rect",
+    "nlines": 112,
+    "play_count": 11,
+    "score": 71
+  },
+  {
+    "id": "MB-112",
+    "source_relpath": "_2024/inscribed_rect/loops.py",
+    "class_name": "ChangeTheSurface",
+    "year": 2024,
+    "topic": "inscribed_rect",
+    "nlines": 114,
+    "play_count": 9,
+    "score": 67
+  },
+  {
+    "id": "MB-113",
+    "source_relpath": "_2024/manim_demo/lorenz.py",
+    "class_name": "LorenzAttractor",
+    "year": 2024,
+    "topic": "manim_demo",
+    "nlines": 82,
+    "play_count": 2,
+    "score": 40
+  },
+  {
+    "id": "MB-114",
+    "source_relpath": "_2024/puzzles/added_dimension.py",
+    "class_name": "MongesTheorem",
+    "year": 2024,
+    "topic": "puzzles",
+    "nlines": 423,
+    "play_count": 37,
+    "score": 180
+  },
+  {
+    "id": "MB-115",
+    "source_relpath": "_2024/puzzles/added_dimension.py",
+    "class_name": "Project3DCube",
+    "year": 2024,
+    "topic": "puzzles",
+    "nlines": 320,
+    "play_count": 32,
+    "score": 164
+  },
+  {
+    "id": "MB-116",
+    "source_relpath": "_2024/puzzles/max_rand.py",
+    "class_name": "VisualizeMaxOfPairCDF",
+    "year": 2024,
+    "topic": "puzzles",
+    "nlines": 314,
+    "play_count": 30,
+    "score": 161
+  },
+  {
+    "id": "MB-117",
+    "source_relpath": "_2024/puzzles/added_dimension.py",
+    "class_name": "Project4DCube",
+    "year": 2024,
+    "topic": "puzzles",
+    "nlines": 381,
+    "play_count": 27,
+    "score": 142
+  },
+  {
+    "id": "MB-118",
+    "source_relpath": "_2024/puzzles/added_dimension.py",
+    "class_name": "SphereStrips",
+    "year": 2024,
+    "topic": "puzzles",
+    "nlines": 247,
+    "play_count": 20,
+    "score": 126
+  },
+  {
+    "id": "MB-119",
+    "source_relpath": "_2024/puzzles/added_dimension.py",
+    "class_name": "StruggleWithStrips",
+    "year": 2024,
+    "topic": "puzzles",
+    "nlines": 238,
+    "play_count": 21,
+    "score": 116
+  },
+  {
+    "id": "MB-120",
+    "source_relpath": "_2024/puzzles/added_dimension.py",
+    "class_name": "AskStripQuestion",
+    "year": 2024,
+    "topic": "puzzles",
+    "nlines": 255,
+    "play_count": 18,
+    "score": 111
+  },
+  {
+    "id": "MB-121",
+    "source_relpath": "_2024/puzzles/added_dimension.py",
+    "class_name": "IntersectingCircles",
+    "year": 2024,
+    "topic": "puzzles",
+    "nlines": 135,
+    "play_count": 14,
+    "score": 78
+  },
+  {
+    "id": "MB-122",
+    "source_relpath": "_2024/transformers/mlp.py",
+    "class_name": "BasicMLPWalkThrough",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 1366,
+    "play_count": 121,
+    "score": 497
+  },
+  {
+    "id": "MB-123",
+    "source_relpath": "_2024/transformers/attention.py",
+    "class_name": "AttentionPatterns",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 1440,
+    "play_count": 88,
+    "score": 358
+  },
+  {
+    "id": "MB-124",
+    "source_relpath": "_2024/transformers/ml_basics.py",
+    "class_name": "PremiseOfML",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 581,
+    "play_count": 43,
+    "score": 182
+  },
+  {
+    "id": "MB-125",
+    "source_relpath": "_2024/transformers/ml_basics.py",
+    "class_name": "SoftmaxBreakdown",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 552,
+    "play_count": 37,
+    "score": 180
+  },
+  {
+    "id": "MB-126",
+    "source_relpath": "_2024/transformers/embedding.py",
+    "class_name": "MJSpace",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 290,
+    "play_count": 27,
+    "score": 144
+  },
+  {
+    "id": "MB-127",
+    "source_relpath": "_2024/transformers/ml_basics.py",
+    "class_name": "ShowGPT3Numbers",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 490,
+    "play_count": 30,
+    "score": 132
+  },
+  {
+    "id": "MB-128",
+    "source_relpath": "_2024/transformers/attention.py",
+    "class_name": "CountMatrixParameters",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 451,
+    "play_count": 22,
+    "score": 107
+  },
+  {
+    "id": "MB-129",
+    "source_relpath": "_2024/transformers/attention.py",
+    "class_name": "IntroduceValueMatrix",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 246,
+    "play_count": 14,
+    "score": 88
+  },
+  {
+    "id": "MB-130",
+    "source_relpath": "_2024/transformers/embedding.py",
+    "class_name": "IntroduceEmbeddingMatrix",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 269,
+    "play_count": 16,
+    "score": 86
+  },
+  {
+    "id": "MB-131",
+    "source_relpath": "_2024/transformers/embedding.py",
+    "class_name": "KingQueenExample",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 276,
+    "play_count": 15,
+    "score": 86
+  },
+  {
+    "id": "MB-132",
+    "source_relpath": "_2024/transformers/mlp.py",
+    "class_name": "Superposition",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 210,
+    "play_count": 15,
+    "score": 82
+  },
+  {
+    "id": "MB-133",
+    "source_relpath": "_2024/transformers/attention.py",
+    "class_name": "MultiHeadedAttention",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 392,
+    "play_count": 15,
+    "score": 79
+  },
+  {
+    "id": "MB-134",
+    "source_relpath": "_2024/transformers/attention.py",
+    "class_name": "RoadNotTaken",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 165,
+    "play_count": 15,
+    "score": 79
+  },
+  {
+    "id": "MB-135",
+    "source_relpath": "_2024/transformers/ml_basics.py",
+    "class_name": "LinearRegression",
+    "year": 2024,
+    "topic": "transformers",
+    "nlines": 136,
+    "play_count": 9,
+    "score": 75
+  },
+  {
+    "id": "MB-136",
+    "source_relpath": "_2023/moser_reboot/main.py",
+    "class_name": "BalancedEquation",
+    "year": 2023,
+    "topic": "moser_reboot",
+    "nlines": 207,
+    "play_count": 21,
+    "score": 106
+  },
+  {
+    "id": "MB-137",
+    "source_relpath": "_2023/moser_reboot/main.py",
+    "class_name": "FinalRearrangment",
+    "year": 2023,
+    "topic": "moser_reboot",
+    "nlines": 109,
+    "play_count": 11,
+    "score": 64
+  },
+  {
+    "id": "MB-138",
+    "source_relpath": "_2023/moser_reboot/main.py",
+    "class_name": "AskAboutSome",
+    "year": 2023,
+    "topic": "moser_reboot",
+    "nlines": 52,
+    "play_count": 10,
+    "score": 55
+  },
+  {
+    "id": "MB-139",
+    "source_relpath": "_2023/moser_reboot/main.py",
+    "class_name": "ExplainNChoose2",
+    "year": 2023,
+    "topic": "moser_reboot",
+    "nlines": 145,
+    "play_count": 10,
+    "score": 55
+  },
+  {
+    "id": "MB-140",
+    "source_relpath": "_2023/moser_reboot/main.py",
+    "class_name": "ShowPattern",
+    "year": 2023,
+    "topic": "moser_reboot",
+    "nlines": 72,
+    "play_count": 8,
+    "score": 50
+  },
+  {
+    "id": "MB-141",
+    "source_relpath": "_2023/moser_reboot/main.py",
+    "class_name": "CountIntersections",
+    "year": 2023,
+    "topic": "moser_reboot",
+    "nlines": 145,
+    "play_count": 4,
+    "score": 36
+  },
+  {
+    "id": "MB-142",
+    "source_relpath": "_2023/numberphile/prime_race.py",
+    "class_name": "PrimeRace",
+    "year": 2023,
+    "topic": "numberphile",
+    "nlines": 94,
+    "play_count": 4,
+    "score": 33
+  },
+  {
+    "id": "MB-143",
+    "source_relpath": "_2023/numberphile/prime_race.py",
+    "class_name": "RaceGraph",
+    "year": 2023,
+    "topic": "numberphile",
+    "nlines": 130,
+    "play_count": 3,
+    "score": 28
+  },
+  {
+    "id": "MB-144",
+    "source_relpath": "_2023/optics_puzzles/driven_harmonic_oscillator.py",
+    "class_name": "DrivenHarmonicOscillator",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 858,
+    "play_count": 66,
+    "score": 299
+  },
+  {
+    "id": "MB-145",
+    "source_relpath": "_2023/optics_puzzles/e_field.py",
+    "class_name": "IntroduceEField",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 658,
+    "play_count": 58,
+    "score": 275
+  },
+  {
+    "id": "MB-146",
+    "source_relpath": "_2023/optics_puzzles/adding_waves.py",
+    "class_name": "AddTwoSineWaves",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 624,
+    "play_count": 34,
+    "score": 170
+  },
+  {
+    "id": "MB-147",
+    "source_relpath": "_2023/optics_puzzles/cylinder.py",
+    "class_name": "TwistingWithinCylinder",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 368,
+    "play_count": 23,
+    "score": 121
+  },
+  {
+    "id": "MB-148",
+    "source_relpath": "_2023/optics_puzzles/cylinder.py",
+    "class_name": "InducedWiggleInCylinder",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 275,
+    "play_count": 23,
+    "score": 117
+  },
+  {
+    "id": "MB-149",
+    "source_relpath": "_2023/optics_puzzles/adding_waves.py",
+    "class_name": "WavePlusLayerInfluence",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 290,
+    "play_count": 15,
+    "score": 104
+  },
+  {
+    "id": "MB-150",
+    "source_relpath": "_2023/optics_puzzles/slowing_waves.py",
+    "class_name": "RevertToOneLayerAtATime",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 280,
+    "play_count": 19,
+    "score": 99
+  },
+  {
+    "id": "MB-151",
+    "source_relpath": "_2023/optics_puzzles/bending_waves.py",
+    "class_name": "SnellsLaw",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 180,
+    "play_count": 14,
+    "score": 92
+  },
+  {
+    "id": "MB-152",
+    "source_relpath": "_2023/optics_puzzles/e_field.py",
+    "class_name": "AltEFieldIntroduction",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 167,
+    "play_count": 13,
+    "score": 78
+  },
+  {
+    "id": "MB-153",
+    "source_relpath": "_2023/optics_puzzles/wave_machine.py",
+    "class_name": "WaveMachineDemo",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 81,
+    "play_count": 8,
+    "score": 67
+  },
+  {
+    "id": "MB-154",
+    "source_relpath": "_2023/optics_puzzles/bending_waves.py",
+    "class_name": "LineGame",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 177,
+    "play_count": 10,
+    "score": 64
+  },
+  {
+    "id": "MB-155",
+    "source_relpath": "_2023/optics_puzzles/e_field.py",
+    "class_name": "OneOfManyCharges",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 143,
+    "play_count": 5,
+    "score": 57
+  },
+  {
+    "id": "MB-156",
+    "source_relpath": "_2023/optics_puzzles/bending_waves.py",
+    "class_name": "TransitionToOverheadView",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 128,
+    "play_count": 8,
+    "score": 57
+  },
+  {
+    "id": "MB-157",
+    "source_relpath": "_2023/optics_puzzles/cylinder.py",
+    "class_name": "TwistingLightBeam",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 181,
+    "play_count": 7,
+    "score": 55
+  },
+  {
+    "id": "MB-158",
+    "source_relpath": "_2023/optics_puzzles/cylinder.py",
+    "class_name": "VectorFieldWigglingNew",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 95,
+    "play_count": 6,
+    "score": 54
+  },
+  {
+    "id": "MB-159",
+    "source_relpath": "_2023/optics_puzzles/e_field.py",
+    "class_name": "PolarizedScattering",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 92,
+    "play_count": 6,
+    "score": 50
+  },
+  {
+    "id": "MB-160",
+    "source_relpath": "_2023/optics_puzzles/bending_waves.py",
+    "class_name": "Prism",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 130,
+    "play_count": 5,
+    "score": 45
+  },
+  {
+    "id": "MB-161",
+    "source_relpath": "_2023/optics_puzzles/e_field.py",
+    "class_name": "CircularPolarization1D",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 68,
+    "play_count": 5,
+    "score": 44
+  },
+  {
+    "id": "MB-162",
+    "source_relpath": "_2023/optics_puzzles/cylinder.py",
+    "class_name": "SimpleLightBeam",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 86,
+    "play_count": 5,
+    "score": 41
+  },
+  {
+    "id": "MB-163",
+    "source_relpath": "_2023/optics_puzzles/slowing_waves.py",
+    "class_name": "KickForward",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 89,
+    "play_count": 6,
+    "score": 40
+  },
+  {
+    "id": "MB-164",
+    "source_relpath": "_2023/optics_puzzles/e_field.py",
+    "class_name": "OscillateOnYOneDField",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 107,
+    "play_count": 5,
+    "score": 37
+  },
+  {
+    "id": "MB-165",
+    "source_relpath": "_2023/optics_puzzles/adding_waves.py",
+    "class_name": "WhiteLightAsASum",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 97,
+    "play_count": 2,
+    "score": 37
+  },
+  {
+    "id": "MB-166",
+    "source_relpath": "_2023/optics_puzzles/cylinder.py",
+    "class_name": "LinearAsASuperpositionOfCircular",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 151,
+    "play_count": 2,
+    "score": 36
+  },
+  {
+    "id": "MB-167",
+    "source_relpath": "_2023/optics_puzzles/e_field.py",
+    "class_name": "RowOfChargesXAxis",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 63,
+    "play_count": 3,
+    "score": 36
+  },
+  {
+    "id": "MB-168",
+    "source_relpath": "_2023/optics_puzzles/driven_harmonic_oscillator.py",
+    "class_name": "JigglesInCalcite",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 115,
+    "play_count": 4,
+    "score": 35
+  },
+  {
+    "id": "MB-169",
+    "source_relpath": "_2023/optics_puzzles/slowing_waves.py",
+    "class_name": "SlowedAndAbsorbed",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 75,
+    "play_count": 2,
+    "score": 34
+  },
+  {
+    "id": "MB-170",
+    "source_relpath": "_2023/optics_puzzles/driven_harmonic_oscillator.py",
+    "class_name": "SpiralPaths",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 44,
+    "play_count": 2,
+    "score": 33
+  },
+  {
+    "id": "MB-171",
+    "source_relpath": "_2023/optics_puzzles/slowing_waves.py",
+    "class_name": "IntroducePhaseKickBack",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 57,
+    "play_count": 5,
+    "score": 32
+  },
+  {
+    "id": "MB-172",
+    "source_relpath": "_2023/optics_puzzles/cylinder.py",
+    "class_name": "TransitionTo2D",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 48,
+    "play_count": 2,
+    "score": 32
+  },
+  {
+    "id": "MB-173",
+    "source_relpath": "_2023/optics_puzzles/e_field.py",
+    "class_name": "Introduce3dMovements",
+    "year": 2023,
+    "topic": "optics_puzzles",
+    "nlines": 40,
+    "play_count": 4,
+    "score": 31
+  },
+  {
+    "id": "MB-174",
+    "source_relpath": "_2023/standup_maths/pool.py",
+    "class_name": "PoolTableReflections",
+    "year": 2023,
+    "topic": "standup_maths",
+    "nlines": 316,
+    "play_count": 27,
+    "score": 128
+  },
+  {
+    "id": "MB-175",
+    "source_relpath": "_2023/standup_maths/basketball.py",
+    "class_name": "ShotHistory",
+    "year": 2023,
+    "topic": "standup_maths",
+    "nlines": 141,
+    "play_count": 10,
+    "score": 56
+  },
+  {
+    "id": "MB-176",
+    "source_relpath": "_2022/borwein/main.py",
+    "class_name": "WhatWeNeedToShow",
+    "year": 2022,
+    "topic": "borwein",
+    "nlines": 256,
+    "play_count": 28,
+    "score": 147
+  },
+  {
+    "id": "MB-177",
+    "source_relpath": "_2022/borwein/main.py",
+    "class_name": "ShowIntegrals",
+    "year": 2022,
+    "topic": "borwein",
+    "nlines": 260,
+    "play_count": 25,
+    "score": 133
+  },
+  {
+    "id": "MB-178",
+    "source_relpath": "_2022/borwein/main.py",
+    "class_name": "ConvolutionTheoremDiagram",
+    "year": 2022,
+    "topic": "borwein",
+    "nlines": 178,
+    "play_count": 11,
+    "score": 74
+  },
+  {
+    "id": "MB-179",
+    "source_relpath": "_2022/borwein/main.py",
+    "class_name": "MovingAverages",
+    "year": 2022,
+    "topic": "borwein",
+    "nlines": 261,
+    "play_count": 10,
+    "score": 69
+  },
+  {
+    "id": "MB-180",
+    "source_relpath": "_2022/borwein/main.py",
+    "class_name": "ReplaceXWithPiX",
+    "year": 2022,
+    "topic": "borwein",
+    "nlines": 96,
+    "play_count": 7,
+    "score": 54
+  },
+  {
+    "id": "MB-181",
+    "source_relpath": "_2022/galois/groups.py",
+    "class_name": "FlowerSymmetries",
+    "year": 2022,
+    "topic": "galois",
+    "nlines": 50,
+    "play_count": 2,
+    "score": 12
+  },
+  {
+    "id": "MB-182",
+    "source_relpath": "_2022/piano/fourier_animations.py",
+    "class_name": "SumOfWaves",
+    "year": 2022,
+    "topic": "piano",
+    "nlines": 164,
+    "play_count": 7,
+    "score": 65
+  },
+  {
+    "id": "MB-183",
+    "source_relpath": "_2022/piano/fourier_animations.py",
+    "class_name": "ThreeDChangeOfBasisExample",
+    "year": 2022,
+    "topic": "piano",
+    "nlines": 130,
+    "play_count": 5,
+    "score": 65
+  },
+  {
+    "id": "MB-184",
+    "source_relpath": "_2022/piano/fourier_animations.py",
+    "class_name": "WaveformDescription",
+    "year": 2022,
+    "topic": "piano",
+    "nlines": 36,
+    "play_count": 3,
+    "score": 17
+  },
+  {
+    "id": "MB-185",
+    "source_relpath": "_2022/puzzles/subsets.py",
+    "class_name": "FifthRootsOfUnity",
+    "year": 2022,
+    "topic": "puzzles",
+    "nlines": 704,
+    "play_count": 66,
+    "score": 294
+  },
+  {
+    "id": "MB-186",
+    "source_relpath": "_2022/puzzles/subsets.py",
+    "class_name": "EvaluationTricks",
+    "year": 2022,
+    "topic": "puzzles",
+    "nlines": 291,
+    "play_count": 34,
+    "score": 171
+  },
+  {
+    "id": "MB-187",
+    "source_relpath": "_2022/puzzles/subsets.py",
+    "class_name": "AnswerGuess",
+    "year": 2022,
+    "topic": "puzzles",
+    "nlines": 126,
+    "play_count": 17,
+    "score": 90
+  },
+  {
+    "id": "MB-188",
+    "source_relpath": "_2022/puzzles/subsets.py",
+    "class_name": "GeneratingFunctions",
+    "year": 2022,
+    "topic": "puzzles",
+    "nlines": 192,
+    "play_count": 14,
+    "score": 78
+  },
+  {
+    "id": "MB-189",
+    "source_relpath": "_2022/puzzles/subsets.py",
+    "class_name": "DirichletSeries",
+    "year": 2022,
+    "topic": "puzzles",
+    "nlines": 194,
+    "play_count": 11,
+    "score": 76
+  },
+  {
+    "id": "MB-190",
+    "source_relpath": "_2022/quintic/polynomial_baisics.py",
+    "class_name": "ConstructPolynomialWithGivenRoots",
+    "year": 2022,
+    "topic": "quintic",
+    "nlines": 625,
+    "play_count": 40,
+    "score": 190
+  },
+  {
+    "id": "MB-191",
+    "source_relpath": "_2022/quintic/polynomial_baisics.py",
+    "class_name": "StudySqrt",
+    "year": 2022,
+    "topic": "quintic",
+    "nlines": 287,
+    "play_count": 14,
+    "score": 84
+  },
+  {
+    "id": "MB-192",
+    "source_relpath": "_2022/quintic/polynomial_baisics.py",
+    "class_name": "SolvabilityChart",
+    "year": 2022,
+    "topic": "quintic",
+    "nlines": 230,
+    "play_count": 10,
+    "score": 78
+  },
+  {
+    "id": "MB-193",
+    "source_relpath": "_2022/quintic/polynomial_baisics.py",
+    "class_name": "FactsAboutRootsToCoefficients",
+    "year": 2022,
+    "topic": "quintic",
+    "nlines": 343,
+    "play_count": 10,
+    "score": 77
+  },
+  {
+    "id": "MB-194",
+    "source_relpath": "_2022/quintic/polynomial_baisics.py",
+    "class_name": "CubeRootBehavior",
+    "year": 2022,
+    "topic": "quintic",
+    "nlines": 28,
+    "play_count": 2,
+    "score": 13
+  },
+  {
+    "id": "MB-195",
+    "source_relpath": "_2022/visual_proofs/lies.py",
+    "class_name": "SquareCircleExample",
+    "year": 2022,
+    "topic": "visual_proofs",
+    "nlines": 270,
+    "play_count": 36,
+    "score": 180
+  },
+  {
+    "id": "MB-196",
+    "source_relpath": "_2022/visual_proofs/lies.py",
+    "class_name": "SphereExample",
+    "year": 2022,
+    "topic": "visual_proofs",
+    "nlines": 219,
+    "play_count": 23,
+    "score": 126
+  },
+  {
+    "id": "MB-197",
+    "source_relpath": "_2022/visual_proofs/lies.py",
+    "class_name": "SphereSectorAnalysis",
+    "year": 2022,
+    "topic": "visual_proofs",
+    "nlines": 225,
+    "play_count": 19,
+    "score": 120
+  },
+  {
+    "id": "MB-198",
+    "source_relpath": "_2022/visual_proofs/lies.py",
+    "class_name": "FalseEuclidProofAnnotation",
+    "year": 2022,
+    "topic": "visual_proofs",
+    "nlines": 130,
+    "play_count": 20,
+    "score": 93
+  },
+  {
+    "id": "MB-199",
+    "source_relpath": "_2022/visual_proofs/lies.py",
+    "class_name": "CircleExample",
+    "year": 2022,
+    "topic": "visual_proofs",
+    "nlines": 129,
+    "play_count": 17,
+    "score": 90
+  },
+  {
+    "id": "MB-200",
+    "source_relpath": "_2022/visual_proofs/lies.py",
+    "class_name": "FakeAreaManipulation",
+    "year": 2022,
+    "topic": "visual_proofs",
+    "nlines": 190,
+    "play_count": 12,
+    "score": 69
+  }
+]

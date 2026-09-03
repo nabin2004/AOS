@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-002",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render the initial Entropy Chart showing the horizontal stacked probability segments and their corresponding vertical information bars.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "EntropyChart",
+        "StackedProbDistribution",
+        "Rectangle",
+        "ValueTracker"
+      ],
+      "clip_query": "A chart showing a horizontal segmented bar at the bottom with vertical bars of varying heights rising from each segment."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Display the vertical axis reference lines and bit labels representing the information scale.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "reference_lines",
+        "Line",
+        "Tex",
+        "bits"
+      ],
+      "clip_query": "Horizontal grid lines with integer labels indicating bit levels on a vertical scale."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animate the dynamic transition of the probability distribution, showing horizontal segments expanding/shrinking and vertical bars adjusting their heights in real-time.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "add_updater",
+        "get_value",
+        "math.log2",
+        "interpolate_color"
+      ],
+      "clip_query": "The bars of the entropy chart dynamically shifting, with some growing taller as their base narrows, and others shrinking as their base widens."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Highlight a specific event's probability segment and its corresponding high information bar to emphasize the inverse relationship.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "PURE_MAGENTA",
+        "set_stroke",
+        "focus"
+      ],
+      "clip_query": "One of the narrow segments and its tall vertical bar being highlighted to show high information content."
+    }
+  ]
+}

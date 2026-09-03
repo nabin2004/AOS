@@ -1,0 +1,169 @@
+{
+  "id": "CL-002",
+  "title": "The Essence of Calculus | Chapter 2: The Paradox of the Derivative",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [960, 1920],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 3,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation explaining the paradox of the derivative. Start with a car traveling from A to B, showing distance vs time graph s(t) and velocity vs time graph v(t). Explain that velocity requires two separate points in time to compute (change in distance / change in time), but the derivative associates a velocity with a single instant. Show the speedometer measuring velocity over a small time interval dt with distance change ds. Demonstrate that ds/dt is the slope between two close points on the graph. Then show that as dt approaches zero, the secant line approaches the tangent line, and the derivative is the slope of the tangent line. Use the specific example s(t) = t³ to show the algebra: expanding (t+dt)³, canceling terms, and taking the limit dt → 0 to get 3t². Finally, address the paradox at t=0: derivative is 0, but the car does move over any finite interval. Conclude that the derivative is the best constant approximation for rate of change, not an instantaneous rate of change.",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter2.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "Chapter2OpeningQuote",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "Introduction",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "FathersOfCalculus",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "IntroduceCar",
+        "key_methods": ["construct", "introduce_added_mobjects", "get_added_movement_anims"]
+      },
+      {
+        "name": "GraphCarTrajectory",
+        "key_methods": ["construct", "graph_sigmoid_trajectory_function", "introduce_graph", "comment_on_slope", "get_change_lines", "show_velocity_graph", "ask_critically_about_velocity"]
+      },
+      {
+        "name": "ShowSpeedometer",
+        "key_methods": ["setup", "introduce_added_mobjects", "get_added_movement_anims"]
+      },
+      {
+        "name": "VelocityInAMomentMakesNoSense",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SnapshotOfACar",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "CompareTwoTimes",
+        "key_methods": ["construct", "introduce_states", "show_equation", "fade_all_but_one_moment", "get_car_state"]
+      },
+      {
+        "name": "VelocityAtIndividualPointsVsPairs",
+        "key_methods": ["construct", "show_individual_times_to_velocity", "show_two_times_on_distance", "show_confused_pi_creature"]
+      },
+      {
+        "name": "FirstRealWorld",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SidestepParadox",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "CompareTwoVerySimilarTimes",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DsOverDtGraphically",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DefineTrueDerivative",
+        "key_methods": ["construct", "get_fraction", "get_brace_and_text"]
+      },
+      {
+        "name": "SecantLineToTangentLine",
+        "key_methods": ["construct", "get_ds_dt_group", "add_graph", "add_derivative_definition", "draw_axes", "show_tangent_line", "what_this_is_not_saying", "best_constant_approximation_around_a_point"]
+      },
+      {
+        "name": "UseOfDImpliesApproaching",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "LeadIntoASpecificExample",
+        "key_methods": ["setup", "construct"]
+      },
+      {
+        "name": "TCubedExample",
+        "key_methods": ["construct", "draw_graph", "show_vertical_lines", "bear_with_me", "add_ds_dt_group", "get_vertical_lines", "brace_for_details", "show_expansion", "react_to_simplicity"]
+      },
+      {
+        "name": "YouWouldntDoThisEveryTime",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ContrastConcreteDtWithLimit",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TimeForAnActualParadox",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ParadoxAtTEquals0",
+        "key_methods": ["construct", "draw_graph", "ask_question", "show_derivative_text", "show_tangent_line", "if_not_then_when", "single_out_question"]
+      },
+      {
+        "name": "TinyMovement",
+        "key_methods": ["construct", "show_initial_motion", "show_ratios", "get_ratio"]
+      },
+      {
+        "name": "NextVideos",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Car motion with distance vs time graph",
+      "Velocity as derivative of distance",
+      "Secant line between two points",
+      "Tangent line as limit of secant lines",
+      "Speedometer visualization",
+      "ds/dt as rise over run",
+      "Algebraic expansion of (t+dt)³",
+      "Paradox at t=0 demonstration",
+      "Best constant approximation"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromFunc", "UpdateFromAlphaFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "MoveCar", "IncrementNumber", "ClockPassesTime", "Rotating", "PiCreatureSays", "RemovePiCreatureBubble", "Indicate"],
+      "mobject_classes": ["Car", "Clock", "Axes", "FunctionGraph", "Dot", "Line", "Arrow", "Brace", "Rectangle", "Circle"],
+      "custom_classes": ["GraphScene", "TeacherStudentsScene", "PiCreatureScene", "ZoomedScene"],
+      "helpers": ["get_graph_label", "get_derivative_graph", "get_vertical_line_to_graph", "input_to_graph_point"],
+      "custom_imports": ["from manim_imports_ext import *", "from _2017.eoc.chapter2 import Car, MoveCar"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "fails to show the car motion and distance graph connection",
+      "severity": "high",
+      "note": "misses the physical intuition"
+    },
+    {
+      "pattern": "doesn't demonstrate the secant-to-tangent limit process",
+      "severity": "high",
+      "note": "fails to show the core derivative concept"
+    },
+    {
+      "pattern": "confuses ds/dt for a specific dt with the derivative (limit)",
+      "severity": "high",
+      "note": "misunderstands the definition"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

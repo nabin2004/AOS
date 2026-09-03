@@ -1,0 +1,219 @@
+{
+  "problem_id": "CL-008",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Car speedometer view: driver sees only speedometer, wants to know distance traveled",
+      "weight": 0.0577,
+      "critical": false,
+      "expected_time_range": [
+        0.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "Car",
+        "speedometer",
+        "distance",
+        "velocity",
+        "view"
+      ],
+      "clip_query": "car interior with speedometer visible"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Velocity graph v(t) = t(8-t) plotted with speedometer points",
+      "weight": 0.0769,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "velocity",
+        "graph",
+        "v(t)",
+        "t(8-t)",
+        "plot"
+      ],
+      "clip_query": "velocity graph appearing with points"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Constant velocity case: distance = velocity \u00d7 time = area of rectangle",
+      "weight": 0.0577,
+      "critical": false,
+      "expected_time_range": [
+        18.0,
+        26.0
+      ],
+      "keyword_bank": [
+        "constant",
+        "velocity",
+        "area",
+        "rectangle",
+        "distance"
+      ],
+      "clip_query": "rectangle showing velocity \u00d7 time = distance"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Piecewise constant approximation: velocity graph approximated by steps, rectangles shown",
+      "weight": 0.0962,
+      "critical": true,
+      "expected_time_range": [
+        26.0,
+        38.0
+      ],
+      "keyword_bank": [
+        "piecewise",
+        "constant",
+        "approximation",
+        "rectangles",
+        "steps"
+      ],
+      "clip_query": "velocity graph with step approximations and rectangles"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Riemann sum: sum of v(t)\u00b7dt for all intervals, represented by rectangle areas",
+      "weight": 0.0962,
+      "critical": true,
+      "expected_time_range": [
+        38.0,
+        48.0
+      ],
+      "keyword_bank": [
+        "Riemann",
+        "sum",
+        "v(t)",
+        "dt",
+        "rectangles"
+      ],
+      "clip_query": "rectangles filling area under velocity graph"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "As dt \u2192 0, rectangles become thinner and sum approaches area under curve",
+      "weight": 0.0962,
+      "critical": true,
+      "expected_time_range": [
+        48.0,
+        58.0
+      ],
+      "keyword_bank": [
+        "dt",
+        "approaches",
+        "zero",
+        "area",
+        "limit"
+      ],
+      "clip_query": "rectangles getting thinner and thinner"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Integral symbol introduced: \u222b_0^8 v(t) dt as stretched 'S' for sum",
+      "weight": 0.0577,
+      "critical": false,
+      "expected_time_range": [
+        58.0,
+        64.0
+      ],
+      "keyword_bank": [
+        "integral",
+        "\u222b",
+        "sum",
+        "bounds"
+      ],
+      "clip_query": "integral symbol appearing with bounds"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "Area function A(T) with variable right endpoint, derivative A'(T) = v(T)",
+      "weight": 0.1154,
+      "critical": true,
+      "expected_time_range": [
+        64.0,
+        76.0
+      ],
+      "keyword_bank": [
+        "A(T)",
+        "area",
+        "derivative",
+        "v(T)",
+        "sliver"
+      ],
+      "clip_query": "area changing as right endpoint moves"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Sliver of area dA = v(T)\u00b7dT shown as thin rectangle approximation",
+      "weight": 0.0962,
+      "critical": true,
+      "expected_time_range": [
+        76.0,
+        86.0
+      ],
+      "keyword_bank": [
+        "dA",
+        "dT",
+        "sliver",
+        "rectangle",
+        "approximation"
+      ],
+      "clip_query": "thin sliver of area labeled dA"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Antiderivative found: F(t) = 4t\u00b2 - (1/3)t\u00b3 has derivative v(t)",
+      "weight": 0.0769,
+      "critical": false,
+      "expected_time_range": [
+        86.0,
+        94.0
+      ],
+      "keyword_bank": [
+        "antiderivative",
+        "F(t)",
+        "4t\u00b2",
+        "1/3t\u00b3",
+        "derivative"
+      ],
+      "clip_query": "antiderivative equation appearing"
+    },
+    {
+      "event_id": "ev_11",
+      "description": "Fundamental Theorem of Calculus: \u222b_a^b f(x) dx = F(b) - F(a)",
+      "weight": 0.0962,
+      "critical": true,
+      "expected_time_range": [
+        94.0,
+        104.0
+      ],
+      "keyword_bank": [
+        "FTC",
+        "F(b)",
+        "F(a)",
+        "fundamental",
+        "theorem"
+      ],
+      "clip_query": "Fundamental Theorem of Calculus equation"
+    },
+    {
+      "event_id": "ev_12",
+      "description": "Signed area: negative area when graph goes below axis (car going backwards)",
+      "weight": 0.0767,
+      "critical": false,
+      "expected_time_range": [
+        104.0,
+        114.0
+      ],
+      "keyword_bank": [
+        "negative",
+        "signed",
+        "area",
+        "backwards"
+      ],
+      "clip_query": "graph dipping below axis with negative area highlighted"
+    }
+  ]
+}

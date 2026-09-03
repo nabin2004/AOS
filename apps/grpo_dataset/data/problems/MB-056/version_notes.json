@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-056",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "VGroup of overlapping Dots with varying opacities and radii",
+      "severity": "medium"
+    },
+    {
+      "category": "custom_helpers",
+      "gl_construct": "get_quantum_computer_symbol",
+      "ce_equivalent": "Text('QC') or custom SVG representation",
+      "severity": "medium"
+    }
+  ]
+}

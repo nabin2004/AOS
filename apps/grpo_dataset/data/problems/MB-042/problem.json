@@ -1,0 +1,72 @@
+{
+  "id": "MB-042",
+  "title": "Kepler's Method of Cosmic Distance Measurement",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Astronomy",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes Kepler's method for determining the relative distance of Mars from the Sun. The visualization should set up a 3D astronomical scene containing the Sun, Earth, and Mars with their respective orbits. \n\n1. **Celestial Bodies & Orbits**:\n   - Create a central Sun with a glowing effect (using multiple layered glow dots or spheres).\n   - Create Earth and Mars as 3D spheres. If textures are available, apply Earth and Mars textures; otherwise, use distinct colors (Blue for Earth, Red for Mars).\n   - Draw the orbits of Earth and Mars as concentric circles scaled appropriately (Mars orbit radius is roughly 1.52 times Earth's orbit radius). Apply a slight stretch/eccentricity and rotation to Mars's orbit to reflect its real elliptical nature.\n   - Add a large celestial sphere in the background with a starfield or constellation texture.\n\n2. **Camera & Perspective**:\n   - Start with the camera tightly zoomed in on Earth, looking towards Mars, creating a first-person observational perspective from Earth.\n   - Smoothly animate the camera zooming out to a global, top-down-tilted orbital view showing both complete orbits.\n\n3. **Visual Indicators & Labels**:\n   - Draw a line connecting Earth and Mars to represent the line of sight.\n   - Add astronomical symbols for Earth (\\earth) and Mars (\\mars) using LaTeX (with the `wasysym` package in the preamble). These symbols should dynamically track the positions of the planets as the camera zooms out.\n   - Ensure smooth scaling of the planet spheres and their glow indicators during the zoom-out so they remain visible from a distance.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-042/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "KeplersMethod"
+    ],
+    "visual_techniques": [
+      "3D Camera Tracking",
+      "Textured Surfaces",
+      "Glow Effects",
+      "Astronomical Orbits",
+      "Dynamic Updaters"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TexturedSurface",
+      "Sphere",
+      "GlowDot",
+      "frame.reorient",
+      "always.move_to",
+      "ShowCreation"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom textures ('SunTexture', 'EarthTextureMap', etc.) causing runtime crashes.",
+      "severity": "high",
+      "note": "Ensure fallback solid colors or standard procedural textures are used if external image assets are missing."
+    },
+    {
+      "pattern": "LaTeX compilation failure due to missing 'wasysym' package in system LaTeX distribution.",
+      "severity": "medium",
+      "note": "Provide a fallback to standard text labels (e.g., 'Earth', 'Mars') if LaTeX rendering fails."
+    },
+    {
+      "pattern": "Camera reorientation methods (frame.reorient) not supported in standard ManimCE.",
+      "severity": "high",
+      "note": "If porting to ManimCE, use ThreeDScene and move_camera instead of InteractiveScene's frame manipulation."
+    }
+  ]
+}

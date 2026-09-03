@@ -1,0 +1,72 @@
+{
+  "id": "MB-027",
+  "title": "Why Complex Numbers - Conformal Maps Grid Transformation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Complex Analysis",
+    "Geometry"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL/InteractiveScene that visualizes a 2D coordinate transformation to introduce complex mapping concepts. \n\n1. Create two side-by-side coordinate planes (NumberPlanes) representing the input and output spaces. Set their range from -4 to 4 on both axes, scale them down, and arrange them horizontally with a buffer.\n2. Generate a fine grid of squares matching the input plane. Create a copy of this grid ('moving_plane') that will undergo the transformation.\n3. Define a transformation function mapping (x, y) to (x + y, 2xy). Apply this function to the target state of the moving plane.\n4. Add mathematical labels: 'f(x, y) = (x + y, 2xy)' above the output plane and '(x, y)' above the input plane.\n5. Highlight a specific grid square (e.g., index 499) in blue on both the input and target states.\n6. Animate the transformation of the grid from the input plane to the output plane using MoveToTarget.\n7. Perform a multi-level zoom-in on the highlighted square to show local behavior. To maintain grid resolution during the zoom, dynamically generate 6 nested, finer grids centered at the target point. Use custom updaters on these finer grids to fade them in (adjusting stroke opacity) based on the camera frame's current area relative to the zoom level. Finally, animate the camera frame scaling down deeply into the transformed square.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-027/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 105,
+    "scene_classes": [
+      "WhyComplexNumbers"
+    ],
+    "visual_techniques": [
+      "Side-by-side coordinate planes",
+      "Grid mapping transformations",
+      "Target-based animations",
+      "Dynamic camera zooming",
+      "Dynamic opacity updaters for multi-scale grids"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "NumberPlane",
+      "Square().get_grid",
+      "apply_function",
+      "MoveToTarget",
+      "camera.frame.animate.scale",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Scene instead of MovingCameraScene or InteractiveScene, causing camera.frame animations to fail.",
+      "severity": "high",
+      "note": "The zoom-in sequence relies heavily on animating self.camera.frame. In ManimCE, this requires MovingCameraScene."
+    },
+    {
+      "pattern": "Missing or incorrect implementation of Square().get_grid() in ManimCE.",
+      "severity": "medium",
+      "note": "get_grid is a ManimGL-specific helper. In ManimCE, a custom VGroup of squares must be constructed manually."
+    },
+    {
+      "pattern": "Incorrect coordinate mapping inside the transformation function.",
+      "severity": "high",
+      "note": "The function must correctly convert points from the input plane's coordinate system to the output plane's coordinate system using c2p and p2c."
+    }
+  ]
+}

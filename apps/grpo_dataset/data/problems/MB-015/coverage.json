@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-015",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Complex plane mapping",
+        "Exponential function w = e^z",
+        "Logarithmic coordinates",
+        "Concentric circles mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "TexturedSurface",
+        "Square3D",
+        "ComplexPlane",
+        "Color gradient lines",
+        "Droste effect recursion"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "TAU period mapping",
+        "Complex coordinates mapping",
+        "Resolution grid (51, 101)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene",
+        "Helper functions for texture mapping",
+        "Plane-to-plane coordinate transformation"
+      ]
+    }
+  }
+}

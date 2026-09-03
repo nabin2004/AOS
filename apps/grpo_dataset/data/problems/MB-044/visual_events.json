@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-044",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The Sun, Earth's orbit, and a glowing Earth dot appear. A line representing 1 A.U. fades in with the text 'Astronomical Unit' while the orbit rotates.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "sun",
+        "orbit",
+        "earth_glow",
+        "dist_line",
+        "dist_label",
+        "Rotate"
+      ],
+      "clip_query": "A 3D scene showing the Sun, a circular orbit, and a line labeled Astronomical Unit"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The text 'Astronomical Unit' morphs character-by-character into 'A.U.' using a ReplacementTransform.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "au_label",
+        "ReplacementTransform",
+        "dist_label"
+      ],
+      "clip_query": "The text Astronomical Unit morphs into A.U."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The camera frame reorients and shifts to the right, showing the orbit from a different perspective.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "frame.animate.reorient",
+        "Rotate",
+        "orbit"
+      ],
+      "clip_query": "The camera pans and rotates to show the orbit from a side perspective"
+    }
+  ]
+}

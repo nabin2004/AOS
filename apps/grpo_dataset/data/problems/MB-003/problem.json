@@ -1,0 +1,66 @@
+{
+  "id": "MB-003",
+  "title": "KL Divergence Definition and Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science",
+    "Calculus"
+  ],
+  "full_prompt": "Create a Manim scene named `KLDivergenceDefinition` that visualizes the concept of Kullback-Leibler (KL) Divergence using an interactive-style dynamic bar chart. \n\nFirst, implement a custom `EntropyChart` class (inheriting from `VGroup`) that represents a probability distribution. The chart must have:\n1. A horizontal base representing a stacked probability distribution, where the width of each segment corresponds to the probability $p_i$ of that event. The sum of these widths must always equal a fixed total width.\n2. Vertical bars rising from each segment, where the height of each bar represents the information content of that event, calculated as $-\\log_2(p_i)$ (or custom heights if specified).\n3. Dynamic updating using `ValueTracker`s for the probabilities, so that when the distribution changes, both the segment widths and the bar heights smoothly animate and adjust.\n4. Reference grid lines indicating information levels in bits.\n\nIn the main `KLDivergenceDefinition` scene, set up two distributions: a true distribution $p$ and an approximating distribution $q$. Show their respective entropy charts side-by-side or sequentially. Animate the transition of using the wrong distribution $q$ to encode messages from $p$, visually demonstrating the 'extra average bits' which defines the KL Divergence: \n$$D_{KL}(P \\parallel Q) = \\sum_{i} P(i) \\log_2 \\frac{P(i)}{Q(i)}$$\nEnsure all formulas are clearly typeset and aligned with the visual elements.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-003/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "KLDivergenceDefinition"
+    ],
+    "visual_techniques": [
+      "Stacked Probability Distribution",
+      "Dynamic Bar Chart with Redraws",
+      "ValueTracker-driven animations",
+      "Mathematical formula alignment"
+    ],
+    "manim_api_patterns": [
+      "always_redraw",
+      "ValueTracker",
+      "VGroup",
+      "Rectangle",
+      "Line",
+      "Tex",
+      "interpolate_color"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Mismatch in always_redraw update logic causing infinite recursion or lag",
+      "severity": "high",
+      "note": "Ensure that the updater functions do not modify the tracked values themselves, only read them."
+    },
+    {
+      "pattern": "StackedProbDistribution class missing or undefined in standard Manim Community",
+      "severity": "high",
+      "note": "StackedProbDistribution is a custom 3Blue1Brown class. In standard Manim, it must be manually implemented using VGroups of Rectangles."
+    }
+  ]
+}

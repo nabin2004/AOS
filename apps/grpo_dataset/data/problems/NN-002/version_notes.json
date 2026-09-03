@@ -1,0 +1,158 @@
+{
+  "problem_id": "NN-002",
+  "conflicts": [
+    {
+      "category": "Import system",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "auto-fail if used",
+      "impact": "Module not found error",
+      "lines_affected": [1]
+    },
+    {
+      "category": "Import system",
+      "gl_construct": "from _2017.nn.network import *",
+      "ce_equivalent": "Custom implementation needed",
+      "severity": "manual-check",
+      "impact": "nn.network is GL-specific custom module",
+      "lines_affected": [9]
+    },
+    {
+      "category": "Import system",
+      "gl_construct": "from _2017.nn.part1 import *",
+      "ce_equivalent": "Custom implementation needed",
+      "severity": "manual-check",
+      "impact": "Part1 contains helper functions not in CE",
+      "lines_affected": [10]
+    },
+    {
+      "category": "Animation renames",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "auto-fail if used",
+      "impact": "Animation not recognized in CE",
+      "lines_affected": ["Multiple animation calls"]
+    },
+    {
+      "category": "Animation renames",
+      "gl_construct": "ApplyMethod",
+      "ce_equivalent": "animate method",
+      "severity": "auto-fail if used",
+      "impact": "Syntax error; ApplyMethod deprecated",
+      "lines_affected": ["Various transform calls"]
+    },
+    {
+      "category": "Animation patterns",
+      "gl_construct": "UpdateFromAlphaFunc, UpdateFromFunc, ShowPassingFlash, LaggedStartMap",
+      "ce_equivalent": "ValueTracker with updater or custom animation",
+      "severity": "warning",
+      "impact": "Updater API differs",
+      "lines_affected": ["Multiple updater calls"]
+    },
+    {
+      "category": "Animation patterns",
+      "gl_construct": "ChangingDecimal, ChangingDecimalWithColor",
+      "ce_equivalent": "Custom implementation with ValueTracker",
+      "severity": "warning",
+      "impact": "ChangingDecimal may not exist in CE",
+      "lines_affected": ["Numerous scenes"]
+    },
+    {
+      "category": "Text rendering",
+      "gl_construct": "OldTex / OldTexText",
+      "ce_equivalent": "Tex / TexText",
+      "severity": "auto-fail if used",
+      "impact": "OldTex not recognized; use Tex instead",
+      "lines_affected": ["All text and math displays"]
+    },
+    {
+      "category": "Class configuration",
+      "gl_construct": "CONFIG dictionary",
+      "ce_equivalent": "__init__ parameters",
+      "severity": "auto-fail if used",
+      "impact": "Syntax error",
+      "lines_affected": ["Multiple class definitions"]
+    },
+    {
+      "category": "Scene types",
+      "gl_construct": "GraphScene",
+      "ce_equivalent": "Scene with axes and graphing utilities",
+      "severity": "auto-fail if used",
+      "impact": "GraphScene doesn't exist in CE; use axes and custom graphing",
+      "lines_affected": ["FunctionMinmization", "SingleVariableCostFunction", "CompareLearningCurves"]
+    },
+    {
+      "category": "Custom classes",
+      "gl_construct": "PiCreatureScene, TeacherStudentsScene, NetworkScene, MNistNetworkMobject, PixelsAsSquares, MNistMobject, ContinualEdgeUpdate, Eyes, SpeechBubble, ScreenRectangle",
+      "ce_equivalent": "Scene with custom methods",
+      "severity": "manual-check",
+      "impact": "These classes don't exist in CE",
+      "lines_affected": ["Inheritance chain"]
+    },
+    {
+      "category": "Custom mobjects",
+      "gl_construct": "PiCreature and subclasses (Randolph, Mortimer)",
+      "ce_equivalent": "PiCreature (different API)",
+      "severity": "warning",
+      "impact": "PiCreature API differs",
+      "lines_affected": ["Character creation"]
+    },
+    {
+      "category": "Helper functions",
+      "gl_construct": "get_organized_images, load_data_wrapper, get_training_image_group, get_decimal_vector",
+      "ce_equivalent": "Custom implementation needed",
+      "severity": "warning",
+      "impact": "These helpers don't exist in CE",
+      "lines_affected": ["Various function calls"]
+    },
+    {
+      "category": "Coordinate systems",
+      "gl_construct": "FRAME_X_RADIUS, FRAME_Y_RADIUS, FRAME_WIDTH, FRAME_HEIGHT constants",
+      "ce_equivalent": "config.frame_width, config.frame_height",
+      "severity": "auto-fail if used",
+      "impact": "Constants not defined",
+      "lines_affected": ["Setup methods"]
+    },
+    {
+      "category": "Mobject manipulation",
+      "gl_construct": "ContinualEdgeUpdate (custom updater for edges)",
+      "ce_equivalent": "Custom implementation with ValueTracker",
+      "severity": "manual-check",
+      "impact": "ContinualEdgeUpdate doesn't exist in CE",
+      "lines_affected": ["Edge update animations"]
+    },
+    {
+      "category": "Image processing",
+      "gl_construct": "ImageMobject with pixel_array manipulation, PixelsFromVect, MNistMobject from image arrays",
+      "ce_equivalent": "ImageMobject with numpy arrays (similar)",
+      "severity": "manual-check",
+      "impact": "API may differ slightly",
+      "lines_affected": ["MNistMobject", "PixelsFromVect", "PixelsAsSquares"]
+    },
+    {
+      "category": "Custom animations",
+      "gl_construct": "ChangingDecimal, ChangingDecimalWithColor, ShowPassingFlash",
+      "ce_equivalent": "Custom implementation or alternative animations",
+      "severity": "warning",
+      "impact": "These animations may not exist in CE",
+      "lines_affected": ["Multiple scenes"]
+    },
+    {
+      "category": "Class inheritance",
+      "gl_construct": "class IntroduceCostFunction(PreviewLearning)",
+      "ce_equivalent": "Composition or different inheritance structure",
+      "severity": "manual-check",
+      "impact": "PreviewLearning is GL-specific",
+      "lines_affected": ["Multiple classes"]
+    },
+    {
+      "category": "Class inheritance",
+      "gl_construct": "class TestPerformance(PreviewLearning)",
+      "ce_equivalent": "Composition or different inheritance structure",
+      "severity": "manual-check",
+      "impact": "PreviewLearning is GL-specific",
+      "lines_affected": ["Multiple classes"]
+    }
+  ],
+  "notes": "This is the second Neural Networks video on gradient descent and backpropagation. Major issues: NetworkScene and related neural network mobjects don't exist in CE. GraphScene doesn't exist in CE - must use axes and custom graphing. PiCreature API differs significantly. Helper functions need custom implementation. ImageMobject with pixel_array manipulation may work but needs testing. ContinualEdgeUpdate custom updater needs reimplementation with ValueTracker. ChangingDecimal and ChangingDecimalWithColor need custom implementation. The cost function visualization with 13,000 parameters is central to this video and needs careful implementation. The gradient descent visualization with single-variable and multi-variable cases is key. The training performance visualization and hidden layer weight interpretation are also critical."
+}

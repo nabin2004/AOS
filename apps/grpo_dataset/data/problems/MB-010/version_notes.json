@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-010",
+  "conflicts": [
+    {
+      "category": "custom_mobject",
+      "gl_construct": "StackedProbDistribution",
+      "ce_equivalent": "Must be manually implemented using a VGroup of Rectangles with widths proportional to probabilities.",
+      "severity": "high"
+    },
+    {
+      "category": "color_interpolation",
+      "gl_construct": "interpolate_color",
+      "ce_equivalent": "interpolate_color is available in manim.utils.color, but usage syntax is identical.",
+      "severity": "low"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-012",
+  "requirements": {
+    "Math": {
+      "weight": 0.15,
+      "expected": [
+        "probability of forming loops",
+        "combinatorics of string connections"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "3D open box rendering",
+        "curved string paths",
+        "endpoint dots",
+        "camera reorientation",
+        "lifting animation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "box dimensions (4.0, 3.0, 2.0)",
+        "number of strings (10)",
+        "number of anchors (9)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene class structure",
+        "piece mapping and merging logic",
+        "dynamic updaters for endpoints"
+      ]
+    }
+  }
+}

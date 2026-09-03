@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-032",
+  "conflicts": [
+    {
+      "category": "Base Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject API",
+      "gl_construct": "LineBrace",
+      "ce_equivalent": "Brace (requires manual rotation or custom implementation for non-axis-aligned lines)",
+      "severity": "high"
+    },
+    {
+      "category": "Shorthand Methods",
+      "gl_construct": "circle.pfp()",
+      "ce_equivalent": "circle.point_from_proportion()",
+      "severity": "medium"
+    },
+    {
+      "category": "Rendering / Updaters",
+      "gl_construct": "proj_group.suspend_updating() / resume_updating()",
+      "ce_equivalent": "proj_group.suspend_updating() / resume_updating() (or manual updater management via remove_updater/add_updater)",
+      "severity": "medium"
+    }
+  ]
+}

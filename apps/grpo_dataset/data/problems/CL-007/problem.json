@@ -1,0 +1,154 @@
+{
+  "id": "CL-007",
+  "title": "The Essence of Calculus | Chapter 7: Limits",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [5760, 6720],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 5,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation explaining limits in calculus. Start with the formal definition of the derivative as the limit of (f(x+h)-f(x))/h as h→0. Show that dx and df are concrete, finite nudges, and the derivative is what the ratio approaches as the nudge approaches zero. Then introduce the epsilon-delta definition of limits: for any epsilon (output tolerance), there exists a delta (input range) such that all inputs within delta of the target give outputs within epsilon of the limit. Show a counterexample where a limit does not exist (jump discontinuity). Finally, demonstrate L'Hôpital's rule: for functions f and g that both approach 0 at x=a, the limit of f/g equals the limit of f'/g', with the intuition that near a, each function is approximated by its tangent line, so the ratio of the functions equals the ratio of their derivatives.",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter7.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "Chapter7OpeningQuote",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ThisVideo",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "LimitJustMeansApproach",
+        "key_methods": ["construct", "create_pi_creature", "get_limit_expression", "get_evaluated_expressions", "get_expression"]
+      },
+      {
+        "name": "Goals",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "RefreshOnDerivativeDefinition",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "RantOpenAndClose",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DiscussLowercaseDs",
+        "key_methods": ["construct", "skip_superclass_anims", "replace_dx_terms", "compare_rhs_and_lhs", "h_is_finite"]
+      },
+      {
+        "name": "OtherViewsOfDx",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GoalsListed",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GraphLimitExpression",
+        "key_methods": ["construct", "introduce_function", "emphasize_non_definedness_at_0", "draw_limit_point_hole", "show_limit", "skeptic_asks", "show_epsilon_delta_intuition", "get_epsilon_delta_group", "animate_epsilon_delta_group_change"]
+      },
+      {
+        "name": "LimitCounterExample",
+        "key_methods": ["construct", "add_func", "draw_graph", "approach_zero", "write_limit_not_defined", "show_epsilon_delta_intuition", "get_epsilon_delta_group", "get_hole"]
+      },
+      {
+        "name": "PrefaceToEpsilonDeltaDefinition",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "EpsilonDeltaExample",
+        "key_methods": ["construct", "skip_superclass_anims", "introduce_epsilon", "match_epsilon", "zoom_in", "introduce_delta", "smaller_epsilon", "get_epsilon_group", "get_delta_group"]
+      },
+      {
+        "name": "EpsilonDeltaCounterExample",
+        "key_methods": ["construct", "introduce_epsilon", "introduce_epsilon_delta_group", "move_epsilon_group_up_and_down", "shake_ed_group"]
+      },
+      {
+        "name": "TheoryHeavy",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "LHopitalExample",
+        "key_methods": ["setup", "setup_axes", "introduce_function", "show_non_definedness_at_one", "plug_in_value_close_to_one", "ask_about_systematic_process", "show_graph_of_numerator_and_denominator", "zoom_in_to_trouble_point", "talk_through_sizes_of_nudges", "substitute_x_equals_1", "show_final_ratio", "show_final_height", "create_pi_creature", "func", "get_func_label", "get_epsilon_delta_group"]
+      },
+      {
+        "name": "DerivativeLimitReciprocity",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GeneralLHoptial",
+        "key_methods": ["construct", "add_graphs", "zoom_in", "show_limit_in_symbols", "show_tiny_nudge", "show_derivative_ratio", "show_example", "show_bernoulli_and_lHopital", "f", "g", "get_frac"]
+      },
+      {
+        "name": "CannotUseLHopital",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NextVideo",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "Chapter7PatreonThanks",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "Thumbnail",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Formal derivative definition via limit",
+      "dx vs h notation comparison",
+      "Epsilon-delta definition with ranges",
+      "Limit existence vs non-existence",
+      "L'Hôpital's rule via tangent line approximation",
+      "Graph with hole at undefined point"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "FocusOn", "ReplacementTransform"],
+      "mobject_classes": ["Circle", "Dot", "Line", "Arrow", "Brace", "NumberPlane", "FunctionGraph", "DashedLine"],
+      "custom_classes": ["GraphScene", "TeacherStudentsScene", "PiCreatureScene", "ZoomedScene"],
+      "helpers": ["get_graph_label", "get_vertical_line_to_graph", "get_secant_slope_group"],
+      "custom_imports": ["from manim_imports_ext import *"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses limits with evaluating at the point",
+      "severity": "high",
+      "note": "fundamental misunderstanding"
+    },
+    {
+      "pattern": "fails to show epsilon-delta definition clearly",
+      "severity": "high",
+      "note": "misses the formal definition"
+    },
+    {
+      "pattern": "doesn't demonstrate L'Hôpital's rule via tangent lines",
+      "severity": "medium",
+      "note": "misses the key intuition"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

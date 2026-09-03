@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-008",
+  "conflicts": [
+    {
+      "category": "external_dependency",
+      "gl_construct": "scipy.spatial.ConvexHull",
+      "ce_equivalent": "scipy.spatial.ConvexHull (requires ensuring scipy is installed in the execution environment)",
+      "severity": "medium"
+    },
+    {
+      "category": "custom_assets",
+      "gl_construct": "FileIcon",
+      "ce_equivalent": "Create a custom vector-based FileIcon using RoundedRectangle and Line/Polygon to ensure cross-platform compatibility without external assets",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_methods",
+      "gl_construct": "mobject.get_all_points()",
+      "ce_equivalent": "mobject.get_points() or extracting points recursively from family",
+      "severity": "medium"
+    }
+  ]
+}

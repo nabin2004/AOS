@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-018",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Complex plane coordinates mapping",
+        "Value tracking of real and complex numbers",
+        "Imaginary unit definition"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "GlowDot tracking animation",
+        "Dynamic decimal label updating",
+        "Camera zoom and reorientation",
+        "Coordinate axis transitions"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "ValueTracker updating to specific random floats",
+        "DecimalNumber formatting to 3 decimal places"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene structure",
+        "Updaters for dot position and label alignment",
+        "Camera state saving and restoring"
+      ]
+    }
+  }
+}

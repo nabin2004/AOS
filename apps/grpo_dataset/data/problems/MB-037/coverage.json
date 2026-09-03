@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-037",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "z-axis coordinate tracking",
+        "sphere radius formula math.sqrt(1 - z**2)",
+        "ValueTracker mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D Sphere",
+        "horizontal Circle rings",
+        "camera reorientation",
+        "yellow highlighted ring",
+        "opacity changes"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "50 rings",
+        "z-tracker values 0.5, -0.5, 0"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene",
+        "always_sort_to_camera",
+        "add_updater for dynamic resizing"
+      ]
+    }
+  }
+}

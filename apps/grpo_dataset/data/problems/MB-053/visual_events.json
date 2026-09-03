@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-053",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render the Earth circle with SVG pattern overlay and the mountain peak on top.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Circle",
+        "SVGMobject",
+        "Polyline",
+        "mountain"
+      ],
+      "clip_query": "A blue circle representing Earth with a small mountain peak on top"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Draw the dashed line of sight tangent to the Earth and label the angle theta at the mountain peak.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "DashedLine",
+        "Arc",
+        "theta_label",
+        "ShowCreation"
+      ],
+      "clip_query": "A dashed line of sight drawn from the mountain peak tangent to the Earth's surface with angle theta"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Draw the Earth's radius line, the hypotenuse, and add a brace labeled 'R + h'.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "Line",
+        "Elbow",
+        "Brace",
+        "R_label",
+        "hyp_label"
+      ],
+      "clip_query": "A right-angled triangle inside the Earth showing radius R and hypotenuse R + h with a brace"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Project the angle theta to the Earth's center and shift the camera up to reveal the final equation.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "TransformFromCopy",
+        "frame.animate.shift",
+        "Tex",
+        "equation"
+      ],
+      "clip_query": "The camera shifts upwards to display the equation R = (R + h) cos(theta)"
+    }
+  ]
+}

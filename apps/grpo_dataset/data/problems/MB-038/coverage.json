@@ -1,0 +1,44 @@
+{
+  "problem_id": "MB-038",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "math.sqrt",
+        "1 - get_z()**2",
+        "ValueTracker"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "Sphere",
+        "SurfaceMesh",
+        "ThreeDAxes",
+        "Circle",
+        "TrueDot"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "0.9",
+        "-0.9",
+        "0.6",
+        "run_time=4",
+        "run_time=8",
+        "run_time=6"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene",
+        "construct",
+        "add_updater",
+        "apply_depth_test",
+        "frame.reorient"
+      ]
+    }
+  }
+}

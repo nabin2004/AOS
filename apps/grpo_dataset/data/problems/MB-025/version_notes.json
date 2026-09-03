@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-025",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Complex Mapping",
+      "gl_construct": "apply_complex_function",
+      "ce_equivalent": "apply_complex_function (available in CE but behavior/coordinate systems might slightly differ)",
+      "severity": "low"
+    }
+  ]
+}

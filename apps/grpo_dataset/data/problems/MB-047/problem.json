@@ -1,0 +1,64 @@
+{
+  "id": "MB-047",
+  "title": "Nearest Planets Orbit Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the orbits of the inner and outer planets (Mercury to Saturn) around the Sun. \n\nYour script should define a scene class `NearestPlanets` inheriting from `InteractiveScene` (or a standard 3D scene if adapting to standard Manim). \n\nKey Requirements:\n1. **Sun and Background Celestial Sphere**:\n   - Create a background celestial sphere using a large `Sphere` (radius ~200) textured with a star map (e.g., \"hiptyc_2020_8k\") and set its opacity to 0.75.\n   - Create a central Sun using a small sphere and multiple glowing layers (`GlowDot` in ManimGL) to simulate a realistic solar glow.\n\n2. **Orbits and Scaling**:\n   - Define the physical orbital radii and periods for Mercury, Venus, Earth, Mars, Jupiter, and Saturn.\n   - Scale all radii relative to Earth's orbital radius so that Earth's orbit has a radius of 1.0.\n   - Create concentric circles representing the orbits. Apply a stroke width that scales with the radius (e.g., `3 * radius**0.25`) and assign distinct colors to each orbit (e.g., Grey, Teal, Blue, Red, Orange, Grey-Brown).\n   - Rotate each orbit by a random angle initially to avoid aligned starting positions.\n\n3. **Orbit Updaters**:\n   - Add an updater to each orbit circle that continuously rotates it at a speed inversely proportional to its orbital period.\n\n4. **Planet Symbols**:\n   - Use LaTeX with the `wasysym` package to render astronomical symbols (`\\mercury`, `\\venus`, `\\earth`, `\\mars`, `\\jupiter`, `\\saturn`).\n   - Position each symbol on its respective orbit and scale it appropriately.\n   - Add an updater to each symbol so that it moves dynamically along with the rotating orbit circle.\n\n5. **Highlighting Logic**:\n   - Include a class attribute `highlighted_orbit` (defaulting to `None`). If an orbit index is specified, dim all other orbits and symbols to 25% opacity while keeping the highlighted orbit and symbol at full opacity.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-047/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "NearestPlanets"
+    ],
+    "visual_techniques": [
+      "3D Textured Surfaces",
+      "Dynamic Orbit Updaters",
+      "LaTeX Symbol Mapping with wasysym",
+      "Multi-layered Glow Effects"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TexturedSurface",
+      "Sphere",
+      "GlowDot",
+      "add_updater",
+      "Tex with additional_preamble"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing LaTeX package wasysym causing compilation failure",
+      "severity": "high",
+      "note": "The system must have wasysym installed or the Tex template must correctly include it."
+    },
+    {
+      "pattern": "TexturedSurface or GlowDot missing in standard Manim Community Edition",
+      "severity": "high",
+      "note": "These are ManimGL-specific classes. If running in CE, they must be mocked or replaced with standard 3D spheres and glow shaders."
+    }
+  ]
+}

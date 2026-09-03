@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-040",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initial 3D cube is displayed with ambient camera rotation active.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "pre_cube",
+        "reorient",
+        "add_ambient_rotation"
+      ],
+      "clip_query": "A 3D wireframe cube rotating slowly in a 3D coordinate space."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The 3D cube transforms into a 4D hypercube projection.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ReplacementTransform",
+        "hypercube"
+      ],
+      "clip_query": "A 3D wireframe cube morphing and expanding into a complex 4D hypercube projection."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Red and teal lines are drawn to highlight the legs of the right triangle, accompanied by labels for root 3 and 1.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "leg1",
+        "leg2",
+        "root3_label",
+        "one_label",
+        "ShowCreation"
+      ],
+      "clip_query": "Red and teal lines highlighting edges inside the hypercube with text labels showing root 3 and 1."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A yellow hypotenuse is drawn, and the previous labels transform into a label showing root of 3 + 1.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        9.0,
+        13.0
+      ],
+      "keyword_bank": [
+        "hyp",
+        "hyp_label",
+        "FadeTransformPieces"
+      ],
+      "clip_query": "A yellow hypotenuse line appearing with a label showing the square root of 3 plus 1."
+    }
+  ]
+}

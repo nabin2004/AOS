@@ -1,0 +1,48 @@
+{
+  "problem_id": "CL-001",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Circle area derivation via concentric rings",
+        "Ring area approximation as 2\u03c0r \u00d7 dr",
+        "Sum of rings as Riemann sum",
+        "Limit as dr \u2192 0 yields exact area",
+        "Area formula \u03c0R\u00b2 derived",
+        "Area under parabola A(x) introduced",
+        "dA/dx = x\u00b2 relationship",
+        "Fundamental Theorem of Calculus"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Circle with radius R and label",
+        "Concentric rings in different colors",
+        "Ring unwrapping to rectangle",
+        "Rectangles under graph of 2\u03c0r",
+        "Limiting process (dr \u2192 0) shown",
+        "Parabola graph with shaded area",
+        "Sliver of area (dA) highlighted"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Radius value shown (R = 3)",
+        "Circumference 2\u03c0r values displayed",
+        "Area calculations shown",
+        "Specific numerical examples (3, 3.001)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: circle area \u2192 rings \u2192 unwrapping \u2192 Riemann sum \u2192 limit \u2192 parabola \u2192 derivative \u2192 FTC",
+        "Clear transitions between concepts",
+        "Geometric and analytic representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

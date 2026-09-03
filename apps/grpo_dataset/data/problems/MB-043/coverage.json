@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-043",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Angle calculations (45 * DEG, -55 * DEG)",
+        "Point from proportion (pfp) mapping on Circle",
+        "Rotation vector calculations for perpendicular alignment"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Circular Earth with SVG texture overlay",
+        "PiCreatures (Randolph and Mortimer) with custom modes",
+        "TrueDot markers for observer positions",
+        "Text labels for observers"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Earth radius of 3",
+        "Angles 45 and -55 degrees",
+        "PiCreature height of 2 scaled down to 0.25"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene usage",
+        "Target generation and MoveToTarget animations",
+        "Camera light source positioning"
+      ]
+    }
+  }
+}

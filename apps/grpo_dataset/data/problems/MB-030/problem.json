@@ -1,0 +1,71 @@
+{
+  "id": "MB-030",
+  "title": "Cross Line with Circle (Sphere Decomposition)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Topology"
+  ],
+  "full_prompt": "Create a Manim scene named 'CrossLineWithCircle' using ManimGL. The scene visualizes the decomposition of a 3D sphere into a line and a circle (representing the Cartesian product-like relation of coordinates). \n\n1. **Layout Setup**:\n   - Set the camera field of view to 5 degrees.\n   - Create a 3D Sphere (with a SurfaceMesh overlay) on the left.\n   - Place an equals sign ('='), a vertical green line, a multiplication sign ('x'), and a red circle in a horizontal row, arranged with large spacing.\n   - Below the sphere, add the formula 'x^2 + y^2 + z^2 = 1'.\n   - Below the line, add the formula 'z^2 <= 1'.\n   - Below the circle, add the formula 'x^2 + y^2 = 1 - z^2'.\n\n2. **Formula Animations**:\n   - Fade in the sphere formula.\n   - Transform the 'z^2 = 1' part of the sphere formula to create the line formula.\n   - Transform a copy of the sphere formula into the circle formula with a curved path arc.\n\n3. **Dynamic Value Tracking**:\n   - Add a number line interval matching the vertical line.\n   - Create a green dot (using GlowDot/TrueDot) that moves along the vertical line.\n   - Use a ValueTracker to animate the dot's z-coordinate from 0 to 0.95, then to -0.95, and back to 0.\n   - Add an updater to the red circle so its width dynamically resizes to match the formula: width * sqrt(1 - z^2), simulating the cross-sectional circle of a sphere at height z.\n\n4. **Transition to 4D**:\n   - Highlight the circle formula with a surrounding rectangle, then fade out the '- z^2' part and shift the remaining formula.\n   - Fade out the tracking dot and interval.\n   - Transition to the 4D hypersphere case by replacing the vertical line with a filled green disk (representing a 2D slice) and updating the labels to represent 4D boundary components (e.g., using a helper method or custom labels for B^3 and B^4 boundaries).",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-030/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "CrossLineWithCircle"
+    ],
+    "visual_techniques": [
+      "3D Sphere and SurfaceMesh rendering",
+      "Dynamic Updaters linked to ValueTracker",
+      "Mathematical formula transformation (TransformMatchingTex)",
+      "Coordinate mapping with NumberLine"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame.set_field_of_view",
+      "SurfaceMesh",
+      "GlowDot",
+      "TrueDot",
+      "ValueTracker",
+      "add_updater",
+      "TransformMatchingTex"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community Scene instead of InteractiveScene, causing camera/frame configuration errors.",
+      "severity": "high",
+      "note": "The code relies on self.frame.set_field_of_view which is specific to ManimGL's InteractiveScene."
+    },
+    {
+      "pattern": "Missing helper method get_sphere_labels.",
+      "severity": "high",
+      "note": "The reference code calls self.get_sphere_labels which is defined in the parent/outer scope of the original file. A robust implementation must mock or define this method."
+    },
+    {
+      "pattern": "Using make_3d() on standard Mobjects in ManimCE.",
+      "severity": "medium",
+      "note": "make_3d() is a ManimGL-specific method for rendering dots/mobjects in 3D space."
+    }
+  ]
+}

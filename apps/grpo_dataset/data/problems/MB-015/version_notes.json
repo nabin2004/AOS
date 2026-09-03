@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-015",
+  "conflicts": [
+    {
+      "category": "framework_choice",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_availability",
+      "gl_construct": "TexturedSurface",
+      "ce_equivalent": "None (requires custom OpenGL shaders or standard ImageMobject with limitations)",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_availability",
+      "gl_construct": "Square3D",
+      "ce_equivalent": "Square (but lacks 3D mesh resolution properties)",
+      "severity": "high"
+    },
+    {
+      "category": "method_signature",
+      "gl_construct": "apply_complex_function",
+      "ce_equivalent": "apply_complex_function (exists but behaves differently on 3D surfaces)",
+      "severity": "medium"
+    }
+  ]
+}

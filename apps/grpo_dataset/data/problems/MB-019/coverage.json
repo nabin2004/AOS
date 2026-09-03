@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-019",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Cubic function plotting",
+        "Local linear approximation concept",
+        "Delta notation for changes in x and y"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Camera zoom animation",
+        "Micro-scale axes rendering",
+        "Brace annotations at micro-scale",
+        "Frame-relative text positioning"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Scale factor of approximately 0.008 for camera zoom",
+        "Cubic function coefficients",
+        "Local axes scaling factor of 0.1"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or MovingCameraScene structure",
+        "ValueTracker usage",
+        "Updaters for camera-relative positioning"
+      ]
+    }
+  }
+}

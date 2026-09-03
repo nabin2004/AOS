@@ -1,0 +1,64 @@
+{
+  "id": "MB-056",
+  "title": "Quantum Circuit and Qubit State Vector Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a complete, self-contained ManimGL visualization representing a quantum circuit execution with dynamic glowing animations and state vector updates. The scene should include:\n1. A quantum circuit layout with 4 horizontal wire lines, several quantum gates (CNOT, X, Z, and measurement gates) placed at specific intervals along the wires.\n2. A surrounding teal rectangle representing the 'quantum computer' machine boundary, labeled with a quantum computer symbol or text.\n3. An animation of a program running through the quantum wires: glow dots (using GlowDot or overlapping circles with varying opacities) should travel from left to right along the wires.\n4. As the glow dots pass through the gates, the gates should dynamically glow or highlight (using an updater that increases stroke width based on the horizontal proximity of the glow dots).\n5. An output display showing random bitstrings or qubit states (using Ket notation like |0101>) updating as the circuit execution completes.\n6. Custom helper classes for Ket notation (Ket, KetGroup) and bitstrings (BitString) to cleanly format quantum states.\n\nTo ensure the code is fully self-contained and executable, implement simple mock versions of the circuit components:\n- `get_labeled_box(wire, x_ratio, label='H')`: returns a VGroup containing a square centered on the wire at a specific x-coordinate, with a text label.\n- `get_cnot(control_wire, target_wire, x_ratio)`: returns a VGroup representing a CNOT gate (a small dot on the control wire, a circle with a plus sign on the target wire, and a vertical line connecting them).\n- `get_measurement(wire, x_ratio)`: returns a VGroup representing a measurement box at the end of the wire.\n- `get_quantum_computer_symbol(height)`: returns a simple text or VGroup representing a quantum computer icon.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-056/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "DisectAQuantumComputer"
+    ],
+    "visual_techniques": [
+      "Quantum circuit diagram",
+      "Glow dots moving along wires",
+      "InteractiveScene updater animations",
+      "Ket notation formatting"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "VGroup",
+      "GlowDot",
+      "SurroundingRectangle",
+      "add_updater",
+      "match_x"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom helper methods like get_labeled_box, get_cnot, get_measurement, or get_quantum_computer_symbol",
+      "severity": "high",
+      "note": "These methods are referenced in the reference snippet but not fully defined. They must be explicitly implemented in the generated code."
+    },
+    {
+      "pattern": "Using GlowDot in standard Manim Community Edition without importing or defining it",
+      "severity": "high",
+      "note": "GlowDot is a ManimGL-specific class. If using Manim CE, it must be simulated using standard Dot and overlapping transparent circles."
+    }
+  ]
+}

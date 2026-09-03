@@ -1,0 +1,72 @@
+{
+  "id": "MB-006",
+  "title": "Visualizing Cross Entropy and Information Distance via GZIP Compression",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Computer Science",
+    "ML",
+    "Information Theory"
+  ],
+  "full_prompt": "Write a ManimGL script using InteractiveScene that visualizes the concept of information distance and compression similarity using GZIP as a metaphor. \n\n1. Create two document representations: 'Document A' and 'Document B'. Each document should consist of 8 stacked horizontal rectangles (width=5, height=1, arranged vertically with no buffer). Document A's rectangles should have varying shades of pink/magenta (using color interpolation between LIGHT_PINK and PURE_MAGENTA). Document B's rectangles should have varying shades of green (interpolating between GREEN_B and GREEN_E). Label them 'Document A' and 'Document B' using TexText and position them side-by-side, then scale and move them to the left side of the screen.\n\n2. Create a combined document 'AB' by copying Document A and appending a snippet (rectangles 4 to 7) of Document B to the bottom. Animate this transition using TransformFromCopy with curved paths (path_arc) to show the parts flying together to form the new document on the right side of the screen.\n\n3. Simulate the compression of this combined document 'AB'. Animate it shrinking/stretching (stretch width/height, remove stroke) to represent a compressed state, and label it 'GZIP(AB)'.\n\n4. Similarly, copy Document A, move it down, and animate its compression into a smaller block labeled 'GZIP(A)'.\n\n5. Fade out the original Document A and B groups, and transition the compressed representations 'GZIP(AB)' and 'GZIP(A)' to the center of the screen, arranging them side-by-side to set up a visual comparison of their sizes. Draw vertical lines next to them to prepare for a difference equation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-006/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 95,
+    "scene_classes": [
+      "BasicIdea"
+    ],
+    "visual_techniques": [
+      "Target-based animation (generate_target, MoveToTarget)",
+      "Path arc transforms (path_arc)",
+      "Color interpolation for randomized document textures",
+      "Compression visual metaphor via stretching and stroke removal"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TexText",
+      "MoveToTarget",
+      "generate_target",
+      "interpolate_color",
+      "path_arc",
+      "AnimationGroup",
+      "TransformFromCopy"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community imports or Scene class instead of ManimGL's InteractiveScene",
+      "severity": "high",
+      "note": "The reference code relies on InteractiveScene and manim_imports_ext. Standard Manim Community will fail on InteractiveScene and TexText."
+    },
+    {
+      "pattern": "Incorrect target-based animation syntax",
+      "severity": "medium",
+      "note": "ManimGL uses obj.generate_target() and MoveToTarget(obj). Standard Manim Community sometimes uses different target behaviors or custom custom animations."
+    },
+    {
+      "pattern": "Missing or incorrect color interpolation parameters",
+      "severity": "low",
+      "note": "Ensure interpolate_color is used correctly with random.random() to generate the distinct document block shades."
+    }
+  ]
+}

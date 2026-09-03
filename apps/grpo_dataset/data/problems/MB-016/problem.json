@@ -1,0 +1,76 @@
+{
+  "id": "MB-016",
+  "title": "Visualizing the Exponential Function as a Mapping Between Number Lines",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Complex Analysis"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the exponential function $e^x$ as a mapping from an input number line (top) to an output number line (bottom). \n\n1. Create two parallel horizontal number lines: an input line at $y = 2$ ranging from -5 to 5, and an output line at $y = -2$ ranging from -21 to 21. Both should have small font size numbers.\n2. Draw a thick arrow pointing from $x = 0$ on the input line to $y = 1$ on the output line, labeled with a large $e^x$ Tex formula.\n3. Generate a set of sample dots along the input line (from -4 to 4 with step 0.25) and their corresponding mapped positions ($e^x$) on the output line. Apply a smooth yellow-to-blue gradient across these dots, make them glow slightly, and animate their introduction: first fade in the input dots with a lagged start, then grow the mapping arrow, fade in the $e^x$ label, and transform a copy of the input dots to the output dots.\n4. Transition to an interactive/dynamic tracker mode: dim the static sample dots, replace the static arrow and label with an active tracker arrow and a dynamic Tex label showing \"e^{+0.00} = 1.000\". The tracker should dynamically update the arrow's endpoints and the label's numerical values as the input $x$ changes.\n5. Highlight the active input dot at $x=0$ with a flash, animate a curved path transformation from the input dot to the output dot, and display static labels for $e^0, e^1, e^2, e^3$ at their respective output positions.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-016/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "TheExponential"
+    ],
+    "visual_techniques": [
+      "ValueTracker with dynamic updaters",
+      "Gradient color interpolation on custom dots",
+      "Dynamic Tex labels with changeable numbers",
+      "LaggedStartMap for sequential animations",
+      "Curved path transformations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "NumberLine",
+      "TrueDot",
+      "Arrow",
+      "Tex",
+      "ValueTracker",
+      "add_updater",
+      "make_number_changeable",
+      "f_always.set_value",
+      "always.next_to",
+      "FadeTransformPieces",
+      "FlashAround"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community Dot instead of TrueDot or missing 3D/glow methods like set_glow_factor",
+      "severity": "medium",
+      "note": "TrueDot and set_glow_factor are specific to 3b1b's ManimGL fork. In standard Manim, use Dot and standard glow/glow-like effects or ignore glow."
+    },
+    {
+      "pattern": "Using make_number_changeable or f_always in standard Manim Community",
+      "severity": "high",
+      "note": "These methods are exclusive to 3b1b's ManimGL. Standard Manim requires DecimalNumber with add_updater to achieve dynamic text updating."
+    },
+    {
+      "pattern": "Incorrect coordinate mapping between the two custom NumberLines",
+      "severity": "high",
+      "note": "Ensure n2p (number to point) is called on the correct NumberLine instance (in_line vs out_line)."
+    }
+  ]
+}

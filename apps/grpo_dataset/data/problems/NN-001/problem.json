@@ -1,0 +1,244 @@
+{
+  "id": "NN-001",
+  "title": "Neural Networks | Chapter 1: What is a Neural Network?",
+  "youtube_video_id": "aircAruvnKk",
+  "video_timestamp_range": [0, 960],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 3,
+  "domain": ["Machine Learning", "Neural Networks"],
+  "full_prompt": "Create an animation explaining the structure of a neural network for handwritten digit recognition. Start with the problem: recognizing a 28x28 pixel handwritten digit. Show the input layer with 784 neurons representing pixel values (0 for black, 1 for white). Show the output layer with 10 neurons representing digits 0-9. Introduce hidden layers (two layers of 16 neurons each) and explain that they process information between input and output. Demonstrate how a neuron works: it holds a number (activation) between 0 and 1. Show that each neuron in one layer connects to all neurons in the next layer with weights (positive weights in green, negative in red). Explain that a neuron's activation is computed as the weighted sum of activations from the previous layer plus a bias, passed through a sigmoid function. Show the matrix notation: a^(l+1) = σ(W·a^l + b).",
+  "raw_code_status": "collected",
+  "raw_code_path": "nn/video1.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "ExampleThrees",
+        "key_methods": ["construct", "show_initial_three", "show_alternate_threes", "resolve_remaining_threes", "show_alternate_digits", "create_pi_creature", "get_three_mobs"]
+      },
+      {
+        "name": "BrainAndHow",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "WriteAProgram",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "LayOutPlan",
+        "key_methods": ["setup", "construct", "show_words", "show_network", "show_math", "ask_about_layers", "show_learning", "show_videos"]
+      },
+      {
+        "name": "PreviewMNistNetwork",
+        "key_methods": ["construct", "feed_in_image", "reset_display", "get_image_to_layer_one_animation", "add_network"]
+      },
+      {
+        "name": "AlternateNeuralNetworks",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PlainVanillaWrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NotPerfectAddOn",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "MoreAThanI",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "BreakDownName",
+        "key_methods": ["construct", "ask_questions", "show_neuron"]
+      },
+      {
+        "name": "IntroduceEachLayer",
+        "key_methods": ["construct", "setup_network_mob", "break_up_image_as_neurons", "show_activation_of_one_neuron", "transform_into_full_network", "show_output_layer", "show_hidden_layers", "show_propogation"]
+      },
+      {
+        "name": "DiscussChoiceForHiddenLayers",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "MoreHonestMNistNetworkPreview",
+        "key_methods": ["construct", "get_image_to_layer_one_animation"]
+      },
+      {
+        "name": "AskAboutPropogationAndTraining",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AskAboutLayers",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "BreakUpMacroPatterns",
+        "key_methods": ["construct", "setup_needed_patterns", "setup_added_patterns", "show_nine", "show_eight", "show_four", "show_second_to_last_layer", "show_upper_loop_activation", "show_what_learning_is_required", "get_equation", "make_transparent"]
+      },
+      {
+        "name": "GenerallyLoopyPattern",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "HowWouldYouRecognizeSubcomponent",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "BreakUpMicroPatterns",
+        "key_methods": ["construct", "break_down_loop", "break_down_long_line"]
+      },
+      {
+        "name": "SecondLayerIsLittleEdgeLayer",
+        "key_methods": ["construct", "setup_network_mob", "setup_activations_and_nines", "describe_second_layer", "show_propogation", "ask_question", "set_neurons_target", "separate_parts"]
+      },
+      {
+        "name": "EdgeDetection",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ManyTasksBreakDownLikeThis",
+        "key_methods": ["construct", "get_wave_form"]
+      },
+      {
+        "name": "AskAboutWhatEdgesAreDoing",
+        "key_methods": ["construct", "add_question", "show_propogation"]
+      },
+      {
+        "name": "IntroduceWeights",
+        "key_methods": ["construct", "zoom_in_on_one_neuron", "show_desired_pixel_region", "ask_about_parameters", "show_weights", "show_weighted_sum", "organize_weights_as_grid", "make_most_weights_0", "add_negative_weights_around_the_edge", "get_digit", "get_pixels_to_detect", "get_surrounding_pixels_for_edge", "make_edges_weighted"]
+      },
+      {
+        "name": "MotivateSquishing",
+        "key_methods": ["construct", "add_weighted_sum", "show_real_number_line", "show_interval", "squish_into_interval"]
+      },
+      {
+        "name": "IntroduceSigmoid",
+        "key_methods": ["construct", "add_title", "add_graph", "show_part"]
+      },
+      {
+        "name": "IncludeBias",
+        "key_methods": ["construct", "zoom_in_on_one_neuron", "setup_start", "add_sigmoid_label", "words_on_activation", "comment_on_need_for_bias", "add_bias", "summarize_weights_and_biases", "get_weighted_sum"]
+      },
+      {
+        "name": "BiasForInactiviyWords",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ShowRemainingNetwork",
+        "key_methods": ["construct", "show_all_of_second_layer", "count_in_biases", "compute_layer_two_of_weights_and_biases_count", "show_remaining_layers", "show_final_number", "tweak_weights"]
+      },
+      {
+        "name": "ImagineSettingByHand",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "WhenTheNetworkFails",
+        "key_methods": ["construct", "setup_network_mob", "black_box", "incorrect_classification", "ask_about_weights", "reset_display"]
+      },
+      {
+        "name": "EvenWhenItWorks",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "IntroduceWeightMatrix",
+        "key_methods": ["construct", "setup_network_mob", "show_weighted_sum", "organize_activations_into_column", "organize_weights_as_matrix", "show_meaning_of_matrix_row", "connect_weighted_sum_to_matrix_multiplication", "show_meaning_of_lower_rows", "add_bias_vector", "apply_sigmoid", "write_clean_final_expression", "fade_weighted_sum", "get_brackets"]
+      },
+      {
+        "name": "HorrifiedMorty",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SigmoidAppliedToVector",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "EoLA3Wrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "FeedForwardCode",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NeuronIsFunction",
+        "key_methods": ["construct", "setup_network_mob", "activate_network", "write_neuron_holds_a_number", "feed_in_new_image", "neuron_is_function", "show_neuron_as_function", "fade_network_back_in", "network_is_a_function", "reset_display"]
+      },
+      {
+        "name": "ComplicationIsReassuring",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NextVideo",
+        "key_methods": ["setup", "construct", "network_and_data", "show_next_video", "talk_about_subscription", "show_video_neural_network"]
+      },
+      {
+        "name": "IntroduceReLU",
+        "key_methods": ["construct", "old_school", "show_ReLU", "label_input_regions"]
+      },
+      {
+        "name": "CompareSigmoidReLUOnDeepNetworks",
+        "key_methods": ["construct", "create_pi_creatures"]
+      },
+      {
+        "name": "ShowAmplify",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "Thumbnail",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "28x28 pixel grid visualization",
+      "Layered neuron network",
+      "Neuron activation as fill opacity",
+      "Weighted connections between layers",
+      "Weight matrix visualization",
+      "Sigmoid function squishing",
+      "Bias as threshold adjustment",
+      "Edge detection as pattern recognition"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc", "UpdateFromFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "FocusOn", "ReplacementTransform", "MoveToTarget", "ShowPassingFlash", "LaggedStartMap", "ChangingDecimal"],
+      "mobject_classes": ["Circle", "Dot", "Line", "Arrow", "Brace", "Rectangle", "Square", "NumberPlane", "FunctionGraph"],
+      "custom_classes": ["PiCreatureScene", "TeacherStudentsScene", "NetworkScene", "MNistNetworkMobject", "PixelsAsSquares", "WrappedImage", "MNistMobject", "ContinualEdgeUpdate"],
+      "helpers": ["get_organized_images", "layer_to_image_array", "make_transparent", "load_data_wrapper"],
+      "custom_imports": ["from manim_imports_ext import *", "from nn.network import *"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses activation with weight",
+      "severity": "high",
+      "note": "fundamental misunderstanding"
+    },
+    {
+      "pattern": "fails to show the weighted sum calculation",
+      "severity": "high",
+      "note": "misses the core computation"
+    },
+    {
+      "pattern": "doesn't explain the sigmoid function's role",
+      "severity": "medium",
+      "note": "misses the non-linear activation"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

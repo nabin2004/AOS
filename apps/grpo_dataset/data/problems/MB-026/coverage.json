@@ -1,0 +1,43 @@
+{
+  "problem_id": "MB-026",
+  "requirements": {
+    "Math": {
+      "weight": 0.15,
+      "expected": [
+        "\\ln(z)",
+        "t2c"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "Randolph",
+        "ImageMobject",
+        "get_bubble",
+        "raise_left_hand",
+        "pondering",
+        "tease",
+        "Blink",
+        "replace"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "width(7)",
+        "Rectangle(3, 1.5)",
+        "shift(0.45 * UP)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene",
+        "construct",
+        "Group",
+        "play",
+        "wait"
+      ]
+    }
+  }
+}

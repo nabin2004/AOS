@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-034",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    },
+    {
+      "category": "3D Geometry",
+      "gl_construct": "SurfaceMesh",
+      "ce_equivalent": "No direct equivalent (requires custom wireframe or Surface object)",
+      "severity": "high"
+    },
+    {
+      "category": "Clipping Planes",
+      "gl_construct": "set_clip_plane",
+      "ce_equivalent": "Not supported natively in CE's standard renderer",
+      "severity": "high"
+    },
+    {
+      "category": "Rendering Optimization",
+      "gl_construct": "sort_faces_back_to_front",
+      "ce_equivalent": "Handled automatically or unsupported in standard CE three-D rendering",
+      "severity": "medium"
+    }
+  ]
+}

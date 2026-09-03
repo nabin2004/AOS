@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-014",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A clock face is displayed with a running clock animation, and a ladybug SVGMobject flies in along a smooth path to land on the 12 o'clock tick mark.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "Clock",
+        "ladybug",
+        "MoveAlongPath",
+        "clock_anim"
+      ],
+      "clip_query": "A ladybug lands on a clock face"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The ladybug begins a random walk, moving clockwise or counterclockwise between clock ticks with yellow arrows indicating the step direction.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "random.choice",
+        "Arrow",
+        "VFadeInThenOut",
+        "path_arc"
+      ],
+      "clip_query": "A ladybug walking randomly along the numbers of a clock"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Visited numbers on the clock turn red, and the final unvisited number turns teal when the ladybug lands on it, completing the walk.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "covered_numbers",
+        "RED",
+        "TEAL",
+        "animate.set_color"
+      ],
+      "clip_query": "The last number on the clock turns teal as the ladybug visits it"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "id": "MB-026",
+  "title": "Appreciating Complex Logarithm Image with Pi Creature",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    15.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Complex Analysis",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a ManimGL scene named `AppreciatingWithMath` using `InteractiveScene`. Create a Randolph Pi creature at the bottom edge. Load an image representing a complex logarithm mapping (from a path like 'exponential/LogImage.png') as an `ImageMobject`, scale it to width 7, and place it in the upper-left corner. Add a LaTeX label '\\ln(z)' with 'z' colored blue, positioned slightly above the center of the image. Animate Randolph raising his left hand towards the image while the image fades in from the top and the label is written. Have Randolph blink and change his expression to 'pondering'. Then, create a thought/speech bubble for Randolph using a transparent 3x1.5 rectangle. Animate the bubble appearing, while the image and label group shrinks and moves to fit inside the bubble, and Randolph looks at the bubble. Finally, change Randolph's expression to 'tease' and have him blink.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-026/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 48,
+    "scene_classes": [
+      "AppreciatingWithMath"
+    ],
+    "visual_techniques": [
+      "Pi Creature Animation",
+      "Image Mobject Manipulation",
+      "Bubble/Thought Bubble Integration",
+      "Group Scaling and Positioning"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Randolph",
+      "ImageMobject",
+      "Tex",
+      "Group",
+      "Blink",
+      "get_bubble",
+      "replace"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing image file 'exponential/LogImage.png' causing runtime crash",
+      "severity": "high",
+      "note": "Provide a fallback or mock ImageMobject if the actual image file is missing during execution."
+    },
+    {
+      "pattern": "Incorrect bubble generation syntax or missing get_bubble method on Randolph",
+      "severity": "medium",
+      "note": "Ensure the Pi Creature library is correctly imported and supports get_bubble."
+    }
+  ]
+}

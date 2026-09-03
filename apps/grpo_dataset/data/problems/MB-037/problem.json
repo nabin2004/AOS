@@ -1,0 +1,71 @@
+{
+  "id": "MB-037",
+  "title": "Separate Rings of Latitude on a Sphere",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    20.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes a sphere sliced into horizontal rings of latitude. First, render a blue sphere and fade in 50 horizontal rings of latitude stacked along the z-axis, with their radii matching the sphere's profile. Reorient the camera to a 3D perspective. Highlight the middle ring (equator) in yellow while dimming the other rings. Finally, use a ValueTracker to animate this highlighted ring sliding up and down the sphere along the z-axis, dynamically updating its radius to match the sphere's curvature ($r = \\sqrt{1 - z^2}$).",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-037/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 45,
+    "scene_classes": [
+      "SeparateRingsOfLatitude"
+    ],
+    "visual_techniques": [
+      "3D camera reorientation",
+      "Parametric 3D rings",
+      "ValueTracker with dynamic updater",
+      "LaggedStartMap animation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Sphere",
+      "Circle",
+      "always_sort_to_camera",
+      "frame.reorient",
+      "LaggedStartMap",
+      "ValueTracker",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using 2D circles instead of 3D circles oriented along the OUT/Z axis",
+      "severity": "high",
+      "note": "Circles must be positioned along the Z-axis (z * OUT) to correctly slice the 3D sphere."
+    },
+    {
+      "pattern": "Incorrect radius formula for latitude rings",
+      "severity": "high",
+      "note": "The radius of a ring at height z must be math.sqrt(1 - z**2) to lie on the unit sphere."
+    },
+    {
+      "pattern": "Missing or incorrect updater for sliding ring",
+      "severity": "high",
+      "note": "The sliding ring must dynamically update both its width/radius and its Z-position based on the ValueTracker."
+    }
+  ]
+}

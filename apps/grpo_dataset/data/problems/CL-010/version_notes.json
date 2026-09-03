@@ -1,0 +1,94 @@
+{
+  "problem_id": "CL-010",
+  "conflicts": [
+    {
+      "category": "Import system",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "auto-fail if used",
+      "impact": "Module not found error",
+      "lines_affected": [1]
+    },
+    {
+      "category": "Animation renames",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "auto-fail if used",
+      "impact": "Animation not recognized in CE",
+      "lines_affected": ["Multiple animation calls"]
+    },
+    {
+      "category": "Animation renames",
+      "gl_construct": "ApplyMethod",
+      "ce_equivalent": "animate method",
+      "severity": "auto-fail if used",
+      "impact": "Syntax error; ApplyMethod deprecated",
+      "lines_affected": ["Various transform calls"]
+    },
+    {
+      "category": "Animation patterns",
+      "gl_construct": "UpdateFromAlphaFunc",
+      "ce_equivalent": "ValueTracker with updater",
+      "severity": "warning",
+      "impact": "Updater API differs",
+      "lines_affected": ["Multiple updater calls"]
+    },
+    {
+      "category": "Text rendering",
+      "gl_construct": "OldTex / OldTexText",
+      "ce_equivalent": "Tex / TexText",
+      "severity": "auto-fail if used",
+      "impact": "OldTex not recognized",
+      "lines_affected": ["All text and math displays"]
+    },
+    {
+      "category": "Class configuration",
+      "gl_construct": "CONFIG dictionary",
+      "ce_equivalent": "__init__ parameters",
+      "severity": "auto-fail if used",
+      "impact": "Syntax error",
+      "lines_affected": ["Multiple class definitions"]
+    },
+    {
+      "category": "Custom classes",
+      "gl_construct": "GraphScene, PiCreatureScene, TeacherStudentsScene, ReconfigurableScene, Pendulum, AreaIsDerivative",
+      "ce_equivalent": "Scene with custom methods",
+      "severity": "manual-check",
+      "impact": "GraphScene doesn't exist in CE",
+      "lines_affected": ["Inheritance chain"]
+    },
+    {
+      "category": "Custom mobjects",
+      "gl_construct": "PiCreature and subclasses",
+      "ce_equivalent": "PiCreature (different API)",
+      "severity": "warning",
+      "impact": "PiCreature API differs",
+      "lines_affected": ["Character creation"]
+    },
+    {
+      "category": "Helper functions",
+      "gl_construct": "derivative, taylor_approximation",
+      "ce_equivalent": "Custom implementation needed",
+      "severity": "warning",
+      "impact": "These helpers don't exist in CE",
+      "lines_affected": ["Various function calls"]
+    },
+    {
+      "category": "Coordinate systems",
+      "gl_construct": "FRAME_X_RADIUS, FRAME_Y_RADIUS constants",
+      "ce_equivalent": "config.frame_width, config.frame_height",
+      "severity": "auto-fail if used",
+      "impact": "Constants not defined",
+      "lines_affected": ["Setup methods"]
+    },
+    {
+      "category": "Pendulum",
+      "gl_construct": "Pendulum class",
+      "ce_equivalent": "Custom implementation needed",
+      "severity": "manual-check",
+      "impact": "Pendulum doesn't exist in CE",
+      "lines_affected": ["Pendulum scenes"]
+    }
+  ],
+  "notes": "Major issues: GraphScene doesn't exist in CE; use Axes and custom graphing. PiCreature API differs. Helper functions need custom implementation. Pendulum class needs reimplementation. Term-by-term Taylor construction requires careful implementation."
+}

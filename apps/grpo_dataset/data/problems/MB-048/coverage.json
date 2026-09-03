@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-048",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Spherical coordinate distribution for 3D stars",
+        "Inverse interpolation for mapping magnitudes and color indices to normalized coordinates",
+        "Coordinate mapping using axes.c2p"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "GlowDot and GlowDots for high-performance rendering",
+        "Continuous 3D camera rotation using frame updaters",
+        "Billboard text rotation facing the camera in 3D space",
+        "Smooth morphing of point clouds using set_points and path_arc"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Synthetic generation of 10,000 stellar data points",
+        "Accurate distance calculation and display using DecimalNumber",
+        "Color mapping from numerical color indices to RGB arrays"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "Inheritance from InteractiveScene",
+        "ValueTracker controlling camera rotation speed",
+        "Sequential play calls with clean group fading to prevent clutter"
+      ]
+    }
+  }
+}

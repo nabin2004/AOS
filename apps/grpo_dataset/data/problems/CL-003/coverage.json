@@ -1,0 +1,44 @@
+{
+  "problem_id": "CL-003",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Derivative of x\u00b2 via square geometry: df = 2x\u00b7dx + dx\u00b2",
+        "Derivative of x\u00b3 via cube geometry: df = 3x\u00b2\u00b7dx + negligible terms",
+        "Power rule: d(x\u207f)/dx = n\u00b7x^(n-1)",
+        "Derivative of 1/x via rectangle of area 1",
+        "Derivative of sin(\u03b8) via unit circle and similar triangles",
+        "Negligible higher-order dx terms"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Square with side x and dx expansion",
+        "Cube with side x and dx expansion",
+        "Rectangle of area 1 for 1/x",
+        "Unit circle with angle \u03b8",
+        "Similar triangles on unit circle",
+        "Graph of sin(\u03b8) and cos(\u03b8)"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Specific example: x=3, dx=0.01 gives df=0.06",
+        "dx\u00b2 = 0.0001 as negligible",
+        "Numerical values on graphs"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: x\u00b2 \u2192 x\u00b3 \u2192 power rule \u2192 1/x \u2192 sin(\u03b8)",
+        "Clear transitions between concepts",
+        "Geometric and algebraic representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

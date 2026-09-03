@@ -1,0 +1,69 @@
+{
+  "id": "MB-023",
+  "title": "Naive Linear Scaling Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    15.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Geometry",
+    "Computer Graphics"
+  ],
+  "full_prompt": "Write a ManimGL scene named `NaiveLinearScaling` that visualizes a geometric scaling process inside a square canvas. Create a large outer white square of side length 6 to act as the canvas. In the bottom-right corner (DR), place a small blue square of side length 0.25, shifted slightly inward. Then, sequentially perform a scaling animation for each corner of the canvas (moving counter-clockwise: DR to DL, DL to UL, UL to UR, and UR back to DR):\n1. Create a green copy of the current small blue square.\n2. Dynamically draw 4 yellow connecting lines between the corners/edges of the original blue square and the expanding green square using `always_redraw`.\n3. Animate the green square scaling up by a factor of 4 and aligning to the next corner of the canvas.\n4. Place a new small blue square at the newly reached corner, shifted inward, and repeat the process for the next corner.\nEnsure proper layering so that the connecting lines and canvas remain behind the scaling squares using `bring_to_back`.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-023/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 95,
+    "scene_classes": [
+      "NaiveLinearScaling"
+    ],
+    "visual_techniques": [
+      "Dynamic Redraw",
+      "Sequential Scaling",
+      "Corner Alignment",
+      "Layer Management"
+    ],
+    "manim_api_patterns": [
+      "always_redraw",
+      "align_to",
+      "shift",
+      "scale",
+      "bring_to_back",
+      "DrawBorderThenFill"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Lambda variable scoping issue in always_redraw loop",
+      "severity": "high",
+      "note": "If the corner index inside the lambda is not bound using a default argument (e.g., `lambda corner=corner:`), all redraws will reference the final value of the loop variable."
+    },
+    {
+      "pattern": "Incorrect alignment direction",
+      "severity": "medium",
+      "note": "Misaligning the scaled squares relative to the canvas corners (DL, UL, UR, DR) breaks the geometric symmetry."
+    },
+    {
+      "pattern": "Layering issues with connecting lines",
+      "severity": "low",
+      "note": "Failing to call bring_to_back on the connecting lines can cause them to render on top of the solid blue/green squares, ruining the visual depth."
+    }
+  ]
+}

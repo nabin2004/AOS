@@ -1,0 +1,196 @@
+{
+  "id": "CL-008",
+  "title": "The Essence of Calculus | Chapter 8: Integrals and the Fundamental Theorem of Calculus",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [6720, 7680],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 4,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation explaining integrals and the Fundamental Theorem of Calculus. Start with the car speedometer problem: given velocity v(t) = t(8-t), find the distance traveled. Show that velocity is constantly changing, so approximate by dividing time into small intervals dt and computing v(t)·dt for each, summing them. Show that as dt→0, the sum approaches the area under the velocity curve. Introduce the integral symbol ∫ as a stretched 'S' for sum. Then show that the area function A(T) has derivative A'(T) = v(T), because a small nudge dT adds a sliver of area v(T)·dT. Thus, to compute the integral, find an antiderivative F such that F' = v, then evaluate F(b) - F(a). This is the Fundamental Theorem of Calculus. Also show the concept of signed area (negative area when graph goes below axis).",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter8.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "Chapter8OpeningQuote",
+        "key_methods": ["construct", "get_formula"]
+      },
+      {
+        "name": "ThisVideo",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "InCarRestrictedView",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GraphDistanceVsTime",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PlotVelocity",
+        "key_methods": ["construct", "add_speedometer", "plot_points", "draw_curve", "get_v_graph_and_label"]
+      },
+      {
+        "name": "Chapter2Wrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GivenDistanceWhatIsVelocity",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DerivativeOfDistance",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AskAboutAntiderivative",
+        "key_methods": ["construct", "add_v_graph", "write_s_formula", "write_antiderivative"]
+      },
+      {
+        "name": "Antiderivative",
+        "key_methods": ["construct", "get_functions", "get_arcs", "get_arc_labels"]
+      },
+      {
+        "name": "AreaUnderVGraph",
+        "key_methods": ["construct", "show_rects"]
+      },
+      {
+        "name": "ConstantVelocityCar",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ConstantVelocityPlot",
+        "key_methods": ["construct", "draw_graph", "show_product", "comment_on_area_wierdness", "note_units"]
+      },
+      {
+        "name": "PiecewiseConstantCar",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PiecewiseConstantPlot",
+        "key_methods": ["construct", "setup_graph", "always_changing", "show_piecewise_constant_graph", "compute_distance_on_each_interval", "approximate_original_curve", "revert_to_specific_approximation", "show_specific_rectangle", "show_v_dt_for_all_rectangles", "write_integral_symbol", "roles_of_dt", "what_does_sum_approach", "label_integral", "get_pw_constant_graph", "get_ticks"]
+      },
+      {
+        "name": "DontKnowHowToHandleNonConstant",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "CarJourneyApproximation",
+        "key_methods": ["construct", "get_approximated_rate_func"]
+      },
+      {
+        "name": "LessWrongCarJourneyApproximation",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TellMeThatsNotSurprising",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "HowDoesThisHelp",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AreaUnderACurve",
+        "key_methods": ["construct", "func"]
+      },
+      {
+        "name": "AltAreaUnderCurve",
+        "key_methods": ["construct", "func"]
+      },
+      {
+        "name": "Chapter1Wrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AreaIsDerivative",
+        "key_methods": ["setup", "construct", "introduce_variable_area", "write_integral", "nudge_input", "show_rectangle_approximation", "add_T_label", "get_area", "change_area_bounds"]
+      },
+      {
+        "name": "DirectInterpretationOfDsDt",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "FindAntiderivative",
+        "key_methods": ["construct", "introduce", "first_part", "second_part", "combine", "add_plus_C"]
+      },
+      {
+        "name": "GraphSPlusC",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "LowerBound",
+        "key_methods": ["construct", "add_integral_and_area", "mention_lower_bound", "drag_right_endpoint_to_zero", "write_antiderivative_difference", "show_alternate_antiderivative_difference", "add_constant_to_antiderivative", "get_integral", "get_antiderivative_difference"]
+      },
+      {
+        "name": "FundamentalTheorem",
+        "key_methods": ["construct", "add_graph_and_integral", "show_f_dx_sum", "show_rects_approaching_area", "write_antiderivative", "write_fundamental_theorem_of_calculus", "show_integral_considering_continuum", "show_antiderivative_considering_bounds"]
+      },
+      {
+        "name": "LetsRecap",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NegativeArea",
+        "key_methods": ["construct", "add_graph_and_area", "write_negative_area", "show_negative_point", "show_car_going_backwards", "write_v_dt", "show_rectangle", "write_signed_area", "get_car_nose_line"]
+      },
+      {
+        "name": "NextVideo",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Car speedometer view",
+      "Velocity graph with Riemann sum rectangles",
+      "Integral as limit of sums",
+      "Area function with variable upper bound",
+      "Sliver approximation dA = v(T)·dT",
+      "Antiderivative finding",
+      "Fundamental Theorem of Calculus",
+      "Signed area (negative area)"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc", "MaintainPositionRelativeTo"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "FocusOn", "ReplacementTransform", "MoveCar", "IncrementNumber"],
+      "mobject_classes": ["Car", "Speedometer", "Dot", "Line", "Arrow", "Brace", "Rectangle", "NumberPlane", "FunctionGraph"],
+      "custom_classes": ["GraphScene", "PiCreatureScene", "TeacherStudentsScene", "ShowSpeedometer", "GraphCarTrajectory", "PlotVelocity"],
+      "helpers": ["get_graph_label", "get_riemann_rectangles", "get_riemann_rectangles_list", "transform_between_riemann_rects"],
+      "custom_imports": ["from manim_imports_ext import *", "from _2017.eoc.chapter2 import Car, MoveCar, ShowSpeedometer, IncrementNumber, GraphCarTrajectory, SecantLineToTangentLine, VELOCITY_COLOR, TIME_COLOR, DISTANCE_COLOR"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses antiderivative with derivative",
+      "severity": "high",
+      "note": "fundamental misunderstanding"
+    },
+    {
+      "pattern": "fails to show the Riemann sum approaching the integral",
+      "severity": "high",
+      "note": "misses the key limit concept"
+    },
+    {
+      "pattern": "doesn't demonstrate dA/dT = v(T) for area function",
+      "severity": "high",
+      "note": "misses the FTC intuition"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

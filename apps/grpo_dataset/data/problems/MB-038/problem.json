@@ -1,0 +1,68 @@
+{
+  "id": "MB-038",
+  "title": "Z-Axis with Circle Slice of a Sphere",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    18.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script using InteractiveScene that visualizes a 3D sphere sliced by a horizontal plane represented by a circle. Create a 3D coordinate system using ThreeDAxes scaled to width 4. Add a semi-transparent blue Sphere of radius 1 with a white SurfaceMesh of resolution (51, 26) and stroke width 2 (opacity 0.25). Ensure the sphere always sorts to the camera. Create a green Z-axis line from Z=-1 to Z=1 with stroke width 10, and apply depth testing. Add a green TrueDot that tracks the Z-value. Create a red Circle of radius 0.8 with stroke width 10, applying depth testing. Use a ValueTracker initialized at 0.6 to control the Z-position. Add updaters to the green dot and the red circle so that they move along the Z-axis according to the tracker. The red circle's width must dynamically scale to 2.01 * sqrt(1 - z^2) to match the cross-section of the sphere at height z. Reorient the camera frame to (phi=23, theta=70, gamma=0) with a focal point of (-0.06, 0.05, -0.19) and zoom 3.02. Animate the Z-tracker from 0.6 to 0.9 over 4 seconds, then to -0.9 over 8 seconds, and finally back to 0.6 over 6 seconds.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-038/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 50,
+    "scene_classes": [
+      "ZAxisWithCircle"
+    ],
+    "visual_techniques": [
+      "3D Scene Setup",
+      "Dynamic Updaters",
+      "Value Tracker Animation",
+      "Surface Mesh Rendering",
+      "Depth Testing"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ThreeDAxes",
+      "Sphere",
+      "SurfaceMesh",
+      "TrueDot",
+      "ValueTracker",
+      "always_sort_to_camera",
+      "apply_depth_test",
+      "frame.reorient"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom imports or classes like InteractiveScene in standard Manim Community",
+      "severity": "high",
+      "note": "Requires ManimGL or custom 3b1b imports. Standard Manim CE will fail on InteractiveScene and TrueDot."
+    },
+    {
+      "pattern": "Incorrect math formula for circle radius",
+      "severity": "medium",
+      "note": "The radius of the circle must scale dynamically with sqrt(1 - z^2)."
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "id": "CL-001",
+  "title": "The Essence of Calculus | Chapter 1: The Area of a Circle",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [0, 960],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 3,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation introducing the fundamental ideas of calculus through the geometric problem of finding the area of a circle. Start by showing a circle with radius R and ask the question 'Why is area = πR²?' Then slice the circle into concentric rings, unwrap one ring to show it approximates a rectangle with width 2πr and thickness dr. Show the sum of all ring areas approximating the area under the graph of 2πr, which forms a triangle. Demonstrate that as dr approaches zero, the approximation becomes exact, yielding area = πR². Then introduce the area function A(x) for the parabola y = x², showing that dA/dx = x², and briefly introduce derivatives and the Fundamental Theorem of Calculus.",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter1.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "Eoc1Thumbnail",
+        "key_methods": ["construct", "func"]
+      },
+      {
+        "name": "CircleScene",
+        "key_methods": ["setup", "introduce_circle", "increase_radius", "get_ring", "get_rings", "get_outer_ring", "unwrap_ring", "unwrap_rings", "get_unwrapped", "create_pi_creature"]
+      },
+      {
+        "name": "Chapter1OpeningQuote",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "Introduction",
+        "key_methods": ["construct", "show_series", "show_many_facts", "invent_calculus"]
+      },
+      {
+        "name": "PreviewFrame",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ProductRuleDiagram",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "IntroduceCircle",
+        "key_methods": ["construct", "introduce_area", "question_area", "show_calculus_symbols"]
+      },
+      {
+        "name": "ApproximateOneRing",
+        "key_methods": ["setup", "construct", "write_radius_three", "try_to_understand_area", "slice_into_rings", "isolate_one_ring", "straighten_ring_out", "approximate_as_rectangle", "show_alternate_width"]
+      },
+      {
+        "name": "MoveForwardWithApproximation",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GraphRectangles",
+        "key_methods": ["setup", "construct", "draw_ring_sum", "draw_r_values", "unwrap_rings_onto_graph", "draw_graph", "point_out_approximation", "let_dr_approach_zero", "compute_area_under_graph", "show_circle_unwrapping", "get_ring_sum", "get_area_formula"]
+      },
+      {
+        "name": "ThinkLikeAMathematician",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TwoThingsToNotice",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "RecapCircleSolution",
+        "key_methods": ["setup", "construct", "break_up_circle", "show_sum", "dr_indicates_spacing", "smaller_dr", "show_riemann_sum", "limiting_riemann_sum", "full_precision"]
+      },
+      {
+        "name": "ExampleIntegralProblems",
+        "key_methods": ["construct", "write_integral_condition", "show_car", "show_graph", "let_dt_approach_zero", "show_confusion"]
+      },
+      {
+        "name": "MathematicianPonderingAreaUnderDifferentCurves",
+        "key_methods": ["construct", "create_pi_creature"]
+      },
+      {
+        "name": "AreaUnderParabola",
+        "key_methods": ["construct", "show_graph", "show_area", "ask_about_area", "show_confusion", "show_variable_endpoint", "name_integral", "move_right_point_to"]
+      },
+      {
+        "name": "WhoCaresAboutArea",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PlayWithThisIdea",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PlayingTowardsDADX",
+        "key_methods": ["setup", "construct", "fast_forward_to_end_of_previous_scene", "nudge_x", "describe_sliver", "shrink_dx", "write_dA_dx", "dA_remains_a_mystery", "write_example_inputs", "show_dA_dx_in_detail", "show_smaller_x"]
+      },
+      {
+        "name": "AlternateAreaUnderCurve",
+        "key_methods": ["construct", "approximation_improves_for_smaller_dx", "name_derivative"]
+      },
+      {
+        "name": "NextVideoWrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ProblemSolvingTool",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "FundamentalTheorem",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NextVideos",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "EndScreen",
+        "key_methods": ["construct", "create_pi_creature"]
+      }
+    ],
+    "visual_techniques": [
+      "Circle area visualization with concentric rings",
+      "Ring unwrapping to rectangle approximation",
+      "Riemann sum visualization",
+      "Area under curve (parabola)",
+      "Derivative as dA/dx ratio",
+      "Fundamental Theorem of Calculus demonstration",
+      "Car velocity/distance analogy"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "Rotate", "GrowFromCenter", "DrawBorderThenFill", "ReplacementTransform", "MoveToTarget", "Indicate", "ApplyWave", "FocusOn", "RemovePiCreatureBubble"],
+      "mobject_classes": ["Vector", "NumberPlane", "OldTex", "OldTexText", "Matrix", "VMobject", "Dot", "Line", "Circle", "Rectangle", "Square", "Polygon", "Arc", "Arrow", "Brace", "Axes", "FunctionGraph"],
+      "custom_classes": ["CircleScene", "GraphScene", "PiCreatureScene", "TeacherStudentsScene", "GraphRectangles", "AreaUnderParabola", "PlayingTowardsDADX", "Car", "VideoSeries"],
+      "helpers": ["get_graph_label", "get_riemann_rectangles", "get_derivative_graph"],
+      "custom_imports": ["from manim_imports_ext import *", "from _2017.eoc.chapter2 import Car, MoveCar"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "fails to show the ring unwrapping visualization",
+      "severity": "high",
+      "note": "misses the key geometric insight"
+    },
+    {
+      "pattern": "doesn't demonstrate the limiting process (dr → 0)",
+      "severity": "high",
+      "note": "fails to show the calculus concept"
+    },
+    {
+      "pattern": "confuses area under curve with circle area",
+      "severity": "medium",
+      "note": "misunderstands the relationship"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

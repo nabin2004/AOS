@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-049",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Parametric equations for spherical coordinates",
+        "Scaling transformations about the origin",
+        "Inverse square law area division (1 to 4 ratio)",
+        "Degree to radian conversions"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D sphere with SurfaceMesh overlay",
+        "GlowDot representing a point light source",
+        "Custom beaming/radiation propagation effect",
+        "Dynamic 3D camera reorientation and rotation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Sphere radius of 2",
+        "Patch u_range and v_range spanning 9 degrees",
+        "Scaling factor of 2 for distance doubling",
+        "Mesh resolution parameters"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inheritance from InteractiveScene",
+        "Implementation of custom beaming_effect helper method",
+        "Use of always_sort_to_camera for proper 3D transparency rendering",
+        "Use of target state generation for smooth scaling animations"
+      ]
+    }
+  }
+}

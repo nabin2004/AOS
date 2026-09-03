@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-004",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Logarithmic scaling using -log2(p)",
+        "Probability distribution summing to 1.0",
+        "Information entropy formula representation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Horizontal stacked probability bar",
+        "Vertical information bars aligned to segments",
+        "Color interpolation across bars",
+        "Horizontal reference grid lines with labels"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker integration for dynamic updates",
+        "Clamping of probability values to prevent log(0)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom EntropyChart VGroup subclass",
+        "Updaters linking horizontal segments and vertical bars"
+      ]
+    }
+  }
+}

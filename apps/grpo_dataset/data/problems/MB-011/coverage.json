@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-011",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Random walk state tracking",
+        "Modulo 12 arithmetic for circular movement"
+      ]
+    },
+    "Visual": {
+      "weight": 0.5,
+      "expected": [
+        "Clock face with 12 distinct positions",
+        "Ladybug character or representative mobject",
+        "Curved transition arrows using path_arc",
+        "Color transitions for visited (red) and final (teal) states"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Correct tracking of 12 unique states",
+        "Correct random seed or step generation"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inheritance from InteractiveScene or Scene",
+        "Custom clock generator method",
+        "Simulation loop with dynamic animation generation"
+      ]
+    }
+  }
+}

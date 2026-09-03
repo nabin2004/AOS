@@ -1,0 +1,55 @@
+{
+  "problem_id": "MB-001",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of Stacked Probability Distribution",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "StackedProbDistribution",
+        "initial_distribution",
+        "segments"
+      ],
+      "clip_query": "A horizontal stacked probability distribution bar showing different event probabilities"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Creation of Information Bars (Entropy Chart)",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "Rectangle",
+        "bar_height",
+        "math.log2",
+        "interpolate_color"
+      ],
+      "clip_query": "Vertical bars rising from the stacked probability segments representing information content in bits"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic Update of Probabilities and Bar Heights",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "add_updater",
+        "update_segments",
+        "get_value"
+      ],
+      "clip_query": "The width of the probability segments and the height of the vertical information bars changing dynamically"
+    }
+  ]
+}

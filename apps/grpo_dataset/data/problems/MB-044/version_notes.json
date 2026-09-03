@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-044",
+  "conflicts": [
+    {
+      "category": "Framework Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "3D Texturing",
+      "gl_construct": "TexturedSurface",
+      "ce_equivalent": "Surface with custom shader or image mapping",
+      "severity": "high"
+    },
+    {
+      "category": "Visual Effects",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with multiple layers of fading opacity",
+      "severity": "medium"
+    },
+    {
+      "category": "Updaters",
+      "gl_construct": "f_always",
+      "ce_equivalent": "add_updater",
+      "severity": "medium"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "frame.animate.reorient",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    }
+  ]
+}

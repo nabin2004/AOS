@@ -1,0 +1,1883 @@
+1
+00:00:12,520 --> 00:00:14,000
+Now that we've seen what a derivative
+
+2
+00:00:14,000 --> 00:00:15,720
+means and what it has to do with rates
+
+3
+00:00:15,720 --> 00:00:17,800
+of change, our next step is to learn how
+
+4
+00:00:17,800 --> 00:00:20,040
+to actually compute these guys. As in,
+
+5
+00:00:20,040 --> 00:00:21,560
+if I give you some kind of function with
+
+6
+00:00:21,560 --> 00:00:23,400
+an explicit formula, you'd want to be
+
+7
+00:00:23,400 --> 00:00:25,120
+able to find what the formula for its
+
+8
+00:00:25,120 --> 00:00:26,680
+derivative is.
+
+9
+00:00:26,680 --> 00:00:28,280
+Maybe it's obvious, but I think it's
+
+10
+00:00:28,280 --> 00:00:30,520
+worth stating explicitly why this is an
+
+11
+00:00:30,520 --> 00:00:32,920
+important thing to be able to do. Why
+
+12
+00:00:32,920 --> 00:00:34,840
+much of a calculus student's time ends
+
+13
+00:00:34,840 --> 00:00:36,080
+up going towards grappling with
+
+14
+00:00:36,080 --> 00:00:38,560
+derivatives of abstract functions rather
+
+15
+00:00:38,560 --> 00:00:40,200
+than thinking about concrete rate of
+
+16
+00:00:40,200 --> 00:00:42,200
+change problems.
+
+17
+00:00:42,200 --> 00:00:43,600
+It's because a lot of real-world
+
+18
+00:00:43,600 --> 00:00:45,320
+phenomena, the sort of things that we
+
+19
+00:00:45,320 --> 00:00:47,600
+want to use calculus to analyze, are
+
+20
+00:00:47,600 --> 00:00:50,240
+modeled using polynomials, trigonometric
+
+21
+00:00:50,240 --> 00:00:52,400
+functions, exponentials, and other pure
+
+22
+00:00:52,400 --> 00:00:54,080
+functions like that.
+
+23
+00:00:54,080 --> 00:00:55,640
+So, if you build up some fluency with
+
+24
+00:00:55,640 --> 00:00:57,960
+the ideas of rates of change for those
+
+25
+00:00:57,960 --> 00:01:00,280
+kinds of pure abstract functions, it
+
+26
+00:01:00,280 --> 00:01:01,720
+gives you a language to more readily
+
+27
+00:01:01,720 --> 00:01:03,120
+talk about the rates at which things
+
+28
+00:01:03,120 --> 00:01:05,519
+change in concrete situations that you
+
+29
+00:01:05,519 --> 00:01:07,920
+might be using calculus to model.
+
+30
+00:01:07,920 --> 00:01:10,200
+But, it is way too easy for this process
+
+31
+00:01:10,200 --> 00:01:12,240
+to feel like just memorizing a list of
+
+32
+00:01:12,240 --> 00:01:14,240
+rules. And if that happens, if you get
+
+33
+00:01:14,240 --> 00:01:16,320
+that feeling, it's also easy to lose
+
+34
+00:01:16,320 --> 00:01:17,760
+sight of the fact that derivatives are
+
+35
+00:01:17,760 --> 00:01:19,640
+fundamentally about just looking at tiny
+
+36
+00:01:19,640 --> 00:01:21,480
+changes to some quantity and how that
+
+37
+00:01:21,480 --> 00:01:23,200
+relates to a resulting tiny change in
+
+38
+00:01:23,200 --> 00:01:24,640
+another quantity.
+
+39
+00:01:24,640 --> 00:01:26,920
+So, in this video and in the next one,
+
+40
+00:01:26,920 --> 00:01:28,440
+my aim is to show you how you can think
+
+41
+00:01:28,440 --> 00:01:30,440
+about a few of these rules intuitively
+
+42
+00:01:30,440 --> 00:01:32,520
+and geometrically. And I really want to
+
+43
+00:01:32,520 --> 00:01:34,560
+encourage you to never forget that tiny
+
+44
+00:01:34,560 --> 00:01:37,960
+nudges are at the heart of derivatives.
+
+45
+00:01:37,960 --> 00:01:39,600
+Let's start with a simple function like
+
+46
+00:01:39,600 --> 00:01:42,000
+f of x equals x squared. What if I asked
+
+47
+00:01:42,000 --> 00:01:43,440
+you its derivative?
+
+48
+00:01:43,440 --> 00:01:44,920
+That is, if you were to look at some
+
+49
+00:01:44,920 --> 00:01:47,840
+value x, like x equals 2, and compare it
+
+50
+00:01:47,840 --> 00:01:50,200
+to a value slightly bigger, just dx
+
+51
+00:01:50,200 --> 00:01:52,520
+bigger, what's the corresponding change
+
+52
+00:01:52,520 --> 00:01:55,520
+in the value of the function, df?
+
+53
+00:01:55,520 --> 00:01:57,520
+And in particular, what's df divided by
+
+54
+00:01:57,520 --> 00:01:59,920
+dx? The rate at which this function is
+
+55
+00:01:59,920 --> 00:02:03,160
+changing per unit change in x.
+
+56
+00:02:03,160 --> 00:02:05,160
+As a first step for intuition, we know
+
+57
+00:02:05,160 --> 00:02:07,440
+that you can think of this ratio df dx
+
+58
+00:02:07,440 --> 00:02:09,280
+as the slope of a tangent line to the
+
+59
+00:02:09,280 --> 00:02:11,280
+graph of x squared.
+
+60
+00:02:11,280 --> 00:02:12,680
+And from that, you can see that the
+
+61
+00:02:12,680 --> 00:02:14,640
+slope generally increases as x
+
+62
+00:02:14,640 --> 00:02:17,040
+increases. At zero, the tangent line is
+
+63
+00:02:17,040 --> 00:02:19,000
+flat and the slope is zero.
+
+64
+00:02:19,000 --> 00:02:20,680
+At x equals one, it's something a bit
+
+65
+00:02:20,680 --> 00:02:22,600
+steeper.
+
+66
+00:02:22,600 --> 00:02:25,080
+At x equals two, it's steeper still.
+
+67
+00:02:25,080 --> 00:02:26,880
+But looking at graphs isn't generally
+
+68
+00:02:26,880 --> 00:02:28,840
+the best way to understand the precise
+
+69
+00:02:28,840 --> 00:02:30,680
+formula for a derivative.
+
+70
+00:02:30,680 --> 00:02:32,240
+For that, it's best to take a more
+
+71
+00:02:32,240 --> 00:02:34,320
+literal look at what x squared actually
+
+72
+00:02:34,320 --> 00:02:36,440
+means. And in this case, let's go ahead
+
+73
+00:02:36,440 --> 00:02:38,240
+and picture a square whose side length
+
+74
+00:02:38,240 --> 00:02:40,040
+is x.
+
+75
+00:02:40,040 --> 00:02:42,040
+If you increase x by some tiny nudge,
+
+76
+00:02:42,040 --> 00:02:44,360
+some little dx, what's the resulting
+
+77
+00:02:44,360 --> 00:02:47,720
+change in the area of that square?
+
+78
+00:02:47,720 --> 00:02:49,959
+That slight change in area is what df
+
+79
+00:02:49,959 --> 00:02:52,440
+means in this context. It's the tiny
+
+80
+00:02:52,440 --> 00:02:54,720
+increase to the value of f of x equals x
+
+81
+00:02:54,720 --> 00:02:57,320
+squared caused by increasing x by that
+
+82
+00:02:57,320 --> 00:02:59,239
+tiny nudge dx.
+
+83
+00:02:59,239 --> 00:03:00,880
+Now, you can see that there's three new
+
+84
+00:03:00,880 --> 00:03:03,360
+bits of area in this diagram. Two thin
+
+85
+00:03:03,360 --> 00:03:06,120
+rectangles and a minuscule square.
+
+86
+00:03:06,120 --> 00:03:07,880
+The two thin rectangles each have side
+
+87
+00:03:07,880 --> 00:03:10,360
+lengths of x and dx. So, they account
+
+88
+00:03:10,360 --> 00:03:13,320
+for two times x times dx units of new
+
+89
+00:03:13,320 --> 00:03:14,519
+area.
+
+90
+00:03:14,519 --> 00:03:16,320
+For example, let's say x was three and
+
+91
+00:03:16,320 --> 00:03:18,640
+dx was 0.01.
+
+92
+00:03:18,640 --> 00:03:20,600
+Then that new area from these two thin
+
+93
+00:03:20,600 --> 00:03:22,840
+rectangles would be two times three
+
+94
+00:03:22,840 --> 00:03:26,840
+times 0.01, which is 0.06. About six
+
+95
+00:03:26,840 --> 00:03:29,720
+times the size of dx.
+
+96
+00:03:29,720 --> 00:03:31,519
+That little square there has an area of
+
+97
+00:03:31,519 --> 00:03:33,680
+dx squared. But you should think of that
+
+98
+00:03:33,680 --> 00:03:37,600
+as being really tiny, negligibly tiny.
+
+99
+00:03:37,600 --> 00:03:40,760
+For example, if dx was 0.01, that would
+
+100
+00:03:40,760 --> 00:03:43,800
+be only 0.0001.
+
+101
+00:03:43,800 --> 00:03:45,720
+And keep in mind, I'm drawing dx with a
+
+102
+00:03:45,720 --> 00:03:47,360
+fair bit of width here just so we can
+
+103
+00:03:47,360 --> 00:03:49,720
+actually see it. But always remember, in
+
+104
+00:03:49,720 --> 00:03:51,920
+principle, dx should be thought of as a
+
+105
+00:03:51,920 --> 00:03:54,000
+truly tiny amount.
+
+106
+00:03:54,000 --> 00:03:56,280
+And for those truly tiny amounts, a good
+
+107
+00:03:56,280 --> 00:03:58,200
+rule of thumb is that you can ignore
+
+108
+00:03:58,200 --> 00:04:00,600
+anything that includes a DX raised to a
+
+109
+00:04:00,600 --> 00:04:02,440
+power greater than one.
+
+110
+00:04:02,440 --> 00:04:04,680
+That is a tiny change squared is a
+
+111
+00:04:04,680 --> 00:04:07,440
+negligible change.
+
+112
+00:04:07,440 --> 00:04:09,400
+What this leaves us with is that DF is
+
+113
+00:04:09,400 --> 00:04:11,800
+just some multiple of DX.
+
+114
+00:04:11,800 --> 00:04:13,880
+And that multiple, 2X, which you could
+
+115
+00:04:13,880 --> 00:04:16,680
+also write as DF divided by DX, is the
+
+116
+00:04:16,680 --> 00:04:19,000
+derivative of X squared.
+
+117
+00:04:19,000 --> 00:04:20,760
+For example, if you were starting at X
+
+118
+00:04:20,760 --> 00:04:23,080
+equals 3, then as you slightly increase
+
+119
+00:04:23,080 --> 00:04:25,760
+X, the rate of change in the area per
+
+120
+00:04:25,760 --> 00:04:28,560
+unit change in length added, DX squared
+
+121
+00:04:28,560 --> 00:04:32,560
+over DX, would be 2 * 3, or 6.
+
+122
+00:04:32,560 --> 00:04:34,080
+And if instead you were starting at X
+
+123
+00:04:34,080 --> 00:04:36,200
+equals 5, then the rate of change would
+
+124
+00:04:36,200 --> 00:04:38,560
+be 10 units of area per unit change in
+
+125
+00:04:38,560 --> 00:04:41,000
+X.
+
+126
+00:04:41,440 --> 00:04:42,680
+Let's go ahead and try a different
+
+127
+00:04:42,680 --> 00:04:45,760
+simple function, f of x equals x cubed.
+
+128
+00:04:45,760 --> 00:04:47,400
+This is going to be the geometric view
+
+129
+00:04:47,400 --> 00:04:48,440
+of the stuff that I went through
+
+130
+00:04:48,440 --> 00:04:50,919
+algebraically in the last video.
+
+131
+00:04:50,919 --> 00:04:52,280
+What's nice here is that we can think of
+
+132
+00:04:52,280 --> 00:04:55,200
+x cubed as the volume of an actual cube
+
+133
+00:04:55,200 --> 00:04:57,400
+whose side lengths are x.
+
+134
+00:04:57,400 --> 00:04:59,440
+And when you increase x by a tiny nudge,
+
+135
+00:04:59,440 --> 00:05:02,200
+a tiny DX, the resulting increase in
+
+136
+00:05:02,200 --> 00:05:04,960
+volume is what I have here in yellow.
+
+137
+00:05:04,960 --> 00:05:07,120
+That represents all the volume in a cube
+
+138
+00:05:07,120 --> 00:05:09,680
+with side lengths x plus DX that's not
+
+139
+00:05:09,680 --> 00:05:11,560
+already in the original cube, the one
+
+140
+00:05:11,560 --> 00:05:13,720
+with side length x.
+
+141
+00:05:13,720 --> 00:05:15,360
+It's nice to think of this new volume as
+
+142
+00:05:15,360 --> 00:05:17,720
+broken up into multiple components, but
+
+143
+00:05:17,720 --> 00:05:20,040
+almost all of it comes from these three
+
+144
+00:05:20,040 --> 00:05:21,360
+square faces.
+
+145
+00:05:21,360 --> 00:05:24,080
+Or said a little more precisely, as DX
+
+146
+00:05:24,080 --> 00:05:26,600
+approaches zero, those three squares
+
+147
+00:05:26,600 --> 00:05:28,840
+comprise a portion closer and closer to
+
+148
+00:05:28,840 --> 00:05:33,760
+100% of that new yellow volume.
+
+149
+00:05:34,160 --> 00:05:35,960
+Each of those thin squares has a volume
+
+150
+00:05:35,960 --> 00:05:39,080
+of x squared times DX, the area of the
+
+151
+00:05:39,080 --> 00:05:42,200
+face times that little thickness DX. So
+
+152
+00:05:42,200 --> 00:05:45,160
+in total, this gives us 3 x squared DX
+
+153
+00:05:45,160 --> 00:05:47,200
+of volume change.
+
+154
+00:05:47,200 --> 00:05:49,000
+And to be sure, there are other slivers
+
+155
+00:05:49,000 --> 00:05:51,160
+of volume here along the edges and that
+
+156
+00:05:51,160 --> 00:05:53,240
+tiny one in the corner, but all of that
+
+157
+00:05:53,240 --> 00:05:55,320
+volume is going to be proportional to dx
+
+158
+00:05:55,320 --> 00:05:57,960
+squared or dx cubed, so we can safely
+
+159
+00:05:57,960 --> 00:05:59,440
+ignore them.
+
+160
+00:05:59,440 --> 00:06:01,040
+Again, this is ultimately because
+
+161
+00:06:01,040 --> 00:06:04,080
+they're going to be divided by dx.
+
+162
+00:06:04,080 --> 00:06:06,080
+And if there's still any dx remaining,
+
+163
+00:06:06,080 --> 00:06:07,840
+then those terms aren't going to survive
+
+164
+00:06:07,840 --> 00:06:11,280
+the process of letting dx approach zero.
+
+165
+00:06:11,280 --> 00:06:13,000
+What this means is that the derivative
+
+166
+00:06:13,000 --> 00:06:15,440
+of x cubed, the rate at which x cubed
+
+167
+00:06:15,440 --> 00:06:18,800
+changes per unit change of x, is 3 * x
+
+168
+00:06:18,800 --> 00:06:21,000
+squared.
+
+169
+00:06:21,000 --> 00:06:22,400
+What that means in terms of graphical
+
+170
+00:06:22,400 --> 00:06:24,880
+intuition is that the slope of the graph
+
+171
+00:06:24,880 --> 00:06:27,919
+of x cubed at every single point x is
+
+172
+00:06:27,919 --> 00:06:31,600
+exactly 3x squared.
+
+173
+00:06:33,919 --> 00:06:35,640
+And reasoning about that slope, it
+
+174
+00:06:35,640 --> 00:06:37,240
+should make sense that this derivative
+
+175
+00:06:37,240 --> 00:06:39,840
+is high on the left and then zero at the
+
+176
+00:06:39,840 --> 00:06:41,840
+origin and then high again as you move
+
+177
+00:06:41,840 --> 00:06:44,040
+to the right, but just thinking in terms
+
+178
+00:06:44,040 --> 00:06:45,919
+of the graph would never have landed us
+
+179
+00:06:45,919 --> 00:06:48,840
+on the precise quantity 3x squared.
+
+180
+00:06:48,840 --> 00:06:50,200
+For that, we had to take a much more
+
+181
+00:06:50,200 --> 00:06:52,480
+direct look at what x cubed actually
+
+182
+00:06:52,480 --> 00:06:54,560
+means.
+
+183
+00:06:54,560 --> 00:06:56,000
+Now, in practice, you wouldn't
+
+184
+00:06:56,000 --> 00:06:57,720
+necessarily think of the square every
+
+185
+00:06:57,720 --> 00:06:59,160
+time you're taking the derivative of x
+
+186
+00:06:59,160 --> 00:07:01,360
+squared, nor would you necessarily think
+
+187
+00:07:01,360 --> 00:07:02,800
+of this cube whenever you're taking the
+
+188
+00:07:02,800 --> 00:07:05,440
+derivative of x cubed. Both of them fall
+
+189
+00:07:05,440 --> 00:07:07,280
+under a pretty recognizable pattern for
+
+190
+00:07:07,280 --> 00:07:09,080
+polynomial terms.
+
+191
+00:07:09,080 --> 00:07:11,120
+The derivative of x to the fourth turns
+
+192
+00:07:11,120 --> 00:07:13,960
+out to be 4x cubed, the derivative of x
+
+193
+00:07:13,960 --> 00:07:16,960
+to the fifth is 5x to the fourth and so
+
+194
+00:07:16,960 --> 00:07:18,720
+on.
+
+195
+00:07:18,720 --> 00:07:20,520
+Abstractly, you'd write this as the
+
+196
+00:07:20,520 --> 00:07:23,680
+derivative of x to the n for any power n
+
+197
+00:07:23,680 --> 00:07:27,520
+is n * x to the n - 1.
+
+198
+00:07:27,520 --> 00:07:29,000
+This right here is what's known in the
+
+199
+00:07:29,000 --> 00:07:31,640
+business as the power rule.
+
+200
+00:07:31,640 --> 00:07:33,840
+In practice, we all quickly just get
+
+201
+00:07:33,840 --> 00:07:35,919
+jaded and think about this symbolically
+
+202
+00:07:35,919 --> 00:07:38,000
+as the exponent hopping down in front,
+
+203
+00:07:38,000 --> 00:07:40,200
+leaving behind one less than itself,
+
+204
+00:07:40,200 --> 00:07:41,720
+rarely pausing to think about the
+
+205
+00:07:41,720 --> 00:07:43,720
+geometric delights that underlie these
+
+206
+00:07:43,720 --> 00:07:45,200
+derivatives.
+
+207
+00:07:45,200 --> 00:07:46,480
+That's the kind of thing that happens
+
+208
+00:07:46,480 --> 00:07:47,760
+when these tend to fall in the middle of
+
+209
+00:07:47,760 --> 00:07:50,480
+much longer computations.
+
+210
+00:07:50,480 --> 00:07:51,920
+But rather than chalking it all off to
+
+211
+00:07:51,920 --> 00:07:53,480
+symbolic patterns, let's just take a
+
+212
+00:07:53,480 --> 00:07:55,400
+moment and think about why this works
+
+213
+00:07:55,400 --> 00:07:58,280
+for powers beyond just two and three.
+
+214
+00:07:58,280 --> 00:08:00,800
+When you nudge that input X, increasing
+
+215
+00:08:00,800 --> 00:08:03,840
+it slightly to X + DX, working out the
+
+216
+00:08:03,840 --> 00:08:06,200
+exact value of that nudged output would
+
+217
+00:08:06,200 --> 00:08:08,600
+involve multiplying together these n
+
+218
+00:08:08,600 --> 00:08:11,560
+separate X + DX terms. The full
+
+219
+00:08:11,560 --> 00:08:14,120
+expansion would be really complicated,
+
+220
+00:08:14,120 --> 00:08:16,080
+but part of the point of derivatives is
+
+221
+00:08:16,080 --> 00:08:17,919
+that most of that complication can be
+
+222
+00:08:17,919 --> 00:08:19,360
+ignored.
+
+223
+00:08:19,360 --> 00:08:21,560
+The first term in your expansion is X to
+
+224
+00:08:21,560 --> 00:08:24,080
+the n. This is analogous to the area of
+
+225
+00:08:24,080 --> 00:08:25,720
+the original square
+
+226
+00:08:25,720 --> 00:08:27,720
+or the volume of the original cube from
+
+227
+00:08:27,720 --> 00:08:30,720
+our previous examples.
+
+228
+00:08:30,720 --> 00:08:32,680
+For the next terms in the expansion, you
+
+229
+00:08:32,680 --> 00:08:38,159
+can choose mostly X's with a single DX.
+
+230
+00:08:41,880 --> 00:08:43,360
+Since there are n different
+
+231
+00:08:43,360 --> 00:08:44,880
+parentheticals from which you could have
+
+232
+00:08:44,880 --> 00:08:47,760
+chosen that single DX, this gives us n
+
+233
+00:08:47,760 --> 00:08:50,240
+separate terms, all of which include n
+
+234
+00:08:50,240 --> 00:08:53,360
+minus one X's times a DX, giving a value
+
+235
+00:08:53,360 --> 00:08:57,400
+of X to the power n minus one times DX.
+
+236
+00:08:57,400 --> 00:08:59,480
+This is analogous to how the majority of
+
+237
+00:08:59,480 --> 00:09:01,480
+the new area in the square came from
+
+238
+00:09:01,480 --> 00:09:04,400
+those two bars, each with area X times
+
+239
+00:09:04,400 --> 00:09:07,280
+DX, or how the bulk of the new volume in
+
+240
+00:09:07,280 --> 00:09:09,480
+the cube came from those three thin
+
+241
+00:09:09,480 --> 00:09:11,920
+squares, each of which had a volume of X
+
+242
+00:09:11,920 --> 00:09:14,720
+squared times DX.
+
+243
+00:09:14,720 --> 00:09:16,440
+There will be many other terms in this
+
+244
+00:09:16,440 --> 00:09:18,360
+expansion, but all of them are just
+
+245
+00:09:18,360 --> 00:09:20,640
+going to be some multiple of DX squared,
+
+246
+00:09:20,640 --> 00:09:22,800
+so we can safely ignore them. And what
+
+247
+00:09:22,800 --> 00:09:25,000
+that means is that all but a negligible
+
+248
+00:09:25,000 --> 00:09:27,160
+portion of the increase in the output
+
+249
+00:09:27,160 --> 00:09:29,920
+comes from n copies of this X to the n
+
+250
+00:09:29,920 --> 00:09:32,920
+minus one times DX. That's what it means
+
+251
+00:09:32,920 --> 00:09:35,720
+for the derivative of X to the n to be n
+
+252
+00:09:35,720 --> 00:09:38,920
+times X to the n - 1.
+
+253
+00:09:38,920 --> 00:09:40,640
+And even though, like I said, in
+
+254
+00:09:40,640 --> 00:09:41,800
+practice, you'll find yourself
+
+255
+00:09:41,800 --> 00:09:43,520
+performing this derivative quickly and
+
+256
+00:09:43,520 --> 00:09:45,680
+symbolically, imagining the exponent
+
+257
+00:09:45,680 --> 00:09:47,640
+hopping down to the front,
+
+258
+00:09:47,640 --> 00:09:49,560
+every now and then, it's nice to just
+
+259
+00:09:49,560 --> 00:09:51,800
+step back and remember why these rules
+
+260
+00:09:51,800 --> 00:09:52,960
+work.
+
+261
+00:09:52,960 --> 00:09:54,600
+Not just because it's pretty, and not
+
+262
+00:09:54,600 --> 00:09:56,040
+just because it helps remind us that
+
+263
+00:09:56,040 --> 00:09:58,000
+math actually makes sense and isn't just
+
+264
+00:09:58,000 --> 00:10:00,160
+a pile of formulas to memorize,
+
+265
+00:10:00,160 --> 00:10:01,800
+but because it flexes that very
+
+266
+00:10:01,800 --> 00:10:03,400
+important muscle of thinking about
+
+267
+00:10:03,400 --> 00:10:07,520
+derivatives in terms of tiny nudges.
+
+268
+00:10:07,520 --> 00:10:08,880
+As another example, think of the
+
+269
+00:10:08,880 --> 00:10:12,640
+function f of x = 1 / x.
+
+270
+00:10:12,640 --> 00:10:14,440
+Now, on the one hand, you could just
+
+271
+00:10:14,440 --> 00:10:16,720
+blindly try applying the power rule,
+
+272
+00:10:16,720 --> 00:10:20,080
+since 1 / x is the same as writing x ^
+
+273
+00:10:20,080 --> 00:10:21,400
+-1.
+
+274
+00:10:21,400 --> 00:10:23,320
+That would involve letting the -1 hop
+
+275
+00:10:23,320 --> 00:10:25,360
+down in front, leaving behind one less
+
+276
+00:10:25,360 --> 00:10:28,200
+than itself, which is -2.
+
+277
+00:10:28,200 --> 00:10:29,640
+But let's have some fun and see if we
+
+278
+00:10:29,640 --> 00:10:31,560
+can reason about this geometrically,
+
+279
+00:10:31,560 --> 00:10:32,840
+rather than just plugging it through
+
+280
+00:10:32,840 --> 00:10:34,760
+some formula.
+
+281
+00:10:34,760 --> 00:10:38,200
+The value 1 / x is asking, "What number
+
+282
+00:10:38,200 --> 00:10:40,920
+multiplied by x = 1?"
+
+283
+00:10:40,920 --> 00:10:43,280
+So, here's how I'd like to visualize it.
+
+284
+00:10:43,280 --> 00:10:45,120
+Imagine a little rectangular puddle of
+
+285
+00:10:45,120 --> 00:10:47,120
+water sitting in two dimensions, whose
+
+286
+00:10:47,120 --> 00:10:48,880
+area is one.
+
+287
+00:10:48,880 --> 00:10:51,320
+And let's say that its width is x, which
+
+288
+00:10:51,320 --> 00:10:53,720
+means that the height has to be 1 / x,
+
+289
+00:10:53,720 --> 00:10:56,360
+since the total area of it is one.
+
+290
+00:10:56,360 --> 00:10:58,880
+So, if x was stretched out to two, then
+
+291
+00:10:58,880 --> 00:11:01,800
+that height is forced down to 1/2.
+
+292
+00:11:01,800 --> 00:11:03,800
+And if you increased x up to three, then
+
+293
+00:11:03,800 --> 00:11:05,280
+the other side has to be squished down
+
+294
+00:11:05,280 --> 00:11:07,080
+to 1/3.
+
+295
+00:11:07,080 --> 00:11:08,680
+This is a nice way to think about the
+
+296
+00:11:08,680 --> 00:11:11,280
+graph of 1 / x, by the way.
+
+297
+00:11:11,280 --> 00:11:12,960
+If you think of this width x of the
+
+298
+00:11:12,960 --> 00:11:15,520
+puddle as being in the xy-plane, then
+
+299
+00:11:15,520 --> 00:11:18,520
+that corresponding output 1 / x, the
+
+300
+00:11:18,520 --> 00:11:21,240
+height of the graph above that point, is
+
+301
+00:11:21,240 --> 00:11:22,880
+whatever the height of your puddle has
+
+302
+00:11:22,880 --> 00:11:26,280
+to be to maintain an area of one.
+
+303
+00:11:26,280 --> 00:11:28,000
+So, with this visual in mind, for the
+
+304
+00:11:28,000 --> 00:11:30,280
+derivative, imagine nudging up that
+
+305
+00:11:30,280 --> 00:11:32,640
+value of x by some tiny amount, some
+
+306
+00:11:32,640 --> 00:11:34,560
+tiny dx.
+
+307
+00:11:34,560 --> 00:11:36,520
+How must the height of this rectangle
+
+308
+00:11:36,520 --> 00:11:38,840
+change so that the area of the puddle
+
+309
+00:11:38,840 --> 00:11:41,160
+remains constant at one?
+
+310
+00:11:41,160 --> 00:11:44,080
+That is, increasing the width by dx adds
+
+311
+00:11:44,080 --> 00:11:46,480
+some new area to the right here. So, the
+
+312
+00:11:46,480 --> 00:11:48,920
+puddle has to decrease in height by some
+
+313
+00:11:48,920 --> 00:11:52,320
+d 1/x so that the area lost off of that
+
+314
+00:11:52,320 --> 00:11:56,000
+top cancels out the area gained.
+
+315
+00:11:56,000 --> 00:11:58,160
+You should think of that d 1/x as being
+
+316
+00:11:58,160 --> 00:12:00,160
+a negative amount, by the way, since
+
+317
+00:12:00,160 --> 00:12:01,720
+it's decreasing the height of the
+
+318
+00:12:01,720 --> 00:12:03,760
+rectangle.
+
+319
+00:12:03,760 --> 00:12:05,360
+And you know what? I'm going to leave
+
+320
+00:12:05,360 --> 00:12:07,320
+the last few steps here for you, for you
+
+321
+00:12:07,320 --> 00:12:08,800
+to pause and ponder and work out an
+
+322
+00:12:08,800 --> 00:12:10,440
+ultimate expression.
+
+323
+00:12:10,440 --> 00:12:12,880
+And once you reason out what d of 1/x
+
+324
+00:12:12,880 --> 00:12:15,200
+divided by dx should be, I want you to
+
+325
+00:12:15,200 --> 00:12:16,760
+compare it to what you would have gotten
+
+326
+00:12:16,760 --> 00:12:18,280
+if you had just blindly applied the
+
+327
+00:12:18,280 --> 00:12:21,000
+power rule purely symbolically to x to
+
+328
+00:12:21,000 --> 00:12:23,840
+the negative one.
+
+329
+00:12:24,160 --> 00:12:25,600
+And while I'm encouraging you to pause
+
+330
+00:12:25,600 --> 00:12:27,280
+and ponder, here's another fun challenge
+
+331
+00:12:27,280 --> 00:12:29,040
+if you're feeling up to it.
+
+332
+00:12:29,040 --> 00:12:30,560
+See if you can reason through what the
+
+333
+00:12:30,560 --> 00:12:32,440
+derivative of the square root of x
+
+334
+00:12:32,440 --> 00:12:35,080
+should be.
+
+335
+00:12:36,680 --> 00:12:38,320
+To finish things off, I want to tackle
+
+336
+00:12:38,320 --> 00:12:40,520
+one more type of function, trigonometric
+
+337
+00:12:40,520 --> 00:12:42,680
+functions. And in particular, let's
+
+338
+00:12:42,680 --> 00:12:45,200
+focus on the sine function.
+
+339
+00:12:45,200 --> 00:12:46,440
+So, for this section, I'm going to
+
+340
+00:12:46,440 --> 00:12:48,080
+assume that you're already familiar with
+
+341
+00:12:48,080 --> 00:12:50,280
+how to think about trig functions using
+
+342
+00:12:50,280 --> 00:12:52,160
+the unit circle, the circle with the
+
+343
+00:12:52,160 --> 00:12:55,160
+radius one centered at the origin.
+
+344
+00:12:55,160 --> 00:12:57,200
+For a given value of theta, like say
+
+345
+00:12:57,200 --> 00:13:00,040
+0.8, you imagine yourself walking around
+
+346
+00:13:00,040 --> 00:13:01,800
+the circle starting from the rightmost
+
+347
+00:13:01,800 --> 00:13:03,920
+point until you've traversed that
+
+348
+00:13:03,920 --> 00:13:07,080
+distance of 0.8 in arc length.
+
+349
+00:13:07,080 --> 00:13:08,480
+This is the same thing as saying that
+
+350
+00:13:08,480 --> 00:13:11,000
+the angle right here is exactly theta
+
+351
+00:13:11,000 --> 00:13:13,400
+radians since the circle has a radius of
+
+352
+00:13:13,400 --> 00:13:14,720
+one.
+
+353
+00:13:14,720 --> 00:13:17,240
+Then, what sine of theta means is the
+
+354
+00:13:17,240 --> 00:13:20,880
+height of that point above the x-axis.
+
+355
+00:13:20,880 --> 00:13:23,040
+And as your theta value increases and
+
+356
+00:13:23,040 --> 00:13:25,160
+you walk around the circle, your height
+
+357
+00:13:25,160 --> 00:13:29,040
+bobs up and down between -1 and 1.
+
+358
+00:13:29,040 --> 00:13:31,240
+So, when you graph sin of theta versus
+
+359
+00:13:31,240 --> 00:13:34,000
+theta, you get this wave pattern, the
+
+360
+00:13:34,000 --> 00:13:37,640
+quintessential wave pattern.
+
+361
+00:13:37,640 --> 00:13:39,600
+And just from looking at this graph, we
+
+362
+00:13:39,600 --> 00:13:41,520
+can start to get a feel for the shape of
+
+363
+00:13:41,520 --> 00:13:43,920
+the derivative of the sine.
+
+364
+00:13:43,920 --> 00:13:46,440
+The slope at zero is something positive,
+
+365
+00:13:46,440 --> 00:13:49,560
+since sin of theta is increasing there.
+
+366
+00:13:49,560 --> 00:13:51,080
+And as we move to the right and sin of
+
+367
+00:13:51,080 --> 00:13:53,160
+theta approaches its peak, that slope
+
+368
+00:13:53,160 --> 00:13:55,680
+goes down to zero.
+
+369
+00:13:55,680 --> 00:13:57,080
+Then the slope is negative for a little
+
+370
+00:13:57,080 --> 00:13:59,560
+while, while the sine is decreasing,
+
+371
+00:13:59,560 --> 00:14:01,560
+before coming back up to zero as the
+
+372
+00:14:01,560 --> 00:14:04,480
+sine graph levels out.
+
+373
+00:14:04,480 --> 00:14:05,720
+And as you continue thinking this
+
+374
+00:14:05,720 --> 00:14:07,360
+through and drawing it out, if you're
+
+375
+00:14:07,360 --> 00:14:08,800
+familiar with the graph of trig
+
+376
+00:14:08,800 --> 00:14:10,800
+functions, you might guess that this
+
+377
+00:14:10,800 --> 00:14:12,840
+derivative graph should be exactly
+
+378
+00:14:12,840 --> 00:14:15,200
+cosine of theta, since all the peaks and
+
+379
+00:14:15,200 --> 00:14:16,960
+valleys line up perfectly with where the
+
+380
+00:14:16,960 --> 00:14:18,320
+peaks and valleys for the cosine
+
+381
+00:14:18,320 --> 00:14:20,040
+function should be.
+
+382
+00:14:20,040 --> 00:14:22,200
+And spoiler alert, the derivative is in
+
+383
+00:14:22,200 --> 00:14:24,240
+fact the cosine of theta.
+
+384
+00:14:24,240 --> 00:14:25,680
+But aren't you a little curious about
+
+385
+00:14:25,680 --> 00:14:28,200
+why it's precisely cosine of theta? I
+
+386
+00:14:28,200 --> 00:14:29,400
+mean, you could have all sorts of
+
+387
+00:14:29,400 --> 00:14:31,040
+functions with peaks and valleys at the
+
+388
+00:14:31,040 --> 00:14:32,720
+same points that have roughly the same
+
+389
+00:14:32,720 --> 00:14:34,520
+shape, but who knows? Maybe the
+
+390
+00:14:34,520 --> 00:14:36,040
+derivative of sine could have turned out
+
+391
+00:14:36,040 --> 00:14:38,240
+to be some entirely new type of function
+
+392
+00:14:38,240 --> 00:14:39,920
+that just happens to have a similar
+
+393
+00:14:39,920 --> 00:14:41,520
+shape.
+
+394
+00:14:41,520 --> 00:14:43,880
+Well, just like the previous examples, a
+
+395
+00:14:43,880 --> 00:14:45,520
+more exact understanding of the
+
+396
+00:14:45,520 --> 00:14:47,280
+derivative requires looking at what the
+
+397
+00:14:47,280 --> 00:14:49,360
+function actually represents, rather
+
+398
+00:14:49,360 --> 00:14:50,600
+than looking at the graph of the
+
+399
+00:14:50,600 --> 00:14:52,240
+function.
+
+400
+00:14:52,240 --> 00:14:53,760
+So, think back to that walk around the
+
+401
+00:14:53,760 --> 00:14:55,080
+unit circle.
+
+402
+00:14:55,080 --> 00:14:56,720
+Having traversed an arc with length
+
+403
+00:14:56,720 --> 00:14:58,720
+theta, and thinking about sin of theta
+
+404
+00:14:58,720 --> 00:15:01,560
+as the height of that point.
+
+405
+00:15:01,560 --> 00:15:03,200
+Now, zoom in to that point on the
+
+406
+00:15:03,200 --> 00:15:06,000
+circle, and consider a slight nudge of d
+
+407
+00:15:06,000 --> 00:15:08,440
+theta along their circumference, a tiny
+
+408
+00:15:08,440 --> 00:15:10,200
+step in your walk around the unit
+
+409
+00:15:10,200 --> 00:15:11,600
+circle.
+
+410
+00:15:11,600 --> 00:15:13,760
+How much does that tiny step change the
+
+411
+00:15:13,760 --> 00:15:15,360
+sin of theta?
+
+412
+00:15:15,360 --> 00:15:17,280
+How much does this increase d theta of
+
+413
+00:15:17,280 --> 00:15:19,720
+arc length increase the height above the
+
+414
+00:15:19,720 --> 00:15:21,480
+x-axis?
+
+415
+00:15:21,480 --> 00:15:23,480
+Well, zoomed in close enough, the circle
+
+416
+00:15:23,480 --> 00:15:25,040
+basically looks like a straight line in
+
+417
+00:15:25,040 --> 00:15:26,760
+this neighborhood. So, let's go ahead
+
+418
+00:15:26,760 --> 00:15:28,920
+and think of this right triangle, where
+
+419
+00:15:28,920 --> 00:15:31,000
+the hypotenuse of that right triangle
+
+420
+00:15:31,000 --> 00:15:33,200
+represents the nudge d theta along the
+
+421
+00:15:33,200 --> 00:15:35,840
+circumference. And that left side here
+
+422
+00:15:35,840 --> 00:15:37,640
+represents the change in height, the
+
+423
+00:15:37,640 --> 00:15:40,000
+resulting d sine of theta.
+
+424
+00:15:40,000 --> 00:15:41,680
+Now, this tiny triangle is actually
+
+425
+00:15:41,680 --> 00:15:44,120
+similar to this larger triangle here
+
+426
+00:15:44,120 --> 00:15:46,320
+with the defining angle theta and whose
+
+427
+00:15:46,320 --> 00:15:48,440
+hypotenuse is the radius of the circle
+
+428
+00:15:48,440 --> 00:15:50,840
+with length one.
+
+429
+00:15:50,840 --> 00:15:52,960
+Specifically, this little angle right
+
+430
+00:15:52,960 --> 00:15:55,200
+here is precisely equal to theta
+
+431
+00:15:55,200 --> 00:15:57,240
+radians.
+
+432
+00:15:57,240 --> 00:15:59,000
+Now, think about what the derivative of
+
+433
+00:15:59,000 --> 00:16:01,280
+sine is supposed to mean.
+
+434
+00:16:01,280 --> 00:16:03,480
+It's the ratio between that d sine of
+
+435
+00:16:03,480 --> 00:16:05,560
+theta, the tiny change to the height,
+
+436
+00:16:05,560 --> 00:16:08,000
+divided by d theta, the tiny change to
+
+437
+00:16:08,000 --> 00:16:10,360
+the input of the function.
+
+438
+00:16:10,360 --> 00:16:12,040
+And from the picture, we can see that
+
+439
+00:16:12,040 --> 00:16:13,800
+that's the ratio between the length of
+
+440
+00:16:13,800 --> 00:16:16,520
+the side adjacent to the angle theta
+
+441
+00:16:16,520 --> 00:16:18,720
+divided by the hypotenuse.
+
+442
+00:16:18,720 --> 00:16:20,440
+Well, let's see. Adjacent divided by
+
+443
+00:16:20,440 --> 00:16:22,800
+hypotenuse? That's exactly what the
+
+444
+00:16:22,800 --> 00:16:24,480
+cosine of theta means. That's the
+
+445
+00:16:24,480 --> 00:16:27,480
+definition of the cosine.
+
+446
+00:16:27,480 --> 00:16:29,040
+So, this gives us two different really
+
+447
+00:16:29,040 --> 00:16:30,520
+nice ways of thinking about how the
+
+448
+00:16:30,520 --> 00:16:33,080
+derivative of sine is cosine.
+
+449
+00:16:33,080 --> 00:16:34,640
+One of them is looking at the graph and
+
+450
+00:16:34,640 --> 00:16:36,080
+getting a loose feel for the shape of
+
+451
+00:16:36,080 --> 00:16:38,120
+things based on thinking about the slope
+
+452
+00:16:38,120 --> 00:16:41,040
+of the sine graph at every single point.
+
+453
+00:16:41,040 --> 00:16:42,760
+And the other is a more precise line of
+
+454
+00:16:42,760 --> 00:16:44,640
+reasoning, looking at the unit circle
+
+455
+00:16:44,640 --> 00:16:47,000
+itself.
+
+456
+00:16:47,000 --> 00:16:48,320
+For those of you that like to pause and
+
+457
+00:16:48,320 --> 00:16:50,320
+ponder, see if you can try a similar
+
+458
+00:16:50,320 --> 00:16:51,839
+line of reasoning to find what the
+
+459
+00:16:51,839 --> 00:16:53,760
+derivative of the cosine of theta should
+
+460
+00:16:53,760 --> 00:16:56,120
+be.
+
+461
+00:16:56,600 --> 00:16:58,080
+In the next video, I'll talk about how
+
+462
+00:16:58,080 --> 00:16:59,720
+you can take derivatives of functions
+
+463
+00:16:59,720 --> 00:17:01,720
+who combine simple functions like these
+
+464
+00:17:01,720 --> 00:17:03,960
+ones, either as sums or products or
+
+465
+00:17:03,960 --> 00:17:06,439
+function compositions, things like that.
+
+466
+00:17:06,439 --> 00:17:08,040
+And similar to this video, the goal is
+
+467
+00:17:08,040 --> 00:17:09,520
+going to be to understand each one
+
+468
+00:17:09,520 --> 00:17:11,360
+geometrically in a way that makes it
+
+469
+00:17:11,360 --> 00:17:13,199
+intuitively reasonable and somewhat more
+
+470
+00:17:13,199 --> 00:17:15,920
+memorable.
+
+471
+00:17:33,320 --> 00:17:35,400
+Mhm.

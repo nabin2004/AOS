@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-022",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "LaTeX formatting for exponential and logarithmic terms",
+        "Color-coded variables {c} and {w}",
+        "Step-by-step algebraic equivalence representation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Randolph Pi Creature with dynamic expressions (raise_left_hand, pondering, tease, confused, maybe)",
+        "TransformMatchingTex transitions between formula states",
+        "SurroundingRectangle highlight with custom stroke color",
+        "Opacity reduction of background formulas"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Font size 72 for Tex formulas",
+        "Curve insertion count of 1000 for Randolph body",
+        "Stroke width of 2 for the surrounding rectangle"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inheritance from InteractiveScene",
+        "Sequential play calls with appropriate wait intervals",
+        "Blink animations integrated into the timeline"
+      ]
+    }
+  }
+}

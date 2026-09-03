@@ -1,0 +1,72 @@
+{
+  "id": "MB-028",
+  "title": "Droste Effect Print Gallery Exponential Zoom",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    20.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Complex Analysis",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL scene named `NoteThe256` that visualizes the Droste effect (conformal exponential mapping) of a print gallery image. The scene should load a log-grid texture, apply a complex exponential function (`np.exp`) to map it into a recursive Droste spiral, and set up a dynamic zooming visualization. Specifically:\n1. Create a background 'ghost' copy of the Droste image with 0.3 opacity, and a main foreground Droste image scaled by 256.\n2. Add a red bounding box (`ScreenRectangle`) that dynamically scales down based on an exponential value tracker.\n3. Clip the main Droste image to this bounding box using continuous clipping.\n4. Add a dynamic text label tracking the scale factor (e.g., '\\times 256.0') that updates its value and position relative to the bounding box as it scales.\n5. Animate the bounding box scaling down exponentially (up to a factor of 256) while simultaneously zooming the camera frame in exponentially to follow the box.\n6. Finally, zoom the camera frame back out to its original size while keeping the scaled-down box visible.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-028/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 75,
+    "scene_classes": [
+      "NoteThe256"
+    ],
+    "visual_techniques": [
+      "Droste effect conformal mapping",
+      "Dynamic camera frame scaling",
+      "Continuous box clipping",
+      "Changeable decimal tracking in Tex"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TexturedSurface",
+      "Square3D",
+      "ValueTracker",
+      "ScreenRectangle",
+      "always.clip_to_box",
+      "make_number_changeable",
+      "f_always.set_value"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing texture file 'PrintGalleryLog.png'",
+      "severity": "high",
+      "note": "The scene relies on an external texture image. If missing, the TexturedSurface will fail to initialize."
+    },
+    {
+      "pattern": "Using Manim Community Edition (CE) syntax",
+      "severity": "high",
+      "note": "Methods like `always.clip_to_box` and `make_number_changeable` are exclusive to ManimGL/3b1b's fork and do not exist in CE."
+    },
+    {
+      "pattern": "Incorrect camera zoom implementation",
+      "severity": "medium",
+      "note": "Directly updating `self.frame.set_height` requires an InteractiveScene or MovingCameraScene framework."
+    }
+  ]
+}

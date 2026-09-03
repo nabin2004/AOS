@@ -1,0 +1,74 @@
+{
+  "id": "MB-045",
+  "title": "Size of Earth Renewed - Cosmic Distance",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Astronomy",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script using InteractiveScene that visualizes the Earth, its axial tilt, and the parallel rays of light coming from the sun to demonstrate Eratosthenes' method of measuring the Earth's size.\n\nYour script should implement the following:\n1. **3D Earth Setup**: Create a 3D Earth sphere using `Sphere` and `TexturedSurface` with day and night textures. Overlay a `SurfaceMesh` on top of it. Add a grey inner shell inside the Earth.\n2. **Slicing Mechanism**: Use a `ValueTracker` to dynamically control clipping planes (`set_clip_plane`) on the Earth, inner shell, and mesh so that the Earth can be sliced open to reveal its interior.\n3. **Axial Tilt**: Rotate the Earth group to represent its actual tilt angle (23.3 degrees) and orientation.\n4. **Unflattening Animation**: Start with the Earth flattened along one axis (using `stretch(1e-3, 0)`), then animate it restoring to its full 3D spherical shape while the camera reorients.\n5. **Sun Rays**: Create a distant `GlowDot` representing the sun. Generate a series of parallel yellow lines (rays) that dynamically update their endpoints to touch the Earth's surface using an updater function.\n6. **Camera Movements**: Perform smooth camera orbits and zooms using `self.frame.reorient` to showcase the 3D nature of the Earth, the parallel rays, and the day/night shading.\n7. **Slicing Animation**: Animate the slicing tracker to cut the Earth in half, revealing the center of the Earth, and place a red `GlowDot` at the center.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-045/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "SizeOfEarthRenewed"
+    ],
+    "visual_techniques": [
+      "3D Textured Surface Rendering",
+      "Dynamic Clipping Planes",
+      "Custom Updaters for Ray Tracing",
+      "Camera Reorientation and Orbiting",
+      "Mobject Unflattening/Restoration"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame.reorient",
+      "TexturedSurface",
+      "SurfaceMesh",
+      "set_clip_plane",
+      "GlowDot",
+      "ValueTracker",
+      "Restore"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing texture files for EarthTextureMap or NightEarthTextureMap",
+      "severity": "high",
+      "note": "If the texture assets are missing in the runtime environment, TexturedSurface will fail to compile or render. Fallback to a colored sphere if textures are unavailable."
+    },
+    {
+      "pattern": "Incorrect clipping plane directions",
+      "severity": "medium",
+      "note": "Using IN instead of OUT or incorrect signs in set_clip_plane can cause the wrong half of the Earth to disappear during the slice animation."
+    },
+    {
+      "pattern": "Manim Community (CE) compatibility issues",
+      "severity": "high",
+      "note": "Attempting to run this code in Manim CE will fail because InteractiveScene, TexturedSurface, SurfaceMesh, and frame.reorient are exclusive to ManimGL."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "problem_id": "CL-002",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Distance function s(t) and velocity as derivative",
+        "Velocity = change in distance / change in time",
+        "ds/dt for small but finite dt",
+        "Derivative as limit as dt \u2192 0",
+        "Secant line slope approaching tangent line slope",
+        "Derivative of t\u00b3 = 3t\u00b2 via algebraic expansion",
+        "Paradox at t=0: derivative zero but car moves over finite interval",
+        "Derivative as best constant approximation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Car animation with distance graph",
+        "Velocity graph as bump curve",
+        "Speedometer visualization",
+        "Graph with dt and ds labeled",
+        "Secant to tangent limit process",
+        "Algebraic expansion visualization",
+        "Flat tangent line at t=0"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Specific example: t\u00b3 function",
+        "Numerical values shown (2\u00b3 = 8, derivative at 2 = 12)",
+        "Small dt examples (0.01, 0.001)",
+        "Distance at 0.1 seconds = 0.001 meters"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: physical intuition \u2192 paradox \u2192 speedometer \u2192 graph \u2192 limit \u2192 algebra \u2192 paradox resolution",
+        "Clear transitions between concepts",
+        "Physical and mathematical representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-007",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the EntropyChart showing the horizontal stacked probability distribution segments at the bottom.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "EntropyChart",
+        "StackedProbDistribution",
+        "segments"
+      ],
+      "clip_query": "A horizontal stacked bar representing a probability distribution at the bottom of the screen."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Rendering of vertical information bars on top of each probability segment, with heights proportional to -log2(p).",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "bars",
+        "always_redraw",
+        "math.log2",
+        "Rectangle"
+      ],
+      "clip_query": "Vertical bars rising from the horizontal probability segments, representing information content."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic transition of the probability distribution using ValueTrackers, causing the segments to widen/shrink and the vertical bars to change height accordingly.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "animate",
+        "set_value"
+      ],
+      "clip_query": "The horizontal segments and vertical bars dynamically resizing and shifting in real-time."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Display of mathematical labels and reference grid lines indicating the information bits scale.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        40.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "reference_lines",
+        "Tex",
+        "vertical_axis_label_text"
+      ],
+      "clip_query": "Grid lines and text labels showing the number of bits on the vertical axis."
+    }
+  ]
+}

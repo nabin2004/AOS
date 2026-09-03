@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-026",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Randolph appears at the bottom and a complex logarithm image with a label fades in at the upper-left while Randolph raises his hand.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Randolph",
+        "ImageMobject",
+        "Tex",
+        "raise_left_hand",
+        "FadeIn",
+        "Write"
+      ],
+      "clip_query": "A blue pi creature raises its hand towards a complex logarithm image in the top left corner"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Randolph blinks and changes expression to pondering.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "Blink",
+        "pondering"
+      ],
+      "clip_query": "The pi creature blinks and looks thoughtful"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A bubble is created, and the image and label shrink to fit inside the bubble.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "get_bubble",
+        "Rectangle",
+        "replace",
+        "look_at"
+      ],
+      "clip_query": "The complex logarithm image shrinks and moves inside a speech bubble next to the pi creature"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Randolph changes expression to tease and blinks.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "tease",
+        "Blink"
+      ],
+      "clip_query": "The pi creature changes expression to tease and blinks"
+    }
+  ]
+}

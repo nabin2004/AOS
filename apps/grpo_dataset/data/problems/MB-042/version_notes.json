@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-042",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient() / self.frame.move_to()",
+      "ce_equivalent": "self.set_camera_orientation() / self.renderer.camera.frame",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Updaters",
+      "gl_construct": "mobject.always.move_to()",
+      "ce_equivalent": "mobject.add_updater(lambda m: m.move_to(...))",
+      "severity": "medium"
+    },
+    {
+      "category": "Texturing",
+      "gl_construct": "TexturedSurface(Sphere(...), 'TextureName')",
+      "ce_equivalent": "ThreeDScene does not have a direct simple TexturedSurface; requires custom openGL shaders or standard material mapping in CE.",
+      "severity": "high"
+    }
+  ]
+}

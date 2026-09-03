@@ -1,0 +1,49 @@
+{
+  "problem_id": "NN-001",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "784 input neurons for 28x28 pixels",
+        "10 output neurons for digits 0-9",
+        "Hidden layers with 16 neurons each",
+        "Weights as numbers multiplying activations",
+        "Weighted sum calculation",
+        "Bias as added constant",
+        "Sigmoid activation function",
+        "Matrix notation: a^(l+1) = \u03c3(W\u00b7a^l + b)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Pixel grid visualization",
+        "Layered neural network",
+        "Neuron activation as brightness",
+        "Weighted connections (green/red)",
+        "Sigmoid curve",
+        "Matrix notation",
+        "Parameter count display"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "784 = 28\u00d728",
+        "16 neurons in hidden layers",
+        "10 output neurons",
+        "13,000 total parameters",
+        "Sigmoid range [0,1]"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: digit recognition \u2192 input layer \u2192 hidden layers \u2192 output \u2192 weights \u2192 activation \u2192 matrix notation",
+        "Clear transitions between concepts",
+        "Geometric and algebraic representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

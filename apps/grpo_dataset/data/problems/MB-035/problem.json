@@ -1,0 +1,67 @@
+{
+  "id": "MB-035",
+  "title": "Area of Circle over Square transitioning to Volume of Sphere over Cube",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Geometry",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the ratio of the area of a circle to a circumscribed square, and then dynamically transitions this concept into 3D to show the ratio of the volume of a sphere to a circumscribed cube.\n\nFirst, display a fraction representing Area(Circle) / Area(Square). Instead of text placeholders for the circle and square, embed a small blue Circle and a small red Square directly inside the Tex formula. Below this fraction, write an equals sign, the formula pi * (1)^2 / (2 * 2), and its decimal approximation (~0.785).\n\nNext, transition the scene to 3D. Transform the 2D Circle into a 3D Sphere with a white SurfaceMesh, and transform the 2D Square into a 3D VCube. Simultaneously, transform the text 'Area' into 'Volume' in the fraction. Update the formula below to represent the volume ratio: (4/3) * pi * (1)^3 / (2 * 2 * 2), and display its decimal approximation (~0.524). Ensure smooth transitions using FadeTransform and FadeTransformPieces.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-035/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "AreaCircleOverAreaSquareThenVolume"
+    ],
+    "visual_techniques": [
+      "Embedding Mobjects inside Tex formulas using replace()",
+      "Transitioning from 2D shapes to 3D shapes (Sphere, VCube)",
+      "Transforming text pieces using FadeTransformPieces",
+      "Using SurfaceMesh to give depth to 3D spheres",
+      "Deactivating depth test for custom layering"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "DecimalNumber",
+      "Sphere",
+      "SurfaceMesh",
+      "VCube",
+      "FadeTransformPieces",
+      "deactivate_depth_test"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.8,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community Cube instead of VCube or failing to handle 3D camera orientation properly.",
+      "severity": "high",
+      "note": "VCube and SurfaceMesh are specific to ManimGL. In ManimCE, standard Cube and Sphere must be used with a 3D camera scene."
+    },
+    {
+      "pattern": "Incorrect alignment when replacing Tex placeholders with Circle and Square mobjects.",
+      "severity": "medium",
+      "note": "The replacement must scale and position the shapes precisely where the Tex placeholders were."
+    }
+  ]
+}

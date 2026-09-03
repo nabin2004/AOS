@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-031",
+  "conflicts": [
+    {
+      "category": "class_inheritance",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_type",
+      "gl_construct": "GlowDots",
+      "ce_equivalent": "PMobject or custom VGroup of Dots with manual opacity decay",
+      "severity": "high"
+    },
+    {
+      "category": "method_binding",
+      "gl_construct": "f_always",
+      "ce_equivalent": "add_updater(lambda m: m.set_value(...))",
+      "severity": "medium"
+    },
+    {
+      "category": "custom_mobject_methods",
+      "gl_construct": "make_number_changeable",
+      "ce_equivalent": "Manual assembly of Tex and DecimalNumber inside a VGroup",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobjects",
+      "gl_construct": "Checkmark / Exmark",
+      "ce_equivalent": "Tex(\"\\\\checkmark\") / Tex(\"\\\\times\")",
+      "severity": "medium"
+    }
+  ]
+}

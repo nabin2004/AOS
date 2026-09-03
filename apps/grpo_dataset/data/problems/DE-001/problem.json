@@ -1,0 +1,65 @@
+{
+  "id": "DE-001",
+  "title": "Neural Network Feedforward and Activation Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a Manim visualization that demonstrates the feedforward propagation of a neural network. The network should have an architecture of 4 input neurons, two hidden layers of 3 neurons each, and 2 output neurons.\n\n1. Draw the network layers clearly, with circles representing neurons and lines representing weights connecting them.\n2. Animate the input layer lighting up with initial activation values (represented by the brightness/color of the circles).\n3. Show the step-by-step propagation of activations from the input layer, through the hidden layers, to the output layer. The connection lines (weights) should briefly glow or change color as the signal passes through them.\n4. Zoom in on or highlight a single neuron in the first hidden layer to show the mathematical formula of its activation: $a_i^{(1)} = \\sigma(\\sum w_{ij} a_j^{(0)} + b_i)$. Display this formula next to the highlighted neuron and visually link the weights and input activations to the terms in the equation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/DE-001/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "Network"
+    ],
+    "visual_techniques": [
+      "Layered network graph rendering",
+      "Edge weight opacity mapping",
+      "Sequential activation propagation",
+      "Mathematical formula overlay"
+    ],
+    "manim_api_patterns": [
+      "VGroup",
+      "Circle",
+      "Line",
+      "Tex",
+      "LaggedStart",
+      "ShowCreation",
+      "Write"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Overlapping network edges and nodes making the graph unreadable",
+      "severity": "high",
+      "note": "Ensure proper spacing between layers and nodes within layers using automated layout calculations."
+    },
+    {
+      "pattern": "Incorrect math rendering of LaTeX subscripts and superscripts",
+      "severity": "medium",
+      "note": "Double-escape LaTeX backslashes in Python strings (e.g., \\\\sigma instead of \\sigma)."
+    }
+  ]
+}

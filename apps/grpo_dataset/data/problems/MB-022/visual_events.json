@@ -1,0 +1,76 @@
+{
+  "problem_id": "MB-022",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Randolph is introduced at the bottom edge, and the initial formula e^{c * ln(w)} is written piece-by-piece with Randolph reacting.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "Randolph",
+        "eq1",
+        "Write",
+        "raise_left_hand",
+        "pondering"
+      ],
+      "clip_query": "A blue cartoon creature looking up at a math formula being written step-by-step."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The formula is simplified step-by-step through three intermediate forms using matching Tex transformations.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "TransformMatchingTex",
+        "eq2",
+        "eq3",
+        "eq4",
+        "tease"
+      ],
+      "clip_query": "Math formulas transforming step-by-step to simplify an exponential expression."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The formulas are replaced with a more complex version containing constants, transforming into a generalized simplified form.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "new_eq1",
+        "new_eq2",
+        "TransformMatchingTex",
+        "look_at"
+      ],
+      "clip_query": "A complex exponential formula transforming into a simpler form with a constant coefficient."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A teal surrounding rectangle highlights the simplified formula, the complex formula dims, and Randolph shows confused and speculative expressions.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        22.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "ShowCreation",
+        "set_opacity",
+        "confused",
+        "maybe"
+      ],
+      "clip_query": "A teal rectangle highlighting a math formula while a cartoon creature looks confused."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-035",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The 2D fraction Area(Circle)/Area(Square) is written on screen, with a blue circle and red square embedded in the formula.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "frac",
+        "circle",
+        "square",
+        "Write"
+      ],
+      "clip_query": "A math fraction showing Area of a blue circle over Area of a red square"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The formula is evaluated to pi/4 and its decimal approximation 0.785 is displayed.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "equals",
+        "rhs",
+        "approx",
+        "value"
+      ],
+      "clip_query": "The fraction is shown to equal pi over 4, which is approximately 0.785"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The 2D circle and square morph into a 3D sphere and cube, while the text 'Area' transforms into 'Volume'.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "sphere",
+        "cube",
+        "volume_words",
+        "FadeTransform"
+      ],
+      "clip_query": "The circle and square transform into a 3D sphere and cube, and the word Area changes to Volume"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The volume ratio formula (4/3)pi/8 is displayed with its decimal approximation 0.524.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "new_frac",
+        "approx",
+        "value"
+      ],
+      "clip_query": "The volume ratio is shown to equal approximately 0.524"
+    }
+  ]
+}

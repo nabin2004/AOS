@@ -1,0 +1,5 @@
+executability_gate: 1.0
+alignment_keyword: 0.3
+alignment_clip: 0.3
+coverage: 0.3
+vcer_penalty: 0.1

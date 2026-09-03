@@ -1,0 +1,69 @@
+{
+  "id": "MB-018",
+  "title": "Complex Plane and Value Tracking Warmup",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Complex Analysis"
+  ],
+  "full_prompt": "Write a Manim script using the ManimGL (or compatible InteractiveScene) framework that visualizes a transition from a 1D real number line to a 2D complex plane. \n\n1. **Real Number Line and Value Tracker**:\n   - Create a horizontal `NumberLine` ranging from -10 to 10 with a stroke width of 5, including numbers positioned below the line.\n   - Create a `ValueTracker` initialized to pi (3.14159).\n   - Create a glowing dot group consisting of a solid yellow dot and a larger glowing yellow dot (`GlowDot` with radius 0.13 and glow factor 1) at 80% opacity.\n   - Add an updater to the dot group so that its position tracks the value of the `ValueTracker` mapped to the number line's coordinates.\n   - Create a yellow text label displaying the value of the tracker formatted to 3 decimal places. Position this label dynamically above the dot group using an updater.\n   - Animate the tracker moving sequentially through the following random values: 4.137, 2.961, -0.984, -1.652, and 3.230.\n\n2. **Transition to Complex Plane**:\n   - Construct a `ComplexPlane` ranging from -10 to 10 on both axes, with coordinate labels of font size 20.\n   - Fade in the vertical imaginary axis and its coordinate labels while simultaneously fading out the number '10' on the original real number line.\n   - Align the complex plane's origin with the existing number line's origin.\n\n3. **Camera Zoom and Imaginary Unit Highlight**:\n   - Save the camera frame's state.\n   - Perform a camera reorientation/zoom focusing on the imaginary unit label 'i' (coordinate label 29 in the complex plane's label list).\n   - Use `CircleIndicate` to highlight the 'i' label.\n   - Write a formula label `= \\sqrt{-1}` next to the 'i' label and hold it for 2 seconds.\n   - Restore the camera frame to its original state and fade out the formula label.\n\n4. **Complex Value Tracker Setup**:\n   - Set up a complex value tracker initialized to `pi + e * 1j`.\n   - Create a yellow dot group at this complex coordinate.\n   - Prepare a dynamic complex label of the form `z = x + yi` where the real part is colored red and the imaginary part is colored green, ready to track the complex value tracker's position.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-018/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 95,
+    "scene_classes": [
+      "Warmup"
+    ],
+    "visual_techniques": [
+      "Dynamic value tracking with updaters",
+      "Coordinate plane transitions",
+      "Camera frame reorientation and zooming",
+      "Custom glowing dot effects",
+      "Dynamic decimal number updates within Tex templates"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "NumberLine",
+      "ComplexPlane",
+      "ValueTracker",
+      "GlowDot",
+      "TrueDot",
+      "make_number_changeable",
+      "camera.frame.save_state",
+      "camera.frame.animate.reorient",
+      "CircleIndicate"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard ManimCE without importing custom 3b1b classes like GlowDot, TrueDot, or make_number_changeable",
+      "severity": "high",
+      "note": "These classes are specific to the 3b1b/manim repository. In standard ManimCE, they must be replaced with standard Dot, custom glow effects, and DecimalNumber updaters."
+    },
+    {
+      "pattern": "Camera reorientation using camera.frame.animate.reorient in standard MovingCameraScene",
+      "severity": "high",
+      "note": "ManimCE's MovingCameraScene uses self.camera.frame.animate.move_to or set_width instead of reorient."
+    }
+  ]
+}

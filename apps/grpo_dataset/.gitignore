@@ -1,0 +1,17 @@
+# Transient GRPO artifacts
+rollouts/
+raw/
+.hf_stage/
+.venv/
+
+# Never version raw visual media assets
+**/*.mp4
+**/*.mov
+**/*.avi
+**/*.png
+**/*.jpg
+**/*.jpeg
+
+# Python cache
+__pycache__/
+*.pyc

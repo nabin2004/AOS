@@ -1,0 +1,803 @@
+1
+00:00:10,320 --> 00:00:13,160
+Let me share with you something I found particularly
+
+2
+00:00:13,160 --> 00:00:16,000
+weird when I was a student first learning calculus.
+
+3
+00:00:16,780 --> 00:00:21,540
+Let's say you have a circle with radius 5 centered at the origin of the xy plane.
+
+4
+00:00:22,140 --> 00:00:26,334
+This is something defined with the equation x2 plus y2 equals 5 squared,
+
+5
+00:00:26,334 --> 00:00:30,644
+that is, all the points on the circle are a distance 5 from the origin as
+
+6
+00:00:30,644 --> 00:00:34,897
+encapsulated by the Pythagorean theorem, where the sum of the squares of
+
+7
+00:00:34,897 --> 00:00:39,440
+the two legs on this triangle equals the square of the hypotenuse, 5 squared.
+
+8
+00:00:40,460 --> 00:00:44,923
+And suppose you want to find the slope of a tangent line to the circle,
+
+9
+00:00:44,923 --> 00:00:47,060
+maybe at the point xy equals 3,4.
+
+10
+00:00:48,140 --> 00:00:51,791
+Now if you're savvy with geometry, you might already know that this
+
+11
+00:00:51,791 --> 00:00:55,660
+tangent line is perpendicular to the radius touching it at that point.
+
+12
+00:00:56,380 --> 00:00:59,530
+But let's say you don't already know that, or maybe you want a
+
+13
+00:00:59,530 --> 00:01:02,680
+technique that generalizes to curves other than just circles.
+
+14
+00:01:03,620 --> 00:01:07,333
+As with other problems about the slopes of tangent lines to curves,
+
+15
+00:01:07,333 --> 00:01:11,379
+the key thought here is to zoom in close enough that the curve basically
+
+16
+00:01:11,379 --> 00:01:16,200
+looks just like its own tangent line, and then ask about a tiny step along that curve.
+
+17
+00:01:17,000 --> 00:01:21,431
+The y component of that little step is what you might call dy,
+
+18
+00:01:21,431 --> 00:01:27,720
+and the x component is dx, so the slope we want is the rise over run, dy divided by dx.
+
+19
+00:01:28,480 --> 00:01:31,642
+But unlike other tangent slope problems in calculus,
+
+20
+00:01:31,642 --> 00:01:36,872
+this curve is not the graph of a function, so we can't just take a simple derivative,
+
+21
+00:01:36,872 --> 00:01:41,980
+asking about the size of some tiny nudge to the output of a function caused by some
+
+22
+00:01:41,980 --> 00:01:43,500
+tiny nudge to the input.
+
+23
+00:01:44,020 --> 00:01:47,921
+x is not an input, and y is not an output, they're both
+
+24
+00:01:47,921 --> 00:01:51,680
+just interdependent values related by some equation.
+
+25
+00:01:52,820 --> 00:01:58,248
+This is what's called an implicit curve, it's just the set of all points x,
+
+26
+00:01:58,248 --> 00:02:03,820
+y that satisfy some property written in terms of the two variables, x and y.
+
+27
+00:02:04,900 --> 00:02:08,518
+The procedure for how you actually find dy, dx for curves like
+
+28
+00:02:08,518 --> 00:02:12,020
+this is the thing I found very weird as a calculus student.
+
+29
+00:02:12,660 --> 00:02:19,103
+You take the derivative of both sides like this, for x squared you write 2x times dx,
+
+30
+00:02:19,103 --> 00:02:24,334
+and similarly y squared becomes 2y times dy, and then the derivative
+
+31
+00:02:24,334 --> 00:02:28,200
+of that constant 5 squared on the right is just 0.
+
+32
+00:02:29,520 --> 00:02:32,100
+Now you can see why this feels a little strange, right?
+
+33
+00:02:32,560 --> 00:02:37,070
+What does it mean to take the derivative of an expression that has multiple
+
+34
+00:02:37,070 --> 00:02:41,640
+variables in it, and why is it that we're tacking on dy and dx in this way?
+
+35
+00:02:42,400 --> 00:02:46,078
+But if you just blindly move forward with what you get,
+
+36
+00:02:46,078 --> 00:02:51,228
+you can rearrange this equation and find an expression for dy divided by dx,
+
+37
+00:02:51,228 --> 00:02:55,240
+which in this case comes out to be negative x divided by y.
+
+38
+00:02:56,040 --> 00:02:59,851
+So at the point with coordinates x, y equals 3, 4,
+
+39
+00:02:59,851 --> 00:03:04,120
+that slope would be negative 3 divided by 4, evidently.
+
+40
+00:03:05,060 --> 00:03:08,860
+This strange process is called implicit differentiation.
+
+41
+00:03:09,620 --> 00:03:12,663
+Don't worry, I have an explanation for how you can interpret
+
+42
+00:03:12,663 --> 00:03:16,060
+taking a derivative of an expression with two variables like this.
+
+43
+00:03:16,580 --> 00:03:20,986
+But first I want to set aside this particular problem and show how it's connected
+
+44
+00:03:20,986 --> 00:03:25,500
+to a different type of calculus problem, something called a related rates problem.
+
+45
+00:03:26,320 --> 00:03:30,392
+Imagine a 5 meter long ladder held up against a wall where the top
+
+46
+00:03:30,392 --> 00:03:33,353
+of the ladder starts 4 meters above the ground,
+
+47
+00:03:33,353 --> 00:03:38,720
+which by the Pythagorean theorem means that the bottom is 3 meters away from the wall.
+
+48
+00:03:39,620 --> 00:03:42,700
+And let's say it's slipping down in such a way that the top
+
+49
+00:03:42,700 --> 00:03:45,780
+of the ladder is dropping at a rate of 1 meter per second.
+
+50
+00:03:46,760 --> 00:03:50,221
+The question is, in that initial moment, what's the rate at
+
+51
+00:03:50,221 --> 00:03:53,800
+which the bottom of the ladder is moving away from the wall?
+
+52
+00:03:55,000 --> 00:03:56,200
+It's interesting, right?
+
+53
+00:03:56,480 --> 00:04:00,356
+That distance from the bottom of the ladder to the wall is 100%
+
+54
+00:04:00,356 --> 00:04:04,540
+determined by the distance from the top of the ladder to the floor.
+
+55
+00:04:05,120 --> 00:04:08,844
+So we should have enough information to figure out how the rates of
+
+56
+00:04:08,844 --> 00:04:12,345
+change for each of those values actually depend on each other,
+
+57
+00:04:12,345 --> 00:04:16,180
+but it might not be entirely clear how exactly you relate those two.
+
+58
+00:04:16,800 --> 00:04:21,566
+First things first, it's always nice to give names to the quantities that we care about,
+
+59
+00:04:21,566 --> 00:04:25,790
+so let's label that distance from the top of the ladder to the ground y of t,
+
+60
+00:04:25,790 --> 00:04:28,660
+written as a function of time because it's changing.
+
+61
+00:04:29,680 --> 00:04:33,900
+Likewise, label the distance between the bottom of the ladder and the wall x of t.
+
+62
+00:04:34,820 --> 00:04:39,480
+The key equation that relates these terms is the Pythagorean theorem,
+
+63
+00:04:39,480 --> 00:04:43,060
+x of t squared plus y of t squared equals 5 squared.
+
+64
+00:04:43,920 --> 00:04:48,540
+What makes that a powerful equation to use is that it's true at all points of time.
+
+65
+00:04:50,300 --> 00:04:54,159
+One way that you could solve this would be to isolate x of t,
+
+66
+00:04:54,159 --> 00:04:59,346
+and then figure out what y of t has to be based on that 1 m per second drop rate,
+
+67
+00:04:59,346 --> 00:05:03,584
+and you could take the derivative of the resulting function dx dt,
+
+68
+00:05:03,584 --> 00:05:07,000
+the rate at which x is changing with respect to time.
+
+69
+00:05:07,860 --> 00:05:10,979
+That's fine, it involves a couple layers of using the chain rule,
+
+70
+00:05:10,979 --> 00:05:15,249
+and it'll definitely work for you, but I want to show a different way that you can think
+
+71
+00:05:15,249 --> 00:05:16,400
+about the same problem.
+
+72
+00:05:17,320 --> 00:05:21,080
+This left hand side of the equation is a function of time, right?
+
+73
+00:05:21,440 --> 00:05:26,101
+It just so happens to equal a constant, meaning the value evidently doesn't change
+
+74
+00:05:26,101 --> 00:05:30,535
+while time passes, but it's still written as an expression dependent on time,
+
+75
+00:05:30,535 --> 00:05:35,140
+which means we can manipulate it like any other function that has t as an input.
+
+76
+00:05:36,060 --> 00:05:40,196
+In particular, we can take a derivative of this left hand side,
+
+77
+00:05:40,196 --> 00:05:45,184
+which is a way of saying if I let a little bit of time pass, some small dt,
+
+78
+00:05:45,184 --> 00:05:49,386
+which causes y to slightly decrease and x to slightly increase,
+
+79
+00:05:49,386 --> 00:05:51,880
+how much does this expression change?
+
+80
+00:05:53,000 --> 00:05:55,991
+On the one hand, we know that the derivative should be 0,
+
+81
+00:05:55,991 --> 00:06:00,556
+since the expression is a constant, and constants don't care about your tiny nudges in
+
+82
+00:06:00,556 --> 00:06:02,340
+time, they just remain unchanged.
+
+83
+00:06:03,080 --> 00:06:06,520
+But on the other hand, what do you get when you compute this derivative?
+
+84
+00:06:08,020 --> 00:06:14,120
+Well, the derivative of x of t squared is 2 times x of t times the derivative of x.
+
+85
+00:06:14,440 --> 00:06:16,980
+That's the chain rule that I talked about last video.
+
+86
+00:06:17,620 --> 00:06:23,667
+2x dx represents the size of a change to x squared caused by some change to x,
+
+87
+00:06:23,667 --> 00:06:26,380
+and then we're dividing out by dt.
+
+88
+00:06:27,500 --> 00:06:30,755
+Likewise, the rate at which y of t squared is
+
+89
+00:06:30,755 --> 00:06:34,660
+changing is 2 times y of t times the derivative of y.
+
+90
+00:06:35,740 --> 00:06:38,403
+Now evidently, this whole expression must be 0,
+
+91
+00:06:38,403 --> 00:06:42,823
+and that's an equivalent way of saying that x squared plus y squared must not
+
+92
+00:06:42,823 --> 00:06:44,580
+change while the ladder moves.
+
+93
+00:06:45,880 --> 00:06:49,927
+At the very start, time t equals 0, the height, y of t,
+
+94
+00:06:49,927 --> 00:06:53,680
+is 4 meters, and that distance x of t is 3 meters.
+
+95
+00:06:54,480 --> 00:06:59,589
+And since the top of the ladder is dropping at a rate of 1 meter per second,
+
+96
+00:06:59,589 --> 00:07:03,420
+that derivative, dy dt, is negative 1 meters per second.
+
+97
+00:07:04,460 --> 00:07:08,848
+Now, this gives us enough information to isolate the derivative, dx dt,
+
+98
+00:07:08,848 --> 00:07:13,360
+and when you work it out, it comes out to be 4 thirds meters per second.
+
+99
+00:07:14,380 --> 00:07:17,925
+The reason I bring up this ladder problem is that I want you to compare
+
+100
+00:07:17,925 --> 00:07:21,520
+it to the problem of finding the slope of a tangent line to the circle.
+
+101
+00:07:22,360 --> 00:07:26,619
+In both cases, we had the equation x squared plus y squared equals 5 squared,
+
+102
+00:07:26,619 --> 00:07:31,320
+and in both cases we ended up taking the derivative of each side of this expression.
+
+103
+00:07:32,200 --> 00:07:36,173
+But for the ladder question, these expressions were functions of time,
+
+104
+00:07:36,173 --> 00:07:38,784
+so taking the derivative has a clear meaning,
+
+105
+00:07:38,784 --> 00:07:42,360
+it's the rate at which the expression changes as time changes.
+
+106
+00:07:43,260 --> 00:07:48,438
+But what makes the circle situation strange is that rather than saying that a small
+
+107
+00:07:48,438 --> 00:07:52,306
+amount of time dt has passed, which causes x and y to change,
+
+108
+00:07:52,306 --> 00:07:56,798
+the derivative just has these tiny nudges dx and dy just floating free,
+
+109
+00:07:56,798 --> 00:07:59,980
+not tied to some other common variable, like time.
+
+110
+00:08:01,140 --> 00:08:02,980
+Let me show you a nice way to think about this.
+
+111
+00:08:03,240 --> 00:08:07,440
+Let's give this expression x squared plus y squared a name, maybe s.
+
+112
+00:08:08,240 --> 00:08:11,060
+s is essentially a function of two variables.
+
+113
+00:08:11,880 --> 00:08:15,660
+It takes every point xy on the plane and associates it with a number.
+
+114
+00:08:16,620 --> 00:08:19,660
+For points on the circle, that number happens to be 25.
+
+115
+00:08:20,560 --> 00:08:24,400
+If you stepped off the circle away from the center, that value would be bigger.
+
+116
+00:08:25,060 --> 00:08:29,689
+For other points xy closer to the origin, that value would be smaller.
+
+117
+00:08:29,689 --> 00:08:34,847
+Now what it means to take a derivative of this expression, a derivative of s,
+
+118
+00:08:34,847 --> 00:08:40,336
+is to consider a tiny change to both of these variables, some tiny change dx to x,
+
+119
+00:08:40,336 --> 00:08:45,891
+and some tiny change dy to y, and not necessarily one that keeps you on the circle,
+
+120
+00:08:45,891 --> 00:08:50,520
+by the way, it's just any tiny step in any direction of the xy plane.
+
+121
+00:08:51,520 --> 00:08:55,020
+From there you ask how much does the value of s change?
+
+122
+00:08:56,000 --> 00:09:01,632
+That difference, the difference in the value of s before the nudge and after the nudge,
+
+123
+00:09:01,632 --> 00:09:03,380
+is what I'm writing as ds.
+
+124
+00:09:04,480 --> 00:09:09,882
+For example, in this picture we're starting off at a point where
+
+125
+00:09:09,882 --> 00:09:15,031
+x equals 3 and where y equals 4, and let's just say that the
+
+126
+00:09:15,031 --> 00:09:20,180
+step I drew has dx at negative 0.02 and dy at negative 0.01.
+
+127
+00:09:21,120 --> 00:09:28,233
+Then the decrease in s, the amount that x squared plus y squared changes over that step,
+
+128
+00:09:28,233 --> 00:09:34,780
+would be about 2 times 3 times negative 0.02 plus 2 times 4 times negative 0.01.
+
+129
+00:09:35,600 --> 00:09:40,800
+That's what this derivative expression, 2x dx plus 2y dy, actually means.
+
+130
+00:09:41,380 --> 00:09:46,657
+It's a recipe for telling you how much the value x squared plus y squared changes as
+
+131
+00:09:46,657 --> 00:09:52,060
+determined by the point xy where you start and the tiny step dx dy that you take. And
+
+132
+00:09:53,080 --> 00:09:56,631
+As with all things derivative, this is only an approximation,
+
+133
+00:09:56,631 --> 00:10:01,580
+but it's one that gets truer and truer for smaller and smaller choices of dx and dy.
+
+134
+00:10:02,500 --> 00:10:07,053
+The key point here is that when you restrict yourself to steps along the circle,
+
+135
+00:10:07,053 --> 00:10:11,720
+you're essentially saying you want to ensure that this value of s doesn't change.
+
+136
+00:10:12,240 --> 00:10:16,520
+It starts at a value of 25 and you want to keep it at a value of 25.
+
+137
+00:10:17,180 --> 00:10:19,100
+That is, ds should be 0.
+
+138
+00:10:20,200 --> 00:10:25,090
+So setting the expression 2x dx plus 2y dy equal to 0 is the condition
+
+139
+00:10:25,090 --> 00:10:29,700
+under which one of these tiny steps actually stays on the circle.
+
+140
+00:10:30,620 --> 00:10:32,460
+Again, this is only an approximation.
+
+141
+00:10:33,040 --> 00:10:36,430
+Speaking more precisely, that condition is what keeps you
+
+142
+00:10:36,430 --> 00:10:39,880
+on the tangent line of the circle, not the circle itself.
+
+143
+00:10:40,580 --> 00:10:43,900
+But for tiny enough steps, those are essentially the same thing.
+
+144
+00:10:45,180 --> 00:10:47,762
+Of course, there's nothing special about the expression
+
+145
+00:10:47,762 --> 00:10:49,780
+x squared plus y squared equals 5 squared.
+
+146
+00:10:50,440 --> 00:10:53,521
+It's always nice to think through more examples,
+
+147
+00:10:53,521 --> 00:10:57,500
+so let's consider this expression sin of x times y2 equals x.
+
+148
+00:10:58,160 --> 00:11:01,640
+This corresponds to a whole bunch of u-shaped curves on the plane.
+
+149
+00:11:02,420 --> 00:11:06,880
+And those curves, remember, represent all of the points xy where the
+
+150
+00:11:06,880 --> 00:11:11,340
+value of sine of x times y squared happens to equal the value of x.
+
+151
+00:11:16,000 --> 00:11:19,558
+Now imagine taking some tiny step with components dx and dy,
+
+152
+00:11:19,558 --> 00:11:22,700
+and not necessarily one that keeps you on the curve.
+
+153
+00:11:23,820 --> 00:11:27,661
+Taking the derivative of each side of this equation will tell
+
+154
+00:11:27,661 --> 00:11:31,440
+us how much the value of that side changes during the step.
+
+155
+00:11:32,460 --> 00:11:35,526
+On the left side, the product rule that we talked through last
+
+156
+00:11:35,526 --> 00:11:38,840
+video tells us that this should be left d right plus right d left.
+
+157
+00:11:39,480 --> 00:11:44,956
+That is sine of x times the change to y squared, which is 2y times dy,
+
+158
+00:11:44,956 --> 00:11:50,980
+plus y squared times the change to sine of x, which is cosine of x times dx.
+
+159
+00:11:52,020 --> 00:11:56,943
+The right side is simply x, so the size of a change to that value is exactly dx,
+
+160
+00:11:56,943 --> 00:11:57,620
+right? Now
+
+161
+00:11:59,160 --> 00:12:04,318
+setting these two sides equal to each other is a way of saying whatever your tiny
+
+162
+00:12:04,318 --> 00:12:09,094
+step with coordinates dx and dy is, if it's going to keep us on the curve,
+
+163
+00:12:09,094 --> 00:12:14,252
+the values of both the left hand side and the right hand side must change by the
+
+164
+00:12:14,252 --> 00:12:15,080
+same amount.
+
+165
+00:12:15,640 --> 00:12:18,860
+That's the only way this top equation can remain true.
+
+166
+00:12:20,220 --> 00:12:23,735
+From there, depending on what problem you're trying to solve,
+
+167
+00:12:23,735 --> 00:12:26,443
+you have something to work with algebraically,
+
+168
+00:12:26,443 --> 00:12:31,110
+and maybe the most common goal is to try to figure out what dy divided by dx is.
+
+169
+00:12:33,210 --> 00:12:37,671
+As a final example here, I want to show you how you can use this technique
+
+170
+00:12:37,671 --> 00:12:41,710
+of implicit differentiation to figure out new derivative formulas.
+
+171
+00:12:42,630 --> 00:12:46,099
+I've mentioned that the derivative of e to the x is itself,
+
+172
+00:12:46,099 --> 00:12:50,626
+but what about the derivative of its inverse function, the natural log of x?
+
+173
+00:12:50,626 --> 00:12:55,270
+Well the graph of the natural log of x can be thought of as an implicit curve.
+
+174
+00:12:56,050 --> 00:13:00,830
+It's all of the points xy on the plane where y happens to equal ln of x.
+
+175
+00:13:01,550 --> 00:13:04,607
+It just happens to be the case that the x's and y's of this
+
+176
+00:13:04,607 --> 00:13:08,130
+equation aren't as intermingled as they were in our other examples.
+
+177
+00:13:09,350 --> 00:13:15,410
+The slope of this graph, dy divided by dx, should be the derivative of ln of x, right?
+
+178
+00:13:16,650 --> 00:13:20,500
+Well to find that, first rearrange this equation
+
+179
+00:13:20,500 --> 00:13:24,030
+y equals ln of x to be e to the y equals x.
+
+180
+00:13:24,650 --> 00:13:30,850
+This is exactly what the natural log of x means, it's saying e to the what equals x.
+
+181
+00:13:31,870 --> 00:13:35,963
+Since we know the derivative of e to the y, we can take the derivative
+
+182
+00:13:35,963 --> 00:13:39,472
+of both sides here, effectively asking how a tiny step with
+
+183
+00:13:39,472 --> 00:13:43,390
+components dx and dy changes the value of each one of these sides.
+
+184
+00:13:44,530 --> 00:13:50,074
+To ensure that a step stays on the curve, the change to the left side of the equation,
+
+185
+00:13:50,074 --> 00:13:54,651
+which is e to the y times dy, must equal the change to the right side,
+
+186
+00:13:54,651 --> 00:13:56,650
+which in this case is just dx.
+
+187
+00:13:57,870 --> 00:14:03,445
+Rearranging, that means dy divided by dx, the slope of our graph,
+
+188
+00:14:03,445 --> 00:14:06,190
+equals 1 divided by e to the y.
+
+189
+00:14:06,910 --> 00:14:11,756
+When we're on the curve, e to the y is by definition the same thing as x,
+
+190
+00:14:11,756 --> 00:14:14,610
+so evidently this slope is 1 divided by x.
+
+191
+00:14:15,830 --> 00:14:19,926
+And of course, an expression for the slope of a graph of a function
+
+192
+00:14:19,926 --> 00:14:24,084
+written in terms of x like this is the derivative of that function,
+
+193
+00:14:24,084 --> 00:14:27,630
+so evidently the derivative of ln of x is 1 divided by x.
+
+194
+00:14:32,610 --> 00:14:37,134
+By the way, all of this is a little sneak peek into multivariable calculus,
+
+195
+00:14:37,134 --> 00:14:40,935
+where you consider functions that have multiple inputs and how
+
+196
+00:14:40,935 --> 00:14:43,830
+they change as you tweak those multiple inputs.
+
+197
+00:14:44,870 --> 00:14:48,878
+The key, as always, is to have a clear image in your head of what
+
+198
+00:14:48,878 --> 00:14:53,070
+tiny nudges are at play, and how exactly they depend on each other.
+
+199
+00:14:54,530 --> 00:14:56,882
+Next up, I'm going to be talking about limits,
+
+200
+00:14:56,882 --> 00:14:59,950
+and how they're used to formalize the idea of a derivative.
+
+201
+00:15:17,490 --> 00:15:22,730
+Thank you.

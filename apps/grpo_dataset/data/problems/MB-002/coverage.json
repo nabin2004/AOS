@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-002",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Information formula: -log2(p_i)",
+        "Probability sum constraint: sum(p_i) = 1",
+        "Logarithmic scaling of vertical heights"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Horizontal stacked bar representing probability distribution",
+        "Vertical bars representing information content",
+        "Color gradient/interpolation across the bars",
+        "Horizontal reference grid lines with bit labels"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTrackers driving the probability values",
+        "Safe thresholding to prevent log2(0) errors",
+        "Accurate coordinate mapping from bit values to screen heights"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom EntropyChart VGroup class",
+        "Updaters linking horizontal segment widths to vertical bar heights and positions",
+        "Clean separation of chart initialization and animation logic"
+      ]
+    }
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "problem_id": "CL-006",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Circle x\u00b2 + y\u00b2 = 25 shown with point (3,4) and tangent line question",
+      "weight": 0.0851,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "Circle",
+        "equation",
+        "point",
+        "tangent",
+        "slope"
+      ],
+      "clip_query": "circle with point (3,4) and tangent line question"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Pythagorean theorem shown: x\u00b2 + y\u00b2 = 5\u00b2 with labels",
+      "weight": 0.0638,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        16.0
+      ],
+      "keyword_bank": [
+        "Pythagorean",
+        "x",
+        "y",
+        "5",
+        "triangle"
+      ],
+      "clip_query": "right triangle with sides labeled x, y, 5"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Zoom in on circle showing dx and dy as tiny step components",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        16.0,
+        26.0
+      ],
+      "keyword_bank": [
+        "zoom",
+        "dx",
+        "dy",
+        "step",
+        "tangent"
+      ],
+      "clip_query": "zoomed view of circle with dx and dy labeled"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "S = x\u00b2 + y\u00b2 introduced as function of two variables",
+      "weight": 0.0851,
+      "critical": true,
+      "expected_time_range": [
+        26.0,
+        34.0
+      ],
+      "keyword_bank": [
+        "S",
+        "function",
+        "two_variables",
+        "x\u00b2+y\u00b2"
+      ],
+      "clip_query": "S = x\u00b2 + y\u00b2 appearing as function label"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "dS = 2x\u00b7dx + 2y\u00b7dy derived as change in S for tiny step",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        34.0,
+        44.0
+      ],
+      "keyword_bank": [
+        "dS",
+        "2x",
+        "dx",
+        "2y",
+        "dy"
+      ],
+      "clip_query": "equation showing dS = 2x\u00b7dx + 2y\u00b7dy"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "For steps along circle, dS = 0, giving slope dy/dx = -x/y",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        44.0,
+        50.0
+      ],
+      "keyword_bank": [
+        "dS=0",
+        "slope",
+        "dy/dx",
+        "-x/y"
+      ],
+      "clip_query": "equation showing dy/dx = -x/y"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Ladder problem introduced: 5m ladder slipping down wall",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        50.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "ladder",
+        "wall",
+        "5m",
+        "slipping"
+      ],
+      "clip_query": "3D ladder leaning against wall"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "x(t) and y(t) labeled with Pythagorean equation x\u00b2 + y\u00b2 = 25",
+      "weight": 0.0851,
+      "critical": true,
+      "expected_time_range": [
+        60.0,
+        70.0
+      ],
+      "keyword_bank": [
+        "x(t)",
+        "y(t)",
+        "Pythagorean",
+        "ladder"
+      ],
+      "clip_query": "ladder with x and y labels and equation"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Taking derivative with respect to time: 2x\u00b7dx/dt + 2y\u00b7dy/dt = 0",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        70.0,
+        80.0
+      ],
+      "keyword_bank": [
+        "dt",
+        "dx/dt",
+        "dy/dt",
+        "derivative",
+        "time"
+      ],
+      "clip_query": "equation with dx/dt and dy/dt terms"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Numerical values plugged in: x=3, y=4, dy/dt=-1, solve for dx/dt",
+      "weight": 0.0851,
+      "critical": false,
+      "expected_time_range": [
+        80.0,
+        86.0
+      ],
+      "keyword_bank": [
+        "3",
+        "4",
+        "-1",
+        "dx/dt",
+        "4/3"
+      ],
+      "clip_query": "numerical substitution solving for dx/dt"
+    },
+    {
+      "event_id": "ev_11",
+      "description": "Derivative of ln(x) found via implicit differentiation: e^y = x",
+      "weight": 0.1064,
+      "critical": true,
+      "expected_time_range": [
+        86.0,
+        96.0
+      ],
+      "keyword_bank": [
+        "ln(x)",
+        "e^y",
+        "implicit",
+        "1/x"
+      ],
+      "clip_query": "natural log graph with derivative formula"
+    }
+  ]
+}

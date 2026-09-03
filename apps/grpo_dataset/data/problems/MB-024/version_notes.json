@@ -1,0 +1,26 @@
+{
+  "problem_id": "MB-024",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high",
+      "note": "InteractiveScene is exclusive to ManimGL. In Manim Community Edition, standard Scene must be used, and interactive features or specific camera controls must be adapted manually."
+    },
+    {
+      "category": "mobject_methods",
+      "gl_construct": "apply_complex_function",
+      "ce_equivalent": "apply_function",
+      "severity": "medium",
+      "note": "apply_complex_function is highly optimized in ManimGL. In ManimCE, apply_function can be used by converting 3D coordinates (x, y, z) to complex numbers, applying the function, and converting back to 3D space."
+    },
+    {
+      "category": "3d_rendering",
+      "gl_construct": "TexturedSurface / Square3D",
+      "ce_equivalent": "ParametricSurface with image texture mapping",
+      "severity": "high",
+      "note": "TexturedSurface and Square3D are specialized OpenGL constructs in ManimGL. Porting this to ManimCE requires custom shader/texture mapping or using standard 2D image mobjects with warp functions."
+    }
+  ]
+}

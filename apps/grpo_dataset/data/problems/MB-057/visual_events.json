@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-057",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Laser pointer is added and the laser beam is created with a non-linear rate function.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "pointer",
+        "beam",
+        "ShowCreation"
+      ],
+      "clip_query": "A laser pointer on the left shoots a beam to the right in a 3D scene."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Polarization wave fades in and the camera frame slowly rotates to reveal the 3D wave structure.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        11.0
+      ],
+      "keyword_bank": [
+        "wave",
+        "VFadeIn",
+        "frame.animate.reorient"
+      ],
+      "clip_query": "A 3D wave propagating along a laser beam as the camera rotates."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "In-situ and corner coordinate planes are added, and a dynamic vector updates its position on the corner plane.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        11.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "plane_in_situ",
+        "corner_plane",
+        "corner_vector",
+        "add_updater"
+      ],
+      "clip_query": "A 2D coordinate plane in the corner showing a dynamic vector tracking the wave's amplitude."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A semi-transparent beam splitter cube and its corresponding rotated 3D axes are added along the beam path.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "splitter",
+        "Cube",
+        "ThreeDAxes",
+        "split_axes"
+      ],
+      "clip_query": "A semi-transparent cube representing a beam splitter is placed along the path of a 3D wave."
+    }
+  ]
+}

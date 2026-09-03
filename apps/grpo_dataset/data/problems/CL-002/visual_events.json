@@ -1,0 +1,218 @@
+{
+  "problem_id": "CL-002",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Car moving from A to B with distance vs time graph being drawn",
+      "weight": 0.0909,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "Car",
+        "distance",
+        "time",
+        "graph",
+        "s(t)"
+      ],
+      "clip_query": "car moving with distance vs time graph drawn simultaneously"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Velocity vs time graph shown as the derivative of distance function",
+      "weight": 0.0727,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "velocity",
+        "v(t)",
+        "derivative",
+        "graph"
+      ],
+      "clip_query": "bump-shaped velocity graph appearing"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Snapshot of car with question 'How fast is this car going?' showing velocity at a single moment makes no sense",
+      "weight": 0.0727,
+      "critical": false,
+      "expected_time_range": [
+        18.0,
+        24.0
+      ],
+      "keyword_bank": [
+        "snapshot",
+        "velocity",
+        "instant",
+        "question"
+      ],
+      "clip_query": "frozen car with question mark and flash"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Two car states shown with equation: velocity = (change in distance)/(change in time)",
+      "weight": 0.0727,
+      "critical": false,
+      "expected_time_range": [
+        24.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "velocity",
+        "change",
+        "distance",
+        "time",
+        "equation"
+      ],
+      "clip_query": "two car positions with formula for velocity"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Speedometer showing velocity over small time interval dt with distance ds",
+      "weight": 0.0909,
+      "critical": true,
+      "expected_time_range": [
+        30.0,
+        38.0
+      ],
+      "keyword_bank": [
+        "speedometer",
+        "dt",
+        "ds",
+        "velocity",
+        "tiny"
+      ],
+      "clip_query": "speedometer measuring over small time interval"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "Zoom in on graph showing ds/dt as slope between two close points",
+      "weight": 0.1091,
+      "critical": true,
+      "expected_time_range": [
+        38.0,
+        48.0
+      ],
+      "keyword_bank": [
+        "ds",
+        "dt",
+        "slope",
+        "rise",
+        "run"
+      ],
+      "clip_query": "zoomed graph showing dt and ds with slope line"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Secant line approaching tangent line as dt \u2192 0",
+      "weight": 0.1091,
+      "critical": true,
+      "expected_time_range": [
+        48.0,
+        58.0
+      ],
+      "keyword_bank": [
+        "secant",
+        "tangent",
+        "limit",
+        "dt",
+        "approaches"
+      ],
+      "clip_query": "secant lines getting closer to tangent line"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "Definition of derivative: ds/dt as dt \u2192 0",
+      "weight": 0.0727,
+      "critical": false,
+      "expected_time_range": [
+        58.0,
+        64.0
+      ],
+      "keyword_bank": [
+        "derivative",
+        "limit",
+        "dt",
+        "approaches",
+        "zero"
+      ],
+      "clip_query": "equation showing derivative equals limit as dt approaches zero"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Algebraic expansion of (2+dt)\u00b3 to find derivative of t\u00b3 at t=2",
+      "weight": 0.1091,
+      "critical": true,
+      "expected_time_range": [
+        64.0,
+        76.0
+      ],
+      "keyword_bank": [
+        "t\u00b3",
+        "expand",
+        "cancel",
+        "dt",
+        "simplify"
+      ],
+      "clip_query": "algebra showing expansion of (2+dt)\u00b3 with cancelling terms"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Derivative of t\u00b3 = 3t\u00b2, beautiful simplification",
+      "weight": 0.0545,
+      "critical": false,
+      "expected_time_range": [
+        76.0,
+        80.0
+      ],
+      "keyword_bank": [
+        "derivative",
+        "3t\u00b2",
+        "beautiful",
+        "simple"
+      ],
+      "clip_query": "equation d/dt(t\u00b3) = 3t\u00b2 appearing"
+    },
+    {
+      "event_id": "ev_11",
+      "description": "Paradox at t=0: derivative is 0 but car moves over finite intervals",
+      "weight": 0.0909,
+      "critical": false,
+      "expected_time_range": [
+        80.0,
+        88.0
+      ],
+      "keyword_bank": [
+        "paradox",
+        "t=0",
+        "derivative",
+        "zero",
+        "moving"
+      ],
+      "clip_query": "point at origin with flat tangent line, question 'is the car moving?'"
+    },
+    {
+      "event_id": "ev_12",
+      "description": "Conclusion: derivative is the best constant approximation for rate of change",
+      "weight": 0.0547,
+      "critical": false,
+      "expected_time_range": [
+        88.0,
+        94.0
+      ],
+      "keyword_bank": [
+        "best",
+        "constant",
+        "approximation",
+        "rate",
+        "change"
+      ],
+      "clip_query": "text explaining derivative as best constant approximation"
+    }
+  ]
+}

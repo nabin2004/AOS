@@ -1,0 +1,46 @@
+{
+  "problem_id": "MB-045",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "EARTH_TILT_ANGLE",
+        "ValueTracker",
+        "np.linspace",
+        "math.sqrt",
+        "rotate_vector"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Sphere",
+        "TexturedSurface",
+        "SurfaceMesh",
+        "GlowDot",
+        "set_clip_plane",
+        "reorient",
+        "inner_shell"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "radius = 3.0",
+        "EARTH_TILT_ANGLE = 23.3 * DEG",
+        "n_rays = 25",
+        "opacity = 0.25"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene",
+        "construct",
+        "add_updater",
+        "Restore",
+        "save_state"
+      ]
+    }
+  }
+}

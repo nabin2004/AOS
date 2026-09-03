@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-008",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Convex hull calculation using scipy.spatial",
+        "Khachiyan algorithm for minimum volume enclosing ellipsoid",
+        "Eigenvalue/eigenvector decomposition for ellipse rotation angle",
+        "Distance metrics representation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Custom document icons with text labels",
+        "Smoothly rendered surrounding ellipses",
+        "Clustered layout of document nodes",
+        "Clear visual distinction between clusters"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Correct calculation of ellipse width and height based on eigenvalues",
+        "Iterative optimization tolerance handling",
+        "Robust fallback dimensions when points are collinear"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Implementation of LanguageTextExample class",
+        "Implementation of SurroundingEllipse class with custom surround method",
+        "Clean separation of geometric optimization logic and animation logic"
+      ]
+    }
+  }
+}

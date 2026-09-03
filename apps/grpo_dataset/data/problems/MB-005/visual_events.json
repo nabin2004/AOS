@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-005",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render the base stacked probability distribution segments representing the probability of each event.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "StackedProbDistribution",
+        "initial_distribution",
+        "segments"
+      ],
+      "clip_query": "A horizontal bar divided into segments of varying widths representing a probability distribution."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Render vertical information bars above each probability segment, with heights proportional to negative log-probability.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "Rectangle",
+        "math.log2",
+        "bar_height",
+        "interpolate_color"
+      ],
+      "clip_query": "Vertical bars of varying heights standing on top of horizontal segments, colored in a blue-to-teal gradient."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Display horizontal reference grid lines and numerical labels indicating information bits on the vertical axis.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        6.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "reference_lines",
+        "Line",
+        "Tex",
+        "vertical_axis_label_text"
+      ],
+      "clip_query": "Horizontal grid lines with integer labels showing information bits next to the vertical bars."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate a dynamic transition where the probability distribution shifts, causing the segments and information bars to resize and reposition smoothly.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "add_updater",
+        "set_value",
+        "animate"
+      ],
+      "clip_query": "The widths of the horizontal segments and the heights of the vertical bars changing dynamically and smoothly."
+    }
+  ]
+}

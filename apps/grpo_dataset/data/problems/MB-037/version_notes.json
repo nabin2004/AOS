@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-037",
+  "conflicts": [
+    {
+      "category": "3D Scene and Camera",
+      "gl_construct": "InteractiveScene and self.frame.reorient",
+      "ce_equivalent": "ThreeDScene and self.set_camera_orientation",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Sorting",
+      "gl_construct": "always_sort_to_camera",
+      "ce_equivalent": "Not directly available in CE; requires manual depth sorting or standard 3D rendering engine handling",
+      "severity": "medium"
+    }
+  ]
+}

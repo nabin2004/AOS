@@ -1,0 +1,74 @@
+{
+  "id": "MB-049",
+  "title": "Inverse Square Law 3D Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    45.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script to visualize the Inverse Square Law in 3D. Create a scene named `InverseSquareLaw` inheriting from `InteractiveScene`. \n\n1. **Setup and Initial Sphere**: \n   - Reorient the camera frame to a 3D perspective (e.g., phi=75, theta=43).\n   - Place a central light source using a glowing white dot (`GlowDot`) at the origin, along with thin 3D axes.\n   - Create a sphere of radius 2 with a semi-transparent white color and a detailed surface mesh (`SurfaceMesh`) overlaid on top. Ensure the sphere always sorts to the camera.\n\n2. **Emanating Radiation**: \n   - Implement a custom beaming/radiation effect that simulates light propagating outward from the center. This can be done by replicating a portion of the sphere, scaling it outward, and animating its opacity from high to low.\n   - Play this radiation animation, then fade in the solid sphere and its mesh.\n\n3. **Unit Area Patch and Beam**:\n   - Define a small parametric surface patch on the sphere's surface (e.g., spanning 9 degrees in both u and v directions) to represent a unit area.\n   - Create a directed beam effect projecting outward from this patch.\n   - Animate the camera rotating slowly to show the 3D structure of this beam.\n\n4. **Wavefront Expansion (Inverse Square Law)**:\n   - Scale the sphere and the parametric patch outward by a factor of 2.\n   - On the scaled-up patch, draw division lines (using parametric curves) that split the expanded patch into 4 equal sub-patches. This visually demonstrates that doubling the distance quadruples the area over which the same light energy is spread.\n   - Perform a final camera reorientation to capture the scaled geometry clearly.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-049/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "InverseSquareLaw"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "Parametric Surfaces and Curves",
+      "Custom Shader-like Beaming Effects",
+      "Surface Meshes",
+      "Depth Sorting (always_sort_to_camera)"
+    ],
+    "manim_api_patterns": [
+      "self.frame.reorient",
+      "GlowDot",
+      "ThreeDAxes",
+      "Sphere",
+      "SurfaceMesh",
+      "ParametricSurface",
+      "ParametricCurve",
+      "always_sort_to_camera",
+      "pointwise_become_partial"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing implementation of the custom beaming_effect helper method",
+      "severity": "high",
+      "note": "The beaming_effect method is crucial for generating the propagating light rays; omitting it or failing to handle the replication loop will crash the script."
+    },
+    {
+      "pattern": "Incompatible camera controls between Manim Community and ManimGL",
+      "severity": "high",
+      "note": "Using self.camera.set_euler_angles instead of self.frame.reorient will fail in ManimGL, and vice versa."
+    },
+    {
+      "pattern": "Incorrect parametric ranges for the patch",
+      "severity": "medium",
+      "note": "Using degrees directly without converting to radians (or using the DEG constant) will result in distorted or invisible patches."
+    }
+  ]
+}

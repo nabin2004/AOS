@@ -1,0 +1,947 @@
+1
+00:00:09,200 --> 00:00:10,840
+Last video, I talked about the dot
+
+2
+00:00:10,840 --> 00:00:12,640
+product, showing both the standard
+
+3
+00:00:12,640 --> 00:00:14,640
+introduction to the topic, as well as a
+
+4
+00:00:14,640 --> 00:00:16,520
+deeper view of how it relates to linear
+
+5
+00:00:16,520 --> 00:00:18,760
+transformations.
+
+6
+00:00:18,760 --> 00:00:20,080
+I'd like to do the same thing for cross
+
+7
+00:00:20,080 --> 00:00:21,760
+products, which also have a standard
+
+8
+00:00:21,760 --> 00:00:23,680
+introduction along with a deeper
+
+9
+00:00:23,680 --> 00:00:25,240
+understanding in the light of linear
+
+10
+00:00:25,240 --> 00:00:27,160
+transformations, but this time I'm
+
+11
+00:00:27,160 --> 00:00:29,680
+dividing it into two separate videos.
+
+12
+00:00:29,680 --> 00:00:31,360
+Here, I'll try to hit the main points
+
+13
+00:00:31,360 --> 00:00:32,960
+that students are usually shown about
+
+14
+00:00:32,960 --> 00:00:34,600
+the cross product, and in the next
+
+15
+00:00:34,600 --> 00:00:36,760
+video, I'll be showing a view which is
+
+16
+00:00:36,760 --> 00:00:38,840
+less commonly taught, but really
+
+17
+00:00:38,840 --> 00:00:40,840
+satisfying when you learn it. We'll
+
+18
+00:00:40,840 --> 00:00:42,880
+start in two dimensions. If you have two
+
+19
+00:00:42,880 --> 00:00:45,440
+vectors, V and W, think about the
+
+20
+00:00:45,440 --> 00:00:48,000
+parallelogram that they span out. What I
+
+21
+00:00:48,000 --> 00:00:50,080
+mean by that is that if you take a copy
+
+22
+00:00:50,080 --> 00:00:53,280
+of V and move its tail to the tip of W,
+
+23
+00:00:53,280 --> 00:00:55,040
+and you take a copy of W and move its
+
+24
+00:00:55,040 --> 00:00:57,520
+tail to the tip of V, the four vectors
+
+25
+00:00:57,520 --> 00:00:59,640
+now on the screen enclose a certain
+
+26
+00:00:59,640 --> 00:01:01,920
+parallelogram.
+
+27
+00:01:01,920 --> 00:01:04,360
+The cross product of V and W, written
+
+28
+00:01:04,360 --> 00:01:06,800
+with the X-shaped multiplication symbol,
+
+29
+00:01:06,800 --> 00:01:10,840
+is the area of this parallelogram.
+
+30
+00:01:10,840 --> 00:01:12,680
+Well, almost. We also need to consider
+
+31
+00:01:12,680 --> 00:01:15,400
+orientation. Basically, if V is on the
+
+32
+00:01:15,400 --> 00:01:18,640
+right of W, then V cross W is positive
+
+33
+00:01:18,640 --> 00:01:19,880
+and equal to the area of the
+
+34
+00:01:19,880 --> 00:01:21,520
+parallelogram.
+
+35
+00:01:21,520 --> 00:01:23,880
+But if V is on the left of W, then the
+
+36
+00:01:23,880 --> 00:01:25,920
+cross product is negative, namely the
+
+37
+00:01:25,920 --> 00:01:28,560
+negative area of that parallelogram.
+
+38
+00:01:28,560 --> 00:01:31,000
+Notice, this means that order matters.
+
+39
+00:01:31,000 --> 00:01:33,800
+If you swapped V and W, instead taking W
+
+40
+00:01:33,800 --> 00:01:35,840
+cross V, the cross product would become
+
+41
+00:01:35,840 --> 00:01:38,960
+the negative of whatever it was before.
+
+42
+00:01:38,960 --> 00:01:40,480
+The way I always remember the ordering
+
+43
+00:01:40,480 --> 00:01:42,120
+here is that when you take the cross
+
+44
+00:01:42,120 --> 00:01:44,160
+product of the two basis vectors in
+
+45
+00:01:44,160 --> 00:01:46,840
+order, I hat cross J hat, the result
+
+46
+00:01:46,840 --> 00:01:49,160
+should be positive. In fact, the order
+
+47
+00:01:49,160 --> 00:01:51,240
+of your basis vectors is what defines
+
+48
+00:01:51,240 --> 00:01:52,720
+orientation.
+
+49
+00:01:52,720 --> 00:01:54,640
+So, since I hat is on the right of J
+
+50
+00:01:54,640 --> 00:01:57,480
+hat, I remember that V cross W has to be
+
+51
+00:01:57,480 --> 00:01:59,440
+positive whenever V is on the right of
+
+52
+00:01:59,440 --> 00:02:01,560
+W.
+
+53
+00:02:01,560 --> 00:02:03,440
+So, for example, with the vectors shown
+
+54
+00:02:03,440 --> 00:02:05,440
+here, I'll just tell you that the area
+
+55
+00:02:05,440 --> 00:02:07,840
+of that parallelogram is seven. And
+
+56
+00:02:07,840 --> 00:02:10,360
+since V is on the left of W, the cross
+
+57
+00:02:10,360 --> 00:02:12,400
+product should be negative. So, V cross
+
+58
+00:02:12,400 --> 00:02:15,840
+W is -7.
+
+59
+00:02:15,840 --> 00:02:17,360
+But, of course, you want to be able to
+
+60
+00:02:17,360 --> 00:02:19,080
+compute this without someone telling you
+
+61
+00:02:19,080 --> 00:02:20,440
+the area.
+
+62
+00:02:20,440 --> 00:02:22,840
+This is where the determinant comes in.
+
+63
+00:02:22,840 --> 00:02:24,640
+So, if you didn't see chapter five of
+
+64
+00:02:24,640 --> 00:02:25,959
+this series where I talk about the
+
+65
+00:02:25,959 --> 00:02:28,000
+determinant, now would be a really good
+
+66
+00:02:28,000 --> 00:02:30,200
+time to go take a look. Even if you did
+
+67
+00:02:30,200 --> 00:02:31,760
+see it, but it was a while ago, I'd
+
+68
+00:02:31,760 --> 00:02:33,320
+recommend taking another look just to
+
+69
+00:02:33,320 --> 00:02:34,680
+make sure those ideas are fresh in your
+
+70
+00:02:34,680 --> 00:02:37,160
+mind.
+
+71
+00:02:37,240 --> 00:02:40,080
+For the 2D cross product, V cross W,
+
+72
+00:02:40,080 --> 00:02:41,880
+what you do is you write the coordinates
+
+73
+00:02:41,880 --> 00:02:44,360
+of V as the first column of a matrix,
+
+74
+00:02:44,360 --> 00:02:46,040
+and you take the coordinates of W and
+
+75
+00:02:46,040 --> 00:02:47,800
+make them the second column. Then, you
+
+76
+00:02:47,800 --> 00:02:51,280
+just compute the determinant.
+
+77
+00:02:51,280 --> 00:02:53,360
+This is because a matrix whose columns
+
+78
+00:02:53,360 --> 00:02:55,640
+represent V and W corresponds with a
+
+79
+00:02:55,640 --> 00:02:57,920
+linear transformation that moves the
+
+80
+00:02:57,920 --> 00:03:00,880
+basis vectors I hat and J hat to V and
+
+81
+00:03:00,880 --> 00:03:03,440
+W.
+
+82
+00:03:06,560 --> 00:03:08,480
+The determinant is all about measuring
+
+83
+00:03:08,480 --> 00:03:10,040
+how areas change due to a
+
+84
+00:03:10,040 --> 00:03:12,320
+transformation. And the prototypical
+
+85
+00:03:12,320 --> 00:03:14,640
+area that we look at is the unit square
+
+86
+00:03:14,640 --> 00:03:17,400
+resting on I hat and J hat. After the
+
+87
+00:03:17,400 --> 00:03:19,600
+transformation, that square gets turned
+
+88
+00:03:19,600 --> 00:03:21,400
+into the parallelogram that we care
+
+89
+00:03:21,400 --> 00:03:23,640
+about. So, the determinant, which
+
+90
+00:03:23,640 --> 00:03:25,360
+generally measures the factor by which
+
+91
+00:03:25,360 --> 00:03:27,880
+areas are changed, gives the area of
+
+92
+00:03:27,880 --> 00:03:30,239
+this parallelogram since it evolved from
+
+93
+00:03:30,239 --> 00:03:32,680
+a square that started with area one.
+
+94
+00:03:32,680 --> 00:03:35,600
+What's more, if V is on the left of W,
+
+95
+00:03:35,600 --> 00:03:37,480
+it means that orientation was flipped
+
+96
+00:03:37,480 --> 00:03:39,440
+during that transformation, which is
+
+97
+00:03:39,440 --> 00:03:41,000
+what it means for the determinant to be
+
+98
+00:03:41,000 --> 00:03:43,600
+negative.
+
+99
+00:03:44,080 --> 00:03:46,080
+As an example, let's say V has
+
+100
+00:03:46,080 --> 00:03:49,560
+coordinates -3 1, and W has coordinates
+
+101
+00:03:49,560 --> 00:03:52,840
+2 1. The determinant of the matrix those
+
+102
+00:03:52,840 --> 00:03:56,840
+coordinates as columns is -3 * 1
+
+103
+00:03:56,840 --> 00:03:59,600
+2 * 1,
+
+104
+00:03:59,600 --> 00:04:01,560
+which is -5.
+
+105
+00:04:01,560 --> 00:04:03,160
+So, evidently, the area of the
+
+106
+00:04:03,160 --> 00:04:05,760
+parallelogram they define is five. And
+
+107
+00:04:05,760 --> 00:04:08,120
+since V is on the left of W, it should
+
+108
+00:04:08,120 --> 00:04:11,240
+make sense that this value is negative.
+
+109
+00:04:11,240 --> 00:04:13,320
+As with any new operation you learn, I'd
+
+110
+00:04:13,320 --> 00:04:14,600
+recommend playing around with this
+
+111
+00:04:14,600 --> 00:04:16,079
+notion a bit in your head just to get
+
+112
+00:04:16,079 --> 00:04:17,640
+kind of an intuitive feel for what the
+
+113
+00:04:17,640 --> 00:04:19,720
+cross product is all about.
+
+114
+00:04:19,720 --> 00:04:21,239
+For example, you might notice that when
+
+115
+00:04:21,239 --> 00:04:23,120
+two vectors are perpendicular, or at
+
+116
+00:04:23,120 --> 00:04:25,000
+least close to being perpendicular,
+
+117
+00:04:25,000 --> 00:04:26,640
+their cross product is larger than it
+
+118
+00:04:26,640 --> 00:04:28,560
+would be if they were pointing in very
+
+119
+00:04:28,560 --> 00:04:31,080
+similar directions, because the area of
+
+120
+00:04:31,080 --> 00:04:33,560
+that parallelogram is larger when the
+
+121
+00:04:33,560 --> 00:04:37,120
+sides are closer to being perpendicular.
+
+122
+00:04:37,120 --> 00:04:38,600
+Something else you might notice is that
+
+123
+00:04:38,600 --> 00:04:40,160
+if you were to scale up one of those
+
+124
+00:04:40,160 --> 00:04:43,600
+vectors, perhaps multiplying V by three,
+
+125
+00:04:43,600 --> 00:04:46,120
+then the area of that parallelogram is
+
+126
+00:04:46,120 --> 00:04:48,960
+also scaled up by a factor of three.
+
+127
+00:04:48,960 --> 00:04:50,840
+So, what this means for the operation is
+
+128
+00:04:50,840 --> 00:04:54,520
+that 3V cross W will be exactly three
+
+129
+00:04:54,520 --> 00:04:58,120
+times the value of V cross W.
+
+130
+00:04:58,120 --> 00:04:59,520
+Now, even though all of this is a
+
+131
+00:04:59,520 --> 00:05:01,800
+perfectly fine mathematical operation,
+
+132
+00:05:01,800 --> 00:05:04,200
+what I just described is technically not
+
+133
+00:05:04,200 --> 00:05:06,360
+the cross product. The true cross
+
+134
+00:05:06,360 --> 00:05:08,360
+product is something that combines two
+
+135
+00:05:08,360 --> 00:05:11,240
+different 3D vectors to get a new 3D
+
+136
+00:05:11,240 --> 00:05:12,520
+vector.
+
+137
+00:05:12,520 --> 00:05:14,000
+Just as before, we're still going to
+
+138
+00:05:14,000 --> 00:05:16,200
+consider the parallelogram defined by
+
+139
+00:05:16,200 --> 00:05:17,640
+the two vectors that we're crossing
+
+140
+00:05:17,640 --> 00:05:18,880
+together.
+
+141
+00:05:18,880 --> 00:05:20,760
+And the area of this parallelogram is
+
+142
+00:05:20,760 --> 00:05:22,760
+still going to play a big role. To be
+
+143
+00:05:22,760 --> 00:05:25,280
+concrete, let's say that the area is 2.5
+
+144
+00:05:25,280 --> 00:05:27,160
+for the vectors shown here.
+
+145
+00:05:27,160 --> 00:05:28,960
+But as I said, the cross product is not
+
+146
+00:05:28,960 --> 00:05:31,040
+a number, it's a vector.
+
+147
+00:05:31,040 --> 00:05:33,000
+This new vector's length will be the
+
+148
+00:05:33,000 --> 00:05:35,000
+area of that parallelogram, which in
+
+149
+00:05:35,000 --> 00:05:37,040
+this case is 2.5.
+
+150
+00:05:37,040 --> 00:05:39,080
+And the direction of that new vector is
+
+151
+00:05:39,080 --> 00:05:40,960
+going to be perpendicular to the
+
+152
+00:05:40,960 --> 00:05:42,560
+parallelogram.
+
+153
+00:05:42,560 --> 00:05:44,640
+But which way, right? I mean, there are
+
+154
+00:05:44,640 --> 00:05:47,240
+two possible vectors with length 2.5
+
+155
+00:05:47,240 --> 00:05:50,560
+that are perpendicular to a given plane.
+
+156
+00:05:50,560 --> 00:05:52,000
+This is where the right-hand rule comes
+
+157
+00:05:52,000 --> 00:05:52,920
+in.
+
+158
+00:05:52,920 --> 00:05:54,920
+Point the forefinger of your right hand
+
+159
+00:05:54,920 --> 00:05:56,440
+in the direction of V.
+
+160
+00:05:56,440 --> 00:05:58,000
+Then stick out your middle finger in the
+
+161
+00:05:58,000 --> 00:05:59,680
+direction of W.
+
+162
+00:05:59,680 --> 00:06:01,680
+Then, when you point up your thumb,
+
+163
+00:06:01,680 --> 00:06:02,920
+that's the direction of the cross
+
+164
+00:06:02,920 --> 00:06:05,560
+product.
+
+165
+00:06:08,240 --> 00:06:10,080
+For example, let's say that V was a
+
+166
+00:06:10,080 --> 00:06:12,040
+vector with length two pointing straight
+
+167
+00:06:12,040 --> 00:06:14,440
+up in the Z direction, and W is a vector
+
+168
+00:06:14,440 --> 00:06:16,560
+with length two pointing in the pure Y
+
+169
+00:06:16,560 --> 00:06:17,840
+direction.
+
+170
+00:06:17,840 --> 00:06:19,520
+The parallelogram that they define in
+
+171
+00:06:19,520 --> 00:06:21,000
+this simple example is actually a
+
+172
+00:06:21,000 --> 00:06:22,880
+square, since they're perpendicular and
+
+173
+00:06:22,880 --> 00:06:24,800
+have the same length. And the area of
+
+174
+00:06:24,800 --> 00:06:27,000
+that square is four. So, their cross
+
+175
+00:06:27,000 --> 00:06:28,440
+product should be a vector with length
+
+176
+00:06:28,440 --> 00:06:29,720
+four.
+
+177
+00:06:29,720 --> 00:06:31,560
+Using the right-hand rule, their cross
+
+178
+00:06:31,560 --> 00:06:33,240
+product should point in the negative X
+
+179
+00:06:33,240 --> 00:06:35,840
+direction.
+
+180
+00:06:36,040 --> 00:06:37,240
+So, the cross product of these two
+
+181
+00:06:37,240 --> 00:06:41,760
+vectors is -4 * I-hat.
+
+182
+00:06:45,760 --> 00:06:47,840
+For more general computations, there is
+
+183
+00:06:47,840 --> 00:06:49,520
+a formula that you could memorize if you
+
+184
+00:06:49,520 --> 00:06:51,240
+wanted, but it's common and easier to
+
+185
+00:06:51,240 --> 00:06:53,000
+instead remember a certain process
+
+186
+00:06:53,000 --> 00:06:55,600
+involving the 3D determinant.
+
+187
+00:06:55,600 --> 00:06:58,080
+Now, this process looks truly strange at
+
+188
+00:06:58,080 --> 00:07:00,680
+first. You write down a 3D matrix where
+
+189
+00:07:00,680 --> 00:07:03,080
+the second and third columns contain the
+
+190
+00:07:03,080 --> 00:07:05,919
+coordinates of V and W. But for that
+
+191
+00:07:05,919 --> 00:07:07,840
+first column, you write the basis
+
+192
+00:07:07,840 --> 00:07:11,440
+vectors I-hat, J-hat, and K-hat.
+
+193
+00:07:11,440 --> 00:07:13,560
+Then, you compute the determinant of
+
+194
+00:07:13,560 --> 00:07:15,160
+this matrix.
+
+195
+00:07:15,160 --> 00:07:17,200
+The silliness is probably clear here.
+
+196
+00:07:17,200 --> 00:07:18,720
+What on earth does it mean to put in a
+
+197
+00:07:18,720 --> 00:07:22,520
+vector as the entry of a matrix?
+
+198
+00:07:22,520 --> 00:07:24,000
+Students are often told that this is
+
+199
+00:07:24,000 --> 00:07:25,960
+just a notational trick. When you carry
+
+200
+00:07:25,960 --> 00:07:28,560
+out the computations as if I-hat, J-hat,
+
+201
+00:07:28,560 --> 00:07:30,480
+and K-hat were numbers, then you get
+
+202
+00:07:30,480 --> 00:07:32,400
+some linear combination of those basis
+
+203
+00:07:32,400 --> 00:07:34,960
+vectors.
+
+204
+00:07:36,080 --> 00:07:38,080
+And the vector defined by that linear
+
+205
+00:07:38,080 --> 00:07:40,040
+combination, students are told to just
+
+206
+00:07:40,040 --> 00:07:42,040
+believe, is the unique vector
+
+207
+00:07:42,040 --> 00:07:44,680
+perpendicular to V and W whose magnitude
+
+208
+00:07:44,680 --> 00:07:45,960
+is the area of the appropriate
+
+209
+00:07:45,960 --> 00:07:48,240
+parallelogram and whose direction obeys
+
+210
+00:07:48,240 --> 00:07:51,200
+the right-hand rule.
+
+211
+00:07:51,240 --> 00:07:53,520
+And sure, in some sense, this is just a
+
+212
+00:07:53,520 --> 00:07:55,800
+notational trick, but there is a reason
+
+213
+00:07:55,800 --> 00:07:57,840
+for doing it.
+
+214
+00:07:57,840 --> 00:07:59,360
+It's not just a coincidence that the
+
+215
+00:07:59,360 --> 00:08:01,880
+determinant is once again important. And
+
+216
+00:08:01,880 --> 00:08:03,920
+putting the basis vectors in those slots
+
+217
+00:08:03,920 --> 00:08:06,160
+is not just a random thing to do.
+
+218
+00:08:06,160 --> 00:08:07,640
+To understand where all of this comes
+
+219
+00:08:07,640 --> 00:08:09,640
+from, it helps to use the idea of
+
+220
+00:08:09,640 --> 00:08:11,520
+duality that I introduced in the last
+
+221
+00:08:11,520 --> 00:08:12,680
+video.
+
+222
+00:08:12,680 --> 00:08:14,040
+This concept is a little bit heavy,
+
+223
+00:08:14,040 --> 00:08:16,080
+though. So, I'm putting it in a separate
+
+224
+00:08:16,080 --> 00:08:17,960
+follow-on video for any of you who are
+
+225
+00:08:17,960 --> 00:08:19,560
+curious to learn more.
+
+226
+00:08:19,560 --> 00:08:22,000
+Arguably, it falls outside the essence
+
+227
+00:08:22,000 --> 00:08:23,840
+of linear algebra. The important part
+
+228
+00:08:23,840 --> 00:08:25,640
+here is to know what that cross product
+
+229
+00:08:25,640 --> 00:08:27,919
+vector geometrically represents.
+
+230
+00:08:27,919 --> 00:08:29,360
+So, if you want to skip that next video,
+
+231
+00:08:29,360 --> 00:08:31,360
+feel free. But for those of you who are
+
+232
+00:08:31,360 --> 00:08:33,000
+willing to go a bit deeper and who are
+
+233
+00:08:33,000 --> 00:08:34,440
+curious about the connection between
+
+234
+00:08:34,440 --> 00:08:36,120
+this computation and the underlying
+
+235
+00:08:36,120 --> 00:08:38,159
+geometry, the ideas that I'll talk about
+
+236
+00:08:38,159 --> 00:08:40,080
+in the next video are just a really
+
+237
+00:08:40,080 --> 00:08:43,240
+elegant piece of math.

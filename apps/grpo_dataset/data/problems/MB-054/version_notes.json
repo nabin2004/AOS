@@ -1,0 +1,33 @@
+{
+  "problem_id": "MB-054",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high",
+      "note": "InteractiveScene is exclusive to ManimGL. In ManimCE, standard Scene must be used."
+    },
+    {
+      "category": "mobject_availability",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with a custom glowing effect or multiple overlapping semi-transparent circles",
+      "severity": "high",
+      "note": "GlowDot is a specialized ManimGL mobject. ManimCE does not have a direct GlowDot equivalent."
+    },
+    {
+      "category": "method_availability",
+      "gl_construct": "Mobject.replicate()",
+      "ce_equivalent": "VGroup(*[mob.copy() for _ in range(n)])",
+      "severity": "medium",
+      "note": "replicate() is a convenient ManimGL shorthand for duplicating mobjects, which is missing in ManimCE."
+    },
+    {
+      "category": "asset_dependency",
+      "gl_construct": "get_quantum_computer_symbol()",
+      "ce_equivalent": "Custom SVGMobject or Tex representation of a quantum computer/chip",
+      "severity": "medium",
+      "note": "This is a custom helper function from 3b1b's repository. It must be defined or replaced with a standard icon/text in vanilla Manim."
+    }
+  ]
+}

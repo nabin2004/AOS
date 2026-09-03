@@ -1,0 +1,69 @@
+{
+  "id": "MB-024",
+  "title": "Four Steps Complex Mapping with Nested Grid",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Complex Analysis",
+    "Geometry"
+  ],
+  "full_prompt": "Write a complete ManimGL script using the InteractiveScene class to visualize the four-step conformal mapping process of a Droste-effect spiral. The scene, named FourStepsWithGrid, should set up four complex coordinate planes arranged in a 2x2 grid layout (Planes A, B, C, and D). On Plane A, generate a nested square grid that recursively scales inward to represent infinite detail. Implement a helper function `apply_func_between_planes` to map mobjects from a source plane to a target plane using a given complex function. Step 1: Show the nested grid on Plane A. Step 2: Map this grid to Plane B using the complex logarithm function, transforming concentric squares into parallel vertical/horizontal lines. Step 3: Apply a complex linear transformation (scaling and rotation) to map the grid from Plane B to Plane C, representing the twist in the log-plane. Step 4: Map the grid from Plane C to Plane D using the complex exponential function, showing how the twisted grid wraps back into a seamless spiral Droste grid. Use arrows to indicate the flow between the planes (A -> B, B -> C, C -> D) and include a glowing blank spot at the origin of Plane D to represent the singularity.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-024/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 180,
+    "scene_classes": [
+      "FourStepsWithGrid"
+    ],
+    "visual_techniques": [
+      "Conformal complex mapping",
+      "Multi-plane coordinate systems",
+      "Recursive nested grid generation",
+      "Complex value tracking and transformations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ComplexValueTracker",
+      "apply_complex_function",
+      "get_grid",
+      "TexturedSurface",
+      "Square3D"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect coordinate mapping between planes due to wrong origin shifts or unit size scaling",
+      "severity": "high",
+      "note": "The helper function apply_func_between_planes must precisely shift to origin, scale to unit size, apply the complex function, scale back, and shift to the target plane."
+    },
+    {
+      "pattern": "Infinite recursion or memory exhaustion when generating nested square grids",
+      "severity": "medium",
+      "note": "Limit the recursion depth (n_recursions) to a reasonable number like 5 or 6 to avoid performance degradation."
+    },
+    {
+      "pattern": "Missing texture files or incorrect path resolution for TexturedSurface",
+      "severity": "medium",
+      "note": "Ensure fallback mechanisms or mock textures are used if external PNG files are not present in the local directory."
+    }
+  ]
+}

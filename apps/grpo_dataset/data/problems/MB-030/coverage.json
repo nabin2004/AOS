@@ -1,0 +1,44 @@
+{
+  "problem_id": "MB-030",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "x^2 + y^2 + z^2 = 1",
+        "z^2 \\le 1",
+        "x^2 + y^2 = 1 - z^2",
+        "math.sqrt(1 - get_z()**2)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Sphere",
+        "SurfaceMesh",
+        "Line",
+        "Circle",
+        "GlowDot",
+        "TrueDot",
+        "disk"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker",
+        "set_value(0.95)",
+        "set_value(-0.95)",
+        "set_value(0)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene",
+        "add_updater",
+        "clear_updaters",
+        "self.frame.set_field_of_view"
+      ]
+    }
+  }
+}

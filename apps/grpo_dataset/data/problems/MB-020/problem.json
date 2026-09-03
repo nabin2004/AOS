@@ -1,0 +1,70 @@
+{
+  "id": "MB-020",
+  "title": "Four Panels with Print Gallery (Escher Droste Effect)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Complex Analysis",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the mathematics behind Escher's Print Gallery (the Droste effect and conformal mapping). Create a scene with four complex planes arranged in a 2x2 grid (Planes A, B, C, and D). Plane A displays a Droste-effect image (using a textured surface). Plane B shows the logarithmic mapping of this image, unwrapping the concentric circles into parallel strips. Plane C applies a complex linear transformation (scaling and rotation) to the log-plane. Plane D maps the transformed log-plane back using the complex exponential function, showing the seamless, tilted spiral effect. Use custom textured surfaces, complex value trackers, and smooth transitions between the panels to illustrate the conformal mapping step-by-step.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-020/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "FourPannelsWithPrintGallery",
+      "CreatingTheSpiral"
+    ],
+    "visual_techniques": [
+      "Complex function mapping",
+      "TexturedSurface rendering",
+      "Multi-panel layout",
+      "Droste effect visualization",
+      "ComplexValueTracker animation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TexturedSurface",
+      "Square3D",
+      "apply_complex_function",
+      "ComplexValueTracker"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing texture files or incorrect paths for TexturedSurface",
+      "severity": "high",
+      "note": "The code relies on local PNG textures (e.g., PrintGalleryLog.png, PiHouseLog.png). Mock textures or placeholders must be handled gracefully if files are missing."
+    },
+    {
+      "pattern": "Incompatibility of TexturedSurface and Square3D in standard Manim Community Edition",
+      "severity": "high",
+      "note": "TexturedSurface and Square3D are specific to ManimGL/Manim-3Blue1Brown. Standard Manim CE will fail to compile this without major modifications."
+    },
+    {
+      "pattern": "High computational overhead due to high-resolution 3D surfaces",
+      "severity": "medium",
+      "note": "Using high resolution values for the log image grid can cause rendering to freeze or run out of memory."
+    }
+  ]
+}

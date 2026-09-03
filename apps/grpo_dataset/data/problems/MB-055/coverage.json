@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-055",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Ket notation formatting",
+        "Vector rotation angle calculation",
+        "State vector projection math",
+        "Superposition formulas"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "NumberPlane coordinate system",
+        "Colored vectors (yellow, teal, white)",
+        "Dashed projection line",
+        "Key icon next to label"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Rotation angle using arccos(1/sqrt(3))",
+        "Coordinate mapping c2p and p2c"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "Custom Ket class inheriting from Tex",
+        "Custom KetGroup class inheriting from VGroup",
+        "InteractiveScene usage",
+        "Transformations and FlashAround highlights"
+      ]
+    }
+  }
+}

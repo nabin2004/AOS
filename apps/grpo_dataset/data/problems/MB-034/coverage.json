@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-034",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Area derivative concept (dA, dr)",
+        "Volume derivative concept (dV, dr)",
+        "Radius label 'r'",
+        "Thickness label 'dr'",
+        "Area label 'A' and Volume label 'V'"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "3D Sphere with SurfaceMesh",
+        "Semi-transparent outer sphere (RED_E)",
+        "Clipping plane animation on the inner sphere",
+        "Camera reorientation in 3D space",
+        "2D Circle and Annulus overlay"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "ValueTracker controlling dr",
+        "dr values animating between 0.5, 0.1, and 0.0"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "Use of InteractiveScene base class",
+        "Class inheritance (ShowSphereVolumeDerivative inheriting from ShowCircleAreaDerivative)",
+        "Dynamic redrawing via always_redraw",
+        "Updaters on SurfaceMesh and dV_group"
+      ]
+    }
+  }
+}

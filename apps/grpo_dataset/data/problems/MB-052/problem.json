@@ -1,0 +1,65 @@
+{
+  "id": "MB-052",
+  "title": "Cosmic Distance Ladder Main Character Timeline",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "History of Science",
+    "Astronomy"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or compatible ManimCE code) that creates an interactive historical timeline for key figures in the history of cosmic distance measurement. \n\n1. **Timeline Setup**:\n   - Create a horizontal timeline using a `NumberLine` spanning from -500 to 2000 with a step of 10. Set `tick_size=0.05`, `longer_tick_multiple=2`, `big_tick_spacing=100`, and a custom unit size (e.g., `1 / 50`).\n   - Add numbers to the timeline from -500 to 2100 in increments of 100. For the negative numbers (representing BCE), remove the negative sign and append a smaller \"BCE\" text label next to the number.\n   - Position the camera frame initially focused on the ancient Greek section of the timeline (around -175).\n\n2. **Characters and Lifespans**:\n   - Define a list of historical figures with their birth/death years, vertical offsets, and custom colors. Figures include: Aristotle (-384 to -322), Eratosthenes (-276 to -194), Aristarchus (-310 to -230), Kepler (1571 to 1630), Copernicus (1473 to 1543), Brahe (1546 to 1601), James Cook (1728 to 1779), Edmond Halley (1656 to 1742), Ole R\u00f8mer (1644 to 1710), Huygens (1629 to 1695), Friedrich Bessel (1784 to 1846), Henrietta Leavitt (1868 to 1921), and Edwin Hubble (1889 to 1953).\n   - For each character, draw a horizontal line representing their lifespan at their respective vertical offset. Add dashed vertical lines connecting the start and end of their lifespan line down to the timeline.\n   - Add a text label with the character's name directly above their lifespan line, colored to match.\n\n3. **Portraits and Images**:\n   - Associate an `ImageMobject` with each character (using placeholder images or standard names like \"Head_of_Aristotle\", \"Eratosthenes\", etc.). Scale each image to a height of 2.0 and position it directly above the character's label.\n\n4. **Animation Sequence**:\n   - Start by fading in Aristotle's lifespan line and label.\n   - Next, fade in Eratosthenes' lifespan line, label, and portrait image while smoothly expanding and shifting the camera frame to encompass both figures.\n   - Fade in Aristarchus' lifespan line and label while fading out Eratosthenes' portrait to keep the screen clean.\n   - Prepare the transition to the Renaissance era (Kepler, Copernicus, Brahe) by panning the camera frame along the timeline.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-052/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "MainCharacterTimeline"
+    ],
+    "visual_techniques": [
+      "Timeline visualization",
+      "Camera frame panning",
+      "Image overlay",
+      "Sequential fade-ins"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "NumberLine",
+      "add_numbers",
+      "n2p",
+      "DashedLine",
+      "ImageMobject",
+      "self.frame"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing image assets for ImageMobject",
+      "severity": "medium",
+      "note": "If the specific portrait images are missing, the script will crash. Use generic placeholders or handle missing files gracefully."
+    },
+    {
+      "pattern": "ManimCE compatibility issues with self.frame",
+      "severity": "high",
+      "note": "In ManimCE, self.frame does not exist; MovingCameraScene and self.camera.frame must be used instead."
+    }
+  ]
+}

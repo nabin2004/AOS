@@ -1,0 +1,179 @@
+{
+  "id": "CL-005",
+  "title": "The Essence of Calculus | Chapter 5: The Exponential Function",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [3840, 4800],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 4,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation explaining the derivative of exponential functions. Start with 2^t as population growth that doubles each day. Show that the derivative of 2^t is proportional to itself: d(2^t)/dt = 2^t · ln(2). Derive this using the exponential property 2^(t+dt) = 2^t · 2^(dt), showing the constant ln(2) emerges as dt → 0. Introduce e as the special base where the proportionality constant is 1, making d(e^t)/dt = e^t. Show how e is defined by this property, similar to how π is defined by circles. Connect to the chain rule: d(e^(c·t))/dt = c·e^(c·t). Finally, explain that any exponential can be written as e^(c·t), where c = ln(a), making the constant c represent the proportionality between the function and its rate of change.",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter5.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "ExpFootnoteOpeningQuote",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "LastVideo",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PopulationSizeGraphVsPopulationMassGraph",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DoublingPopulation",
+        "key_methods": ["construct", "introduce_expression", "introduce_pi_creatures", "count_through_days", "ask_about_dM_dt", "growth_per_day", "relate_growth_rate_to_pop_size", "create_pi_creatures", "reset", "let_one_day_pass", "get_population_size_descriptor", "get_num_days", "get_curr_day", "get_from_day_to_day_label"]
+      },
+      {
+        "name": "GraphOfTwoToT",
+        "key_methods": ["construct", "get_label_group"]
+      },
+      {
+        "name": "SimpleGraphOfTwoToT",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "FakeDiagram",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AnalyzeExponentRatio",
+        "key_methods": ["construct", "try_specific_dt_values"]
+      },
+      {
+        "name": "ExponentRatioWithThree",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ExponentRatioWithSeven",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ExponentRatioWithEight",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ExponentRatioWithE",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "CompareTwoConstantToEightConstant",
+        "key_methods": ["construct", "get_derivative_expression", "create_pi_creature"]
+      },
+      {
+        "name": "AskAboutConstantOne",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "WhyPi",
+        "key_methods": ["construct", "create_pi_creature"]
+      },
+      {
+        "name": "GraphOfExp",
+        "key_methods": ["construct", "show_slopes"]
+      },
+      {
+        "name": "Chapter4Wrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ApplyChainRule",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ChainRuleIntuition",
+        "key_methods": ["construct", "nudge_x"]
+      },
+      {
+        "name": "WhyNaturalLogOf2ShowsUp",
+        "key_methods": ["construct", "add_e_to_the_three_t", "show_e_to_log_2", "get_exp_C", "get_a_to_t", "get_log_str"]
+      },
+      {
+        "name": "CompareWaysToWriteExponentials",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ManyExponentialForms",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TooManySymbols",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TemperatureOverTimeOfWarmWater",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TemperatureOverTimeOfWarmWaterWithSolution",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "InvestedMoney",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NaturalLog",
+        "key_methods": ["construct", "show_natural_loggedness", "get_expression"]
+      },
+      {
+        "name": "NextVideo",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Population growth with PiCreatures",
+      "Exponential property: a^(t+dt) = a^t · a^dt",
+      "Limit as dt → 0 reveals ln(a)",
+      "e as special base with derivative = itself",
+      "Graph of e^t with slope = height",
+      "Chain rule application",
+      "Natural log as inverse of e"
+    ],
+    "manim_api_patterns": {
+      "updaters": [],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "FocusOn", "ReplacementTransform"],
+      "mobject_classes": ["PiCreature", "NumberLine", "FunctionGraph", "Axes", "Dot", "Line", "Arrow", "Brace", "Circle"],
+      "custom_classes": ["GraphScene", "TeacherStudentsScene", "PiCreatureScene", "ThreeLinesChainRule"],
+      "helpers": ["get_graph_label", "get_vertical_line_to_graph", "get_secant_slope_group"],
+      "custom_imports": ["from manim_imports_ext import *", "from _2017.eoc.chapter4 import ThreeLinesChainRule"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses e with 2.71828 as arbitrary number",
+      "severity": "high",
+      "note": "misses the definitional nature of e"
+    },
+    {
+      "pattern": "fails to show the limit process that reveals ln(a)",
+      "severity": "high",
+      "note": "misses the key derivation"
+    },
+    {
+      "pattern": "doesn't connect derivative constant to natural log",
+      "severity": "medium",
+      "note": "misses the connection"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "id": "MB-019",
+  "title": "Visualizing the Meaning of the Derivative via Zooming",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or compatible ManimCE code) that visualizes the geometric meaning of a derivative by zooming in on a curve until it looks linear. First, set up a standard coordinate system (Axes) and plot the cubic curve f(x) = x^3 + 3x^2 - x - 3. Display a label for the function. Next, place a tiny, scaled-down set of local axes (labeled dx and df(x)) at a specific point on the curve. Animate a dramatic camera zoom-in (scaling down to approximately 0.008 of the original frame size) centered on this point, while simultaneously fading out the original function label and increasing the stroke width of the local axes so they remain visible. Once zoomed in, construct and animate tiny braces representing delta x (horizontal) and delta f(x) (vertical) at this micro-scale. Finally, introduce an equation showing that delta f(x) is approximately delta x times a constant 'c' at a small scale. Use an updater on this equation so that its size and position dynamically scale with the camera frame, keeping it fixed in the top-left corner of the screen during any camera movements.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-019/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 95,
+    "scene_classes": [
+      "DerivativeMeaning"
+    ],
+    "visual_techniques": [
+      "Camera Zooming",
+      "Micro-scale Coordinate Systems",
+      "Dynamic Frame-Relative Updaters",
+      "Brace Annotations at Micro-Scale"
+    ],
+    "manim_api_patterns": [
+      "self.camera.frame.animate",
+      "Axes",
+      "ParametricCurve",
+      "Brace",
+      "ValueTracker",
+      "add_updater",
+      "fix_in_frame"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Camera zoom fails to focus on the correct micro-coordinate, resulting in a blank screen.",
+      "severity": "high",
+      "note": "The target point must be precisely calculated using the curve's points array."
+    },
+    {
+      "pattern": "Braces and labels are rendered at normal scale, making them massive and overlapping when zoomed in.",
+      "severity": "high",
+      "note": "Braces and text must be scaled down by a factor matching the camera zoom (e.g., 0.011) to look correct."
+    },
+    {
+      "pattern": "The equation drifts off-screen during zoom because it is not properly anchored to the camera frame.",
+      "severity": "medium",
+      "note": "An updater must dynamically adjust the equation's height and position relative to self.camera.frame."
+    }
+  ]
+}

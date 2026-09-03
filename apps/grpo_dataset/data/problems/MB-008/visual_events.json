@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-008",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Spawn document nodes across the screen grouped into visual clusters.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "LanguageTextExample",
+        "FileIcon",
+        "Text",
+        "VGroup"
+      ],
+      "clip_query": "Multiple document icons appearing on screen in clustered groups"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Draw distance lines or connections between documents to show similarity metrics.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "Line",
+        "DashedLine",
+        "Arrow",
+        "distance"
+      ],
+      "clip_query": "Lines connecting document icons to represent distances"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animate the creation of surrounding ellipses enclosing each document cluster.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "SurroundingEllipse",
+        "ConvexHull",
+        "Create",
+        "ShowCreation"
+      ],
+      "clip_query": "Ellipses drawing themselves around clusters of document icons"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Dynamically update or shift a document and show the surrounding ellipse adapting its shape.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "surround",
+        "animate",
+        "play",
+        "shift"
+      ],
+      "clip_query": "An ellipse dynamically resizing and rotating as document icons move"
+    }
+  ]
+}

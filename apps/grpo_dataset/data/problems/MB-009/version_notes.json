@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-009",
+  "conflicts": [
+    {
+      "category": "Animation Class Names",
+      "gl_construct": "VShowPassingFlash",
+      "ce_equivalent": "ShowPassingFlash",
+      "severity": "medium"
+    },
+    {
+      "category": "Imports",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "high"
+    },
+    {
+      "category": "Custom Mobjects",
+      "gl_construct": "StackedProbDistribution",
+      "ce_equivalent": "Must be manually implemented using standard VGroup and Rectangles in ManimCE",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "problem_id": "NN-004",
+  "requirements": {
+    "Math": {
+      "weight": 0.4,
+      "expected": [
+        "Cost function C0 = (a^L - y)^2",
+        "Activation formula a^L = \u03c3(w^L\u00b7a^(L-1) + b^L)",
+        "z^L = w^L\u00b7a^(L-1) + b^L as weighted input",
+        "Chain rule: \u2202C0/\u2202w^L = (\u2202C0/\u2202a^L)\u00b7(\u2202a^L/\u2202z^L)\u00b7(\u2202z^L/\u2202w^L)",
+        "\u2202C0/\u2202a^L = 2(a^L - y)",
+        "\u2202a^L/\u2202z^L = \u03c3'(z^L)",
+        "\u2202z^L/\u2202w^L = a^(L-1)",
+        "Generalization with indices: \u2202C0/\u2202w^L_jk = a^(L-1)_k \u00b7 \u03c3'(z^L_j) \u00b7 \u2202C0/\u2202a^L_j",
+        "Recursive error: \u03b4^L = \u2207_a C \u2299 \u03c3'(z^L)",
+        "\u03b4^l = ((w^{l+1})^T \u03b4^{l+1}) \u2299 \u03c3'(z^l)",
+        "\u2202C/\u2202b^l_j = \u03b4^l_j",
+        "\u2202C/\u2202w^l_jk = a^{l-1}_k \u03b4^l_j"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Simplified network with one neuron per layer",
+        "Computational graph showing dependencies",
+        "Number lines for values of w, z, a, C0",
+        "Sensitivity demonstration with wiggling",
+        "Chain rule equations with highlighted components",
+        "Index notation for multiple neurons",
+        "Four fundamental equations displayed",
+        "Recursive propagation arrows showing backward flow"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "784 input neurons (28\u00d728 pixels)",
+        "16 neurons in hidden layers",
+        "10 output neurons (digits 0-9)",
+        "13,000+ weights and biases",
+        "z as weighted sum before activation",
+        "a as activation between 0 and 1"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: simple network \u2192 cost \u2192 activation \u2192 z \u2192 computational graph \u2192 sensitivity \u2192 chain rule \u2192 explicit derivatives \u2192 generalization \u2192 recursive equations \u2192 four equations \u2192 summary",
+        "Clear progression from simple to complex",
+        "Geometric intuition connected to algebraic formulas",
+        "Recursive nature emphasized through equations",
+        "Proper mathematical notation throughout"
+      ]
+    }
+  }
+}

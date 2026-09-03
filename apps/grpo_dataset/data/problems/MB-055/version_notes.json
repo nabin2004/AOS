@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-055",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "animation_name",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "mobject_method",
+      "gl_construct": "make_number_changeable",
+      "ce_equivalent": "None (requires custom DecimalNumber tracker implementation)",
+      "severity": "high"
+    },
+    {
+      "category": "animation_syntax",
+      "gl_construct": "animate.fade",
+      "ce_equivalent": "animate.set_opacity",
+      "severity": "medium"
+    }
+  ]
+}

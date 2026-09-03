@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-027",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "MovingCameraScene",
+      "severity": "high"
+    },
+    {
+      "category": "Grid Generation",
+      "gl_construct": "Square().get_grid()",
+      "ce_equivalent": "VGroup(*[Square() for ...]) arranged in a grid",
+      "severity": "medium"
+    },
+    {
+      "category": "Camera Manipulation",
+      "gl_construct": "self.camera.frame",
+      "ce_equivalent": "self.camera.frame (requires MovingCameraScene)",
+      "severity": "high"
+    },
+    {
+      "category": "Curve Subdivision",
+      "gl_construct": "insert_n_curves()",
+      "ce_equivalent": "No direct equivalent; must increase VMobject points or use dense Bezier curves manually",
+      "severity": "medium"
+    }
+  ]
+}

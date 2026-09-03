@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-025",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "complex function mapping",
+        "conformal mapping",
+        "logarithm",
+        "nested grid"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "input-output grids",
+        "nested square grid",
+        "BackgroundRectangle",
+        "question marks"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "n_recursions",
+        "scale_factor",
+        "stroke_width_decay_factor"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "apply_func_between_planes",
+        "get_nested_square_grid",
+        "PalleteOfFunctions class"
+      ]
+    }
+  }
+}

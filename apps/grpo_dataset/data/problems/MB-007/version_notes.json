@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-007",
+  "conflicts": [
+    {
+      "category": "manim_imports_ext",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobject",
+      "gl_construct": "StackedProbDistribution",
+      "ce_equivalent": "Custom implementation using standard VGroup and Rectangles with custom updater logic",
+      "severity": "high"
+    },
+    {
+      "category": "updater_syntax",
+      "gl_construct": "always_redraw(get_bars)",
+      "ce_equivalent": "always_redraw(get_bars) or adding an updater function via .add_updater()",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "id": "NN-004",
+  "title": "Neural Networks | Chapter 4: Backpropagation Calculus",
+  "youtube_video_id": "aircAruvnKk",
+  "video_timestamp_range": [2880, 3840],
+  "category": ["math-intensive", "algorithm-visualization", "concept-exposition"],
+  "difficulty_level": 5,
+  "domain": ["Machine Learning", "Neural Networks", "Calculus", "Linear Algebra"],
+  "full_prompt": "Create an animation explaining the calculus behind backpropagation. Start by showing the feedforward process through a simple network (single neuron per layer) with labeled weights and biases. Define the cost function C0 = (a^L - y)^2 for a single training example. Show the activation formula a^L = σ(w^L·a^(L-1) + b^L). Introduce z^L = w^L·a^(L-1) + b^L as the weighted input before activation. Break the computation into a computational graph showing the chain of dependencies: weights and biases → z → a → cost. Use number lines to show the values of w, z, a, and C0, and visually demonstrate sensitivity by wiggling w and showing how it affects z, a, and C0. Show the chain rule derivatives: ∂C0/∂w^L = (∂C0/∂a^L)·(∂a^L/∂z^L)·(∂z^L/∂w^L). Compute each derivative explicitly: ∂C0/∂a^L = 2(a^L - y), ∂a^L/∂z^L = σ'(z^L), ∂z^L/∂w^L = a^(L-1). Show this gives ∂C0/∂w^L = 2(a^L - y)·σ'(z^L)·a^(L-1). Generalize to multiple neurons with indices j and k: ∂C0/∂w^L_jk = a^(L-1)_k · σ'(z^L_j) · ∂C0/∂a^L_j. Show the recursive nature: the error at layer L depends on the error at layer L+1 through the transpose of the weight matrix. Show the four fundamental backpropagation equations: δ^L = ∇_a C ⊙ σ'(z^L), δ^l = ((w^{l+1})^T δ^{l+1}) ⊙ σ'(z^l), ∂C/∂b^l_j = δ^l_j, ∂C/∂w^l_jk = a^{l-1}_k δ^l_j. Conclude with the full algorithm and how it computes the gradient efficiently.",
+  "raw_code_status": "collected",
+  "raw_code_path": "nn/video4.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "LayOutPlan",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "Network",
+        "key_methods": ["__init__", "feedforward", "get_activation_of_all_layers", "SGD", "update_mini_batch", "backprop", "evaluate", "cost_derivative"]
+      },
+      {
+        "name": "SimplestNetworkExample",
+        "key_methods": ["construct", "seed_random_libraries", "collapse_ordinary_network", "show_weights_and_biases", "focus_just_on_last_two_layers", "label_neurons", "show_desired_output", "show_cost", "show_activation_formula", "introduce_z", "break_into_computational_graph", "show_preceding_layer_in_computational_graph", "show_number_lines", "ask_about_w_sensitivity", "show_derivative_wrt_w", "show_chain_of_events", "show_chain_rule", "name_chain_rule", "indicate_everything_on_screen", "prepare_for_derivatives", "compute_derivatives", "get_lost_in_formulas", "fire_together_wire_together", "organize_chain_rule_rhs", "show_average_derivative", "show_gradient", "transition_to_derivative_wrt_b", "show_derivative_wrt_b", "show_derivative_wrt_a", "show_previous_weight_and_bias", "animate_long_path", "get_neuron_activation_decimal", "get_all_comp_graph_parts"]
+      },
+      {
+        "name": "GeneralFormulas",
+        "key_methods": ["setup", "construct", "setup_network_mob", "show_all_a_labels", "only_show_abstract_a_labels", "add_desired_output", "show_cost", "show_example_weight", "show_values_between_weight_and_cost", "show_weight_chain_rule", "show_derivative_wrt_prev_activation", "show_multiple_paths_from_prev_layer_neuron", "show_previous_layer", "replace_subscript", "get_chain_rule"]
+      },
+      {
+        "name": "LayersOfComplexity",
+        "key_methods": ["construct", "get_chain_rule_equations"]
+      }
+    ],
+    "visual_techniques": [
+      "Single neuron per layer simplification",
+      "Weight and bias labeling",
+      "Cost function with squared difference",
+      "Activation formula with sigmoid",
+      "z as weighted input before activation",
+      "Computational graph visualization",
+      "Number lines for values of w, z, a, C0",
+      "Sensitivity demonstration by wiggling",
+      "Chain rule derivative visualization",
+      "Partial derivative notation",
+      "Index notation for multiple neurons",
+      "Four fundamental backpropagation equations",
+      "Matrix transpose in recursive error propagation",
+      "Element-wise product (Hadamard product) notation"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc", "UpdateFromFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "FocusOn", "ReplacementTransform", "MoveToTarget", "ShowPassingFlash", "LaggedStartMap", "ChangingDecimal"],
+      "mobject_classes": ["Circle", "Dot", "Line", "Arrow", "Brace", "Rectangle", "Square", "NumberPlane", "FunctionGraph", "DoubleArrow", "DashedLine", "Vector", "Tex", "OldTex", "OldTexText", "DecimalNumber", "SurroundingRectangle", "UnitInterval", "BulletedList", "ScreenRectangle"],
+      "custom_classes": ["PiCreatureScene", "TeacherStudentsScene", "NetworkScene", "PreviewLearning", "MNistNetworkMobject", "PixelsAsSquares", "WrappedImage", "MNistMobject", "ContinualEdgeUpdate", "Eyes", "SpeechBubble", "NetworkMobject", "Network"],
+      "helpers": ["get_organized_images", "load_data_wrapper", "get_training_image_group", "get_decimal_vector", "sigmoid", "sigmoid_prime", "sigmoid_inverse", "ReLU", "ReLU_prime"],
+      "custom_imports": ["from manim_imports_ext import *", "from nn.network import *"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses ∂z/∂w with ∂a/∂w",
+      "severity": "high",
+      "note": "misses the chain rule structure"
+    },
+    {
+      "pattern": "fails to show the recursive nature of error propagation",
+      "severity": "high",
+      "note": "misses the key insight of backpropagation"
+    },
+    {
+      "pattern": "doesn't explain the Hadamard product (⊙)",
+      "severity": "medium",
+      "note": "misses the element-wise multiplication notation"
+    },
+    {
+      "pattern": "doesn't show the four fundamental equations explicitly",
+      "severity": "medium",
+      "note": "misses the formal mathematical statement"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

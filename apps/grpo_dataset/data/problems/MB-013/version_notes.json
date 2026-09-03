@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-013",
+  "conflicts": [
+    {
+      "category": "PiCreatures",
+      "gl_construct": "Randolph(), Mortimer()",
+      "ce_equivalent": "Requires custom PiCreature community package or manual SVG imports",
+      "severity": "high"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Layout",
+      "gl_construct": "arrange_in_grid",
+      "ce_equivalent": "arrange_in_grid (with different parameters or manual positioning)",
+      "severity": "medium"
+    },
+    {
+      "category": "Animations",
+      "gl_construct": "VFadeIn, set_anim_args",
+      "ce_equivalent": "FadeIn",
+      "severity": "low"
+    }
+  ]
+}

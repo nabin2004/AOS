@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-020",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "complex logarithm mapping",
+        "complex exponential mapping",
+        "complex multiplication as rotation and scaling",
+        "conformal mapping principles"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "four-panel grid layout",
+        "TexturedSurface rendering",
+        "smooth transition animations between planes",
+        "coordinate grid lines and labels"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "complex value tracker updates",
+        "resolution settings for 3D surfaces",
+        "scale factors and fixed points"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene inheritance",
+        "setup and construct structure",
+        "helper functions for image loading and mapping"
+      ]
+    }
+  }
+}

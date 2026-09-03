@@ -1,0 +1,36 @@
+{
+  "problem_id": "DE-001",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Sigmoid function formula \\sigma",
+        "Weighted sum representation \\sum w_{ij} a_j + b",
+        "Layer indexing notation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "Distinct node colors for active vs inactive states",
+        "Varying line opacities representing weight strengths",
+        "Smooth transition animations for propagation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Correct layer sizes [4, 3, 3, 2]",
+        "Normalized activation values between 0 and 1"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "Clear separation of layers along the X-axis",
+        "Sequential execution of feedforward steps",
+        "Clean alignment of the mathematical formula overlay"
+      ]
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-043",
+  "conflicts": [
+    {
+      "category": "framework_brand",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobjects",
+      "gl_construct": "Randolph, Mortimer (PiCreatures)",
+      "ce_equivalent": "Custom SVGMobjects or simple shapes representing observers",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_methods",
+      "gl_construct": "pfp (point from proportion)",
+      "ce_equivalent": "point_from_proportion",
+      "severity": "medium"
+    },
+    {
+      "category": "custom_mobjects",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot",
+      "severity": "medium"
+    }
+  ]
+}

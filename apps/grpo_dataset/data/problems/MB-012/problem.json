@@ -1,0 +1,70 @@
+{
+  "id": "MB-012",
+  "title": "Monthly Mindbenders: Strings in a Box",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Computer Science",
+    "Mathematics",
+    "Probability"
+  ],
+  "full_prompt": "Create a 3D Manim visualization illustrating the 'Strings in a Box' probability puzzle. The scene should be built using ManimGL's InteractiveScene (or equivalent 3D scene structure). Define an open 3D box with dimensions 4.0 x 3.0 x 2.0. Generate 10 strings lying on the floor, each represented as a curved path with distinct dots at both endpoints. Implement a staggered dropping animation where the strings and their endpoint dots fall onto the floor using a custom rate function (e.g., rush_into) while the camera smoothly reorients. Next, simulate a sequence of joining operations: select two random endpoints, highlight them, and lift them up above the box height (box height + 1.0) using a custom pulling/lifting animation. Use dynamic updaters to ensure the endpoint dots remain pinned to the string ends as they stretch and lift. Finally, handle the logic of merging string pieces or forming closed loops when endpoints are joined.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-012/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 280,
+    "scene_classes": [
+      "Strings"
+    ],
+    "visual_techniques": [
+      "3D camera reorientation",
+      "Dynamic endpoint tracking with updaters",
+      "Staggered drop animations",
+      "Custom string pulling/lifting physics simulation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame.reorient",
+      "f_always.move_to",
+      "animate.restore",
+      "rush_into"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect 3D coordinate transformations when lifting strings",
+      "severity": "high",
+      "note": "Lifting strings in 3D space requires accurate z-axis manipulation; using 2D vectors will cause rendering errors."
+    },
+    {
+      "pattern": "Updater loops causing infinite recursion or lag in ManimGL",
+      "severity": "high",
+      "note": "Using f_always or add_updater on multiple interconnected mobjects can cause cyclic dependency issues if not cleared properly."
+    },
+    {
+      "pattern": "Missing helper methods like get_open_box or get_floor_strings",
+      "severity": "high",
+      "note": "The reference code relies on custom geometry generation methods that must be fully implemented."
+    }
+  ]
+}

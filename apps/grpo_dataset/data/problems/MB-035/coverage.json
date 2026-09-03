@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-035",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Area fraction formula with embedded shapes",
+        "Volume fraction formula with embedded 3D shapes",
+        "Decimal approximation of pi/4 (0.785)",
+        "Decimal approximation of pi/6 (0.524)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Smooth transition from 2D Circle to 3D Sphere with SurfaceMesh",
+        "Smooth transition from 2D Square to 3D VCube",
+        "Text transformation from 'Area' to 'Volume'",
+        "Correct color coding (blue for circle/sphere, red for square/cube)"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "DecimalNumber displaying 0.785",
+        "DecimalNumber displaying 0.524"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Use of InteractiveScene or ThreeDScene",
+        "Proper alignment of formulas, equals signs, and approximations",
+        "Deactivating depth test for clean rendering of overlapping 3D meshes"
+      ]
+    }
+  }
+}

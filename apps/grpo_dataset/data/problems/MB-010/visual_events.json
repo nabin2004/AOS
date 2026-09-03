@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-010",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation of the two probability distributions P and Q with their respective EntropyCharts.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "EntropyChart",
+        "StackedProbDistribution",
+        "distribution_trackers"
+      ],
+      "clip_query": "Two probability distribution charts showing stacked segments and vertical information bars"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animation showing the calculation of Entropy H(P) and H(Q) as the weighted average of the bar heights.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "bars",
+        "Tex",
+        "H(P)",
+        "H(Q)"
+      ],
+      "clip_query": "Mathematical formulas for entropy H(P) and H(Q) appearing next to the bar charts"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Visualizing Cross Entropy H(P, Q) by applying the bar heights (code lengths) of Q to the probability widths of P.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        30.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "cross_entropy",
+        "H(P, Q)",
+        "always_redraw"
+      ],
+      "clip_query": "Applying the bar heights of one distribution to the segment widths of another distribution"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Comparing H(P, Q) and H(Q, P) to demonstrate asymmetry, showing that H(P, Q) is not equal to H(Q, P).",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        45.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "not_equal",
+        "asymmetric",
+        "H(Q, P)"
+      ],
+      "clip_query": "Comparison showing that cross entropy H(P, Q) is not equal to H(Q, P)"
+    }
+  ]
+}

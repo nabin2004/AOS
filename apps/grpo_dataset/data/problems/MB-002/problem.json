@@ -1,0 +1,71 @@
+{
+  "id": "MB-002",
+  "title": "Cross Entropy Definition and Information Chart Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science",
+    "Calculus"
+  ],
+  "full_prompt": "Create a Manim visualization that defines and illustrates the concept of information/entropy using a dynamic chart. The core of the visualization is an 'EntropyChart' which consists of two main components: \n1. A horizontal stacked probability distribution bar at the bottom, where the width of each segment represents the probability $p_i$ of an event. The sum of these widths must always equal a fixed total width (representing a total probability of 1.0).\n2. Vertical bars extending upwards from each horizontal segment. The height of each vertical bar must dynamically represent the information content of that event, calculated as $-\\log_2(p_i)$.\n\nYour implementation must:\n- Define a custom Mobject or VGroup class (e.g., `EntropyChart`) that manages this layout.\n- Use `ValueTracker`s to drive the probability distribution. When the trackers change, both the horizontal segment widths and the vertical bar heights must update smoothly and in sync using updaters.\n- Include a vertical axis or reference grid lines with integer labels (0, 1, 2, 3...) to measure the information content in bits.\n- Color the bars using a smooth gradient or interpolation (e.g., from blue to teal) to visually distinguish the different events.\n- Handle potential division-by-zero or log-of-zero errors by enforcing a minimum probability threshold (e.g., 1/16 or 0.01) for each event.\n- Create an animation scene where the probability distribution shifts dynamically (e.g., one event becomes highly likely while others shrink), demonstrating how the corresponding information bars shrink and grow inversely.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-002/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "CrossEntropyDefinition"
+    ],
+    "visual_techniques": [
+      "Dynamic Updaters",
+      "ValueTracker-driven geometry",
+      "Custom Stacked Probability Distribution",
+      "Color Interpolation"
+    ],
+    "manim_api_patterns": [
+      "ValueTracker",
+      "add_updater",
+      "interpolate_color",
+      "VGroup",
+      "Rectangle",
+      "Line",
+      "Tex"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing StackedProbDistribution class in standard Manim",
+      "severity": "high",
+      "note": "The reference code relies on a custom 3b1b class 'StackedProbDistribution'. Implementations using standard ManimCE must reconstruct this behavior using a VGroup of adjacent Rectangles."
+    },
+    {
+      "pattern": "Math domain error with log2(0)",
+      "severity": "high",
+      "note": "If a probability tracker goes to 0 or negative during transitions, math.log2 will throw an error. Ensure strict clamping or thresholding is applied."
+    },
+    {
+      "pattern": "Misalignment of vertical bars during updates",
+      "severity": "medium",
+      "note": "As horizontal segments shift, the vertical bars must update both their heights and their horizontal positions (aligning to the top of their respective segments)."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-010",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "cross entropy formula",
+        "information content -log2(p)",
+        "asymmetry inequality H(P, Q) != H(Q, P)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "EntropyChart with stacked probability segments",
+        "vertical bars representing information bits",
+        "color interpolation for bars",
+        "side-by-side comparison layout"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "ValueTracker for probability values",
+        "ValueTracker for bar heights",
+        "dynamic recalculation of heights using log2"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "VGroup inheritance for EntropyChart",
+        "always_redraw for dynamic updates",
+        "updater functions for StackedProbDistribution"
+      ]
+    }
+  }
+}

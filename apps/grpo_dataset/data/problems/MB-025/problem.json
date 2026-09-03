@@ -1,0 +1,65 @@
+{
+  "id": "MB-025",
+  "title": "Palette of Complex Functions and Conformal Grids",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Complex Analysis",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL scene named `PalleteOfFunctions` that visualizes a gallery of complex function mappings. The scene should:\n1. Define a helper function `apply_func_between_planes(mob, func, src_plane, trg_plane)` that shifts, scales, applies a complex function, and maps a Mobject from a source plane to a target plane.\n2. Define a helper function `get_nested_square_grid` that recursively generates a nested square grid with a specified number of recursions, height, and stroke width decay.\n3. In the `PalleteOfFunctions` class (inheriting from `InteractiveScene`), construct a series of input-output grids for complex functions: $c \\cdot z$, $z^2$, $z^3$, $e^z$, $\\ln(z)$, $\\cos(z)$, and $\\sin(z)$.\n4. Position these examples vertically and horizontally.\n5. For the logarithm example, replace its default input and output grids with a custom nested square grid, and apply the complex logarithm mapping using `apply_func_between_planes` to show conformal grid deformation.\n6. Cover up some of the advanced examples (from $e^z$ onwards) with grey background rectangles and question marks to create a mystery/quiz effect.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-025/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "PalleteOfFunctions"
+    ],
+    "visual_techniques": [
+      "Complex function mapping",
+      "Nested recursive grids",
+      "Conformal mapping visualization",
+      "InteractiveScene layout"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "apply_complex_function",
+      "get_grid",
+      "BackgroundRectangle",
+      "replace_submobject"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom helper functions like apply_func_between_planes or get_nested_square_grid",
+      "severity": "high",
+      "note": "The scene relies heavily on these custom geometric transformations; omitting them will break the conformal mapping visualization."
+    },
+    {
+      "pattern": "Incorrect coordinate mapping or scaling in apply_complex_function",
+      "severity": "medium",
+      "note": "Ensure the scaling factors relative to the source and target planes are correctly computed to avoid distorted or out-of-bounds grids."
+    }
+  ]
+}

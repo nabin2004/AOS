@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-053",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    },
+    {
+      "category": "Mobject",
+      "gl_construct": "Elbow",
+      "ce_equivalent": "RightAngle",
+      "severity": "medium"
+    },
+    {
+      "category": "Camera",
+      "gl_construct": "self.frame",
+      "ce_equivalent": "self.camera.frame",
+      "severity": "high"
+    }
+  ]
+}

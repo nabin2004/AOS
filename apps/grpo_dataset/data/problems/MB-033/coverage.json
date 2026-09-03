@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-033",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "4D coordinate representation",
+        "3D rotation matrix transposition",
+        "Stereographic or orthographic projection from 4D to 3D",
+        "Sphere slicing geometry (sqrt(1 - z^2))"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene 3D camera reorientation",
+        "SurfaceMesh of a Sphere",
+        "Teal and Blue stroke coloring with custom opacities",
+        "Smooth continuous ambient rotation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "np.linspace for coordinate generation",
+        "ValueTracker angle interpolation up to 360 degrees",
+        "Matrix multiplication using np.dot"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom updaters via add_updater",
+        "LaggedStart with generator comprehensions",
+        "Dynamic attribute assignment on VMobjects (points_4d)"
+      ]
+    }
+  }
+}

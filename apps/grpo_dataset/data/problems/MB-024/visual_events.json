@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-024",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialize and display the 2x2 layout of four complex planes with the nested square grid on Plane A.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "get_nested_square_grid",
+        "planes",
+        "setup"
+      ],
+      "clip_query": "A 2x2 grid of coordinate planes with a nested square grid on the top-left plane."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animate the mapping of the nested grid from Plane A to Plane B using the complex logarithm function.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "apply_complex_function",
+        "np.log",
+        "log_arrow_group"
+      ],
+      "clip_query": "The nested square grid transforms into parallel lines on the top-right plane via a logarithmic mapping."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animate the linear transformation (rotation and scaling) of the grid from Plane B to Plane C.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "const",
+        "var_const",
+        "ComplexValueTracker"
+      ],
+      "clip_query": "The grid of parallel lines rotates and scales as it moves to the bottom-left plane."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate the exponential mapping from Plane C to Plane D, wrapping the grid into a spiral Droste pattern.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        9.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "np.exp",
+        "exp_arrow_group",
+        "blank_spot"
+      ],
+      "clip_query": "The rotated grid wraps into a spiral pattern on the bottom-right plane with a glowing center."
+    }
+  ]
+}

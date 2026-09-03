@@ -1,0 +1,1063 @@
+1
+00:00:00,000 --> 00:00:14,320
+[Submit subtitle corrections at criblate.com]
+
+2
+00:00:14,320 --> 00:00:17,267
+The last several videos have been about the idea of a derivative,
+
+3
+00:00:17,267 --> 00:00:20,940
+and before moving on to integrals I want to take some time to talk about limits.
+
+4
+00:00:21,660 --> 00:00:24,820
+To be honest, the idea of a limit is not really anything new.
+
+5
+00:00:25,160 --> 00:00:28,700
+If you know what the word approach means you pretty much already know what a limit is.
+
+6
+00:00:29,040 --> 00:00:32,247
+You could say it's a matter of assigning fancy notation to
+
+7
+00:00:32,247 --> 00:00:35,620
+the intuitive idea of one value that gets closer to another.
+
+8
+00:00:36,440 --> 00:00:39,660
+But there actually are a few reasons to devote a full video to this topic.
+
+9
+00:00:40,280 --> 00:00:43,634
+For one thing, it's worth showing how the way I've been describing
+
+10
+00:00:43,634 --> 00:00:46,683
+derivatives so far lines up with the formal definition of a
+
+11
+00:00:46,683 --> 00:00:50,240
+derivative as it's typically presented in most courses and textbooks.
+
+12
+00:00:50,920 --> 00:00:54,996
+I want to give you a little confidence that thinking in terms of dx and df as
+
+13
+00:00:54,996 --> 00:00:58,807
+concrete non-zero nudges is not just some trick for building intuition,
+
+14
+00:00:58,807 --> 00:01:03,360
+it's actually backed up by the formal definition of a derivative in all of its rigor.
+
+15
+00:01:04,260 --> 00:01:07,977
+I also want to shed light on what exactly mathematicians mean when
+
+16
+00:01:07,977 --> 00:01:11,920
+they say approach in terms of the epsilon-delta definition of limits.
+
+17
+00:01:12,520 --> 00:01:16,580
+Then we'll finish off with a clever trick for computing limits called L'Hopital's rule.
+
+18
+00:01:17,800 --> 00:01:21,700
+So, first things first, let's take a look at the formal definition of the derivative.
+
+19
+00:01:22,320 --> 00:01:25,370
+As a reminder, when you have some function f of x,
+
+20
+00:01:25,370 --> 00:01:29,702
+to think about its derivative at a particular input, maybe x equals 2,
+
+21
+00:01:29,702 --> 00:01:33,545
+you start by imagining nudging that input some little dx away,
+
+22
+00:01:33,545 --> 00:01:36,900
+and looking at the resulting change to the output, df.
+
+23
+00:01:37,960 --> 00:01:41,586
+The ratio df divided by dx, which can be nicely thought of as
+
+24
+00:01:41,586 --> 00:01:46,699
+the rise over run slope between the starting point on the graph and the nudged point,
+
+25
+00:01:46,699 --> 00:01:48,720
+is almost what the derivative is.
+
+26
+00:01:49,100 --> 00:01:53,960
+The actual derivative is whatever this ratio approaches as dx approaches 0.
+
+27
+00:01:55,000 --> 00:01:57,875
+Just to spell out a little what's meant there,
+
+28
+00:01:57,875 --> 00:02:01,813
+that nudge to the output df is the difference between f at the
+
+29
+00:02:01,813 --> 00:02:05,063
+starting input plus dx and f at the starting input,
+
+30
+00:02:05,063 --> 00:02:07,500
+the change to the output caused by dx.
+
+31
+00:02:08,680 --> 00:02:14,271
+To express that you want to find what this ratio approaches as dx approaches 0,
+
+32
+00:02:14,271 --> 00:02:17,880
+you write lim for limit, with dx arrow 0 below it.
+
+33
+00:02:18,960 --> 00:02:21,829
+You'll almost never see terms with a lowercase
+
+34
+00:02:21,829 --> 00:02:24,760
+d like dx inside a limit expression like this.
+
+35
+00:02:25,320 --> 00:02:28,027
+Instead, the standard is to use a different variable,
+
+36
+00:02:28,027 --> 00:02:31,040
+something like delta x, or commonly h for whatever reason.
+
+37
+00:02:31,860 --> 00:02:35,562
+The way I like to think of it is that terms with this lowercase d
+
+38
+00:02:35,562 --> 00:02:40,118
+in the typical derivative expression have built into them this idea of a limit,
+
+39
+00:02:40,118 --> 00:02:43,080
+the idea that dx is supposed to eventually go to 0.
+
+40
+00:02:44,660 --> 00:02:47,550
+In a sense, this left hand side here, df over dx,
+
+41
+00:02:47,550 --> 00:02:51,148
+the ratio we've been thinking about for the past few videos,
+
+42
+00:02:51,148 --> 00:02:55,808
+is just shorthand for what the right hand side here spells out in more detail,
+
+43
+00:02:55,808 --> 00:03:00,940
+writing out exactly what we mean by df, and writing out this limit process explicitly.
+
+44
+00:03:01,620 --> 00:03:05,212
+This right hand side here is the formal definition of a derivative,
+
+45
+00:03:05,212 --> 00:03:08,160
+as you would commonly see it in any calculus textbook.
+
+46
+00:03:08,760 --> 00:03:11,177
+And if you'll pardon me for a small rant here,
+
+47
+00:03:11,177 --> 00:03:15,748
+I want to emphasize that nothing about this right hand side references the paradoxical
+
+48
+00:03:15,748 --> 00:03:17,640
+idea of an infinitely small change.
+
+49
+00:03:18,260 --> 00:03:19,960
+The point of limits is to avoid that.
+
+50
+00:03:20,620 --> 00:03:22,976
+This value h is the exact same thing as the dx
+
+51
+00:03:22,976 --> 00:03:25,280
+I've been referencing throughout the series.
+
+52
+00:03:25,900 --> 00:03:32,280
+It's a nudge to the input of f with some non-zero, finitely small size, like 0.001.
+
+53
+00:03:33,100 --> 00:03:37,700
+It's just that we're analyzing what happens for arbitrarily small choices of h.
+
+54
+00:03:38,580 --> 00:03:43,060
+In fact, the only reason people introduce a new variable name into this formal
+
+55
+00:03:43,060 --> 00:03:45,933
+definition, rather than just, you know, using dx,
+
+56
+00:03:45,933 --> 00:03:50,815
+is to be super extra clear that these changes to the input are just ordinary numbers
+
+57
+00:03:50,815 --> 00:03:53,400
+that have nothing to do with infinitesimals.
+
+58
+00:03:54,380 --> 00:03:57,850
+The thing is, there are others who like to interpret this dx as an
+
+59
+00:03:57,850 --> 00:04:00,268
+infinitely small change, whatever that means,
+
+60
+00:04:00,268 --> 00:04:03,843
+or to just say that dx and df are nothing more than symbols that we
+
+61
+00:04:03,843 --> 00:04:05,420
+shouldn't take too seriously.
+
+62
+00:04:06,220 --> 00:04:09,480
+But by now in the series, you know I'm not really a fan of either of those views.
+
+63
+00:04:10,020 --> 00:04:14,178
+I think you can and should interpret dx as a concrete, finitely small nudge,
+
+64
+00:04:14,178 --> 00:04:18,500
+just so long as you remember to ask what happens when that thing approaches 0.
+
+65
+00:04:19,420 --> 00:04:23,026
+For one thing, and I hope the past few videos have helped convince you of this,
+
+66
+00:04:23,026 --> 00:04:26,906
+that helps to build stronger intuition for where the rules of calculus actually come
+
+67
+00:04:26,906 --> 00:04:27,180
+from.
+
+68
+00:04:27,180 --> 00:04:29,900
+But it's not just some trick for building intuitions.
+
+69
+00:04:30,460 --> 00:04:34,074
+Everything I've been saying about derivatives with this concrete,
+
+70
+00:04:34,074 --> 00:04:38,857
+finitely small nudge philosophy is just a translation of this formal definition we're
+
+71
+00:04:38,857 --> 00:04:40,080
+staring at right now.
+
+72
+00:04:41,040 --> 00:04:44,961
+Long story short, the big fuss about limits is that they let us avoid
+
+73
+00:04:44,961 --> 00:04:48,940
+talking about infinitely small changes by instead asking what happens
+
+74
+00:04:48,940 --> 00:04:52,520
+as the size of some small change to our variable approaches 0.
+
+75
+00:04:53,280 --> 00:04:56,074
+And this brings us to goal number 2, understanding
+
+76
+00:04:56,074 --> 00:04:59,260
+exactly what it means for one value to approach another.
+
+77
+00:05:00,440 --> 00:05:07,140
+For example, consider the function 2 plus h cubed minus 2 cubed all divided by h.
+
+78
+00:05:08,480 --> 00:05:12,215
+This happens to be the expression that pops out when you unravel
+
+79
+00:05:12,215 --> 00:05:16,125
+the definition of a derivative of x cubed evaluated at x equals 2,
+
+80
+00:05:16,125 --> 00:05:19,860
+but let's just think of it as any old function with an input h.
+
+81
+00:05:20,440 --> 00:05:23,249
+Its graph is this nice continuous looking parabola,
+
+82
+00:05:23,249 --> 00:05:27,380
+which would make sense because it's a cubic term divided by a linear term.
+
+83
+00:05:28,200 --> 00:05:32,142
+But actually, if you think about what's going on at h equals 0,
+
+84
+00:05:32,142 --> 00:05:36,460
+plugging that in you would get 0 divided by 0, which is not defined.
+
+85
+00:05:37,420 --> 00:05:40,030
+So really, this graph has a hole at that point,
+
+86
+00:05:40,030 --> 00:05:43,029
+and you have to kind of exaggerate to draw that hole,
+
+87
+00:05:43,029 --> 00:05:45,140
+often with an empty circle like this.
+
+88
+00:05:45,140 --> 00:05:47,785
+But keep in mind, the function is perfectly well
+
+89
+00:05:47,785 --> 00:05:50,320
+defined for inputs as close to 0 as you want.
+
+90
+00:05:51,260 --> 00:05:55,639
+Wouldn't you agree that as h approaches 0, the corresponding output,
+
+91
+00:05:55,639 --> 00:05:58,280
+the height of this graph, approaches 12?
+
+92
+00:05:59,160 --> 00:06:01,580
+It doesn't matter which side you come at it from.
+
+93
+00:06:03,740 --> 00:06:08,200
+That limit of this ratio as h approaches 0 is equal to 12.
+
+94
+00:06:09,360 --> 00:06:12,857
+But imagine that you're a mathematician inventing calculus,
+
+95
+00:06:12,857 --> 00:06:17,480
+and someone skeptically asks you, well, what exactly do you mean by approach?
+
+96
+00:06:18,440 --> 00:06:21,173
+That would be kind of an annoying question, I mean, come on,
+
+97
+00:06:21,173 --> 00:06:24,180
+we all know what it means for one value to get closer to another.
+
+98
+00:06:24,940 --> 00:06:28,543
+But let's start thinking about ways that you might be able to answer that person,
+
+99
+00:06:28,543 --> 00:06:29,700
+completely unambiguously.
+
+100
+00:06:30,940 --> 00:06:34,128
+For a given range of inputs within some distance of 0,
+
+101
+00:06:34,128 --> 00:06:38,970
+excluding the forbidden point 0 itself, look at all of the corresponding outputs,
+
+102
+00:06:38,970 --> 00:06:42,040
+all possible heights of the graph above that range.
+
+103
+00:06:42,860 --> 00:06:47,219
+As the range of input values closes in more and more tightly around 0,
+
+104
+00:06:47,219 --> 00:06:51,640
+that range of output values closes in more and more closely around 12.
+
+105
+00:06:52,420 --> 00:06:57,280
+And importantly, the size of that range of output values can be made as small as you want.
+
+106
+00:06:59,020 --> 00:07:02,396
+As a counter example, consider a function that looks like this,
+
+107
+00:07:02,396 --> 00:07:06,200
+which is also not defined at 0, but it kind of jumps up at that point.
+
+108
+00:07:06,960 --> 00:07:11,544
+When you approach h equals 0 from the right, the function approaches the value 2,
+
+109
+00:07:11,544 --> 00:07:14,600
+but as you come at it from the left, it approaches 1.
+
+110
+00:07:15,540 --> 00:07:19,769
+Since there's not a single clear, unambiguous value that this function
+
+111
+00:07:19,769 --> 00:07:24,420
+approaches as h approaches 0, the limit is simply not defined at that point.
+
+112
+00:07:25,160 --> 00:07:30,005
+One way to think of this is that when you look at any range of inputs around 0,
+
+113
+00:07:30,005 --> 00:07:34,973
+and consider the corresponding range of outputs, as you shrink that input range,
+
+114
+00:07:34,973 --> 00:07:38,960
+the corresponding outputs don't narrow in on any specific value.
+
+115
+00:07:39,780 --> 00:07:43,855
+Instead, those outputs straddle a range that never shrinks smaller than 1,
+
+116
+00:07:43,855 --> 00:07:47,380
+even as you make that input range as tiny as you could imagine.
+
+117
+00:07:48,520 --> 00:07:52,247
+This perspective of shrinking an input range around the limiting point,
+
+118
+00:07:52,247 --> 00:07:56,815
+and seeing whether or not you're restricted in how much that shrinks the output range,
+
+119
+00:07:56,815 --> 00:08:00,280
+leads to something called the epsilon-delta definition of limits.
+
+120
+00:08:01,220 --> 00:08:03,279
+Now I should tell you, you could argue that this is
+
+121
+00:08:03,279 --> 00:08:05,500
+needlessly heavy duty for an introduction to calculus.
+
+122
+00:08:06,060 --> 00:08:08,312
+Like I said, if you know what the word approach means,
+
+123
+00:08:08,312 --> 00:08:11,940
+you already know what a limit means, there's nothing new on the conceptual level here.
+
+124
+00:08:12,320 --> 00:08:16,226
+But this is an interesting glimpse into the field of real analysis,
+
+125
+00:08:16,226 --> 00:08:21,299
+and gives you a taste for how mathematicians make the intuitive ideas of calculus more
+
+126
+00:08:21,299 --> 00:08:22,640
+airtight and rigorous.
+
+127
+00:08:23,700 --> 00:08:25,340
+You've already seen the main idea here.
+
+128
+00:08:25,660 --> 00:08:29,569
+When a limit exists, you can make this output range as small as you want,
+
+129
+00:08:29,569 --> 00:08:33,907
+but when the limit doesn't exist, that output range cannot get smaller than some
+
+130
+00:08:33,907 --> 00:08:38,405
+particular value, no matter how much you shrink the input range around the limiting
+
+131
+00:08:38,405 --> 00:08:38,780
+input.
+
+132
+00:08:39,680 --> 00:08:42,463
+Let's freeze that same idea, but a little more precisely,
+
+133
+00:08:42,463 --> 00:08:45,880
+maybe in the context of this example where the limiting value was 12.
+
+134
+00:08:46,780 --> 00:08:49,985
+Think about any distance away from 12, where for some reason it's
+
+135
+00:08:49,985 --> 00:08:53,140
+common to use the Greek letter epsilon to denote that distance.
+
+136
+00:08:53,820 --> 00:08:58,040
+And the intent here is gonna be that this distance epsilon is as small as you want.
+
+137
+00:08:58,820 --> 00:09:04,627
+What it means for the limit to exist is that you will always be able to find a
+
+138
+00:09:04,627 --> 00:09:10,062
+range of inputs around our limiting point, some distance delta around 0,
+
+139
+00:09:10,062 --> 00:09:15,943
+so that any input within delta of 0 corresponds to an output within a distance
+
+140
+00:09:15,943 --> 00:09:17,060
+epsilon of 12.
+
+141
+00:09:18,420 --> 00:09:21,107
+The key point here is that that's true for any epsilon,
+
+142
+00:09:21,107 --> 00:09:24,820
+no matter how small, you'll always be able to find the corresponding delta.
+
+143
+00:09:25,580 --> 00:09:29,934
+In contrast, when a limit does not exist, as in this example here,
+
+144
+00:09:29,934 --> 00:09:33,430
+you can find a sufficiently small epsilon, like 0.4,
+
+145
+00:09:33,430 --> 00:09:39,168
+so that no matter how small you make your range around 0, no matter how tiny delta is,
+
+146
+00:09:39,168 --> 00:09:43,060
+the corresponding range of outputs is just always too big.
+
+147
+00:09:43,700 --> 00:09:48,640
+There is no limiting output where everything is within a distance epsilon of that output.
+
+148
+00:09:54,100 --> 00:09:57,160
+So far, this is all pretty theory-heavy, don't you think?
+
+149
+00:09:57,680 --> 00:10:00,338
+Limits being used to formally define the derivative,
+
+150
+00:10:00,338 --> 00:10:04,120
+and epsilons and deltas being used to rigorously define the limit itself.
+
+151
+00:10:04,900 --> 00:10:08,260
+So let's finish things off here with a trick for actually computing limits.
+
+152
+00:10:09,100 --> 00:10:12,307
+For instance, let's say for some reason you were studying
+
+153
+00:10:12,307 --> 00:10:15,740
+the function sin of pi times x divided by x squared minus 1.
+
+154
+00:10:16,220 --> 00:10:19,240
+Maybe this was modeling some kind of dampened oscillation.
+
+155
+00:10:20,240 --> 00:10:23,460
+When you plot a bunch of points to graph this, it looks pretty continuous.
+
+156
+00:10:27,280 --> 00:10:29,480
+But there's a problematic value at x equals 1.
+
+157
+00:10:30,000 --> 00:10:35,276
+When you plug that in, sin of pi is 0, and the denominator also comes out to 0,
+
+158
+00:10:35,276 --> 00:10:38,949
+so the function is actually not defined at that input,
+
+159
+00:10:38,949 --> 00:10:41,620
+and the graph should have a hole there.
+
+160
+00:10:42,200 --> 00:10:45,021
+This also happens, by the way, at x equals negative 1,
+
+161
+00:10:45,021 --> 00:10:48,940
+but let's just focus our attention on a single one of these holes for now.
+
+162
+00:10:50,020 --> 00:10:53,726
+The graph certainly does seem to approach a distinct value at that point,
+
+163
+00:10:53,726 --> 00:10:54,640
+wouldn't you say?
+
+164
+00:10:57,280 --> 00:11:02,941
+So you might ask, how exactly do you find what output this approaches as x approaches 1,
+
+165
+00:11:02,941 --> 00:11:05,000
+since you can't just plug in 1?
+
+166
+00:11:07,960 --> 00:11:13,199
+Well, one way to approximate it would be to plug in a number that's just really,
+
+167
+00:11:13,199 --> 00:11:15,360
+really close to 1, like 1.00001.
+
+168
+00:11:16,120 --> 00:11:20,080
+Doing that, you'd find that this should be a number around negative 1.57.
+
+169
+00:11:21,160 --> 00:11:23,600
+But is there a way to know precisely what it is?
+
+170
+00:11:23,960 --> 00:11:27,538
+Some systematic process to take an expression like this one,
+
+171
+00:11:27,538 --> 00:11:30,280
+that looks like 0 divided by 0 at some input,
+
+172
+00:11:30,280 --> 00:11:33,500
+and ask what is its limit as x approaches that input?
+
+173
+00:11:36,440 --> 00:11:40,105
+After limits, so helpfully let us write the definition for derivatives,
+
+174
+00:11:40,105 --> 00:11:44,700
+derivatives can actually come back here and return the favor to help us evaluate limits.
+
+175
+00:11:45,200 --> 00:11:46,020
+Let me show you what I mean.
+
+176
+00:11:47,020 --> 00:11:50,308
+Here's what the graph of sin of pi times x looks like,
+
+177
+00:11:50,308 --> 00:11:53,900
+and here's what the graph of x squared minus 1 looks like.
+
+178
+00:11:53,900 --> 00:11:56,720
+That's a lot to have up on the screen, but just
+
+179
+00:11:56,720 --> 00:11:59,420
+focus on what's happening around x equals 1.
+
+180
+00:12:00,180 --> 00:12:06,234
+The point here is that sin of pi times x and x squared minus 1 are both 0 at that point,
+
+181
+00:12:06,234 --> 00:12:08,160
+they both cross the x axis.
+
+182
+00:12:09,000 --> 00:12:14,205
+In the same spirit as plugging in a specific value near 1, like 1.00001,
+
+183
+00:12:14,205 --> 00:12:20,640
+let's zoom in on that point and consider what happens just a tiny nudge dx away from it.
+
+184
+00:12:21,300 --> 00:12:26,312
+The value sin of pi times x is bumped down, and the value of that nudge,
+
+185
+00:12:26,312 --> 00:12:32,160
+which was caused by the nudge dx to the input, is what we might call d sin of pi x.
+
+186
+00:12:33,040 --> 00:12:37,191
+And from our knowledge of derivatives, using the chain rule,
+
+187
+00:12:37,191 --> 00:12:41,480
+that should be around cosine of pi times x times pi times dx.
+
+188
+00:12:42,700 --> 00:12:47,700
+Since the starting value was x equals 1, we plug in x equals 1 to that expression.
+
+189
+00:12:51,260 --> 00:12:56,640
+In other words, the amount that this sin of pi times x graph changes is roughly
+
+190
+00:12:56,640 --> 00:13:02,360
+proportional to dx, with a proportionality constant equal to cosine of pi times pi.
+
+191
+00:13:03,360 --> 00:13:07,893
+And cosine of pi, if we think back to our trig knowledge, is exactly negative 1,
+
+192
+00:13:07,893 --> 00:13:11,180
+so we can write this whole thing as negative pi times dx.
+
+193
+00:13:12,220 --> 00:13:18,375
+Similarly, the value of the x squared minus 1 graph changes by some dx squared minus 1,
+
+194
+00:13:18,375 --> 00:13:23,540
+and taking the derivative, the size of that nudge should be 2x times dx.
+
+195
+00:13:24,480 --> 00:13:29,349
+Again, we were starting at x equals 1, so we plug in x equals 1 to that expression,
+
+196
+00:13:29,349 --> 00:13:33,280
+meaning the size of that output nudge is about 2 times 1 times dx.
+
+197
+00:13:34,920 --> 00:13:41,202
+What this means is that for values of x which are just a tiny nudge dx away from 1,
+
+198
+00:13:41,202 --> 00:13:46,350
+the ratio sin of pi x divided by x squared minus 1 is approximately
+
+199
+00:13:46,350 --> 00:13:49,680
+negative pi times dx divided by 2 times dx.
+
+200
+00:13:50,900 --> 00:13:54,740
+The dx's here cancel out, so what's left is negative pi over 2.
+
+201
+00:13:55,720 --> 00:13:58,540
+And importantly, those approximations get more and more
+
+202
+00:13:58,540 --> 00:14:01,360
+accurate for smaller and smaller choices of dx, right?
+
+203
+00:14:02,310 --> 00:14:05,549
+This ratio, negative pi over 2, actually tells
+
+204
+00:14:05,549 --> 00:14:09,000
+us the precise limiting value as x approaches 1.
+
+205
+00:14:09,540 --> 00:14:13,045
+Remember, what that means is that the limiting height on
+
+206
+00:14:13,045 --> 00:14:16,800
+our original graph is evidently exactly negative pi over 2.
+
+207
+00:14:18,220 --> 00:14:21,557
+What happened there is a little subtle, so I want to go through it again,
+
+208
+00:14:21,557 --> 00:14:23,340
+but this time a little more generally.
+
+209
+00:14:24,120 --> 00:14:29,324
+Instead of these two specific functions, which are both equal to 0 at x equals 1,
+
+210
+00:14:29,324 --> 00:14:34,849
+think of any two functions, f of x and g of x, which are both 0 at some common value,
+
+211
+00:14:34,849 --> 00:14:35,620
+x equals a.
+
+212
+00:14:36,280 --> 00:14:39,676
+The only constraint is that these have to be functions where you're able
+
+213
+00:14:39,676 --> 00:14:43,024
+to take a derivative of them at x equals a, which means that they each
+
+214
+00:14:43,024 --> 00:14:46,420
+basically look like a line when you zoom in close enough to that value.
+
+215
+00:14:47,800 --> 00:14:52,141
+Even though you can't compute f divided by g at this trouble point,
+
+216
+00:14:52,141 --> 00:14:57,390
+since both of them equal 0, you can ask about this ratio for values of x really,
+
+217
+00:14:57,390 --> 00:15:00,500
+really close to a, the limit as x approaches a.
+
+218
+00:15:01,220 --> 00:15:06,200
+It's helpful to think of those nearby inputs as just a tiny nudge, dx, away from a.
+
+219
+00:15:06,760 --> 00:15:12,083
+The value of f at that nudged point is approximately its derivative,
+
+220
+00:15:12,083 --> 00:15:14,980
+df over dx, evaluated at a times dx.
+
+221
+00:15:15,980 --> 00:15:22,051
+Likewise, the value of g at that nudged point is approximately the derivative of g,
+
+222
+00:15:22,051 --> 00:15:23,880
+evaluated at a times dx.
+
+223
+00:15:25,060 --> 00:15:30,860
+So, near that trouble point, the ratio between the outputs of f and g is actually about
+
+224
+00:15:30,860 --> 00:15:33,993
+the same as the derivative of f at a times dx,
+
+225
+00:15:33,993 --> 00:15:37,060
+divided by the derivative of g at a times dx.
+
+226
+00:15:37,880 --> 00:15:41,240
+Those dx's cancel out, so the ratio of f and g near a is
+
+227
+00:15:41,240 --> 00:15:44,540
+about the same as the ratio between their derivatives.
+
+228
+00:15:45,860 --> 00:15:50,253
+Because each of those approximations gets more and more accurate for smaller and
+
+229
+00:15:50,253 --> 00:15:54,700
+smaller nudges, this ratio of derivatives gives the precise value for the limit.
+
+230
+00:15:55,540 --> 00:15:58,500
+This is a really handy trick for computing a lot of limits.
+
+231
+00:15:58,920 --> 00:16:02,884
+Whenever you come across some expression that seems to equal 0 divided by
+
+232
+00:16:02,884 --> 00:16:06,848
+0 when you plug in some particular input, just try taking the derivative
+
+233
+00:16:06,848 --> 00:16:10,920
+of the top and bottom expressions and plugging in that same trouble input.
+
+234
+00:16:13,980 --> 00:16:16,300
+This clever trick is called L'Hopital's Rule.
+
+235
+00:16:17,240 --> 00:16:20,136
+Interestingly, it was actually discovered by Johann Bernoulli,
+
+236
+00:16:20,136 --> 00:16:22,798
+but L'Hopital was this wealthy dude who essentially paid
+
+237
+00:16:22,798 --> 00:16:25,880
+Bernoulli for the rights to some of his mathematical discoveries.
+
+238
+00:16:26,740 --> 00:16:30,138
+Academia is weird back then, but hey, in a very literal way,
+
+239
+00:16:30,138 --> 00:16:32,460
+it pays to understand these tiny nudges.
+
+240
+00:16:34,960 --> 00:16:38,665
+Right now, you might be remembering that the definition of a derivative
+
+241
+00:16:38,665 --> 00:16:42,213
+for a given function comes down to computing the limit of a certain
+
+242
+00:16:42,213 --> 00:16:45,605
+fraction that looks like 0 divided by 0, so you might think that
+
+243
+00:16:45,605 --> 00:16:49,780
+L'Hopital's Rule could give us a handy way to discover new derivative formulas.
+
+244
+00:16:50,680 --> 00:16:53,422
+But that would actually be cheating, since presumably
+
+245
+00:16:53,422 --> 00:16:56,320
+you don't know what the derivative of the numerator is.
+
+246
+00:16:57,020 --> 00:16:59,543
+When it comes to discovering derivative formulas,
+
+247
+00:16:59,543 --> 00:17:02,323
+something we've been doing a fair amount this series,
+
+248
+00:17:02,323 --> 00:17:04,640
+there is no systematic plug-and-chug method.
+
+249
+00:17:05,120 --> 00:17:05,960
+But that's a good thing!
+
+250
+00:17:06,400 --> 00:17:09,324
+Whenever creativity is needed to solve problems like these,
+
+251
+00:17:09,324 --> 00:17:11,852
+it's a good sign that you're doing something real,
+
+252
+00:17:11,852 --> 00:17:15,420
+something that might give you a powerful tool to solve future problems.
+
+253
+00:17:18,260 --> 00:17:21,771
+And speaking of powerful tools, up next I'm going to be talking about
+
+254
+00:17:21,771 --> 00:17:25,282
+what an integral is, as well as the fundamental theorem of calculus.
+
+255
+00:17:25,282 --> 00:17:28,691
+This is another example of where limits can be used to help give a
+
+256
+00:17:28,691 --> 00:17:32,100
+clear meaning to a pretty delicate idea that flirts with infinity.
+
+257
+00:17:33,580 --> 00:17:36,770
+As you know, most support for this channel comes through Patreon,
+
+258
+00:17:36,770 --> 00:17:40,746
+and the primary perk for patrons is early access to future series like this one,
+
+259
+00:17:40,746 --> 00:17:43,200
+where the next one is going to be on probability.
+
+260
+00:17:44,260 --> 00:17:48,089
+But for those of you who want a more tangible way to flag that you're
+
+261
+00:17:48,089 --> 00:17:51,640
+part of the community, there is also a small 3blue1brown store.
+
+262
+00:17:52,300 --> 00:17:53,960
+Links on the screen and in the description.
+
+263
+00:17:54,680 --> 00:18:04,964
+I'm still debating whether or not to make a preliminary batch of plushie pie creatures,
+
+264
+00:18:04,964 --> 00:18:13,947
+it depends on how many viewers seem interested in the store more generally,
+
+265
+00:18:13,947 --> 00:18:23,758
+but let me know in comments what other kinds of things you'd like to see in there.
+
+266
+00:18:23,758 --> 00:18:26,240
+Thanks for watching!

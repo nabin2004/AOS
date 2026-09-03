@@ -1,0 +1,221 @@
+{
+  "problem_id": "NN-001",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Handwritten digit '3' shown at low resolution (28x28 pixels), brain recognizes it effortlessly",
+      "weight": 0.0543,
+      "critical": false,
+      "expected_time_range": [
+        0.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "handwritten",
+        "digit",
+        "3",
+        "28x28",
+        "pixels"
+      ],
+      "clip_query": "low resolution handwritten 3 appearing"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Question posed: how to write a program that recognizes digits from pixel data",
+      "weight": 0.0543,
+      "critical": false,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "program",
+        "recognize",
+        "digit",
+        "pixels",
+        "784"
+      ],
+      "clip_query": "question text about writing digit recognition program"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "784 input neurons shown representing each pixel (28x28 grid), with brightness as activation",
+      "weight": 0.1087,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        24.0
+      ],
+      "keyword_bank": [
+        "input",
+        "neurons",
+        "784",
+        "28x28",
+        "pixels"
+      ],
+      "clip_query": "28x28 grid of neurons lighting up like pixels"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Output layer with 10 neurons for digits 0-9, brightest neuron is the network's choice",
+      "weight": 0.087,
+      "critical": true,
+      "expected_time_range": [
+        24.0,
+        34.0
+      ],
+      "keyword_bank": [
+        "output",
+        "10",
+        "digits",
+        "neurons",
+        "activation"
+      ],
+      "clip_query": "10 neurons labeled 0-9 with one brightly lit"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Hidden layers introduced (two layers of 16 neurons each) as question marks",
+      "weight": 0.087,
+      "critical": true,
+      "expected_time_range": [
+        34.0,
+        44.0
+      ],
+      "keyword_bank": [
+        "hidden",
+        "layers",
+        "16",
+        "neurons",
+        "question"
+      ],
+      "clip_query": "two layers of neurons with question marks"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "A single neuron shown holding a number (activation) between 0 and 1",
+      "weight": 0.087,
+      "critical": true,
+      "expected_time_range": [
+        44.0,
+        54.0
+      ],
+      "keyword_bank": [
+        "neuron",
+        "activation",
+        "number",
+        "0.5",
+        "circle"
+      ],
+      "clip_query": "single circle neuron with number inside"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Weights shown as connections between neurons, positive (green) and negative (red)",
+      "weight": 0.1087,
+      "critical": true,
+      "expected_time_range": [
+        54.0,
+        66.0
+      ],
+      "keyword_bank": [
+        "weights",
+        "connections",
+        "green",
+        "red",
+        "positive",
+        "negative"
+      ],
+      "clip_query": "lines connecting neurons colored green and red"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "Weighted sum calculation shown: multiply each activation by its weight, sum them up",
+      "weight": 0.1087,
+      "critical": true,
+      "expected_time_range": [
+        66.0,
+        76.0
+      ],
+      "keyword_bank": [
+        "weighted sum",
+        "multiply",
+        "add",
+        "activation",
+        "weight"
+      ],
+      "clip_query": "equation showing weighted sum of activations"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Sigmoid function shown squishing any real number into range 0 to 1",
+      "weight": 0.087,
+      "critical": true,
+      "expected_time_range": [
+        76.0,
+        84.0
+      ],
+      "keyword_bank": [
+        "sigmoid",
+        "S-curve",
+        "0 to 1",
+        "logistic",
+        "squish"
+      ],
+      "clip_query": "S-shaped curve mapping values to 0-1"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Bias introduced as an extra number added to the weighted sum before sigmoid",
+      "weight": 0.0652,
+      "critical": false,
+      "expected_time_range": [
+        84.0,
+        90.0
+      ],
+      "keyword_bank": [
+        "bias",
+        "threshold",
+        "added",
+        "weighted sum"
+      ],
+      "clip_query": "bias term being added to weighted sum"
+    },
+    {
+      "event_id": "ev_11",
+      "description": "Weights organized as a matrix for compact notation (W\u00b7a + b)",
+      "weight": 0.087,
+      "critical": false,
+      "expected_time_range": [
+        90.0,
+        100.0
+      ],
+      "keyword_bank": [
+        "matrix",
+        "W",
+        "a",
+        "b",
+        "multiplication"
+      ],
+      "clip_query": "matrix multiplication equation appearing"
+    },
+    {
+      "event_id": "ev_12",
+      "description": "Full network shown as a function: f(a_0,...,a_783) = [y_0,...,y_9] with 13,000 parameters",
+      "weight": 0.0651,
+      "critical": false,
+      "expected_time_range": [
+        100.0,
+        108.0
+      ],
+      "keyword_bank": [
+        "function",
+        "parameters",
+        "13,000",
+        "weights",
+        "biases"
+      ],
+      "clip_query": "network function with 13,000 parameter count"
+    }
+  ]
+}

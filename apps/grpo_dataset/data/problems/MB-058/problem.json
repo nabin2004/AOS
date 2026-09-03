@@ -1,0 +1,69 @@
+{
+  "id": "MB-058",
+  "title": "Contrasting Classical and Quantum Computers: State Vectors and Bits",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Computer Science",
+    "Physics"
+  ],
+  "full_prompt": "Create a ManimGL visualization that contrasts classical and quantum computers, focusing on classical bits and layers of abstraction. \n\n1. **Setup and Split Screen**:\n   - Create a split screen with a vertical white line down the center of the frame.\n   - Place a classical computer symbol on the left side and a quantum computer symbol on the right side, both positioned near the top edge.\n   - Display a set of classical bits (represented as boxed integers) below the classical computer symbol.\n\n2. **Transition to Classical Focus**:\n   - Fade out the quantum computer symbol and the vertical dividing line.\n   - Shift the camera frame to center on the classical computer side.\n   - Transform the initial short bit sequence into a longer, 8-bit boxed representation (e.g., representing the character 'C').\n\n3. **Layers of Abstraction**:\n   - Create three stacked horizontal rectangles representing layers of abstraction (Hardware, Bits, Data types).\n   - Apply a vertical color gradient (e.g., from dark blue to light blue) across these layers and set their opacity to 0.5.\n   - Position these layers behind the boxed bits.\n   - Add a label \"Layers of Abstraction\" to the right of the stack.\n   - Label each layer on the left: \"Hardware\" (bottom), \"Bits\" (middle), and \"Data types\" (top).\n   - Display corresponding representations for each layer: a circuit diagram for Hardware, raw bits for Bits, and an integer/character representation (e.g., 67 and 'C') for Data types.\n\nEnsure smooth transitions, precise alignment, and clean typography using ManimGL's InteractiveScene and frame manipulation capabilities.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-058/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "ContrstClassicalAndQuantum"
+    ],
+    "visual_techniques": [
+      "Split screen layout",
+      "Stacked layers of abstraction",
+      "Custom BitString and Ket representations",
+      "Camera frame movement"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame.animate",
+      "LaggedStartMap",
+      "ReplacementTransform",
+      "VGroup",
+      "Tex"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community Edition syntax for camera frame manipulation (e.g., self.camera.frame) instead of ManimGL's self.frame.",
+      "severity": "high",
+      "note": "The reference code is written in ManimGL where self.frame is directly accessible and animatable."
+    },
+    {
+      "pattern": "Missing custom helper functions like get_classical_computer_symbol, get_quantum_computer_symbol, or get_bit_circuit.",
+      "severity": "high",
+      "note": "These are custom external assets/functions. If not available, they must be mocked or replaced with standard SVGMobjects/VGroups."
+    },
+    {
+      "pattern": "Incorrect usage of replicate() and set_submobject_colors_by_gradient() which are specific to ManimGL.",
+      "severity": "medium",
+      "note": "In Manim CE, these must be implemented using VGroup copies and set_color_by_gradient."
+    }
+  ]
+}

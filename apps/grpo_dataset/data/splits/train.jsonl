@@ -1,0 +1,1 @@
+{"id": "MB-001", "prompt": "Animate a single-variable gradient descent process on a loss curve L(w) = (w-2)^2 + 1. Show the parameter w updating step by step, with a dot moving along the curve toward the minimum, and visualize the tangent line or gradient arrow before each move.", "problem_path": "data/problems/MB-001/problem.json"}

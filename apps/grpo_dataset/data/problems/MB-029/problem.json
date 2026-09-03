@@ -1,0 +1,69 @@
+{
+  "id": "MB-029",
+  "title": "Volume and Boundary Grid of n-Spheres",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a Manim scene named `VolumeGrid` that visualizes a grid comparing the boundary and volume formulas of n-dimensional spheres (n-balls) for dimensions 0 through 9. The grid should have 10 columns and 2 rows. The top row represents the boundary of an n-ball (\\partial B^n), and the bottom row represents the volume (B^n). Column labels should show the dimension index (0 to 9) with a header 'Dimension' above them. Populate the grid cells with the corresponding formulas (e.g., boundary: 0, 2, 2\\pi r, 4\\pi r^2, etc.; volume: 1, 2r, \\pi r^2, 4/3 \\pi r^3, etc.). Highlight the cells for d=2 and d=3 using a teal fill animation with a 'there and back' rate function. Add row labels on the left, and use a surrounding rectangle to highlight them. Pan the camera frame to the left to reveal a 'Boundary' label next to the top row, then pan back. Finally, draw curved teal arrows pointing from the volume cells to the boundary cells for dimensions 2 and 3 to represent the derivative relationship, and animate their creation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-029/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "VolumeGrid"
+    ],
+    "visual_techniques": [
+      "Grid Layout",
+      "Cell Highlighting",
+      "Camera Frame Panning",
+      "Curved Arrows",
+      "Formula Transformation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame",
+      "there_and_back_with_pause",
+      "TransformMatchingTex",
+      "ShowCreation"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using self.frame in Manim Community Edition instead of self.camera.frame",
+      "severity": "high",
+      "note": "ManimGL uses self.frame for camera manipulation, whereas ManimCE uses self.camera.frame."
+    },
+    {
+      "pattern": "Using ShowCreation instead of Create in ManimCE",
+      "severity": "medium",
+      "note": "ShowCreation is a ManimGL/classic API, while ManimCE uses Create."
+    },
+    {
+      "pattern": "Missing there_and_back_with_pause rate function in standard ManimCE",
+      "severity": "medium",
+      "note": "there_and_back_with_pause is specific to 3Blue1Brown's custom ManimGL setup; standard CE users should use there_and_back or custom rate functions."
+    }
+  ]
+}

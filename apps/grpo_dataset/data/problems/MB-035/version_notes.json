@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-035",
+  "conflicts": [
+    {
+      "category": "3D Mobjects",
+      "gl_construct": "VCube",
+      "ce_equivalent": "Cube",
+      "severity": "high"
+    },
+    {
+      "category": "3D Rendering",
+      "gl_construct": "SurfaceMesh",
+      "ce_equivalent": "No direct equivalent; requires custom parametric surface lines or standard Sphere resolution adjustments",
+      "severity": "high"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "FadeTransformPieces",
+      "ce_equivalent": "ReplacementTransform",
+      "severity": "medium"
+    }
+  ]
+}

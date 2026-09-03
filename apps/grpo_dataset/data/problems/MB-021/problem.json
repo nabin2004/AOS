@@ -1,0 +1,70 @@
+{
+  "id": "MB-021",
+  "title": "Conformal Map Visualization of f(z) = z^2",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Complex Analysis"
+  ],
+  "full_prompt": "Create a Manim scene named `MoreComplicatedExamples1` that visualizes the conformal mapping $f(z) = z^2$ using two side-by-side complex planes. First, display the formula $f(z) = z^2$ in a large font with 'f' colored pink and 'z' colored yellow, surrounded by a black stroke. Next, transition this formula to the top of the right plane while introducing two complex planes side-by-side: an input plane on the left and an output plane on the right, both ranging from -4 to 4 on both axes. Add coordinate labels to both planes. Create a fine grid of squares on the input plane. Then, perform three point-by-point evaluations: $f(2) = 4$, $f(i) = -1$, and $f(-1) = 1$. For each evaluation, show a glowing dot appearing on the input plane, write the corresponding equation, and animate a copy of the dot traveling along a curved path (using a negative arc) to its mapped position on the output plane. Finally, fade out these point evaluations to prepare for the full grid transformation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-021/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "MoreComplicatedExamples1"
+    ],
+    "visual_techniques": [
+      "Complex coordinate mapping",
+      "Dual-plane visualization",
+      "Arc-path point transformation",
+      "Grid-based conformal mapping"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ComplexPlane",
+      "TrueDot",
+      "GlowDot",
+      "apply_function",
+      "p2n",
+      "n2p"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect coordinate conversion between screen space and complex plane space using p2n and n2p",
+      "severity": "high",
+      "note": "Ensure the correct plane instance is used for converting points to complex numbers and vice versa."
+    },
+    {
+      "pattern": "Missing custom classes TrueDot or GlowDot in standard Manim environments",
+      "severity": "medium",
+      "note": "If running on standard Manim Community, replace TrueDot and GlowDot with standard Dot and overlapping semi-transparent larger dots for the glow effect."
+    },
+    {
+      "pattern": "Grid interpolation issues when applying non-linear functions",
+      "severity": "medium",
+      "note": "Ensure the grid has enough curve points (using insert_n_curves or similar) so that the transformation z^2 looks smooth and curved rather than jagged."
+    }
+  ]
+}

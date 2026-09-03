@@ -1,0 +1,70 @@
+{
+  "id": "MB-040",
+  "title": "Hypercube Projection and Diagonal Calculation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    20.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a ManimGL script using InteractiveScene that visualizes a 4D hypercube projection and calculates its diagonal length. First, define a helper method `get_cube(bases)` that generates the edges of an n-dimensional parallelotope given a list of basis vectors using `itertools.product`. In the `construct` method, set up the camera frame orientation and add a slow ambient rotation. Define a 3D cube using three standard basis vectors, and a 4D hypercube projection using four basis vectors (the fourth being `[1.5, 1.0, 0.5]`). Show the 3D cube first, then animate its transition into the 4D hypercube projection using `ReplacementTransform`. Next, highlight a right triangle within the hypercube structure: draw a red line representing a 3D diagonal of length $\\sqrt{3}$ with a corresponding label, then draw a teal line representing the fourth-dimensional edge of length $1$ with a label. Finally, animate the drawing of a yellow hypotenuse representing the 4D diagonal, and transition the labels into a new label showing $\\sqrt{3 + 1}$ using `FadeTransformPieces`.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-040/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 68,
+    "scene_classes": [
+      "Hypercube"
+    ],
+    "visual_techniques": [
+      "3D Camera Orientation",
+      "Ambient Rotation",
+      "N-dimensional Parallelotope Generation",
+      "3D Text Rotation",
+      "Vector Highlighting"
+    ],
+    "manim_api_patterns": [
+      "self.frame.reorient",
+      "self.frame.add_ambient_rotation",
+      "ReplacementTransform",
+      "ShowCreation",
+      "FadeTransformPieces",
+      "it.product"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.8,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE camera controls instead of self.frame.reorient",
+      "severity": "high",
+      "note": "ManimGL uses self.frame for 3D camera manipulation, which is incompatible with ManimCE's ThreeDScene camera."
+    },
+    {
+      "pattern": "Incorrect 3D rotation of Tex labels",
+      "severity": "medium",
+      "note": "Tex labels must be rotated in 3D space (e.g., rotate(90 * DEG, RIGHT)) to align properly with the 3D perspective."
+    },
+    {
+      "pattern": "Missing itertools import for the hypercube generator",
+      "severity": "medium",
+      "note": "The get_cube helper relies on 'it.product' which requires importing itertools as 'it'."
+    }
+  ]
+}

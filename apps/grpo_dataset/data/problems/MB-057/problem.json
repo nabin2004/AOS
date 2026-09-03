@@ -1,0 +1,70 @@
+{
+  "id": "MB-057",
+  "title": "Beam Splitter and Polarization Wave Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Quantum Computing"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class to visualize a polarization wave passing through a beam splitter. \n\nYour script should accomplish the following:\n1. **Setup the 3D Environment**: Position the camera light source and set an initial 3D frame orientation using `self.frame.reorient(-121, 76, 0, (-3.29, -0.25, -0.34), 4.80)`. \n2. **Laser Pointer and Beam**: Add a laser pointer model aligned to the left edge. Generate a laser beam extending from the pointer's right side along the positive X-axis. Animate the beam's creation using a custom non-linear rate function (`t**10`).\n3. **Polarization Wave**: Create a dynamic wave representing the polarization state controlled by a `ValueTracker` for theta (initially 90 degrees). Animate the wave fading in and slowly rotate the camera frame over 8 seconds to a new orientation: `(-57, 74, 0, (-3.29, -0.18, -0.18), 4.80)`.\n4. **In-Situ and Corner Coordinate Planes**: Create a set of coordinate planes (`NumberPlane`). One plane (`plane_in_situ`) should be scaled, rotated, and positioned in 3D space at a sample point along the beam. Another plane (`corner_plane`) should be fixed in the frame at the upper-left corner. \n5. **Dynamic Vector Updater**: Add a vector to the corner plane that dynamically updates its coordinates based on the wave's amplitude and polarization angle at the sample point. Use an updater function that projects the wave's output onto the DOWN and OUT directions to compute the vector's 2D coordinates.\n6. **Beam Splitter Cube**: Place a semi-transparent cube (`Cube`) rotated by 45 degrees along the beam path to represent a beam splitter. Set up 3D axes (`ThreeDAxes`) aligned with the splitter's orientation to show the split polarization axes.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-057/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "BeamSplitter"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "Dynamic Vector Updaters",
+      "Wave/Field Propagation",
+      "Coordinate Plane Mapping"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame.reorient",
+      "ValueTracker",
+      "VFadeIn",
+      "ShowCreation",
+      "Cube",
+      "ThreeDAxes"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community camera orientation methods instead of self.frame.reorient",
+      "severity": "high",
+      "note": "ManimGL uses self.frame.reorient or self.frame.animate.reorient for 3D camera control."
+    },
+    {
+      "pattern": "Incorrect coordinate mapping in vector updaters",
+      "severity": "medium",
+      "note": "The updater must correctly project 3D wave coordinates to the 2D plane coordinates using plane.c2p."
+    },
+    {
+      "pattern": "Missing or misaligned beam splitter cube and axes",
+      "severity": "medium",
+      "note": "The beam splitter cube must be rotated 45 degrees and aligned with the split axes."
+    }
+  ]
+}

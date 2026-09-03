@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-052",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "MovingCameraScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Frame",
+      "gl_construct": "self.frame",
+      "ce_equivalent": "self.camera.frame",
+      "severity": "high"
+    },
+    {
+      "category": "Coordinate Mapping",
+      "gl_construct": "timeline.n2p(val)",
+      "ce_equivalent": "timeline.number_to_point(val)",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation Arguments",
+      "gl_construct": "set_anim_args(run_time=3)",
+      "ce_equivalent": "run_time=3 inside self.play()",
+      "severity": "medium"
+    }
+  ]
+}

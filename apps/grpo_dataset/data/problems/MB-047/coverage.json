@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-047",
+  "requirements": {
+    "Math": {
+      "weight": 0.15,
+      "expected": [
+        "Orbit radius scaling relative to Earth",
+        "Orbital period calculation for rotation speed",
+        "Random initial angular offset using TAU"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "Textured celestial sphere background",
+        "Multi-layered glowing Sun",
+        "Concentric colored orbit circles with stroke width gradients",
+        "LaTeX astronomical symbols from wasysym package"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Exact orbital radii constants",
+        "Exact orbital period constants in days",
+        "Conversion factor from physical units to screen units"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene or ThreeDScene structure",
+        "Frame configuration",
+        "Updaters for continuous orbit rotation",
+        "Updaters for symbol positioning along the orbits"
+      ]
+    }
+  }
+}

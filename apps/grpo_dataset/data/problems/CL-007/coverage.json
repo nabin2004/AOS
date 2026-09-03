@@ -1,0 +1,43 @@
+{
+  "problem_id": "CL-007",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Formal derivative definition: f'(x) = lim_{h\u21920} (f(x+h)-f(x))/h",
+        "dx/h as finite non-zero nudge",
+        "Epsilon-delta definition of limits",
+        "Limit existence vs non-existence",
+        "L'H\u00f4pital's rule: lim f/g = lim f'/g'",
+        "Approximation by tangent lines"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Secant to tangent limit process",
+        "Graph with hole at undefined point",
+        "Jump discontinuity counterexample",
+        "Epsilon and delta ranges on graph",
+        "Tangent line approximations"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Numerical example: (2+h)\u00b3-8 / h \u2192 12",
+        "h approaching 0 numerically",
+        "sin(\u03c0)/(1\u00b2-1) \u2192 0/0 then -\u03c0/2"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: derivative definition \u2192 limits \u2192 epsilon-delta \u2192 L'H\u00f4pital",
+        "Clear transitions between concepts",
+        "Geometric and algebraic representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

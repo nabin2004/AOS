@@ -1,0 +1,43 @@
+{
+  "problem_id": "CL-004",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Sum rule: derivative of sum = sum of derivatives",
+        "Product rule: d(f\u00b7g) = f\u00b7dg + g\u00b7df",
+        "Chain rule: d(g(h))/dx = dg/dh \u00b7 dh/dx",
+        "Visual derivation of each rule via tiny nudges",
+        "Left d right + right d left mnemonic",
+        "dh cancellation in chain rule"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Stacked vertical bars for sum rule",
+        "Adjustable box for product rule",
+        "Three number lines for chain rule",
+        "Nudges propagating through layers",
+        "Area pieces highlighted"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Specific examples with x=0.5",
+        "Numerical values on graphs",
+        "dx proportionality constants"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: sum rule \u2192 product rule \u2192 chain rule",
+        "Clear transitions between concepts",
+        "Geometric and algebraic representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

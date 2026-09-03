@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-044",
+  "requirements": {
+    "Math": {
+      "weight": 0.15,
+      "expected": [
+        "Astronomical Unit definition",
+        "Orbit rotation (TAU)",
+        "Vector rotation (90 * DEG)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "TexturedSurface Sphere",
+        "GlowDot",
+        "Camera reorientation",
+        "ReplacementTransform text morphing"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "EARTH_ORBIT_RADIUS",
+        "SUN_RADIUS",
+        "EARTH_TILT_ANGLE",
+        "orbit_radius = 3.5"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene subclass",
+        "get_sun helper function",
+        "get_celestial_sphere helper function",
+        "f_always updaters"
+      ]
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "problem_id": "MB-020",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup of the four complex planes (A, B, C, D) in a 2x2 grid layout with coordinate axes.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "planes",
+        "get_four_planes",
+        "dark_planes"
+      ],
+      "clip_query": "Four coordinate planes arranged in a two-by-two grid"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Displaying the initial Droste-effect image on Plane A.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "droste_image",
+        "get_droste_from_log_image_path",
+        "a_plane"
+      ],
+      "clip_query": "A Droste-effect image displayed on the top-left complex plane"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Mapping the Droste image to the log-plane (Plane B) using the complex logarithm function.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "log_image_tiles",
+        "b_plane",
+        "math.log"
+      ],
+      "clip_query": "The image unwrapped into parallel strips on the top-right complex plane"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Applying a shear/rotation transformation in the log-plane (Plane C) using a complex multiplier.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        30.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "ComplexValueTracker",
+        "const",
+        "c_plane"
+      ],
+      "clip_query": "The unwrapped strips rotated and sheared on the bottom-left complex plane"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Mapping the transformed log-plane back to the exponential plane (Plane D) to form the seamless spiral.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        45.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "np.exp",
+        "d_plane",
+        "blank_spot"
+      ],
+      "clip_query": "The sheared strips mapped back into a seamless tilted spiral on the bottom-right complex plane"
+    }
+  ]
+}

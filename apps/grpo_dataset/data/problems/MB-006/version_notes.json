@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-006",
+  "conflicts": [
+    {
+      "category": "InteractiveScene vs Scene",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "TexText vs Tex",
+      "gl_construct": "TexText",
+      "ce_equivalent": "Tex",
+      "severity": "medium"
+    },
+    {
+      "category": "Target-based animation syntax",
+      "gl_construct": "obj.generate_target(), MoveToTarget(obj)",
+      "ce_equivalent": "obj.generate_target(), MoveToTarget(obj)",
+      "severity": "low"
+    }
+  ]
+}

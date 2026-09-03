@@ -1,0 +1,237 @@
+{
+  "problem_id": "NN-002",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Recap of neural network structure: 784 input neurons, hidden layers of 16 neurons each, 10 output neurons for digits 0-9",
+      "weight": 0.08,
+      "critical": false,
+      "expected_time_range": [
+        0.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "recap",
+        "neural network",
+        "input",
+        "hidden",
+        "output",
+        "784",
+        "10"
+      ],
+      "clip_query": "neural network architecture recap with layers labeled"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Network classifies a digit example - output layer shows brightest neuron as network's choice",
+      "weight": 0.06,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "classifies",
+        "output",
+        "brightest",
+        "digit",
+        "activation"
+      ],
+      "clip_query": "network classifying a digit with output layer highlighted"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Cost function introduced: squared differences between actual and desired output activations for one training example",
+      "weight": 0.1,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "cost function",
+        "squared differences",
+        "training example",
+        "output activations",
+        "desired"
+      ],
+      "clip_query": "equation showing cost as sum of squared differences"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Cost function takes 13,000 weights and biases as input, outputs a single number describing network performance",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        30.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "13,000",
+        "weights",
+        "biases",
+        "single number",
+        "cost"
+      ],
+      "clip_query": "cost function with many inputs and one output"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Single-variable cost function shown as a curve on a graph, with slope/derivative visualization",
+      "weight": 0.1,
+      "critical": true,
+      "expected_time_range": [
+        40.0,
+        55.0
+      ],
+      "keyword_bank": [
+        "single variable",
+        "curve",
+        "slope",
+        "derivative",
+        "local minimum"
+      ],
+      "clip_query": "graph of cost function with slope lines"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "Gradient descent on single-variable function: taking steps downhill based on slope, approaching minimum",
+      "weight": 0.1,
+      "critical": true,
+      "expected_time_range": [
+        55.0,
+        70.0
+      ],
+      "keyword_bank": [
+        "gradient descent",
+        "downhill",
+        "steps",
+        "slope",
+        "minimum"
+      ],
+      "clip_query": "ball rolling down hill to minimum of function"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Two-variable function visualized as surface, gradient vector shown pointing in direction of steepest increase",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        70.0,
+        82.0
+      ],
+      "keyword_bank": [
+        "two variables",
+        "surface",
+        "gradient",
+        "steepest increase",
+        "direction"
+      ],
+      "clip_query": "3D surface with gradient arrows pointing uphill"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "Negative gradient gives direction of steepest decrease - the downhill direction",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        82.0,
+        90.0
+      ],
+      "keyword_bank": [
+        "negative gradient",
+        "steepest decrease",
+        "downhill",
+        "direction"
+      ],
+      "clip_query": "arrows pointing downhill on surface"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "13,000-dimensional gradient: each component tells us how to nudge a weight or bias to decrease cost",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        90.0,
+        102.0
+      ],
+      "keyword_bank": [
+        "13,000",
+        "gradient",
+        "components",
+        "nudge",
+        "weights",
+        "biases"
+      ],
+      "clip_query": "large vector with many components showing gradient"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Relative magnitudes of gradient components indicate which weights matter most for reducing cost",
+      "weight": 0.06,
+      "critical": false,
+      "expected_time_range": [
+        102.0,
+        112.0
+      ],
+      "keyword_bank": [
+        "relative magnitudes",
+        "importance",
+        "weights",
+        "components"
+      ],
+      "clip_query": "different sized arrows showing weight importance"
+    },
+    {
+      "event_id": "ev_11",
+      "description": "Network learning on training examples: cost function decreases over time as weights are adjusted",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        112.0,
+        125.0
+      ],
+      "keyword_bank": [
+        "learning",
+        "training",
+        "cost decreasing",
+        "weights adjusted"
+      ],
+      "clip_query": "network training with cost decreasing over time"
+    },
+    {
+      "event_id": "ev_12",
+      "description": "Testing performance: network achieves 96% accuracy on unseen digits",
+      "weight": 0.05,
+      "critical": false,
+      "expected_time_range": [
+        125.0,
+        135.0
+      ],
+      "keyword_bank": [
+        "testing",
+        "96%",
+        "accuracy",
+        "unseen digits"
+      ],
+      "clip_query": "test accuracy display showing 96%"
+    },
+    {
+      "event_id": "ev_13",
+      "description": "Hidden layers don't learn interpretable edge detectors - they show random-looking patterns",
+      "weight": 0.05,
+      "critical": false,
+      "expected_time_range": [
+        135.0,
+        148.0
+      ],
+      "keyword_bank": [
+        "hidden layers",
+        "random patterns",
+        "not edges",
+        "interpretable"
+      ],
+      "clip_query": "random pixel patterns from hidden layer weights"
+    }
+  ]
+}

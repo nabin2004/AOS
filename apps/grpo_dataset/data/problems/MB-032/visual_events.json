@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-032",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup of coordinate plane, unit circle, and two labeled unit vectors (v and w) at initial angles.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "NumberPlane",
+        "Circle",
+        "Vector",
+        "v1",
+        "v2"
+      ],
+      "clip_query": "A coordinate plane with a unit circle and two colored vectors starting from the origin."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Vector v rotates, and the projection group (dashed line, thick projection line, brace, and dot product label) is revealed.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "dashed_line",
+        "proj_line",
+        "proj_brace",
+        "label",
+        "ShowCreation"
+      ],
+      "clip_query": "A dashed line drops from one vector to another, highlighting a projection with a brace and dot product label."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The vectors wander to new angles, and the projection group dynamically updates its position, length, and orientation.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        7.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "resume_updating",
+        "angle_tracker",
+        "animate"
+      ],
+      "clip_query": "Two vectors rotate on a circle while their projection line and brace dynamically resize and follow them."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The projection group is removed, and the vectors rapidly jump to 50 random positions on the unit circle.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        18.0,
+        28.0
+      ],
+      "keyword_bank": [
+        "remove",
+        "random.random",
+        "set_value"
+      ],
+      "clip_query": "Two vectors rapidly jump to random positions on a unit circle."
+    }
+  ]
+}

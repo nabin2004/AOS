@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-013",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Randolph and Mortimer PiCreatures appear at the bottom, followed by a 10x10 grid of integers from 1 to 100 fading in at the top.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "Randolph",
+        "Mortimer",
+        "Integer",
+        "arrange_in_grid"
+      ],
+      "clip_query": "Two cartoon creatures looking up at a 10 by 10 grid of numbers from 1 to 100"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "10 random numbers in the grid are highlighted with teal rectangles, while the rest of the grid is dimmed.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "random.sample",
+        "SurroundingRectangle",
+        "TEAL",
+        "set_fill"
+      ],
+      "clip_query": "A grid of numbers where ten random numbers are highlighted with teal boxes"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The 10 selected numbers are rearranged into a 2x5 grid above the PiCreatures, and the original grid fades out.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "MoveToTarget",
+        "FadeOut",
+        "arrange_in_grid"
+      ],
+      "clip_query": "Ten numbers arranged in a two by five grid above two cartoon creatures"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Two subsets of the 10 numbers are highlighted, and an equation showing their equal sums is displayed at the top.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "find_a_match",
+        "get_group_rects",
+        "get_top_sum",
+        "TransformFromCopy"
+      ],
+      "clip_query": "An equation showing two sums of numbers being equal, with corresponding numbers highlighted below"
+    }
+  ]
+}

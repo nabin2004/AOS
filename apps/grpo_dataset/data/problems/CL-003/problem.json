@@ -1,0 +1,171 @@
+{
+  "id": "CL-003",
+  "title": "The Essence of Calculus | Chapter 3: Derivative Formulas Through Geometry",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [1920, 2880],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 3,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation explaining derivative formulas through geometric reasoning. Start with f(x) = x² visualized as the area of a square with side length x. Show that increasing x by dx adds two rectangles of area x·dx and a tiny square of area dx², so df/dx = 2x. Then extend to f(x) = x³ visualized as the volume of a cube with side length x, showing that the dominant change comes from three faces of area x²·dx, giving df/dx = 3x². Generalize to the power rule: derivative of xⁿ is n·x^(n-1). Then tackle f(x) = 1/x using a rectangle of area 1, showing the geometric reasoning for its derivative. Finally, explain the derivative of sin(θ) using the unit circle and similar triangles, showing that d(sin θ)/dθ = cos θ.",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter3.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "Chapter3OpeningQuote",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PoseAbstractDerivative",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ContrastAbstractAndConcrete",
+        "key_methods": ["construct", "get_car_anim", "get_spring_anim", "get_population_anim"]
+      },
+      {
+        "name": "ApplicationNames",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ListOfRules",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DerivativeOfXSquaredAsGraph",
+        "key_methods": ["construct", "draw_graph", "ask_about_df_dx", "show_differing_slopes", "mention_alternate_view", "position_little_rectangle"]
+      },
+      {
+        "name": "NudgeSideLengthOfSquare",
+        "key_methods": ["construct", "add_function_label", "introduce_square", "increase_area", "write_df_equation", "set_color_shapes", "examine_thin_rectangles", "examine_tiny_square", "show_smaller_dx", "rule_of_thumb", "write_out_derivative"]
+      },
+      {
+        "name": "ChangeInAreaOverChangeInX",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NudgeSideLengthOfCube",
+        "key_methods": ["construct", "add_title", "introduce_cube", "write_df_equation", "write_derivative", "grab_pieces", "shrink_dx", "get_cube", "get_dv_pices", "organize_faces", "organize_bars", "get_prism", "pose_3d_mobject", "unpose_3d_mobject"]
+      },
+      {
+        "name": "ShowCubeDVIn3D",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "GraphOfXCubed",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PatternForPowerRule",
+        "key_methods": ["construct", "introduce_pattern", "generalize_pattern", "show_hopping"]
+      },
+      {
+        "name": "PowerRuleAlgebra",
+        "key_methods": ["construct", "workout_product", "pull_out_linear_terms"]
+      },
+      {
+        "name": "ReactToFullExpansion",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "OneOverX",
+        "key_methods": ["setup", "construct", "introduce_function", "introduce_puddle", "introduce_graph", "perform_nudge", "create_pi_creature", "draw_graph", "get_rectangle_group", "get_rectangle", "change_rectangle_group"]
+      },
+      {
+        "name": "AskRecipriocalQuestion",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SquareRootOfX",
+        "key_methods": ["construct", "add_title", "introduce_square", "nudge_square"]
+      },
+      {
+        "name": "MentionSine",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NameUnitCircle",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DerivativeOfSineIsSlope",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "IntroduceUnitCircleWithSine",
+        "key_methods": ["construct", "setup_axes", "add_title", "introduce_unit_circle", "draw_example_radians", "label_sine", "walk_around_circle", "get_unit_circle"]
+      },
+      {
+        "name": "DerivativeIntuitionFromSineGraph",
+        "key_methods": ["construct", "setup_axes", "draw_sine_graph", "draw_derivative_from_slopes", "alter_derivative_graph", "v_line_update"]
+      },
+      {
+        "name": "LookToFunctionsMeaning",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DerivativeFromZoomingInOnSine",
+        "key_methods": ["construct", "zoom_in", "perform_nudge", "show_similar_triangles", "analyze_ratios"]
+      },
+      {
+        "name": "TryWithCos",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NextVideo",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Square area as x² with dx rectangles",
+      "Cube volume as x³ with dx faces",
+      "Power rule via combinatorial expansion",
+      "Rectangle of area 1 for 1/x derivative",
+      "Unit circle for sin(θ) derivative",
+      "Similar triangles for trig derivative",
+      "Zoom-in on circle for d(sin)/dθ"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc", "UpdateFromFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "Rotate", "GrowFromCenter", "DrawBorderThenFill", "MoveToTarget", "Indicate"],
+      "mobject_classes": ["Square", "Rectangle", "Cube", "Circle", "Arc", "Axes", "FunctionGraph", "ParametricCurve"],
+      "custom_classes": ["GraphScene", "PiCreatureScene", "TeacherStudentsScene", "ZoomedScene"],
+      "helpers": ["get_graph_label", "get_derivative_graph", "get_vertical_line_to_graph"],
+      "custom_imports": ["from manim_imports_ext import *", "from _2017.eoc.chapter2 import DISTANCE_COLOR, TIME_COLOR, VELOCITY_COLOR, Car, MoveCar"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "fails to show the geometric visualization (square/cube)",
+      "severity": "high",
+      "note": "misses the key pedagogical approach"
+    },
+    {
+      "pattern": "doesn't demonstrate the dx² term being negligible",
+      "severity": "medium",
+      "note": "misses an important calculus concept"
+    },
+    {
+      "pattern": "confuses the derivative with the function value",
+      "severity": "high",
+      "note": "fundamental misunderstanding"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

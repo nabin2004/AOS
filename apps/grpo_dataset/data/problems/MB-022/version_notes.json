@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-022",
+  "conflicts": [
+    {
+      "category": "Mobject",
+      "gl_construct": "Randolph",
+      "ce_equivalent": "Mocked PiCreature or custom SVG class",
+      "severity": "high"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "Blink",
+      "ce_equivalent": "Custom blink animation or mocked method",
+      "severity": "medium"
+    }
+  ]
+}

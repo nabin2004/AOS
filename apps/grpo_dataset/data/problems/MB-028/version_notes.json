@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-028",
+  "conflicts": [
+    {
+      "category": "framework",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "MovingCameraScene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "TexturedSurface",
+      "ce_equivalent": "No direct equivalent; requires custom OpenGL implementation or pre-rendered image assets in CE",
+      "severity": "high"
+    },
+    {
+      "category": "updater_syntax",
+      "gl_construct": "always.clip_to_box",
+      "ce_equivalent": "add_updater with custom clipping logic or custom shader",
+      "severity": "high"
+    },
+    {
+      "category": "text_manipulation",
+      "gl_construct": "make_number_changeable / f_always.set_value",
+      "ce_equivalent": "DecimalNumber with an updater tracking a ValueTracker",
+      "severity": "medium"
+    }
+  ]
+}

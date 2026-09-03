@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-029",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Manipulation",
+      "gl_construct": "self.frame",
+      "ce_equivalent": "self.camera.frame",
+      "severity": "high"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Rate Functions",
+      "gl_construct": "there_and_back_with_pause",
+      "ce_equivalent": "there_and_back",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-046",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "3D Starfield Initialization and Camera Rotation: A glowing Sun is placed at the center, surrounded by a 3D cloud of stars, with the camera continuously rotating around them.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "GlowDot",
+        "GlowDots",
+        "frame.reorient",
+        "add_updater"
+      ],
+      "clip_query": "A 3D starfield rotating around a central glowing sun"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Stellar Distance Measurements: Lines are drawn from the Sun to various stars, accompanied by dynamic 'L.Y.' labels that rotate to face the camera.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "Line",
+        "DecimalNumber",
+        "L.Y.",
+        "ShowCreation"
+      ],
+      "clip_query": "Lines extending from the center to stars with distance labels in light years"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Star Colorization: The stars transition from solid white to a spectrum of stellar colors based on their color index.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "set_rgba_array",
+        "color_index",
+        "rgbas"
+      ],
+      "clip_query": "Stars in a 3D cluster changing color from white to blue, yellow, and red"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "H.R. Diagram Morphing: The camera resets to 2D, axes fade in, and the stars morph from their 3D spatial coordinates into a 2D scatter plot sorted by color and brightness.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "Axes",
+        "c2p",
+        "to_default_state",
+        "sorted_by_color",
+        "fully_sorted"
+      ],
+      "clip_query": "Stars morphing from a 3D cluster into a 2D scatter plot on a coordinate system"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-016",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Exponential function mapping",
+        "Logarithmic spacing visualization",
+        "Function domain to codomain mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Parallel horizontal number lines",
+        "Color gradient interpolation (YELLOW to BLUE)",
+        "Dynamic updating arrow connecting two lines",
+        "Glow effects on coordinate dots"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "ValueTracker updating decimal values in real-time",
+        "Correct exponential calculation (np.exp)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Use of updaters for dynamic positioning",
+        "Lagged animations for dot groups",
+        "Smooth transitions between static and dynamic states"
+      ]
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "id": "MB-014",
+  "title": "Ladybug Random Walk on a Clock",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Probability",
+    "Combinatorics"
+  ],
+  "full_prompt": "Write a Manim scene where a ladybug lands on a clock face and performs a random walk along the clock's hour marks (0 to 11). The clock should have a working clock animation. The ladybug starts at 12 (0) and randomly steps clockwise or counterclockwise. Each visited number turns red, and the last unvisited number turns teal when reached. The ladybug's movement should follow the arc of the clock.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-014/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 90,
+    "scene_classes": [
+      "Ladybug"
+    ],
+    "visual_techniques": [
+      "Custom Clock Animation",
+      "Random Walk Simulation",
+      "Arc-based Movement",
+      "Color Highlighting"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Clock",
+      "ClockPassesTime",
+      "cycle_animation",
+      "MoveAlongPath",
+      "VFadeInThenOut",
+      "Arrow",
+      "path_arc"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing SVGMobject 'ladybug'",
+      "severity": "high",
+      "note": "The code relies on an external SVG asset 'ladybug.svg'. If missing, it will crash. A fallback shape should be used if asset is unavailable."
+    },
+    {
+      "pattern": "Clock class availability",
+      "severity": "medium",
+      "note": "Uses custom Clock class from manim_imports_ext. May need standard Manim equivalent if ported."
+    }
+  ]
+}

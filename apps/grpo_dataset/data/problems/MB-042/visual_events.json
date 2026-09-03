@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-042",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initial close-up view focused on Earth, looking towards Mars, with a line of sight connecting them.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "frame.move_to",
+        "earth",
+        "line_to_mars",
+        "reorient"
+      ],
+      "clip_query": "A close-up 3D view of Earth looking towards Mars with a red line connecting them."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Camera zooms out to reveal the full orbits of Earth and Mars around the central glowing Sun.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "frame.animate.to_default_state",
+        "earth_orbit",
+        "mars_orbit",
+        "sun"
+      ],
+      "clip_query": "Camera zooming out to show concentric planetary orbits around a glowing sun."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Astronomical symbols for Earth and Mars appear and dynamically track the planets' positions.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "wasysym",
+        "earth_symbol",
+        "mars_symbol",
+        "always.next_to"
+      ],
+      "clip_query": "Astronomical symbols tracking Earth and Mars in their orbits."
+    }
+  ]
+}

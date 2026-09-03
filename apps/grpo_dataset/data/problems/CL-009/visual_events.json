@@ -1,0 +1,201 @@
+{
+  "problem_id": "CL-009",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Graph of sin(x) from 0 to \u03c0 shown with question 'Average height?'",
+      "weight": 0.0732,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "sin(x)",
+        "graph",
+        "average",
+        "height",
+        "question"
+      ],
+      "clip_query": "sine wave with question mark asking for average height"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Finite average shown with numbers: (1+4+2+5)/4 = 3",
+      "weight": 0.0732,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "average",
+        "sum",
+        "count",
+        "finite",
+        "divide"
+      ],
+      "clip_query": "numbers being added and divided for average"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Sampling finite points on sine curve to compute approximate average",
+      "weight": 0.122,
+      "critical": true,
+      "expected_time_range": [
+        14.0,
+        26.0
+      ],
+      "keyword_bank": [
+        "sample",
+        "points",
+        "sin",
+        "average",
+        "approximation"
+      ],
+      "clip_query": "dots on sine curve with average calculation"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Number of samples = interval length / dx, so average = (\u03a3 f(x)\u00b7dx) / (b-a)",
+      "weight": 0.122,
+      "critical": true,
+      "expected_time_range": [
+        26.0,
+        38.0
+      ],
+      "keyword_bank": [
+        "dx",
+        "samples",
+        "integral",
+        "width",
+        "average"
+      ],
+      "clip_query": "equation deriving average as sum over interval length"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "As dx \u2192 0, average approaches integral divided by interval length",
+      "weight": 0.122,
+      "critical": true,
+      "expected_time_range": [
+        38.0,
+        48.0
+      ],
+      "keyword_bank": [
+        "limit",
+        "dx",
+        "integral",
+        "area",
+        "width"
+      ],
+      "clip_query": "rectangles getting thinner, sum approaching area"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "Formula: average = (1/(b-a)) \u222b_a^b f(x) dx",
+      "weight": 0.0732,
+      "critical": false,
+      "expected_time_range": [
+        48.0,
+        54.0
+      ],
+      "keyword_bank": [
+        "average",
+        "integral",
+        "formula",
+        "1/(b-a)"
+      ],
+      "clip_query": "average value formula appearing"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Antiderivative -cos(x) found for sin(x), integral evaluated: 2",
+      "weight": 0.0976,
+      "critical": true,
+      "expected_time_range": [
+        54.0,
+        64.0
+      ],
+      "keyword_bank": [
+        "antiderivative",
+        "-cos(x)",
+        "integral",
+        "2",
+        "FTC"
+      ],
+      "clip_query": "-cos(x) graph with integral calculation"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "Average height = 2/\u03c0 \u2248 0.64",
+      "weight": 0.0488,
+      "critical": false,
+      "expected_time_range": [
+        64.0,
+        68.0
+      ],
+      "keyword_bank": [
+        "2/\u03c0",
+        "0.64",
+        "average",
+        "sin"
+      ],
+      "clip_query": "average value 2/\u03c0 appearing"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Alternate perspective: average value of f = average slope of antiderivative F",
+      "weight": 0.0976,
+      "critical": false,
+      "expected_time_range": [
+        68.0,
+        76.0
+      ],
+      "keyword_bank": [
+        "average",
+        "slope",
+        "antiderivative",
+        "F(x)",
+        "derivative"
+      ],
+      "clip_query": "slope of antiderivative graph shown"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Average slope = (F(b)-F(a))/(b-a) = secant line slope",
+      "weight": 0.0976,
+      "critical": false,
+      "expected_time_range": [
+        76.0,
+        84.0
+      ],
+      "keyword_bank": [
+        "secant",
+        "slope",
+        "F(b)",
+        "F(a)",
+        "average"
+      ],
+      "clip_query": "secant line across antiderivative graph"
+    },
+    {
+      "event_id": "ev_11",
+      "description": "General formula for any function f(x): average = (F(b)-F(a))/(b-a)",
+      "weight": 0.0728,
+      "critical": false,
+      "expected_time_range": [
+        84.0,
+        90.0
+      ],
+      "keyword_bank": [
+        "general",
+        "average",
+        "F(b)",
+        "F(a)",
+        "formula"
+      ],
+      "clip_query": "general average formula appearing"
+    }
+  ]
+}

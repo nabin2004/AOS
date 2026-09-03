@@ -1,0 +1,71 @@
+{
+  "id": "MB-053",
+  "title": "Al-Biruni Earth Radius Measurement",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Geometry",
+    "Trigonometry",
+    "History of Mathematics"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes Al-Biruni's method for measuring the Earth's radius. Create a circular Earth with radius 2, overlayed with an SVG map pattern, and place a small mountain of height 0.3 on top. Draw a dashed line of sight from the mountain peak tangent to the Earth's horizon, and show the angle theta between this line of sight and the horizontal. Next, draw the Earth's radius R to the tangent point, forming a right-angled triangle with the Earth's center and the mountain peak. Add a right-angle elbow at the tangent point and a brace along the hypotenuse labeled 'R + h'. Project the angle theta to the Earth's center, and finally shift the camera frame upward to write the trigonometric equation R = (R + h) * cos(theta).",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-053/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "AlBiruniEarthMeasurement"
+    ],
+    "visual_techniques": [
+      "Geometric construction",
+      "Camera frame animation",
+      "SVG texture mapping",
+      "Mathematical derivation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "SVGMobject",
+      "Elbow",
+      "Brace",
+      "ShowCreation",
+      "TransformFromCopy",
+      "frame.animate.shift"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing 'earth' SVG asset",
+      "severity": "high",
+      "note": "The code relies on SVGMobject('earth'). If the asset is missing, the script will crash. A fallback procedural texture or placeholder should be provided if assets are unavailable."
+    },
+    {
+      "pattern": "Using standard Manim CE camera syntax",
+      "severity": "medium",
+      "note": "In ManimGL, the camera frame is accessed via self.frame, whereas in Manim CE it is self.camera.frame."
+    },
+    {
+      "pattern": "Elbow class missing in Manim CE",
+      "severity": "medium",
+      "note": "The Elbow class is specific to ManimGL/3b1b's fork. In Manim CE, RightAngle should be used instead."
+    }
+  ]
+}

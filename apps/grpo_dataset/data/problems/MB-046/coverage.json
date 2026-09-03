@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-046",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Coordinate mapping using axes.c2p",
+        "Interpolation of color indices and absolute magnitudes",
+        "3D vector normalization for label positioning"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Continuous 3D camera rotation",
+        "Glowing star particles (GlowDots or equivalent)",
+        "Smooth morphing transition from 3D space to 2D axes",
+        "Camera-facing text labels in 3D space"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Synthetic stellar data generation fallback",
+        "Correct mapping of color index to RGB values",
+        "Accurate distance calculations for line labels"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Use of ValueTracker for frame rotation",
+        "Sequential animation flow (rotation -> lines -> colors -> morph)",
+        "Graceful handling of missing external data files"
+      ]
+    }
+  }
+}

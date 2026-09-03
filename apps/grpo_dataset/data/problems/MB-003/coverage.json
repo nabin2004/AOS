@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-003",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "KL Divergence formula",
+        "negative log probability",
+        "entropy calculation",
+        "cross entropy"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Stacked probability segments",
+        "Dynamic vertical bars",
+        "ValueTracker updates",
+        "Color interpolation for bars"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Probability values summing to 1.0",
+        "Log base 2 calculations",
+        "Bit values display"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom EntropyChart VGroup class",
+        "always_redraw for dynamic bars",
+        "Updaters for stacked segments"
+      ]
+    }
+  }
+}

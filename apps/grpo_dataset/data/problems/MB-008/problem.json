@@ -1,0 +1,70 @@
+{
+  "id": "MB-008",
+  "title": "Distances Between Documents and Surrounding Ellipses",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Create a Manim scene named 'DistancesBetweenDocuments' that visualizes document clustering and distances in a 2D embedding space. \n\nYour implementation must include:\n1. A custom `LanguageTextExample` class (inheriting from `VGroup`) representing a document. It should contain a file icon (you can construct a simple file icon using a `RoundedRectangle` or `Polygon` with a folded corner if `FileIcon` is not directly available) and a text label below it.\n2. A custom `SurroundingEllipse` class (inheriting from `Ellipse`) that dynamically computes the minimum bounding ellipse enclosing a set of points or a Mobject. Use a convex hull calculation (via `scipy.spatial.ConvexHull`) and Khachiyan's algorithm (or a robust approximation) to find the minimum volume enclosing ellipse. The ellipse must correctly handle rotation, scaling, and translation based on the distribution of the target points.\n3. In the main scene, spawn multiple document nodes grouped into distinct clusters (e.g., 'Topic A' and 'Topic B').\n4. Draw dashed lines or arrows between documents to represent distances/similarities.\n5. Animate the creation of these documents, draw the surrounding ellipses around each cluster, and show how the ellipses dynamically update or scale if a document is added or moved.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-008/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "DistancesBetweenDocuments"
+    ],
+    "visual_techniques": [
+      "Convex Hull calculation",
+      "Minimum Volume Enclosing Ellipsoid (Khachiyan Algorithm)",
+      "Custom Mobject SurroundingEllipse",
+      "Document clustering visualization"
+    ],
+    "manim_api_patterns": [
+      "VGroup",
+      "Ellipse",
+      "set_points",
+      "point_from_proportion",
+      "move_to",
+      "rotate"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Singular matrix error in Khachiyan algorithm",
+      "severity": "high",
+      "note": "Occurs when points are collinear or too few points are provided. Ensure dummy points or a fallback bounding box are used."
+    },
+    {
+      "pattern": "Missing FileIcon class",
+      "severity": "medium",
+      "note": "FileIcon is a custom 3b1b asset. If not present, fallback to a custom SVG or a simple vector drawing of a document."
+    },
+    {
+      "pattern": "Scipy dependency missing",
+      "severity": "medium",
+      "note": "ConvexHull requires scipy. Ensure scipy is imported safely or provide a fallback 2D bounding box ellipse."
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-029",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Grid and dimension labels fade in, showing columns 1 to 9 and the 'Dimension' header.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "grid",
+        "col_labels",
+        "cols_label"
+      ],
+      "clip_query": "A grid with dimension labels 1 to 9 appearing on screen"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Cells for dimension 2 and 3 are highlighted with a teal fill, and their boundary/volume formulas are written inside them.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "highlight_cell",
+        "labels",
+        "Write"
+      ],
+      "clip_query": "Highlighting cells in a grid and writing math formulas inside them"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Row labels appear, a surrounding rectangle highlights them, and the camera pans left to show the 'Boundary' text.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "row_labels",
+        "SurroundingRectangle",
+        "boundary_word",
+        "frame.animate.set_x"
+      ],
+      "clip_query": "Camera panning left to show a text label next to a grid"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Curved teal arrows are drawn from the volume row to the boundary row for dimensions 2 and 3.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        16.0
+      ],
+      "keyword_bank": [
+        "Arrow",
+        "path_arc",
+        "arrows"
+      ],
+      "clip_query": "Curved arrows pointing upwards between rows in a grid"
+    }
+  ]
+}

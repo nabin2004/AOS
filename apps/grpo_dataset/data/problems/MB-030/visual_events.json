@@ -1,0 +1,76 @@
+{
+  "problem_id": "MB-030",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Equation layout setup showing a 3D Sphere, an equals sign, a vertical green line, a multiplication sign, and a red circle aligned horizontally.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Sphere",
+        "SurfaceMesh",
+        "Line",
+        "Circle",
+        "Group",
+        "arrange"
+      ],
+      "clip_query": "A 3D blue sphere, a vertical green line, and a red circle arranged horizontally with equals and multiplication signs."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Formulas fade in and transform under their respective geometric objects.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "Tex",
+        "TransformFromCopy",
+        "TransformMatchingTex"
+      ],
+      "clip_query": "Mathematical formulas appearing under the sphere, line, and circle, with parts of the formulas transforming into each other."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A green dot moves up and down the vertical line while the red circle dynamically resizes its width based on the dot's position.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        24.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "GlowDot",
+        "TrueDot",
+        "add_updater",
+        "math.sqrt"
+      ],
+      "clip_query": "A green dot tracking along a vertical line while a red circle dynamically shrinks and expands in sync."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Transition to the 4D case where the vertical line is replaced by a green disk and labels are updated.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        24.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "disk",
+        "set_fill",
+        "LaggedStartMap",
+        "FadeOut",
+        "FadeIn"
+      ],
+      "clip_query": "The vertical line is replaced by a filled green disk, and labels transition to represent 4D hypersphere boundaries."
+    }
+  ]
+}

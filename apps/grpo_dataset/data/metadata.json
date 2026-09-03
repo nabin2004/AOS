@@ -1,0 +1,22 @@
+{
+  "dataset_name": "manibench-grpo",
+  "version": "0.1.0",
+  "generated_at": "2026-08-17",
+  "split_policy": {
+    "strategy": "deterministic_fixed_seed",
+    "seed": 20260817,
+    "train_ratio": 0.8,
+    "val_ratio": 0.1,
+    "test_ratio": 0.1
+  },
+  "problems": [
+    {
+      "id": "MB-001",
+      "title": "Single Variable Gradient Descent",
+      "difficulty": 3,
+      "domain": ["ML", "Calculus"],
+      "category": ["drift-sensitive", "direct-visualization"],
+      "path": "data/problems/MB-001/problem.json"
+    }
+  ]
+}

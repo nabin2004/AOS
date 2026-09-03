@@ -1,0 +1,76 @@
+{
+  "problem_id": "MB-047",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Celestial sphere background and central glowing Sun are initialized and rendered.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "celestial_sphere",
+        "TexturedSurface",
+        "Sphere",
+        "sun",
+        "GlowDot"
+      ],
+      "clip_query": "A glowing sun at the center of a dark, starry celestial sphere background."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Concentric planetary orbits are drawn as colored circles around the Sun.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "Circle",
+        "orbits",
+        "radii",
+        "colors"
+      ],
+      "clip_query": "Concentric colored circular orbits appearing around a central glowing star."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Astronomical symbols for the planets are rendered and placed on their respective orbits.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "Tex",
+        "symbols",
+        "wasysym",
+        "mercury",
+        "venus",
+        "earth"
+      ],
+      "clip_query": "Astrological or astronomical symbols placed on concentric circular orbits."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Orbits and symbols rotate continuously at different speeds based on their orbital periods.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "add_updater",
+        "rotate",
+        "period",
+        "seconds_per_day"
+      ],
+      "clip_query": "Concentric planetary orbits and symbols rotating dynamically at varying speeds."
+    }
+  ]
+}

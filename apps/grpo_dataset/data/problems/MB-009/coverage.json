@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-009",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Information content formula -log2(p_i)",
+        "Probability distribution sum to 1 constraint",
+        "Dirichlet distribution or normalized random parts for random_distribution"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Stacked horizontal probability segments",
+        "Vertical information bars aligned with horizontal segments",
+        "Y-axis reference lines with bit labels",
+        "FancyCircumscribe highlight effect"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker updating probability values dynamically",
+        "Logarithmic scaling of bar heights based on tracker values",
+        "Minimum threshold enforcement to avoid division by zero"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom EntropyChart VGroup subclass",
+        "Updaters linking horizontal segment widths to vertical bar positions and heights",
+        "Clean separation of distribution generation and visual representation"
+      ]
+    }
+  }
+}

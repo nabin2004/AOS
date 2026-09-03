@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-033",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "camera_control",
+      "gl_construct": "self.frame.animate.reorient",
+      "ce_equivalent": "self.set_camera_orientation / self.begin_ambient_camera_rotation",
+      "severity": "high"
+    },
+    {
+      "category": "mesh_generation",
+      "gl_construct": "SurfaceMesh",
+      "ce_equivalent": "No direct equivalent; requires manual VGroup of parametric curves or custom Surface styling",
+      "severity": "high"
+    },
+    {
+      "category": "animation_naming",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    }
+  ]
+}

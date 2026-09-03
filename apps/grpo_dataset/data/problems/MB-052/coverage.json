@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-052",
+  "requirements": {
+    "Math": {
+      "weight": 0.15,
+      "expected": [
+        "NumberLine mapping",
+        "Coordinate conversion using n2p or number_to_point"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "Lifespan lines with custom colors",
+        "Dashed vertical lines connecting to the timeline",
+        "Character name labels",
+        "Portrait ImageMobjects positioned above labels"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Timeline range from -500 to 2000",
+        "Correct birth and death years for historical figures",
+        "Vertical offsets for overlapping lifespans"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Camera frame movement and zooming",
+        "Sequential animations with FadeIn and FadeOut",
+        "BCE label formatting logic"
+      ]
+    }
+  }
+}

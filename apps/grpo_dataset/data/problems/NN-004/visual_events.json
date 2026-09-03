@@ -1,0 +1,241 @@
+{
+  "problem_id": "NN-004",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Simplified network: single neuron per layer with labeled weights w1, w2, w3 and biases b1, b2, b3",
+      "weight": 0.06,
+      "critical": false,
+      "expected_time_range": [
+        0.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "simplified",
+        "single neuron",
+        "weights",
+        "biases",
+        "w1",
+        "b1"
+      ],
+      "clip_query": "network with one neuron per layer labeled w and b"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Cost function C0 = (a^L - y)^2 shown for a single training example",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "cost function",
+        "C0",
+        "a^L",
+        "y",
+        "squared"
+      ],
+      "clip_query": "equation C0 equals a minus y squared"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Activation formula: a^L = \u03c3(w^L\u00b7a^(L-1) + b^L) with sigmoid function",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        32.0
+      ],
+      "keyword_bank": [
+        "activation",
+        "sigmoid",
+        "weighted sum",
+        "bias",
+        "sigma"
+      ],
+      "clip_query": "activation equation with sigma and weighted sum"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Introduce z^L = w^L\u00b7a^(L-1) + b^L as the weighted input before activation",
+      "weight": 0.06,
+      "critical": false,
+      "expected_time_range": [
+        32.0,
+        42.0
+      ],
+      "keyword_bank": [
+        "z",
+        "weighted input",
+        "before activation",
+        "w times a plus b"
+      ],
+      "clip_query": "equation z equals weighted sum before sigmoid"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Computational graph showing dependencies: weights and biases \u2192 z \u2192 a \u2192 cost",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        42.0,
+        54.0
+      ],
+      "keyword_bank": [
+        "computational graph",
+        "dependencies",
+        "chain",
+        "z",
+        "a",
+        "cost"
+      ],
+      "clip_query": "graph showing flow from weights to cost"
+    },
+    {
+      "event_id": "ev_06",
+      "description": "Number lines showing values of w, z, a, and C0 with dots marking current values",
+      "weight": 0.06,
+      "critical": false,
+      "expected_time_range": [
+        54.0,
+        64.0
+      ],
+      "keyword_bank": [
+        "number lines",
+        "values",
+        "w",
+        "z",
+        "a",
+        "C0"
+      ],
+      "clip_query": "number lines with dots for w, z, a, C0"
+    },
+    {
+      "event_id": "ev_07",
+      "description": "Sensitivity demonstration: wiggling w shows how it affects z, a, and C0",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        64.0,
+        76.0
+      ],
+      "keyword_bank": [
+        "sensitivity",
+        "wiggling",
+        "affects",
+        "z",
+        "a",
+        "C0"
+      ],
+      "clip_query": "wiggling weight with cascading effects on other values"
+    },
+    {
+      "event_id": "ev_08",
+      "description": "Chain rule: \u2202C0/\u2202w^L = (\u2202C0/\u2202a^L)\u00b7(\u2202a^L/\u2202z^L)\u00b7(\u2202z^L/\u2202w^L)",
+      "weight": 0.1,
+      "critical": true,
+      "expected_time_range": [
+        76.0,
+        90.0
+      ],
+      "keyword_bank": [
+        "chain rule",
+        "partial derivatives",
+        "dC/da",
+        "da/dz",
+        "dz/dw"
+      ],
+      "clip_query": "chain rule equation with three partial derivatives"
+    },
+    {
+      "event_id": "ev_09",
+      "description": "Explicit derivatives: \u2202C0/\u2202a^L = 2(a^L - y), \u2202a^L/\u2202z^L = \u03c3'(z^L), \u2202z^L/\u2202w^L = a^(L-1)",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        90.0,
+        102.0
+      ],
+      "keyword_bank": [
+        "2(a-y)",
+        "sigma prime",
+        "a^(L-1)",
+        "explicit derivatives"
+      ],
+      "clip_query": "three derivative equations with values"
+    },
+    {
+      "event_id": "ev_10",
+      "description": "Generalization to multiple neurons: indices j and k, \u2202C0/\u2202w^L_jk = a^(L-1)_k \u00b7 \u03c3'(z^L_j) \u00b7 \u2202C0/\u2202a^L_j",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        102.0,
+        114.0
+      ],
+      "keyword_bank": [
+        "indices",
+        "j",
+        "k",
+        "multiple neurons",
+        "generalization"
+      ],
+      "clip_query": "equation with subscripts j and k"
+    },
+    {
+      "event_id": "ev_11",
+      "description": "Recursive error propagation: \u03b4^l = ((w^{l+1})^T \u03b4^{l+1}) \u2299 \u03c3'(z^l)",
+      "weight": 0.08,
+      "critical": true,
+      "expected_time_range": [
+        114.0,
+        126.0
+      ],
+      "keyword_bank": [
+        "recursive",
+        "error propagation",
+        "transpose",
+        "delta",
+        "Hadamard"
+      ],
+      "clip_query": "equation showing delta propagating backward with transpose"
+    },
+    {
+      "event_id": "ev_12",
+      "description": "Four fundamental backpropagation equations displayed together",
+      "weight": 0.1,
+      "critical": true,
+      "expected_time_range": [
+        126.0,
+        140.0
+      ],
+      "keyword_bank": [
+        "four equations",
+        "delta^L",
+        "delta^l",
+        "\u2202C/\u2202b",
+        "\u2202C/\u2202w"
+      ],
+      "clip_query": "four backpropagation equations displayed"
+    },
+    {
+      "event_id": "ev_13",
+      "description": "Summary: backpropagation computes gradient efficiently using these equations",
+      "weight": 0.06,
+      "critical": false,
+      "expected_time_range": [
+        140.0,
+        148.0
+      ],
+      "keyword_bank": [
+        "summary",
+        "backpropagation",
+        "gradient",
+        "efficient",
+        "equations"
+      ],
+      "clip_query": "summary text with backpropagation equations"
+    }
+  ]
+}

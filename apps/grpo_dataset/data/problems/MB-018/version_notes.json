@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-018",
+  "conflicts": [
+    {
+      "category": "Mobject classes",
+      "gl_construct": "GlowDot, TrueDot",
+      "ce_equivalent": "Dot with custom glow effect or standard Dot with outer glowing circles",
+      "severity": "high"
+    },
+    {
+      "category": "Dynamic Tex manipulation",
+      "gl_construct": "make_number_changeable",
+      "ce_equivalent": "Using DecimalNumber or standard ValueTracker with always_redraw",
+      "severity": "high"
+    },
+    {
+      "category": "Camera manipulation",
+      "gl_construct": "self.camera.frame.animate.reorient",
+      "ce_equivalent": "self.play(self.camera.frame.animate.move_to(...).set_width(...)) in MovingCameraScene",
+      "severity": "high"
+    }
+  ]
+}

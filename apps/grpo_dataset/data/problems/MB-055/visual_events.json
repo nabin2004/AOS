@@ -1,0 +1,75 @@
+{
+  "problem_id": "MB-055",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialize coordinate plane, target state vector (yellow), and initial state vector (teal) with their respective ket labels and a key icon.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "NumberPlane",
+        "key_vect",
+        "b_vect",
+        "key_label",
+        "b_label",
+        "key_icon"
+      ],
+      "clip_query": "A 2D coordinate plane showing a vertical yellow vector and a diagonal teal vector with ket labels."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Highlight the target state vector and its label using GrowArrow and FlashAround animations.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        4.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "GrowArrow",
+        "FlashAround",
+        "key_vect",
+        "key_label"
+      ],
+      "clip_query": "A flash animation highlighting the yellow ket label on the vertical axis."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Introduce the horizontal axis vector representing non-target states, along with general and example LaTeX formulas.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        7.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "x_vect",
+        "x_label_general",
+        "x_label_example",
+        "TransformFromCopy"
+      ],
+      "clip_query": "A white horizontal vector appearing with mathematical formulas written in LaTeX."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Project the teal state vector onto the vertical axis, drawing a dashed line and highlighting the target state component in the equation.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "b_vect_proj",
+        "dashed_line",
+        "rhs",
+        "FlashAround"
+      ],
+      "clip_query": "A dashed line projecting a diagonal vector onto the vertical axis, with a highlighted equation component."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-027",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Coordinate transformation mapping (x, y) to (x + y, 2xy)",
+        "Local linearity visualization via zooming",
+        "Input and output space representation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Side-by-side NumberPlanes",
+        "Warped grid transformation",
+        "Highlighted blue square",
+        "Deep camera zoom-in sequence",
+        "Dynamic grid opacity fading"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Plane range from -4 to 4",
+        "Grid resolution of 20x20 for nested zooms",
+        "6 nested zoom levels",
+        "Square index 499 highlighted"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Use of InteractiveScene or MovingCameraScene",
+        "Target-based animation (MoveToTarget)",
+        "Updaters for dynamic opacity adjustment",
+        "Camera frame manipulation"
+      ]
+    }
+  }
+}

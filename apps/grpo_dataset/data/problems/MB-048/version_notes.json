@@ -1,0 +1,34 @@
+{
+  "problem_id": "MB-048",
+  "conflicts": [
+    {
+      "category": "Class Hierarchy",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene (with custom camera/three_d_camera setup)",
+      "severity": "high"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "GlowDot / GlowDots",
+      "ce_equivalent": "Dot / Dot3D (Glow effects are native to ManimGL's shader-based renderer)",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient / self.frame.add_updater",
+      "severity": "high"
+    },
+    {
+      "category": "Animation Methods",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobject Methods",
+      "gl_construct": "line.pfp (point_from_proportion)",
+      "ce_equivalent": "line.point_from_proportion",
+      "severity": "medium"
+    }
+  ]
+}

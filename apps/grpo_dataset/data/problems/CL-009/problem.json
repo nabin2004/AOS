@@ -1,0 +1,143 @@
+{
+  "id": "CL-009",
+  "title": "The Essence of Calculus | Chapter 9: Average Value of a Continuous Variable",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [7680, 8640],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 4,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation explaining the average value of a continuous function. Start with the graph of sin(x) from 0 to π and ask 'What is the average height?' Show that finite averages involve summing values and dividing by count, but continuous variables have infinitely many values. Approximate by sampling finite points, compute the average, and show that as more points are sampled, the average approaches the integral divided by the interval length. Derive the formula: average = (1/(b-a)) ∫_a^b f(x) dx. Then compute for sin(x): the antiderivative is -cos(x), so the integral is 2, and the average is 2/π. Finally, show an alternate perspective: the average value of f is the average slope of its antiderivative F, which equals the net change in F divided by the change in x, making the FTC intuitive.",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter9.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "Chapter9OpeningQuote",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AverageOfContinuousVariable",
+        "key_methods": ["construct", "get_v_line_change_anim"]
+      },
+      {
+        "name": "ThisVideo",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AverageOfSineStart",
+        "key_methods": ["construct", "add_graph", "ask_about_average", "get_graph_portion_between_bounds", "setup_axes", "add_x_axis_labels"]
+      },
+      {
+        "name": "LengthOfDayGraph",
+        "key_methods": ["construct", "add_graph", "show_solar_pannel", "set_color_summer_months", "mention_constants"]
+      },
+      {
+        "name": "AskAboutAverageOfContinuousVariables",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AverageOfFiniteSet",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TryToAddInfinitelyManyPoints",
+        "key_methods": ["construct", "add_graph", "try_to_add_infinitely_many_values", "show_continuum", "mention_integral"]
+      },
+      {
+        "name": "FiniteSample",
+        "key_methods": ["construct", "show_finite_sample", "get_sample_lines"]
+      },
+      {
+        "name": "FiniteSampleWithMoreSamplePoints",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "FeelsRelatedToAnIntegral",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "IntegralOfSine",
+        "key_methods": ["construct", "put_average_in_corner", "write_integral", "show_riemann_rectangles", "let_dx_approach_zero", "bring_back_average", "distribute_dx", "write_area_over_width", "show_moving_v_line"]
+      },
+      {
+        "name": "Approx31",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "LetsSolveThis",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "Antiderivative",
+        "key_methods": ["construct", "add_x_axis_labels", "negate_derivative_of_cosine", "walk_through_slopes", "apply_ftoc", "show_difference_in_antiderivative", "comment_on_area", "divide_by_pi", "set_color_antiderivative_fraction", "show_slope", "bring_back_derivative", "show_tangent_slope"]
+      },
+      {
+        "name": "GeneralAverage",
+        "key_methods": ["construct", "add_graph", "ask_about_average", "show_signed_area", "put_area_away", "show_finite_sample", "show_improving_samples", "func"]
+      },
+      {
+        "name": "GeneralAntiderivative",
+        "key_methods": ["construct", "fade_existing_graph", "add_fraction", "add_antiderivative_graph", "show_average_in_terms_of_F", "show_change_in_height", "shift_antideriv_graph_up_and_down", "draw_slope", "show_tangent_line_slopes"]
+      },
+      {
+        "name": "LastVideoWrapper",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ASecondIntegralSensation",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Average of finite set as sum/count",
+      "Continuous average as limit of sample averages",
+      "Integral as area under curve",
+      "Average = area / width",
+      "Antiderivative slope interpretation",
+      "Finite sample approximations",
+      "Signed area for negative values"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "ReplacementTransform", "MoveToTarget"],
+      "mobject_classes": ["Dot", "Line", "Arrow", "Brace", "Rectangle", "FunctionGraph", "UnitInterval"],
+      "custom_classes": ["GraphScene", "TeacherStudentsScene", "PiCreatureScene"],
+      "helpers": ["get_graph_label", "get_vertical_lines_to_graph", "get_riemann_rectangles", "get_riemann_rectangles_list", "transform_between_riemann_rects"],
+      "custom_imports": ["from manim_imports_ext import *"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses finite average with continuous average",
+      "severity": "high",
+      "note": "fundamental misunderstanding"
+    },
+    {
+      "pattern": "fails to show the sampling approximation to the integral",
+      "severity": "high",
+      "note": "misses the key connection"
+    },
+    {
+      "pattern": "doesn't demonstrate the slope interpretation of average value",
+      "severity": "medium",
+      "note": "misses an important perspective"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "problem_id": "NN-003",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Cost function as average over training examples",
+        "Gradient as partial derivatives of cost with respect to each weight and bias",
+        "Chain rule for computing derivatives backward through network",
+        "Proportionality of nudges to error and activation",
+        "Sum of contributions from all output neurons",
+        "Recursive computation of gradients layer by layer",
+        "Average of gradients over training examples"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Network architecture with layers",
+        "Output layer with desired nudges (up/down arrows)",
+        "Single neuron zoom-in with three contributing factors",
+        "Weight connections with brightness indicating influence",
+        "Backward propagation arrows through layers",
+        "Grid of training examples with changes",
+        "Gradient vector construction",
+        "Mini-batch visualization"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "784 input neurons (28\u00d728 pixels)",
+        "16 neurons in hidden layers",
+        "10 output neurons (digits 0-9)",
+        "13,000+ weights and biases",
+        "Mini-batch size (100 examples)",
+        "Tens of thousands of training examples"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: recap \u2192 single example effect \u2192 backward propagation \u2192 averaging \u2192 gradient \u2192 mini-batches \u2192 summary",
+        "Clear progression from intuitive to algorithmic",
+        "Proportional reasoning throughout",
+        "Connection between intuitive nudges and formal gradient",
+        "Practical computational considerations"
+      ]
+    }
+  }
+}

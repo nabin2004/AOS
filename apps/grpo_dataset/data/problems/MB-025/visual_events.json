@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-025",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation and alignment of multiple input-output function grids (e.g., c*z, z^2, z^3, e^z, ln(z)).",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "get_input_output_grid",
+        "examples",
+        "shift"
+      ],
+      "clip_query": "A vertical gallery of input-output complex coordinate grids representing mathematical functions."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Generation of a nested recursive square grid for the logarithm example.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "get_nested_square_grid",
+        "log_grid",
+        "n_recursions"
+      ],
+      "clip_query": "A recursive, nested square grid with decreasing stroke widths towards the center."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Conformal mapping of the nested grid using np.log between the source and target planes.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "apply_func_between_planes",
+        "np.log",
+        "replace_submobject"
+      ],
+      "clip_query": "A nested grid mapped conformally into a logarithmic spiral-like coordinate system."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Covering up advanced examples with grey background rectangles and question marks.",
+      "weight": 0.1,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "BackgroundRectangle",
+        "Tex",
+        "?"
+      ],
+      "clip_query": "Grey rectangles with question marks covering up several complex function grids."
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-009",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation and rendering of the initial EntropyChart showing horizontal probability segments and vertical information bars.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "EntropyChart",
+        "StackedProbDistribution",
+        "Rectangle",
+        "Line"
+      ],
+      "clip_query": "An entropy chart showing a stacked horizontal probability distribution at the bottom and vertical information bars rising from each segment."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Dynamic transition of the probability distribution, showing horizontal segments resizing and vertical bars smoothly scaling in height.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "add_updater",
+        "get_value",
+        "set_distribution"
+      ],
+      "clip_query": "The horizontal segments of the probability distribution dynamically resize while the vertical bars smoothly change their heights."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A passing flash highlight effect (FancyCircumscribe) surrounding a specific information bar to draw focus.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        7.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "FancyCircumscribe",
+        "VShowPassingFlash",
+        "SurroundingRectangle"
+      ],
+      "clip_query": "A yellow glowing rectangular outline flashes around one of the vertical bars in the entropy chart."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Comparison or overlay of a second distribution (cross-entropy state) where bar heights represent -log2(q_i) aligned with p_i widths.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        9.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "bar_heights",
+        "cross_entropy",
+        "KLDivergenceDemo"
+      ],
+      "clip_query": "The vertical bars of the entropy chart adjust to represent a different distribution's information content while maintaining the original segment widths."
+    }
+  ]
+}

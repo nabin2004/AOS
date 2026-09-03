@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-003",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation of the EntropyChart with initial stacked probability distribution segments at the bottom.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "EntropyChart",
+        "StackedProbDistribution",
+        "segments",
+        "initial_distribution"
+      ],
+      "clip_query": "A stacked probability distribution bar showing different event probabilities at the bottom of the screen."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Growth of vertical information bars representing negative log probabilities above each segment.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "bars",
+        "always_redraw",
+        "math.log2",
+        "Rectangle",
+        "height"
+      ],
+      "clip_query": "Vertical bars rising above a probability distribution, representing information content in bits."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic transition of probability values using ValueTrackers, showing bars stretching and shrinking.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "update_segments",
+        "distribution_trackers",
+        "animate"
+      ],
+      "clip_query": "An animated bar chart where the widths of the base segments and heights of the bars dynamically adjust."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Overlaying of KL Divergence formula or comparison between true distribution p and approximating distribution q.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        25.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "KLDivergenceDefinition",
+        "Tex",
+        "cross_entropy",
+        "KL"
+      ],
+      "clip_query": "Mathematical formula for KL divergence or cross entropy displayed alongside the dynamic charts."
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-023",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Draws the white canvas square and the first small blue square in the bottom-right corner.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "canvas",
+        "square1b",
+        "DrawBorderThenFill"
+      ],
+      "clip_query": "A white square outline with a small blue square in the bottom right corner"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Scales a green square copy up to the bottom-left corner, dynamically drawing yellow connecting lines between the original blue square and the expanding green square.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "square2a",
+        "connectingLines1",
+        "always_redraw",
+        "scale",
+        "DL"
+      ],
+      "clip_query": "A green square scaling up towards the bottom-left corner with yellow lines connecting it to a blue square"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Spawns a new blue square at the bottom-left, then scales a green copy up to the top-left corner with yellow connecting lines.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "square2b",
+        "square3a",
+        "connectingLines2",
+        "UL"
+      ],
+      "clip_query": "A green square scaling up towards the top-left corner with yellow lines connecting it to a blue square"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Spawns a blue square at the top-left, then scales a green copy up to the top-right corner with yellow connecting lines.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "square3b",
+        "square4a",
+        "connectingLines3",
+        "UR"
+      ],
+      "clip_query": "A green square scaling up towards the top-right corner with yellow lines connecting it to a blue square"
+    }
+  ]
+}

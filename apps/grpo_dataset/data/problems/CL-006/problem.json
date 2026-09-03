@@ -1,0 +1,128 @@
+{
+  "id": "CL-006",
+  "title": "The Essence of Calculus | Chapter 6: Implicit Differentiation",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [4800, 5760],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 4,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation explaining implicit differentiation. Start with a circle x² + y² = 25 and ask for the slope of the tangent line at point (3,4). Show that the curve is not a function (not y = f(x)). Introduce the idea of zooming in on the curve and considering tiny steps dx and dy. Define S = x² + y² as a function of two variables, and show that dS = 2x·dx + 2y·dy. Explain that staying on the circle means dS = 0, which gives the slope dy/dx = -x/y. Then show the ladder problem (related rates) as a parallel example where x and y are functions of time, with d(x²+y²)/dt = 0. Finally, use implicit differentiation to find the derivative of ln(x) by rewriting as e^y = x and differentiating both sides.",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter6.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "Chapter6OpeningQuote",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ThisWasConfusing",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SlopeOfCircleExample",
+        "key_methods": ["construct", "setup_plane", "introduce_circle", "talk_through_pythagorean_theorem", "draw_example_slope", "show_perpendicular_radius", "show_dx_and_dy", "write_slope_as_dy_dx", "point_out_this_is_not_a_graph", "perform_implicit_derivative", "show_final_slope"]
+      },
+      {
+        "name": "NameImplicitDifferentation",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "Ladder",
+        "key_methods": ["init_points"]
+      },
+      {
+        "name": "RelatedRatesExample",
+        "key_methods": ["construct", "introduce_ladder", "write_related_rates", "measure_ladder", "slide_ladder", "ponder_question", "write_equation", "isolate_x_of_t", "discuss_lhs_as_function", "let_dt_pass", "take_derivative_of_rhs", "take_derivative_of_lhs", "bring_back_velocity_arrows", "replace_terms_in_final_form", "write_final_solution", "get_added_anims_for_ladder_fall", "let_ladder_fall", "reset_ladder", "update_brace", "update_x_and_y_lines", "update_x_and_y_labels", "get_ladder_brace", "get_x_and_y_labels", "get_x_and_y_lines", "get_ladder_angle", "get_ladder_length"]
+      },
+      {
+        "name": "LightweightLadderScene",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "LightweightCircleExample",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "CompareLadderAndCircle",
+        "key_methods": ["construct", "introduce_both_scenes", "show_derivatives", "comment_on_ladder_derivative", "comment_on_circle_derivative", "create_pi_creature", "color_equations"]
+      },
+      {
+        "name": "TwoVariableFunctionAndDerivative",
+        "key_methods": ["construct", "write_equation", "show_example_point", "shift_example_point", "take_derivative_symbolically", "show_dx_dy_step", "plug_in_example_values", "ask_about_equalling_zero", "show_tangent_step", "point_out_equalling_zero", "show_tangent_line", "get_s_expression"]
+      },
+      {
+        "name": "TryOtherExamples",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "AlternateExample",
+        "key_methods": ["construct", "add_plane", "draw_graph", "emphasize_meaning_of_points", "zoom_in", "show_tiny_step", "ask_about_derivatives", "differentiate_lhs", "differentiate_rhs", "put_step_on_curve", "emphasize_equality", "manipulate_to_find_dy_dx"]
+      },
+      {
+        "name": "AskAboutNaturalLog",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DerivativeOfNaturalLog",
+        "key_methods": ["construct", "add_plane", "draw_graph", "describe_as_implicit_curve", "slope_gives_derivative", "rearrange_equation", "take_derivative", "show_tiny_nudge", "note_derivatives", "solve_for_dy_dx", "show_slope_above_x"]
+      },
+      {
+        "name": "FinalWords",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Circle as implicit curve",
+      "Zoom in on curve for tangent slope",
+      "dx and dy as components of tiny step",
+      "S = x² + y² as function of two variables",
+      "dS = 2x·dx + 2y·dy",
+      "Setting dS = 0 for steps along curve",
+      "Ladder problem as related rates",
+      "Derivative of ln(x) via implicit differentiation"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc", "UpdateFromFunc", "MaintainPositionRelativeTo"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "Indicate", "FocusOn", "ReplacementTransform"],
+      "mobject_classes": ["Circle", "Dot", "Line", "Arrow", "Brace", "NumberPlane", "FunctionGraph", "Prism", "Rectangle"],
+      "custom_classes": ["GraphScene", "TeacherStudentsScene", "PiCreatureScene", "ThreeDScene", "ZoomedScene"],
+      "helpers": ["get_graph_label", "get_vertical_line_to_graph", "get_secant_slope_group"],
+      "custom_imports": ["from manim_imports_ext import *"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses implicit differentiation with regular differentiation",
+      "severity": "high",
+      "note": "fundamental misunderstanding"
+    },
+    {
+      "pattern": "fails to explain why dS = 0 for steps along the curve",
+      "severity": "high",
+      "note": "misses the key insight"
+    },
+    {
+      "pattern": "doesn't connect circle and ladder problems",
+      "severity": "medium",
+      "note": "misses the unifying concept"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

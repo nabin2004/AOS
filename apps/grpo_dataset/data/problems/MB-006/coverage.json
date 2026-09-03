@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-006",
+  "requirements": {
+    "Math": {
+      "weight": 0.15,
+      "expected": [
+        "GZIP(AB)",
+        "GZIP(A)",
+        "TexText labels with color mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "Stacked pink/magenta rectangles for Document A",
+        "Stacked green rectangles for Document B",
+        "Stretched/compressed block representations",
+        "Curved path transitions (path_arc)",
+        "Vertical comparison lines"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "8 rectangles per document",
+        "Rectangle dimensions (width=5, height=1)",
+        "Stretch factors (0.15, 0.4) for compression simulation"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene class",
+        "Target-based animations (generate_target, MoveToTarget)",
+        "AnimationGroup with lag_ratio"
+      ]
+    }
+  }
+}

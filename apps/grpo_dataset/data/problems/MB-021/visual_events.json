@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-021",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display of the formula f(z) = z^2 with pink and yellow coloring.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "f_of_z",
+        "Tex",
+        "PINK",
+        "YELLOW"
+      ],
+      "clip_query": "A large formula f(z) = z^2 written on a dark background with pink and yellow letters."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Introduction of side-by-side complex planes with coordinate labels and grid.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "in_plane",
+        "out_plane",
+        "add_coordinate_labels"
+      ],
+      "clip_query": "Two side-by-side complex coordinate planes appearing on screen with grid lines."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Point-by-point evaluations of f(2), f(i), and f(-1) with glowing dots moving along curved paths.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "f_of_2",
+        "f_of_i",
+        "f_of_negative_1",
+        "TrueDot",
+        "GlowDot",
+        "path_arc"
+      ],
+      "clip_query": "Glowing dots moving along curved paths from the left complex plane to the right complex plane as equations are written."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Fade out of point evaluations to prepare for the full grid transformation.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "FadeOut",
+        "Group"
+      ],
+      "clip_query": "The text equations and dots fading out, leaving only the two complex planes."
+    }
+  ]
+}

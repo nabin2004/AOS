@@ -1,0 +1,72 @@
+{
+  "id": "MB-011",
+  "title": "Ladybug Random Walk on a Clock",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Probability",
+    "Combinatorics"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes a ladybug performing a random walk on a clock face. The clock should have 12 tick marks and numbers 1 to 12 (with 12 at the top, index 0). A ladybug (represented by an SVG or a custom group of shapes) starts at the 12 o'clock position. It then performs a random walk, stepping either clockwise (+1) or counter-clockwise (-1) at each step. As the ladybug visits each number, the number should turn red. The simulation continues until 11 of the 12 numbers have been visited. The very last unvisited number should be highlighted in a distinct color (e.g., teal) to emphasize the probability distribution of the last-visited state. Use curved arrows (using path_arc) to animate the ladybug's transitions from one clock tick to another, and fade the arrows in and out dynamically.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-011/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 120,
+    "scene_classes": [
+      "Ladybug",
+      "ProbabilityCalculation"
+    ],
+    "visual_techniques": [
+      "Random Walk Simulation",
+      "Clock Face Visualization",
+      "SVG Mobject Animation",
+      "Path Arc Arrows",
+      "Dynamic Color Highlighting"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Clock",
+      "SVGMobject",
+      "MoveAlongPath",
+      "VFadeInThenOut",
+      "cycle_animation",
+      "ClockPassesTime"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing SVGMobject 'ladybug' asset causing runtime crash",
+      "severity": "high",
+      "note": "If the 'ladybug' SVG is missing, the code must fallback to a procedurally drawn bug or a simple Dot/Group representation."
+    },
+    {
+      "pattern": "Infinite loop in random walk simulation",
+      "severity": "high",
+      "note": "Ensure the random walk loop terminates correctly when len(covered_numbers) reaches 12."
+    },
+    {
+      "pattern": "Incorrect index mapping for clock numbers",
+      "severity": "medium",
+      "note": "The clock numbers must align correctly with the 12 tick marks, starting with 12 at the top."
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-028",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the Droste image and its low-opacity background ghost copy.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "droste_image",
+        "drost_image_ghost",
+        "set_opacity"
+      ],
+      "clip_query": "A recursive Droste spiral image displayed on screen with a faint ghost background."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Introduction of the red bounding box and the dynamic scale label starting at 1.0.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "box",
+        "box_label",
+        "ScreenRectangle",
+        "RED"
+      ],
+      "clip_query": "A red rectangular frame appears with a label showing times 1.0."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Simultaneous exponential scaling of the red box and camera zoom, with the label counting up to 256.0.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "box_exp_tracker",
+        "frame_exp_tracker",
+        "animate",
+        "math.log(256)"
+      ],
+      "clip_query": "The red box shrinks exponentially as the camera zooms in, and the scale label dynamically counts up to 256."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The camera zooms back out to the original frame size, leaving the small scaled-down red box visible.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        14.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "frame_exp_tracker",
+        "animate.set_value(0)"
+      ],
+      "clip_query": "The camera zooms out to reveal the full scene with a tiny red box in the center."
+    }
+  ]
+}

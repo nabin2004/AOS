@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-015",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the dual complex planes (z-plane on the left, w-plane on the right) with coordinate labels.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "z_plane",
+        "w_plane",
+        "add_coordinate_labels"
+      ],
+      "clip_query": "Two complex planes side by side with coordinate labels"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Vertical lines on the z-plane are mapped to concentric circles on the w-plane using the exponential function.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "v_lines",
+        "circles",
+        "apply_complex_function",
+        "np.exp"
+      ],
+      "clip_query": "Vertical lines on a complex plane mapping to concentric circles on another plane"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A textured surface representing a log-transformed image is initialized and positioned.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "TexturedSurface",
+        "Square3D",
+        "get_log_image",
+        "deactivate_depth_test"
+      ],
+      "clip_query": "A textured rectangular image surface on a complex plane"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The log-transformed image is mapped back using the exponential function to create a seamless Droste effect.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        30.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "get_droste_from_log_image_path",
+        "apply_complex_function",
+        "np.exp",
+        "log_images"
+      ],
+      "clip_query": "An infinite recursive Droste effect image formed by exponential mapping"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-020",
+  "conflicts": [
+    {
+      "category": "3D and Texturing",
+      "gl_construct": "TexturedSurface",
+      "ce_equivalent": "No direct equivalent in standard Manim Community Edition; requires custom shader or PMobject/ImageMobject manipulation.",
+      "severity": "high"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Complex Mapping",
+      "gl_construct": "apply_complex_function",
+      "ce_equivalent": "apply_function with complex-to-real conversions",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "id": "MB-010",
+  "title": "Cross Entropy is Asymmetric",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Information Theory",
+    "ML"
+  ],
+  "full_prompt": "Write a ManimGL script to visualize why cross entropy is asymmetric ($H(P, Q) \\neq H(Q, P)$).\n\nCreate a custom `EntropyChart` class that inherits from `VGroup`. This chart should represent a probability distribution as a horizontal bar of stacked segments (representing probabilities $p_i$ summing to 1) at the bottom, and vertical bars rising from each segment representing the information content ($-\\log_2 p_i$ bits).\n\nThe `EntropyChart` should support:\n1. Dynamic updates of the distribution using `ValueTracker`s.\n2. Redrawing of the vertical bars using `always_redraw` so that their heights dynamically scale with $-\\log_2 p_i$ and align perfectly with the horizontal segments.\n3. Color interpolation for the bars.\n\nIn the main scene `CrossEntropyIsAsymmetric`:\n1. Instantiate two different probability distributions, $P$ and $Q$.\n2. Display their respective `EntropyChart`s side-by-side or stacked.\n3. Show the calculation of the entropy $H(P)$ and $H(Q)$ as the expected value of the bar heights under their own distributions.\n4. Demonstrate cross entropy $H(P, Q)$ by taking the bar heights (code lengths) from distribution $Q$ and placing them on top of the probability segments of distribution $P$. Show that the resulting expected length is different from $H(P)$ and also different from $H(Q, P)$ (which is the bar heights of $P$ on the segments of $Q$).\n5. Highlight the inequality $H(P, Q) \\neq H(Q, P)$ with clear text and visual cues.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-010/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "CrossEntropyIsAsymmetric"
+    ],
+    "visual_techniques": [
+      "Stacked probability distribution charts",
+      "Dynamic bar charts with ValueTrackers",
+      "Mathematical formula animations",
+      "Asymmetry comparison layout"
+    ],
+    "manim_api_patterns": [
+      "always_redraw",
+      "ValueTracker",
+      "StackedProbDistribution",
+      "VGroup",
+      "Tex",
+      "interpolate_color"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom StackedProbDistribution class or equivalent implementation in standard Manim",
+      "severity": "high",
+      "note": "StackedProbDistribution is a custom 3b1b class; if not defined, it must be implemented manually using VGroup and Rectangles."
+    },
+    {
+      "pattern": "Incorrect alignment of vertical information bars with horizontal probability segments",
+      "severity": "medium",
+      "note": "The bars must dynamically align to the top of the corresponding horizontal segments as the distribution changes."
+    }
+  ]
+}

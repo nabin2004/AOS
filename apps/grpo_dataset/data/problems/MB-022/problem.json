@@ -1,0 +1,70 @@
+{
+  "id": "MB-022",
+  "title": "Simplifying Exponential Formulas with Pi Creatures",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "concept-exposition",
+    "interactive"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Algebra"
+  ],
+  "full_prompt": "Create a Manim scene named SimplifyFormula using the ManimGL/InteractiveScene framework. In this scene, a Randolph Pi Creature is positioned at the bottom edge of the screen. The scene demonstrates the algebraic simplification of an exponential formula step-by-step. First, display the formula e^{c * ln(w)} with specific color mappings (yellow for '{c}' and pink for '{w}'). Write the components of this formula sequentially while Randolph reacts (raising his left hand, pondering, and blinking). Next, show the step-by-step simplification to =(e^{ln(w)})^c, then to =(w)^c, and finally to =w^c using smooth matching Tex transformations. Randolph should change expressions to 'tease' and blink during these steps. After this, transition to a more general case by transforming the initial formula into e^{c * (ln(w) - z_0) + z_0} and the simplified formula into = A w^c. Finally, highlight the simplified term with a teal surrounding rectangle, dim the opacity of the complex formula, and have Randolph look at the result with confused and then speculative ('maybe') expressions.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-022/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 75,
+    "scene_classes": [
+      "SimplifyFormula"
+    ],
+    "visual_techniques": [
+      "Pi Creature animation and expression changes",
+      "Tex transformation matching",
+      "Surrounding rectangle highlight",
+      "Opacity modulation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Randolph",
+      "Tex",
+      "TransformMatchingTex",
+      "Blink",
+      "ShowCreation",
+      "SurroundingRectangle"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing Randolph or PiCreature class definition in standard Manim Community",
+      "severity": "high",
+      "note": "Randolph is a custom 3Blue1Brown Pi Creature. In standard ManimCE, this must be mocked or imported from a custom module."
+    },
+    {
+      "pattern": "Use of ShowCreation instead of Create in ManimCE",
+      "severity": "medium",
+      "note": "ManimGL uses ShowCreation, whereas ManimCE uses Create."
+    },
+    {
+      "pattern": "InteractiveScene base class missing in standard Manim",
+      "severity": "high",
+      "note": "InteractiveScene is specific to ManimGL. Standard ManimCE uses Scene."
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "id": "CL-004",
+  "title": "The Essence of Calculus | Chapter 4: The Chain Rule, Product Rule, and Sum Rule",
+  "youtube_video_id": "WUvTyaaNQzM",
+  "video_timestamp_range": [2880, 3840],
+  "category": ["direct-visualization", "concept-exposition", "drift-sensitive"],
+  "difficulty_level": 4,
+  "domain": ["Calculus"],
+  "full_prompt": "Create an animation explaining the three fundamental rules for combining derivatives: the sum rule, product rule, and chain rule. Start with the sum rule using graphs of sine(x) and x² - show that the derivative of their sum is the sum of their derivatives by visualizing the change in height as stacked vertical bars. Then introduce the product rule using an adjustable box with side lengths equal to two functions, showing that the change in area comes from two rectangles: left times d(right) plus right times d(left). Finally, explain the chain rule using three number lines showing the composition of functions, demonstrating that the derivative of g(h(x)) is dg/dh times dh/dx, with the dh terms canceling naturally.",
+  "raw_code_status": "collected",
+  "raw_code_path": "_2017/eoc/chapter4.py",
+  "reference_code_analysis": {
+    "framework": "manim_gl",
+    "total_lines": 0,
+    "scene_classes": [
+      {
+        "name": "Chapter4OpeningQuote",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "TransitionFromLastVideo",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "DampenedSpring",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ComingUp",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "PreSumRuleDiscussion",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "SumRule",
+        "key_methods": ["construct", "write_function", "add_graphs", "zoom_in_on_graph", "show_example_stacking", "show_df", "show_difference", "expand_derivative"]
+      },
+      {
+        "name": "DiscussProducts",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "NotGraphsForProducts",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ConfusedMorty",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "IntroduceProductAsArea",
+        "key_methods": ["construct", "introduce_box", "talk_though_sine", "define_f_of_x", "nudge_x", "get_nudge_label_group", "get_df_boxes", "get_df_box_labels", "write_df", "set_color_boxes_and_label", "set_color_right_boxes", "set_color_bottom_boxes", "describe_bottom_box", "describe_right_box", "ignore_corner", "show_thinner_dx", "expand_derivative", "write_derivative_abstractly", "write_mneumonic", "animate_x_change", "get_x_slider", "get_box_label_group", "get_box", "get_box_labels"]
+      },
+      {
+        "name": "WriteDXSquared",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "MneumonicExample",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ConstantMultiplication",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ConstantMultiplicationFigure",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ShoveXSquaredInSine",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "ThreeLinesChainRule",
+        "key_methods": ["construct", "introduce_line_group", "draw_function_arrows", "talk_through_movement", "nudge_x", "wiggle_by_dx", "animate_x_change", "get_line_group", "get_number_line", "get_line_label", "replace_x_squared_with_h", "give_example_of_meaning", "discuss_dsine_sign"]
+      },
+      {
+        "name": "GeneralizeChainRule",
+        "key_methods": ["construct"]
+      },
+      {
+        "name": "WatchingVideo",
+        "key_methods": ["construct", "create_pi_creatures"]
+      },
+      {
+        "name": "NextVideo",
+        "key_methods": ["construct"]
+      }
+    ],
+    "visual_techniques": [
+      "Sum rule via stacked vertical bars on graphs",
+      "Product rule via adjustable area box",
+      "Three number lines for chain rule visualization",
+      "Left d right + right d left mnemonic",
+      "dh cancellation in chain rule"
+    ],
+    "manim_api_patterns": {
+      "updaters": ["UpdateFromAlphaFunc", "MaintainPositionRelativeTo"],
+      "animation_types": ["Write", "ShowCreation", "Transform", "FadeIn", "FadeOut", "ApplyMethod", "GrowFromCenter", "FocusOn", "Indicate", "ReplacementTransform"],
+      "mobject_classes": ["NumberLine", "Rectangle", "FunctionGraph", "Axes", "Dot", "Line", "Arrow", "Brace", "Circle", "RegularPolygon"],
+      "custom_classes": ["GraphScene", "PiCreatureScene", "TeacherStudentsScene", "ReconfigurableScene"],
+      "helpers": ["get_graph_label", "get_vertical_lines_to_graph"],
+      "custom_imports": ["from manim_imports_ext import *"]
+    }
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.75,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "confuses product rule with sum rule",
+      "severity": "high",
+      "note": "fundamental misunderstanding"
+    },
+    {
+      "pattern": "fails to show the dh cancellation in chain rule",
+      "severity": "high",
+      "note": "misses the key chain rule insight"
+    },
+    {
+      "pattern": "doesn't demonstrate the product rule via area visualization",
+      "severity": "medium",
+      "note": "misses the geometric intuition"
+    },
+    {
+      "pattern": "uses GL-specific syntax like ShowCreation or CONFIG dicts",
+      "severity": "medium",
+      "note": "CE compatibility issues"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-023",
+  "conflicts": [
+    {
+      "category": "Class Inheritance",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobject Alignment",
+      "gl_construct": "align_to(canvas, DR)",
+      "ce_equivalent": "align_to(canvas, DR)",
+      "severity": "low"
+    },
+    {
+      "category": "Dynamic Redraw",
+      "gl_construct": "always_redraw(lambda: ...)",
+      "ce_equivalent": "always_redraw(lambda: ...)",
+      "severity": "low"
+    }
+  ]
+}

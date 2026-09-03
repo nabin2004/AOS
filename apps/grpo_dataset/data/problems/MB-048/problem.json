@@ -1,0 +1,76 @@
+{
+  "id": "MB-048",
+  "title": "Measuring Nearby Stars and the H-R Diagram",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete ManimGL script using the InteractiveScene class that visualizes nearby stars, measures their distances, and transitions them into a Hertzsprung-Russell (H-R) diagram. Since external data files might not be available, generate synthetic stellar data for 10,000 stars. The synthetic data should include: absolute magnitudes (ranging from -5 to 15), color indices (ranging from -0.4 to 2.0), and 3D positions distributed spherically around the origin. \n\nYour visualization must include the following phases:\n1. **3D Star Field**: Place a bright white GlowDot at the center representing the Sun. Generate 10,000 stars using GlowDots. Position them in a 3D sphere with distances scaled appropriately. Set up a continuous camera rotation using a ValueTracker and a frame updater.\n2. **Distance Measurements**: Select 10 random stars and sequentially draw a blue line from the Sun to each star. Display a billboard-style decimal label showing the distance in light years. The label must rotate to face the camera dynamically. Fade out the previous line/label as the next one appears.\n3. **Coloring**: Transition the stars from solid white to their respective spectral colors mapped from their synthetic color indices (using a blue-to-red colormap like matplotlib's coolwarm).\n4. **H-R Diagram Transition**: Stop the camera rotation and smoothly transition the camera back to its default 2D state. Fade out the Sun and fade in a 2D coordinate system (Axes) representing Color (X-axis) vs. Absolute Brightness (Y-axis). Morph the 3D star positions into random 2D scatter points on the axes.\n5. **Sorting**: Animate the stars morphing from their random scatter positions to being sorted horizontally by color, and finally into their fully sorted H-R diagram positions (where X is color index and Y is absolute magnitude). Ensure smooth path arcs and custom run times for these transitions.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-048/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "MeasuringNearbyStars"
+    ],
+    "visual_techniques": [
+      "3D camera rotation with ValueTracker",
+      "GlowDots for high-performance star rendering",
+      "Dynamic billboard text rotation in 3D space",
+      "Multi-stage morphing animations of point clouds",
+      "Color mapping using matplotlib colormaps"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "GlowDot",
+      "GlowDots",
+      "frame.reorient",
+      "frame.add_updater",
+      "DecimalNumber",
+      "pfp",
+      "set_rgba_array",
+      "Axes",
+      "c2p",
+      "inverse_interpolate"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Hardcoded local file path for HYG stellar data causing FileNotFoundError",
+      "severity": "high",
+      "note": "The original code reads from a local Dropbox path. The implementation must fallback to robust synthetic data generation if the file is missing."
+    },
+    {
+      "pattern": "Using Community Edition camera methods on ManimGL's frame",
+      "severity": "high",
+      "note": "ManimGL uses self.frame.reorient and self.frame.add_updater instead of move_camera."
+    },
+    {
+      "pattern": "Incorrect billboard label rotation in 3D",
+      "severity": "medium",
+      "note": "Labels must be rotated using frame.get_phi() and frame.get_theta() to remain readable as the camera rotates."
+    }
+  ]
+}

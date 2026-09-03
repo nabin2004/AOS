@@ -1,0 +1,49 @@
+{
+  "problem_id": "CL-006",
+  "requirements": {
+    "Math": {
+      "weight": 0.35,
+      "expected": [
+        "Circle equation x\u00b2 + y\u00b2 = 25",
+        "Tangent slope via implicit differentiation: dy/dx = -x/y",
+        "S = x\u00b2 + y\u00b2 as function of two variables",
+        "dS = 2x\u00b7dx + 2y\u00b7dy",
+        "Ladder problem as related rates",
+        "d(x\u00b2+y\u00b2)/dt = 2x\u00b7dx/dt + 2y\u00b7dy/dt = 0",
+        "Derivative of ln(x) via e^y = x",
+        "d(ln x)/dx = 1/x"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Circle with point and tangent line",
+        "Zoom in on circle with dx and dy",
+        "S function visualization",
+        "3D ladder against wall",
+        "x(t) and y(t) labels",
+        "Natural log graph",
+        "Comparison of circle and ladder problems"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Point (3,4) on circle",
+        "Slope -3/4 at (3,4)",
+        "Ladder: x=3, y=4, dy/dt=-1",
+        "dx/dt = 4/3",
+        "ln(x) derivative = 1/x"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Logical flow: circle slope \u2192 S function \u2192 ladder problem \u2192 ln derivative",
+        "Clear transitions between concepts",
+        "Geometric and algebraic representations linked",
+        "Proper pacing for complex ideas"
+      ]
+    }
+  }
+}

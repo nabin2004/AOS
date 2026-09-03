@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-049",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The scene initializes in 3D with a central glowing light source and axes, followed by an outward-propagating radiation wave.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "GlowDot",
+        "ThreeDAxes",
+        "beaming_effect",
+        "radiation"
+      ],
+      "clip_query": "A glowing white dot at the center of 3D axes with an expanding spherical wave of light."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A small parametric patch is highlighted on the sphere's surface, and a focused beam of light projects outward from it while the camera rotates.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "ParametricSurface",
+        "patch",
+        "beam",
+        "reorient"
+      ],
+      "clip_query": "A small white square patch highlighted on a 3D sphere with a beam of light projecting outward."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The sphere and the patch scale up by a factor of 2, demonstrating radial propagation.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        28.0
+      ],
+      "keyword_bank": [
+        "scale",
+        "MoveToTarget",
+        "ghost_sphere"
+      ],
+      "clip_query": "The sphere and the highlighted patch expand outward to twice their original size."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Division lines appear on the expanded patch, splitting it into 4 equal sub-patches to illustrate the inverse square law.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        28.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "ParametricCurve",
+        "division",
+        "FadeIn"
+      ],
+      "clip_query": "Grid lines divide the expanded patch on the sphere into four smaller equal squares."
+    }
+  ]
+}

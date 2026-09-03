@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-005",
+  "conflicts": [
+    {
+      "category": "framework_dependency",
+      "gl_construct": "StackedProbDistribution",
+      "ce_equivalent": "Must be manually implemented in ManimCE using a VGroup of Rectangles positioned next to each other via next_to(..., RIGHT, buff=0).",
+      "severity": "high"
+    },
+    {
+      "category": "updater_behavior",
+      "gl_construct": "add_updater with direct property modification",
+      "ce_equivalent": "In ManimCE, dynamic resizing of Rectangles inside updaters requires recreating the Rectangle or using .become() to avoid cumulative scaling/distortion issues.",
+      "severity": "high"
+    },
+    {
+      "category": "color_utility",
+      "gl_construct": "interpolate_color",
+      "ce_equivalent": "interpolate_color is available in both, but color hex strings and constant names (like BLUE_E, TEAL_E) must be verified for exact match.",
+      "severity": "low"
+    }
+  ]
+}
