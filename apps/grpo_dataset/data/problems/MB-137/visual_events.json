@@ -1,0 +1,68 @@
+{
+  "problem_id": "MB-137",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Introduction of Euler's formula F = E - V + 1 and substitution of V = n + nC4",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "top_eq",
+        "V_eq",
+        "FadeTransform"
+      ],
+      "clip_query": "Euler's formula F = E - V + 1 is shown, and V is substituted with n + nC4"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Substitution of E = nC2 + 2*nC4 + n into the formula",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "E_eq",
+        "top_eq3",
+        "FadeTransform"
+      ],
+      "clip_query": "E is substituted with nC2 + 2*nC4 + n in the formula"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Highlighting and cancellation of matching terms",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "FlashAround",
+        "FadeOut"
+      ],
+      "clip_query": "Terms in the equation flash and fade out to show algebraic cancellation"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Rearrangement of remaining terms into the final simplified formula using curved paths",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "final_eq",
+        "path_arc",
+        "Transform"
+      ],
+      "clip_query": "The remaining terms smoothly slide along curved paths to form F = 1 + nC2 + nC4"
+    }
+  ]
+}

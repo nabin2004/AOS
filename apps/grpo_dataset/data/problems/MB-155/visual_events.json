@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-155",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation and initialization of the ChargedParticle with a '+' sign at the center of the screen.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ChargedParticle",
+        "TrueDot",
+        "Tex",
+        "add"
+      ],
+      "clip_query": "A red charged particle with a plus sign appears at the center"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The charged particle begins to oscillate or move, and its position history starts tracking.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "increment_clock",
+        "recent_positions",
+        "position_history"
+      ],
+      "clip_query": "The red charged particle starts moving or oscillating"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The electromagnetic vector field (Lorentz force field) is rendered around the particle, showing field vectors.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "lorentz_force",
+        "points_to_particle_info",
+        "VectorField",
+        "always_redraw"
+      ],
+      "clip_query": "A dynamic vector field representing the electromagnetic field appears around the moving particle"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Propagation of the radiation field outward as the particle accelerates, showing wave-like disturbances in the field vectors.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "a_perp",
+        "acceleration",
+        "c",
+        "delays"
+      ],
+      "clip_query": "Wave-like disturbances propagate outward through the vector field"
+    }
+  ]
+}

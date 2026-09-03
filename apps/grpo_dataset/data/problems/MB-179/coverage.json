@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-179",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "rect_func",
+        "convolution calculation",
+        "plateau width formula",
+        "f_n(0) evaluation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "dual axes layout",
+        "sliding window animation",
+        "plateau line highlight",
+        "brace with label",
+        "glow dot path tracing"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "sample_resolution",
+        "plateau width calculation",
+        "0.9999999999852937"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or Scene class",
+        "add_updater",
+        "TransformFromCopy",
+        "get_axes"
+      ]
+    }
+  }
+}

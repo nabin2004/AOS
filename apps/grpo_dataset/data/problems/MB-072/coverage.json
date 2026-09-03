@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-072",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "integral expression \\int^\\infty_0 e^{-st} dt",
+        "exponential function e^{-st}",
+        "analytical evaluation steps for s=1",
+        "anti-derivative expression"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "coordinate axes with labels",
+        "dynamic exponential graph",
+        "interactive slider for s",
+        "shaded area under the curve",
+        "camera frame reorientation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for s parameter",
+        "s values: 5, 0.25, 1, -0.2",
+        "axes limits: x up to 15, y up to 1"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene structure",
+        "dynamic graph binding or updaters",
+        "camera frame animation"
+      ]
+    }
+  }
+}

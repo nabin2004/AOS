@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-161",
+  "conflicts": [
+    {
+      "category": "3D Mobjects",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot3D or Sphere",
+      "severity": "medium"
+    },
+    {
+      "category": "Vector Fields",
+      "gl_construct": "VectorField with custom update_vectors",
+      "ce_equivalent": "ArrowVectorField with custom updater",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.camera.frame",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    }
+  ]
+}

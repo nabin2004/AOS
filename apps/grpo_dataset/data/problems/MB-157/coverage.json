@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-157",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "optical rotation matrix",
+        "sinusoidal wave equation with phase and time dependency",
+        "twist rate calculation as a function of x coordinate"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D rendering of a cylinder with custom opacity",
+        "dynamic continuous wave propagation using frame updaters",
+        "helical/twisting wave geometry inside the cylinder"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "sampling resolution for wave points",
+        "correct frequency and wavelength scaling"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "custom VMobject subclass with update_points method",
+        "custom Cylinder subclass with camera sorting",
+        "proper integration of time delta (dt) in the wave updater"
+      ]
+    }
+  }
+}

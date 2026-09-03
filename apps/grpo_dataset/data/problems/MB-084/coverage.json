@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-084",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "ComplexPlane",
+        "Arc",
+        "Euler's formula representation",
+        "Unit circle coordinates"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Red sweeping arc",
+        "Randolph PiCreature",
+        "Speech bubble",
+        "YouTube thumbnail grid"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for angle tracking",
+        "DecimalNumber updating dynamically along the arc"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "LaggedStart animation",
+        "FadeTransform for character morphing",
+        "Group alignment and positioning"
+      ]
+    }
+  }
+}

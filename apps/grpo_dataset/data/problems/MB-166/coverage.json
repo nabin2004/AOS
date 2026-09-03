@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-166",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "vector addition",
+        "angular frequency",
+        "superposition",
+        "circular polarization",
+        "linear polarization"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "rotating vectors",
+        "traced paths",
+        "color-coded vectors",
+        "head-to-tail addition",
+        "dashed circles"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "rotation speed / frequency",
+        "vector magnitudes"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for phase/time",
+        "always_redraw or updaters for dynamic vectors",
+        "clear labels"
+      ]
+    }
+  }
+}

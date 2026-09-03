@@ -1,0 +1,70 @@
+{
+  "id": "MB-064",
+  "title": "Trying to Describe Computing (Classical vs Quantum)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Computer Science",
+    "Physics"
+  ],
+  "full_prompt": "Create a Manim scene using ManimGL/InteractiveScene that visualizes the concept of classical computing. The scene should feature two PiCreatures: Randolph (blue, on the left) and Buddy (maroon, on the right). Initially, display a 3D-rotated laptop in the center-top. Randolph points to the laptop while Buddy looks at it. Next, introduce a classical computer chip symbol (a computer chip SVG with a math symbol inside, e.g., '\\mathcal{C}') and shift the laptop upwards. Then, display a factoring equation: '91 = 7 x 13'. Animate the numbers '7' and '7 x 13' moving into the chip, transforming into '91' to represent classical computation (multiplication/factoring). Finally, display a complex logic gate diagram (using an SVG like 'Four_bit_adder_with_carry_lookahead') with a stroke animation while the PiCreatures react to it.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-064/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "TryingToDescribeComputing"
+    ],
+    "visual_techniques": [
+      "PiCreatures",
+      "SVG rendering",
+      "Mathematical transformations",
+      "Lagged animations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "SVGMobject",
+      "Tex",
+      "LaggedStart",
+      "Blink",
+      "ReplacementTransform",
+      "TransformFromCopy"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom SVGs ('computer_chip', 'Four_bit_adder_with_carry_lookahead')",
+      "severity": "high",
+      "note": "The code relies on external SVG assets. If these are missing, SVGMobject will fail to load."
+    },
+    {
+      "pattern": "Use of custom PiCreature classes and methods in standard Manim Community",
+      "severity": "high",
+      "note": "Randolph, PiCreature, and Blink are custom 3b1b classes and will not work in standard Manim Community without importing the active_projects/3b1b library."
+    },
+    {
+      "pattern": "InteractiveScene inheritance",
+      "severity": "medium",
+      "note": "InteractiveScene is specific to ManimGL and is not available in Manim Community."
+    }
+  ]
+}

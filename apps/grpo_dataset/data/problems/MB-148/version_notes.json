@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-148",
+  "conflicts": [
+    {
+      "category": "Renderer / 3D Depth Sorting",
+      "gl_construct": "self.always_sort_to_camera(camera)",
+      "ce_equivalent": "Not directly available in ManimCE; standard CE uses a different 3D renderer (moderngl-based or cairo-based) where depth sorting is handled automatically or via z-index, but transparency sorting can be problematic.",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject API",
+      "gl_construct": "ParametricSurface(lambda u, v: ..., u_range=..., v_range=..., prefered_creation_axis=0)",
+      "ce_equivalent": "ParametricSurface(lambda u, v: ..., u_range=..., v_range=...) (omit prefered_creation_axis as it is GL-specific)",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobject API",
+      "gl_construct": "set_flat_stroke(False)",
+      "ce_equivalent": "Omit this call in ManimCE as flat stroke rendering is a ManimGL-specific optimization.",
+      "severity": "low"
+    }
+  ]
+}

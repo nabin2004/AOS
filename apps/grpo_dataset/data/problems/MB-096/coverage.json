@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-096",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "wave interference formula",
+        "diffraction grating equation",
+        "phase difference calculation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "LightWaveSlice shader rendering",
+        "DotCloud representing point sources",
+        "wavefront propagation",
+        "interference patterns"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "frequency parameter",
+        "wave_number parameter",
+        "decay_factor parameter",
+        "time-based animation updates"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "LightWaveSlice custom Mobject",
+        "FullDiffractionGrating scene class",
+        "updater functions for time increment"
+      ]
+    }
+  }
+}

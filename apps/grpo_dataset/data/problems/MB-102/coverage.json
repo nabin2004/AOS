@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-102",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "superposition principle",
+        "wave equation",
+        "interference fringes",
+        "phase difference"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "custom shader rendering",
+        "DotCloud point sources",
+        "dynamic wave propagation",
+        "intensity visualization"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "wave frequency",
+        "wave number",
+        "decay factor",
+        "amplitude calculation"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "LightWaveSlice custom Mobject",
+        "updater for time increment",
+        "uniform synchronization",
+        "moderngl integration"
+      ]
+    }
+  }
+}

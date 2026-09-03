@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-085",
+  "conflicts": [
+    {
+      "category": "Mobject",
+      "gl_construct": "Exmark",
+      "ce_equivalent": "VGroup(Line(UL, DR), Line(UR, DL)).set_color(RED)",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject",
+      "gl_construct": "Checkmark",
+      "ce_equivalent": "Tex('\\\\checkmark').set_color(GREEN)",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with a larger, semi-transparent Dot behind it, or standard Dot",
+      "severity": "medium"
+    },
+    {
+      "category": "API",
+      "gl_construct": "ValueTracker(0).replicate(2)",
+      "ce_equivalent": "[ValueTracker(0) for _ in range(2)]",
+      "severity": "medium"
+    }
+  ]
+}

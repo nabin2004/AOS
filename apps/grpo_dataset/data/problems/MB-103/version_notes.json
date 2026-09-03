@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-103",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "custom_helper",
+      "gl_construct": "self.get_term_rect()",
+      "ce_equivalent": "SurroundingRectangle() with custom padding",
+      "severity": "high"
+    },
+    {
+      "category": "animation_rename",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    },
+    {
+      "category": "latex_indexing",
+      "gl_construct": "lines[0][\"|R + O|\"]",
+      "ce_equivalent": "Isolating substrings using Tex('...', isolate=['...']) and get_part_by_tex()",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "problem_id": "MB-097",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the zone plate geometry and the incoming plane wave representation.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "LightWaveSlice",
+        "point_sources",
+        "zone_plate"
+      ],
+      "clip_query": "A plane wave approaching a zone plate or diffraction grating structure."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Activation of the secondary point sources at the zone plate apertures, initiating wave propagation.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "sync_points",
+        "increment_time",
+        "wave_number"
+      ],
+      "clip_query": "Waves propagating outwards from multiple point sources on a grid."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Formation of constructive and destructive interference patterns, showing a clear focal point.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "decay_factor",
+        "frequency",
+        "max_amp"
+      ],
+      "clip_query": "An interference pattern focusing light to a bright central spot."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Transitioning the visualization to display wave intensity (squared amplitude) instead of raw phase/amplitude.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        45.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "show_intensity",
+        "set_uniform"
+      ],
+      "clip_query": "The wave visualization shifting to show intensity mapping."
+    }
+  ]
+}

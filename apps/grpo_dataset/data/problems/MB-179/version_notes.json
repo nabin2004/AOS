@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-179",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot (with custom glow or styling)",
+      "severity": "medium"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "OldTex",
+      "ce_equivalent": "MathTex",
+      "severity": "medium"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "method",
+      "gl_construct": "pfp",
+      "ce_equivalent": "point_from_proportion",
+      "severity": "medium"
+    }
+  ]
+}

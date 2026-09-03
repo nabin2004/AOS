@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-113",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "3D Axes and Camera Setup with Equation Overlay",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "self.frame.reorient",
+        "equations",
+        "fix_in_frame"
+      ],
+      "clip_query": "A 3D coordinate system rotates slowly while the Lorenz system differential equations appear in the top-left corner."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Initialization of Trajectories and Glow Dots",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "GlowDot",
+        "TracingTail",
+        "curves",
+        "ShowCreation"
+      ],
+      "clip_query": "Multiple glowing dots appear at the starting point of the trajectories and begin to move, leaving faint trails."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Chaotic Divergence of Trajectories",
+      "weight": 0.5,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "ShowCreation",
+        "linear",
+        "curves",
+        "evolution_time"
+      ],
+      "clip_query": "The glowing dots trace out the classic butterfly shape of the Lorenz attractor, gradually diverging from each other due to chaos."
+    }
+  ]
+}

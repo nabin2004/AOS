@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-075",
+  "conflicts": [
+    {
+      "category": "Class Inheritance",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation Methods",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "high"
+    },
+    {
+      "category": "Tex Transformations",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "Transform (with custom fade out/in or ReplacementTransform)",
+      "severity": "medium"
+    },
+    {
+      "category": "Tex Matching",
+      "gl_construct": "TransformMatchingTex(..., matched_keys=[...])",
+      "ce_equivalent": "TransformMatchingTex(..., key_map={...}) or standard TransformMatchingTex",
+      "severity": "medium"
+    }
+  ]
+}

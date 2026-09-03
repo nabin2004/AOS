@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-106",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Parametric equations mapping (u, v) to 3D space",
+        "Midpoint calculation of two points on a curve",
+        "Euclidean distance calculation between two points on a curve",
+        "Half-parametric domain mapping to avoid duplicate chord pairs"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D Parametric Surface rendering with custom color/opacity",
+        "Dynamic chord line connecting two moving points",
+        "Tracking dots on both the 2D loop and the 3D surface",
+        "3D camera rotation and perspective adjustment"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "ValueTrackers for parameters u and v",
+        "Smooth interpolation of points along the loop path"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Use of updaters (always_redraw or add_updater) for dynamic tracking",
+        "Proper handling of 3D scene layers and camera controls"
+      ]
+    }
+  }
+}

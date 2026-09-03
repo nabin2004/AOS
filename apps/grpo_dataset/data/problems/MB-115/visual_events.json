@@ -1,0 +1,87 @@
+{
+  "problem_id": "MB-115",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation of the 3D axes, number plane, and the 3D cube shell wireframe using Write.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "NumberPlane",
+        "cube_shell",
+        "Write"
+      ],
+      "clip_query": "A 3D yellow wireframe cube being drawn on a 3D coordinate grid"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Fade in of vertex dots and 3D coordinate labels alongside camera reorientation.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "labels",
+        "vert_dots",
+        "reorient",
+        "LaggedStartMap"
+      ],
+      "clip_query": "Text labels showing coordinates appearing next to the vertices of a 3D cube"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Highlighting the base edges of the cube, followed by highlighting the top edges of the cube.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        7.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "edges",
+        "set_stroke",
+        "set_opacity"
+      ],
+      "clip_query": "Alternating highlights between the bottom and top square faces of a 3D wireframe cube"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Camera reorients to look directly down the diagonal corner of the cube.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "reorient",
+        "frame.animate"
+      ],
+      "clip_query": "The camera rotating to align perfectly with the diagonal axis of a 3D cube"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Drawing the diagonal vector and projecting the cube onto a perpendicular plane.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "diag_vect",
+        "apply_matrix",
+        "proj_cube_shell",
+        "TransformFromCopy"
+      ],
+      "clip_query": "A 3D cube projecting its shadow onto a flat 2D plane perpendicular to its diagonal"
+    }
+  ]
+}

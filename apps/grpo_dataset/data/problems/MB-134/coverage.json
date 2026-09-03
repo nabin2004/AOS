@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-134",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Matrix representation of weights",
+        "Vector embeddings",
+        "Value interpolation and range mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Dynamic color mapping based on sign and magnitude",
+        "Smooth value transitions in matrix entries",
+        "Clear visual distinction between positive (blue) and negative (red) weights"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Decimal formatting with signs",
+        "Range clipping for color interpolation",
+        "Alpha calculations for sub-animations"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom Animation class implementation",
+        "Subclassing DecimalMatrix",
+        "Modular helper functions for color mapping"
+      ]
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-127",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation and rendering of the custom Dial objects, showing the arc, tick marks, and initial needle positions.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "Dial",
+        "Arc",
+        "ticks",
+        "needle"
+      ],
+      "clip_query": "A set of circular dials or gauges appearing on screen with needles pointing to initial values."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Needle value update animation where the needle rotates smoothly to a new value on the dial.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "set_value",
+        "needle",
+        "put_start_and_end_on"
+      ],
+      "clip_query": "The needles on the dials rotating to point to new values."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Concentric passing flash streak animation sweeping along the dial during value updates.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        2.0,
+        4.5
+      ],
+      "keyword_bank": [
+        "VShowPassingFlash",
+        "diff_arcs",
+        "animate_set_value"
+      ],
+      "clip_query": "Glowing streaks or flashes sweeping around the circular dials as the values change."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Display of text labels or numbers representing GPT-3 parameters alongside the dials.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "Text",
+        "DecimalNumber",
+        "GPT-3"
+      ],
+      "clip_query": "Text labels and numbers indicating parameter values next to the gauges."
+    }
+  ]
+}

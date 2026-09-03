@@ -1,0 +1,67 @@
+{
+  "id": "MB-154",
+  "title": "Wave Refraction and Interface Alignment Game",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a complete Manim scene named `LineGame` (using ManimGL/InteractiveScene conventions) that visualizes the geometry of wave refraction at a boundary interface. \n\n1. **Setup the Interface and Medium**:\n   - Create a diagonal interface line passing through the origin (from `6 * DL` to `6 * UR`).\n   - Create a shaded blue region representing the lower medium (e.g., using a large Square rotated by -45 degrees and scaled up, positioned to the right/below the interface).\n\n2. **Wavefront Generation (Helper Method)**:\n   - Implement a helper method `get_line_group(self, interface, line_direction, spacing, ...)` that generates a series of parallel lines (wavefronts) intersecting the interface. \n   - The spacing between the top wavefronts should be larger (representing $\\lambda_1$), and the spacing between the bottom wavefronts should be smaller (representing $\\lambda_2$).\n\n3. **Dial UI Control**:\n   - Create a dial UI element consisting of a Circle and a Vector (acting as a pointer/dial) to control the angle of the lower wavefronts.\n   - Use `always_redraw` to dynamically update the lower wavefronts based on the dial's vector direction.\n\n4. **Animation Sequence**:\n   - Fade in the top wavefronts and write the label $\\lambda_1$.\n   - Highlight the intersection points of these top wavefronts with the interface (using pink dots).\n   - Fade in the lower wavefronts (initially misaligned) and write the label $\\lambda_2$.\n   - Rotate the dial to show how the lower wavefronts rotate. Align them so that their intersection points with the interface match those of the top wavefronts.\n   - Highlight the aligned intersection points with yellow dots.\n   - Rotate the dial through a few test angles to demonstrate the mismatch, then return to alignment.\n   - Draw arcs and labels for the angles of incidence and refraction ($\\theta_1$ and $\\theta_2$) relative to the interface.\n   - Adjust the camera frame height dynamically to focus on the intersection region during the angle demonstration.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-154/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 145,
+    "scene_classes": [
+      "LineGame"
+    ],
+    "visual_techniques": [
+      "Shaded medium region using rotated Square",
+      "Dynamic parallel line generation intersecting a diagonal line",
+      "Interactive dial UI using Vector and Circle",
+      "Intersection point highlighting with colored dots",
+      "Camera frame zooming and panning"
+    ],
+    "manim_api_patterns": [
+      "always_redraw",
+      "Rotate",
+      "Restore",
+      "save_state",
+      "self.frame.animate.set_height",
+      "Arc",
+      "pfp"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using self.camera.frame instead of self.frame in ManimGL context",
+      "severity": "high",
+      "note": "ManimGL uses self.frame directly for camera manipulation, whereas ManimCE uses self.camera.frame."
+    },
+    {
+      "pattern": "Incorrect coordinate math for parallel line spacing along a diagonal interface",
+      "severity": "medium",
+      "note": "The spacing between wavefronts must be projected correctly along the interface to ensure matching intersection points."
+    }
+  ]
+}

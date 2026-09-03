@@ -1,0 +1,63 @@
+{
+  "id": "MB-125",
+  "title": "Softmax Breakdown Visualization",
+  "youtube_video_id": "wjZofJX0v4M",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a Manim scene named `SoftmaxBreakdown` that visualizes the step-by-step computation of the Softmax function on a vector of logits. The visualization should: 1. Display an initial column vector of logits (e.g., [2.0, 1.0, 0.1, -1.0, -2.0]). 2. Show the exponentiation step: apply $e^{x_i}$ to each logit, showing the intermediate values. 3. Show the summation of these exponentiated values. 4. Show the division step (normalization) where each exponentiated value is divided by the sum to produce the final probabilities. 5. Use color-coding to represent the magnitude of the values (e.g., blue for positive, red for negative, or a gradient). 6. Include smooth transitions, highlighting the active row/element being computed, and updating the values dynamically using custom Mobjects like `DecimalMatrix` or `DecimalNumber`.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-125/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 280,
+    "scene_classes": [
+      "SoftmaxBreakdown"
+    ],
+    "visual_techniques": [
+      "Matrix-vector multiplication animation",
+      "Dynamic decimal updating",
+      "Color interpolation based on value",
+      "Highlighting rows with SurroundingRectangle"
+    ],
+    "manim_api_patterns": [
+      "DecimalMatrix",
+      "NumericEmbedding",
+      "ShowIncreasingSubsets",
+      "UpdateFromAlphaFunc",
+      "SurroundingRectangle"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom classes like DecimalMatrix or NumericEmbedding in standard Manim CE",
+      "severity": "high",
+      "note": "The reference code relies on custom 3b1b classes. If porting to CE, these must be implemented manually using standard Matrix or VGroup of DecimalNumbers."
+    },
+    {
+      "pattern": "Incorrect color interpolation logic causing crash",
+      "severity": "medium",
+      "note": "The value_to_color function uses custom interpolation utilities. Ensure standard Manim color interpolation is used instead."
+    }
+  ]
+}

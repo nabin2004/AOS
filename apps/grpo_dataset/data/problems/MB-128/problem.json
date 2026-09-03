@@ -1,0 +1,73 @@
+{
+  "id": "MB-128",
+  "title": "Counting Transformer Matrix Parameters and Matrix-Vector Products",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Linear Algebra",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a Manim scene named `CountMatrixParameters` that visualizes a step-by-step matrix-vector product, specifically styled to represent weight matrices and parameter computations in a Transformer model. \n\nYour implementation must include:\n1. A custom `WeightMatrix` class (inheriting from `DecimalMatrix` or a custom matrix of `DecimalNumber`s) that generates a grid of decimal values. The values should be color-coded based on their sign and magnitude: positive values should transition from dark blue to light blue, and negative values from dark red to light red.\n2. A helper function `matrix_row_vector_product` that animates the dot product of a single matrix row with a column vector. It should highlight the active row elements and vector elements using yellow `SurroundingRectangle`s, and dynamically update the value of the resulting vector element using `UpdateFromAlphaFunc` as the multiplication progresses.\n3. A helper function `show_matrix_vector_product` that sets up the full equation $W \\cdot v = u$, aligning the matrix, vector, equals sign, and result vector. It should loop through the rows of the matrix, triggering the row-vector product animation for each row, and handle ellipses rows gracefully if the matrix is truncated.\n4. The main `CountMatrixParameters` scene which instantiates a weight matrix (e.g., representing a projection matrix like $W_Q$ or $W_K$), an input vector, and runs the step-by-step multiplication animation to visually explain how transformer parameters operate on token embeddings.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-128/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "CountMatrixParameters"
+    ],
+    "visual_techniques": [
+      "Color-coded decimal matrices based on value sign and magnitude",
+      "Step-by-step row-vector dot product highlighting",
+      "Dynamic decimal value updating via custom alpha functions",
+      "Surrounding rectangle animations for active elements"
+    ],
+    "manim_api_patterns": [
+      "DecimalMatrix",
+      "SurroundingRectangle",
+      "ShowIncreasingSubsets",
+      "UpdateFromAlphaFunc",
+      "FadeIn",
+      "FadeOut",
+      "VGroup",
+      "Tex"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Use of DecimalMatrix in standard Manim Community Edition without defining it",
+      "severity": "high",
+      "note": "DecimalMatrix is a custom class in 3b1b's ManimGL. In ManimCE, it must be implemented manually using Matrix or VGroups of DecimalNumbers."
+    },
+    {
+      "pattern": "Missing is_fixed_in_frame or fix_in_frame() support in 2D scenes",
+      "severity": "medium",
+      "note": "fix_in_frame is a ManimGL-specific camera method. If porting to ManimCE, this should be omitted or handled via standard canvas positioning."
+    },
+    {
+      "pattern": "Incorrect argument structure for UpdateFromAlphaFunc",
+      "severity": "high",
+      "note": "Ensure the updater function inside UpdateFromAlphaFunc correctly takes (mobject, alpha) and updates the decimal value dynamically."
+    }
+  ]
+}

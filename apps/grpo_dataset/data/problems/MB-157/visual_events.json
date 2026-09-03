@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-157",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the 3D axes and the horizontal grid plane representing the propagation space.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "NumberPlane",
+        "get_axes_and_plane"
+      ],
+      "clip_query": "A 3D coordinate system with axes and a grid plane is displayed."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The semi-transparent Sugar Cylinder is rendered along the x-axis, representing the optically active medium.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "SugarCylinder",
+        "Cylinder",
+        "opacity"
+      ],
+      "clip_query": "A semi-transparent cylinder is placed along the main axis of the 3D space."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "An oscillating wave begins propagating along the x-axis, showing standard sinusoidal oscillation before entering the cylinder.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "OscillatingWave",
+        "add_updater",
+        "update_points"
+      ],
+      "clip_query": "A sinusoidal wave propagates dynamically along the axis."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The wave enters the cylinder and its polarization plane begins to twist continuously, forming a helical pattern.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "twist_rate",
+        "twist_angles",
+        "xt_to_yz"
+      ],
+      "clip_query": "The propagating wave twists into a helical shape inside the cylinder."
+    }
+  ]
+}

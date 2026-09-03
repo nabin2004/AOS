@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-113",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient / self.frame.add_updater",
+      "ce_equivalent": "self.set_camera_orientation / self.begin_ambient_camera_rotation",
+      "severity": "high"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "GlowDot / TracingTail",
+      "ce_equivalent": "Dot / TracedPath",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    },
+    {
+      "category": "UI Overlay",
+      "gl_construct": "mobject.fix_in_frame()",
+      "ce_equivalent": "self.add_fixed_in_frame_mobjects(mobject)",
+      "severity": "high"
+    }
+  ]
+}

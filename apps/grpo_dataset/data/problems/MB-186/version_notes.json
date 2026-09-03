@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-186",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot (with custom glow or standard Dot)",
+      "severity": "medium"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform",
+      "severity": "medium"
+    },
+    {
+      "category": "method",
+      "gl_construct": "plane.i2gp",
+      "ce_equivalent": "plane.input_to_graph_point",
+      "severity": "high"
+    }
+  ]
+}

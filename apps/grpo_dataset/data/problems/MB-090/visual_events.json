@@ -1,0 +1,58 @@
+{
+  "problem_id": "MB-090",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup of dual complex planes (s-plane on the left, out-plane on the right) with coordinate labels and the initial zeta sum formula label.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        1.5
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "add_planes",
+        "sum_label",
+        "s_plane",
+        "out_plane"
+      ],
+      "clip_query": "Two complex planes side-by-side with coordinate labels and a mathematical formula at the top"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animation of the complex tracker 's' moving to the first non-trivial zeta zero, causing the partial sum path on the right plane to dynamically update and spiral.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        1.5,
+        4.5
+      ],
+      "keyword_bank": [
+        "s_tracker",
+        "animate",
+        "set_value",
+        "zeta_zeros",
+        "partial_sum_path"
+      ],
+      "clip_query": "A yellow dot moving on the left complex plane while a teal spiral path dynamically updates on the right complex plane"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animation of the regulator constant 'c' increasing from 0 to 0.01, showing the spiral path contracting or converging.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        4.5,
+        6.0
+      ],
+      "keyword_bank": [
+        "exp_const_tracker",
+        "animate",
+        "set_value",
+        "c_dec"
+      ],
+      "clip_query": "The teal spiral path on the right complex plane contracting as the regulator constant c increases"
+    }
+  ]
+}

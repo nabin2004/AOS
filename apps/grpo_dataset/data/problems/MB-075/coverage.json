@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-075",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "General linear ordinary differential equation representation",
+        "Substitution of exponential ansatz x(t) = e^{st}",
+        "Factoring out the exponential term to yield the characteristic equation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Color gradient applied to derivative terms",
+        "Smooth transitions of surrounding rectangles highlighting terms",
+        "Arc-based transformation path for factoring terms"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Correct indexing of Tex submobjects for splitting the equation",
+        "Accurate mapping of keys for matching Tex transformations"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "Sequential progression from ODE to substituted form to factored form",
+        "Clean layout transitions with equations aligned and centered appropriately"
+      ]
+    }
+  }
+}

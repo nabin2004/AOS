@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-124",
+  "conflicts": [
+    {
+      "category": "mobject",
+      "gl_construct": "TexMatrix",
+      "ce_equivalent": "Matrix or MathTex",
+      "severity": "high"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "ShowIncreasingSubsets",
+      "ce_equivalent": "AnimationGroup of FadeIn/Write with lag_ratio",
+      "severity": "medium"
+    },
+    {
+      "category": "data_loading",
+      "gl_construct": "datasets.load_from_disk / load_image_net_data",
+      "ce_equivalent": "Mocked ImageMobject or local placeholder image",
+      "severity": "high"
+    }
+  ]
+}

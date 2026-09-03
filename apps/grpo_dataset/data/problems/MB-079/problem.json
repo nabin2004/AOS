@@ -1,0 +1,65 @@
+{
+  "id": "MB-079",
+  "title": "Laplace Transform Strategy and Equation Walkthrough",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Differential Equations"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL/InteractiveScene that visualizes the high-level strategy of solving differential equations using the Laplace Transform. \n\n1. Create a 2x2 layout of terms representing the steps of the Laplace transform method:\n   - Top-Left (UL): \"Differential Equation\"\n   - Bottom-Left (DL): \"Transformed Equation\" (colored Yellow)\n   - Bottom-Right (DR): \"Transformed Solution\" (colored Yellow)\n   - Top-Right (UR): \"Solution\"\n\n2. Create custom labeled arrows connecting these terms:\n   - An arrow pointing down from \"Differential Equation\" to \"Transformed Equation\" labeled with the Laplace symbol '\\mathcal{L}'.\n   - An arrow pointing right from \"Transformed Equation\" to \"Transformed Solution\" labeled with 'Solve (Algebraically)'.\n   - An arrow pointing up from \"Transformed Solution\" to \"Solution\" labeled with the Inverse Laplace symbol '\\mathcal{L}^{-1}'.\n\n3. Animate the sequential appearance of these terms and arrows:\n   - Show the \"Differential Equation\" term first.\n   - Grow the first arrow and transform the \"Differential Equation\" text into \"Transformed Equation\".\n   - Grow the second arrow and transform \"Transformed Equation\" into \"Transformed Solution\".\n   - Grow the third arrow and transform \"Transformed Solution\" into the final \"Solution\".\n\n4. Add background domain indicators:\n   - Divide the screen horizontally into two domains using full-screen rectangles.\n   - The top half represents the \"Time domain\" (outlined in Blue).\n   - The bottom half represents the \"s domain\" (outlined in Yellow).\n   - Fade in these domain boundaries and their respective labels in the upper-left corners of each domain.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-079/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "PreviewStrategy",
+      "WalkThroughEquationSolution"
+    ],
+    "visual_techniques": [
+      "Custom Arrow Generation",
+      "TransformMatchingStrings",
+      "FadeTransform",
+      "FullScreenRectangle split domains",
+      "LaggedStart"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "FullScreenRectangle",
+      "TransformMatchingStrings",
+      "FadeTransform",
+      "GrowArrow"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Use of FullScreenRectangle in ManimCE",
+      "severity": "high",
+      "note": "FullScreenRectangle is a ManimGL-specific class. In ManimCE, a custom Rectangle with screen dimensions must be used."
+    },
+    {
+      "pattern": "Use of TransformMatchingStrings",
+      "severity": "medium",
+      "note": "TransformMatchingStrings is specific to ManimGL. ManimCE users should use TransformMatchingTex or manual ReplacementTransform."
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "problem_id": "MB-162",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of 3D axes and background grid plane",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "NumberPlane",
+        "get_axes_and_plane"
+      ],
+      "clip_query": "3D coordinate axes and grid plane in a dark background"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Creation and propagation of the oscillating 3D wave",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "OscillatingWave",
+        "update_points",
+        "xt_to_point",
+        "get_spectral_color"
+      ],
+      "clip_query": "A colorful 3D sine wave propagating along the x-axis"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Addition of electric field vectors along the wave path",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "GraphAsVectorField",
+        "VectorField"
+      ],
+      "clip_query": "Electric field vectors pointing from the axis to the wave curve"
+    }
+  ]
+}

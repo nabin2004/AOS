@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-122",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Matrix-vector multiplication logic",
+        "Dot product calculation",
+        "Decimal value interpolation",
+        "Value range mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "SurroundingRectangle highlighting",
+        "Color-coded numeric values (blue/red)",
+        "Data flying particle effects",
+        "Aligned matrix and vector layouts"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Dynamic decimal updates via UpdateFromAlphaFunc",
+        "Accurate partial sum tracking",
+        "Decimal sign handling"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Modular helper functions for matrix operations",
+        "Sequential animation flow using LaggedStart",
+        "Proper handling of ellipses/placeholder rows in matrices"
+      ]
+    }
+  }
+}

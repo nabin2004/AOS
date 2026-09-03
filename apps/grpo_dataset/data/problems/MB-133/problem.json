@@ -1,0 +1,69 @@
+{
+  "id": "MB-133",
+  "title": "Multi-Headed Attention Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL/InteractiveScene that visualizes the transition from a single attention head to multi-headed attention in a Transformer model. First, display the title 'Single head of attention' with a screen rectangle below it. Highlight the word 'head' using a FlashAround animation. Next, morph the title into 'Multi-headed attention' using precise FadeTransform animations on the text slices. Then, transition the camera into a 3D perspective (using set_floor_plane('xz') and frame reorientation) while keeping the title fixed in the frame. Stack multiple attention pattern layers (represented by ImageMobjects or styled SurroundingRectangles) along the Z-axis (using the OUT direction) and animate them fading in sequentially with a LaggedStart animation to show parallel multi-head processing.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-133/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "MultiHeadedAttention"
+    ],
+    "visual_techniques": [
+      "3D camera reorientation",
+      "Text slicing and morphing (FadeTransform)",
+      "Lagged stack generation along Z-axis",
+      "ImageMobject integration with fallback styling"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "frame.animate.reorient",
+      "fix_in_frame",
+      "FadeTransform",
+      "LaggedStart",
+      "arrange(OUT)"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing local image assets causing runtime crashes",
+      "severity": "high",
+      "note": "The code references local attention pattern images. Fallback mock rectangles or dynamically generated noise patterns must be used if assets are missing."
+    },
+    {
+      "pattern": "Manim Community vs ManimGL API mismatch",
+      "severity": "high",
+      "note": "Using self.frame or fix_in_frame() in Manim Community will fail. Must use ThreeDScene equivalents if porting."
+    },
+    {
+      "pattern": "Text slicing index errors",
+      "severity": "medium",
+      "note": "Slicing Text objects like single_title['Single'] requires precise substring matching or specific indexing which can easily break."
+    }
+  ]
+}

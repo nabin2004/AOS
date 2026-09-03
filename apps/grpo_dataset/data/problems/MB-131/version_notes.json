@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-131",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "camera_control",
+      "gl_construct": "self.frame.animate.set_euler_angles",
+      "ce_equivalent": "self.move_camera",
+      "severity": "high"
+    },
+    {
+      "category": "text_rendering",
+      "gl_construct": "label.set_backstroke()",
+      "ce_equivalent": "label.set_stroke(width=..., color=...)",
+      "severity": "medium"
+    }
+  ]
+}

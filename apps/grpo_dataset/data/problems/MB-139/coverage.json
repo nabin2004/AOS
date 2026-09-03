@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-139",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "n choose 2 notation",
+        "combinations formula",
+        "coordinate pairs representation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "circle diagram with chords",
+        "sequential highlighting of pairs",
+        "grid layout of coordinate labels",
+        "temporary blue lines connecting dots"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "updating counter from 0 to 21",
+        "changing n value to 7"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "InteractiveScene structure",
+        "loop over combinations",
+        "conditional grid wrapping"
+      ]
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-192",
+  "conflicts": [
+    {
+      "category": "imports",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "high"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "OldTex",
+      "ce_equivalent": "MathTex",
+      "severity": "high"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "OldTexText",
+      "ce_equivalent": "Tex",
+      "severity": "high"
+    },
+    {
+      "category": "camera",
+      "gl_construct": "self.camera.frame",
+      "ce_equivalent": "Inherit from MovingCameraScene and use self.camera.frame",
+      "severity": "high"
+    }
+  ]
+}

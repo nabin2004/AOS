@@ -1,0 +1,74 @@
+{
+  "id": "MB-179",
+  "title": "Moving Averages and Borwein Integrals Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Fourier Analysis",
+    "Signal Processing"
+  ],
+  "full_prompt": "Write a complete Manim script to visualize the concept of moving averages and convolutions leading to the Borwein integral phenomenon. The scene should contain two coordinate systems (axes): an upper one for the original function and a lower one for the resulting convolution. First, plot a rectangular step function f_1(x) (which is 1.0 on [-0.5, 0.5] and 0.0 elsewhere) on the upper axes. Animate a glowing dot tracing this step function. Next, transition the layout by shrinking the upper axes and f_1(x) label to the top-right, and introducing a second set of axes at the bottom. Then, iteratively compute and display the convolutions f_{n+1}(x) on the lower axes. For each iteration, visualize a sliding window (representing the moving average) moving across the upper graph to generate the lower graph. Highlight the flat plateau at the top of each convolution graph with a yellow line, a brace, and a label indicating its width (which decreases as 1 - sum_{k=3}^{2n+1} 1/k). Also, display the value of f_{n+1}(0) on the screen, showing that it remains exactly 1.0 for the first several iterations, but eventually drops slightly below 1.0 (e.g., to 0.9999999999852937...) when the plateau width becomes negative.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-179/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "MovingAverages"
+    ],
+    "visual_techniques": [
+      "Dual coordinate systems (upper and lower axes)",
+      "Sliding window moving average animation",
+      "Iterative graph generation and transformation",
+      "Dynamic brace and plateau highlighting",
+      "Glow dot path tracing"
+    ],
+    "manim_api_patterns": [
+      "get_axes",
+      "get_graph",
+      "c2p",
+      "Brace",
+      "ShowCreation",
+      "TransformFromCopy",
+      "add_updater",
+      "pfp"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect coordinate mapping between upper and lower axes",
+      "severity": "high",
+      "note": "The sliding window must align precisely with the upper axes while drawing the resulting convolution on the lower axes."
+    },
+    {
+      "pattern": "Failure to compute convolutions numerically in real-time",
+      "severity": "medium",
+      "note": "Pre-computing or using highly optimized numpy arrays for the convolution graphs is necessary to avoid extremely slow rendering times."
+    },
+    {
+      "pattern": "Missing or misaligned plateau braces",
+      "severity": "medium",
+      "note": "The plateau width formula must correctly evaluate to 0 or negative, and the brace must handle zero-width cases gracefully without throwing errors."
+    }
+  ]
+}

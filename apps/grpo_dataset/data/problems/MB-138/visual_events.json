@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-138",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Mortimer raises his left hand as the text 'The 3rd Summer of Math Exposition' fades in above him.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "morty",
+        "words",
+        "raise_left_hand",
+        "FadeIn"
+      ],
+      "clip_query": "Mortimer points to the text 'The 3rd Summer of Math Exposition'"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The text 'The 3rd Summer of Math Exposition' transforms along an arc into 'SoME3' while Mortimer raises his right hand.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "TransformMatchingStrings",
+        "small_words",
+        "raise_right_hand",
+        "path_arc"
+      ],
+      "clip_query": "Text transforms into SoME3"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Randolph fades in shrugging, and the text 'SoME3' transforms into '3SoME' while Mortimer looks sassy.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        7.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "randy",
+        "three_some",
+        "shruggie",
+        "sassy",
+        "VFadeIn"
+      ],
+      "clip_query": "Randolph fades in shrugging next to 3SoME text"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The text '3SoME' transforms back to 'SoME3' near Mortimer, while Mortimer raises his right hand and Randolph looks sassy.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        11.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "small_words_copy",
+        "three_some",
+        "raise_right_hand",
+        "sassy"
+      ],
+      "clip_query": "Text transforms back to SoME3 near Mortimer"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-070",
+  "conflicts": [
+    {
+      "category": "Library Architecture",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Animation Names",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "high"
+    },
+    {
+      "category": "Animation Names",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform",
+      "severity": "medium"
+    },
+    {
+      "category": "Tex Submobject Selection",
+      "gl_construct": "sFs['{s}F({s})']",
+      "ce_equivalent": "sFs.get_part_by_tex('{s}F({s})') or manual indexing",
+      "severity": "high"
+    }
+  ]
+}

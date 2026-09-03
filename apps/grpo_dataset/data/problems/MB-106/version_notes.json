@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-106",
+  "conflicts": [
+    {
+      "category": "framework_classes",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_types",
+      "gl_construct": "TrueDot / GlowDot",
+      "ce_equivalent": "Dot / Sphere",
+      "severity": "medium"
+    },
+    {
+      "category": "surface_rendering",
+      "gl_construct": "ParametricSurface",
+      "ce_equivalent": "Surface",
+      "severity": "medium"
+    },
+    {
+      "category": "camera_control",
+      "gl_construct": "self.camera.frame",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    }
+  ]
+}

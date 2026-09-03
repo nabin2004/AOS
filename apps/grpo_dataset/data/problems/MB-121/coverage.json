@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-121",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Vector-based circle placement",
+        "Pairwise intersection calculation",
+        "Radial vector normalization"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Three blue circles and one yellow circle",
+        "Glow dots at intersection points",
+        "Radial lines forming a geometric skeleton",
+        "Smooth dynamic updates during movement"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Circle radius of 2",
+        "Stroke width 2 for blue, 3 for yellow",
+        "Vector tracker coordinates (RIGHT, UL, DL)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "Use of updaters for dynamic positioning",
+        "VectorizedPoint or ValueTracker for animation control",
+        "Implementation of get_radial_lines helper method"
+      ]
+    }
+  }
+}

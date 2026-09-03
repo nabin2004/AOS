@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-059",
+  "conflicts": [
+    {
+      "category": "Camera & 3D",
+      "gl_construct": "self.frame.reorient, frame.add_updater",
+      "ce_equivalent": "self.set_camera_orientation, self.begin_ambient_camera_rotation",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Positioning",
+      "gl_construct": "mobject.fix_in_frame()",
+      "ce_equivalent": "mobject.to_corner(UL).set_on_background_color_multiplier(0) or using a separate ScreenScene/Canvas",
+      "severity": "high"
+    },
+    {
+      "category": "Updaters",
+      "gl_construct": "vector.always.set_perpendicular_to_camera(self.frame)",
+      "ce_equivalent": "vector.add_updater(lambda m: m.look_at(camera.get_position()))",
+      "severity": "medium"
+    }
+  ]
+}

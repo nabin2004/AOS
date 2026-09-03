@@ -1,0 +1,61 @@
+{
+  "id": "MB-138",
+  "title": "Summer of Math Exposition 3 Introduction Scene",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    15.0
+  ],
+  "category": [
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "General Mathematics"
+  ],
+  "full_prompt": "Write a ManimGL script that creates an interactive scene introducing the '3rd Summer of Math Exposition' (SoME3). The scene features two PiCreatures: Randolph (on the left) and Mortimer (on the right). Mortimer is initially present on the bottom right corner. A large text block reading 'The 3rd Summer of\\nMath Exposition' fades in above Mortimer as he raises his left hand to point at it. After a brief pause, this text transforms into 'SoME3' using a curved path arc of 45 degrees, while Mortimer changes his pose to raise his right hand. Next, Randolph fades in on the left with a shrugging pose, looking at a new text '3SoME' which is transformed from 'SoME3' (again with a 45-degree path arc), while Mortimer reacts sassily. Mortimer then becomes angry looking at Randolph. Finally, the text '3SoME' transforms back to 'SoME3' positioned near Mortimer, while Mortimer raises his right hand and Randolph adopts a sassy expression. Ensure appropriate blinking animations and pauses are integrated throughout the sequence.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-138/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 55,
+    "scene_classes": [
+      "AskAboutSome"
+    ],
+    "visual_techniques": [
+      "PiCreature character animation",
+      "Text transformation with path arcs",
+      "Multi-character interaction and expression changes"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Randolph",
+      "Mortimer",
+      "TransformMatchingStrings",
+      "Blink",
+      "VFadeIn"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom PiCreature classes (Randolph, Mortimer) in standard Manim Community Edition",
+      "severity": "high",
+      "note": "The scene relies heavily on 3b1b's custom PiCreature assets and animations like Blink, which are not present in standard ManimCE."
+    },
+    {
+      "pattern": "Use of TransformMatchingStrings in standard Manim",
+      "severity": "high",
+      "note": "TransformMatchingStrings is a custom ManimGL/3b1b class. Standard ManimCE uses TransformMatchingTex or standard Transform."
+    }
+  ]
+}

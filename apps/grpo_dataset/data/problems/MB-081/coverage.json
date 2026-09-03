@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-081",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Complex exponential function e^{st}",
+        "Real and imaginary components of s",
+        "Derivative of complex exponential d/dt e^{2it} = 2i e^{2it}",
+        "Euler's formula representation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "S-plane coordinate system with real and imaginary axes",
+        "Exponential plane showing complex trajectory",
+        "Dynamic 2D graph plotting the real part of the function",
+        "Moving dot and dynamic text labels updating with trackers"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Value tracking for complex variable s",
+        "Value tracking for time variable t",
+        "Coordinate mapping from complex values to screen space"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Multi-panel layout alignment",
+        "Camera frame panning and zooming to follow graph progression",
+        "Smooth transitions between mathematical expressions"
+      ]
+    }
+  }
+}

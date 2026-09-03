@@ -1,0 +1,58 @@
+{
+  "problem_id": "MB-136",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display the Euler formula equation V - E + F = 2 at the top of the screen and initialize a single vertex with a 'Trivial graph' label and arrow.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "Tex",
+        "equation",
+        "Trivial graph",
+        "Vector",
+        "dots"
+      ],
+      "clip_query": "A math equation V - E + F = 2 displayed at the top with a single dot labeled as a trivial graph below it."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Sequentially flash the V, F, and E variables in the equation, fading in their corresponding initial values (1, 0, 1) and flashing the background to represent the outer face.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "FlashAround",
+        "numbers",
+        "full_rect",
+        "FadeIn"
+      ],
+      "clip_query": "Highlighting variables in the Euler equation and showing the numbers 1, 0, and 1 appear underneath them."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animate the addition of a new edge and a new vertex, displaying a text label 'New edge -> New vertex' and dynamically incrementing the V and E counters.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "ShowCreation",
+        "edges",
+        "New edge",
+        "New vertex",
+        "ChangeDecimalToValue"
+      ],
+      "clip_query": "An edge drawing from the first vertex to a new vertex, with text indicating a new edge and vertex, and the formula counters updating."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-196",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_3d",
+      "gl_construct": "TexturedSurface",
+      "ce_equivalent": "No direct equivalent; requires custom shader or mapping in ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_3d",
+      "gl_construct": "SurfaceMesh",
+      "ce_equivalent": "No direct equivalent; requires manual extraction of curves or custom VMobjects",
+      "severity": "high"
+    },
+    {
+      "category": "camera_api",
+      "gl_construct": "self.camera.frame",
+      "ce_equivalent": "self.set_camera_orientation / self.camera",
+      "severity": "medium"
+    }
+  ]
+}

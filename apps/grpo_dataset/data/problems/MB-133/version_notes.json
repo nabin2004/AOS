@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-133",
+  "conflicts": [
+    {
+      "category": "3D Camera API",
+      "gl_construct": "self.frame.animate.reorient()",
+      "ce_equivalent": "self.set_camera_orientation() or self.move_camera()",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Fixed in Frame",
+      "gl_construct": "mobject.fix_in_frame()",
+      "ce_equivalent": "self.add_fixed_in_frame_mobjects(mobject)",
+      "severity": "high"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "medium"
+    }
+  ]
+}

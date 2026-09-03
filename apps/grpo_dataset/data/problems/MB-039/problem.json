@@ -1,0 +1,71 @@
+{
+  "id": "MB-039",
+  "title": "Volume of Unit Ball in Higher Dimensions",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or compatible ManimCE) that visualizes the volume of a unit ball across dimensions 0 to 10. \n\n1. Create a set of axes ranging from x=[0, 25] and y=[0, 5]. Position it towards the bottom-left of the screen. Add numbers to the x-axis. Label the y-axis 'Volume of a\\nunit ball' and the x-axis 'Dimension'.\n2. Define the volume function for an n-dimensional unit ball: V(n) = pi^(n/2) / Gamma(n/2 + 1). Plot this continuous graph in blue.\n3. For each integer dimension from 0 to 10, display the corresponding exact volume formula (e.g., '1', '2', '\\pi', '{4 \\over 3} \\pi', etc.) next to a vertical line and dot on the graph. \n4. Next to each formula, show its decimal approximation (using DecimalNumber) with an approximation sign ('\\approx'). For dimensions 0 and 1, hide the approximation since they are exact integers.\n5. Animate through these dimensions sequentially, showing one vertical line, dot, and formula-approximation group at a time, removing the previous one before showing the next.\n6. After iterating through all dimensions, fade out the decimal approximations, dim the vertical lines and dots, and transition the final formula into the general formula '\\pi^{n/2} \\over (n/2)!' positioned near the graph.\n7. Finally, display the recurrence relation 'V_n = {2\\pi \\over n} V_{n - 2}' in the upper right corner with 'V_n' and 'V_{n-2}' highlighted in yellow.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-039/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "ShowNumericalValues"
+    ],
+    "visual_techniques": [
+      "Continuous graph plotting",
+      "Dynamic DecimalNumber updating",
+      "Iterative sequential highlighting",
+      "Mathematical formula transformation"
+    ],
+    "manim_api_patterns": [
+      "Axes",
+      "get_graph",
+      "get_v_line_to_graph",
+      "DecimalNumber",
+      "Tex",
+      "InteractiveScene",
+      "FadeTransform",
+      "ShowCreation"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.8,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using math.gamma with negative or invalid float values",
+      "severity": "high",
+      "note": "Ensure the dimension n is non-negative so math.gamma(n/2 + 1) is always well-defined."
+    },
+    {
+      "pattern": "Missing or misaligned DecimalNumber approximations next to Tex formulas",
+      "severity": "medium",
+      "note": "Use VGroup arrange(RIGHT) and next_to to ensure the formula, approx symbol, and decimal number are perfectly aligned."
+    },
+    {
+      "pattern": "API mismatch for get_v_line_to_graph or i2gp in ManimCE",
+      "severity": "high",
+      "note": "In ManimCE, use axes.get_vertical_line(axes.input_to_graph_point(x, graph)) instead of get_v_line_to_graph and i2gp."
+    }
+  ]
+}

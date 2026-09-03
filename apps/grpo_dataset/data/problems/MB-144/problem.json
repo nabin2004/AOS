@@ -1,0 +1,68 @@
+{
+  "id": "MB-144",
+  "title": "Driven Harmonic Oscillator Physics Simulation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Create a Manim scene named `DrivenHarmonicOscillator` that visualizes a physical simulation of a driven harmonic oscillator. The visualization must include three custom components:\n\n1. A `Spring` class (inheriting from `VMobject`) that represents a 3D-like helical spring. It should construct a helix using a parametric curve, add straight lead lines at both ends, and use updaters to dynamically stretch, scale, and position itself between a fixed anchor point and a moving mass.\n\n2. A `HarmonicOscillator` class (inheriting from `TrueDot` or a 3D dot) that simulates physical motion. It must maintain state variables for mass, damping, spring constant $k$, velocity, and external forces. It should use a sub-stepped numerical integration method (e.g., Euler-Cromer or Verlet) inside a frame-rate independent updater (`update_position(dt)`) to calculate displacement and acceleration based on Hooke's law, damping, and any registered external driving forces.\n\n3. A `DynamicPlot` class (inheriting from `VMobject`) that dynamically plots the displacement of the oscillator over time on a set of axes.\n\nIn the main scene, set up the physical system with a fixed anchor point, a spring, and the oscillator mass. Apply a periodic external driving force (e.g., a sinusoidal force) to demonstrate driven harmonic motion, showing resonance or phase lag. Simultaneously, display a scrolling real-time plot of the mass's displacement over time.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-144/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "DrivenHarmonicOscillator"
+    ],
+    "visual_techniques": [
+      "Physics Simulation",
+      "Dynamic Updaters",
+      "3D Helix Spring Rendering",
+      "Real-time Plotting"
+    ],
+    "manim_api_patterns": [
+      "ParametricCurve",
+      "TrueDot",
+      "add_updater",
+      "stretch",
+      "put_start_and_end_on"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Numerical instability in physics integration loop",
+      "severity": "high",
+      "note": "If dt is too large or sub-stepping is not implemented, the mass will fly off-screen due to accumulated integration errors."
+    },
+    {
+      "pattern": "Spring stretching distortion",
+      "severity": "medium",
+      "note": "Using standard scaling instead of stretching along a single axis and repositioning can cause the spring's helix radius to distort."
+    },
+    {
+      "pattern": "Updater lag or desynchronization",
+      "severity": "high",
+      "note": "The spring, mass, and plot updaters must execute in the correct order or within the same frame step to prevent visual separation."
+    }
+  ]
+}

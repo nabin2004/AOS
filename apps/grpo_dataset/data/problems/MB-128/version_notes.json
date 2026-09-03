@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-128",
+  "conflicts": [
+    {
+      "category": "Matrix Class",
+      "gl_construct": "DecimalMatrix",
+      "ce_equivalent": "Matrix (with custom DecimalNumber elements inside)",
+      "severity": "high"
+    },
+    {
+      "category": "Camera/Frame",
+      "gl_construct": "fix_in_frame() / is_fixed_in_frame",
+      "ce_equivalent": "None (standard 2D canvas is fixed by default; for 3D, use standard CE camera methods)",
+      "severity": "medium"
+    },
+    {
+      "category": "Color Utilities",
+      "gl_construct": "interpolate_color_by_hsl",
+      "ce_equivalent": "interpolate_color",
+      "severity": "low"
+    }
+  ]
+}

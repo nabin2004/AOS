@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-083",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Taylor series expansion formula",
+        "Complex number substitution (pi * i)",
+        "Euler's formula visualization"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "ComplexPlane with coordinate labels",
+        "GlowDot tracking vector sum",
+        "Spiral of vectors representing series terms",
+        "Brace and text annotations"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Correct vector coordinates corresponding to (pi^n / n!) * i^n",
+        "Proper scaling of the complex plane to fit the spiral"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Sequential term-by-term animation loop",
+        "Synchronized formula transformation and vector drawing"
+      ]
+    }
+  }
+}

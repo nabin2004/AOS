@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-190",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Symmetric polynomials",
+        "Vieta's formulas",
+        "Factored polynomial expansion",
+        "Root-coefficient relationships"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Color-coded roots",
+        "Aligned equations",
+        "Smooth transitions between factored and expanded forms",
+        "Distinct coefficient colors"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Combinatoric generation of symmetric terms",
+        "Correct sign alternating logic based on degree"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Helper functions for LaTeX generation",
+        "VGroup alignment and layout management",
+        "Use of OldTex or Tex for complex mathematical formulas"
+      ]
+    }
+  }
+}

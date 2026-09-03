@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-126",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "3D coordinate mapping",
+        "Direction vector calculation",
+        "Random uniform distribution in 3D space"
+      ]
+    },
+    "Visual": {
+      "weight": 0.5,
+      "expected": [
+        "ThreeDAxes",
+        "Glowing tapered lines",
+        "3D Text labels facing camera",
+        "Camera orbit animation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Coordinate ranges [-5, 5]",
+        "Line count of at least 100",
+        "Custom stroke width profiles"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "MJSpace class definition",
+        "Helper function for direction lines",
+        "Camera updater or frame animation loop"
+      ]
+    }
+  }
+}

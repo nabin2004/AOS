@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-181",
+  "conflicts": [
+    {
+      "category": "class_inheritance",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_names",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "high"
+    },
+    {
+      "category": "method_names",
+      "gl_construct": "arc.pfp(proportion)",
+      "ce_equivalent": "arc.point_from_proportion(proportion)",
+      "severity": "high"
+    },
+    {
+      "category": "assets",
+      "gl_construct": "ImageMobject(os.path.join(ASSET_DIR, 'Flower'))",
+      "ce_equivalent": "VGroup representing a procedural flower (e.g., Circle and Ellipses)",
+      "severity": "high"
+    }
+  ]
+}

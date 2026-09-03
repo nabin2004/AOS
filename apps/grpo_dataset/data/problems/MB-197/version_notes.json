@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-197",
+  "conflicts": [
+    {
+      "category": "Camera API",
+      "gl_construct": "self.camera.frame.reorient()",
+      "ce_equivalent": "self.set_camera_orientation() or self.camera.set_euler_angles()",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Creation Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Parametric Surface API",
+      "gl_construct": "ParametricSurface(uv_func, u_range, v_range, resolution)",
+      "ce_equivalent": "Surface(func, u_range, v_range, resolution)",
+      "severity": "high"
+    },
+    {
+      "category": "Submobject Traversal",
+      "gl_construct": "family_members_with_points()",
+      "ce_equivalent": "get_family() or iterating over submobjects recursively",
+      "severity": "medium"
+    }
+  ]
+}

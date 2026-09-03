@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-086",
+  "conflicts": [
+    {
+      "category": "Framework Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Creation Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Clipping Planes",
+      "gl_construct": "set_clip_plane",
+      "ce_equivalent": "Not natively supported on VMobjects in CE without custom shaders or masking",
+      "severity": "high"
+    },
+    {
+      "category": "Rate Functions",
+      "gl_construct": "wiggle",
+      "ce_equivalent": "wiggle (available in manim.utils.rate_functions)",
+      "severity": "low"
+    }
+  ]
+}

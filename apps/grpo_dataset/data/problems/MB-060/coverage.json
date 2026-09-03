@@ -1,0 +1,42 @@
+{
+  "problem_id": "MB-060",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "\\sqrt{1^2 + 1^2}",
+        "\\sqrt{2}",
+        "\\sqrt{\\sqrt{2}^2 + 1^2}",
+        "\\sqrt{3}"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "ThreeDAxes",
+        "NumberPlane",
+        "Square",
+        "VCube",
+        "GlowDot",
+        "Pink diagonal line",
+        "Yellow 3D diagonal line"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Square side length 2",
+        "Cube side length 2",
+        "Camera reorientation angles (-16, 68, 0)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene class structure",
+        "Smooth camera transitions",
+        "Ambient rotation during 3D visualization"
+      ]
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-099",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "wave propagation equation",
+        "frequency",
+        "wave number",
+        "decay factor",
+        "interference patterns"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "LightWaveSlice rendering",
+        "DotCloud point sources",
+        "intensity visualization",
+        "shader-based wave propagation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "frequency values",
+        "decay factor values",
+        "time rate"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "LightWaveSlice class definition",
+        "custom shader integration",
+        "updater for time increment",
+        "sync_points method"
+      ]
+    }
+  }
+}

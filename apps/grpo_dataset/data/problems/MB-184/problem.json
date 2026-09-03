@@ -1,0 +1,68 @@
+{
+  "id": "MB-184",
+  "title": "Waveform Decomposition and Fourier Analysis",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Signal Processing",
+    "Fourier Analysis"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the decomposition of an audio waveform into its Fourier components. The scene should first plot a full waveform using a passing flash effect. Then, it should zoom in on a specific segment of the waveform, scaling the axes and graph to fill the frame, and transition to a new set of axes. Next, it should prepare the scene for a 3D perspective by rotating the mobjects and reorienting the camera frame. Finally, it should perform a Fourier transform (FFT) on the signal segment and break it down into individual sine wave components aligned along a 3D axis.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-184/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "DecomposeAudioSegment",
+      "WaveformDescription"
+    ],
+    "visual_techniques": [
+      "Passing Flash",
+      "Camera Zoom and Stretch",
+      "3D Camera Reorientation",
+      "FFT-based Waveform Decomposition"
+    ],
+    "manim_api_patterns": [
+      "self.camera.frame",
+      "ShowCreation",
+      "VShowPassingFlash",
+      "pfp",
+      "get_anchors",
+      "MoveToTarget",
+      "frame.reorient"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community camera syntax instead of ManimGL's self.camera.frame",
+      "severity": "high",
+      "note": "ManimGL uses self.camera.frame.reorient() and self.camera.frame.stretch() which are not compatible with Manim Community's Camera class."
+    },
+    {
+      "pattern": "Missing audio file dependency",
+      "severity": "medium",
+      "note": "The script relies on an external .wav file. Mocking or generating a synthetic waveform is recommended if the file is missing."
+    }
+  ]
+}

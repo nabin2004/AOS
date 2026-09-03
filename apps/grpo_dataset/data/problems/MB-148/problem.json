@@ -1,0 +1,69 @@
+{
+  "id": "MB-148",
+  "title": "Induced Wiggle in Cylinder (Optics Puzzle)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script to visualize the propagation of a polarized light wave through a sugar solution cylinder, demonstrating optical rotation. Create a 3D scene with coordinate axes and a background plane. Define a custom 'SugarCylinder' class inheriting from Cylinder that aligns with the x-axis, has a semi-transparent blue color, and uses camera-based depth sorting. Define a 'TwistedRibbon' class inheriting from ParametricSurface to represent the rotating polarization state of the light wave as a 3D ribbon with a specified amplitude and twist rate. Implement a 'PropagatingRings' class inheriting from VGroup that animates concentric circles expanding outwards along the propagation path using a custom updater. Finally, define a 'Polarizer' class to represent a polarizing filter. Combine these elements into a single 3D scene where the camera rotates to show the spatial structure of the twisted ribbon inside the cylinder.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-148/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "InducedWiggleInCylinder"
+    ],
+    "visual_techniques": [
+      "3D Parametric Surface rendering",
+      "Custom 3D Cylinder with transparency and camera sorting",
+      "Dynamic propagating rings using frame-by-frame updaters",
+      "3D coordinate mapping and camera rotation"
+    ],
+    "manim_api_patterns": [
+      "ThreeDAxes",
+      "Cylinder",
+      "ParametricSurface",
+      "always_sort_to_camera",
+      "add_updater",
+      "NumberPlane"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "always_sort_to_camera is missing or throws AttributeError in standard Manim Community",
+      "severity": "high",
+      "note": "This method is exclusive to the ManimGL/3b1b fork. In ManimCE, 3D transparency sorting is handled automatically by the modernGL renderer or requires manual z-index adjustments."
+    },
+    {
+      "pattern": "ParametricSurface argument mismatch (e.g., prefered_creation_axis)",
+      "severity": "medium",
+      "note": "The parameter 'prefered_creation_axis' is specific to ManimGL and will cause errors in standard ManimCE."
+    },
+    {
+      "pattern": "set_flat_stroke(False) is not supported",
+      "severity": "low",
+      "note": "This is a ManimGL-specific optimization for 3D stroke rendering and should be omitted or handled conditionally in ManimCE."
+    }
+  ]
+}

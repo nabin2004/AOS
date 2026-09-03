@@ -1,0 +1,64 @@
+{
+  "id": "MB-190",
+  "title": "Construct Polynomial with Given Roots",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Algebra",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL scene named `ConstructPolynomialWithGivenRoots` that visualizes the construction of a polynomial from its roots. The scene should define helper functions to generate LaTeX representations of factored polynomials, expanded polynomials, and the symmetric system of equations (Vieta's formulas) relating roots to coefficients. The roots should be color-coded (e.g., using a color gradient), and the coefficients should also have distinct colors. The visualization should show the factored form P(x) = (x - r_1)(x - r_2)..., expand it step-by-step to show how the symmetric polynomials in the roots arise as coefficients, and present the system of equations linking the coefficients to the elementary symmetric polynomials of the roots. Ensure smooth transitions, proper alignment of equations, and clear visual grouping of related mathematical terms.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-190/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "ConstructPolynomialWithGivenRoots"
+    ],
+    "visual_techniques": [
+      "Color-coded LaTeX terms",
+      "Symmetric polynomial expansion",
+      "Vieta's formulas alignment",
+      "Dynamic root-to-coefficient mapping"
+    ],
+    "manim_api_patterns": [
+      "OldTex",
+      "VGroup",
+      "color_gradient",
+      "arrange",
+      "shift",
+      "set_color"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Mismatched LaTeX brackets or syntax errors in OldTex",
+      "severity": "high",
+      "note": "Using OldTex with complex string formatting can easily lead to unparseable LaTeX if braces are not balanced."
+    },
+    {
+      "pattern": "Color gradient interpolation failure",
+      "severity": "medium",
+      "note": "If the list of roots is empty or has size 1, color_gradient might fail or return unexpected types."
+    }
+  ]
+}

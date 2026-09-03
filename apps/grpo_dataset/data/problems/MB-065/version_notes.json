@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-065",
+  "conflicts": [
+    {
+      "category": "framework_mismatch",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "custom_assets",
+      "gl_construct": "Randolph",
+      "ce_equivalent": "Mocked Pi Creature or custom SVGMobject",
+      "severity": "high"
+    },
+    {
+      "category": "custom_assets",
+      "gl_construct": "Exmark / Checkmark",
+      "ce_equivalent": "Tex('{\\\\color{red}\\\\times}') / Tex('{\\\\color{green}\\\\checkmark}')",
+      "severity": "medium"
+    },
+    {
+      "category": "custom_assets",
+      "gl_construct": "get_quantum_computer_symbol",
+      "ce_equivalent": "SVGMobject or custom shape representing a quantum computer",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_api",
+      "gl_construct": "cycle_animation / ClockPassesTime",
+      "ce_equivalent": "Custom updater on a Clock mobject rotating its hands",
+      "severity": "high"
+    }
+  ]
+}

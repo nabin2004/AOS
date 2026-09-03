@@ -1,0 +1,89 @@
+{
+  "problem_id": "MB-059",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the 3D axes, grid plane, rotating camera frame, 3D vector, and screen-fixed coordinate matrix.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "NumberPlane",
+        "frame.reorient",
+        "Vector",
+        "DecimalMatrix",
+        "fix_in_frame"
+      ],
+      "clip_query": "A 3D coordinate system with a teal vector and a coordinate matrix in the upper left corner."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The 3D vector rotates around the Z-axis while the coordinate matrix dynamically updates its values.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "Rotate",
+        "OUT",
+        "update_coord_array"
+      ],
+      "clip_query": "A teal vector rotating in 3D space while a matrix of numbers updates dynamically."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The vector sequentially points to the basis states |0>, |1>, and |2>, with corresponding ket labels fading in.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "KetGroup",
+        "Integer",
+        "set_vect_anim",
+        "FadeIn"
+      ],
+      "clip_query": "A vector pointing along the axes with ket labels like |0>, |1>, and |2> appearing."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A key icon appears next to the |2> label, and the label turns yellow to highlight the secret key.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "get_key_icon",
+        "key_icon",
+        "YELLOW"
+      ],
+      "clip_query": "A key icon appearing next to a yellow ket label in a 3D scene."
+    },
+    {
+      "event_id": "ev_05",
+      "description": "The vector transitions to the balanced state [1, 1, 1] and a 'balanced state' text label appears.",
+      "weight": 0.15,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        24.0
+      ],
+      "keyword_bank": [
+        "balanced_state",
+        "balance_name",
+        "set_vect_anim"
+      ],
+      "clip_query": "A vector pointing diagonally in 3D space with a label reading 'balanced state'."
+    }
+  ]
+}

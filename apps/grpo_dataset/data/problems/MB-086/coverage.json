@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-086",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Definition of a complex smooth function combining exponential decay, cubic polynomial, and cosine",
+        "Definition of a limited domain interval [2, 6]",
+        "Definition of a tweaked function that deviates quadratically outside the limited domain",
+        "Calculation of tangent lines along the graph using a ValueTracker"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Distinct color coding: blue for the limited domain graph, red for the extensions",
+        "Use of clipping planes to cleanly separate the extensions from the original domain",
+        "Smooth morphing animations of the extensions using .become()",
+        "Wiggle rate function applied to the modified graph to show dynamic deformation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker driving the tangent line's x-coordinate from 2 to 6",
+        "Random nudge values generated dynamically for the extension points",
+        "Precise coordinate mapping using axes.c2p"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inheritance from InteractiveScene (ManimGL)",
+        "Implementation of a custom helper method get_extension to construct smooth VMobjects",
+        "Proper state saving and restoration (save_state, Restore) for the extension object"
+      ]
+    }
+  }
+}

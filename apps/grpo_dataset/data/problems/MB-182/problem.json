@@ -1,0 +1,72 @@
+{
+  "id": "MB-182",
+  "title": "Sum of Sine Waves (Fourier Series Concept)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Physics",
+    "Signal Processing"
+  ],
+  "full_prompt": "Write a complete Manim script using the ManimGL/Manim Community framework that visualizes the summation of multiple sine waves to build a complex wave. First, create a single pure sine wave on a set of coordinate axes. Add a brace indicating the period of this wave with the label '220 cycles / sec.' and label the axes 'Air pressure' and 'Time'. Second, transition this single wave into a stack of four smaller axes aligned vertically on the right side of the screen. Each of these smaller axes should display a different harmonic frequency wave (ratios 1, 6/5, 3/2, and 21/12 relative to the base frequency), colored with a gradient from BLUE to YELLOW, and labeled with their respective frequencies in Hz (220 Hz, 264 Hz, 330 Hz, 385 Hz). Finally, introduce a larger top axes spanning the upper portion of the screen, preparing to display the combined sum of these individual waves.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-182/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "SumOfWaves"
+    ],
+    "visual_techniques": [
+      "Multi-axes alignment",
+      "Wave summation helper function",
+      "Dynamic brace labeling",
+      "Gradient coloring across VGroup",
+      "Coordinate-to-graph mapping (i2gp)"
+    ],
+    "manim_api_patterns": [
+      "Axes",
+      "Brace",
+      "Line",
+      "i2gp",
+      "squish_rate_func",
+      "LaggedStartMap",
+      "ReplacementTransform"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Use of `i2gp` in ManimCE without translating to `input_to_graph_point`",
+      "severity": "high",
+      "note": "ManimGL uses `axes.i2gp(x, graph)` while ManimCE uses `axes.input_to_graph_point(x, graph)`."
+    },
+    {
+      "pattern": "Use of `ShowCreation` instead of `Create` in ManimCE",
+      "severity": "medium",
+      "note": "ManimGL's `ShowCreation` must be mapped to `Create` if running on ManimCE."
+    },
+    {
+      "pattern": "Incorrect gradient coloring on VGroup",
+      "severity": "medium",
+      "note": "Using `set_submobject_colors_by_gradient` which is specific to ManimGL; in ManimCE, `set_color_by_gradient` should be used."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-185",
+  "conflicts": [
+    {
+      "category": "mobject_compatibility",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with a larger, low-opacity Dot behind it, or standard Dot",
+      "severity": "high"
+    },
+    {
+      "category": "scene_base",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "method_compatibility",
+      "gl_construct": "shift_onto_screen",
+      "ce_equivalent": "Manual positioning using next_to or shift with boundary checks",
+      "severity": "medium"
+    }
+  ]
+}

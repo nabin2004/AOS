@@ -1,0 +1,70 @@
+{
+  "id": "MB-159",
+  "title": "Polarized Scattering of Electromagnetic Waves",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Calculus",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a 3D Manim scene named 'PolarizedScattering' that visualizes the scattering of a polarized electromagnetic wave by a charged particle. The scene should include:\n1. A 3D coordinate system (axes) with an incoming electromagnetic wave propagating along the X-axis. The wave should be represented as a 3D parametric curve (using a custom VMobject like 'OscillatingWave') with adjustable y and z amplitudes, phases, and wavelength.\n2. A charged particle (represented as a sphere or dot) located at the origin. The particle must oscillate dynamically in response to the electric field of the incoming wave.\n3. A dynamic vector attached to the particle representing its acceleration ('AccelerationVector'), which updates its direction and magnitude in real-time as the particle oscillates.\n4. A dynamic vector field surrounding the particle that visualizes the scattered radiation field. This field should be calculated using the Lorentz force / dipole radiation formula (specifically computing the perpendicular component of acceleration, taking into account retardation/delay effects from the particle's past positions).\n5. Smooth 3D camera rotation to showcase the spatial distribution of the scattered field, demonstrating that no radiation is scattered along the axis of the particle's acceleration.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-159/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 320,
+    "scene_classes": [
+      "PolarizedScattering"
+    ],
+    "visual_techniques": [
+      "3D Parametric Waves",
+      "Dynamic Particle Updaters",
+      "Lorentz Force Field Simulation",
+      "Retarded Vector Fields",
+      "3D Camera Rotation"
+    ],
+    "manim_api_patterns": [
+      "VMobject custom updaters",
+      "Vector subclassing with pin_to_particle",
+      "VectorField with custom force functions",
+      "Camera frame rotation"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Division by zero or infinity in field calculations near the particle origin",
+      "severity": "high",
+      "note": "Ensure points_to_particle_info uses an adjusted norm/radius threshold to prevent field vectors from blowing up near the particle."
+    },
+    {
+      "pattern": "Lag or low frame rate due to real-time calculation of retarded potentials/past positions",
+      "severity": "medium",
+      "note": "Optimize the history tracking of the particle's position and acceleration to avoid deep loops during updater execution."
+    },
+    {
+      "pattern": "Incorrect 3D camera orientation hiding the wave's polarization plane",
+      "severity": "medium",
+      "note": "Set an initial camera angle (phi, theta) that clearly shows both the Y and Z components of the wave oscillation."
+    }
+  ]
+}

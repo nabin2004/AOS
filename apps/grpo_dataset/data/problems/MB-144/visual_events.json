@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-144",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the physical system showing the fixed anchor, the helical spring, and the spherical mass at rest.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "Spring",
+        "HarmonicOscillator",
+        "anchor",
+        "mass"
+      ],
+      "clip_query": "A helical spring attached to a spherical mass at rest"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The mass is released or perturbed, demonstrating free damped harmonic oscillation as the spring compresses and expands.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "velocity",
+        "damping",
+        "displacement",
+        "update_position"
+      ],
+      "clip_query": "A spring-mass system oscillating back and forth with damping"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "An external periodic driving force is applied, causing the system to transition into driven harmonic motion.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "external_forces",
+        "driving",
+        "sin",
+        "cos"
+      ],
+      "clip_query": "A driven harmonic oscillator moving under an external periodic force"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A dynamic plot scrolls in real-time, tracing the displacement of the oscillator over time.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "DynamicPlot",
+        "axes",
+        "add_point",
+        "plot"
+      ],
+      "clip_query": "A real-time scrolling graph plotting the displacement of an oscillator"
+    }
+  ]
+}

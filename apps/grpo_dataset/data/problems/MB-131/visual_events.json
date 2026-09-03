@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-131",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup of 3D axes and background grid plane with custom camera orientation.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "add_plane",
+        "axes"
+      ],
+      "clip_query": "A 3D coordinate system with a grid plane in a dark background"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Drawing the 'King' and 'Man' vectors as labeled arrows from the origin.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "LabeledArrow",
+        "King",
+        "Man"
+      ],
+      "clip_query": "Two labeled 3D vectors representing King and Man pointing from the origin"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Performing vector subtraction (King - Man) and adding the 'Woman' vector sequentially in 3D space.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        7.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "Woman",
+        "vector",
+        "shift",
+        "add"
+      ],
+      "clip_query": "Vectors being chained together head-to-tail in 3D space"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Revealing the 'Queen' vector and showing the close alignment with the computed vector tip.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        16.0
+      ],
+      "keyword_bank": [
+        "Queen",
+        "LabeledArrow",
+        "align"
+      ],
+      "clip_query": "A final vector labeled Queen aligning with the end of the chained vectors"
+    }
+  ]
+}

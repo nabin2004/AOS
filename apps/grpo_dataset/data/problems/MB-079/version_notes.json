@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-079",
+  "conflicts": [
+    {
+      "category": "class_inheritance",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_type",
+      "gl_construct": "FullScreenRectangle",
+      "ce_equivalent": "Rectangle(width=config.frame_width, height=config.frame_height)",
+      "severity": "high"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "TransformMatchingStrings",
+      "ce_equivalent": "TransformMatchingTex or manual ReplacementTransform",
+      "severity": "medium"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform(..., path_arc=...) or FadeTransform (if using modern ManimCE)",
+      "severity": "low"
+    }
+  ]
+}

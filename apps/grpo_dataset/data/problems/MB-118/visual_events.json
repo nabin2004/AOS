@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-118",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of 3D axes, coordinate plane, yellow circle, and flat 2D pre-strip on the screen.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "NumberPlane",
+        "Circle",
+        "pre_strip",
+        "ShowCreation"
+      ],
+      "clip_query": "A 2D coordinate plane with a yellow circle and a flat strip segment shown in the center."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Camera reorients into a 3D perspective while the flat strip expands into a 3D spherical band on the semi-transparent sphere.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "reorient",
+        "Restore",
+        "sphere",
+        "strip"
+      ],
+      "clip_query": "The camera rotates into 3D space as a flat strip morphs into a curved band on a semi-transparent sphere."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A 3D brace labeled 'd' is added next to the strip, and a 2D text label 'Area = pi d' is written in the upper right corner.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        13.0
+      ],
+      "keyword_bank": [
+        "Brace",
+        "TexText",
+        "fix_in_frame",
+        "Write"
+      ],
+      "clip_query": "A brace labeled d appears next to the spherical strip, and the text Area = pi d is displayed in the corner."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The spherical strip and its brace slide dynamically along the sphere's axis using a ValueTracker, demonstrating constant width.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        13.0,
+        23.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "add_updater",
+        "x0_tracker",
+        "animate"
+      ],
+      "clip_query": "The spherical band and its brace slide back and forth along the sphere while maintaining a constant width."
+    }
+  ]
+}

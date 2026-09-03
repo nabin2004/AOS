@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-194",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render side-by-side complex planes: Root Plane on the left (blue/yellow theme) and Coefficient Plane on the right (grey/red theme).",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "arrange",
+        "LEFT",
+        "planes"
+      ],
+      "clip_query": "Two complex planes side-by-side on a dark background"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Initialize the coefficient dot (red) and the three root dots (yellow) at their starting algebraic positions.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "Dot",
+        "root_color",
+        "coef_color",
+        "add_dots"
+      ],
+      "clip_query": "A red dot on the right plane and three yellow dots on the left plane"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animate the coefficient dot moving in a circle around the origin in the coefficient plane.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "add_updater",
+        "cos",
+        "sin",
+        "circle"
+      ],
+      "clip_query": "A red dot tracing a circular path on the right complex plane"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Simultaneously update the three root dots to rotate smoothly, tracing out arcs that cover 120 degrees each.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "sort_to_minimize_distances",
+        "tracers",
+        "roots"
+      ],
+      "clip_query": "Three yellow dots tracing symmetric arcs on the left complex plane"
+    }
+  ]
+}

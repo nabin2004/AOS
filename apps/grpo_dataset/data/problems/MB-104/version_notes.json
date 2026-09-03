@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-104",
+  "conflicts": [
+    {
+      "category": "Camera API",
+      "gl_construct": "self.frame",
+      "ce_equivalent": "self.camera.frame",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Methods",
+      "gl_construct": "replicate",
+      "ce_equivalent": "VGroup(*[mobject.copy() for _ in range(n)])",
+      "severity": "medium"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Background Mobjects",
+      "gl_construct": "FullScreenRectangle",
+      "ce_equivalent": "FullScreenRectangle (if available) or custom Rectangle matching frame dimensions",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "id": "MB-067",
+  "title": "Flattening a 3D Cone into a 2D Sector",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    16.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Calculus"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or modern ManimCE equivalent) that visualizes the process of flattening a 3D cone into a 2D flat sector. \n\nYour scene should:\n1. Set up a 3D coordinate system with axes and 6 tracking dots (colored red, green, and blue) positioned along the positive and negative directions of the X, Y, and Z axes to anchor the 3D space.\n2. Define a parametric surface for a 3D cone with a radius of 3.0, and another parametric surface representing the flattened 2D sector of the cone. The sector angle theta should be calculated based on the cone's geometry (e.g., theta = TAU * sin(TAU / 8)).\n3. Render the 3D cone surface with a dark grey color and realistic shading.\n4. Draw a red path (geodesic-like line) and a yellow dashed dividing line directly on the cone's surface.\n5. Animate the camera (frame) to rotate and showcase the 3D structure of the cone and its lines.\n6. Smoothly morph (Transform) the 3D cone, the red path, and the yellow dividing line into their flat 2D counterparts simultaneously while reorienting the camera to a top-down 2D perspective.\n7. Ensure depth testing is properly configured so that the lines and dots render correctly relative to the surfaces.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-067/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 105,
+    "scene_classes": [
+      "FlattenCone"
+    ],
+    "visual_techniques": [
+      "3D Parametric Surfaces",
+      "Camera Reorientation",
+      "Morphing/Transformations in 3D Space",
+      "Depth Testing and Layering"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame.animate.reorient",
+      "ParametricSurface",
+      "TrueDot",
+      "ShowCreation",
+      "Transform"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Camera reorientation syntax error when porting to ManimCE (using self.frame instead of self.camera)",
+      "severity": "high",
+      "note": "ManimGL uses self.frame.animate.reorient, while ManimCE uses self.move_camera or self.camera.set_euler_angles."
+    },
+    {
+      "pattern": "TrueDot or apply_depth_test missing in ManimCE",
+      "severity": "medium",
+      "note": "TrueDot is specific to ManimGL; in CE, Dot3D or Sphere should be used, and depth testing is handled automatically by the OpenGL renderer."
+    }
+  ]
+}

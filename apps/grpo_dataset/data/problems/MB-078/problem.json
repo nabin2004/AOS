@@ -1,0 +1,65 @@
+{
+  "id": "MB-078",
+  "title": "Family of Complex Solutions in Simple Harmonic Motion",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Physics"
+  ],
+  "full_prompt": "Write a complete Manim scene named `ShowFamilyOfComplexSolutions` that visualizes a family of complex solutions to a differential equation representing a spring-mass system. The scene must include a spring-mass system simulation (using a custom `SrpingMassSystem` class or similar) and show how complex exponentials or complex solutions relate to the physical motion. Specifically, render a spring-mass system with adjustable parameters (like spring constant $k$, damping $\\mu$), and display a family of complex solution curves (e.g., $e^{st}$ where $s$ is complex) on a complex plane or coordinate system, showing how different complex coefficients scale and rotate the solutions to form real physical trajectories.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-078/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 250,
+    "scene_classes": [
+      "ShowFamilyOfComplexSolutions"
+    ],
+    "visual_techniques": [
+      "Spring-mass system simulation",
+      "Parametric curves",
+      "Complex plane mapping",
+      "Updaters for physical simulation"
+    ],
+    "manim_api_patterns": [
+      "ParametricCurve",
+      "VGroup",
+      "add_updater",
+      "interpolate_color_by_hsl",
+      "Vector",
+      "Square",
+      "Tex"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect integration of the ODE in the spring-mass system updater leading to numerical instability or explosion.",
+      "severity": "high",
+      "note": "Ensure the time_step method uses a sufficiently small dt_size or sub-stepping to keep the simulation stable."
+    },
+    {
+      "pattern": "Mismatch between the physical spring-mass position and the complex plane trajectory visualization.",
+      "severity": "medium",
+      "note": "The real part of the complex solution must align perfectly with the horizontal or vertical displacement of the physical mass."
+    }
+  ]
+}

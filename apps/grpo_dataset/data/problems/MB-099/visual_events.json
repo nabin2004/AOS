@@ -1,0 +1,68 @@
+{
+  "problem_id": "MB-099",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the point sources (DotCloud) and the LightWaveSlice custom Mobject on screen.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "DotCloud",
+        "LightWaveSlice",
+        "point_sources"
+      ],
+      "clip_query": "A set of point sources appearing on screen with a blue wave slice background"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Continuous propagation of waves outward from the point sources, driven by the time-increment updater.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "increment_time",
+        "time_rate",
+        "add_updater"
+      ],
+      "clip_query": "Concentric waves propagating outwards from multiple point sources"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Toggling the visualization to show wave intensity instead of raw amplitude, simulating film exposure.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "show_intensity",
+        "set_uniform"
+      ],
+      "clip_query": "The wave pattern transitions to show static intensity interference fringes"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Dynamic movement or addition of point sources with real-time syncing of positions to the shader uniforms.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "sync_points",
+        "set_sources",
+        "always.sync_points"
+      ],
+      "clip_query": "Point sources moving while the interference wave pattern dynamically updates in response"
+    }
+  ]
+}

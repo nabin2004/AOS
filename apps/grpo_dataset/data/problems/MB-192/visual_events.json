@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-192",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialize the grid layout containing polynomial names (Linear to Quintic) and their general algebraic equations.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "words",
+        "equations",
+        "gen_form_words",
+        "lines"
+      ],
+      "clip_query": "A grid showing polynomial names and their general algebraic equations"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Shift the camera frame and adjust column spacing to make room for the solvability column.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "frame",
+        "save_state",
+        "shift",
+        "set_height"
+      ],
+      "clip_query": "Camera shifts and zooms out to reveal more space on the right side of the chart"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Display the 'Can you solve for x?' column header and prepare the cover rectangles.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        25.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "solvable_word",
+        "cover_rect",
+        "right_cover_rect"
+      ],
+      "clip_query": "The text 'Can you solve for x?' appears at the top of the third column"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate the reveal of solvability marks (checkmarks or crosses) for each polynomial degree.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        40.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "marks",
+        "s_words",
+        "play"
+      ],
+      "clip_query": "Checkmarks and solvability indicators are revealed row by row"
+    }
+  ]
+}

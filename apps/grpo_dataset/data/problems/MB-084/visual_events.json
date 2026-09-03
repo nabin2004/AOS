@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-084",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Complex plane is rendered on the left, and a red arc sweeps from 0 to pi with a tracking decimal number.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "Arc",
+        "ValueTracker",
+        "DecimalNumber",
+        "ShowCreation"
+      ],
+      "clip_query": "A complex plane with a red arc sweeping along the unit circle from 0 to pi."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The formula e^{pi i} = -1 is written via lagged transforms from the plane elements.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.5
+      ],
+      "keyword_bank": [
+        "Tex",
+        "LaggedStart",
+        "FadeTransform",
+        "formula"
+      ],
+      "clip_query": "The formula e^{pi i} = -1 appearing on screen with elements transforming from the complex plane."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The formula characters transform into 'Clich\u00e9?' and Randolph appears saying 'This again?'.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        6.5,
+        10.0
+      ],
+      "keyword_bank": [
+        "Randolph",
+        "cliche",
+        "says",
+        "Blink"
+      ],
+      "clip_query": "A cartoon character saying 'This again?' next to the word 'Clich\u00e9?'."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A grid of YouTube thumbnails is displayed on the left side of the screen.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "ImageMobject",
+        "thumbnails",
+        "Group",
+        "arrange"
+      ],
+      "clip_query": "A collection of YouTube video thumbnails arranged on the screen."
+    }
+  ]
+}

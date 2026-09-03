@@ -1,0 +1,65 @@
+{
+  "id": "MB-068",
+  "title": "Square on a Sphere (Spherical Geometry & Holonomy)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    26.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Topology"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL/InteractiveScene that visualizes the concept of a 'square' on a sphere to demonstrate spherical geometry and holonomy. \n\n1. Create a 3D scene with a grey Sphere and a white SurfaceMesh overlaying it (resolution 41x21) to give it a clear 3D structure. Set up a light source and orient the camera to a 3D perspective.\n2. Define a parametric curve representing a 40-degree arc on the sphere's surface. Draw this first arc in red while smoothly reorienting the camera.\n3. Sequentially draw three more red arcs, each rotated 90 degrees relative to the end of the previous arc, to attempt to form a 'square' on the sphere. Because of spherical curvature, this path will not close. \n4. At each corner, dynamically calculate and draw a white right-angle indicator (elbow) to visually prove that the angles are exactly 90 degrees. \n5. After drawing all four sides, animate a transition where each arc rotates 90 degrees about its endpoint using an UpdateFromAlphaFunc to show how the tangent vectors map to each other. Keep the camera slowly rotating throughout the animation to maintain the 3D depth effect.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-068/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 81,
+    "scene_classes": [
+      "SquareOnASphere"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "Parametric Curves on Spheres",
+      "Custom VMobject Right-Angle Indicators",
+      "UpdateFromAlphaFunc for Rotational Transitions"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Sphere",
+      "SurfaceMesh",
+      "ParametricCurve",
+      "ShowCreation",
+      "frame.animate.reorient",
+      "UpdateFromAlphaFunc"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect 3D rotation axis or center in get_rotated_arc",
+      "severity": "high",
+      "note": "The rotation must happen exactly about the endpoint of the arc using the endpoint vector as the axis to stay tangent to the sphere."
+    },
+    {
+      "pattern": "Camera reorientation syntax mismatch",
+      "severity": "medium",
+      "note": "Manim Community uses move_to/set_euler_angles, while ManimGL uses frame.reorient."
+    }
+  ]
+}

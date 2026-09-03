@@ -1,0 +1,64 @@
+{
+  "id": "MB-116",
+  "title": "Visualizing the CDF of the Maximum of Two Random Variables",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Probability",
+    "Calculus"
+  ],
+  "full_prompt": "Write a Manim script (compatible with ManimGL/InteractiveScene) that visualizes the probability distribution of the maximum of two independent uniform random variables. First, set up a 2D coordinate system (Axes) ranging from 0 to 1 on both axes. Create a custom helper function to generate a random variable label group containing a ValueTracker, an ArrowTip pointing at the axis, and a Tex label (e.g., 'x_1' in blue for the x-axis, 'x_2' in yellow for the y-axis). Implement two custom Animation classes: 1) 'TrackingDots' which leaves a trail of glowing dots (GlowDot) at the tracked coordinate, and 2) 'Randomize' which rapidly updates a ValueTracker with random values to simulate sampling. Animate the introduction of the x_1 tracker, run the randomization animation with tracking dots along the x-axis, and then highlight a specific interval (a < x_1 < b) using a colored SurroundingRectangle and display the corresponding probability equation 'P(a < x_1 < b) = b - a'.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-116/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "VisualizeMaxOfPairCDF"
+    ],
+    "visual_techniques": [
+      "ValueTracker-driven Arrow Tips",
+      "Custom GlowDot Trail Animation",
+      "Rapid Randomization Animation",
+      "Coordinate Mapping"
+    ],
+    "manim_api_patterns": [
+      "Axes",
+      "ValueTracker",
+      "ArrowTip",
+      "GlowDot",
+      "SurroundingRectangle",
+      "InteractiveScene"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community Scene instead of InteractiveScene when utilizing specific ManimGL features",
+      "severity": "high",
+      "note": "The reference code relies on InteractiveScene and specific updater syntax like 'always.next_to' which is unique to ManimGL."
+    },
+    {
+      "pattern": "Missing custom GlowDot or TrackingDots implementation",
+      "severity": "high",
+      "note": "The visual trail effect relies on the custom TrackingDots animation class. Substituting with standard static dots loses the dynamic sampling feel."
+    }
+  ]
+}

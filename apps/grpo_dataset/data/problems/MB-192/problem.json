@@ -1,0 +1,69 @@
+{
+  "id": "MB-192",
+  "title": "Solvability Chart of Polynomials",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Algebra",
+    "History of Mathematics"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or compatible Community Edition syntax) that creates a 'Solvability Chart' for polynomial equations from degree 1 (Linear) up to degree 5 (Quintic). The chart should organize polynomial degrees, their general algebraic forms, and their solvability status in a clean grid layout. \n\nKey requirements:\n1. Define helper functions for polynomial operations if needed, such as converting roots to coefficients, finding roots via Newton's method, and generating LaTeX strings for the quadratic and cubic formulas.\n2. Set up a grid layout with columns for the degree name (Linear, Quadratic, Cubic, Quartic, Quintic), the general form equation (e.g., ax + b = 0, ax^2 + bx + c = 0, etc.), and a column asking 'Can you solve for x?'.\n3. Use camera frame manipulation (shifting and zooming) to focus on specific parts of the chart during the transition.\n4. Implement cover rectangles (using black fill with zero stroke) to mask out and progressively reveal rows or columns of the chart.\n5. Add visual marks (such as checkmarks or crosses) next to each polynomial type to indicate whether a general formula exists.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-192/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "SolvabilityChart"
+    ],
+    "visual_techniques": [
+      "Grid Layout",
+      "Camera Frame Zoom and Shift",
+      "Cover Rectangles for Reveal",
+      "Mathematical Formula Rendering"
+    ],
+    "manim_api_patterns": [
+      "self.camera.frame",
+      "OldTex",
+      "OldTexText",
+      "VGroup",
+      "Rectangle",
+      "save_state"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using OldTex or OldTexText in standard Manim Community Edition without fallback",
+      "severity": "high",
+      "note": "OldTex and OldTexText are specific to 3b1b's custom ManimGL. In standard Manim CE, use Tex or MathTex instead."
+    },
+    {
+      "pattern": "Direct camera frame manipulation (self.camera.frame) in standard Scene",
+      "severity": "high",
+      "note": "In Manim CE, camera frame manipulation requires inheriting from MovingCameraScene instead of standard Scene."
+    },
+    {
+      "pattern": "Misalignment of grid lines and cover rectangles",
+      "severity": "medium",
+      "note": "Cover rectangles must be precisely aligned with the grid rows and columns to prevent visual leaks during transitions."
+    }
+  ]
+}

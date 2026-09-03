@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-097",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Wave equation formulation",
+        "Superposition principle for multiple point sources",
+        "Huygens-Fresnel principle representation",
+        "Zone plate focal length relation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "Custom shader-based wave rendering",
+        "Smooth wave propagation animation over time",
+        "Interference pattern visualization with constructive/destructive regions",
+        "Intensity mapping toggle"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Frequency and wave number parameters",
+        "Decay factor scaling with distance",
+        "Time rate scaling for animation speed"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "Custom Mobject subclass with ModernGL integration",
+        "Dynamic uniform synchronization",
+        "Updater-based time incrementation",
+        "Depth test application"
+      ]
+    }
+  }
+}

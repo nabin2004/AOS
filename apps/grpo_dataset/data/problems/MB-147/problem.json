@@ -1,0 +1,64 @@
+{
+  "id": "MB-147",
+  "title": "Twisting Within Cylinder (Polarized Light in Sugar Water)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Optics"
+  ],
+  "full_prompt": "Create a 3D Manim visualization showing polarized light twisting as it passes through a sugar cylinder (representing sugar water). The scene should include:\n1. A 3D coordinate system (axes and plane) aligned horizontally.\n2. A semi-transparent cylinder ('SugarCylinder') representing the medium.\n3. A twisted ribbon ('TwistedRibbon') representing the polarization plane twisting along the cylinder's length.\n4. Multiple light waves or a mean wave propagating through the cylinder, with their polarization angles twisting.\n5. A polarizer disk at the end or along the path.\nUse ManimGL's 3D capabilities, including `ThreeDAxes`, `Cylinder`, `ParametricSurface`, and custom updaters for wave propagation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-147/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "TwistingWithinCylinder"
+    ],
+    "visual_techniques": [
+      "3D rendering",
+      "Parametric surfaces",
+      "Dynamic updaters",
+      "Color mapping (Spectral)"
+    ],
+    "manim_api_patterns": [
+      "ThreeDAxes",
+      "Cylinder",
+      "ParametricSurface",
+      "always_sort_to_camera",
+      "set_flat_stroke"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "3D camera sorting issues with transparent cylinders",
+      "severity": "high",
+      "note": "In ManimGL, transparent overlapping 3D objects require proper camera sorting or depth buffer handling. Use always_sort_to_camera."
+    },
+    {
+      "pattern": "Flat stroke rendering errors in 3D",
+      "severity": "medium",
+      "note": "Set set_flat_stroke(False) on 3D curves to prevent them from rendering as flat 2D lines."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "MB-132",
+  "title": "Superposition in N-Dimensional Space",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Linear Algebra",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete Manim script that visualizes the concept of superposition and high-dimensional vector spaces. First, create an undulating bubble representing an 'N-dimensional Space' with a corresponding label. Inside this bubble, briefly show several concept vectors (labeled 'Latin', 'Microphone', 'Basketball', 'The 1920s') fading in and out in different directions. Next, present a mathematical question: 'Choose multiple vectors, each pair 90 degrees apart' versus 'between 89 and 91 degrees apart'. Show that the maximum number of strictly orthogonal vectors is N, while the maximum number of almost-orthogonal vectors scales exponentially as approximately exp(epsilon * N). To illustrate the strictly orthogonal case, render three 3D vectors (pointing along the X, Y, and Z axes) with right-angle elbow indicators showing they are mutually perpendicular. Ensure smooth camera transitions and clean text layouts.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-132/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "Superposition"
+    ],
+    "visual_techniques": [
+      "Undulating bubble simulation",
+      "3D vector rendering with shading",
+      "Camera state restoration",
+      "Lagged start animations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "undulating_bubble",
+      "Vector",
+      "Elbow",
+      "Restore",
+      "LaggedStartMap"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing undulating_bubble helper method in standard ManimCE",
+      "severity": "high",
+      "note": "The undulating_bubble is a custom method in 3b1b's active branch. Standard ManimCE implementations must simulate this using a distorted circle with a periodic updater."
+    },
+    {
+      "pattern": "Use of Elbow class in 3D context",
+      "severity": "medium",
+      "note": "Elbow is a 2D/3D helper in ManimGL but might not behave correctly in standard ManimCE 3D scenes without proper orientation."
+    }
+  ]
+}

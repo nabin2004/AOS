@@ -1,0 +1,71 @@
+{
+  "id": "MB-089",
+  "title": "Zeta Function Partial Sum Path Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Complex Analysis",
+    "Number Theory"
+  ],
+  "full_prompt": "Write a Manim script (compatible with ManimGL/Manim Community) that visualizes the partial sums of the Riemann Zeta function (or its regularized Dirichlet series) on the complex plane.\n\nYour visualization must include:\n1. Two side-by-side complex planes:\n   - A left plane representing the domain of $s$ (with range approximately $x \\in [-1, 3]$ and $y \\in [-40, 40]$, scaled to a width of 4).\n   - A right plane representing the output space (with range approximately $x \\in [-3, 3]$ and $y \\in [-3, 3]$, scaled to a width of 6).\n2. A tracker for the complex variable $s$, visualized as a highlighted dot on the left plane, with a label 's' that dynamically follows it.\n3. A dynamic path on the right plane representing the partial sums of the series:\n   $$\\sum_{n=1}^{N} \\frac{1}{n^s} e^{-cn}$$\n   where $N$ is a large number (e.g., 100,000) and $c$ is a regularizing exponential constant (initially 0).\n4. A formula label at the top showing the mathematical expression of the sum, with color-coded variables (e.g., yellow for $s$ and red for $c$). If $c > 0$, display a dynamic decimal readout of $c$.\n5. An animation sequence where:\n   - The complex tracker $s$ is animated to move to the first non-trivial zero of the Riemann zeta function (approximately $0.5 + 14.134725i$).\n   - The exponential constant $c$ is then animated to increase from 0 to 0.01, showing how the regularized sum converges or spirals on the output plane.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-089/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "ZetaSum"
+    ],
+    "visual_techniques": [
+      "Dual Complex Planes",
+      "Complex Value Tracker",
+      "Dynamic VMobject Path Updating",
+      "Cumulative Sum Vector Path"
+    ],
+    "manim_api_patterns": [
+      "ComplexPlane",
+      "ComplexValueTracker",
+      "ValueTracker",
+      "add_updater",
+      "set_points_as_corners",
+      "n2p"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using mpmath.zetazero inside the animation loop, causing severe lag.",
+      "severity": "medium",
+      "note": "Pre-calculate the zeta zeros before starting the animation or setup."
+    },
+    {
+      "pattern": "ComplexValueTracker is not natively supported in Manim Community.",
+      "severity": "high",
+      "note": "If using Manim Community, implement a custom complex tracker using ValueTracker or a 2D vector tracker."
+    },
+    {
+      "pattern": "Array size mismatch or slow performance when computing 100,000 terms dynamically in Python.",
+      "severity": "medium",
+      "note": "Use vectorized NumPy operations (np.cumsum, np.exp, np.arange) inside the updater to ensure real-time performance."
+    }
+  ]
+}

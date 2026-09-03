@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-117",
+  "conflicts": [
+    {
+      "category": "camera_control",
+      "gl_construct": "self.frame.reorient()",
+      "ce_equivalent": "self.set_camera_orientation()",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_types",
+      "gl_construct": "DotCloud",
+      "ce_equivalent": "PMobject or VGroup of Dots",
+      "severity": "high"
+    },
+    {
+      "category": "matrix_transformations",
+      "gl_construct": "apply_matrix()",
+      "ce_equivalent": "apply_matrix()",
+      "severity": "medium"
+    }
+  ]
+}

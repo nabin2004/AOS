@@ -1,0 +1,26 @@
+{
+  "problem_id": "MB-157",
+  "conflicts": [
+    {
+      "category": "mobject_3d",
+      "gl_construct": "Cylinder",
+      "ce_equivalent": "Cylinder",
+      "severity": "medium",
+      "note": "In ManimGL, Cylinder has specific shading parameters and always_sort_to_camera method which do not exist or behave differently in ManimCE."
+    },
+    {
+      "category": "rendering",
+      "gl_construct": "set_flat_stroke(False)",
+      "ce_equivalent": "None (handled automatically or via different 3D stroke settings)",
+      "severity": "low",
+      "note": "set_flat_stroke is used in ManimGL to control 3D stroke rendering style."
+    },
+    {
+      "category": "style",
+      "gl_construct": "colormaps.get_cmap",
+      "ce_equivalent": "custom color interpolation or standard palette",
+      "severity": "medium",
+      "note": "ManimGL uses matplotlib colormaps directly via colormaps.get_cmap, which might require manual color mapping in ManimCE."
+    }
+  ]
+}

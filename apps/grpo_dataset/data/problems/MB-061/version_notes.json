@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-061",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "custom_mobjects",
+      "gl_construct": "BitString",
+      "ce_equivalent": "VGroup of Tex or Text objects representing bits",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobjects",
+      "gl_construct": "KetGroup",
+      "ce_equivalent": "VGroup containing Tex('|\\\\psi\\\\rangle')",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobjects",
+      "gl_construct": "get_blackbox_machine",
+      "ce_equivalent": "RoundedRectangle or custom SVG representing a machine",
+      "severity": "high"
+    }
+  ]
+}

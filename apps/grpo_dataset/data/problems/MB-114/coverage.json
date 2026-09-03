@@ -1,0 +1,42 @@
+{
+  "problem_id": "MB-114",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Homothety",
+        "Collinearity",
+        "Monge's theorem",
+        "3D projection",
+        "Tangent cones"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D camera rotation",
+        "Sphere rendering",
+        "Tangent line generation",
+        "Opacity transitions",
+        "2D to 3D transition"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Circle radii",
+        "Sphere coordinates",
+        "Camera angles",
+        "Reorientation parameters"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene structure",
+        "Update suspends and resumes",
+        "Dynamic redrawing with always_redraw"
+      ]
+    }
+  }
+}

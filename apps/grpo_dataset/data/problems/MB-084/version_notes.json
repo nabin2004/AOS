@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-084",
+  "conflicts": [
+    {
+      "category": "Framework Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Animation Name",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation Name",
+      "gl_construct": "VFadeIn",
+      "ce_equivalent": "FadeIn",
+      "severity": "low"
+    },
+    {
+      "category": "Transform Method",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform",
+      "severity": "medium"
+    },
+    {
+      "category": "Custom Object",
+      "gl_construct": "Randolph",
+      "ce_equivalent": "None (requires custom PiCreature library or replacement with SVGMobject/mock)",
+      "severity": "high"
+    }
+  ]
+}

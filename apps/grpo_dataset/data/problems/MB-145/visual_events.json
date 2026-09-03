@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-145",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation of a ChargedParticle with a visual sign (+ or -) and its corresponding AccelerationVector pinned to it.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ChargedParticle",
+        "AccelerationVector",
+        "TrueDot"
+      ],
+      "clip_query": "A charged particle with a plus sign and an attached pink acceleration vector"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Emission of expanding influence rings from the charged particle to represent field propagation.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "get_influence_ring",
+        "Circle",
+        "add_updater",
+        "set_stroke"
+      ],
+      "clip_query": "Expanding concentric rings radiating outwards from a central charged particle"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic movement of the particle causing the acceleration vector to change direction and magnitude.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        7.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "pin_to_particle",
+        "get_acceleration",
+        "put_start_and_end_on"
+      ],
+      "clip_query": "A moving red dot with a pink vector that dynamically stretches and rotates as the dot accelerates"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Visualization of the force field vectors (Coulomb or Lorentz force) surrounding the particle.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "coulomb_force",
+        "lorentz_force",
+        "points_to_particle_info"
+      ],
+      "clip_query": "A grid of vector arrows representing an electric force field surrounding a charged particle"
+    }
+  ]
+}

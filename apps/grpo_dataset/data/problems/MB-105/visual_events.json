@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-105",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initial setup showing the closed loop on the left and the unit interval on the right with a yellow tracker arrow.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "loop",
+        "interval",
+        "UnitInterval",
+        "x_tip"
+      ],
+      "clip_query": "A closed loop on the left and a unit interval number line on the right"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The tracker dot moves along the loop while the yellow arrow moves along the unit interval from 0 to 1 and back.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "x_tracker",
+        "animate",
+        "set_value",
+        "there_and_back"
+      ],
+      "clip_query": "A dot tracing a closed loop synchronized with an arrow moving along a number line"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Scissors appear and cut the loop, causing the endpoints to separate slightly.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        6.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "scissors",
+        "snipped_loop",
+        "Transform"
+      ],
+      "clip_query": "Scissors cutting a closed loop, splitting it into an open curve"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The open loop morphs and unrolls into a straight line segment matching the unit interval.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        9.0,
+        13.0
+      ],
+      "keyword_bank": [
+        "Transform",
+        "line",
+        "path_arc"
+      ],
+      "clip_query": "An open curved loop transforming and straightening into a flat line segment"
+    }
+  ]
+}

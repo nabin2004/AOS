@@ -1,0 +1,90 @@
+{
+  "problem_id": "MB-139",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup circle diagram with 7 numbered dots and chords, and display the question 'How many pairs of points?'",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "circle",
+        "chords",
+        "dots",
+        "numbers",
+        "question"
+      ],
+      "clip_query": "A circle with 7 numbered dots and connecting chords, with a question 'How many pairs of points?' at the top right."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Iterate through all 21 pairs of points, drawing temporary blue lines and adding coordinate labels to a grid",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "pair_labels",
+        "temp_line",
+        "dots",
+        "numbers",
+        "it.combinations"
+      ],
+      "clip_query": "A sequence of temporary blue lines connecting pairs of dots on a circle, with coordinate labels appearing in a grid on the right."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Introduce the 'n choose 2' notation and label",
+      "weight": 0.15,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        16.0
+      ],
+      "keyword_bank": [
+        "nc2",
+        "nc2_label",
+        "FadeIn"
+      ],
+      "clip_query": "The mathematical notation 'n choose 2' appearing on screen next to the circle diagram."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate counting of points and pairs, updating the RHS value to 21",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        16.0,
+        24.0
+      ],
+      "keyword_bank": [
+        "number_rects",
+        "pair_rects",
+        "ChangeDecimalToValue",
+        "ShowIncreasingSubsets",
+        "rhs_num"
+      ],
+      "clip_query": "Yellow rectangles highlighting the dots and pair labels sequentially as a counter updates to 21."
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Reveal the algebraic calculation formula step-by-step",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        24.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "new_rhs",
+        "Write"
+      ],
+      "clip_query": "The algebraic formula '= 7 * (7 - 1) / 2' being written out next to the 'n choose 2' notation."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "MB-173",
+  "title": "3D Charged Particle Movements and Acceleration Vectors",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Create a 3D Manim scene named `Introduce3dMovements` that visualizes a charged particle moving in 3D space. The visualization should include a custom `ChargedParticle` (represented as a 3D sphere with a sign) and an `AccelerationVector` pinned to the particle. The camera should rotate in 3D to show the spatial movement. Implement custom physics helper functions like `lorentz_force` and `points_to_particle_info` to calculate the field or forces, and update the particle's position and acceleration dynamically. The scene must demonstrate smooth 3D camera transitions, particle movement, and dynamic vector updating.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-173/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "Introduce3dMovements"
+    ],
+    "visual_techniques": [
+      "3D Camera Rotation",
+      "Dynamic Updaters",
+      "Custom 3D Mobjects",
+      "Vector Fields"
+    ],
+    "manim_api_patterns": [
+      "TrueDot",
+      "Vector",
+      "Group",
+      "add_updater",
+      "move_to",
+      "rotate",
+      "put_start_and_end_on"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "3D camera rotation causing rendering crashes in older Manim versions",
+      "severity": "high",
+      "note": "Ensure compatibility with ManimGL's 3D camera system and avoid using deprecated 2D camera methods."
+    },
+    {
+      "pattern": "Updater functions referencing non-existent attributes of ChargedParticle",
+      "severity": "medium",
+      "note": "Ensure ChargedParticle class is fully implemented with position history tracking."
+    }
+  ]
+}

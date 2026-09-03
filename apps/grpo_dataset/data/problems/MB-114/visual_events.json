@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-114",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Three 2D circles of different sizes are drawn, and their external tangent lines are animated to intersect at three distinct points.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "circles",
+        "tangent_pairs",
+        "intersection_dots",
+        "GrowFromCenter"
+      ],
+      "clip_query": "Three circles with external tangent lines intersecting at three points"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A straight line (Monge's line) is drawn passing through all three intersection points, demonstrating their collinearity.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "monge_line",
+        "put_start_and_end_on",
+        "intersection_dots"
+      ],
+      "clip_query": "A line passing through three intersection points of tangent lines of three circles"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The camera rotates to a 3D perspective, a 3D grid plane is faded in, and the 2D circles are replaced by 3D spheres.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "plane",
+        "spheres",
+        "frame.animate.reorient",
+        "FadeIn"
+      ],
+      "clip_query": "3D spheres on a grid plane with camera rotating"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "3D tangent cones are drawn wrapping around the spheres, with their vertices aligning with the 2D intersection points, while sphere opacities change to show depth.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        35.0,
+        50.0
+      ],
+      "keyword_bank": [
+        "tangent_groups",
+        "set_opacity",
+        "reorient"
+      ],
+      "clip_query": "3D tangent cones wrapping around spheres with changing opacities"
+    }
+  ]
+}

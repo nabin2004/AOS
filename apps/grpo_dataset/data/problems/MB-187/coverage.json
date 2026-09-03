@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-187",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "set notation",
+        "subsets",
+        "divisibility by 5",
+        "2^{2,000}"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "blue set text",
+        "teal total subsets label",
+        "massive grid of digits",
+        "custom curly braces"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "2000 elements",
+        "grid dimensions",
+        "comma spacing in massive integers"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene class",
+        "get_question_title helper",
+        "get_set_tex helper",
+        "massive_int helper"
+      ]
+    }
+  }
+}

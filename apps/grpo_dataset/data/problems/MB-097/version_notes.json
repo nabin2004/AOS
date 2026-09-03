@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-097",
+  "conflicts": [
+    {
+      "category": "Framework Architecture",
+      "gl_construct": "Mobject custom shader attributes (shader_folder, render_primitive)",
+      "ce_equivalent": "Manim Community does not support direct shader_folder attributes on standard Mobjects. Implementing this in CE requires custom OpenGLMobject subclasses or writing custom vertex/fragment shaders using CE's OpenGL renderer backend, which has a different API.",
+      "severity": "high"
+    },
+    {
+      "category": "Data Types",
+      "gl_construct": "data_dtype with custom structured numpy arrays",
+      "ce_equivalent": "Manim CE uses standard numpy arrays for points and colors, and does not expose structured dtypes for custom vertex attributes easily.",
+      "severity": "high"
+    },
+    {
+      "category": "Uniform Management",
+      "gl_construct": "set_uniforms, set_uniform, and locked_uniform_keys",
+      "ce_equivalent": "Manim CE's OpenGL renderer uses a different uniform setting mechanism, typically via shader wrappers or custom material classes.",
+      "severity": "high"
+    }
+  ]
+}

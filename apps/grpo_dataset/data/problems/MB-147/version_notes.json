@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-147",
+  "conflicts": [
+    {
+      "category": "3D Rendering & Shading",
+      "gl_construct": "Cylinder, ParametricSurface, always_sort_to_camera",
+      "ce_equivalent": "Cylinder, ParametricSurface (no always_sort_to_camera, requires different renderer or manual sorting)",
+      "severity": "high"
+    },
+    {
+      "category": "Stroke Rendering",
+      "gl_construct": "set_flat_stroke(False)",
+      "ce_equivalent": "Not directly supported or default behavior is different; stroke width in 3D might require custom styling or VMobject setup",
+      "severity": "medium"
+    },
+    {
+      "category": "Color Maps",
+      "gl_construct": "colormaps.get_cmap('Spectral')",
+      "ce_equivalent": "Requires matplotlib or custom color interpolation function in Manim Community",
+      "severity": "medium"
+    }
+  ]
+}

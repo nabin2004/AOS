@@ -1,0 +1,70 @@
+{
+  "id": "MB-094",
+  "title": "Primes Near a Million and Prime Density",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    64.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Number Theory",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the density of prime numbers near one million ($T = 1,000,000$). Create a long number line spanning from $T - 800$ to $T + 800$ with a spacing of 50, and add custom tick stretching for sub-intervals. Plot prime numbers in this range as glowing dots (using GlowDots or equivalent glowing circles). Highlight twin primes by drawing yellow arcs connecting them, labeled with a small yellow '+2' text above each arc. Group the number line, prime dots, and twin prime arcs together, shift them down, and apply a continuous updater that pans the entire group slowly to the left to simulate a moving timeline of numbers. In the upper half of the screen, display the text 'How dense are primes?'. After a delay, transition this text into 'Prime density near T' using a transform animation, and draw a curved blue arrow pointing from the letter 'T' to an example label '(e.g. T = 1,000,000)'. Finally, fade out the example and arrow, and write out the approximation symbol and the formula '1 / \\ln(T)' to show the Prime Number Theorem density approximation, matching the 'T' from the density label to the 'T' in the formula.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-094/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 105,
+    "scene_classes": [
+      "PrimesNearMillion"
+    ],
+    "visual_techniques": [
+      "Continuous panning via updater",
+      "Glow dots for discrete data visualization",
+      "Arc overlays for twin prime relationships",
+      "Formula transformation and alignment"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "GlowDots",
+      "number_line.n2p",
+      "add_updater",
+      "FadeTransform",
+      "ShowCreation",
+      "TransformFromCopy"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing GlowDots class in community edition",
+      "severity": "high",
+      "note": "GlowDots is a ManimGL-specific class. In ManimCE, it must be substituted with standard Dots or custom PMobjects with glow shaders."
+    },
+    {
+      "pattern": "Incorrect updater syntax causing static number line",
+      "severity": "high",
+      "note": "The continuous leftward panning relies on an updater shifting the group by dt. If dt is ignored or the updater is not added correctly, the line remains static."
+    },
+    {
+      "pattern": "Mismatched sub-mobject indexing in Tex/TexText",
+      "severity": "medium",
+      "note": "The code references specific parts of Tex objects like lhs['T'] and rhs['T']. If the LaTeX compiler splits characters differently, this indexing will fail."
+    }
+  ]
+}

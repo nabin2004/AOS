@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-068",
+  "conflicts": [
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient",
+      "ce_equivalent": "self.camera.set_euler_angles",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Types",
+      "gl_construct": "SurfaceMesh",
+      "ce_equivalent": "No direct equivalent; must be constructed manually using multiple ParametricSurfaces or VGroups of curves",
+      "severity": "high"
+    },
+    {
+      "category": "Animation Names",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    }
+  ]
+}

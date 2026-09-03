@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-198",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "low"
+    },
+    {
+      "category": "animation_api",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "math_utilities",
+      "gl_construct": "midpoint(D, P)",
+      "ce_equivalent": "(D + P) / 2",
+      "severity": "low"
+    }
+  ]
+}

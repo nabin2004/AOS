@@ -1,0 +1,73 @@
+{
+  "id": "MB-114",
+  "title": "Monge's Theorem (3D Sphere Projection Proof)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Topology",
+    "3D Visualization"
+  ],
+  "full_prompt": "Write a ManimGL script using InteractiveScene that visualizes Monge's Theorem. First, create three 2D circles of different sizes and positions. Draw the external tangent lines for each of the three pairs of circles, showing that each pair of tangents intersects at a single point (the external center of homothety). Animate the scaling of the circles towards these intersection points to visually demonstrate the homothety. Draw a single line (Monge's line) that passes through all three intersection points to show they are collinear. Next, transition the scene into 3D: rotate the camera, fade in a 3D coordinate plane, and replace the 2D circles with 3D spheres of corresponding radii resting on the plane. Render 3D tangent cones (or tangent line groups) wrapping around each pair of spheres, showing that the vertices of these 3D cones lie exactly at the 2D intersection points on the plane. Rotate the camera to different angles and adjust the opacities of the spheres to clearly show the 3D geometric alignment that proves Monge's Theorem.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-114/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "MongesTheorem"
+    ],
+    "visual_techniques": [
+      "2D to 3D transition",
+      "Dynamic redrawing with always_redraw",
+      "Camera reorientation and rotation",
+      "Homothety scaling animations",
+      "3D sphere and tangent cone rendering",
+      "Opacity transitions for depth perception"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "always_redraw",
+      "f_always.put_start_and_end_on",
+      "self.frame.animate.reorient",
+      "LaggedStartMap",
+      "GrowFromCenter",
+      "Restore"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE camera methods instead of ManimGL's self.frame.animate.reorient",
+      "severity": "high",
+      "note": "ManimGL uses self.frame for camera control, whereas ManimCE uses self.camera or ThreeDScene methods."
+    },
+    {
+      "pattern": "Incorrect syntax for f_always or always attribute wrappers",
+      "severity": "high",
+      "note": "The f_always and always syntax is unique to ManimGL's shader-based updater system. In ManimCE, standard add_updater must be used."
+    },
+    {
+      "pattern": "Missing helper methods for tangent line and sphere generation",
+      "severity": "medium",
+      "note": "The reference code relies on custom helper methods like get_all_external_tangents and get_spheres which must be fully implemented or mocked."
+    }
+  ]
+}

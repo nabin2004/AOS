@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-135",
+  "conflicts": [
+    {
+      "category": "shorthand_methods",
+      "gl_construct": "arc.pfp(alpha)",
+      "ce_equivalent": "arc.point_from_proportion(alpha)",
+      "severity": "high"
+    },
+    {
+      "category": "animations",
+      "gl_construct": "VShowPassingFlash",
+      "ce_equivalent": "ShowPassingFlash",
+      "severity": "high"
+    },
+    {
+      "category": "color_interpolation",
+      "gl_construct": "interpolate_color_by_hsl",
+      "ce_equivalent": "interpolate_color",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_syntax",
+      "gl_construct": "self.animate.set_value(value)",
+      "ce_equivalent": "self.animate.set_value(value) or custom ValueTracker updater",
+      "severity": "medium"
+    }
+  ]
+}

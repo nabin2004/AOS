@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-091",
+  "conflicts": [
+    {
+      "category": "Base Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Grid Generation",
+      "gl_construct": "Square().get_grid(20, row_size, buff=0)",
+      "ce_equivalent": "VGroup(*[VGroup(*[Square() for _ in range(row_size)]) for _ in range(20)]).arrange_in_grid(rows=20, cols=row_size, buff=0)",
+      "severity": "high"
+    },
+    {
+      "category": "Animation Name",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    }
+  ]
+}

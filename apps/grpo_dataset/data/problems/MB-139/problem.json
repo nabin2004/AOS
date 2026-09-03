@@ -1,0 +1,63 @@
+{
+  "id": "MB-139",
+  "title": "Explaining N Choose 2 with Circle Chords",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Combinatorics",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the concept of 'n choose 2' using a circle with 7 points and their connecting chords. First, display a circle diagram containing 7 dots, all possible chords connecting them, and numbers 1 to 7 labeling each dot. Display the question 'How many pairs of points?' at the top right. Then, systematically iterate through all 21 pairs of points. For each pair, temporarily dim the rest of the diagram, draw a bright blue line connecting the two points, and add a coordinate label like '(1, 2)' to a growing grid of pair labels on the right side of the screen. After showing all pairs, restore the diagram's opacity and introduce the 'n choose 2' notation. Animate the counting process: highlight the 7 numbered dots with yellow rectangles while changing the 'n' in the formula to 7, then highlight the grid of pair labels sequentially using yellow rectangles while dynamically updating the RHS of the equation from 0 to 21. Finally, write out the algebraic calculation formula '= 7 * (7 - 1) / 2' step-by-step next to the notation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-139/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 140,
+    "scene_classes": [
+      "ExplainNChoose2"
+    ],
+    "visual_techniques": [
+      "Iterative highlighting",
+      "Dynamic text updating",
+      "Grid layout generation",
+      "Mathematical notation animation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "make_number_changeable",
+      "ChangeDecimalToValue",
+      "ShowIncreasingSubsets",
+      "VFadeIn"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community syntax for dynamic number changes instead of ManimGL's make_number_changeable and ChangeDecimalToValue",
+      "severity": "high",
+      "note": "The reference code relies heavily on ManimGL's custom Mobject methods for changing numbers in-place."
+    },
+    {
+      "pattern": "Incorrect grid layout calculation for the 21 pair labels, causing them to overlap or overflow the screen boundaries",
+      "severity": "medium",
+      "note": "The loop dynamically wraps the labels to a new column when they exceed a y-coordinate threshold of -3."
+    }
+  ]
+}

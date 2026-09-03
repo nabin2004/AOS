@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-189",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Von Mangoldt function coefficients",
+        "Dirichlet series representation",
+        "Prime and prime power color coding"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Horizontal dividing line",
+        "Arrows pointing from numbers to coefficients",
+        "Brace and label under the series"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "n from 1 to 13",
+        "s exponent in denominators"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene structure",
+        "ShowIncreasingSubsets animation",
+        "ReplacementTransform of numbers to denominators"
+      ]
+    }
+  }
+}

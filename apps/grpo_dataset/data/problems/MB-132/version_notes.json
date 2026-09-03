@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-132",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene or Scene",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobject",
+      "gl_construct": "undulating_bubble",
+      "ce_equivalent": "Custom VMobject with an updater modifying points using a sine wave",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobject",
+      "gl_construct": "Elbow",
+      "ce_equivalent": "RightAngle or custom Line-based VGroup",
+      "severity": "medium"
+    },
+    {
+      "category": "method_signature",
+      "gl_construct": "make_number_changeable",
+      "ce_equivalent": "DecimalNumber with an updater",
+      "severity": "medium"
+    }
+  ]
+}

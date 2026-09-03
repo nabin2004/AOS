@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-144",
+  "conflicts": [
+    {
+      "category": "mobject_types",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot3D or Dot",
+      "severity": "high"
+    },
+    {
+      "category": "parametric_curves",
+      "gl_construct": "ParametricCurve",
+      "ce_equivalent": "ParametricFunction",
+      "severity": "medium"
+    },
+    {
+      "category": "rendering_methods",
+      "gl_construct": "set_flat_stroke(False)",
+      "ce_equivalent": "Removed (handled automatically or via 3D stroke settings)",
+      "severity": "low"
+    },
+    {
+      "category": "updaters",
+      "gl_construct": "mobject.add_updater(lambda m, dt: ...)",
+      "ce_equivalent": "mobject.add_updater(lambda m, dt: ...)",
+      "severity": "low"
+    }
+  ]
+}

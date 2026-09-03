@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-195",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Unwrapping circumference of radius 2 to length 4*pi",
+        "Step-like square approximation logic (get_square_approx)",
+        "Perimeter calculation showing constant length of 8"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "GlowDot path tracing animation",
+        "Color transition of curves from yellow to red",
+        "Scaling animation with there_and_back rate function"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Circle radius = 2.0",
+        "Rich circle components = 2^14",
+        "10 approximation levels (approx_curves)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene class structure",
+        "Sequential play calls for unwrapping, perimeter proof, and folding iterations",
+        "Proper cleanup and fading out of temporary labels"
+      ]
+    }
+  }
+}

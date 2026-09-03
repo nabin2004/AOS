@@ -1,0 +1,76 @@
+{
+  "problem_id": "MB-077",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Introduction of the Laplace transform definition of cos(t) with an arrow and script L",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "cos_t",
+        "arrow",
+        "fancy_L",
+        "lt_def",
+        "GrowArrow",
+        "Write"
+      ],
+      "clip_query": "The Laplace transform definition of cosine is written out with an arrow and a script L symbol."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Highlighting cos(t) and substituting it with its complex exponential Euler form",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "cos_rect",
+        "split_inside",
+        "TransformMatchingTex",
+        "ShowCreation"
+      ],
+      "clip_query": "A teal rectangle highlights cos(t) before it transforms into its complex exponential representation inside the integral."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Highlighting the entire substituted integral with a surrounding rectangle",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        11.0
+      ],
+      "keyword_bank": [
+        "cos_rect",
+        "split_inside",
+        "animate",
+        "surround"
+      ],
+      "clip_query": "A thick teal rectangle surrounds the entire substituted integral expression."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Splitting the integral into two separate linear parts",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        11.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "split_outside",
+        "side_eq",
+        "TransformFromCopy",
+        "srcs",
+        "trgs"
+      ],
+      "clip_query": "The integral splits into two separate integrals using linearity, with terms animating downwards."
+    }
+  ]
+}

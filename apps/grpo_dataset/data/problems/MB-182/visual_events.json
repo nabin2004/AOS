@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-182",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A single blue sine wave is drawn on a set of axes, accompanied by a period brace labeled '220 cycles / sec.' and axes labels 'Air pressure' and 'Time'.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "Axes",
+        "Brace",
+        "i2gp",
+        "Air pressure",
+        "Time",
+        "ShowCreation"
+      ],
+      "clip_query": "A single blue sine wave plotted on axes with a brace indicating its period labeled 220 cycles per second"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The single wave and axes transform into the first of four smaller stacked axes, while the other three axes and waves fade in.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "ReplacementTransform",
+        "low_axes_group",
+        "waves",
+        "TransformFromCopy"
+      ],
+      "clip_query": "The single wave splits and transforms into four smaller stacked sine waves on the right side of the screen"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Frequency labels (220 Hz, 264 Hz, 330 Hz, 385 Hz) fade in next to each of the four stacked waves.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        7.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "axes_labels",
+        "Hz",
+        "LaggedStartMap",
+        "FadeIn"
+      ],
+      "clip_query": "Frequency labels in Hz appearing next to four stacked sine waves"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A larger top axes is introduced at the upper portion of the screen to prepare for displaying the sum of the waves.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        9.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "top_axes",
+        "top_rect",
+        "Sum"
+      ],
+      "clip_query": "A larger empty coordinate system appears at the top of the screen labeled Sum"
+    }
+  ]
+}

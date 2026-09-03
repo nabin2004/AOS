@@ -1,0 +1,73 @@
+{
+  "id": "MB-178",
+  "title": "Convolution Theorem Diagram",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Signal Processing",
+    "Fourier Analysis"
+  ],
+  "full_prompt": "Write a Manim script to visualize the Convolution Theorem diagram. Create a dual-column layout with three rows of axes on each side. The left column displays functions in the spatial/time domain, and the right column displays their Fourier transforms in the frequency domain.\n\nLeft Column (Sinc Functions):\n- Top: $f(x) = \\text{sinc}(x) = \\frac{\\sin(\\pi x)}{\\pi x}$ in Blue.\n- Middle: $g(x) = \\text{sinc}(x/2) = \\frac{\\sin(\\pi x / 2)}{\\pi x / 2}$ in Yellow.\n- Bottom: The product $f(x) \\cdot g(x)$ in Green.\n\nRight Column (Fourier Transforms):\n- Top: A rectangular pulse of width 1 (from -0.5 to 0.5) and height 1 in Blue.\n- Middle: A rectangular pulse of width 0.5 (from -0.25 to 0.25) and height 2 in Yellow.\n- Bottom: A trapezoidal pulse (representing the convolution of the two rectangular pulses) in Green.\n\nLabels and Connections:\n- Add mathematical labels for each function on the left and their Fourier transforms (using $\\mathcal{F}[\\dots]$ notation with a Teal color for the $\\mathcal{F}$ symbol) on the right.\n- Add curved Teal arrows pointing from the left labels to the right labels to represent the Fourier transform mapping.\n\nAnimations:\n1. Fade in the top two left plots (axes, graphs, and labels) sequentially.\n2. Perform a complex transform animation where the top two left plots and labels merge/multiply to form the third (bottom) left plot and its label.\n3. (Optional/Inferred) Show the corresponding Fourier transforms on the right side, demonstrating that multiplication in the spatial domain corresponds to convolution in the frequency domain.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-178/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "ConvolutionTheoremDiagram"
+    ],
+    "visual_techniques": [
+      "Dual-column layout alignment",
+      "Custom coordinate-to-point (c2p) graph plotting",
+      "Manual VMobject corner-point construction for discontinuous/step functions",
+      "Complex multi-object transforms (TransformFromCopy, FadeTransform)",
+      "Curved arrows with custom path arcs"
+    ],
+    "manim_api_patterns": [
+      "Axes",
+      "c2p",
+      "VMobject().set_points_as_corners",
+      "OldTex",
+      "Arrow",
+      "LaggedStartMap",
+      "FadeTransform",
+      "TransformFromCopy"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using OldTex in standard Manim Community environments without compatibility layers",
+      "severity": "high",
+      "note": "OldTex is specific to 3b1b's ManimGL fork. Standard Manim CE uses MathTex or Tex."
+    },
+    {
+      "pattern": "Incorrect alignment of the dual-column axes using hardcoded coordinates",
+      "severity": "medium",
+      "note": "The left and right axes must be precisely aligned horizontally and vertically using VGroup arrangement and shift operations."
+    },
+    {
+      "pattern": "Discontinuous step functions (rectangular pulses) rendered with diagonal transition lines",
+      "severity": "medium",
+      "note": "Must use set_points_as_corners with explicit vertical step coordinates to avoid slanted vertical edges on the rectangular pulses."
+    }
+  ]
+}

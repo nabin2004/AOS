@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-119",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Circle radius label 1",
+        "Strip width variables d_1, d_2, d_3, d_4",
+        "Summation expression d_1 + d_2 + d_3 + d_4 + ... + d_n"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Rotating radial line drawing a circle",
+        "Dynamic width label updating with ValueTracker",
+        "Multiple colored strips overlapping the circle",
+        "Semi-transparent random strips covering the circle"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Circle radius = 2.5",
+        "ValueTracker bounds for strip width",
+        "Random seed for strip generation"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or Scene structure",
+        "always_redraw for dynamic strip updating",
+        "LaggedStart and MoveToTarget for label transition"
+      ]
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-159",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "An incoming 3D polarized wave propagates along the X-axis, oscillating in the Y-Z plane.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "OscillatingWave",
+        "y_amplitude",
+        "z_amplitude",
+        "wave_len"
+      ],
+      "clip_query": "A 3D oscillating electromagnetic wave propagating along an axis"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A charged particle at the origin begins to oscillate in response to the wave, with a pink acceleration vector tracking its movement.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "AccelerationVector",
+        "pin_to_particle",
+        "get_acceleration"
+      ],
+      "clip_query": "A charged particle oscillating with a dynamic acceleration vector attached"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A dynamic vector field appears around the particle, showing the scattered electric field radiating outwards.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        30.0,
+        50.0
+      ],
+      "keyword_bank": [
+        "lorentz_force",
+        "points_to_particle_info",
+        "VectorField"
+      ],
+      "clip_query": "A dynamic vector field showing scattered radiation from an oscillating dipole"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The 3D camera rotates around the scene to show the dipole radiation pattern from multiple angles.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        50.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "camera",
+        "frame",
+        "set_euler_angles"
+      ],
+      "clip_query": "3D camera rotating around an oscillating dipole radiation field"
+    }
+  ]
+}

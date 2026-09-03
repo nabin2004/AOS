@@ -1,0 +1,71 @@
+{
+  "id": "MB-186",
+  "title": "Evaluation Tricks for Polynomial Subsets",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Algebra",
+    "Combinatorics"
+  ],
+  "full_prompt": "Write a complete Manim script using the ManimGL/Manim community framework that visualizes a polynomial evaluation puzzle. First, set up a function f(x) which is the product of (1 + x^n) for n from 1 to 10. Create a NumberPlane with x-range (-1, 1) and y-range (-10, 10), and plot the graph of this function in yellow. On the right side of the screen, display the factored form of the polynomial: f(x) = (1 + x)(1 + x^2)...(1 + x^2000) and its expanded form with coefficients c_n. Label these as 'What we know' and 'What we want' with arrows pointing to them. Cover the coefficients of the expanded form with a grey 'black box' containing question marks to represent the unknown coefficients. Next, introduce a ValueTracker for x, and animate a vertical line and a glowing dot tracking the graph as x varies from 0.5 to -0.5, then to 0.7. Finally, show the evaluation of the function at x = 0 to reveal that f(0) = 1 = c_0, moving the tracker to 0.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-186/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "EvaluationTricks"
+    ],
+    "visual_techniques": [
+      "ValueTracker-driven graph tracing",
+      "SurroundingRectangle with question marks (black box)",
+      "Mathematical formula transformations",
+      "Coordinate plane plotting"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "NumberPlane",
+      "get_graph",
+      "ValueTracker",
+      "GlowDot",
+      "FadeTransform",
+      "i2gp",
+      "c2p"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using GlowDot in standard Manim Community without importing or defining it",
+      "severity": "high",
+      "note": "GlowDot is specific to ManimGL. In ManimCE, use a standard Dot or create a custom glow effect."
+    },
+    {
+      "pattern": "Using plane.i2gp in Manim Community",
+      "severity": "high",
+      "note": "In ManimCE, plane.i2gp is replaced by plane.input_to_graph_point."
+    },
+    {
+      "pattern": "Using ShowCreation instead of Create",
+      "severity": "medium",
+      "note": "ShowCreation is deprecated/absent in modern Manim Community; use Create instead."
+    }
+  ]
+}

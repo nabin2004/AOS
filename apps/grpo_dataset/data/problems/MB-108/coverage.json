@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-108",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Parametric loop function mapping [0, 1] to 3D space",
+        "Midpoint calculation between two points on the loop",
+        "Distance calculation between two points on the loop",
+        "3D coordinate mapping: (midpoint_x, midpoint_y, distance)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "GlowDot and TrueDot combination for high-quality point rendering",
+        "Dynamic connecting line updating its position based on dot coordinates",
+        "3D camera rotation and perspective shift",
+        "Smooth tracing of the mapped 3D coordinate"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "ValueTracker managing 1D or 2D parameter arrays",
+        "Numerical optimization or sampling to find specific configurations (e.g., find_rectangle)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Use of InteractiveScene as the base class",
+        "Updaters attached to dots and lines for real-time animation",
+        "Proper group management for complex multi-component Mobjects"
+      ]
+    }
+  }
+}

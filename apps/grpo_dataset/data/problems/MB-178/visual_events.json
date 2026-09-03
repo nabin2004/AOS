@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-178",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Fade in the top two left axes, sinc graphs, and mathematical labels sequentially.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "left_plots",
+        "left_labels",
+        "LaggedStartMap",
+        "FadeIn"
+      ],
+      "clip_query": "The top two sinc function graphs and their mathematical labels fade into view on the left side of the screen."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Transform and multiply the top two sinc plots and labels to construct the third (bottom) product plot and label.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "Transform",
+        "TransformFromCopy",
+        "FadeTransform",
+        "left_plots[2]"
+      ],
+      "clip_query": "The top two sinc graphs merge and transform downwards to form a third, narrower product sinc graph at the bottom left."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animate curved Teal arrows pointing from the left domain labels to the right frequency domain labels.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        5.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "Arrow",
+        "path_arc",
+        "ft_arrows",
+        "TEAL"
+      ],
+      "clip_query": "Curved teal arrows sweep from the left column formulas to the right column Fourier transform formulas."
+    }
+  ]
+}

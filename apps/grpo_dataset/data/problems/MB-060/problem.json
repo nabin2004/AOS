@@ -1,0 +1,72 @@
+{
+  "id": "MB-060",
+  "title": "Pythagorean Intuition in 2D and 3D",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Quantum Computing"
+  ],
+  "full_prompt": "Write a complete ManimGL script using the InteractiveScene class to visualize the Pythagorean theorem's extension from 2D to 3D. \n\n1. **Setup**: Create a 2D coordinate system using ThreeDAxes and a NumberPlane (scaled by 2, faded). Position a 2x2 square at the origin (aligned to the bottom-left corner). \n2. **2D Trace**: Animate a red GlowDot tracing the bottom and right edges of the square. As it traces, draw red lines along these edges and display '1' labels next to them. \n3. **2D Diagonal**: Draw a pink diagonal line from the bottom-left to the top-right corner of the square. Animate the GlowDot moving to the top-right corner. Display the label '\\sqrt{1^2 + 1^2}' and transform it into '\\sqrt{2}' using matching tex transformations.\n4. **3D Transition**: Fade in the 3D axes and a 3D cube (VCube) of side length 2. Reorient the camera frame smoothly to a 3D perspective (e.g., frame.animate.reorient(-16, 68, 0, (0.45, 0.98, 1.05), 4.36)) and add ambient rotation. Trace the third dimension (Z-axis) edge of the cube with a red line, moving the GlowDot to its end and showing a '1' label rotated to face the 3D perspective.\n5. **3D Diagonal**: Draw a yellow 3D diagonal line from the origin to the opposite corner of the cube (1, 1, 1). Display the label '\\sqrt{\\sqrt{2}^2 + 1^2}' next to this diagonal, rotated appropriately for the 3D view, showing how the 2D diagonal and the 3rd dimension combine to form the 3D diagonal.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-060/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 115,
+    "scene_classes": [
+      "PythagoreanIntuition"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "Ambient Frame Rotation",
+      "GlowDot Path Animation",
+      "Tex Transformation",
+      "3D Vector/Cube Construction"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ThreeDAxes",
+      "NumberPlane",
+      "GlowDot",
+      "VCube",
+      "frame.animate.reorient",
+      "frame.add_ambient_rotation",
+      "TransformMatchingTex"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community (CE) imports or classes like ThreeDScene instead of InteractiveScene",
+      "severity": "high",
+      "note": "The reference code relies on manimlib (ManimGL) specific camera controls (self.frame) and classes (GlowDot, VCube)."
+    },
+    {
+      "pattern": "Using Create instead of ShowCreation",
+      "severity": "medium",
+      "note": "ManimGL uses ShowCreation for drawing animations, while ManimCE uses Create."
+    },
+    {
+      "pattern": "Incorrect camera reorientation syntax",
+      "severity": "high",
+      "note": "frame.animate.reorient is a ManimGL-specific method. Attempting to use set_camera_orientation will fail or behave differently."
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "id": "MB-197",
+  "title": "Sphere Sector Analysis",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a complete Manim script using the ManimGL framework that visualizes the division of a sphere into sectors (slices) and analyzes how the width of a sector varies with latitude (phi angle). \n\nYour visualization should include:\n1. A 3D scene setup with a custom camera orientation and 3D axes.\n2. A sphere constructed from discrete parametric slices (sectors) using `ParametricSurface` with alternating colors (e.g., shades of blue) and an equator circle.\n3. A surface mesh overlaid on the sphere to emphasize the geometry.\n4. An animation that introduces the sphere slices and mesh while reorienting the camera.\n5. An isolation step where all slices except one are faded to low opacity (e.g., 0.1) to focus the viewer's attention.\n6. A dynamic red parametric curve (`ParametricCurve`) representing the width of the slice at a given latitude, accompanied by a 'Width' text label that dynamically updates its position and scale relative to the width line.\n7. An animation that drives a `ValueTracker` for the latitude angle (phi) from 45 degrees to 0, then to 90 degrees, and back to 0, showing how the width of the sector shrinks to zero at the poles and reaches its maximum at the equator.\n\nEnsure helper functions are defined for generating the north and south slices of the sphere, applying depth testing, and coloring the slices. Use clean, modular code compatible with ManimGL.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-197/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 145,
+    "scene_classes": [
+      "SphereSectorAnalysis"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "Parametric Surfaces",
+      "ValueTracker Updaters",
+      "Opacity manipulation",
+      "Mesh overlay"
+    ],
+    "manim_api_patterns": [
+      "self.camera.frame.reorient",
+      "ParametricSurface",
+      "ParametricCurve",
+      "ValueTracker",
+      "ShowCreation",
+      "family_members_with_points"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE camera methods like self.set_camera_orientation instead of self.camera.frame.reorient",
+      "severity": "high",
+      "note": "The reference code uses ManimGL's camera frame API. Mixing CE camera APIs will cause execution failure."
+    },
+    {
+      "pattern": "Incorrect argument names for ParametricSurface or ParametricCurve",
+      "severity": "high",
+      "note": "ManimGL uses u_range and v_range as lists/tuples, and resolution as a tuple, which differs slightly from CE's Surface API."
+    },
+    {
+      "pattern": "Missing depth test application on 3D objects",
+      "severity": "medium",
+      "note": "Without apply_depth_test(), the 3D layering of the sphere slices, axes, and width line will render incorrectly."
+    }
+  ]
+}

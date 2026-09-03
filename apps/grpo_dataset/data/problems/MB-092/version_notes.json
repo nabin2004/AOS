@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-092",
+  "conflicts": [
+    {
+      "category": "class_inheritance",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_types",
+      "gl_construct": "StringMobject",
+      "ce_equivalent": "Mobject / VMobject (with custom string filtering or standard list comprehension)",
+      "severity": "medium"
+    },
+    {
+      "category": "text_rendering",
+      "gl_construct": "TexText",
+      "ce_equivalent": "Tex (using standard LaTeX text formatting or Tex with custom template)",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_apis",
+      "gl_construct": "FadeTransformPieces",
+      "ce_equivalent": "TransformMatchingShapes or ReplacementTransform",
+      "severity": "medium"
+    }
+  ]
+}

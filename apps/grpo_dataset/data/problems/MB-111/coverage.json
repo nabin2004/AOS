@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-111",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "smooth_index",
+        "interpolate",
+        "ValueTracker"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "get_special_dot",
+        "GlowDot",
+        "TrueDot",
+        "get_dot_polygon"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "n_samples",
+        "linspace",
+        "smooth_index"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "LoopScene",
+        "DiscussOrderOfPoints",
+        "add_updater"
+      ]
+    }
+  }
+}

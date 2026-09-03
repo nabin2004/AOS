@@ -1,0 +1,70 @@
+{
+  "id": "MB-121",
+  "title": "Intersecting Circles and Radial Lines Puzzle",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Topology"
+  ],
+  "full_prompt": "Write a ManimGL script to visualize a geometric puzzle involving intersecting circles and radial lines. Create a scene class named `IntersectingCircles` inheriting from `InteractiveScene` (or standard `Scene` if adapting to CE). \n\n1. Initialize four circles of radius 2. The first three should be colored blue (BLUE_B) with stroke width 2, and the fourth should be yellow (YELLOW) with stroke width 3. \n2. Position the circles dynamically using three vector trackers (using `VectorizedPoint` or `ValueTracker` initialized to RIGHT, UL, and DL). Implement a custom updater `update_circles` that places the first three circles at positions scaled by their respective tracker vectors, and the fourth circle at the sum of these vectors.\n3. Add glow dots (or standard dots) at the pairwise intersection points of the circles, updating their positions dynamically as the circles move.\n4. Animate the initial creation of the three blue circles, followed by the glow dots, and then reveal the fourth yellow circle.\n5. Perform a sequence of animations moving the vector trackers to shift the circles dynamically.\n6. Transition to a radial line representation: fade out the circles, show dots at their centers, and draw radial lines connecting the centers to the intersection points.\n7. Animate the radial lines dynamically updating as the vector trackers are moved again, showing how the skeleton of the puzzle deforms.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-121/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "IntersectingCircles"
+    ],
+    "visual_techniques": [
+      "Dynamic Updaters",
+      "Vector Trackers",
+      "GlowDots",
+      "Geometric Constraints",
+      "Lagged Animations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "VectorizedPoint",
+      "GlowDots",
+      "add_updater",
+      "ShowCreation",
+      "LaggedStartMap"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing helper method get_radial_lines",
+      "severity": "high",
+      "note": "The reference code snippet calls self.get_radial_lines which is defined later in the class. The generated code must implement this method or an equivalent logic to construct the radial lines."
+    },
+    {
+      "pattern": "GlowDots undefined in ManimCE",
+      "severity": "medium",
+      "note": "If run in ManimCE, GlowDots will raise a NameError. Must fall back to standard Dots or a custom PMobject/glow effect."
+    },
+    {
+      "pattern": "ShowCreation vs Create",
+      "severity": "medium",
+      "note": "ShowCreation is a ManimGL/classic API; ManimCE uses Create."
+    }
+  ]
+}

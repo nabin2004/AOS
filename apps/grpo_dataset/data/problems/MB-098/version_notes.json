@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-098",
+  "conflicts": [
+    {
+      "category": "Shader Integration",
+      "gl_construct": "LightWaveSlice(Mobject) with shader_folder and moderngl.TRIANGLE_STRIP",
+      "ce_equivalent": "ManimCE does not support custom moderngl shader folders directly on Mobjects in this manner. One would have to use custom OpenGLMobject or custom shader wrappers which are structured differently.",
+      "severity": "high"
+    },
+    {
+      "category": "Uniform Updates",
+      "gl_construct": "self.set_uniforms() and self.always.sync_points()",
+      "ce_equivalent": "ManimCE uses a different updater and attribute system; custom uniforms are not natively exposed on standard Mobjects without custom shader boilerplate.",
+      "severity": "high"
+    },
+    {
+      "category": "Data Types",
+      "gl_construct": "data_dtype with custom numpy structured arrays for points",
+      "ce_equivalent": "ManimCE uses standard numpy arrays for points and does not expose raw vertex attribute layout customization easily to the user.",
+      "severity": "high"
+    }
+  ]
+}

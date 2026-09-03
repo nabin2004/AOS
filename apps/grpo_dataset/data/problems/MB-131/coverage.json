@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-131",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "PCA projection matrix multiplication",
+        "3D vector addition and subtraction",
+        "Coordinate mapping from vector space to 3D scene coordinates (c2p)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D camera rotation and orientation adjustments",
+        "Custom LabeledArrow with 3D rotated text labels",
+        "Color-coded vectors for different words",
+        "Grid plane overlay for spatial reference"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Correct dimensionality reduction to 3 components",
+        "Accurate relative positioning of King, Man, Woman, and Queen vectors"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inheritance from Word2VecScene",
+        "Custom LabeledArrow class definition",
+        "Proper setup of 3D axes and model loading"
+      ]
+    }
+  }
+}

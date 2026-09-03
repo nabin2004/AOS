@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-156",
+  "conflicts": [
+    {
+      "category": "Mobject Type",
+      "gl_construct": "DotCloud",
+      "ce_equivalent": "PMobject or custom VGroup of Dots with updaters",
+      "severity": "high"
+    },
+    {
+      "category": "3D Geometry",
+      "gl_construct": "VCube",
+      "ce_equivalent": "Cube",
+      "severity": "medium"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Vector Fields",
+      "gl_construct": "TimeVaryingVectorField",
+      "ce_equivalent": "Custom implementation using ArrowVectorField or custom updater on Mobjects",
+      "severity": "high"
+    }
+  ]
+}

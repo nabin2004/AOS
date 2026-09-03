@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-088",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "\\mathcal{L}",
+        "x({t})",
+        "m x''({t}) + \\mu x'({t}) + k x(t) = F_0 \\cos(\\omega{t})",
+        "x({t}) = c_1 e^{s_1 {t}} + c_2 e^{s_2 {t}} + c_3 e^{s_3 {t}} + c_4 e^{s_4 {t}}"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Stylized machine representation",
+        "Curved path animations using path_arc",
+        "Point-based fading (FadeOutToPoint/FadeInFromPoint or equivalent scale-down transitions)",
+        "Surrounding highlighting boxes"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Color-coded variables (t in blue, s in yellow, c in grey/white)",
+        "Arc angles generated via np.linspace"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Sequential flow: Input -> ODE -> Output -> Highlighting",
+        "Proper layering (z-index) of the machine and text elements"
+      ]
+    }
+  }
+}

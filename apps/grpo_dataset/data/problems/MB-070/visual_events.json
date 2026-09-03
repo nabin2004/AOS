@@ -1,0 +1,89 @@
+{
+  "problem_id": "MB-070",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation of f(t) and transition to f'(t) via the derivative arrow",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "ft",
+        "dft",
+        "deriv_arrow",
+        "TransformMatchingTex"
+      ],
+      "clip_query": "f(t) transforms into f'(t) with a horizontal arrow labeled d/dt"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Laplace transform arrows grow downwards, transforming f'(t) to L{f'(t)} and f(t) to F(s)",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "lt_arrows",
+        "Fs",
+        "L_df",
+        "TransformFromCopy"
+      ],
+      "clip_query": "Vertical arrows labeled with L point downwards to F(s) and L{f'(t)}"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "F(s) transforms to sF(s) with multiplication arrow, and L{f'(t)} aligns below with an equals sign",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "s_mult_arrow",
+        "sFs",
+        "equals",
+        "FadeTransform"
+      ],
+      "clip_query": "F(s) is multiplied by s to become sF(s) with an equals sign pointing to L{f'(t)}"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Red 'Almost...' text appears, followed by the subtraction of f(0) to correct the formula",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "almost",
+        "f(0)",
+        "minus",
+        "FadeOut"
+      ],
+      "clip_query": "Red text 'Almost...' appears and then the formula is corrected to sF(s) - f(0)"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Surrounding rectangle highlights the derivative and multiplication arrows to show the correspondence",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        22.0,
+        28.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "rect",
+        "mid_lt_arrow"
+      ],
+      "clip_query": "A teal rectangle highlights the d/dt and x s arrow labels"
+    }
+  ]
+}

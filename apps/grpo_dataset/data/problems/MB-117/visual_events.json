@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-117",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of 3D Axes, Plane, and Cube Shell drawing",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "NumberPlane",
+        "cube_shell",
+        "Write"
+      ],
+      "clip_query": "A 3D coordinate system with a yellow wireframe cube drawing its edges at the origin."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Fading in coordinate labels and camera reorientation",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "labels",
+        "vert_dots",
+        "reorient",
+        "LaggedStartMap"
+      ],
+      "clip_query": "Text labels showing 3D coordinates appear next to the vertices of the cube as the camera rotates."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Highlighting base and top squares of the cube",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        7.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "edges",
+        "set_stroke",
+        "set_opacity"
+      ],
+      "clip_query": "The top and bottom faces of the cube alternate in brightness to highlight its parallel structure."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Camera rotation to look down the corner and projecting the cube",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "reorient",
+        "proj_mat",
+        "perp_plane",
+        "apply_matrix"
+      ],
+      "clip_query": "The camera aligns with the cube's main diagonal, and a flat 2D projection of the cube is cast onto a plane."
+    }
+  ]
+}

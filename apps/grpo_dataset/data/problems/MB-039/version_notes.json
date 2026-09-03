@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-039",
+  "conflicts": [
+    {
+      "category": "framework_base",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_name",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "high"
+    },
+    {
+      "category": "animation_name",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_method",
+      "gl_construct": "axes.get_v_line_to_graph",
+      "ce_equivalent": "axes.get_vertical_line",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_method",
+      "gl_construct": "axes.i2gp",
+      "ce_equivalent": "axes.input_to_graph_point",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_method",
+      "gl_construct": "shift_onto_screen",
+      "ce_equivalent": "None (manually adjust position or use to_edge/next_to)",
+      "severity": "medium"
+    }
+  ]
+}

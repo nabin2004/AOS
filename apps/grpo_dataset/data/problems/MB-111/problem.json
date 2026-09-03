@@ -1,0 +1,70 @@
+{
+  "id": "MB-111",
+  "title": "Discussing the Order of Points on a Loop",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Topology"
+  ],
+  "full_prompt": "Create a Manim visualization based on the `DiscussOrderOfPoints` scene from 3Blue1Brown's 'inscribed_rect' series. The scene should define a loop (using an SVG or custom VMobject) and track points moving along this loop. It should implement helper methods to create movable pairs or quads of dots (using `ValueTracker` and custom update functions), draw connecting lines, midpoints, polygons, and labels that dynamically track these moving dots. The main scene `DiscussOrderOfPoints` should demonstrate the ordering of points (e.g., A, B, C, D) along the loop, highlighting how their relative positions change or are maintained as they slide along the curve.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-111/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "LoopScene",
+      "DiscussOrderOfPoints"
+    ],
+    "visual_techniques": [
+      "Dynamic Updaters",
+      "ValueTracker-driven animation",
+      "SVG path sampling",
+      "Custom GlowDot/TrueDot combinations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ValueTracker",
+      "f_always",
+      "add_updater",
+      "SVGMobject",
+      "Family members with points"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing SVG file 'example_loop1'",
+      "severity": "high",
+      "note": "The code references an external SVG file. A fallback parametric loop or inline VMobject should be used if the SVG is missing."
+    },
+    {
+      "pattern": "f_always and always syntax errors",
+      "severity": "high",
+      "note": "Manim Community Edition does not support .f_always or .always syntax; standard updaters or .add_updater must be used instead."
+    },
+    {
+      "pattern": "TrueDot and GlowDot undefined",
+      "severity": "medium",
+      "note": "These are custom 3b1b Mobjects. Standard Dot or custom Group of Dots with varying opacity/radius should be used as fallbacks."
+    }
+  ]
+}

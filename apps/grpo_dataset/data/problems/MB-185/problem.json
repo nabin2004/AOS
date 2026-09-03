@@ -1,0 +1,64 @@
+{
+  "id": "MB-185",
+  "title": "Fifth Roots of Unity on the Complex Plane",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Complex Analysis",
+    "Algebra"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL/ManimCE that visualizes the fifth roots of unity on the complex plane. \n\n1. Create a coordinate system using a Complex Plane positioned on the left side of the screen. Add coordinate labels and a title 'Complex plane' near the upper-left corner.\n2. Draw a unit circle centered at the origin of the complex plane.\n3. Calculate the coordinates of the fifth roots of unity: e^(i * n * 2pi / 5) for n from 0 to 4.\n4. Draw a regular pentagon connecting these five root points. The pentagon should have a teal stroke and a semi-transparent teal fill.\n5. Add glowing dots (or standard dots with a glow effect) at each of the five root points, along with yellow arrows pointing from the origin to each root.\n6. On the right side of the screen, display a LaTeX formula for a polynomial function: f(x) = \\sum_{n=0}^N c_n x^n, coloring 'x' in blue.\n7. Draw an angle arc at the origin representing the angle 2\\pi / 5 for the first root, and label it.\n8. Add LaTeX labels for each root: \\zeta^0 = 1, \\zeta, \\zeta^2, \\zeta^3, \\zeta^4, positioned radially outward from each respective root point.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-185/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 140,
+    "scene_classes": [
+      "FifthRootsOfUnity"
+    ],
+    "visual_techniques": [
+      "Complex plane plotting",
+      "Geometric polygon overlay",
+      "Mathematical labeling with LaTeX",
+      "Vector arrows"
+    ],
+    "manim_api_patterns": [
+      "ComplexPlane",
+      "GlowDot",
+      "Polygon",
+      "Arc",
+      "Tex",
+      "Arrow"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "GlowDot is missing in standard Manim Community, causing NameError.",
+      "severity": "high",
+      "note": "Replace GlowDot with Dot or a custom glowing effect when porting to Manim Community."
+    },
+    {
+      "pattern": "ComplexPlane coordinate label positioning methods like shift_onto_screen do not exist in Manim Community.",
+      "severity": "medium",
+      "note": "Manim Community uses add_coordinates() or manual label positioning."
+    }
+  ]
+}

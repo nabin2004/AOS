@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-064",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Tex equation for factoring",
+        "91 = 7 x 13"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "PiCreatures (Randolph and Buddy)",
+        "Laptop SVGMobject",
+        "Computer chip SVGMobject",
+        "Logic gate circuit diagram SVGMobject"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Coordinates for PiCreatures",
+        "Scale factors for laptop and chip"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene structure",
+        "LaggedStart animations",
+        "Blink animations",
+        "ReplacementTransform and TransformFromCopy"
+      ]
+    }
+  }
+}

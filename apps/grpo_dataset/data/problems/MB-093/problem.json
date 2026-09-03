@@ -1,0 +1,74 @@
+{
+  "id": "MB-093",
+  "title": "New Gaps in Primes Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    15.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Number Theory",
+    "Probability"
+  ],
+  "full_prompt": "Write a Manim script using the ManimGL framework that visualizes prime gaps on a large scale. First, construct a horizontal number line spanning from 99980 to 100100, shifted slightly left and up. Identify all prime numbers in this range using a library like sympy, and place glowing dots (or standard dots with a glow effect) at their corresponding positions on the number line. Add text labels for these prime numbers. Next, animate the camera (using self.frame) to pan and zoom in on a large prime near the center of the range. Label this prime as 'Big prime, p' in yellow with an arrow pointing to it. Then, create a brace spanning the gap between the last two primes in the range, labeled 'gap'. Finally, display the expected gap equation 'E[gap] = \\ln(p)' at the top of the screen, using smooth FadeTransform transitions to morph the 'gap' and 'p' labels into their respective positions in the equation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-093/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 68,
+    "scene_classes": [
+      "NewGapsInPrimes"
+    ],
+    "visual_techniques": [
+      "Camera panning and zooming via self.frame",
+      "GlowDots for highlighting specific coordinates",
+      "Brace and Arrow annotations",
+      "FadeTransform for morphing text elements"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "NumberLine",
+      "GlowDots",
+      "TexText",
+      "self.frame.animate",
+      "FadeTransform"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community Scene instead of InteractiveScene when self.frame is manipulated",
+      "severity": "high",
+      "note": "In Manim Community, self.camera.frame must be used instead of self.frame, and the scene must inherit from MovingCameraScene."
+    },
+    {
+      "pattern": "Missing sympy import for prime calculation",
+      "severity": "high",
+      "note": "The script relies on sympy.isprime to filter prime numbers in the specified range."
+    },
+    {
+      "pattern": "Using GlowDots in standard Manim CE",
+      "severity": "medium",
+      "note": "GlowDots is a ManimGL-specific class. In Manim CE, standard Dots with a custom glow or multiple layered semi-transparent circles must be used."
+    },
+    {
+      "pattern": "TexText syntax errors",
+      "severity": "medium",
+      "note": "TexText is specific to ManimGL. In Manim CE, Tex or MathTex should be used with appropriate LaTeX formatting."
+    }
+  ]
+}

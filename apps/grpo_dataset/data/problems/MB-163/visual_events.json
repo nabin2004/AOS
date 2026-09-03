@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-163",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the coordinate axes and vertical boundary layers",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "axes",
+        "layers",
+        "Line",
+        "layer_xs"
+      ],
+      "clip_query": "A coordinate system with vertical lines representing boundaries"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Continuous propagation of the oscillating wave through the boundaries",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "OscillatingWave",
+        "update_points",
+        "add_updater"
+      ],
+      "clip_query": "An oscillating wave propagating horizontally across vertical lines"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Phase shift adjustment using ValueTrackers to kick the wave forward",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "phase_kick_trackers",
+        "ValueTracker",
+        "animate"
+      ],
+      "clip_query": "The wave phase shifting forward at the boundary lines"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Vector field representation of the wave showing electric field vectors",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "OscillatingFieldWave",
+        "vect_wave"
+      ],
+      "clip_query": "A wave represented by vertical vector arrows oscillating in amplitude"
+    }
+  ]
+}

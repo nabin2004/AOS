@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-124",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "matrix-vector product representation",
+        "symbolic weight matrix W",
+        "input vector x"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "SurroundingRectangle highlighting",
+        "sequential row-by-row animation",
+        "pixel grid overlay"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "pixel grid dimensions",
+        "matrix dimensions (n_rows, n_cols)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "PremiseOfML class",
+        "show_symbolic_matrix_vector_product helper",
+        "get_full_matrix_vector_product helper",
+        "create_pixels helper"
+      ]
+    }
+  }
+}

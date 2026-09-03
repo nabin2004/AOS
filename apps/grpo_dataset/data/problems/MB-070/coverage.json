@@ -1,0 +1,44 @@
+{
+  "problem_id": "MB-070",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "f(t)",
+        "F(s)",
+        "f'(t)",
+        "sF(s) - f(0)",
+        "\\mathcal{L}",
+        "d / d{t}",
+        "\\times {s}"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "commutative diagram grid layout",
+        "horizontal and vertical arrows",
+        "color-coded variables (t in blue, s in yellow)",
+        "surrounding rectangle highlight"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "h_buff=2.0",
+        "v_buff=3.0",
+        "path_arc=45 * DEG",
+        "path_arc=-45 * DEG"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene or Scene class structure",
+        "LaggedStart animations",
+        "TransformMatchingTex transitions",
+        "FadeTransform or ReplacementTransform transitions"
+      ]
+    }
+  }
+}

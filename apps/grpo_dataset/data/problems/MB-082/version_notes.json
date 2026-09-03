@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-082",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene (with custom camera/frame adjustments)",
+      "severity": "high"
+    },
+    {
+      "category": "api_difference",
+      "gl_construct": "ParametricSurface",
+      "ce_equivalent": "Surface",
+      "severity": "medium"
+    },
+    {
+      "category": "api_difference",
+      "gl_construct": "color_by_uv_function",
+      "ce_equivalent": "custom function passed to Surface(colors=...)",
+      "severity": "medium"
+    }
+  ]
+}

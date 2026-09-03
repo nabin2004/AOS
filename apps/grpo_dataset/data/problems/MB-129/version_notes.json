@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-129",
+  "conflicts": [
+    {
+      "category": "custom_classes",
+      "gl_construct": "NumericEmbedding",
+      "ce_equivalent": "Must be custom-implemented using standard DecimalNumbers arranged in a matrix/vector layout.",
+      "severity": "high"
+    },
+    {
+      "category": "animations",
+      "gl_construct": "ShowIncreasingSubsets",
+      "ce_equivalent": "Can be simulated in CE using custom animation loops or ShowSubmobjectsOneByOne with custom lag ratios.",
+      "severity": "medium"
+    },
+    {
+      "category": "camera",
+      "gl_construct": "fix_in_frame() / is_fixed_in_frame",
+      "ce_equivalent": "Not needed if using standard 2D Scene; if using ThreeDScene, use add_fixed_in_frame_mobjects.",
+      "severity": "medium"
+    },
+    {
+      "category": "color_utilities",
+      "gl_construct": "random_bright_color / interpolate_color_by_hsl",
+      "ce_equivalent": "Use standard Manim color interpolation functions like interpolate_color.",
+      "severity": "low"
+    }
+  ]
+}

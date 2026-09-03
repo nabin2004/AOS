@@ -1,0 +1,42 @@
+{
+  "problem_id": "MB-113",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Lorenz system ODEs",
+        "scipy.integrate.solve_ivp",
+        "initial state perturbation (epsilon)",
+        "Runge-Kutta integration"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "ThreeDAxes",
+        "Continuous camera rotation (theta updater)",
+        "GlowDot",
+        "TracingTail",
+        "Color gradient (BLUE_E to BLUE_A)",
+        "ShowCreation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "sigma=10, rho=28, beta=8/3",
+        "evolution_time=30",
+        "n_points=10",
+        "epsilon=1e-5"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "InteractiveScene",
+        "fix_in_frame for equations",
+        "add_updater for dots and camera"
+      ]
+    }
+  }
+}

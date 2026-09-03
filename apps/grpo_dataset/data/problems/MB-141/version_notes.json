@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-141",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "mobject_api",
+      "gl_construct": "make_number_changeable",
+      "ce_equivalent": "DecimalNumber with ValueTracker",
+      "severity": "high"
+    },
+    {
+      "category": "animation_api",
+      "gl_construct": "ChangeDecimalToValue",
+      "ce_equivalent": "tracker.animate.set_value",
+      "severity": "high"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-148",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the 3D coordinate axes, background plane, and the semi-transparent SugarCylinder.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "SugarCylinder",
+        "Cylinder",
+        "axes",
+        "plane"
+      ],
+      "clip_query": "A 3D semi-transparent cylinder is rendered along a set of coordinate axes"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Rendering of the TwistedRibbon representing the rotating polarization plane of the light wave.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "TwistedRibbon",
+        "ParametricSurface",
+        "amplitude",
+        "twist_rate"
+      ],
+      "clip_query": "A twisted 3D ribbon representing a polarized light wave propagating through space"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animation of propagating concentric rings along the cylinder axis using a custom updater.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "ProbagatingRings",
+        "Circle",
+        "update_rings",
+        "add_updater"
+      ],
+      "clip_query": "Concentric rings propagating outwards along a 3D axis"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Introduction of the Polarizer filter and interaction with the propagating wave.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "Polarizer",
+        "VGroup"
+      ],
+      "clip_query": "A polarizer filter interacting with a 3D light wave"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "id": "MB-112",
+  "title": "Inscribed Rectangle Surface Transformation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "direct-visualization"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Geometry",
+    "Topology"
+  ],
+  "full_prompt": "Write a complete ManimGL script using the 3b1b/manimlib framework that visualizes the relationship between a 2D loop and its corresponding 3D midpoint-distance surface (used in the topological proof of the inscribed rectangle theorem). \n\nYour scene, named `ChangeTheSurface`, should perform the following sequence:\n1. Initialize a 3D scene with a 2D loop (e.g., an ellipse or a smooth deformed loop) lying on the xy-plane.\n2. Show two points, $A(u)$ and $B(v)$, moving along the loop. Draw a line segment connecting them, highlight their midpoint on the xy-plane, and project a vertical line up to a height $z$ equal to the distance between $A$ and $B$.\n3. Generate the full 3D parametric surface defined by: $S(u, v) = (\\text{midpoint}_x(u,v), \\text{midpoint}_y(u,v), \\text{distance}(u,v))$ for $u \\le v$ (or the half-parametric version to avoid double-counting, creating a Mobius-like ribbon/surface).\n4. Rotate the camera to a 3D perspective to clearly show the surface's height representing chord length.\n5. Smoothly morph the 2D loop into a different shape (e.g., from an ellipse to a clover-like loop) and animate the 3D surface dynamically morphing to match the new loop's geometry using an updater or a custom transition.\n\nEnsure you use ManimGL's 3D rendering capabilities, including proper surface shading, custom dot glows, and smooth camera rotations.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-112/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimlib",
+    "total_lines": 150,
+    "scene_classes": [
+      "LoopScene",
+      "ChangeTheSurface"
+    ],
+    "visual_techniques": [
+      "3D Parametric Surface rendering",
+      "Dynamic surface morphing via updaters",
+      "Glow dots and custom 3D markers",
+      "Coordinate mapping (midpoint, distance -> 3D space)"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ParametricSurface",
+      "TrueDot",
+      "GlowDot",
+      "smooth_index",
+      "family_members_with_points"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community Surface syntax instead of ManimGL ParametricSurface",
+      "severity": "high",
+      "note": "ManimGL's ParametricSurface expects a function returning a 3D array/list and uses u_range/v_range differently than Manim Community."
+    },
+    {
+      "pattern": "Failure to dynamically update the 3D surface when the 2D loop morphs",
+      "severity": "high",
+      "note": "The surface must be bound to the loop's shape via an updater or reconstructed smoothly during the transition."
+    },
+    {
+      "pattern": "Incorrect domain mapping for the half-surface",
+      "severity": "medium",
+      "note": "Mapping the full square [0,1]x[0,1] results in self-intersection and double-covering. The half-parametric function helper must be used correctly."
+    }
+  ]
+}

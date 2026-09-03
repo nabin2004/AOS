@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-199",
+  "conflicts": [
+    {
+      "category": "mobject_compatibility",
+      "gl_construct": "OldTex",
+      "ce_equivalent": "Tex",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_compatibility",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "scene_compatibility",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "low"
+    }
+  ]
+}

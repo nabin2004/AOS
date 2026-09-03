@@ -1,0 +1,69 @@
+{
+  "id": "MB-090",
+  "title": "Zeta Function Partial Sum Path Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    6.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Complex Analysis",
+    "Number Theory"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the partial sums of the Riemann Zeta function (or its exponentially regulated version) on the complex plane. The scene should display two complex planes side-by-side: an 's-plane' on the left and an 'out-plane' on the right. A yellow dot representing the complex variable $s$ should be interactive/trackable on the s-plane. On the out-plane, draw a continuous path representing the partial sums $\\sum_{n=1}^N n^{-s} e^{-cn}$. Animate the tracker $s$ moving to the first non-trivial zero of the zeta function, and animate the regulator constant $c$ changing from 0 to 0.01, showing how the spiral of partial sums converges or changes shape.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-090/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 120,
+    "scene_classes": [
+      "ZetaSum"
+    ],
+    "visual_techniques": [
+      "Dual complex planes side-by-side",
+      "Dynamic path generation via updaters",
+      "Complex value tracking",
+      "Regulated convergence visualization"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ComplexPlane",
+      "ComplexValueTracker",
+      "add_updater",
+      "set_points_as_corners"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE ValueTracker for complex numbers directly without handling real/imaginary parts, causing type errors.",
+      "severity": "high",
+      "note": "ManimGL's ComplexValueTracker natively supports complex numbers, whereas ManimCE's ValueTracker only supports floats."
+    },
+    {
+      "pattern": "Missing mpmath dependency or incorrect zeta zero calculation.",
+      "severity": "medium",
+      "note": "Ensure mpmath is imported and used correctly to fetch the non-trivial zeros of the Riemann Zeta function."
+    },
+    {
+      "pattern": "Using ManimGL-specific syntax like 'always.next_to' or 'make_number_changeable' in a standard Manim Community environment.",
+      "severity": "high",
+      "note": "These are shorthand methods unique to the 3b1b/manim (ManimGL) repository."
+    }
+  ]
+}

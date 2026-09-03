@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-091",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Grid of 20x12 squares is created and filled with sequential integer labels from 1 to 240.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Square",
+        "get_grid",
+        "Integer",
+        "labels"
+      ],
+      "clip_query": "A grid of numbered squares from 1 to 240 appears on screen."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Non-prime numbers fade to low opacity, and prime numbers are copied to a list at the top next to 'Primes:'.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "non_primes",
+        "primes",
+        "prime_list",
+        "TransformFromCopy"
+      ],
+      "clip_query": "Non-prime numbers fade out while prime numbers are highlighted and collected at the top."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The grid is restored to full opacity, and the text 'Reduce all mod' is introduced.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        9.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "reduction_label",
+        "FadeOut",
+        "set_fill"
+      ],
+      "clip_query": "The grid numbers light up again and a label 'Reduce all mod' appears."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The grid rows are animated to separate vertically, aligning into columns to visualize modular reduction for a selected prime.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "rows",
+        "generate_target",
+        "arrange",
+        "ShowCreation"
+      ],
+      "clip_query": "Rows of the grid separate vertically and align to show modular columns."
+    }
+  ]
+}

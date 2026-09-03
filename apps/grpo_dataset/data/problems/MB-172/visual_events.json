@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-172",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render 3D axes and a circularly polarized oscillating wave propagating along the X-axis.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "OscillatingWave",
+        "add_updater"
+      ],
+      "clip_query": "A 3D helical wave propagating along an axis in a 3D coordinate system"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Smoothly rotate the camera frame to look directly down the propagation axis (X-axis).",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "camera.frame",
+        "animate",
+        "increment_theta",
+        "increment_phi"
+      ],
+      "clip_query": "Camera rotating in 3D space to align with the longitudinal axis of a wave"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Project the wave's helical path into a 2D circle on the screen plane.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "xt_to_yz",
+        "circle",
+        "projection"
+      ],
+      "clip_query": "A 3D wave collapsing into a 2D circular projection"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate electric field vectors rotating circularly to emphasize the polarization state.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "VectorField",
+        "Vector",
+        "polarization"
+      ],
+      "clip_query": "Rotating vectors tracing a circle representing circular polarization"
+    }
+  ]
+}

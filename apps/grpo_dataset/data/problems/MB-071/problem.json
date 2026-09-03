@@ -1,0 +1,73 @@
+{
+  "id": "MB-071",
+  "title": "Laplace Transform Equation Solving Walkthrough",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Differential Equations"
+  ],
+  "full_prompt": "Write a Manim scene that visualizes the strategy of solving a differential equation using the Laplace Transform. First, create a 2x2 layout representing the four stages of the process: Top-Left (Differential Equation), Bottom-Left (Transformed Equation), Bottom-Right (Transformed Solution), and Top-Right (Solution). Draw arrows connecting these stages: a downward arrow for the Laplace Transform, a rightward arrow for algebraic solving, and an upward arrow for the Inverse Laplace Transform. Label these arrows appropriately. Color the bottom row (s-domain) yellow and the top row (time-domain) blue/white. Highlight the domains by splitting the screen into a 'Time domain' (top half) and an 's domain' (bottom half) using background rectangles. Then, transition to showing a concrete differential equation $m x''(t) + \\mu x'(t) + k x(t) = F_0 \\cos(\\omega t)$ and demonstrate its Laplace transform term-by-term.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-071/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "PreviewStrategy",
+      "WalkThroughEquationSolution"
+    ],
+    "visual_techniques": [
+      "TransformMatchingStrings",
+      "FadeTransform",
+      "Custom Arrow Generation with Labels",
+      "Screen Splitting with Rectangles",
+      "Color-coded Tex equations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "FullScreenRectangle",
+      "TransformMatchingStrings",
+      "FadeTransform",
+      "GrowArrow",
+      "Tex",
+      "Text",
+      "VGroup"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom helper methods like get_lt_arrow or grow_lt_arrow when inheriting classes",
+      "severity": "high",
+      "note": "Ensure all helper methods from PreviewStrategy are correctly defined or inherited in the final scene."
+    },
+    {
+      "pattern": "Using FullScreenRectangle in standard Manim Community without defining it",
+      "severity": "high",
+      "note": "FullScreenRectangle is a ManimGL-specific class. In Manim Community, use a standard Rectangle with screen dimensions."
+    },
+    {
+      "pattern": "Incorrect string matching keys in TransformMatchingStrings",
+      "severity": "medium",
+      "note": "Ensure the key_map dictionary matches actual substrings present in the source and target text."
+    }
+  ]
+}

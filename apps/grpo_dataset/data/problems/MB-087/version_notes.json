@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-087",
+  "conflicts": [
+    {
+      "category": "Library Architecture",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobject Animation",
+      "gl_construct": "VFadeIn",
+      "ce_equivalent": "FadeIn",
+      "severity": "low"
+    },
+    {
+      "category": "Specialized Mobjects",
+      "gl_construct": "Mortimer",
+      "ce_equivalent": "Custom vector character design or standard annotation arrow",
+      "severity": "high"
+    }
+  ]
+}

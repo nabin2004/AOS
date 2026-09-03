@@ -1,0 +1,64 @@
+{
+  "id": "MB-176",
+  "title": "What We Must Show: Borwein Integrals and Fourier Transforms",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Fourier Analysis"
+  ],
+  "full_prompt": "Write a ManimGL scene named `WhatWeNeedToShow` that visualizes the mathematical setup for Borwein integrals. The scene should display a title 'What we must show' with a stylized underline. Below the title, display a grid of Fourier transform identities and examples (e.g., FT of sinc, FT of sinc with scaling, integral evaluation, convolution theorem). In the lower half, set up two coordinate systems side-by-side: one for the time domain (t) showing a sinc function, and one for the frequency domain (omega) showing a rectangular function. Use a `ValueTracker` to dynamically scale the sinc function and the corresponding rectangular function, demonstrating the scaling property of the Fourier transform.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-176/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 150,
+    "scene_classes": [
+      "WhatWeNeedToShow"
+    ],
+    "visual_techniques": [
+      "Dynamic graph binding",
+      "ValueTracker-driven updaters",
+      "Grid alignment of Tex expressions",
+      "Custom stroke width gradients"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Axes",
+      "bind_graph_to_func",
+      "add_updater",
+      "ValueTracker",
+      "c2p"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community Axes methods or missing bind_graph_to_func which is specific to ManimGL",
+      "severity": "high",
+      "note": "Manim Community does not have bind_graph_to_func. In Manim CE, one must use always_redraw or custom updaters to update graphs."
+    },
+    {
+      "pattern": "Incorrect coordinate mapping or updater crashes when k approaches zero",
+      "severity": "medium",
+      "note": "Ensure the value tracker for k does not reach 0 to avoid division by zero in the rect function width."
+    }
+  ]
+}

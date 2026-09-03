@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-074",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "low"
+    },
+    {
+      "category": "mobject_slicing",
+      "gl_construct": "equation1[\"{m} x''(t)\"]",
+      "ce_equivalent": "equation1.get_part_by_tex(\"x''(t)\") or manual indexing",
+      "severity": "high"
+    },
+    {
+      "category": "color_utility",
+      "gl_construct": "interpolate_color_by_hsl",
+      "ce_equivalent": "interpolate_color (RGB-based or custom HSL conversion)",
+      "severity": "medium"
+    }
+  ]
+}

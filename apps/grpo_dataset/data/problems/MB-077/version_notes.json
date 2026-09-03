@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-077",
+  "conflicts": [
+    {
+      "category": "Framework Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Animation Name",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Method",
+      "gl_construct": "shift_onto_screen()",
+      "ce_equivalent": "None (use standard positioning like to_edge or shift)",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation Syntax",
+      "gl_construct": "set_anim_args()",
+      "ce_equivalent": "Pass rate_func or run_time directly inside animate",
+      "severity": "medium"
+    }
+  ]
+}

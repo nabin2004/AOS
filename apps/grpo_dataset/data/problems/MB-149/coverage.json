@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-149",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Wave equation propagation",
+        "Phase shift calculation",
+        "Superposition principle",
+        "Vector field mapping from 1D to 3D space"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "ThreeDAxes",
+        "OscillatingWave VMobject",
+        "Dynamic VectorField",
+        "Spectral colormap color transitions"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Wavelength parameters",
+        "Amplitude values",
+        "Twist rate (polarization rotation)",
+        "Phase offset values"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Continuous updaters for wave motion",
+        "Custom VMobject subclassing for custom geometry",
+        "Vector field tracking linked to wave state"
+      ]
+    }
+  }
+}

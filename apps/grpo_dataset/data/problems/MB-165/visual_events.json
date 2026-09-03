@@ -1,0 +1,55 @@
+{
+  "problem_id": "MB-165",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Establishment of 3D axes and rendering of multiple individual oscillating waves of different spectral colors (red to violet) propagating along the x-axis.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "OscillatingWave",
+        "ThreeDAxes",
+        "get_spectral_color",
+        "wave_len"
+      ],
+      "clip_query": "Multiple colored 3D waves propagating along an axis"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The individual spectral waves are combined/averaged to form a single complex wave (the MeanWave) representing the superposition of white light.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "MeanWave",
+        "update_points",
+        "sum",
+        "get_points"
+      ],
+      "clip_query": "A single complex white wave formed by summing multiple colored waves"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A vector field is overlaid on the wave, showing electric field vectors oscillating along the propagation path.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "GraphAsVectorField",
+        "VectorField",
+        "vector_func"
+      ],
+      "clip_query": "Vector field arrows oscillating along a 3D wave path"
+    }
+  ]
+}

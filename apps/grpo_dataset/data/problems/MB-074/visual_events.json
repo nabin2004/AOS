@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-074",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Sequential creation of position, velocity, and acceleration labels with curved d/dt arrows on the right.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "funcs",
+        "labels",
+        "arrows",
+        "path_arc",
+        "ddt"
+      ],
+      "clip_query": "A column of derivative terms x(t), x'(t), and x''(t) appearing one by one with curved arrows labeled d/dt."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Assembly of the physical equation m x''(t) = -k x(t) - mu x'(t) with descriptive braces for Force, Spring force, and Damping.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "equation1",
+        "braces",
+        "ma_brace",
+        "kx_brace",
+        "mu_v_brace"
+      ],
+      "clip_query": "The equation m x''(t) = -k x(t) - mu x'(t) appearing with braces underneath labeling Force, Spring force, and Damping."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Rearrangement of the equation to standard form m x''(t) + mu x'(t) + k x(t) = 0.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        25.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "equation2",
+        "TransformMatchingTex",
+        "path_arc"
+      ],
+      "clip_query": "The terms of the differential equation rearranging smoothly into standard homogeneous form equal to zero."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Introduction of the exponential hypothesis x(t) = e^{st}.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        35.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "hypothesis",
+        "hyp_word",
+        "hyp_tex"
+      ],
+      "clip_query": "The text 'Hypothesis: x(t) = e^{st}' appearing on screen."
+    }
+  ]
+}

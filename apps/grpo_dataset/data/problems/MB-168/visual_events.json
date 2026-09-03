@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-168",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render a 3D helical spring connected to a spherical atom at rest.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "Spring",
+        "ParametricCurve",
+        "HarmonicOscillator"
+      ],
+      "clip_query": "A 3D helical spring attached to a blue sphere in a dark environment"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Initiate free damped harmonic oscillation of the sphere when released from a displacement.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "update_position",
+        "velocity",
+        "damping"
+      ],
+      "clip_query": "A sphere oscillating back and forth on a spring, with the motion gradually decaying"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Apply an external sinusoidal driving force, causing the sphere to jiggle with a steady-state driven frequency.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "external_forces",
+        "add_external_force",
+        "math.sin"
+      ],
+      "clip_query": "A sphere on a spring jiggling continuously under a driving force"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Rotate the 3D camera to showcase the spatial structure of the spring-mass system.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "camera",
+        "frame",
+        "increment_theta"
+      ],
+      "clip_query": "3D camera rotating around an oscillating spring-mass system"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "id": "MB-086",
+  "title": "Real Extension of a Function on a Limited Domain",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Analysis"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class that visualizes the concept of extending a real-valued function beyond a limited domain. First, set up a coordinate system (Axes) spanning x from -1 to 10 and y from -1 to 5. Define a smooth function f(x) combining exponential decay, a cubic polynomial, and a cosine wave. Draw only a partial graph of this function over a limited domain (x from 2 to 6) in blue, and label it 'f(x)'. Highlight the limited domain on the x-axis with a blue line and the text 'Limited Domain'. Next, show that this function can be extended to the left and right. Implement a custom extension generator that smoothly connects the boundary points of the limited graph to randomly nudged points outside the domain, using clipping planes to ensure the extensions do not overlap the original domain. Animate these extensions morphing through several random configurations to emphasize that the extension is not unique. After restoring the extension to its default state, show a tangent line sliding along the original limited domain graph using a ValueTracker to represent the derivative. Finally, replace the extensions with a full graph and a modified graph that wiggles dynamically (using a wiggle rate function) to represent 'wiggly spaghetti' extensions, demonstrating how easily a real function can be smoothly extended in infinitely many ways.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-086/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "RealExtension"
+    ],
+    "visual_techniques": [
+      "Dynamic Graph Extension",
+      "Tangent Line Tracking",
+      "Wiggle Animation",
+      "Clipping Planes"
+    ],
+    "manim_api_patterns": [
+      "Axes",
+      "get_graph",
+      "always_redraw",
+      "ValueTracker",
+      "set_clip_plane",
+      "wiggle",
+      "become"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE Create instead of ManimGL ShowCreation",
+      "severity": "high",
+      "note": "The script is written in ManimGL where ShowCreation is the standard creation animator."
+    },
+    {
+      "pattern": "Missing custom get_extension helper method",
+      "severity": "high",
+      "note": "The scene relies on a custom helper method to generate smooth extensions with random nudges and clipping planes."
+    },
+    {
+      "pattern": "Incorrect clipping plane syntax",
+      "severity": "medium",
+      "note": "set_clip_plane is a ManimGL-specific method; attempting to translate this directly to ManimCE will fail without custom masking."
+    }
+  ]
+}

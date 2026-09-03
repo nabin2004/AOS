@@ -1,0 +1,78 @@
+{
+  "id": "MB-177",
+  "title": "Borwein Integrals - Visualizing the Sinc Function and its Integral",
+  "youtube_video_id": "gB9n2gHsHN4",
+  "video_timestamp_range": [
+    0.0,
+    180.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Fourier Analysis"
+  ],
+  "full_prompt": "Write a Manim script that visualizes the sinc function, its properties, and its integral. The visualization should include the following steps:\n1. **Axes Setup**: Create a coordinate system (axes) without default labels. Plot the sinc function graph (defined as sin(x)/x) in blue. Animate the graph drawing outwards from the center (splitting into left and right halves) using a smooth creation animation.\n2. **Sinc Envelope & Sine Wave**: Display the label 'sin(x)/x' and introduce the term 'sinc(x)' with an arrow pointing to it. Show a teal sine wave and a yellow 1/x envelope graph. Transform the sine wave into the sinc function to visually demonstrate how the 1/x envelope dampens the sine wave.\n3. **Limit at Zero**: Highlight the removable singularity at x=0. Place a hollow dot (hole) at (0,1) and display the equation 'sin(0)/0 = ???'. Transition this equation to the limit 'lim_{x -> 0} sin(x)/x = 1'. Animate two glowing dots starting from the sides and moving along the graph towards the hole at x=0 using a ValueTracker.\n4. **Area Under the Curve**: Clean up the limit annotations, restore the sinc graph's full opacity, and shade the area under the curve. Display the integral equation showing that the total area under sinc(x) from negative to positive infinity equals pi.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-177/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 150,
+    "scene_classes": [
+      "ShowIntegrals"
+    ],
+    "visual_techniques": [
+      "Graph plotting",
+      "Custom VMobject creation",
+      "ValueTracker animation",
+      "Area under curve shading",
+      "Mathematical typesetting"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "get_axes",
+      "get_graph",
+      "ShowCreation",
+      "OldTex",
+      "GlowDot",
+      "ValueTracker",
+      "get_area"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Use of InteractiveScene or ManimGL-specific classes in Community Edition",
+      "severity": "high",
+      "note": "InteractiveScene must be replaced with standard Scene, and custom GL methods like get_axes must be adapted to standard Axes."
+    },
+    {
+      "pattern": "OldTex usage in standard Manim",
+      "severity": "medium",
+      "note": "OldTex is specific to ManimGL/3b1b-version and should be replaced with Tex or MathTex in Manim Community."
+    },
+    {
+      "pattern": "GlowDot missing in standard Manim",
+      "severity": "medium",
+      "note": "GlowDot is a custom 3b1b/ManimGL class. Use Dot with a custom halo or standard Dot with a larger semi-transparent background dot."
+    },
+    {
+      "pattern": "ShowCreation vs Create",
+      "severity": "medium",
+      "note": "ShowCreation is used in ManimGL; standard Manim CE uses Create."
+    }
+  ]
+}

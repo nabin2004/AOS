@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-166",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Introduction of the two counter-rotating circular vectors (clockwise and counter-clockwise) with circular dashed traces.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "Vector",
+        "rotate",
+        "dashed",
+        "Circle"
+      ],
+      "clip_query": "Two counter-rotating vectors tracing circular paths"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Addition of the two vectors head-to-tail to demonstrate vector addition.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "shift",
+        "get_end",
+        "always_redraw",
+        "Vector"
+      ],
+      "clip_query": "Vectors added head-to-tail showing vector addition"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Display of the resulting sum vector oscillating purely along a single linear axis.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "sum",
+        "oscillate",
+        "linear",
+        "TracedPath"
+      ],
+      "clip_query": "Resultant vector oscillating along a straight line"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Addition of text labels and mathematical expressions showing the cancellation of the perpendicular components.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        35.0,
+        50.0
+      ],
+      "keyword_bank": [
+        "Tex",
+        "Write",
+        "label",
+        "superposition"
+      ],
+      "clip_query": "Labels indicating left-handed, right-handed, and linear polarization"
+    }
+  ]
+}

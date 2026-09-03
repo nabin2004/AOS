@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-063",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "DecimalMatrix and BitString labels (00, 01, 10, 11) are initialized and displayed on the left side of the screen.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "DecimalMatrix",
+        "BitString",
+        "indices"
+      ],
+      "clip_query": "A decimal matrix representing a 4D vector with binary labels 00, 01, 10, 11 on its left."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Four parallel horizontal real number lines fade in on the right side of the screen, labeled with R.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "NumberLine",
+        "number_lines",
+        "R_labels"
+      ],
+      "clip_query": "Four horizontal real number lines stacked vertically with real number labels."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dots representing the vector components transform from the matrix elements onto the corresponding number lines.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "FadeTransform",
+        "dots",
+        "dec_vect"
+      ],
+      "clip_query": "Dots appearing on the number lines, transitioning from the matrix elements."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Complex planes are prepared and positioned, and dynamic connecting lines are drawn from the matrix elements to the dots.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "dot_lines",
+        "update_dot_lines"
+      ],
+      "clip_query": "Connecting lines linking the matrix elements to the dots on the coordinate systems."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "MB-126",
+  "title": "Michael Jackson Semantic Embedding Space Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Linear Algebra",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a 3D Manim scene named `MJSpace` that visualizes a semantic embedding space centered around concepts related to Michael Jackson. The scene must include the following elements:\n1. A 3D coordinate system using `ThreeDAxes` with custom ranges (e.g., x, y, z from -5 to 5) and subtle grid lines.\n2. Multiple text labels representing tokens/words (such as 'Michael Jackson', 'pop', 'music', 'dance', 'singer', 'moonwalk', 'thriller', 'star') positioned at distinct, pre-defined 3D coordinates to simulate semantic clustering.\n3. A custom directional flow effect using a large number of short, glowing lines (e.g., 500 lines) aligned with a specific semantic direction vector (e.g., `[1, 1, 0]`). These lines should be randomly distributed across the space, with stroke widths that taper off at the ends to look like glowing streaks.\n4. An active camera rotation animation that orbits around the z-axis (changing theta and phi) to showcase the depth and 3D spatial relationships of the word embeddings and the directional flow.\n5. Smooth transitions where labels fade in, and the directional lines animate or drift along their vector direction.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-126/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "MJSpace"
+    ],
+    "visual_techniques": [
+      "3D Vector Space Projection",
+      "Directional Flow Fields",
+      "3D Camera Orbiting",
+      "Text Labeling in 3D Space"
+    ],
+    "manim_api_patterns": [
+      "ThreeDAxes",
+      "self.camera.frame",
+      "Line.insert_n_curves",
+      "VGroup",
+      "random.uniform"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Camera rotation syntax mismatch between ManimGL (self.camera.frame) and ManimCE (self.set_camera_orientation)",
+      "severity": "high",
+      "note": "Ensure the camera controls match the targeted Manim version; ManimGL uses self.camera.frame.animate.increment_theta while ManimCE uses self.begin_ambient_camera_rotation."
+    },
+    {
+      "pattern": "Text rendering issues in 3D space where labels do not face the camera",
+      "severity": "medium",
+      "note": "Use self.camera.frame.add_updater to keep text labels oriented towards the camera, or use fixed-orientation 3D text."
+    }
+  ]
+}

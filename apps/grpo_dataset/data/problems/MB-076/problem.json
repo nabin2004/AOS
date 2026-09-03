@@ -1,0 +1,71 @@
+{
+  "id": "MB-076",
+  "title": "General Linear ODE and Characteristic Polynomial Derivation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Differential Equations"
+  ],
+  "full_prompt": "Write a Manim scene named `GeneralLinearEquation` (using ManimGL/InteractiveScene conventions) that visualizes the derivation of the characteristic polynomial from a general linear ordinary differential equation (ODE).\n\n1. **Setup Equations**:\n   - Define a general linear ODE: $a_n x^{(n)}(t) + \\dots + a_2 x''(t) + a_1 x'(t) + a_0 x(t) = 0$.\n   - Apply a color gradient (from BLUE to TEAL) to the derivative terms ($x^{(n)}(t)$, $x''(t)$, etc.).\n   - Define the substituted version where $x(t) = e^{st}$ is plugged in: $a_n (s^n e^{st}) + \\dots + a_0 e^{st} = 0$, coloring the $s$ terms YELLOW.\n   - Define the factored version: $e^{st} (a_n s^n + \\dots + a_0) = 0$.\n\n2. **Animate Equation Introduction**:\n   - Position the ODE at the top. Split it into a right part (starting from the $a_2$ term) and a left part.\n   - Fade in the right part centered, then restore it to its correct position while writing the left part.\n\n3. **Highlight Components**:\n   - Sequentially highlight the derivative terms ($x(t)$ variants) using yellow surrounding rectangles.\n   - Transform these highlights to surround the coefficients ($a_i$).\n   - Transform the highlights to surround the entire left-hand side, then the right-hand side ($= 0$), and finally fade them out.\n\n4. **Ansatz Substitution and Factoring**:\n   - Perform a `FadeTransform` from the terms of the original ODE to the substituted exponential version using a key map.\n   - Transform the substituted equation into the factored equation using `TransformMatchingTex` with a curved path (`path_arc = 45 * DEG`).\n   - Highlight the resulting characteristic polynomial with a surrounding rectangle while fading out the $e^{st}$ term and its parentheses.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-076/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "GeneralLinearEquation"
+    ],
+    "visual_techniques": [
+      "Color gradient interpolation on Tex submobjects",
+      "SurroundingRectangle sequential transformations",
+      "FadeTransform with explicit key mapping",
+      "TransformMatchingTex with path_arc"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "color_gradient",
+      "SurroundingRectangle",
+      "FadeTransform",
+      "TransformMatchingTex",
+      "LaggedStartMap",
+      "ShowCreation"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE's Create instead of ManimGL's ShowCreation",
+      "severity": "high",
+      "note": "The reference code relies on ShowCreation. Mixing GL and CE rendering APIs will cause execution failure."
+    },
+    {
+      "pattern": "Incorrect Tex indexing for slicing and highlighting",
+      "severity": "high",
+      "note": "The code relies on exact string keys and index slicing of Tex objects (e.g., ode[x_tex]). Any modification to the LaTeX strings will break the indexing."
+    },
+    {
+      "pattern": "Missing InteractiveScene import or base class",
+      "severity": "medium",
+      "note": "Must inherit from InteractiveScene if using 3b1b's custom ManimGL framework."
+    }
+  ]
+}

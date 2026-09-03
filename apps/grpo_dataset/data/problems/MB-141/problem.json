@@ -1,0 +1,63 @@
+{
+  "id": "MB-141",
+  "title": "Moser's Circle Problem: Counting Intersections and Pairs",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Combinatorics",
+    "Geometry"
+  ],
+  "full_prompt": "Write a Manim scene named `CountIntersections` (or `ExplainNChoose2`) that visualizes the combinations of points on a circle. The scene should draw a circle with 7 points, draw chords between them, and sequentially highlight each pair of points and their connecting chord while displaying the corresponding coordinate pairs (e.g., (1, 2), (1, 3)...) in a grid on the right. After showing all pairs, it should display the formula '{n \\choose 2}' with the label 'n choose 2', animate the count updating to 21, and show the algebraic calculation '= {7 \\cdot (7 - 1) \\over 2}'. Make sure to handle the layout gracefully so that the text labels do not overlap with the circle diagram.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-141/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "ExplainNChoose2"
+    ],
+    "visual_techniques": [
+      "Sequential highlighting",
+      "Dynamic decimal updating",
+      "Grid layout of text labels",
+      "Mathematical formula rendering"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "get_circle_diagram",
+      "make_number_changeable",
+      "ChangeDecimalToValue",
+      "ShowIncreasingSubsets"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing helper method get_circle_diagram",
+      "severity": "high",
+      "note": "The reference code relies on get_circle_diagram which is defined later in the file. Implementers must provide a robust circle and chord generator."
+    },
+    {
+      "pattern": "ManimGL-specific make_number_changeable API usage in ManimCE",
+      "severity": "high",
+      "note": "Using make_number_changeable or ChangeDecimalToValue directly in ManimCE will crash. Use DecimalNumber and ValueTracker instead."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-145",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Coulomb force equation",
+        "Lorentz force equation with retarded time/delay",
+        "Acceleration vector normalization with tanh"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Expanding influence rings with stroke width decay",
+        "Charged particle with sign (+/-)",
+        "Dynamic vector pinned to particle"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "History tracking of particle positions and accelerations",
+        "Adjusted norms to prevent singularity at origin"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom ChargedParticle class inheriting from Group",
+        "Custom AccelerationVector class inheriting from Vector",
+        "Updaters for dynamic ring expansion and vector pinning"
+      ]
+    }
+  }
+}

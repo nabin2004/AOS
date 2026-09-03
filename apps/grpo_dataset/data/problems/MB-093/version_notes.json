@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-093",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "MovingCameraScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Manipulation",
+      "gl_construct": "self.frame.animate.match_x(...).set_height(...)",
+      "ce_equivalent": "self.play(self.camera.frame.animate.move_to(...).set(width=...))",
+      "severity": "high"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "GlowDots",
+      "ce_equivalent": "VGroup of standard Dots with varying opacities to simulate glow",
+      "severity": "medium"
+    },
+    {
+      "category": "Text",
+      "gl_construct": "TexText",
+      "ce_equivalent": "Tex",
+      "severity": "medium"
+    }
+  ]
+}

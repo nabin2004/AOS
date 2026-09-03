@@ -1,0 +1,62 @@
+{
+  "id": "MB-187",
+  "title": "Subsets Divisible by 5 - Answer Guessing",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Combinatorics",
+    "Number Theory"
+  ],
+  "full_prompt": "Create a Manim scene named `AnswerGuess` using ManimGL. The scene should present a combinatorics puzzle: 'Find the number of subsets of {1, 2, 3, 4, 5, ..., 2,000}, the sum of whose elements is divisible by 5'. First, display the question title at the top of the screen. The set {1, 2, 3, ..., 2000} should be formatted nicely with custom brackets and commas, colored in blue. Next, display the total number of subsets, which is 2^{2,000}, positioned below the title. Implement helper functions: `get_question_title()` to format the question text and replace the static set text with a dynamically generated set representation; `get_set_tex(values)` to generate a formatted set representation with curly braces, integers, commas, and ellipses for large sets; `set_tex_transform(set_1, set_2)` to animate the transformation from one set representation to another, matching identical elements and fading in new ones; and `massive_int(num)` to format a massive integer (like 2^{2000} expanded) into a grid of digits with commas. In the `construct` method of `AnswerGuess` (which inherits from `InteractiveScene`), display the title, show the total number of subsets, and then transition to showing a massive integer representation of 2^{2000} or a similar large number to emphasize the scale of the problem.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-187/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "AnswerGuess"
+    ],
+    "visual_techniques": [
+      "Custom Set Formatting",
+      "Grid-based Digit Layout",
+      "Dynamic Set Transformations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "OldTexText",
+      "Integer",
+      "arrange_in_grid",
+      "TransformFromCopy"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing helper functions like get_set_tex or massive_int",
+      "severity": "high",
+      "note": "The scene relies heavily on custom formatting helpers defined outside the class."
+    },
+    {
+      "pattern": "Incorrect grid layout for massive_int",
+      "severity": "medium",
+      "note": "Using standard arrange instead of arrange_in_grid can cause layout overflow."
+    }
+  ]
+}

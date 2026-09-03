@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-173",
+  "conflicts": [
+    {
+      "category": "mobject_compatibility",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot3D or Sphere",
+      "severity": "high"
+    },
+    {
+      "category": "camera_control",
+      "gl_construct": "self.camera.frame",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_methods",
+      "gl_construct": "make_3d()",
+      "ce_equivalent": "None (3D rendering is automatic or handled via 3D classes)",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-132",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "An undulating bubble representing N-dimensional space appears with a label, followed by concept vectors fading in and out.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "undulating_bubble",
+        "N-dimensional",
+        "Latin",
+        "Microphone",
+        "Basketball",
+        "The 1920s"
+      ],
+      "clip_query": "An undulating bubble representing N-dimensional space with concept vectors fading in and out"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The first task text 'Choose multiple vectors, each pair 90 degrees apart' is displayed at the top of the screen.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        7.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "90^\\circ apart",
+        "task1"
+      ],
+      "clip_query": "Text displaying 'Choose multiple vectors, each pair 90 degrees apart'"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Three mutually orthogonal 3D vectors grow from the center of the bubble, accompanied by right-angle elbow indicators.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "perp_vectors",
+        "elbows",
+        "GrowArrow",
+        "ShowCreation"
+      ],
+      "clip_query": "Three mutually orthogonal 3D vectors growing with right-angle indicators"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The second task and its exponential maximum formula are introduced, contrasting with the linear N limit.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "maximum2",
+        "\\approx \\exp(\\epsilon \\cdot N)",
+        "task2"
+      ],
+      "clip_query": "Text showing the exponential maximum formula for almost-orthogonal vectors"
+    }
+  ]
+}

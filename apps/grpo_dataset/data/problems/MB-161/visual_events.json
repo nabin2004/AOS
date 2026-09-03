@@ -1,0 +1,57 @@
+{
+  "problem_id": "MB-161",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Charged particle is initialized and begins moving in a circular orbit in the XY plane.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ChargedParticle",
+        "circular",
+        "orbit",
+        "XY"
+      ],
+      "clip_query": "A charged particle rotating in a circular path in 3D space"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Electric field vectors along the propagation axis begin to update, showing delayed propagation of the field.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "lorentz_force",
+        "delay",
+        "past_acceleration",
+        "VectorField"
+      ],
+      "clip_query": "Electric field vectors propagating along an axis with a time delay"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The camera rotates in 3D to reveal the helical, circularly polarized wave structure of the electric field.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "camera",
+        "frame",
+        "phi",
+        "theta",
+        "rotation"
+      ],
+      "clip_query": "3D camera rotating around a helical wave of vectors representing circular polarization"
+    }
+  ]
+}

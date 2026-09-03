@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-171",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "An oscillating wave is initialized and propagates smoothly along the horizontal axis.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "OscillatingWave",
+        "add_updater",
+        "update_points"
+      ],
+      "clip_query": "A continuous wave oscillating and propagating along an axis"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Vertical boundary lines are introduced, slicing the wave into distinct spatial regions.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "layer_xs",
+        "Line",
+        "layers"
+      ],
+      "clip_query": "Vertical boundary lines slicing a propagating wave"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A phase shift (phase kick back) is applied at the boundaries, causing a visible shift in the wave's phase as it crosses each line.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "phase_kick_trackers",
+        "phase_kick_back",
+        "ValueTracker"
+      ],
+      "clip_query": "A wave experiencing a phase shift at vertical boundaries"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Amplitude damping is applied at the boundaries, causing the wave's amplitude to decrease step-wise after each boundary.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        20.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "absorbtion_trackers",
+        "damping_per_layer",
+        "amplitudes"
+      ],
+      "clip_query": "A wave decreasing in amplitude as it passes through vertical boundaries"
+    }
+  ]
+}

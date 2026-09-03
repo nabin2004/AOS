@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-060",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "2D Square and Side Construction: A square is drawn, and a red GlowDot traces the bottom and right sides, leaving behind red lines and '1' labels.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "Square",
+        "GlowDot",
+        "side_lines",
+        "ones",
+        "ShowCreation"
+      ],
+      "clip_query": "A red dot traces the sides of a white square on a grid, labeling them with the number 1."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "2D Diagonal and Square Root Labeling: A pink diagonal line is drawn across the square, and the label transforms from \\sqrt{1^2 + 1^2} to \\sqrt{2}.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "diag",
+        "sqrts",
+        "TransformMatchingTex"
+      ],
+      "clip_query": "A pink diagonal line appears across the square with a square root label transforming into the square root of 2."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "3D Cube Transition and Camera Reorientation: The camera smoothly rotates into a 3D perspective, revealing a 3D cube and adding ambient rotation.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "VCube",
+        "frame.animate.reorient",
+        "frame.add_ambient_rotation"
+      ],
+      "clip_query": "The camera rotates into a 3D view showing a wireframe cube rotating slowly."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "3D Diagonal and Final Labeling: A yellow diagonal line is drawn from the origin to the opposite corner of the cube, labeled with the 3D Pythagorean formula.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "diag3",
+        "new_sqrts",
+        "ShowCreation"
+      ],
+      "clip_query": "A yellow diagonal line spans across the 3D cube with a label showing the square root of the square root of 2 squared plus 1 squared."
+    }
+  ]
+}

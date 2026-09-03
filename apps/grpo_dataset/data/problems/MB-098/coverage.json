@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-098",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Wave equation",
+        "Phase difference",
+        "Constructive and destructive interference formulas",
+        "Path length difference"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "Custom shader-based wave rendering",
+        "Concentric wave propagation animation",
+        "Color mapping of wave intensity",
+        "Double slit barrier representation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Frequency values",
+        "Wave number values",
+        "Decay factor values",
+        "Slit separation distance"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom LightWaveSlice class inheriting from Mobject",
+        "ModernGL TRIANGLE_STRIP primitive setup",
+        "Dynamic uniform synchronization",
+        "Time-based updater functions"
+      ]
+    }
+  }
+}

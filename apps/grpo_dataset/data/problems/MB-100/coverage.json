@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-100",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "wave interference equations",
+        "diffraction patterns",
+        "zone plate geometry",
+        "phase accumulation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "custom shader rendering",
+        "DotCloud visualization",
+        "LightWaveSlice wave propagation",
+        "intensity mapping"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "frequency values",
+        "wave number values",
+        "decay factor scaling",
+        "time rate updates"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "custom Mobject subclassing",
+        "moderngl integration",
+        "always updater pattern",
+        "uniform synchronization"
+      ]
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "problem_id": "MB-072",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display the integral expression and the axes with the initial graph of e^{-st} for s=1.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "integral",
+        "axes",
+        "graph",
+        "exp_func"
+      ],
+      "clip_query": "An integral expression at the top and an exponential decay curve plotted on axes."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Introduce the slider for s and animate s changing to 5, 0.25, and 1, showing the graph dynamically updating.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "s_slider",
+        "s_tracker",
+        "animate.set_value"
+      ],
+      "clip_query": "A slider at the top left controlling the steepness of the exponential decay curve."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Show the area under the graph with a shaded region, an arrow, and the label 'Area'.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "area_word",
+        "get_area_under_graph",
+        "arrow"
+      ],
+      "clip_query": "A shaded area under the exponential curve with an arrow pointing to it labeled Area."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate s to a negative value (-0.2) and reorient the camera frame to show the diverging area.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        25.0,
+        32.0
+      ],
+      "keyword_bank": [
+        "frame.animate.reorient",
+        "s_tracker.animate.set_value"
+      ],
+      "clip_query": "The camera pans and zooms out as the exponential curve diverges upwards for a negative s value."
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Show the analytical evaluation of the integral for s=1, resulting in area = 1.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        32.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "simple_integral",
+        "anti_deriv",
+        "equals_one"
+      ],
+      "clip_query": "Mathematical equations showing the step-by-step integration of e^{-t} resulting in 1."
+    }
+  ]
+}

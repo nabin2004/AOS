@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-155",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Lorentz force calculation",
+        "Retarded time delay calculation",
+        "Perpendicular acceleration component",
+        "Adjusted distance norms to prevent division by zero"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "ChargedParticle with a visual sign (+ or -)",
+        "Dynamic vector field updating in real-time",
+        "Smooth particle motion/trajectory",
+        "Color-coded vectors based on field strength"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Euler integration steps per frame",
+        "History size tracking for position and acceleration",
+        "Speed of light constant c",
+        "Epsilon0 permittivity constant"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "ChargedParticle class inheriting from Group",
+        "Custom update/increment_clock mechanism",
+        "Vector field updating using custom functions",
+        "Proper handling of past position/acceleration history"
+      ]
+    }
+  }
+}

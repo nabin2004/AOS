@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-069",
+  "requirements": {
+    "Math": {
+      "weight": 0.15,
+      "expected": [
+        "Intersection of shapes",
+        "Random distribution of points inside a circle",
+        "Rotation and scaling transformations"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "Overlapping colored blobs",
+        "DotCloud representing training data",
+        "Text labels with backstrokes",
+        "Arrow pointing to the intersection"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Random scaling factors",
+        "Random rotation angles",
+        "Point from proportion calculations (pfp)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene structure",
+        "LaggedStart and LaggedStartMap animations",
+        "Animate transitions for scaling and moving text"
+      ]
+    }
+  }
+}

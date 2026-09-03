@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-096",
+  "conflicts": [
+    {
+      "category": "shader_architecture",
+      "gl_construct": "LightWaveSlice(Mobject) with shader_folder",
+      "ce_equivalent": "ManimCE does not support direct custom shader folders on standard Mobjects easily without overriding OpenGLVMobject and writing custom shader wrappers.",
+      "severity": "high"
+    },
+    {
+      "category": "moderngl_integration",
+      "gl_construct": "moderngl.TRIANGLE_STRIP",
+      "ce_equivalent": "ManimCE uses cairo by default, and its moderngl integration is structured differently under the opengl renderer.",
+      "severity": "high"
+    },
+    {
+      "category": "updater_syntax",
+      "gl_construct": "self.always.sync_points()",
+      "ce_equivalent": "self.add_updater(lambda m: m.sync_points())",
+      "severity": "medium"
+    }
+  ]
+}

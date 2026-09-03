@@ -1,0 +1,71 @@
+{
+  "id": "MB-091",
+  "title": "Sieve of Eratosthenes with Modular Reduction Grid",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Number Theory",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL/InteractiveScene that visualizes the Sieve of Eratosthenes and modular reduction using a grid layout. \n\n1. **Title Setup**: Create a text label \"Primes: \" at the top-left of the screen.\n2. **Grid Setup**: Create a grid of 20 rows and 12 columns of squares (totaling 240 squares) spanning the width of the screen. Label each square with its corresponding integer from 1 to 240.\n3. **Initial Sift**: \n   - Identify prime and non-prime labels using a prime-checking utility (like sympy.isprime).\n   - Animate non-prime labels fading to a low opacity (0.25) over 5 seconds.\n   - Copy the prime labels and animate them transforming into a horizontal list next to the \"Primes: \" title.\n   - Restore the grid labels to full opacity and fade out the temporary prime list.\n4. **Modular Reduction Setup**: Add a label \"Reduce all mod\" below the prime list and above the grid.\n5. **Modular Reduction Animation**: For the first few primes (e.g., 2, 3, 5, etc.), perform a loop where:\n   - The prime is highlighted with a SurroundingRectangle.\n   - The prime is copied to the top list.\n   - The grid rows are split and animated to separate vertically (increasing the vertical buffer between rows) to visually align numbers into modular columns.\n\nEnsure smooth transitions, precise target-based animations for the grid rows, and clear color coding.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-091/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "SieveWithMod"
+    ],
+    "visual_techniques": [
+      "Grid layout manipulation",
+      "Target-based animation",
+      "Opacity-based sifting",
+      "Highlighting with SurroundingRectangle"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Integer",
+      "Square.get_grid",
+      "VGroup",
+      "TransformFromCopy",
+      "ShowCreation",
+      "generate_target"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect grid indexing or row slicing when rearranging rows",
+      "severity": "high",
+      "note": "Slicing the grid into rows of size 12 must be done carefully to avoid IndexErrors or misaligned sub-VGroups."
+    },
+    {
+      "pattern": "ManimCE vs ManimGL API mismatch for ShowCreation",
+      "severity": "medium",
+      "note": "ShowCreation is used in ManimGL; if running in ManimCE, Create must be used instead."
+    },
+    {
+      "pattern": "InteractiveScene base class missing in standard ManimCE",
+      "severity": "high",
+      "note": "InteractiveScene is exclusive to ManimGL. For ManimCE, the base class must be Scene."
+    }
+  ]
+}

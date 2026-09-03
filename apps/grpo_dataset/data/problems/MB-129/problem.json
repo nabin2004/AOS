@@ -1,0 +1,65 @@
+{
+  "id": "MB-129",
+  "title": "Introduce Value Matrix in Self-Attention",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a complete ManimGL scene named `IntroduceValueMatrix` that visualizes the introduction of the Value Matrix ($W_V$) in the self-attention mechanism of Transformers. The scene should show a word/token embedding vector (representing a word like 'kitty') being multiplied by a weight matrix $W_V$ to produce a new 'Value' vector (representing the message or value of that token). Use a custom matrix-vector multiplication animation where rows of the matrix and elements of the vector are highlighted sequentially using surrounding rectangles, and the resulting vector's elements are computed and updated dynamically. Color-code the matrix entries based on their values (using a blue-to-red or similar gradient for positive/negative values). Ensure smooth transitions, clear text labels for the matrix, input vector, and output value vector, and clean layout positioning.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-129/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 320,
+    "scene_classes": [
+      "IntroduceValueMatrix"
+    ],
+    "visual_techniques": [
+      "Matrix-vector multiplication animation",
+      "Surrounding rectangles highlighting rows and columns",
+      "Value-to-color mapping for matrix entries",
+      "Token/word representation with colored background rectangles"
+    ],
+    "manim_api_patterns": [
+      "NumericEmbedding",
+      "ShowIncreasingSubsets",
+      "UpdateFromAlphaFunc",
+      "SurroundingRectangle",
+      "VGroup",
+      "FadeIn",
+      "FadeOut"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom classes like NumericEmbedding or custom matrix helpers",
+      "severity": "high",
+      "note": "The reference code relies heavily on custom 3b1b classes like NumericEmbedding. If porting to standard Manim, these must be simulated using standard DecimalNumbers and Mobject matrices."
+    },
+    {
+      "pattern": "Camera/Frame fixing issues",
+      "severity": "medium",
+      "note": "Using fix_in_frame() or is_fixed_in_frame in standard ManimCE will cause errors unless using a 3D scene or omitting them."
+    }
+  ]
+}

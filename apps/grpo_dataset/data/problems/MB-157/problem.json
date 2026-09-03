@@ -1,0 +1,65 @@
+{
+  "id": "MB-157",
+  "title": "Twisting Light Beam in a Sugar Cylinder",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes a twisting light beam propagating through a sugar solution cylinder. \n\n1. **Coordinate System & Setup**:\n   - Implement a helper function `get_axes_and_plane` that creates a 3D coordinate system using `ThreeDAxes` and a horizontal `NumberPlane`. The axes should span $x \\in [0, 24]$, $y \\in [-1, 1]$, and $z \\in [-1, 1]$.\n   - Position the axes so that they are shifted relative to an origin point (e.g., `5 * LEFT`).\n\n2. **Sugar Cylinder**:\n   - Create a custom `SugarCylinder` class inheriting from `Cylinder`. It should represent a medium (like sugar water) that causes optical rotation.\n   - The cylinder should be aligned along the x-axis, starting from the origin of the axes, with a customizable radius and semi-transparent opacity (e.g., 0.2) to allow the wave inside to be visible.\n   - Use `always_sort_to_camera` to ensure correct 3D rendering order.\n\n3. **Oscillating Wave**:\n   - Create a custom `OscillatingWave` class inheriting from `VMobject` that dynamically updates its points over time using an updater (`add_updater`).\n   - The wave should propagate along the x-axis. Its shape is defined by y and z amplitudes, phases, wavelength, and a `twist_rate` (rotations per unit distance).\n   - In the update loop, calculate the wave's coordinates: first compute the standard linear polarization components $y_{out}$ and $z_{out}$ using sine functions of $(x, t)$, then apply a 2D rotation matrix in the $y-z$ plane by an angle $\\theta = x \\cdot \\text{twist\\_rate} \\cdot 2\\pi$ to simulate optical activity (polarization twisting).\n   - Use `set_points_as_corners` to construct the continuous wave path.\n\n4. **Animation Scene**:\n   - Define a scene class `TwistingLightBeam` (inheriting from `ThreeDScene` or standard `Scene` if using ManimGL's interactive camera).\n   - Set up the camera angle to view the 3D setup clearly (e.g., phi=70 degrees, theta=-50 degrees).\n   - Add the axes, plane, and the sugar cylinder to the scene.\n   - Instantiate and add the `OscillatingWave` with a non-zero twist rate inside the cylinder region to show the polarization plane twisting as it travels through the medium.\n   - Let the animation run for several seconds to show the continuous propagation of the wave.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-157/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 145,
+    "scene_classes": [
+      "TwistingLightBeam"
+    ],
+    "visual_techniques": [
+      "3D Coordinate System Setup",
+      "Dynamic VMobject Updaters",
+      "Custom 3D Cylinder Subclassing",
+      "Optical Rotation Wave Simulation"
+    ],
+    "manim_api_patterns": [
+      "ThreeDAxes",
+      "Cylinder",
+      "VMobject",
+      "add_updater",
+      "set_points_as_corners",
+      "always_sort_to_camera",
+      "set_flat_stroke"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE syntax for 3D camera orientation or cylinder creation which lacks ManimGL-specific methods like always_sort_to_camera",
+      "severity": "high",
+      "note": "The reference code relies on ManimGL's interactive camera and specific Cylinder/VMobject attributes like set_flat_stroke."
+    },
+    {
+      "pattern": "Incorrect math in the 2D rotation of the wave's polarization plane",
+      "severity": "medium",
+      "note": "The twist angle must be calculated as a function of x (position along the cylinder) to correctly visualize optical rotation."
+    }
+  ]
+}

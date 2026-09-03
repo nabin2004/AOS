@@ -1,0 +1,73 @@
+{
+  "id": "MB-074",
+  "title": "Solving the Damped Spring Equation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Physics"
+  ],
+  "full_prompt": "Write a Manim script using the ManimGL/InteractiveScene framework that visualizes the setup and formulation of the damped spring differential equation. \n\n1. **Derivatives Setup**:\n   - Display three stacked mathematical terms on the right side of the screen: $x(t)$ (Position), $x'(t)$ (Velocity), and $x''(t)$ (Acceleration).\n   - Color-code these terms using a smooth gradient from Teal to Red (e.g., using HSL interpolation).\n   - Draw curved arrows pointing downwards from $x(t)$ to $x'(t)$, and from $x'(t)$ to $x''(t)$, labeled with the derivative operator $\\frac{d}{dt}$.\n   - Animate the sequential appearance of these terms and their connecting arrows.\n\n2. **Equation Formulation (F=ma)**:\n   - Write out the physical equation: $m x''(t) = -k x(t) - \\mu x'(t)$ at the top left.\n   - Use braces underneath the terms to label them: \"F\" (under $m x''(t)$), \"Spring force\" (under $-k x(t)$), and \"Damping\" (under $-\\mu x'(t)$).\n   - Animate the terms of this equation flying in from their corresponding derivative terms on the right, accompanied by the appearance and transition of the braces.\n\n3. **Rearrangement**:\n   - Smoothly transform the equation into its standard homogeneous form: $m x''(t) + \\mu x'(t) + k x(t) = 0$ using a matching Tex transformation with a curved path arc.\n\n4. **Hypothesis Introduction**:\n   - Introduce the hypothesis text \"Hypothesis: \" followed by $x(t) = e^{st}$ to prepare for solving the differential equation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-074/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 110,
+    "scene_classes": [
+      "SolveDampedSpringEquation"
+    ],
+    "visual_techniques": [
+      "TransformMatchingTex",
+      "LaggedStart",
+      "FadeTransformPieces",
+      "Brace labeling",
+      "Color interpolation by HSL"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "Text",
+      "VGroup",
+      "Line",
+      "path_arc",
+      "GrowFromPoint",
+      "TransformFromCopy",
+      "FadeTransform"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Tex slicing errors when accessing specific terms like equation1['{m} x''(t)']",
+      "severity": "high",
+      "note": "ManimCE and ManimGL handle Tex string splitting differently. Slicing by exact substring requires precise Tex grouping."
+    },
+    {
+      "pattern": "Missing custom color helper function 'interpolate_color_by_hsl'",
+      "severity": "medium",
+      "note": "Ensure the HSL interpolation helper is fully defined or replaced with standard Manim color interpolation."
+    },
+    {
+      "pattern": "Overlapping layout of equations and braces",
+      "severity": "medium",
+      "note": "Braces must be carefully positioned relative to specific equation sub-mobjects to avoid visual clutter."
+    }
+  ]
+}

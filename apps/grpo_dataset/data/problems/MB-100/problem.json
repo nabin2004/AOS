@@ -1,0 +1,67 @@
+{
+  "id": "MB-100",
+  "title": "Create Zone Plate Hologram Simulation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes wave interference patterns to simulate a zone plate hologram. Define a custom `LightWaveSlice` Mobject that inherits from `Mobject` and uses a custom OpenGL shader (`diffraction_shader`) with `moderngl.TRIANGLE_STRIP` to render wave propagation from multiple point sources. The class must support dynamic uniforms such as `frequency`, `wave_number`, `max_amp`, `decay_factor`, and `show_intensity`. It should synchronize its point sources from a `DotCloud` object using an updater that calls `sync_points()` and increments time. Implement the main scene `CreateZonePlate` which instantiates this wave slice, sets up point sources, and animates the transition from wave propagation to intensity visualization, demonstrating how interference patterns form a zone plate.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-100/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "CreateZonePlate"
+    ],
+    "visual_techniques": [
+      "Custom OpenGL Shaders",
+      "Wave Interference Simulation",
+      "Dynamic Uniform Updates",
+      "DotCloud Point Sources"
+    ],
+    "manim_api_patterns": [
+      "Mobject custom shader",
+      "moderngl.TRIANGLE_STRIP",
+      "always.sync_points()",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom shader files or incorrect shader folder path",
+      "severity": "high",
+      "note": "The LightWaveSlice class relies on an external 'diffraction_shader' folder containing vertex/fragment shaders. Without these, rendering will fail."
+    },
+    {
+      "pattern": "Incompatibility with Manim Community Edition (ManimCE)",
+      "severity": "high",
+      "note": "ManimCE does not natively support the same custom shader/uniform API as ManimGL (3b1b version), leading to attribute errors on set_uniform."
+    },
+    {
+      "pattern": "Incorrect ModernGL primitive type or vertex data length",
+      "severity": "medium",
+      "note": "Setting data['point'] to 4 points with TRIANGLE_STRIP must match the shader's expected input layout."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "problem_id": "MB-182",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "sine wave generation function",
+        "frequency ratios [1, 1.2, 1.5, 1.75]",
+        "harmonic frequency calculations (220, 264, 330, 385 Hz)",
+        "wave superposition setup"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "main axes with labels",
+        "brace indicating wave period",
+        "stacked layout of four smaller axes",
+        "gradient coloring from BLUE to YELLOW",
+        "top axes for wave summation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "base frequency of 0.5",
+        "axes x-range (0, 12)",
+        "axes y-range (-1, 1) and (-4, 4)",
+        "brace position at x = 4.5"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "get_wave_sum helper function",
+        "squish_rate_func for coordinated animations",
+        "LaggedStartMap for sequential creation",
+        "ReplacementTransform for layout transition"
+      ]
+    }
+  }
+}

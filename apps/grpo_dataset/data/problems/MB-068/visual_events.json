@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-068",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A grey sphere with a white surface mesh is rendered, and the camera reorients to a 3D perspective.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Sphere",
+        "SurfaceMesh",
+        "frame.reorient"
+      ],
+      "clip_query": "A 3D grey sphere with a white grid mesh on a dark background"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A red parametric curve (arc) is drawn along the sphere's surface while the camera slowly rotates.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "ParametricCurve",
+        "ShowCreation",
+        "line1"
+      ],
+      "clip_query": "A red arc curve being drawn on the surface of a 3D sphere"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Three more red arcs are drawn sequentially, each at a 90-degree angle to the previous one, with white right-angle elbow indicators appearing at each corner.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "get_elbow",
+        "get_rotated_arc",
+        "ShowCreation",
+        "elbow"
+      ],
+      "clip_query": "Four red arcs forming an open square-like shape on a sphere with white right-angle markers"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The arcs animate by rotating 90 degrees about their endpoints to demonstrate the geometric transition and spherical excess.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        24.0
+      ],
+      "keyword_bank": [
+        "UpdateFromAlphaFunc",
+        "match_points",
+        "get_rotated_arc"
+      ],
+      "clip_query": "Red arcs on a sphere rotating dynamically about their endpoints"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "id": "MB-050",
+  "title": "Inverse Square Law 3D Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    45.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class that visualizes the Inverse Square Law in 3D. \n\n1. Setup a 3D scene with a central light source represented by a GlowDot and a wireframe sphere of radius 2 using Sphere and SurfaceMesh.\n2. Create an outward-emanating light radiation effect. This should be achieved by replicating a portion of the sphere, scaling it outwards, and animating its opacity using a custom beaming_effect helper and a ValueTracker.\n3. Highlight a small parametric patch on the sphere's surface (e.g., u from 0 to 9 degrees, v from 90 to 99 degrees) and project a beam of light through it.\n4. Rotate and reorient the camera dynamically to capture the 3D perspective.\n5. Scale the sphere and the patch by a factor of 2 to demonstrate how the same light energy spreads over 4 times the area. Show grid divisions on the scaled-up patch using ParametricCurves to visually represent the 4x area increase.\n6. Ensure proper 3D rendering depth sorting using always_sort_to_camera.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-050/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 110,
+    "scene_classes": [
+      "InverseSquareLaw"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "Parametric Surfaces",
+      "Custom Beaming Glow Effect",
+      "3D Mesh Rendering",
+      "Dynamic Scaling about Origin"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "GlowDot",
+      "ThreeDAxes",
+      "Sphere",
+      "SurfaceMesh",
+      "ParametricSurface",
+      "ParametricCurve",
+      "frame.reorient",
+      "always_sort_to_camera"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing always_sort_to_camera call causing 3D transparency rendering artifacts",
+      "severity": "medium",
+      "note": "Without proper sorting, overlapping transparent 3D surfaces will render out of order."
+    },
+    {
+      "pattern": "Incorrect camera reorientation parameters leading to sudden jumps or out-of-frame objects",
+      "severity": "high",
+      "note": "The camera reorient method requires precise angles and target coordinates to keep the sphere centered."
+    }
+  ]
+}

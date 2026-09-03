@@ -1,0 +1,67 @@
+{
+  "id": "MB-134",
+  "title": "Road Not Taken - Transformer Embedding and Weight Matrix Visualization",
+  "youtube_video_id": "wjZofJX0v4M",
+  "video_timestamp_range": [
+    120.0,
+    180.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete Manim scene using ManimGL that visualizes a transformer weight matrix and numeric embedding vector. Implement a custom `WeightMatrix` class (subclassing `DecimalMatrix`) where each decimal entry is dynamically colored based on its value: positive values should transition from dark blue to light blue, and negative values from dark red to light red. Implement a custom `RandomizeMatrixEntries` animation class that smoothly interpolates the matrix values from their starting values to a new set of random values, updating their colors dynamically during the transition. Finally, show a single column vector representing a `NumericEmbedding` with similar dynamic coloring. The scene should demonstrate the initialization of the matrix, the smooth randomization animation, and the presentation of the embedding vector.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-134/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "RoadNotTaken"
+    ],
+    "visual_techniques": [
+      "Dynamic value-to-color mapping",
+      "Custom matrix entry interpolation animation",
+      "Decimal matrix rendering with custom brackets and ellipses"
+    ],
+    "manim_api_patterns": [
+      "DecimalMatrix",
+      "Animation",
+      "interpolate_color_by_hsl",
+      "get_entries",
+      "set_fill"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect color interpolation function name in ManimCE vs ManimGL",
+      "severity": "high",
+      "note": "ManimGL uses interpolate_color_by_hsl, while ManimCE uses interpolate_color."
+    },
+    {
+      "pattern": "DecimalMatrix missing or behaving differently in standard ManimCE",
+      "severity": "high",
+      "note": "DecimalMatrix is a specialized class in 3b1b's ManimGL; in ManimCE, a standard Matrix with custom decimal formatting must be used."
+    },
+    {
+      "pattern": "Custom Animation class override mismatch",
+      "severity": "medium",
+      "note": "Overriding interpolate_mobject requires careful handling of sub-alphas and updating the parent matrix state."
+    }
+  ]
+}

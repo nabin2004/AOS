@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-125",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "softmax formula",
+        "exponentiation",
+        "normalization",
+        "logits",
+        "probabilities"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "DecimalMatrix",
+        "color-coded elements",
+        "SurroundingRectangle highlights",
+        "smooth transitions"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "accurate softmax calculation",
+        "correct decimal representation",
+        "dynamic value updates"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "SoftmaxBreakdown class",
+        "helper functions for matrix operations",
+        "sequential animation flow"
+      ]
+    }
+  }
+}

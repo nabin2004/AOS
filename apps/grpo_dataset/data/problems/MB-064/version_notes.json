@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-064",
+  "conflicts": [
+    {
+      "category": "Framework",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Custom Library",
+      "gl_construct": "PiCreature / Randolph",
+      "ce_equivalent": "None (requires custom implementation or replacement with standard Mobjects)",
+      "severity": "high"
+    },
+    {
+      "category": "Custom Library",
+      "gl_construct": "Blink",
+      "ce_equivalent": "None (requires custom animation or replacement)",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobject Method",
+      "gl_construct": "insert_n_curves",
+      "ce_equivalent": "None (specific to ManimGL VMobject)",
+      "severity": "medium"
+    }
+  ]
+}

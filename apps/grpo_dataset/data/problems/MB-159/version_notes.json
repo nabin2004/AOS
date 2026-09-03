@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-159",
+  "conflicts": [
+    {
+      "category": "3D Rendering & Camera",
+      "gl_construct": "self.camera.frame or self.play(frame.animate...)",
+      "ce_equivalent": "ThreeDScene with self.move_camera(phi=..., theta=...)",
+      "severity": "high"
+    },
+    {
+      "category": "Vector Fields",
+      "gl_construct": "Custom vector field updates using manual vector arrays and custom updaters",
+      "ce_equivalent": "ArrowVectorField or VectorField with custom functions in Manim Community",
+      "severity": "medium"
+    },
+    {
+      "category": "Updaters",
+      "gl_construct": "Updater functions taking (m, dt) with direct attribute modification",
+      "ce_equivalent": "Standard add_updater in Manim Community, ensuring dt is handled correctly for rate-independent animations",
+      "severity": "low"
+    }
+  ]
+}

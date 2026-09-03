@@ -1,0 +1,49 @@
+{
+  "problem_id": "MB-118",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "ParametricSurface",
+        "ValueTracker",
+        "PI",
+        "DEGREES",
+        "np.sin",
+        "np.cos"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "ThreeDAxes",
+        "NumberPlane",
+        "Circle",
+        "Brace",
+        "reorient",
+        "always_sort_to_camera",
+        "set_clip_plane"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "delta_x",
+        "x0",
+        "opacity",
+        "shading",
+        "z_index"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene",
+        "construct",
+        "add_updater",
+        "Restore",
+        "save_state",
+        "fix_in_frame"
+      ]
+    }
+  }
+}

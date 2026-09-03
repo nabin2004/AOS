@@ -1,0 +1,73 @@
+{
+  "id": "MB-066",
+  "title": "Burnside's Lemma Incomplete Squares Orbit Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Group Theory",
+    "Combinatorics",
+    "Abstract Algebra"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or compatible ManimCE) that visualizes the partitioning of 16 elements (represented as squares) into orbits under a group action (Burnside's Lemma context). \n\n1. **Initial Setup**: Create a row of 16 squares (numbered 0 to 15) arranged horizontally across the screen, scaled to fit the frame width.\n2. **Grouping & Reordering**: Group the squares into 6 distinct orbits/groups based on the following index sets:\n   - Group 0: [0]\n   - Group 1: [1, 2, 4, 8]\n   - Group 2: [3, 6, 9, 12]\n   - Group 3: [5, 10]\n   - Group 4: [7, 11, 13, 14]\n   - Group 5: [15]\n   Animate the squares moving from their initial linear order to their grouped layout using a curved path (`path_arc = 45 * DEG`) over 3 seconds.\n3. **Surrounding Rectangles**: Draw rounded surrounding rectangles around each of the 6 groups. Apply a color gradient from RED to YELLOW across these rectangles. Animate their creation using a lagged start.\n4. **Counting Groups**: Place an integer `1` above each of the 6 group rectangles, with `+` signs between them. Add a brace over the entire sum with the label `6` to show the total number of orbits. Animate these elements fading in and growing.\n5. **Fraction Transformation**: Transition the integer `1` above each group into a set of fractions corresponding to the size of that group. For a group of size $n$, replace its `1` with $n$ individual fractions of $1/n$ positioned above each square in that group. Update the plus signs to span across all individual fractions. Animate this transition smoothly using `ReplacementTransform`.\n6. **Rotational Symmetry Indicators**: Below the groups, draw a horizontal dividing line and prepare to show rotational symmetry symbols (such as 'Id' and circular arcs with arrowheads representing a $90^\\circ$ rotation).",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-066/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 130,
+    "scene_classes": [
+      "IncompleteSquares"
+    ],
+    "visual_techniques": [
+      "Path arc animations",
+      "Surrounding rectangles with color gradients",
+      "Mathematical formula transformation (integers to fractions)",
+      "Braces and labels",
+      "Custom vector graphics (rotation arcs with tips)"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "MoveToTarget",
+      "LaggedStartMap",
+      "SurroundingRectangle",
+      "ReplacementTransform",
+      "Brace",
+      "Tex",
+      "Integer"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom helper method `self.get_square` in standard Manim implementations.",
+      "severity": "high",
+      "note": "The reference code calls `self.get_square(n)`. In standard Manim, this must be replaced with a custom square generator, e.g., creating a Square with a number label inside."
+    },
+    {
+      "pattern": "Use of `set_submobject_colors_by_gradient` which is specific to ManimGL.",
+      "severity": "medium",
+      "note": "In ManimCE, use `set_color_by_gradient` or manually assign colors to submobjects."
+    },
+    {
+      "pattern": "Use of `InteractiveScene` and `self.frame` which are ManimGL-specific.",
+      "severity": "high",
+      "note": "Must be ported to standard `Scene` and `self.camera` for ManimCE compatibility."
+    }
+  ]
+}

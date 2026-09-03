@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-139",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Dynamic Numbers",
+      "gl_construct": "make_number_changeable / ChangeDecimalToValue",
+      "ce_equivalent": "DecimalNumber with ValueTracker and always_redraw",
+      "severity": "high"
+    },
+    {
+      "category": "Fading Animations",
+      "gl_construct": "VFadeIn",
+      "ce_equivalent": "FadeIn",
+      "severity": "low"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "id": "MB-113",
+  "title": "Lorenz Attractor Chaotic Trajectories Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "drift-sensitive"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the chaotic behavior of the Lorenz Attractor. The scene should set up a 3D coordinate system using ThreeDAxes, scaled to fit the frame, and continuously rotate the camera around the z-axis using a frame updater. Display the system of differential equations in the upper-left corner of the screen, fixed in frame, with variables x, y, and z color-coded in RED, GREEN, and BLUE respectively. Solve the Lorenz system ODEs using scipy's solve_ivp for 10 slightly perturbed initial states (differing by epsilon = 1e-5) to demonstrate chaotic divergence. Generate smooth 3D curves from these solved points, colored with a gradient from dark blue to light blue. Attach glowing dots (GlowDot) and tracing tails (TracingTail) to the trajectories, and animate the curves drawing themselves linearly over a duration of 30 seconds.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-113/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 95,
+    "scene_classes": [
+      "LorenzAttractor"
+    ],
+    "visual_techniques": [
+      "3D Camera Rotation",
+      "ODE Integration",
+      "Tracing Tails",
+      "Glow Dots",
+      "Multi-trajectory Chaos Visualization"
+    ],
+    "manim_api_patterns": [
+      "ThreeDAxes",
+      "self.frame.reorient",
+      "self.frame.add_updater",
+      "Tex",
+      "fix_in_frame",
+      "solve_ivp",
+      "VMobject().set_points_smoothly",
+      "GlowDot",
+      "TracingTail",
+      "ShowCreation"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing scipy import or integration failure",
+      "severity": "high",
+      "note": "The script relies on scipy.integrate.solve_ivp; if scipy is not installed or the ODE solver fails, the scene will crash."
+    },
+    {
+      "pattern": "ManimCE vs ManimGL camera API mismatch",
+      "severity": "high",
+      "note": "Using self.frame.reorient or self.frame.add_updater in a standard ManimCE environment will raise an AttributeError. Must use ManimGL or translate to ThreeDScene camera methods."
+    },
+    {
+      "pattern": "Missing GlowDot or TracingTail classes",
+      "severity": "medium",
+      "note": "GlowDot and TracingTail are specific to 3b1b's ManimGL fork. In standard ManimCE, they must be substituted with Dot/TracedPath or custom implementations."
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-125",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Displaying the input logits vector with color-coded values.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "DecimalMatrix",
+        "logits",
+        "value_to_color"
+      ],
+      "clip_query": "A column vector of numbers representing logits with color-coded backgrounds or text."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Applying the exponential function to each logit element.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "np.exp",
+        "exps",
+        "DecimalNumber",
+        "FadeIn",
+        "Transform"
+      ],
+      "clip_query": "Applying exponential function to a vector of numbers, showing e raised to the power of each number."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Summing the exponentiated values to compute the denominator.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "sum",
+        "np.sum",
+        "plus",
+        "denominator"
+      ],
+      "clip_query": "Summing a list of exponentiated numbers to get a total sum."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Dividing each exponentiated value by the sum to get final probabilities.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "softmax",
+        "probabilities",
+        "division",
+        "normalize"
+      ],
+      "clip_query": "Dividing each exponentiated value by the sum to produce a probability distribution vector."
+    }
+  ]
+}

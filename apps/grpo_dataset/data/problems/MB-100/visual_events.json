@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-100",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the DotCloud point sources representing light emitters",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "DotCloud",
+        "point_sources",
+        "get_points"
+      ],
+      "clip_query": "point sources representing light emitters appear on screen"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Rendering of the LightWaveSlice showing active wave propagation and interference",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "LightWaveSlice",
+        "wave_number",
+        "frequency"
+      ],
+      "clip_query": "wave propagation and interference patterns radiating from sources"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic update of wave parameters (frequency or decay factor) over time",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "set_frequency",
+        "set_decay_factor",
+        "increment_time"
+      ],
+      "clip_query": "wave interference patterns changing frequency or intensity dynamically"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Transition to intensity mode to reveal the static zone plate pattern",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "show_intensity",
+        "pause",
+        "set_uniform"
+      ],
+      "clip_query": "wave patterns transition into a high-contrast zone plate hologram"
+    }
+  ]
+}

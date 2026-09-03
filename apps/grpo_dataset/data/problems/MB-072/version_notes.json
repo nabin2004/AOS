@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-072",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobject",
+      "gl_construct": "Slider",
+      "ce_equivalent": "Custom implementation using Line, Dot, and DecimalNumber with ValueTracker",
+      "severity": "high"
+    },
+    {
+      "category": "method",
+      "gl_construct": "axes.bind_graph_to_func",
+      "ce_equivalent": "always_redraw(lambda: axes.plot(lambda t: ...))",
+      "severity": "high"
+    },
+    {
+      "category": "camera",
+      "gl_construct": "frame.animate.reorient",
+      "ce_equivalent": "self.play(self.camera.frame.animate.set_euler_angles(...).move_to(...))",
+      "severity": "medium"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "VFadeIn",
+      "ce_equivalent": "FadeIn",
+      "severity": "low"
+    }
+  ]
+}

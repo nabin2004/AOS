@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-183",
+  "conflicts": [
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.camera.frame.reorient() / self.camera.frame.add_updater()",
+      "ce_equivalent": "self.set_camera_orientation() / self.begin_ambient_camera_rotation()",
+      "severity": "high"
+    },
+    {
+      "category": "Text Rendering",
+      "gl_construct": "OldTex",
+      "ce_equivalent": "Tex / MathTex",
+      "severity": "medium"
+    },
+    {
+      "category": "3D Rendering",
+      "gl_construct": "mob.apply_depth_test()",
+      "ce_equivalent": "None (handled automatically or via renderer configurations in CE)",
+      "severity": "medium"
+    }
+  ]
+}

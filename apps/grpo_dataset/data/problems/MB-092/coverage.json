@@ -1,0 +1,43 @@
+{
+  "problem_id": "MB-092",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "prime sequence '2, 3, 5, ..., p_n'",
+        "product formula 'N = 2 * 3 * 5 * ... * p_n + 1'",
+        "prime factorization 'N = q_1 ... q_k'",
+        "contradiction logic statement 'Cannot be in {2, 3, 5, ..., p_n}'"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "SurroundingRectangle around prime sequence",
+        "SurroundingRectangle around factorization",
+        "Teal Vector/Arrow pointing to prime factors",
+        "Red-tinted background rectangle for contradiction",
+        "FadeTransformPieces or equivalent smooth transition"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "font_size 72 for main equations",
+        "font_size 60 for labels",
+        "font_size 90 for Contradiction text",
+        "stroke width 3 for rectangles",
+        "fill opacity 0.1 for contradiction box"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene or Scene class structure",
+        "Sequential animation flow (supposition -> product -> factorization -> contradiction)",
+        "VGroup grouping for layout alignment",
+        "Use of match_x or next_to for relative positioning"
+      ]
+    }
+  }
+}

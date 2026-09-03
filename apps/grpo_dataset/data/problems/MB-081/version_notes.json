@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-081",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene or MovingCameraScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame",
+      "ce_equivalent": "self.camera.frame",
+      "severity": "high"
+    },
+    {
+      "category": "Value Trackers",
+      "gl_construct": "ComplexValueTracker",
+      "ce_equivalent": "ValueTracker (using complex numbers directly or tracking real/imag separately)",
+      "severity": "medium"
+    },
+    {
+      "category": "Custom Animation Methods",
+      "gl_construct": "self.play_time_forward",
+      "ce_equivalent": "Animate a standard ValueTracker representing time t over a specified duration",
+      "severity": "high"
+    }
+  ]
+}

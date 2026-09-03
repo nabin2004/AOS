@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-127",
+  "conflicts": [
+    {
+      "category": "framework_imports",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "high"
+    },
+    {
+      "category": "animation_syntax",
+      "gl_construct": "self.animate.set_value(value)",
+      "ce_equivalent": "Use a custom ValueTracker or custom updater function to animate custom properties in ManimCE.",
+      "severity": "high"
+    },
+    {
+      "category": "passing_flash",
+      "gl_construct": "VShowPassingFlash",
+      "ce_equivalent": "ShowPassingFlash",
+      "severity": "medium"
+    },
+    {
+      "category": "color_interpolation",
+      "gl_construct": "interpolate_color_by_hsl",
+      "ce_equivalent": "interpolate_color (using HSL space manually or standard RGB interpolation)",
+      "severity": "medium"
+    }
+  ]
+}

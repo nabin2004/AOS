@@ -1,0 +1,67 @@
+{
+  "problem_id": "MB-096",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the diffraction grating point sources and the LightWaveSlice overlay.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "DotCloud",
+        "LightWaveSlice",
+        "point_sources"
+      ],
+      "clip_query": "A set of point sources representing a diffraction grating appears on screen with a wave slice overlay."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Continuous propagation of waves from the point sources, showing interference fringes.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "increment_time",
+        "time_rate",
+        "sync_points"
+      ],
+      "clip_query": "Waves propagate outwards from multiple point sources, creating an interference pattern."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Modification of wave parameters such as frequency or wave number, altering the fringe spacing.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "set_frequency",
+        "set_wave_number"
+      ],
+      "clip_query": "The wave interference pattern changes spacing as frequency or wavelength is adjusted."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Toggling the wave visualization to show intensity instead of raw amplitude.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "show_intensity",
+        "set_uniform"
+      ],
+      "clip_query": "The wave pattern transitions to show intensity, highlighting bright and dark bands."
+    }
+  ]
+}

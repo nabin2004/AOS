@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-090",
+  "conflicts": [
+    {
+      "category": "InteractiveScene",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "ComplexValueTracker",
+      "gl_construct": "ComplexValueTracker",
+      "ce_equivalent": "ValueTracker with complex values or separate real/imaginary ValueTrackers",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Shorthands",
+      "gl_construct": "always.next_to",
+      "ce_equivalent": "add_updater(lambda m: m.next_to(...))",
+      "severity": "medium"
+    },
+    {
+      "category": "Decimal Number Change",
+      "gl_construct": "make_number_changeable",
+      "ce_equivalent": "DecimalNumber with an updater",
+      "severity": "medium"
+    },
+    {
+      "category": "Dots",
+      "gl_construct": "TrueDot, GlowDot",
+      "ce_equivalent": "Dot",
+      "severity": "low"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "MB-083",
+  "title": "Imaginary Inputs to the Taylor Series",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Complex Analysis"
+  ],
+  "full_prompt": "Write a ManimGL scene named 'ImaginaryInputsToTheTaylorSeries' that visualizes plugging a complex number (specifically pi * i) into the Taylor series of e^x. First, set up a ComplexPlane at the bottom of the screen with a yellow GlowDot at pi * i, labeled. At the top, show the 'false' intuitive equation e^x = e * e * ... * e with a brace indicating 'x times' and a red label saying 'Nonsense if x is complex'. Then, transition this false equation into the actual Taylor series expansion for e^x. Next, plug in 'pi * i' term-by-term. As each term is added, draw a corresponding vector on the complex plane representing that term (forming a spiral that converges to -1), update the yellow dot to track the tip of the current vector sum, and display the mathematical label for each vector term (e.g., pi * i, (pi^2 / 2) * i^2, etc.). Use smooth transitions and precise positioning to align the equations and the complex plane.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-083/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "ImaginaryInputsToTheTaylorSeries"
+    ],
+    "visual_techniques": [
+      "Complex Plane Vector Addition",
+      "Taylor Series Expansion Animation",
+      "Mathematical Formula Transformation",
+      "GlowDot Tracking"
+    ],
+    "manim_api_patterns": [
+      "ComplexPlane",
+      "GlowDot",
+      "Brace",
+      "TransformMatchingTex",
+      "FadeTransform",
+      "GrowArrow",
+      "InteractiveScene"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom helper methods like get_spiral_vectors or get_series",
+      "severity": "high",
+      "note": "The reference code relies on helper methods defined in the parent class or external imports. Reimplementing these or mocking them is critical for execution."
+    },
+    {
+      "pattern": "GlowDot class undefined in standard Manim Community",
+      "severity": "medium",
+      "note": "GlowDot is specific to ManimGL/3b1b's custom library. Standard Dot with a glow effect or simple Dot must be used as a fallback."
+    }
+  ]
+}

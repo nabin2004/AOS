@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-092",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display the finite prime sequence '2, 3, 5, ..., p_n' with a yellow surrounding rectangle and the label 'All primes (suppose finite)'.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "prime_sequence",
+        "finite_words",
+        "sequence_rect"
+      ],
+      "clip_query": "A sequence of prime numbers 2, 3, 5, ..., p_n with a yellow box and a label saying 'All primes (suppose finite)'"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Transform the prime sequence into the product formula 'N = 2 * 3 * 5 * ... * p_n' and write '+1' next to it.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "product",
+        "plus_one",
+        "TransformMatchingTex"
+      ],
+      "clip_query": "The prime sequence transforming into a product formula N = 2 * 3 * 5 * ... * p_n + 1"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Introduce the prime factorization 'N = q_1 ... q_k' with a teal arrow and the label 'Prime factors'.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "factor_eq",
+        "factor_arrow",
+        "factor_word",
+        "FadeTransformPieces"
+      ],
+      "clip_query": "A teal arrow pointing from the product formula to a new equation N = q_1 ... q_k labeled 'Prime factors'"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Highlight q_1, show the contradiction text, and draw a large red-tinted box around the scene with the word 'Contradiction!'.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "q_rect",
+        "q_words",
+        "rect",
+        "cont_word"
+      ],
+      "clip_query": "A red-tinted box enclosing the mathematical proof with a bold white title 'Contradiction!'"
+    }
+  ]
+}

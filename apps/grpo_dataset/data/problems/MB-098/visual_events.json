@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-098",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the double-slit barrier and the two point sources representing the slits.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "DotCloud",
+        "point_sources",
+        "DoubleSlit"
+      ],
+      "clip_query": "A double slit barrier with two point sources representing the slits"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Activation of the LightWaveSlice shader showing concentric waves propagating outwards from the two slits.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "LightWaveSlice",
+        "wave_number",
+        "frequency",
+        "decay_factor"
+      ],
+      "clip_query": "Concentric waves propagating outwards from two point sources"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Visualization of constructive and destructive interference patterns (crests and troughs aligning to form bright and dark bands).",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "show_intensity",
+        "max_amp",
+        "sync_points"
+      ],
+      "clip_query": "Interference pattern with bright and dark bands from double slit diffraction"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Dynamic adjustment of wave parameters (e.g., frequency or slit separation) showing real-time updates in the interference pattern.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        40.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "set_frequency",
+        "set_wave_number",
+        "increment_time"
+      ],
+      "clip_query": "Interference pattern dynamically changing as wave parameters are adjusted"
+    }
+  ]
+}

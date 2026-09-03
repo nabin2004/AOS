@@ -1,0 +1,75 @@
+{
+  "problem_id": "MB-065",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Reveal of multiple-choice options with grey covers",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "choices",
+        "covers",
+        "Restore",
+        "FadeIn"
+      ],
+      "clip_query": "Multiple choice options covered by grey rectangles appearing on screen"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Grid of Randolph Pi Creatures showing correct/incorrect answers",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "pis",
+        "Randolph",
+        "Exmark",
+        "Checkmark",
+        "all_symbols",
+        "MoveToTarget"
+      ],
+      "clip_query": "A grid of blue cartoon characters with checkmarks and cross marks appearing next to them"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Question icons (quantum computer, clock, question mark) fade in",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        14.0
+      ],
+      "keyword_bank": [
+        "question",
+        "get_quantum_computer_symbol",
+        "Clock",
+        "ClockPassesTime"
+      ],
+      "clip_query": "A quantum computer symbol, a clock, and a question mark appearing above the choices"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Covers stretch away to reveal the multiple-choice answers",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        14.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "covers",
+        "stretch",
+        "about_edge",
+        "set_opacity"
+      ],
+      "clip_query": "Grey rectangles stretching and fading away to reveal the text of the multiple choice options"
+    }
+  ]
+}

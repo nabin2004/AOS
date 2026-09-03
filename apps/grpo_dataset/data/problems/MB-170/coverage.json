@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-170",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Helical parametric equations",
+        "Phase rotation angle calculation",
+        "3D coordinate transformations"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Sucrose molecule visualization",
+        "DotCloud atom rendering with custom radii",
+        "Line bonds connecting atoms",
+        "Helical spiral path curve",
+        "Rotating electric field vectors",
+        "3D camera orbiting"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Exact 3D coordinates for Sucrose atoms",
+        "Correct atom radii (H: 0.1, O: 0.2, C: 0.19)",
+        "Helical frequency and pitch parameters"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Molecule base class inheriting from Group",
+        "Sucrose class inheriting from Molecule",
+        "Depth testing applied to 3D groups",
+        "Proper use of ManimGL's 3D camera frame"
+      ]
+    }
+  }
+}

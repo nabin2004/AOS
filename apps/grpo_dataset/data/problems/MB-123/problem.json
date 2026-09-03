@@ -1,0 +1,71 @@
+{
+  "id": "MB-123",
+  "title": "Attention Patterns and Matrix-Vector Multiplication in Transformers",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Create a Manim visualization demonstrating step-by-step matrix-vector multiplication as used in transformer attention patterns. The visualization should display a matrix and a vector, then compute their product row-by-row. For each row, highlight the active row elements and the corresponding vector elements using yellow surrounding rectangles that appear sequentially. Dynamically update the resulting product vector's elements as the dot product is calculated using an alpha update function. Implement a custom color-mapping helper to colorize matrix/attention values based on their magnitude (using a softmax-like scale from blue to red). Ensure the layout is clean, with an equals sign and brackets properly aligned, and handle potential 3D camera frame-fixing if the scene is rendered in a 3D context.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-123/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "AttentionPatterns"
+    ],
+    "visual_techniques": [
+      "Matrix-row vector product step-by-step highlighting",
+      "Dynamic decimal number updates via UpdateFromAlphaFunc",
+      "Softmax value-to-color mapping",
+      "Sequential subset highlighting with ShowIncreasingSubsets"
+    ],
+    "manim_api_patterns": [
+      "SurroundingRectangle",
+      "ShowIncreasingSubsets",
+      "UpdateFromAlphaFunc",
+      "DecimalNumber",
+      "VGroup",
+      "FadeIn",
+      "FadeOut"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing NumericEmbedding custom class in standard Manim CE",
+      "severity": "high",
+      "note": "NumericEmbedding is a custom 3b1b class. In standard Manim CE, it must be replaced with a standard Matrix or VGroup of DecimalNumbers."
+    },
+    {
+      "pattern": "Incorrect index mapping during row-vector multiplication loop",
+      "severity": "medium",
+      "note": "Ensure the length of the row matches the length of the vector elements to avoid index out of range errors."
+    },
+    {
+      "pattern": "Camera frame fixing methods (fix_in_frame) failing in standard 2D scenes",
+      "severity": "medium",
+      "note": "fix_in_frame() is a ManimGL/ThreeDScene method. If running in standard 2D Manim CE, this method does not exist and will throw an AttributeError."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-063",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "State vector representation",
+        "Binary string indexing (BitString)",
+        "Real number lines mapping",
+        "Complex plane coordinate mapping (n2p)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "DecimalMatrix layout",
+        "Parallel vertical stacking of coordinate systems",
+        "Glow dots or distinct component markers",
+        "Connecting lines from matrix to dots"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Normalized 4D random vector generation",
+        "Decimal formatting with signs",
+        "Coordinate values between -1 and 1"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Dynamic updaters for dots and connecting lines",
+        "Target generation for complex planes transition",
+        "Lagged start animations for smooth entry"
+      ]
+    }
+  }
+}

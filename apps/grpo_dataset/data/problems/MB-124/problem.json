@@ -1,0 +1,68 @@
+{
+  "id": "MB-124",
+  "title": "Premise of Machine Learning: Matrix-Vector Products and Pixels",
+  "youtube_video_id": "wjZofJX0v4M",
+  "video_timestamp_range": [
+    0.0,
+    180.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Linear Algebra",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a Manim scene named `PremiseOfML` that visualizes the core mathematical premise of machine learning: representing data (like images) as vectors and processing them via matrix-vector multiplications. \n\nYour visualization should include:\n1. A symbolic matrix-vector multiplication equation $W x = y$ where $W$ is a weight matrix, $x$ is an input vector, and the right-hand side shows the linear combination of terms. Use a custom matrix representation (like `TexMatrix` or standard Manim matrices) to display this clearly with colored elements.\n2. An animation helper `show_symbolic_matrix_vector_product` that highlights each row of the matrix and the corresponding elements of the vector using yellow surrounding rectangles, sequentially stepping through the rows to show how the output vector is computed.\n3. A function to load or represent an image (such as an ImageNet sample) and a helper `create_pixels` that overlays a grid of tiny colored squares (pixels) over the image to visually demonstrate how an image is discretized into numerical vector inputs.\n\nEnsure the transitions between the symbolic linear algebra and the pixelated image representation are smooth and clearly structured.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-124/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "PremiseOfML"
+    ],
+    "visual_techniques": [
+      "Symbolic matrix-vector multiplication highlighting",
+      "Pixel grid generation from images",
+      "TexMatrix alignment and coloring"
+    ],
+    "manim_api_patterns": [
+      "TexMatrix",
+      "SurroundingRectangle",
+      "ShowIncreasingSubsets",
+      "VGroup",
+      "FadeOut"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom TexMatrix class in standard Manim Community",
+      "severity": "high",
+      "note": "TexMatrix is a custom 3b1b ManimGL class. Standard Manim CE implementations must substitute this with Matrix or MathTex."
+    },
+    {
+      "pattern": "External dataset dependency (datasets/ImageNet)",
+      "severity": "high",
+      "note": "The code attempts to load ImageNet data using HuggingFace datasets. For offline execution, this must be mocked or replaced with a local placeholder image."
+    },
+    {
+      "pattern": "ShowIncreasingSubsets compatibility",
+      "severity": "medium",
+      "note": "ShowIncreasingSubsets might behave differently or be missing in standard Manim CE, requiring manual implementation using successive FadeIn/Write animations."
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-177",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "sinc function definition",
+        "limit as x approaches 0",
+        "integral of sinc(x) from -infinity to infinity equals pi"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Sinc graph split and drawn smoothly",
+        "1/x envelope and sine wave transformation",
+        "Hollow dot at (0,1) representing removable singularity",
+        "Shaded area under the curve"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for animating dots towards x=0",
+        "Coordinate mapping using c2p and i2gp"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Sequential scene progression",
+        "Updaters for tracking dots on the graph",
+        "Clean transitions and fade-outs between sub-scenes"
+      ]
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-067",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.animate.reorient(phi, theta, gamma)",
+      "ce_equivalent": "self.move_camera(phi=..., theta=..., added_anims=[...])",
+      "severity": "high"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot3D or Sphere",
+      "severity": "medium"
+    },
+    {
+      "category": "Animations",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    },
+    {
+      "category": "Rendering",
+      "gl_construct": "apply_depth_test() / deactivate_depth_test()",
+      "ce_equivalent": "Handled automatically by modern OpenGL renderer in CE, or ignored in standard cairo renderer",
+      "severity": "medium"
+    }
+  ]
+}

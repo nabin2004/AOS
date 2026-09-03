@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-102",
+  "conflicts": [
+    {
+      "category": "Shader Integration",
+      "gl_construct": "moderngl.TRIANGLE_STRIP with custom shader_folder",
+      "ce_equivalent": "Manim Community does not support custom moderngl shaders natively in the same way; one would have to use custom fragment shaders via VectorizedVMobject or custom Shader classes, or fallback to CPU-bound grid approximations which are extremely slow.",
+      "severity": "high"
+    },
+    {
+      "category": "DotCloud Uniform Sync",
+      "gl_construct": "always.sync_points() updating shader uniforms dynamically",
+      "ce_equivalent": "Manim Community requires custom updaters on a VMobject or PMobject, but lacks direct uniform-binding APIs for arbitrary shader variables.",
+      "severity": "high"
+    }
+  ]
+}

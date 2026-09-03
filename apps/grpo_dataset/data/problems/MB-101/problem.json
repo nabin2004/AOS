@@ -1,0 +1,72 @@
+{
+  "id": "MB-101",
+  "title": "Complex Waves and Hologram Amplitude Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or compatible ManimCE syntax) that visualizes the mathematical representation of complex waves in holography. \n\n1. **Formula Assembly**: Start by displaying the expression 'Amplitude(R + O)^2' at the top of the screen. First, fade in the 'R + O' term, then write 'Amplitude(' and ')' around it while restoring 'R + O' to its proper position. Finally, fade in the exponent '^2'.\n\n2. **Function Expansion**: Scale down the amplitude expression and move it to the upper-left corner. Transition the 'O' term into a full function 'O(x, y, z, t)'. Highlight the spatial coordinates '(x, y, z)' with a yellow surrounding rectangle, a pointing vector, and the text 'Point in space'. Then, transition the spatial highlight to highlight the time variable 't' with a teal rectangle and the text 'Time'.\n\n3. **Complex Plane & Real Line Mapping**: Create a transition where 'O(x, y, z, t)' points to a real number line and a complex plane. Set up a `ValueTracker` to simulate time. Compute a complex wave value using a rotating phasor: $A e^{i \\omega t}$ (where amplitude is 1.5 and frequency is 0.25). \n\n4. **Dynamic Indicator**: Add a dynamic indicator dot (using a glowing dot style) that oscillates along the real axis of the complex plane. The dot's position must update dynamically based on the real part of the complex phasor, and its color should interpolate between blue (for positive values) and red (for negative values) based on its distance from the origin.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-101/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 130,
+    "scene_classes": [
+      "ComplexWaves"
+    ],
+    "visual_techniques": [
+      "ValueTracker-driven dynamic updates",
+      "Formula component transformation",
+      "Surrounding highlight boxes with custom corner rounding",
+      "Color interpolation based on dynamic mathematical state"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "SurroundingRectangle",
+      "Vector",
+      "ComplexPlane",
+      "ValueTracker",
+      "GlowDot",
+      "TrueDot",
+      "FadeTransformPieces"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimGL-specific GlowDot or TrueDot in standard ManimCE environment without fallback",
+      "severity": "high",
+      "note": "If running in ManimCE, GlowDot and TrueDot must be replaced with standard Dot or custom PMobject/VMobject implementations."
+    },
+    {
+      "pattern": "Incorrect string indexing in Tex formulas (e.g., amp_expr['R + O'])",
+      "severity": "medium",
+      "note": "Tex indexing varies significantly between Manim versions; explicit substring matching or split Tex elements are safer."
+    },
+    {
+      "pattern": "ValueTracker updater blocking main thread or failing to increment",
+      "severity": "medium",
+      "note": "Ensure the updater correctly uses dt or a global clock to increment the tracker value smoothly."
+    }
+  ]
+}

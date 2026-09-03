@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-199",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "pi R label",
+        "R label",
+        "pi R^2 formula"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Blue circle",
+        "20 sectors",
+        "Interlocked rectangular arrangement",
+        "Yellow and pink dimension lines"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "20 slices",
+        "Radius 2.0"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene or Scene structure",
+        "Sector generation logic",
+        "Target-based animations"
+      ]
+    }
+  }
+}

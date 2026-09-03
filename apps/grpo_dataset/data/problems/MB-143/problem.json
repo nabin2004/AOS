@@ -1,0 +1,70 @@
+{
+  "id": "MB-143",
+  "title": "Prime Race Graph Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    85.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Number Theory",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the prime race between primes of the form 4n+1 and 4n+3. The visualization should compute the running difference (Team 3 minus Team 1) for primes up to 26863. The graph's stroke color should dynamically interpolate between Blue (when Team 1 leads), White, and Red (when Team 3 leads). Use an Axes object to plot the graph. Implement a custom reveal mechanism using a FullScreenRectangle that moves to the right, simulating the graph being drawn over time. Start with a zoomed-in camera view on the origin, step through the first 30 primes, then restore the camera frame to full view while revealing up to prime index 200. Finally, dynamically squish (stretch horizontally) the graph and the x-axis to fit the entire race of 26863 primes within the screen width, while displaying a running integer counter of the current prime number at the bottom.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-143/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 115,
+    "scene_classes": [
+      "RaceGraph"
+    ],
+    "visual_techniques": [
+      "Dynamic graph stretching using UpdateFromAlphaFunc",
+      "Color interpolation based on running difference values",
+      "Camera zoom and restore using frame.save_state() and Restore",
+      "Reveal animation using a moving FullScreenRectangle mask"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Axes",
+      "FullScreenRectangle",
+      "UpdateFromAlphaFunc",
+      "Restore",
+      "Integer",
+      "interpolate_color"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim CE Scene instead of InteractiveScene, causing frame manipulation methods to fail.",
+      "severity": "high",
+      "note": "ManimGL's self.frame is not directly available in Manim CE without using Camera classes or different API calls."
+    },
+    {
+      "pattern": "Incorrectly scaling the graph using stretch without updating the bounding box or origin point.",
+      "severity": "medium",
+      "note": "The stretch method must specify about_point=origin to prevent the graph from shifting off-screen."
+    },
+    {
+      "pattern": "Slow performance when computing primes or updating the graph points dynamically.",
+      "severity": "medium",
+      "note": "Pre-computing the prime differences and colors before the animation loop is critical for performance."
+    }
+  ]
+}

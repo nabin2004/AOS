@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-099",
+  "conflicts": [
+    {
+      "category": "framework_mismatch",
+      "gl_construct": "moderngl.TRIANGLE_STRIP",
+      "ce_equivalent": "Not directly supported in ManimCE without low-level custom OpenGL shader wrappers.",
+      "severity": "high"
+    },
+    {
+      "category": "shader_pipeline",
+      "gl_construct": "self.set_uniforms / self.set_uniform",
+      "ce_equivalent": "ManimCE uses a different shader architecture and does not expose direct uniform setters on standard Mobjects in the same way.",
+      "severity": "high"
+    },
+    {
+      "category": "updaters",
+      "gl_construct": "self.always.sync_points()",
+      "ce_equivalent": "self.add_updater(lambda m: m.sync_points())",
+      "severity": "medium"
+    }
+  ]
+}

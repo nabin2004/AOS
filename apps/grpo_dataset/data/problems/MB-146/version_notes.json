@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-146",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene (with custom camera/frame handling)",
+      "severity": "high"
+    },
+    {
+      "category": "Graph Binding",
+      "gl_construct": "axes.get_graph(..., bind=True)",
+      "ce_equivalent": "axes.plot(...) with always_redraw or custom updaters",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Frame",
+      "gl_construct": "self.frame.animate.set_x(-5)",
+      "ce_equivalent": "self.camera.frame.animate.set_x(-5)",
+      "severity": "medium"
+    },
+    {
+      "category": "Text Mobjects",
+      "gl_construct": "TexText",
+      "ce_equivalent": "Tex or TexTemplate",
+      "severity": "medium"
+    }
+  ]
+}

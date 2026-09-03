@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-090",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Riemann Zeta function representation",
+        "Complex number mapping",
+        "Exponential regulation factor e^{-cn}",
+        "Zeta zeros computation using mpmath"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Dual complex planes side-by-side",
+        "Dynamic VMobject path with updater",
+        "Yellow tracking dot for s",
+        "Color-coded Tex labels for s and c"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Numpy vectorized computation of partial sums",
+        "Complex value tracking updates",
+        "Accurate coordinate-to-point mapping (n2p)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "InteractiveScene or Scene base class",
+        "Updaters for dynamic path and label updates",
+        "Clean layout arrangement of planes and labels"
+      ]
+    }
+  }
+}

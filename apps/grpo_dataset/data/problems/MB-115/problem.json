@@ -1,0 +1,69 @@
+{
+  "id": "MB-115",
+  "title": "3D Cube Projection and Coordinate Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a ManimGL script using InteractiveScene that visualizes a 3D cube, its vertex coordinates, and its projection along a diagonal vector. \n\n1. **Scene Setup**:\n   - Set up a 3D environment with `ThreeDAxes` and a `NumberPlane` on the XY plane. Use thin grey strokes for the axes and blue strokes for the plane lines.\n   - Position the camera frame at an initial orientation: azimuth 28 degrees, polar 68 degrees, distance/zoom factor 2.89, looking at target (0.99, 0.63, 0.66).\n   - Position a light source at [3, 5, 7].\n\n2. **Cube Construction**:\n   - Define the 8 vertices of a unit cube using the Cartesian product of {0, 1} in 3D space.\n   - Create a `DotCloud` at these vertices with a small radius (e.g., 0.025) and teal color.\n   - Create the wireframe shell of the cube by drawing lines between vertices that are at distance 1 from each other. Set the stroke color to yellow, stroke width to 1, and shift the cube so that its center is at the origin.\n   - Animate the drawing of the cube shell using `Write` with a lag ratio.\n\n3. **Coordinate Labeling**:\n   - Add 3D text labels (e.g., '(0, 0, 0)', '(1, 1, 1)') next to each vertex. Rotate the labels slightly (e.g., 45 degrees around the RIGHT axis) so they face the camera nicely, and add a black backstroke for readability.\n   - Animate the camera reorienting to a new angle while fading in the vertex dots and coordinate labels.\n\n4. **Edge Highlighting**:\n   - Group the cube's edges and sort them by their Z-coordinate.\n   - Temporarily dim the top edges and their corresponding labels (reduce opacity/stroke width) to highlight the base square.\n   - Then, dim the base edges and highlight the top square edges.\n   - Finally, restore all edges and labels to full opacity, then fade out the coordinate labels.\n\n5. **Camera Reorientation & Projection**:\n   - Reorient the camera to look directly down the diagonal corner of the cube (e.g., azimuth 135.795, polar 55.795).\n   - Draw a diagonal vector pointing along [1, 1, 1] and label it.\n   - Project the cube onto a perpendicular plane. Create a flat projection of the cube shell and vertex dots by applying a projection matrix (perpendicular to the diagonal vector) and animate the transformation from the 3D cube to its 2D flat projection.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-115/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 150,
+    "scene_classes": [
+      "Project3DCube"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "3D Coordinate Labeling",
+      "Edge Highlighting",
+      "Matrix Projection",
+      "DotCloud Rendering"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ThreeDAxes",
+      "DotCloud",
+      "frame.reorient",
+      "apply_matrix"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE ThreeDScene camera methods instead of ManimGL's InteractiveScene frame.reorient",
+      "severity": "high",
+      "note": "The reference code relies on self.frame.reorient and self.frame.animate.reorient which are specific to ManimGL."
+    },
+    {
+      "pattern": "Incorrect vertex mapping or missing DotCloud support in standard ManimCE",
+      "severity": "medium",
+      "note": "DotCloud is a specialized ManimGL class; in ManimCE, it must be simulated using VGroup of Dot3D or PMobject."
+    },
+    {
+      "pattern": "Applying matrix transformations directly to 3D Mobjects without proper projection matrices",
+      "severity": "high",
+      "note": "The projection requires a custom projection matrix applied via apply_matrix to simulate the flat 2D shadow."
+    }
+  ]
+}

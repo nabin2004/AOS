@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-093",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Number line is rendered with prime numbers labeled and highlighted with glowing dots.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "NumberLine",
+        "primes",
+        "GlowDots",
+        "add_numbers"
+      ],
+      "clip_query": "A horizontal number line showing large numbers with glowing dots on prime values."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The camera pans and zooms in on a large prime near the center of the visible range.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "self.frame.animate",
+        "match_x",
+        "set_height"
+      ],
+      "clip_query": "The camera smoothly pans to the right and zooms in on a specific labeled number on the line."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A yellow label 'Big prime, p' appears with an arrow pointing to the selected prime.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "TexText",
+        "Arrow",
+        "YELLOW",
+        "GrowArrow"
+      ],
+      "clip_query": "A yellow label reading 'Big prime, p' appears with an arrow pointing upwards to a number."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A brace appears showing the gap between primes, followed by the expected gap equation morphing into place.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "Brace",
+        "gap",
+        "E[gap]",
+        "FadeTransform"
+      ],
+      "clip_query": "A brace labeled 'gap' appears, followed by an equation E[gap] = ln(p) appearing at the top."
+    }
+  ]
+}

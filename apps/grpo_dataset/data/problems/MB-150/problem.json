@@ -1,0 +1,70 @@
+{
+  "id": "MB-150",
+  "title": "Reverting to One Layer at a Time Wave Phase Shift",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Create a ManimGL visualization that demonstrates how a wave's phase and amplitude change as it passes through multiple layers of a medium (e.g., glass), and then transitions to analyzing a single layer at a time. \n\nYour implementation should include:\n1. A coordinate system (axes) where the wave propagates along the x-axis.\n2. A custom `SlicedWave` group that contains:\n   - An `OscillatingWave` (a continuous sine wave whose points are updated dynamically using an updater based on time and x-coordinates).\n   - An `OscillatingFieldWave` (vertical vectors representing the field strength along the wave).\n   - Vertical lines representing the boundaries of the medium layers.\n3. Dynamic wave modification: As the wave passes each layer's x-coordinate, its phase must be shifted (phase kick-back) and its amplitude must be scaled (damping). Use `ValueTracker`s for these parameters so they can be animated dynamically.\n4. An animation sequence in the scene `RevertToOneLayerAtATime` that:\n   - Shows the wave propagating through multiple layers with visible phase shifts and damping.\n   - Animates the removal or fading out of all but one layer to isolate and analyze the individual contribution of a single layer on the wave's phase and amplitude.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-150/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "RevertToOneLayerAtATime"
+    ],
+    "visual_techniques": [
+      "Dynamic wave propagation using custom updaters",
+      "ValueTracker-driven phase shifts and amplitude damping",
+      "Vector field visualization along a wave",
+      "Layered visual transitions"
+    ],
+    "manim_api_patterns": [
+      "VMobject",
+      "Group",
+      "ValueTracker",
+      "add_updater",
+      "set_points_as_corners",
+      "colormaps.get_cmap"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect updater logic causing the wave to freeze or distort over time",
+      "severity": "high",
+      "note": "Ensure the time variable in the updater increments correctly using dt and is not reset prematurely."
+    },
+    {
+      "pattern": "Discontinuities at layer boundaries due to incorrect phase shift math",
+      "severity": "high",
+      "note": "The phase shift must be applied continuously for all x greater than the layer's x-coordinate."
+    },
+    {
+      "pattern": "Mismatched vector field alignment with the wave curve",
+      "severity": "medium",
+      "note": "The vectors in OscillatingFieldWave must dynamically query the wave's y-coordinate at their respective x-positions."
+    }
+  ]
+}

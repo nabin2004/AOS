@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-160",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Snell's Law implementation",
+        "Vector rotation (rotate_vector)",
+        "Line-line intersection calculation (find_intersection)",
+        "Refractive index interpolation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Spectral color mapping (spectral_cmap)",
+        "3D Extruded Prism (Prismify)",
+        "Dynamic ray tracing with always_redraw",
+        "3D Camera reorientation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Generating 200 distinct light beams",
+        "Non-linear interpolation of refractive indices (alphas = np.linspace(0, 1, n_beams)**1.5)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Transition between 2D and 3D states",
+        "Use of turn_animation_into_updater for continuous camera rotation",
+        "Precise timing of fades and camera movements"
+      ]
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-116",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup of 2D Axes and introduction of the x_1 tracker (blue arrow tip and label) on the x-axis.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Axes",
+        "x1_tracker",
+        "x1_tip",
+        "x1_label",
+        "BLUE"
+      ],
+      "clip_query": "A 2D coordinate axis showing a blue arrow tip and label x_1 on the horizontal axis."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Randomization animation of x_1 with tracking dots trailing along the x-axis to simulate random sampling.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        13.0
+      ],
+      "keyword_bank": [
+        "Randomize",
+        "TrackingDots",
+        "GlowDot",
+        "x1_tracker"
+      ],
+      "clip_query": "A blue arrow rapidly jumping to random positions on the horizontal axis, leaving a glowing trail of dots."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Highlighting the interval a < x_1 < b and displaying the probability equation P(a < x_1 < b) = b - a.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        13.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "Tex",
+        "P(a < x_1 < b) = b - a"
+      ],
+      "clip_query": "A blue highlighted rectangle on the horizontal axis with a probability equation displayed above it."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Introduction of the x_2 tracker (yellow arrow tip and label) on the vertical axis.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        20.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "x2_tracker",
+        "x2_tip",
+        "x2_label",
+        "YELLOW"
+      ],
+      "clip_query": "A yellow arrow tip and label x_2 appearing on the vertical axis of the 2D coordinate system."
+    }
+  ]
+}

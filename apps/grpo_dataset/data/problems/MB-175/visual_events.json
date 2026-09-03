@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-175",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "3D Court Setup and Camera Reorientation",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "frame.reorient",
+        "basketball-court",
+        "court_rect"
+      ],
+      "clip_query": "A 3D basketball court plane viewed from an angled perspective"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Year Label Display",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "TexText",
+        "fix_in_frame",
+        "year_label"
+      ],
+      "clip_query": "A text label showing the year fixed to the screen overlay"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dot Cloud Generation",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "DotCloud",
+        "get_dots",
+        "YELLOW"
+      ],
+      "clip_query": "A dense cloud of yellow dots appearing on the basketball court"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "3D Density Bar Chart (VCubes)",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "VCube",
+        "get_bars",
+        "BLUE_E"
+      ],
+      "clip_query": "3D bars rising from the basketball court representing shot density"
+    }
+  ]
+}

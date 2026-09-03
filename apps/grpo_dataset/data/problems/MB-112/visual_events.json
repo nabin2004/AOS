@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-112",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render the initial 2D loop on the xy-plane with two tracking dots, showing their midpoint and a vertical line representing their distance.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "loop",
+        "midpoint",
+        "distance",
+        "TrueDot",
+        "GlowDot"
+      ],
+      "clip_query": "A 2D loop on a flat plane with two moving dots, a connecting line, and a vertical line indicating distance."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Generate and render the 3D parametric surface representing all point pairs, with height corresponding to distance.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "ParametricSurface",
+        "get_surface_func",
+        "get_half_parametric_func"
+      ],
+      "clip_query": "A 3D surface rising above a 2D loop, where the height of the surface represents the distance between pairs of points on the loop."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Rotate the camera to showcase the 3D structure of the surface and its boundary.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "camera",
+        "frame",
+        "set_euler_angles"
+      ],
+      "clip_query": "Camera rotating around a 3D surface to show its topological structure from different angles."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Morph the 2D loop into a new shape, with the 3D surface dynamically updating and morphing its shape in sync.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "morph",
+        "updater",
+        "animate",
+        "ChangeTheSurface"
+      ],
+      "clip_query": "A 2D loop changing its shape while the 3D surface above it smoothly deforms and morphs to match the new geometry."
+    }
+  ]
+}

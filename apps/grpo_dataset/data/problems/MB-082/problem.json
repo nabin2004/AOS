@@ -1,0 +1,70 @@
+{
+  "id": "MB-082",
+  "title": "Translate to New Language (Laplace Transform)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Signal Processing"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes how a complex signal can be decomposed into individual exponential components on the s-plane (Laplace domain). \n\nYour visualization should include:\n1. A main 2D function graph representing a signal $f(t)$ which is constructed as a linear combination of complex exponentials: $f(t) = \\sum w_i e^{s_i t}$.\n2. An s-plane grid populated with small 'icon' graphs of $e^{st}$ placed at their corresponding complex coordinates $s = \\sigma + i\\omega$. Each icon should show a small bounding box, axes, and the real part of the exponential curve.\n3. An introductory animation that fades in the main function graph, its axes, and the s-plane containing the grid of exponential icons.\n4. A transition animation that dims (fades out) all exponential icons on the s-plane except for the specific key components ($s_i$) that actually compose the signal $f(t)$.\n5. Text labels showing the weights ($w_i$) next to the highlighted key exponential icons on the s-plane.\n\nEnsure you handle the layout cleanly, placing the main signal graph and the s-plane in a clear multi-panel arrangement. Use ManimGL's InteractiveScene or standard Scene with appropriate camera adjustments.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-082/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 145,
+    "scene_classes": [
+      "TranslateToNewLanguage"
+    ],
+    "visual_techniques": [
+      "3D Parametric Surface rendering",
+      "Complex phase-to-color mapping",
+      "Multi-panel layout (2D graph alongside s-plane grid)",
+      "Target-based state animations (save_state, generate_target, fade)"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ParametricSurface",
+      "SurfaceMesh",
+      "Axes",
+      "color_by_uv_function",
+      "LaggedStartMap",
+      "SurroundingRectangle"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community imports instead of ManimGL imports",
+      "severity": "high",
+      "note": "The reference code relies on ManimGL's InteractiveScene and custom surface/mesh APIs. Mixing imports will cause syntax and runtime errors."
+    },
+    {
+      "pattern": "Missing implementation of the complex phase-to-color mapping function (z_to_color)",
+      "severity": "medium",
+      "note": "The 3D complex graph relies on custom HSL color mapping based on the phase of the complex output."
+    },
+    {
+      "pattern": "Incorrect positioning of the exponential icons on the s-plane",
+      "severity": "medium",
+      "note": "The icons must be mapped to the s-plane's coordinate system using s_plane.c2p(u, v) to align correctly with the grid."
+    }
+  ]
+}

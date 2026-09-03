@@ -1,0 +1,69 @@
+{
+  "id": "MB-117",
+  "title": "3D Cube Projection and Coordinate Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Create a 3D visualization scene using ManimGL that demonstrates the structure and projection of a 3D cube.\n\n1. Set up a 3D coordinate system with `ThreeDAxes` and a `NumberPlane` on the XY plane. Set the stroke of the axes and plane lines to be subtle.\n2. Construct a unit cube with vertices at all combinations of {0, 1} in 3D space. Use a `DotCloud` for the vertices and draw lines for the edges. Center the cube appropriately.\n3. Initially position the camera to view the cube from an angled perspective using `self.frame.reorient`.\n4. Animate the drawing of the cube's edges using `Write` with a lag ratio.\n5. Add text labels showing the coordinates (e.g., '(0, 0, 0)', '(1, 1, 1)') next to each vertex, rotating them to face the camera appropriately.\n6. Reorient the camera to a new angle while fading in the coordinate labels and vertex dots.\n7. Highlight the structure of the cube by first fading out the top face edges and labels, then fading out the bottom face edges and labels, and finally restoring them all to full opacity.\n8. Rotate the camera to look directly down the main diagonal corner of the cube.\n9. Project the 3D cube onto a 2D plane perpendicular to the main diagonal. Show a projection plane, draw a vector along the diagonal, and transform a copy of the cube and its vertices onto this plane using a projection matrix.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-117/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "Project3DCube"
+    ],
+    "visual_techniques": [
+      "3D camera reorientation",
+      "Matrix transformation projection",
+      "DotCloud rendering",
+      "Edge highlighting and fading"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame.reorient",
+      "ThreeDAxes",
+      "DotCloud",
+      "apply_matrix",
+      "LaggedStartMap"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE camera rotation methods instead of ManimGL's self.frame.reorient",
+      "severity": "high",
+      "note": "ManimGL uses self.frame for camera control, which has different arguments and behavior compared to ManimCE's ThreeDScene camera."
+    },
+    {
+      "pattern": "DotCloud class missing or failing in ManimCE",
+      "severity": "high",
+      "note": "DotCloud is specific to ManimGL; in ManimCE, PMobject or multiple Dot mobjects must be used instead."
+    },
+    {
+      "pattern": "Incorrect matrix multiplication or projection application",
+      "severity": "medium",
+      "note": "Applying a custom projection matrix to 3D mobjects requires careful handling of the coordinate dimensions."
+    }
+  ]
+}

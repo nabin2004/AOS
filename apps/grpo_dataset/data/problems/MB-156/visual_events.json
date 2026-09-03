@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-156",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the 3D scene showing the angled medium boundary and the incoming wave dot cloud in perspective view.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "VCube",
+        "DotCloud",
+        "interface_origin",
+        "interface_normal"
+      ],
+      "clip_query": "A 3D perspective view of a transparent blue block representing a medium and a grid of white dots representing a wave field."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Wave propagation starts, showing wavefronts moving from left to right and bending/slowing down as they cross the interface into the medium.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "add_updater",
+        "time_func",
+        "opacity_func",
+        "index"
+      ],
+      "clip_query": "Waves of light/opacity propagating through a dot grid and refracting at an angled boundary."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Camera smoothly rotates from the initial 3D perspective angle to a flat, overhead 2D view.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "frame",
+        "animate",
+        "increment_theta",
+        "increment_phi"
+      ],
+      "clip_query": "The camera rotates from a tilted 3D angle to a direct top-down overhead view of the wave field."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Overhead view stabilizes, clearly demonstrating the geometric relationship of refraction (Snell's Law visual representation).",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        9.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "TransitionToOverheadView",
+        "prop_direction"
+      ],
+      "clip_query": "A flat 2D overhead view of parallel wavefronts bending at a vertical interface boundary."
+    }
+  ]
+}

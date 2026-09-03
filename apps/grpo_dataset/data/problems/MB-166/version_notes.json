@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-166",
+  "conflicts": [
+    {
+      "category": "Mobject Updaters",
+      "gl_construct": "always_redraw",
+      "ce_equivalent": "always_redraw or add_updater",
+      "severity": "medium"
+    },
+    {
+      "category": "Vector styling",
+      "gl_construct": "Vector",
+      "ce_equivalent": "Arrow",
+      "severity": "low"
+    }
+  ]
+}

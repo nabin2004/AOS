@@ -1,0 +1,34 @@
+{
+  "problem_id": "MB-192",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "General form equations for linear, quadratic, cubic, quartic, and quintic polynomials",
+        "LaTeX formatting of algebraic variables and coefficients"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Grid lines separating rows and columns",
+        "Checkmarks or visual indicators for solvability",
+        "Cover rectangles masking parts of the screen"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Correct indexing of rows and columns",
+        "Precise coordinate offsets for shifting columns"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "Camera frame manipulation (zoom, shift, save/restore state)",
+        "Sequential reveal animations using cover masks"
+      ]
+    }
+  }
+}

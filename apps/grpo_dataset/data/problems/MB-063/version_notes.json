@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-063",
+  "conflicts": [
+    {
+      "category": "InteractiveScene",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "ComplexValueTracker",
+      "gl_construct": "ComplexValueTracker",
+      "ce_equivalent": "ValueTracker (using separate trackers for real and imaginary parts, or custom updater)",
+      "severity": "high"
+    },
+    {
+      "category": "GlowDot",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot (optionally styled with a larger, semi-transparent background Dot for glow effect)",
+      "severity": "medium"
+    },
+    {
+      "category": "DecimalMatrix",
+      "gl_construct": "DecimalMatrix",
+      "ce_equivalent": "Matrix (with custom element formatting using DecimalNumber)",
+      "severity": "medium"
+    }
+  ]
+}

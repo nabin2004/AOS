@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-059",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Ket notation rendering",
+        "3D vector coordinates",
+        "Basis states |0>, |1>, |2>",
+        "Balanced state vector normalization"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "3D axes and grid plane",
+        "Rotating camera frame",
+        "Dynamic DecimalMatrix fixed in frame",
+        "Key icon next to secret state",
+        "Vector perpendicular to camera setting"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for rotation velocity",
+        "Dynamic coordinate updates in matrix",
+        "Vector normalization calculations"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Ket and KetGroup custom classes",
+        "InteractiveScene structure",
+        "Updaters for camera and matrix"
+      ]
+    }
+  }
+}

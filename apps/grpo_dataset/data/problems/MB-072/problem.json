@@ -1,0 +1,71 @@
+{
+  "id": "MB-072",
+  "title": "Integration of Real Exponential Function",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "interactive"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script using `InteractiveScene` that visualizes the integration of the real exponential function $e^{-st}$ as the parameter $s$ varies. First, display the integral expression $\\int^\\infty_0 e^{-st} dt$ at the top of the screen. Create a set of axes with x-range [0, 15] and y-range [0, 1]. Plot the graph of $e^{-st}$ dynamically bound to a `ValueTracker` for $s$ (initially $s=1$). Add a slider for $s$ at the top left. Animate the slider and the graph as $s$ changes to 5, then 0.25, and back to 1. Next, show that the integral represents the area under the curve by adding an 'Area' label with an arrow pointing to the shaded region under the graph. Then, animate $s$ to a negative value (-0.2) and reorient the camera frame to capture the diverging graph and area. Finally, show the analytical evaluation of the integral for $s=1$, showing that the area equals 1.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-072/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 105,
+    "scene_classes": [
+      "IntegrateRealExponential"
+    ],
+    "visual_techniques": [
+      "Dynamic graph binding",
+      "ValueTracker slider",
+      "Area under curve visualization",
+      "Camera frame reorientation",
+      "Tex transformation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Axes",
+      "axes.bind_graph_to_func",
+      "Slider",
+      "ValueTracker",
+      "axes.get_area_under_graph",
+      "frame.animate.reorient"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community Scene instead of ManimGL InteractiveScene",
+      "severity": "high",
+      "note": "The reference code relies on ManimGL's InteractiveScene and its specific camera frame controls."
+    },
+    {
+      "pattern": "Missing Slider class or bind_graph_to_func method",
+      "severity": "high",
+      "note": "Slider and bind_graph_to_func are specific to ManimGL / 3b1b's custom library. In standard Manim, these must be implemented manually using ValueTrackers and always_redraw."
+    },
+    {
+      "pattern": "Incorrect camera reorientation syntax",
+      "severity": "medium",
+      "note": "frame.animate.reorient is unique to ManimGL. Standard Manim uses self.camera.frame.animate.set_euler_angles or move_to."
+    }
+  ]
+}

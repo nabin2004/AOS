@@ -1,0 +1,71 @@
+{
+  "id": "MB-195",
+  "title": "The Pi = 4 Fallacy (Square-Circle Approximation Paradox)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a complete Manim scene named `SquareCircleExample` using ManimGL/Manim-centric API. The scene visualizes the classic 'pi = 4' geometric fallacy where a square's corners are iteratively folded in to approximate a circle, showing that while the shape visually approaches a circle, its perimeter remains constant at 8.\n\nYour code should implement the following steps:\n1. Create a circle of radius 2.0 with a deep blue fill and a thin white stroke. Show a radial line labeled '1'.\n2. Create a yellow circumference highlight that unwraps into a straight line of length 2 * pi * radius above the circle to illustrate the actual circumference.\n3. Fade out the unwrapped line and show a bounding square (perimeter = 8) around the circle. Show 8 radial segments of length 1 to visually prove the perimeter is 8.\n4. Implement an iterative folding process. You will need a helper method `get_square_approx(self, circle, num_steps)` (or equivalent logic) that generates a step-like approximation of the circle with a given number of vertices.\n5. Animate the transition through successive finer approximations (e.g., doubling the number of steps at each iteration).\n6. For the first approximation step, animate two glowing dots (GlowDot) tracing along the original square path and the new folded path simultaneously to emphasize that the path length remains unchanged despite the visual folding.\n7. Continue the iterations, changing the stroke width and color of the curves to red as they get closer to the circle.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-195/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "SquareCircleExample"
+    ],
+    "visual_techniques": [
+      "Path unwrapping to a straight line",
+      "Iterative step-curve generation",
+      "Simultaneous path tracing with GlowDots",
+      "Submobject spacing and restoration"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "OldTex",
+      "OldTexText",
+      "ShowCreation",
+      "MoveAlongPath",
+      "space_out_submobjects",
+      "there_and_back"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing helper method `get_square_approx`",
+      "severity": "high",
+      "note": "The scene relies on a custom helper method to generate the step-like square approximations. Without it, the iterative folding loop will crash."
+    },
+    {
+      "pattern": "ManimCE vs ManimGL API mismatch",
+      "severity": "high",
+      "note": "Using `Create` instead of `ShowCreation`, or `Tex` instead of `OldTex` in a ManimGL context will cause rendering failures."
+    },
+    {
+      "pattern": "Incorrect path tracing logic",
+      "severity": "medium",
+      "note": "The `MoveAlongPath` animation requires properly formatted curves with matching subdivision counts to look smooth."
+    }
+  ]
+}

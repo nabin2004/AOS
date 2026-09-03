@@ -1,0 +1,73 @@
+{
+  "id": "MB-077",
+  "title": "Laplace Transform of Cosine Symbolically",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Create a Manim scene named 'LaplaceTransformOfCosineSymbolically' that demonstrates the symbolic derivation of the Laplace transform of cos(t). \n\n1. **Initial Setup & Definition**:\n   - Define a color map for variables: `{t}` in BLUE, `{s}` in YELLOW, and `\\omega` in PINK.\n   - Display the term 'cos(t)' in the upper-left corner.\n   - Draw a vector arrow pointing to the right from 'cos(t)' with a script 'L' (representing the Laplace transform operator) above it.\n   - To the right of the arrow, write out the defining integral of the Laplace transform: \\int^\\infty_0 \\cos(t) e^{-st} dt.\n   - Animate this setup using a lagged start: grow the arrow, write the 'L' symbol, write the integral sign, transform a copy of 'cos(t)' into the integrand, and write the remaining exponential term.\n\n2. **Euler's Substitution**:\n   - Introduce the complex exponential split of cosine: \\cos(t) = \\frac{1}{2}(e^{it} + e^{-it}).\n   - Show a surrounding rectangle around the '\\cos(t)' term in the integral.\n   - Transform the integral to replace '\\cos(t)' with the exponential split, moving the surrounding rectangle to highlight this new substituted term.\n   - Fade out the rectangle.\n\n3. **Linearity Expansion**:\n   - Highlight the entire substituted integral with a new surrounding rectangle, then fade it out.\n   - Position an equals sign below the equation, pointing downwards.\n   - Below the equals sign, write the split version of the integral using linearity: \\frac{1}{2} \\int^\\infty_0 e^{it} e^{-st} dt + \\frac{1}{2} \\int^\\infty_0 e^{-it} e^{-st} dt.\n   - Animate the transition by copying and transforming the corresponding terms from the combined integral into the split integrals step-by-step.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-077/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "LaplaceTransformOfCosineSymbolically"
+    ],
+    "visual_techniques": [
+      "Tex color mapping",
+      "SurroundingRectangle highlighting",
+      "TransformMatchingTex",
+      "LaggedStart of formula components",
+      "TransformFromCopy for step-by-step derivation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "Vector",
+      "SurroundingRectangle",
+      "TransformMatchingTex",
+      "LaggedStart",
+      "TransformFromCopy",
+      "ShowCreation",
+      "FadeTransform"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using InteractiveScene or self.frame in standard Manim Community Edition",
+      "severity": "high",
+      "note": "If porting to ManimCE, replace InteractiveScene with Scene and avoid self.frame manipulations."
+    },
+    {
+      "pattern": "Mismatched Tex keys in TransformMatchingTex",
+      "severity": "medium",
+      "note": "Ensure key_map keys exactly match the isolated substrings in the Tex mobjects."
+    },
+    {
+      "pattern": "ShowCreation undefined in ManimCE",
+      "severity": "high",
+      "note": "Replace ShowCreation with Create when using ManimCE."
+    }
+  ]
+}

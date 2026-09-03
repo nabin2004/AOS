@@ -1,0 +1,73 @@
+{
+  "id": "MB-136",
+  "title": "Euler's Formula Balanced Equation Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Geometry",
+    "Topology",
+    "Graph Theory"
+  ],
+  "full_prompt": "Write a Manim script that visualizes Euler's formula (V - E + F = 2) using a dynamic graph representation. The scene should start by displaying the equation 'V - E + F = 2' at the top of the screen. Underneath each variable (V, E, F), display its corresponding integer value, initialized to 1, 0, and 1 respectively for a trivial graph (one vertex, zero edges, and one outer face). Create a graph structure with vertices (dots), edges (lines), and colored faces (polygons). Start the visualization by showing a single vertex labeled as a 'Trivial graph' with an arrow pointing to it. Flash the variables V, F, and E in the equation sequentially, fading in their initial values (1, 0, 1) and briefly highlighting the background to represent the outer face. Then, animate the addition of a new edge and a new vertex, showing how the counts of V and E increment dynamically while maintaining the balance of the equation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-136/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "BalancedEquation"
+    ],
+    "visual_techniques": [
+      "Dynamic integer counters",
+      "Graph rendering with vertices, edges, and faces",
+      "Sequential highlighting with FlashAround",
+      "Custom rate functions (there_and_back) for background flashing"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "FullScreenRectangle",
+      "Tex",
+      "Integer",
+      "VGroup",
+      "Vector",
+      "FlashAround",
+      "ChangeDecimalToValue",
+      "LaggedStart"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimGL-specific InteractiveScene in ManimCE without fallback",
+      "severity": "high",
+      "note": "InteractiveScene is exclusive to ManimGL. For ManimCE, use Scene."
+    },
+    {
+      "pattern": "Using TexText instead of Tex or Tex with text blocks in ManimCE",
+      "severity": "medium",
+      "note": "TexText is a ManimGL class; ManimCE uses Tex with standard LaTeX text commands."
+    },
+    {
+      "pattern": "Incorrect indexing of Tex characters for V, E, F variables",
+      "severity": "medium",
+      "note": "Hardcoded character indexing like equation[char][0] can break if the LaTeX compiler groups characters differently."
+    }
+  ]
+}

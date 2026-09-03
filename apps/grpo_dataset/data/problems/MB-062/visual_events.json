@@ -1,0 +1,85 @@
+{
+  "problem_id": "MB-062",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Introduction of the number set {0, 1, ..., N-1} at the top and the blackbox machine with '???' marks.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "number_set",
+        "machine",
+        "q_marks"
+      ],
+      "clip_query": "A set of numbers from 0 to 19 at the top of the screen with a blackbox machine in the center."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Highlighting the key number 12 with a yellow key icon and passing it through the machine for evaluation.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "key_icon",
+        "key_input",
+        "evaluation_animation"
+      ],
+      "clip_query": "A yellow key icon appears under the number 12, which is then evaluated by the blackbox machine."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Arranging other numbers in a grid and passing them through the machine to show negative evaluations.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "other_inputs",
+        "arrange_in_grid",
+        "evaluation_animation"
+      ],
+      "clip_query": "A grid of numbers is evaluated by the machine, showing negative results."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Revealing the internal Python code 'def f(n): return (n == 12)' inside the transparent machine.",
+      "weight": 0.15,
+      "critical": true,
+      "expected_time_range": [
+        25.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "innards",
+        "Code",
+        "set_fill"
+      ],
+      "clip_query": "The blackbox machine becomes transparent, revealing a Python code block inside."
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Sequential guess-and-check loop evaluating numbers from 0 to 12 one by one.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        35.0,
+        55.0
+      ],
+      "keyword_bank": [
+        "guess and check",
+        "last_group",
+        "evaluation_animation"
+      ],
+      "clip_query": "Numbers are sequentially fed into the machine one by one in a linear search simulation."
+    }
+  ]
+}

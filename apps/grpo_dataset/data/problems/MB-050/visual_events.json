@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-050",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initial 3D scene setup with a central light source (GlowDot), 3D axes, and a sphere with a surface mesh.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "GlowDot",
+        "ThreeDAxes",
+        "Sphere",
+        "SurfaceMesh"
+      ],
+      "clip_query": "A glowing dot at the center of 3D axes surrounded by a wireframe sphere mesh"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Eminating light radiation effect expanding outwards from the center.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        11.0
+      ],
+      "keyword_bank": [
+        "beaming_effect",
+        "radiation",
+        "op_tracker"
+      ],
+      "clip_query": "Glowing light radiation expanding outwards from a central source"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Highlighting a small parametric patch on the sphere and projecting a beam through it.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        11.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "ParametricSurface",
+        "patch",
+        "beam"
+      ],
+      "clip_query": "A small highlighted patch on a sphere with a beam of light projecting through it"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Scaling the sphere and patch by a factor of 2 to demonstrate the inverse square law division.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        25.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "ParametricCurve",
+        "division",
+        "ghost_sphere",
+        "scale"
+      ],
+      "clip_query": "A sphere and its highlighted patch scaling up to twice their size, showing grid divisions"
+    }
+  ]
+}

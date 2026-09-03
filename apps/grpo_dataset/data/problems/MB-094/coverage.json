@@ -1,0 +1,42 @@
+{
+  "problem_id": "MB-094",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Prime density near T",
+        "1 / \\ln(T)",
+        "T = 1,000,000",
+        "twin primes +2 label"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "GlowDots representing primes",
+        "Yellow arcs connecting twin primes",
+        "NumberLine with custom ticks",
+        "Continuous leftward panning animation",
+        "Curved blue arrow pointing to example"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Number line range from 1e6 - 800 to 1e6 + 800",
+        "Spacing of 50 for labeled numbers",
+        "Continuous shift rate of 2 * dt * LEFT",
+        "Glow factor of 2 and radius of 0.35 for dots"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene base class",
+        "add_updater for continuous movement",
+        "FadeTransform for text transition",
+        "TransformFromCopy for formula variable alignment"
+      ]
+    }
+  }
+}

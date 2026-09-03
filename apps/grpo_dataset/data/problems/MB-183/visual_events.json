@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-183",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of 3D axes, standard basis vectors (RGB), and the yellow signal vector with a rotating camera frame.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "basis_mobs",
+        "signal",
+        "frame.add_updater"
+      ],
+      "clip_query": "A 3D coordinate system with red, green, and blue basis vectors and a yellow vector labeled Signal under a rotating camera."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animation of the linear combination components showing how the signal vector is composed of standard basis projections.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "always_redraw",
+        "get_linear_combination",
+        "TransformFromCopy"
+      ],
+      "clip_query": "Component vectors colored red, green, and blue appearing tip-to-tail to form the yellow signal vector."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic movement of the signal vector to multiple coordinates, with components updating in real-time.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "put_start_and_end_on",
+        "components.resume_updating"
+      ],
+      "clip_query": "The yellow signal vector moving to different 3D coordinates while its projection components dynamically stretch and shrink."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Transformation of the basis vectors to a new rotated coordinate system, followed by updating the signal's components relative to the new basis.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        25.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "rotation_between_vectors",
+        "MoveToTarget",
+        "new_basis"
+      ],
+      "clip_query": "The basis vectors rotating to a new orientation, and the component vectors updating to align with the new basis directions."
+    }
+  ]
+}

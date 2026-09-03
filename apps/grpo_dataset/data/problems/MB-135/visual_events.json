@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-135",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render the coordinate axes and a scatter plot of data points representing a linear trend with some noise.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "Axes",
+        "Dot",
+        "scatter",
+        "add_coordinates"
+      ],
+      "clip_query": "A coordinate system showing a scatter plot of data points"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Introduce two custom Dial mobjects representing the weight (w) and bias (b) parameters, complete with ticks and needles.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "Dial",
+        "Arc",
+        "ticks",
+        "needle"
+      ],
+      "clip_query": "Two circular dials with needles representing weight and bias parameters"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Draw the initial regression line and vertical residual lines connecting each data point to the regression line.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "Line",
+        "residuals",
+        "regression line",
+        "always_redraw"
+      ],
+      "clip_query": "A regression line passing through the scatter plot with vertical error lines"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate the dials turning to new values, showing a passing flash effect along the dial arcs, while the regression line and residuals dynamically update.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "animate_set_value",
+        "VShowPassingFlash",
+        "updater",
+        "set_value"
+      ],
+      "clip_query": "Dials rotating their needles with passing flashes while the regression line tilts and shifts"
+    }
+  ]
+}

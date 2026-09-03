@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-067",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of 3D axes and RGB tracking dots along the coordinate axes.",
+      "weight": 0.15,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        1.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "TrueDot",
+        "tracking_dots"
+      ],
+      "clip_query": "3D coordinate axes with red, green, and blue tracking dots"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Creation of the 3D cone surface while the camera rotates to show its 3D structure.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        1.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "cone",
+        "ParametricSurface",
+        "reorient"
+      ],
+      "clip_query": "A grey 3D cone surface appearing as the camera rotates"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Drawing the red path and yellow dashed dividing line on the surface of the cone.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        5.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "cone_line",
+        "cone_div_line",
+        "DashedLine"
+      ],
+      "clip_query": "A red line and a yellow dashed line drawn on the cone surface"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Simultaneous transformation of the cone and its lines into a flat 2D sector, ending with a top-down camera view.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        9.0,
+        16.0
+      ],
+      "keyword_bank": [
+        "Transform",
+        "flat_cone",
+        "flat_line",
+        "flat_div_line"
+      ],
+      "clip_query": "The 3D cone flattening out into a 2D circular sector with lines morphing flat"
+    }
+  ]
+}

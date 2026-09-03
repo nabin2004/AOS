@@ -1,0 +1,71 @@
+{
+  "id": "MB-103",
+  "title": "Complex Algebra Expansion for Hologram Wave Reconstruction",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Physics",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or standard Manim with appropriate adaptations) that visualizes the algebraic expansion of a complex wave equation representing the light passing beyond a holographic film. \n\n1. Display four lines of LaTeX equations aligned vertically:\n   - Line 0: R * |R + O|^2\n   - Line 1: R * (R + O)(R^* + O^*)\n   - Line 2: R * R * R^* + R * R^* * O + R * R * O^* + R * O * O^*\n   - Line 3: (|R|^2 + |O|^2) * R + |R|^2 * O + R^2 * O^*\n\n2. Initially, display only Line 0. Add a text label \"Part of the wave\\nbeyond the film\" to the right of Line 0, pointed to by a vector arrow.\n\n3. Animate the transition from Line 0 to Line 1 by showing how the squared magnitude |R + O|^2 splits into the product of the complex number and its conjugate (R + O)(R^* + O^*).\n\n4. Perform a step-by-step FOIL expansion from Line 1 to Line 2. For each term expansion, temporarily highlight the source terms in Line 1 and the resulting term in Line 2 using surrounding rectangles (or a custom bounding box helper) before fading in the term and its corresponding '+' sign.\n\n5. Highlight the conjugate pairs (R * R^* and O * O^*) in Line 2 using red rectangles. Draw red arrows pointing from a label \"Real numbers\" at the bottom to these highlighted terms.\n\n6. Finally, fade out the highlights and transition/simplify the terms of Line 2 into the grouped terms of Line 3.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-103/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "ComplexAlgebra"
+    ],
+    "visual_techniques": [
+      "LaTeX substring indexing and matching",
+      "Dynamic term highlighting with custom bounding boxes",
+      "Step-by-step algebraic expansion (FOIL)",
+      "Coordinated arrow and label callouts"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "TransformFromCopy",
+      "LaggedStart",
+      "ShowCreation",
+      "GrowArrow",
+      "FadeIn",
+      "FadeOut"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "LaTeX compilation failure due to raw string formatting or special characters",
+      "severity": "high",
+      "note": "Ensure LaTeX strings use raw format R\"...\" and that standard packages are available."
+    },
+    {
+      "pattern": "Missing custom helper method 'get_term_rect'",
+      "severity": "high",
+      "note": "get_term_rect is a custom method in 3b1b's active branch. In standard Manim, this must be replaced with SurroundingRectangle or a custom function."
+    },
+    {
+      "pattern": "Submobject indexing mismatch when slicing Tex objects",
+      "severity": "medium",
+      "note": "Slicing Tex objects by string keys (e.g., lines[0]['|R + O|']) is highly version-dependent and fragile. Splitting Tex into separate arguments is safer."
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "MB-119",
+  "title": "Struggle with Strips Puzzle Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Puzzles"
+  ],
+  "full_prompt": "Write a Manim script (compatible with ManimGL or Manim Community) that visualizes a geometric puzzle involving covering a circle with strips. First, draw a circle of radius 2.5 with a yellow outline. Show its radius by drawing a white radial line from the center to the right edge, labeled with the integer '1'. Animate the drawing of the circle by rotating this radial line 360 degrees. Next, introduce a 'strip' (a region between two parallel lines intersecting the circle) with a width labeled dynamically using a ValueTracker. The width label should show the decimal value of the width, which dynamically updates as the strip's boundaries shift, and then transitions to the label 'd_1'. Introduce three more colored strips (green, dark blue, light blue) labeled 'd_2', 'd_3', and 'd_4'. Then, cover the circle with a large number of semi-transparent, randomly oriented strips to illustrate the concept of covering the circle. Finally, animate the labels 'd_1', 'd_2', 'd_3', 'd_4' moving to the top of the screen to form a mathematical summation expression: 'd_1 + d_2 + d_3 + d_4 + ... + d_n'. Note: Since 'get_strip' is a custom method, you should implement a helper function to construct a strip as a polygon or a combination of lines/shapes clipped to the circle, or approximate it using a rotated rectangle.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-119/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "AskStripQuestion"
+    ],
+    "visual_techniques": [
+      "always_redraw",
+      "ValueTracker",
+      "there_and_back animation",
+      "ReplacementTransform",
+      "MoveToTarget",
+      "LaggedStart"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Circle",
+      "Line",
+      "Integer",
+      "DecimalNumber",
+      "Tex",
+      "VGroup",
+      "always_redraw",
+      "ValueTracker",
+      "there_and_back",
+      "ReplacementTransform",
+      "MoveToTarget",
+      "LaggedStart"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing implementation of custom helper get_strip",
+      "severity": "high",
+      "note": "The reference code relies on self.get_strip and self.animate_strip_in which are defined elsewhere in the 3b1b codebase. The generated code must implement these manually."
+    },
+    {
+      "pattern": "Incorrect use of InteractiveScene in Manim Community",
+      "severity": "medium",
+      "note": "If running in Manim Community, InteractiveScene must be replaced with Scene, and ShowCreation with Create."
+    }
+  ]
+}

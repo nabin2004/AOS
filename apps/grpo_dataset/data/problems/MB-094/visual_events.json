@@ -1,0 +1,76 @@
+{
+  "problem_id": "MB-094",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The number line centered at 1,000,000 appears on screen and immediately begins panning continuously to the left.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "NumberLine",
+        "add_updater",
+        "shift",
+        "LEFT"
+      ],
+      "clip_query": "A number line centered around one million continuously scrolling to the left."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Glowing dots representing prime numbers and yellow arcs highlighting twin primes are displayed on the moving number line.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        13.0
+      ],
+      "keyword_bank": [
+        "GlowDots",
+        "Line",
+        "path_arc",
+        "YELLOW",
+        "+2"
+      ],
+      "clip_query": "Glowing dots and yellow arcs with +2 labels moving along a number line."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The text 'How dense are primes?' transforms into 'Prime density near T', and a curved blue arrow points to the example '(e.g. T = 1,000,000)'.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        13.0,
+        19.0
+      ],
+      "keyword_bank": [
+        "FadeTransform",
+        "ShowCreation",
+        "Arrow",
+        "path_arc",
+        "example"
+      ],
+      "clip_query": "Text transforming to 'Prime density near T' with a curved blue arrow pointing to an example."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The arrow and example fade out, and the prime density formula '1 / ln(T)' is written out next to an approximation symbol.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        19.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "FadeOut",
+        "Write",
+        "approx",
+        "1 / \\ln(T)",
+        "TransformFromCopy"
+      ],
+      "clip_query": "The formula 1/ln(T) appearing on screen next to an approximation sign."
+    }
+  ]
+}

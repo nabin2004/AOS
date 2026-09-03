@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-066",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "missing_helper",
+      "gl_construct": "self.get_square(n)",
+      "ce_equivalent": "A custom method returning a VGroup containing a Square and an Integer label.",
+      "severity": "high"
+    },
+    {
+      "category": "style_api",
+      "gl_construct": "set_submobject_colors_by_gradient",
+      "ce_equivalent": "set_color_by_gradient",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_api",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    }
+  ]
+}

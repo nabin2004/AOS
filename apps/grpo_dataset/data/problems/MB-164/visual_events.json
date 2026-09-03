@@ -1,0 +1,54 @@
+{
+  "problem_id": "MB-164",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A charged particle is initialized at the origin and begins oscillating sinusoidally along the Y-axis, with a pink acceleration vector attached to it.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ChargedParticle",
+        "AccelerationVector",
+        "add_updater"
+      ],
+      "clip_query": "A red charged particle oscillating up and down with a pink acceleration vector attached to it"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A 1D array of electric field vectors along the X-axis begins to react, showing a transverse wave propagating outwards as the particle oscillates.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "lorentz_force",
+        "points_to_particle_info",
+        "Vector",
+        "add_updater"
+      ],
+      "clip_query": "A wave of electric field vectors propagating horizontally away from an oscillating charge"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The system reaches a steady state where a clear sinusoidal electromagnetic wave pattern is visible in the field vectors.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "lorentz_force",
+        "c",
+        "epsilon0"
+      ],
+      "clip_query": "A continuous transverse wave pattern of vectors oscillating on the Y-axis"
+    }
+  ]
+}

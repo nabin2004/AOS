@@ -1,0 +1,63 @@
+{
+  "id": "MB-156",
+  "title": "Transition to Overhead View of Refracting Waves",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes a wave propagating through space and entering a medium with a different refractive index, transitioning from a 3D perspective view to a flat overhead 2D view. \n\nYour implementation must include:\n1. A custom `WaveIntoMedium` class inheriting from `TimeVaryingVectorField` (or implementing custom time-varying vector field logic) that calculates wave phase based on propagation direction, frequency, and a refractive index change across a defined interface boundary.\n2. A `ScalarFieldByOpacity` class inheriting from `DotCloud` that maps points to opacity values dynamically using an updater function.\n3. A `WavesByOpacity` class that links the vector field values to dot cloud opacities to visually represent wavefronts.\n4. A medium representation using `VCube` (or a 3D block) that is rotated and positioned to align with the interface boundary.\n5. A scene class `TransitionToOverheadView` that inherits from a base interactive/3D scene, sets up the wave and medium, and performs a camera transition from a 3D perspective angle to a direct overhead (0, 0) view while the wave continues to propagate and refract.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-156/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 155,
+    "scene_classes": [
+      "TransitionToOverheadView"
+    ],
+    "visual_techniques": [
+      "3D Camera Rotation",
+      "Dot Cloud Opacity Mapping",
+      "Time-Varying Vector Fields",
+      "Refraction Simulation"
+    ],
+    "manim_api_patterns": [
+      "TimeVaryingVectorField",
+      "DotCloud",
+      "VCube",
+      "InteractiveScene",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing ManimGL-specific classes like DotCloud or VCube in standard ManimCE environments",
+      "severity": "high",
+      "note": "DotCloud and VCube are exclusive to ManimGL/manimlib. Standard Manim Community Edition (ManimCE) will fail to execute this code directly without custom implementations of these classes."
+    },
+    {
+      "pattern": "Incorrect phase calculation at the interface boundary",
+      "severity": "medium",
+      "note": "The phase calculation must correctly incorporate the refractive index step function to show realistic wave bending (refraction)."
+    }
+  ]
+}

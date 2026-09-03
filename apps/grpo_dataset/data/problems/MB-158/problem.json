@@ -1,0 +1,70 @@
+{
+  "id": "MB-158",
+  "title": "Vector Field Representation of Oscillating Light Wave",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Create a 3D Manim visualization showing an oscillating light wave represented as both a continuous 3D curve and a dynamic vector field along the propagation axis. Define a custom 3D coordinate system using ThreeDAxes and a background NumberPlane. Implement an `OscillatingWave` class (inheriting from VMobject) that generates a 3D wave propagating along the x-axis, with oscillations in the y and z directions. The wave's points should update dynamically using an updater based on time, wavelength, speed, and phase. Implement a `GraphAsVectorField` class (inheriting from VectorField) that samples points along the x-axis and draws vectors (arrows) representing the wave's displacement vector at each point. The vectors must update dynamically in sync with the wave. Apply a spectral color map to the wave and vectors based on the wavelength. Animate the scene by showing the wave and vector field propagating smoothly over time, demonstrating the physical concept of light polarization and wave-particle representation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-158/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "VectorFieldWigglingNew"
+    ],
+    "visual_techniques": [
+      "3D Vector Fields",
+      "Dynamic Updaters",
+      "Spectral Color Mapping",
+      "3D Wave Propagation"
+    ],
+    "manim_api_patterns": [
+      "ThreeDAxes",
+      "NumberPlane",
+      "VMobject",
+      "VectorField",
+      "add_updater",
+      "c2p"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect 3D coordinate mapping (c2p) inside the updater loop causing the wave to render off-screen.",
+      "severity": "high",
+      "note": "Ensure the axes origin and scaling are correctly aligned with the wave's x-range."
+    },
+    {
+      "pattern": "Vector field arrows failing to update dynamically or lagging behind the continuous wave curve.",
+      "severity": "high",
+      "note": "The vector field must use a dynamic updater that queries the wave's state or time variable on every frame."
+    },
+    {
+      "pattern": "Color mapping function throwing errors due to missing colormap libraries or incorrect range interpolation.",
+      "severity": "medium",
+      "note": "Use standard matplotlib colormaps or manual RGB interpolation for spectral colors."
+    }
+  ]
+}

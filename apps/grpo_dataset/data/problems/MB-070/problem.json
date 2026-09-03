@@ -1,0 +1,76 @@
+{
+  "id": "MB-070",
+  "title": "Laplace Transform Derivative Formula Commutative Diagram",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Differential Equations"
+  ],
+  "full_prompt": "Create a Manim visualization demonstrating the Laplace transform of a derivative using a commutative diagram. The diagram should arrange four main terms in a grid: f(t) (top-left), F(s) (top-right), f'(t) (bottom-left), and sF(s) - f(0) (bottom-right). Use custom colors for variables like '{t}' (blue) and '{s}' (yellow). Draw vertical arrows pointing downwards representing the Laplace transform (labeled with L), and horizontal arrows pointing right representing differentiation (d/dt) and multiplication by s (x s). Animate the creation of f(t), then show the transition to f'(t) with a rightward arrow. Next, show the Laplace transform of f'(t) to L{f'(t)} and f(t) to F(s) using downward arrows. Animate the multiplication of F(s) by s to get sF(s), and position L{f'(t)} below it with an equals sign. Introduce an 'Almost...' correction label in red, then transform f(t) to complete the formula by subtracting f(0). Finally, highlight the connection between differentiation in the time domain and multiplication by s in the s-domain using a surrounding rectangle.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-070/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 115,
+    "scene_classes": [
+      "DerivativeFormula"
+    ],
+    "visual_techniques": [
+      "Commutative Diagram Layout",
+      "TransformMatchingTex",
+      "FadeTransform",
+      "LaggedStart",
+      "SurroundingRectangle Highlights"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "Arrow",
+      "Vector",
+      "TransformMatchingTex",
+      "FadeTransform",
+      "ShowCreation"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Use of InteractiveScene in Community Edition",
+      "severity": "high",
+      "note": "InteractiveScene is exclusive to ManimGL. Must fallback to Scene in ManimCE."
+    },
+    {
+      "pattern": "ShowCreation undefined in ManimCE",
+      "severity": "high",
+      "note": "ShowCreation must be replaced with Create in ManimCE."
+    },
+    {
+      "pattern": "FadeTransform undefined in ManimCE",
+      "severity": "medium",
+      "note": "FadeTransform is a ManimGL-specific animation; use ReplacementTransform or FadeIn/FadeOut combinations in CE."
+    },
+    {
+      "pattern": "Submobject indexing of Tex templates",
+      "severity": "medium",
+      "note": "Accessing specific parts of Tex using string keys (e.g., sFs['-'] or sFs['f(0)']) requires precise matching and can fail if the LaTeX compiler splits strings differently."
+    }
+  ]
+}

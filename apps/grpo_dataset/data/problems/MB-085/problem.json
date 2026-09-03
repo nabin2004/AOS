@@ -1,0 +1,65 @@
+{
+  "id": "MB-085",
+  "title": "Forced Oscillator Solution Form and Coefficient Tuning",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    45.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Differential Equations"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes the solution form of a forced oscillator. First, display a linear combination of four exponential terms: $x(t) = c_1 e^{s_1 t} + c_2 e^{s_2 t} + c_3 e^{s_3 t} + c_4 e^{s_4 t}$. Color the coefficients $c_n$ blue and the exponents $s_n$ yellow. Split the equation to show only the first two terms, and mark it as incorrect using a red 'Nope!' text and an Exmark. Then, show a green checkmark and 'Actually...' to indicate the full solution is needed. Next, create vertical number lines acting as sliders for the coefficients $c_1$ and $c_2$. Use ValueTrackers to animate these coefficients randomly changing values, updating arrow tips and decimal labels next to the number lines. Finally, introduce a complex plane in the upper left corner showing four specific poles ($s_1, s_2, s_3, s_4$) as glowing dots.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-085/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "ForcedOscillatorSolutionForm"
+    ],
+    "visual_techniques": [
+      "ValueTracker-driven sliders",
+      "Complex plane plotting",
+      "Color-coded LaTeX formulas",
+      "Interactive-style annotations (Exmark/Checkmark)"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "Exmark",
+      "Checkmark",
+      "ValueTracker",
+      "ComplexPlane",
+      "GlowDot"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom classes like Exmark or Checkmark in standard Manim Community",
+      "severity": "high",
+      "note": "Exmark and Checkmark are specific to 3Blue1Brown's manim_imports_ext. In standard Manim, these must be drawn manually using VGroup of Lines or SVGMobjects."
+    },
+    {
+      "pattern": "ValueTracker replication and array-based updaters",
+      "severity": "medium",
+      "note": "Using .replicate(2) on ValueTracker is a ManimGL feature; standard Manim requires creating individual ValueTrackers."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-150",
+  "conflicts": [
+    {
+      "category": "colormaps",
+      "gl_construct": "colormaps.get_cmap(\"Spectral\")",
+      "ce_equivalent": "import matplotlib.pyplot as plt; cmap = plt.get_cmap(\"Spectral\")",
+      "severity": "medium"
+    },
+    {
+      "category": "updaters",
+      "gl_construct": "self.add_updater(lambda m, dt: m.update_points(dt))",
+      "ce_equivalent": "self.add_updater(lambda m, dt: m.update_points(dt)) (Note: Ensure dt is handled correctly in CE as well)",
+      "severity": "low"
+    },
+    {
+      "category": "flat_stroke",
+      "gl_construct": "self.set_flat_stroke(False)",
+      "ce_equivalent": "Not directly supported in standard ManimCE VMobjects; omit or use custom shader configurations if needed.",
+      "severity": "medium"
+    }
+  ]
+}

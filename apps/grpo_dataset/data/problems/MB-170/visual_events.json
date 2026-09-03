@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-170",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The 3D Sucrose molecule is constructed and fades into the center of the 3D scene with depth testing enabled.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Sucrose",
+        "DotCloud",
+        "apply_depth_test",
+        "FadeIn"
+      ],
+      "clip_query": "A 3D sucrose molecule model fades into the center of a dark 3D scene."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A helical spiral path representing the electric field vector of propagating light is drawn passing through the molecule.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        7.0
+      ],
+      "keyword_bank": [
+        "ParametricCurve",
+        "helix",
+        "ShowCreation",
+        "spiral"
+      ],
+      "clip_query": "A glowing helical spiral curve is drawn along an axis passing through the molecule."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A series of rotating vector arrows are animated along the helical path, demonstrating the rotation of the polarization plane.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        7.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "Arrow",
+        "Vector",
+        "always_redraw",
+        "rotation"
+      ],
+      "clip_query": "Rotating vector arrows point outwards from the central axis to the helical path, spinning dynamically."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The camera smoothly orbits around the 3D scene, showing the spatial relationship between the sucrose molecule and the spiral light path.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "camera.frame",
+        "increment_theta",
+        "increment_phi",
+        "orbit"
+      ],
+      "clip_query": "The 3D camera rotates around the helical path and the sucrose molecule."
+    }
+  ]
+}

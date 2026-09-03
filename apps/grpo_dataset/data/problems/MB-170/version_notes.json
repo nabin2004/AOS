@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-170",
+  "conflicts": [
+    {
+      "category": "Mobject Type",
+      "gl_construct": "DotCloud",
+      "ce_equivalent": "Group of Sphere or Dot3D mobjects",
+      "severity": "high"
+    },
+    {
+      "category": "3D Depth Control",
+      "gl_construct": "self.apply_depth_test()",
+      "ce_equivalent": "renderer.camera.enable_depth_test()",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.camera.frame",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "medium"
+    },
+    {
+      "category": "Color Utilities",
+      "gl_construct": "color_to_rgba",
+      "ce_equivalent": "color_to_rgb (with separate opacity handling)",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "id": "MB-152",
+  "title": "Alternating Electric Field Introduction and Electromagnetic Wave Propagation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "drift-sensitive"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Calculus",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes the propagation of an electric field from an oscillating charged particle. The visualization must implement custom physics calculations for Coulomb and Lorentz forces with retarded time delay (representing the finite speed of light, c). \n\nYour implementation should include:\n1. A custom `ChargedParticle` class (inheriting from `Group` or `VGroup`) that tracks its position history to calculate delayed field effects.\n2. Functions for `coulomb_force` and `lorentz_force` that compute the field vectors at any given grid of points, taking into account the particle's past positions and accelerations.\n3. An expanding 'influence ring' (`get_influence_ring`) that visually demonstrates the propagation of electromagnetic updates outward from the source charge at speed `c`.\n4. An active scene (`AltEFieldIntroduction`) where a positive charge is introduced, begins to oscillate harmonically, and generates a dynamic vector field showing wave-like propagation of the electric field vectors.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-152/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "AltEFieldIntroduction"
+    ],
+    "visual_techniques": [
+      "Dynamic Vector Fields",
+      "Retarded Time Delay Simulation",
+      "Expanding Wavefront Rings",
+      "3D Shaded Dot Rendering"
+    ],
+    "manim_api_patterns": [
+      "TrueDot",
+      "Group",
+      "add_updater",
+      "Tex",
+      "VectorField"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing position history tracking for retarded time calculations, causing instantaneous field updates.",
+      "severity": "high",
+      "note": "The physics simulation relies on tracking past positions to compute the Lorentz force correctly. Without history tracking, the wave propagation effect is lost."
+    },
+    {
+      "pattern": "Using standard Manim Community Dot instead of TrueDot or failing to handle 3D rendering compatibility.",
+      "severity": "medium",
+      "note": "TrueDot provides 3D shading in ManimGL. In Community edition, this must be simulated or replaced with a standard Dot/Sphere."
+    },
+    {
+      "pattern": "Vector field arrows blowing up to infinity near the point charge.",
+      "severity": "high",
+      "note": "Must implement the adjusted norm logic in points_to_particle_info to prevent division by zero or extremely large vectors near the charge center."
+    }
+  ]
+}

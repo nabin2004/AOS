@@ -1,0 +1,68 @@
+{
+  "id": "MB-061",
+  "title": "Quantum Compilation and Grover's Algorithm Blackbox Machine",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    45.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Quantum Computing",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a Manim scene named `QuantumCompilation` using ManimGL that visualizes the transition from a classical blackbox binary function circuit to a quantum gate compilation. First, display a blackbox machine (using a custom or placeholder shape representing a machine) and reveal an internal binary function circuit (loaded from an SVG or constructed with paths) inside it. Next, show a classical integer input (e.g., 13) that transforms into its binary representation (a BitString). Animate this BitString passing through the machine to produce a binary output (e.g., 0). Then, change the input value dynamically to another number (e.g., 5) and update the output to 1. After showing the classical case, scale down the classical machine and move it to the top. Introduce a quantum machine below it, labeled 'Quantum Gates', with an arrow pointing from the classical to the quantum version. Finally, map the classical bit string to a quantum state representation using ket notation (e.g., KetGroup) and show the corresponding output state with a negative sign.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-061/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "QuantumCompilation"
+    ],
+    "visual_techniques": [
+      "SVG circuit animation",
+      "Dynamic BitString updating from Integer value",
+      "FadeTransform and TransformFromCopy transitions",
+      "Ket notation visualization for quantum states",
+      "Surrounding highlight rectangles"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "SVGMobject",
+      "BitString",
+      "Integer",
+      "KetGroup",
+      "ChangeDecimalToValue",
+      "FadeTransform",
+      "TransformFromCopy",
+      "MoveToTarget"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom assets or helper functions like get_blackbox_machine and BinaryFunctionCircuit SVG",
+      "severity": "high",
+      "note": "The code relies on external SVGs and custom 3b1b library functions. Placeholders or standard Manim shapes must be used if these are missing."
+    },
+    {
+      "pattern": "Undefined BitString or KetGroup classes in standard Manim",
+      "severity": "high",
+      "note": "These are custom classes from 3b1b's Grover video codebase. Standard Tex or custom VGroups must be substituted if running in standard Manim Community Edition."
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-143",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initial zoomed-in view of the axes with the graph starting to reveal step-by-step as the black rectangle mask shifts right.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "frame.save_state",
+        "set_height",
+        "set_x_shift",
+        "rect"
+      ],
+      "clip_query": "A close-up zoom on a mathematical graph starting to draw from the origin with a labeled y-axis."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Camera zooms out to the full frame view while the graph rapidly reveals up to the 200th prime.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "Restore",
+        "frame",
+        "set_x_shift",
+        "run_time"
+      ],
+      "clip_query": "The camera zooms out to show a wider view of a red and blue line graph plotting prime differences."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The graph and x-axis dynamically squish horizontally to fit the entire dataset, while a large integer counter at the bottom rapidly updates to show the current prime number.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        22.0,
+        87.0
+      ],
+      "keyword_bank": [
+        "UpdateFromAlphaFunc",
+        "stretch",
+        "prime_label",
+        "set_value"
+      ],
+      "clip_query": "A line graph dynamically compressing horizontally as a large prime number counter rapidly increases at the bottom."
+    }
+  ]
+}

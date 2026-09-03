@@ -1,0 +1,72 @@
+{
+  "id": "MB-084",
+  "title": "Introducing Euler's Formula on the Complex Plane",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Complex Analysis"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class to introduce Euler's formula. First, set up a ComplexPlane on the left side of the screen with a blue grid and coordinate labels for 1, -1, i, and -i. Draw a red arc of radius 1 representing an angle of pi, with a DecimalNumber tracking the angle as it sweeps from 0 to pi. Once the arc is complete, replace the decimal number with a red pi label. Next, write the formula 'e^{pi i} = -1' on the upper right, using LaggedStart to transform the pi label, the i label, and the -1 coordinate label from the plane into their respective positions in the formula. After a brief pause, transform the characters of the formula into the word 'Clich\u00e9?' while introducing a Randolph PiCreature on the right who says 'This again?' in a sassy tone. Finally, display a grid of YouTube thumbnails on the left representing various popular videos about Euler's formula.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-084/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "IntroduceEulersFormula"
+    ],
+    "visual_techniques": [
+      "Complex plane plotting",
+      "ValueTracker with updater",
+      "LaggedStart transforms",
+      "PiCreature animations",
+      "ImageMobject grid layout"
+    ],
+    "manim_api_patterns": [
+      "ComplexPlane",
+      "Arc",
+      "ValueTracker",
+      "DecimalNumber",
+      "Tex",
+      "Randolph",
+      "FadeTransform",
+      "LaggedStart"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing PiCreature assets or Randolph class definition",
+      "severity": "high",
+      "note": "Randolph is a custom 3b1b class. If running in standard Manim, it must be mocked or replaced with a standard Mobject."
+    },
+    {
+      "pattern": "ImageMobject URL loading failure",
+      "severity": "medium",
+      "note": "Loading YouTube thumbnails directly from URLs can fail if there is no internet access during rendering."
+    },
+    {
+      "pattern": "FadeTransform or ShowCreation API mismatch",
+      "severity": "medium",
+      "note": "Manim Community uses Create instead of ShowCreation, and ReplacementTransform instead of FadeTransform."
+    }
+  ]
+}

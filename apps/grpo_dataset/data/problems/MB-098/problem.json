@@ -1,0 +1,69 @@
+{
+  "id": "MB-098",
+  "title": "Double Slit Diffraction Wave Interference",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes double-slit diffraction using a custom shader-based wave slice. Create a custom Mobject class `LightWaveSlice` that inherits from `Mobject` and uses a custom shader (e.g., `diffraction_shader`) with `moderngl.TRIANGLE_STRIP` to render wave propagation. The class must accept a set of point sources (represented by a `DotCloud`), and dynamically pass their coordinates as uniforms to the shader. Implement uniforms for frequency, wave number, decay factor, maximum amplitude, and time. The wave slice should update its time uniform continuously using an updater. In the main `DoubleSlit` scene, set up a barrier with two narrow slits (represented by two point sources positioned closely together), and overlay the `LightWaveSlice` to show the resulting wave interference pattern. Animate the propagation of the waves, showing constructive and destructive interference, and demonstrate how changing the wave parameters (like frequency or slit separation) dynamically updates the interference pattern.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-098/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "DoubleSlit"
+    ],
+    "visual_techniques": [
+      "Custom Shader Rendering",
+      "Triangle Strip Primitive",
+      "Dynamic Uniform Updating",
+      "Wave Interference Simulation"
+    ],
+    "manim_api_patterns": [
+      "Mobject custom shader",
+      "moderngl.TRIANGLE_STRIP",
+      "set_uniforms",
+      "add_updater",
+      "always.sync_points"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom shader files or incorrect shader folder path",
+      "severity": "high",
+      "note": "The LightWaveSlice class relies on external GLSL shaders. If the shader folder is missing or misconfigured, rendering will fail."
+    },
+    {
+      "pattern": "Incompatible shader uniform types or names",
+      "severity": "high",
+      "note": "Mismatches between Python-side set_uniform calls and GLSL-side uniform declarations will cause ModernGL compilation errors."
+    },
+    {
+      "pattern": "Attempting to run in standard Manim Community (ManimCE)",
+      "severity": "high",
+      "note": "This code uses ManimGL-specific shader integration and ModernGL primitives which are completely unsupported in ManimCE."
+    }
+  ]
+}

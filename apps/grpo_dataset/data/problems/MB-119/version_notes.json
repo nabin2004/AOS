@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-119",
+  "conflicts": [
+    {
+      "category": "Scene class and rendering",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobject creation and animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    },
+    {
+      "category": "Custom helper methods",
+      "gl_construct": "self.get_strip, self.animate_strip_in",
+      "ce_equivalent": "Must be implemented manually as custom helper functions using standard Mobjects (e.g., polygons or rectangles clipped to a circle)",
+      "severity": "high"
+    }
+  ]
+}

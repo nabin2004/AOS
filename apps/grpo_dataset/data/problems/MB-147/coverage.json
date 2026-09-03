@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-147",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Parametric equations for twisted ribbon",
+        "Wave propagation equations with phase shift",
+        "Spectral color mapping based on wavelength"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "Semi-transparent 3D cylinder",
+        "Twisted helical ribbon",
+        "Oscillating 3D waves",
+        "Polarizer disk with grid lines"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Wavelength values",
+        "Twist rate calculation",
+        "Resolution parameters for parametric surfaces"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "Custom VMobject with updaters",
+        "ThreeDAxes alignment",
+        "Camera sorting for transparency"
+      ]
+    }
+  }
+}

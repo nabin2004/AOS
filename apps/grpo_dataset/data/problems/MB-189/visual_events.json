@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-189",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display of titles, horizontal line, and initial sequence of numbers pointing to Von Mangoldt coefficients",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "titles",
+        "h_line",
+        "numbers",
+        "arrows",
+        "coefs"
+      ],
+      "clip_query": "A sequence of numbers with arrows pointing down to mathematical terms like ln(2), ln(3), 0"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Fade in of Von Mangoldt definition and details text on the right side",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        1.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "vm_def",
+        "details"
+      ],
+      "clip_query": "Definition of a mathematical sequence mapping n to log p if n is a prime power"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Transformation of numbers into denominators and assembly of the Dirichlet series",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "ReplacementTransform",
+        "numbers",
+        "denoms",
+        "overs",
+        "plusses"
+      ],
+      "clip_query": "Numbers transforming into denominators of a long mathematical series with fraction bars and plus signs appearing"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Grouping the series and adding a brace labeled Dirichlet series",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        9.0,
+        13.0
+      ],
+      "keyword_bank": [
+        "brace",
+        "name",
+        "MoveToTarget",
+        "GrowFromCenter"
+      ],
+      "clip_query": "A brace appearing under a mathematical series with the label Dirichlet series"
+    }
+  ]
+}

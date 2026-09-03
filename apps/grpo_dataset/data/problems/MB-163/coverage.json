@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-163",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "wave phase calculation",
+        "amplitude damping",
+        "phase kick addition",
+        "sine wave equation with spatial and temporal components"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "vertical boundary lines",
+        "continuous wave curve",
+        "vector field arrows",
+        "color mapping based on wavelength or phase"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker values for phase shift",
+        "damping factor per layer",
+        "wave speed and wavelength parameters"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "SlicedWave custom Group class",
+        "OscillatingWave custom VMobject class",
+        "updaters for real-time wave propagation"
+      ]
+    }
+  }
+}

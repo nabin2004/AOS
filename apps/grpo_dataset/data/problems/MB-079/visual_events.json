@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-079",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display of the initial 'Differential Equation' term and its transition to 'Transformed Equation' via the Laplace transform arrow.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ode",
+        "lt_ode",
+        "lt_arrow",
+        "TransformMatchingStrings"
+      ],
+      "clip_query": "The text 'Differential Equation' transforms into 'Transformed Equation' with a downward arrow labeled with the Laplace symbol."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Transition from 'Transformed Equation' to 'Transformed Solution' via the algebraic solve arrow.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        5.5
+      ],
+      "keyword_bank": [
+        "solve_arrow",
+        "lt_ans",
+        "FadeTransform"
+      ],
+      "clip_query": "An arrow pointing right labeled 'Solve Algebraically' appears, transforming the text to 'Transformed Solution'."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Transition from 'Transformed Solution' back to 'Solution' via the Inverse Laplace arrow.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.5,
+        8.0
+      ],
+      "keyword_bank": [
+        "inv_lt_arrow",
+        "ans",
+        "FadeTransform"
+      ],
+      "clip_query": "An upward arrow labeled with the inverse Laplace symbol appears, transforming the text to 'Solution'."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Creation of the split-screen Time domain and s domain background rectangles with labels.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "FullScreenRectangle",
+        "time_domain",
+        "s_domain",
+        "time_label",
+        "s_label"
+      ],
+      "clip_query": "Two horizontal domain boxes fade in, labeling the top half 'Time domain' and the bottom half 's domain'."
+    }
+  ]
+}

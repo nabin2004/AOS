@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-081",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the s-plane, exponential plane, and 2D graph with trackers for s and t.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "s_plane",
+        "exp_plane",
+        "axes",
+        "s_tracker",
+        "t_tracker"
+      ],
+      "clip_query": "A split-screen layout showing a complex s-plane, an exponential plane, and a 2D graph axis."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animation of the complex parameter s moving from -1 to 0.2, then to 0, and finally to 1j.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "s_tracker.animate.set_value",
+        "1j"
+      ],
+      "clip_query": "A yellow dot moving across a complex coordinate plane while a graph dynamically updates its shape."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Advancing time t forward, causing the trajectory on the exponential plane to trace a circle and the 2D graph to plot a sine wave, accompanied by camera frame movement.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "play_time_forward",
+        "frame.animate.set_x"
+      ],
+      "clip_query": "A curve tracing out a circle on a complex plane and a wave on a 2D graph as the camera pans right."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Transitioning s to 2j, updating the label to e^{2it}, and displaying the derivative equation d/dt(e^{2it}) = 2i * e^{2it}.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "deriv_expression",
+        "ReplacementTransform",
+        "exp_2it_label"
+      ],
+      "clip_query": "The derivative equation of a complex exponential appearing next to a complex plane trajectory."
+    }
+  ]
+}

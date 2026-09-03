@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-169",
+  "conflicts": [
+    {
+      "category": "framework_imports",
+      "gl_construct": "manim_imports_ext",
+      "ce_equivalent": "manim",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_methods",
+      "gl_construct": "set_flat_stroke",
+      "ce_equivalent": "None (not supported directly in CE, use standard stroke styling)",
+      "severity": "medium"
+    },
+    {
+      "category": "updaters",
+      "gl_construct": "add_updater(lambda m, dt: m.update_points(dt))",
+      "ce_equivalent": "add_updater(lambda m, dt: m.update_points(dt)) (syntax is compatible, but implementation of update_points must handle point setting carefully)",
+      "severity": "low"
+    }
+  ]
+}

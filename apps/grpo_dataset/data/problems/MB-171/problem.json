@@ -1,0 +1,63 @@
+{
+  "id": "MB-171",
+  "title": "Introduce Phase Kick Back in Wave Propagation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes a wave propagating through multiple boundary layers, where each layer introduces a phase shift ('phase kick back') and amplitude damping (absorption). Implement a custom `SlicedWave` group that contains an `OscillatingWave` (a VMobject whose points are updated dynamically via an updater function), vertical lines representing the boundaries, and `ValueTracker`s to control the phase shift and damping at each boundary. The wave's y-coordinate should be computed dynamically based on its x-coordinate, time, and the cumulative phase shifts and damping factors from all boundaries to the left of the point. Ensure the wave updates smoothly over time using `add_updater`.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-171/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "IntroducePhaseKickBack"
+    ],
+    "visual_techniques": [
+      "Dynamic wave propagation with custom updaters",
+      "Boundary-based phase shifting and amplitude damping",
+      "ValueTracker-driven physical parameters"
+    ],
+    "manim_api_patterns": [
+      "VMobject",
+      "Group",
+      "ValueTracker",
+      "add_updater",
+      "set_points_as_corners",
+      "c2p"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect phase shift calculation leading to discontinuous wave segments at boundaries",
+      "severity": "high",
+      "note": "Ensure the cumulative phase shift and damping are correctly applied to all points to the right of each boundary using vectorized numpy operations."
+    },
+    {
+      "pattern": "Updater function failing to update points dynamically over time",
+      "severity": "high",
+      "note": "The updater must correctly increment time and re-evaluate the wave's coordinates using the current ValueTracker states."
+    }
+  ]
+}

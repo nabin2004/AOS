@@ -1,0 +1,19 @@
+{
+  "problem_id": "MB-194",
+  "conflicts": [
+    {
+      "category": "API Change",
+      "gl_construct": "ComplexPlane",
+      "ce_equivalent": "ComplexPlane",
+      "severity": "low",
+      "note": "Both frameworks support ComplexPlane, but coordinate mapping methods like n2p (number to point) and p2n (point to number) must be used consistently."
+    },
+    {
+      "category": "Animation Mechanism",
+      "gl_construct": "add_updater with direct state mutation",
+      "ce_equivalent": "Mobject.add_updater with ValueTracker",
+      "severity": "medium",
+      "note": "In ManimCE, using a ValueTracker for the angle/time parameter is cleaner and more predictable than relying on frame-rate dependent updaters."
+    }
+  ]
+}

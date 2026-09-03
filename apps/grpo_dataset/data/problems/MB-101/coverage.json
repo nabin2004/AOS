@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-101",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Tex formula Amplitude(R + O)^2",
+        "Function notation O(x, y, z, t)",
+        "Complex phasor calculation using exponential form",
+        "Real projection of complex numbers"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "SurroundingRectangle highlights with rounded corners",
+        "Vector arrows pointing to formula components",
+        "ComplexPlane and NumberLine coordinate systems",
+        "Dynamic color interpolation (red to blue) for the oscillating dot"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for continuous time simulation",
+        "Frequency and amplitude parameter configuration",
+        "Dynamic coordinate mapping using plane.n2p"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or Scene class structure",
+        "Updaters attached to the indicator dot",
+        "Smooth transition animations (FadeTransformPieces or equivalent)"
+      ]
+    }
+  }
+}

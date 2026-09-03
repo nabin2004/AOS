@@ -1,0 +1,65 @@
+{
+  "id": "MB-194",
+  "title": "Cube Root Behavior in the Complex Plane",
+  "youtube_video_id": "zNYXg_8-v60",
+  "video_timestamp_range": [
+    300.0,
+    360.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Complex Analysis",
+    "Abstract Algebra"
+  ],
+  "full_prompt": "Write a Manim script (compatible with ManimGL/Manim Community) that visualizes the relationship between a complex number $c$ and its three cube roots $z$ (where $z^3 = c$). Create two complex planes side-by-side: the left plane represents the 'Root Plane' (for $z$) and the right plane represents the 'Coefficient Plane' (for $c$). Place a red dot in the coefficient plane representing $c$, and three yellow dots in the root plane representing the three cube roots of $c$. Animate the coefficient $c$ moving in a complete circle of radius $R$ around the origin in the coefficient plane. As $c$ completes a full $360^\\circ$ rotation, show how the three roots in the root plane rotate by $120^\\circ$ each, permuting their positions. Use continuous tracers to show the paths of both the coefficient and the roots. Implement a distance-minimizing sorting algorithm (like Hungarian matching or nearest-neighbor sorting) to ensure that the roots update smoothly without discontinuous jumps between frames.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-194/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "CubeRootBehavior",
+      "RootCoefScene"
+    ],
+    "visual_techniques": [
+      "Side-by-side ComplexPlanes",
+      "Dynamic updaters linking root and coefficient positions",
+      "Continuous path tracers",
+      "Optimal transport/sorting to minimize root jumping"
+    ],
+    "manim_api_patterns": [
+      "ComplexPlane",
+      "always_redraw",
+      "add_updater",
+      "VGroup",
+      "get_center"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Discontinuous root jumping",
+      "severity": "high",
+      "note": "If roots are not sorted to minimize distance to their previous positions, they will randomly swap identities/colors at branch cuts."
+    },
+    {
+      "pattern": "ComplexPlane coordinate mismatch",
+      "severity": "medium",
+      "note": "Failing to correctly map complex numbers to the local coordinate systems of the side-by-side planes."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-121",
+  "conflicts": [
+    {
+      "category": "framework",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "GlowDots",
+      "ce_equivalent": "VGroup of standard Dots with a custom glow/halo effect or standard Dots",
+      "severity": "high"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "VectorizedPoint",
+      "ce_equivalent": "ValueTracker or Mobject with empty points",
+      "severity": "medium"
+    }
+  ]
+}

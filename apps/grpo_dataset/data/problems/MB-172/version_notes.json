@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-172",
+  "conflicts": [
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.camera.frame.animate.set_euler_angles(theta, phi, gamma)",
+      "ce_equivalent": "self.move_camera(phi=..., theta=..., run_time=...)",
+      "severity": "high"
+    },
+    {
+      "category": "Updaters",
+      "gl_construct": "self.add_updater(lambda m, dt: m.update_points(dt))",
+      "ce_equivalent": "self.add_updater(lambda m, dt: m.update_points(dt)) (Note: CE requires explicit dt handling and sometimes redrawing points via dynamic curves)",
+      "severity": "medium"
+    },
+    {
+      "category": "Vector Fields",
+      "gl_construct": "VectorField(func, axes)",
+      "ce_equivalent": "ArrowVectorField(func)",
+      "severity": "medium"
+    }
+  ]
+}

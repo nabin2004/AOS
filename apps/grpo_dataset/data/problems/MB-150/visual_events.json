@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-150",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialize the coordinate axes and render multiple vertical lines representing the medium layers, with the wave propagating through them.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "axes",
+        "layers",
+        "OscillatingWave",
+        "SlicedWave"
+      ],
+      "clip_query": "A wave propagating through multiple vertical layer boundaries on a coordinate grid."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animate the phase shift and amplitude damping as the wave crosses each layer boundary, showing a clear change in wavelength or phase offset.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "phase_kick_trackers",
+        "absorbtion_trackers",
+        "ValueTracker"
+      ],
+      "clip_query": "The wave changing phase and amplitude as it passes through vertical lines."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Transition the scene by fading out or removing all layers except one, reverting the wave behavior to show only a single layer's effect.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "FadeOut",
+        "play",
+        "animate"
+      ],
+      "clip_query": "All but one vertical layer fading out, leaving a single layer and its effect on the wave."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Demonstrate the isolated phase kick-back of the single remaining layer, highlighting the localized shift in the wave's cycle.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        25.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "phase_kick_back",
+        "xt_to_yz",
+        "vect_wave"
+      ],
+      "clip_query": "A single vertical layer causing a distinct phase shift in a propagating wave."
+    }
+  ]
+}

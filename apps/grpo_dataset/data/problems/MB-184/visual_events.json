@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-184",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Full Waveform Plotting with Passing Flash",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ShowCreation",
+        "VShowPassingFlash",
+        "get_signal_graph"
+      ],
+      "clip_query": "A blue waveform being drawn across the screen with a bright passing flash highlighting the curve."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Zooming in on Waveform Segment",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "zoom_rect",
+        "stretch",
+        "MoveToTarget",
+        "new_axes"
+      ],
+      "clip_query": "The camera zooms in on a small rectangular region of the waveform, stretching it to fill the entire screen."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "3D Camera Reorientation",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        9.0,
+        11.0
+      ],
+      "keyword_bank": [
+        "rotate",
+        "reorient",
+        "frame"
+      ],
+      "clip_query": "The 2D plot rotates into a 3D perspective as the camera tilts and shifts its angle."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Fourier Component Decomposition",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        11.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "np.fft.fft",
+        "sine_waves",
+        "break_down_into_fourier_components"
+      ],
+      "clip_query": "The single waveform splits into multiple individual sine waves spaced out along a depth axis in 3D space."
+    }
+  ]
+}

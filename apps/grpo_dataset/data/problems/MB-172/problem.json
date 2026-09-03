@@ -1,0 +1,63 @@
+{
+  "id": "MB-172",
+  "title": "Transitioning 3D Oscillating Waves to 2D Polarization States",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Create a Manim scene named `TransitionTo2D` that visualizes a 3D oscillating wave (representing light) propagating along an axis, and then transitions to a 2D view to explain polarization. \n\n1. **Setup the 3D Environment**: Create a 3D coordinate system using axes and a grid plane. The wave should propagate along the X-axis.\n2. **Create the Oscillating Wave**: Implement a custom wave class (inheriting from `VMobject` or using dynamic updaters) that models a circularly polarized wave. The wave should have adjustable parameters for amplitude, wavelength, phase, and propagation speed. It must dynamically update its points over time to simulate continuous propagation.\n3. **Camera Animation**: Start with an angled 3D perspective showing the wave's helical/circular propagation in 3D space. Then, smoothly rotate the camera frame to look directly down the propagation axis (the X-axis).\n4. **2D Projection & Vector Field**: As the camera aligns with the X-axis, the 3D wave should visually project into a 2D circle or ellipse. Add a vector field or a set of dynamic vectors pointing from the center of the propagation axis to the wave's envelope, illustrating the rotating electric field vector of circularly polarized light.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-172/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "TransitionTo2D"
+    ],
+    "visual_techniques": [
+      "3D Camera Rotation",
+      "Dynamic Wave Updaters",
+      "Vector Fields",
+      "Coordinate Mapping"
+    ],
+    "manim_api_patterns": [
+      "ThreeDAxes",
+      "VMobject with updater",
+      "c2p mapping",
+      "VectorField",
+      "self.camera.frame"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Camera rotation using ManimCE syntax in a ManimGL context or vice versa",
+      "severity": "high",
+      "note": "ManimGL uses self.camera.frame for camera manipulation, while ManimCE uses self.set_camera_orientation."
+    },
+    {
+      "pattern": "Lagging or broken wave updaters due to incorrect dt handling",
+      "severity": "medium",
+      "note": "Ensure the update_points method correctly increments time and recalculates vertices on every frame."
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "problem_id": "MB-103",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display of the initial wave equation R * |R + O|^2 with the 'Part of the wave beyond the film' label and arrow indicator.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Tex",
+        "Text",
+        "Vector",
+        "GrowArrow",
+        "lines"
+      ],
+      "clip_query": "The initial complex wave equation is displayed with a label pointing to it."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Transformation of the squared magnitude term into its complex conjugate product representation.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "TransformFromCopy",
+        "LaggedStart",
+        "lines"
+      ],
+      "clip_query": "The squared magnitude term splits into a product of complex conjugates."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Step-by-step FOIL expansion of the terms with temporary highlighting rectangles.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "get_term_rect",
+        "Transform",
+        "FadeIn",
+        "plusses"
+      ],
+      "clip_query": "Terms are highlighted sequentially with rectangles during algebraic expansion."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Highlighting of conjugate pairs as 'Real numbers' using red rectangles and pointing arrows.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "pair_rects",
+        "real_label",
+        "Arrow",
+        "RED"
+      ],
+      "clip_query": "Conjugate pairs are highlighted in red with arrows pointing from a 'Real numbers' label."
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Simplification and grouping of the expanded terms into the final simplified equation line.",
+      "weight": 0.15,
+      "critical": true,
+      "expected_time_range": [
+        22.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "lines",
+        "FadeOut",
+        "set_opacity"
+      ],
+      "clip_query": "The expanded terms simplify into the final grouped algebraic expression."
+    }
+  ]
+}

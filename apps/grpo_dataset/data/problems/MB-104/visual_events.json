@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-104",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Introduction of the top three outline columns with titles and image placeholders",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "top_outlines",
+        "top_images",
+        "top_titles",
+        "FadeIn"
+      ],
+      "clip_query": "Three image cards with titles 'The process', 'The simplest hologram', and 'The general derivation' fade in side-by-side."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Camera frame zooms in on the first column while other columns fade out",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "frame.animate",
+        "FadeOut",
+        "top_rects"
+      ],
+      "clip_query": "The camera zooms in on the leftmost card labeled 'The process' while the other cards disappear."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Isolation highlights shifting focus between the first and second columns",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "isolate",
+        "set_opacity",
+        "top_rects",
+        "top_titles"
+      ],
+      "clip_query": "The cards dim and brighten selectively to highlight 'The process' and then 'The simplest hologram'."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Expansion of the middle column into three sub-columns connected by Bezier curves",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "mid_outlines",
+        "CubicBezier",
+        "mid_images",
+        "Restore",
+        "LaggedStartMap"
+      ],
+      "clip_query": "Three new sub-cards emerge below the middle card, connected by curved lines."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "problem_id": "MB-108",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render a custom 2D closed loop and initialize two glowing dots on it.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "loop_func",
+        "GlowDot",
+        "TrueDot",
+        "ValueTracker"
+      ],
+      "clip_query": "A 2D closed loop with two glowing dots on it"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Draw a dynamic connecting line between the two dots with an active updater showing their midpoint.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "get_connecting_line",
+        "midpoint",
+        "add_updater"
+      ],
+      "clip_query": "A line connecting two dots on a loop with a midpoint highlighted"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Rotate the camera into a 3D perspective to reveal the Z-axis representing distance.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "frame",
+        "set_euler_angles",
+        "animate"
+      ],
+      "clip_query": "Camera rotating to show a 3D coordinate space"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Generate and display the 3D surface representing the mapping of all point pairs.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "ParametricSurface",
+        "get_dist",
+        "midpoint"
+      ],
+      "clip_query": "A 3D surface representing the distance and midpoint mapping of a loop"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Animate the dots moving along the loop while tracing their corresponding path on the 3D surface.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        30.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "add_updater",
+        "trace"
+      ],
+      "clip_query": "Dots moving on a 2D loop while a 3D point traces a path on a surface"
+    }
+  ]
+}

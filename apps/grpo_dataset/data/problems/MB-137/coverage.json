@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-137",
+  "requirements": {
+    "Math": {
+      "weight": 0.4,
+      "expected": [
+        "Euler's formula F = E - V + 1",
+        "V substitution",
+        "E substitution",
+        "Cancellation of terms",
+        "Final simplified formula"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Color-coded equations (TEAL and BLUE_B)",
+        "FlashAround highlights for cancellation",
+        "Curved path arc transitions",
+        "FadeTransform for smooth substitution"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Tex character indexing for precise transforms",
+        "Coordinate shifts for equation positioning"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene structure",
+        "LaggedStart for clean multi-object animations",
+        "ReplacementTransform for in-place equation updates"
+      ]
+    }
+  }
+}

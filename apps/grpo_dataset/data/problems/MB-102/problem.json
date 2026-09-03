@@ -1,0 +1,68 @@
+{
+  "id": "MB-102",
+  "title": "Superposition of Light Waves from Point Sources",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a high-performance wave interference visualization in ManimGL. Define a custom Mobject class named `LightWaveSlice` that inherits from `Mobject` and utilizes a custom ModernGL shader to compute and render the superposition of light waves from multiple point sources in real-time. The class should take a `DotCloud` representing the point sources and dynamically pass their coordinates as uniforms to the shader. Implement methods to update uniforms such as frequency, wave number, decay factor, and time. Create a scene named `SuperpositionOfPoints` where several point sources are initialized, animated to move, and the resulting dynamic interference patterns (including amplitude and intensity views) are displayed on a 2D slice.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-102/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "SuperpositionOfPoints"
+    ],
+    "visual_techniques": [
+      "Custom ModernGL Shader",
+      "Dynamic Uniform Updates",
+      "DotCloud Point Sources",
+      "Wave Interference Visualization"
+    ],
+    "manim_api_patterns": [
+      "Mobject custom shader",
+      "set_uniforms",
+      "add_updater",
+      "always.sync_points",
+      "DotCloud"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing shader files or incorrect shader folder path",
+      "severity": "high",
+      "note": "The custom shader folder 'diffraction_shader' must exist and contain valid vertex/fragment shaders compatible with ModernGL."
+    },
+    {
+      "pattern": "Performance lag due to CPU-bound wave calculations",
+      "severity": "high",
+      "note": "Attempting to calculate wave superposition on the CPU for a dense grid instead of using GPU shaders will result in extremely low frame rates."
+    },
+    {
+      "pattern": "Uniform mismatch between Python and GLSL",
+      "severity": "medium",
+      "note": "The number of point sources in DotCloud must match the expected uniform array size or dynamic uniform names in the shader."
+    }
+  ]
+}

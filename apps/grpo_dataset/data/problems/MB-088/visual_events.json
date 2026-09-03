@@ -1,0 +1,87 @@
+{
+  "problem_id": "MB-088",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The Laplace machine and the calligraphic L symbol are rendered at the center of the screen.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "machine",
+        "fancy_L",
+        "\\mathcal{L}"
+      ],
+      "clip_query": "A central machine box containing a large calligraphic letter L"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The input function x(t) is written above the machine and then sucked/pumped down into it.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "in_func",
+        "FadeOutToPoint",
+        "machine.get_bottom"
+      ],
+      "clip_query": "The function x(t) fading and shrinking down into the central machine"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A second-order differential equation is displayed and funneled into the machine along curved paths.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        16.0
+      ],
+      "keyword_bank": [
+        "ode",
+        "path_arc",
+        "np.linspace",
+        "FadeOutToPoint"
+      ],
+      "clip_query": "A differential equation splitting and funneling down into the machine"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The output function containing exponential terms emerges from the bottom of the machine.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        16.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "out_func",
+        "FadeInFromPoint",
+        "machine.get_bottom"
+      ],
+      "clip_query": "An output equation with exponential terms emerging from the bottom of the machine"
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Surrounding rectangles highlight the s and c coefficients in the output function.",
+      "weight": 0.1,
+      "critical": false,
+      "expected_time_range": [
+        22.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "s_rects",
+        "c_rects",
+        "SurroundingRectangle",
+        "ReplacementTransform"
+      ],
+      "clip_query": "Yellow and white rectangles highlighting coefficients in the mathematical formula"
+    }
+  ]
+}

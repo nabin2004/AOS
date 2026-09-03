@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-155",
+  "conflicts": [
+    {
+      "category": "Mobject API",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject API",
+      "gl_construct": "Group",
+      "ce_equivalent": "VGroup or Group",
+      "severity": "medium"
+    },
+    {
+      "category": "Updater API",
+      "gl_construct": "Custom update method overriding Mobject.update without standard updaters",
+      "ce_equivalent": "add_updater",
+      "severity": "high"
+    }
+  ]
+}

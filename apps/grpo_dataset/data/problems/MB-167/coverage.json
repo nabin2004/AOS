@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-167",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "lorentz_force",
+        "points_to_particle_info",
+        "acceleration",
+        "charge"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "ChargedParticle",
+        "TrueDot",
+        "RowOfChargesXAxis"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "epsilon0",
+        "radius",
+        "c",
+        "history_size"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Group",
+        "update",
+        "increment_clock"
+      ]
+    }
+  }
+}

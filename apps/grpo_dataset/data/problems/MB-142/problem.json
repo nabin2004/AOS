@@ -1,0 +1,62 @@
+{
+  "id": "MB-142",
+  "title": "Prime Race Visualization (Modulo 4)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    85.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Number Theory",
+    "Calculus"
+  ],
+  "full_prompt": "Write a Manim script using the ManimGL/InteractiveScene API that visualizes the 'Prime Race' between primes congruent to 1 mod 4 and 3 mod 4. Create two horizontal tracks labeled 'p = 1 mod 4' (in blue) and 'p = 3 mod 4' (in red). Generate prime numbers up to 26,863 using sympy. Represent each prime as a square block containing its integer value, colored according to its modulo 4 congruence. Arrange these blocks sequentially in their respective tracks. Animate the race by first fading in the first 10 prime blocks individually. Then, dynamically scale and shift the camera frame to the right while rapidly revealing subsequent blocks using ShowIncreasingSubsets to simulate a fast-forwarding race. Finally, zoom out to show the final state of the race where the tracks extend far to the right.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-142/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 103,
+    "scene_classes": [
+      "PrimeRace"
+    ],
+    "visual_techniques": [
+      "Dynamic camera tracking",
+      "Increasing subsets animation",
+      "Custom color-coded grid blocks",
+      "Lagged start map transitions"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame",
+      "ShowIncreasingSubsets",
+      "LaggedStartMap"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community Camera instead of InteractiveScene frame",
+      "severity": "high",
+      "note": "The reference code relies on self.frame (ManimGL) for dynamic zooming and panning. Using self.camera from Manim Community will cause attribute errors."
+    },
+    {
+      "pattern": "Sympy dependency missing",
+      "severity": "medium",
+      "note": "The script requires sympy to generate prime numbers. Ensure sympy is imported."
+    }
+  ]
+}

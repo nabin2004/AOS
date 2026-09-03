@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-060",
+  "conflicts": [
+    {
+      "category": "InteractiveScene vs ThreeDScene",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.animate.reorient",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Types",
+      "gl_construct": "VCube",
+      "ce_equivalent": "Cube",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobject Types",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot (with custom glow/stroke effects)",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation Methods",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    }
+  ]
+}

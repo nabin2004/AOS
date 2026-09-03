@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-078",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render and initialize the Spring-Mass System with a block and a parametric spring coil.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "SrpingMassSystem",
+        "ParametricCurve",
+        "Square",
+        "mass",
+        "spring"
+      ],
+      "clip_query": "A spring-mass system with a grey spring and a blue block labeled m is displayed on screen."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animate the spring-mass system oscillating with real-time physics simulation via updaters.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "add_updater",
+        "time_step",
+        "velocity",
+        "get_force"
+      ],
+      "clip_query": "The spring-mass system oscillates back and forth horizontally."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Display a family of complex solution curves (e.g., spirals or rotating vectors in the complex plane) representing the complex roots of the characteristic equation.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "interpolate_color_by_hsl",
+        "ComplexPlane",
+        "get_coef_colors",
+        "ParametricCurve"
+      ],
+      "clip_query": "A set of colorful spiral curves or rotating vectors representing complex solutions are drawn on a coordinate plane."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Show the transition or projection of these complex solutions into the real-valued physical oscillation of the mass.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        35.0,
+        50.0
+      ],
+      "keyword_bank": [
+        "Vector",
+        "get_velocity_vector",
+        "real",
+        "projection"
+      ],
+      "clip_query": "The complex vectors project onto the real axis, matching the physical motion of the oscillating mass."
+    }
+  ]
+}

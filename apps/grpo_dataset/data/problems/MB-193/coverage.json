@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-193",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Vieta's formulas",
+        "Symmetric polynomials",
+        "Combinations of roots",
+        "Roots to coefficients mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Color-coded root variables",
+        "Aligned equations",
+        "Smooth dot transitions",
+        "Optimal transport mapping"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Newton's method for root finding",
+        "Polynomial division",
+        "Distance minimization (optimal transport)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Helper functions for polynomial math",
+        "Symmetric system generator",
+        "Custom Tex mapping"
+      ]
+    }
+  }
+}

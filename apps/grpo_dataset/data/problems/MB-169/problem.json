@@ -1,0 +1,68 @@
+{
+  "id": "MB-169",
+  "title": "Slowed and Absorbed Wave Propagation through Layers",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes an oscillating wave propagating through multiple vertical layers (boundaries). Each layer should introduce a phase shift (slowing down the wave) and a damping factor (absorbing/reducing the amplitude of the wave). \n\nYour implementation should include:\n1. A `SlicedWave` class (inheriting from `Group`) that manages an `OscillatingWave` (a dynamic `VMobject` that updates its points over time) and an `OscillatingFieldWave` (representing the vector field of the wave).\n2. The wave's phase and amplitude should be calculated dynamically using `ValueTracker`s for each layer's phase kick and absorption/damping factor. This allows animating the transition of these physical properties.\n3. A coordinate system (axes) where the wave propagates along the x-axis, and vertical lines represent the boundaries of the layers.\n4. The wave's points must be updated continuously using an updater function (`add_updater`) based on elapsed time `dt` to simulate continuous wave propagation.\n5. Ensure the wave's color is determined dynamically or set to a spectral colormap.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-169/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "SlowedAndAbsorbed"
+    ],
+    "visual_techniques": [
+      "Dynamic wave simulation using time-dependent updaters",
+      "Layered phase shifts and amplitude damping",
+      "Vector field representation of oscillating waves",
+      "ValueTracker-driven physical parameter animation"
+    ],
+    "manim_api_patterns": [
+      "VMobject update_points with add_updater",
+      "ValueTracker for dynamic parameter tracking",
+      "c2p coordinate mapping",
+      "merge_dicts_recursively for configuration"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Static wave rendering instead of dynamic time-based propagation",
+      "severity": "high",
+      "note": "The wave must continuously propagate using an updater that increments time by dt."
+    },
+    {
+      "pattern": "Discontinuous phase jumps at layer boundaries",
+      "severity": "medium",
+      "note": "The phase kick and damping must be applied correctly based on the x-coordinate relative to the layer boundaries."
+    },
+    {
+      "pattern": "Missing vector field lines",
+      "severity": "medium",
+      "note": "The OscillatingFieldWave must render vertical field lines connecting the wave to the axis."
+    }
+  ]
+}

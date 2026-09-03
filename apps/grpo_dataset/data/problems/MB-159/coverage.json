@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-159",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Lorentz force equation implementation",
+        "Retarded time/delay calculation for wave propagation",
+        "Perpendicular acceleration vector projection",
+        "Dipole radiation intensity distribution"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "3D parametric wave curve (OscillatingWave)",
+        "Dynamic acceleration vector pinned to particle",
+        "Dynamic vector field representing scattered radiation",
+        "Color-coded field vectors based on strength"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Time-dependent updaters using dt",
+        "Particle position and acceleration history tracking",
+        "Field evaluation grid coordinates"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom VMobject subclass for the wave",
+        "Custom Vector subclass for the acceleration vector",
+        "3D scene setup with camera rotation animations"
+      ]
+    }
+  }
+}

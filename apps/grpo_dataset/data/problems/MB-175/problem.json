@@ -1,0 +1,71 @@
+{
+  "id": "MB-175",
+  "title": "NBA Shot History 3D Density Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Statistics",
+    "Data Science"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes NBA shot history data in 3D. The scene should set up a 3D environment with the camera reoriented to look at a basketball court from an angle (e.g., reorienting the frame to -65 degrees azimuth and 70 degrees elevation). Place a basketball court image ('basketball-court') on the ground plane, scaled to fit a 50x94 coordinate system. Display a dynamic 'Year: 2000' label fixed to the screen frame. Load shot coordinate data (or simulate a realistic distribution of coordinates if the CSV files are missing) for a range of years (e.g., 1997 to 2022). For each year, generate two representations: a dense cloud of small yellow dots (using DotCloud with low opacity) representing individual shot locations, and a 3D grid of bars (using VCubes) where the height/depth of each bar represents the density of shots in that grid cell. Ensure the 3D bars are properly sorted by depth relative to the camera to avoid rendering artifacts, and apply a blue-to-white or custom color scheme to the bars.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-175/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "ShotHistory"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "ImageMobject Mapping",
+      "DotCloud Rendering",
+      "3D VCube Grid Density Histogram",
+      "Depth Sorting"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ThreeDScene",
+      "DotCloud",
+      "VCube",
+      "frame.reorient",
+      "fix_in_frame",
+      "Axes"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "FileNotFoundError when loading CSV data",
+      "severity": "high",
+      "note": "The script must gracefully fall back to generating mock coordinate data if the local CSV files are not found."
+    },
+    {
+      "pattern": "VCube stretching and positioning errors",
+      "severity": "medium",
+      "note": "Incorrect scaling or alignment of VCubes can cause them to float or clip through the court plane."
+    },
+    {
+      "pattern": "Camera depth sorting issues",
+      "severity": "medium",
+      "note": "Failing to sort the bars based on the camera's implied location can cause incorrect overlapping of 3D elements."
+    }
+  ]
+}

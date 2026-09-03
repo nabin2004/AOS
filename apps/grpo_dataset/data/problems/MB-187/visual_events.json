@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-187",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display of the question title with the blue formatted set {1, 2, 3, ..., 2000}.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "get_question_title",
+        "set_tex",
+        "BLUE",
+        "UP"
+      ],
+      "clip_query": "The question text 'Find the number of subsets of {1, 2, 3, 4, 5, ..., 2,000}, the sum of whose elements is divisible by 5' appears at the top."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Display of the total number of subsets as 2^{2,000}.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "count",
+        "Total subsets",
+        "2^{2{,}000}",
+        "TEAL"
+      ],
+      "clip_query": "The text 'Total subsets: 2^{2,000}' is displayed below the question."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Transformation or expansion showing a massive integer grid representing the scale of 2^{2000}.",
+      "weight": 0.4,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "massive_int",
+        "arrange_in_grid",
+        "Integer",
+        "comma"
+      ],
+      "clip_query": "A massive grid of digits representing a huge number fills the screen."
+    }
+  ]
+}

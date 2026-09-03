@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-156",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Phase calculation using dot product with interface normal",
+        "Refractive index scaling factor applied to wave speed",
+        "Sigmoid or tanh function for smooth opacity mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "VCube representing the refracting medium",
+        "DotCloud representing the wave field",
+        "Dynamic opacity updates based on wave amplitude",
+        "Camera transition from 3D perspective to overhead 2D view"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Refractive index value of 2.0",
+        "Wave frequency and amplitude parameters",
+        "Dot cloud density configuration"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inheritance from InteractiveScene or ThreeDScene",
+        "Custom updater functions for real-time wave propagation",
+        "Proper setup of interface normal and origin vectors"
+      ]
+    }
+  }
+}

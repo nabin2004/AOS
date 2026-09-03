@@ -1,0 +1,69 @@
+{
+  "id": "MB-104",
+  "title": "Hologram Video Structure Outline",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a ManimGL script that creates a structured outline visualization for a video about holograms. The scene should start by shifting the camera frame slightly upwards and adding a full-screen background rectangle. Create three top-level outline columns using ScreenRectangles arranged horizontally. Each column should contain an image placeholder (using ImageMobject for 'HologramProcess.jpg', 'SimplestHologram.jpg', and 'HologramEquation.png') and a title text ('The process', 'The simplest hologram', 'The general derivation') positioned above it. Fade these three columns in one by one. Next, perform a camera zoom animation: fade out the second and third columns, and animate the camera frame to zoom in closely on the first column ('The process'). Then, restore the camera frame to its default state and fade the other columns back in. Implement an isolation animation function that dims (reduces opacity of) all columns except a specified target index; use this to highlight the first column, then the second column. Finally, expand the second column ('The simplest hologram') downwards into three sub-columns ('Exposure pattern', 'Reconstruction', 'Added complexity') using ImageMobjects ('ZonePlateExposure', 'DotReconstruction', 'MultipleDotHologram'). Connect the outer edges of the parent column to the outer edges of the sub-columns using smooth CubicBezier curves, and animate the sub-columns transitioning out from the parent column using a lagged restore animation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-104/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "Outline"
+    ],
+    "visual_techniques": [
+      "Camera Frame Zooming",
+      "Image Mobject Replacement",
+      "Custom Isolation Animation",
+      "Cubic Bezier Connectors",
+      "Lagged Transition Animations"
+    ],
+    "manim_api_patterns": [
+      "self.frame",
+      "FullScreenRectangle",
+      "ScreenRectangle",
+      "Group",
+      "VGroup",
+      "CubicBezier",
+      "LaggedStartMap",
+      "Restore",
+      "FadeIn",
+      "FadeOut"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing image assets",
+      "severity": "medium",
+      "note": "The scene relies on specific JPG/PNG assets. Placeholders or generated patterns should be used if assets are missing."
+    },
+    {
+      "pattern": "ManimGL vs ManimCE frame API mismatch",
+      "severity": "high",
+      "note": "Using self.frame.animate is specific to ManimGL/ManimCE-3b1b. In standard ManimCE, this requires self.camera.frame."
+    }
+  ]
+}

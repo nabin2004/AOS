@@ -1,0 +1,90 @@
+{
+  "problem_id": "MB-160",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A flat 2D triangle prism is displayed, and an incoming white light beam splits into a spectrum of 200 refracted beams.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "flat_prism",
+        "in_beam",
+        "get_beams",
+        "ShowCreation"
+      ],
+      "clip_query": "A white light beam enters a 2D triangular prism and splits into a colorful spectrum of refracted rays."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A thick magenta x-ray beam is briefly drawn through the prism and then removed.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        2.0,
+        4.5
+      ],
+      "keyword_bank": [
+        "x_ray",
+        "ShowCreation",
+        "remove"
+      ],
+      "clip_query": "A thick pink or magenta ray is shown passing straight through the prism."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The flat prism fades out as a 3D prism fades in, and the camera rotates to a 3D perspective view.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.5,
+        8.5
+      ],
+      "keyword_bank": [
+        "prism",
+        "Prismify",
+        "reorient",
+        "FadeIn",
+        "FadeOut"
+      ],
+      "clip_query": "The camera rotates into a 3D view showing a three-dimensional glass prism refracting light."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The incoming light beam is animated up and down, causing the refracted spectral rays to dynamically shift and update.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        8.5,
+        13.5
+      ],
+      "keyword_bank": [
+        "put_start_and_end_on",
+        "in_beam",
+        "always_redraw"
+      ],
+      "clip_query": "The source light beam moves up and down, and the refracted rainbow rays dynamically adjust their angles."
+    },
+    {
+      "event_id": "ev_05",
+      "description": "The camera rotates back to a flat 2D perspective, and the 3D prism transitions back to the flat 2D triangle.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        13.5,
+        16.0
+      ],
+      "keyword_bank": [
+        "reorient",
+        "flat_prism",
+        "prism",
+        "FadeIn",
+        "FadeOut"
+      ],
+      "clip_query": "The camera returns to a flat 2D view of the triangular prism."
+    }
+  ]
+}

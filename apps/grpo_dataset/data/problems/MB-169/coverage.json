@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-169",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Phase shift calculation based on layer position",
+        "Exponential or step-wise amplitude damping",
+        "Sinusoidal wave equation with spatial and temporal components"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "Continuous wave line rendering",
+        "Vertical vector field lines (field wave)",
+        "Distinct vertical lines for layer boundaries",
+        "Spectral colormap for wave styling"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker values for phase kick and absorption",
+        "Wave speed and wavelength parameters",
+        "Sample resolution for smooth curve rendering"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "SlicedWave class inheriting from Group",
+        "OscillatingWave class inheriting from VMobject",
+        "Time-dependent updater function using dt"
+      ]
+    }
+  }
+}

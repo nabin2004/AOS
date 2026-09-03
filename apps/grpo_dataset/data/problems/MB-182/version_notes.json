@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-182",
+  "conflicts": [
+    {
+      "category": "method_name",
+      "gl_construct": "axes.i2gp(x, wave)",
+      "ce_equivalent": "axes.input_to_graph_point(x, wave)",
+      "severity": "high"
+    },
+    {
+      "category": "animation_class",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "style_method",
+      "gl_construct": "set_submobject_colors_by_gradient",
+      "ce_equivalent": "set_color_by_gradient",
+      "severity": "medium"
+    },
+    {
+      "category": "updater_pattern",
+      "gl_construct": "always_redraw",
+      "ce_equivalent": "always_redraw",
+      "severity": "low"
+    }
+  ]
+}

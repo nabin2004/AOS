@@ -1,0 +1,63 @@
+{
+  "id": "MB-167",
+  "title": "Row of Charges on X-Axis Electric Field Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Electromagnetism"
+  ],
+  "full_prompt": "Create a ManimGL scene named `RowOfChargesXAxis` that visualizes a row of charged particles positioned along the X-axis and their resulting electric field. Implement a custom `ChargedParticle` class inheriting from `Group` that encapsulates a `TrueDot` representing the particle, handles charge, mass, and tracks position/acceleration history. Implement helper functions `lorentz_force` and `points_to_particle_info` to calculate the electromagnetic forces and field vectors, taking into account retardation effects (using past positions and delays based on the speed of light `c`). The scene should display a sequence of positive and negative charges arranged linearly, and render the surrounding vector field dynamically using these custom physics calculations to avoid singularities near the charges.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-167/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "RowOfChargesXAxis"
+    ],
+    "visual_techniques": [
+      "Vector Field",
+      "Charged Particles",
+      "Lorentz Force Calculation",
+      "Dynamic Updaters"
+    ],
+    "manim_api_patterns": [
+      "TrueDot",
+      "Group",
+      "Tex",
+      "VectorField",
+      "always_redraw"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing lorentz_force or points_to_particle_info helper functions",
+      "severity": "high",
+      "note": "The scene relies on custom physics calculations for field vectors."
+    },
+    {
+      "pattern": "ManimCE vs ManimGL compatibility issues with TrueDot or Group",
+      "severity": "high",
+      "note": "TrueDot and Group are specific to 3blue1brown's ManimGL fork."
+    }
+  ]
+}

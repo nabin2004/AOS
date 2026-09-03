@@ -1,0 +1,66 @@
+{
+  "id": "MB-131",
+  "title": "King - Man + Woman = Queen Word2Vec Embedding Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a complete, high-quality ManimGL script that visualizes the classic word embedding analogy: King - Man + Woman = Queen in a 3D vector space. Your script should define a custom `LabeledArrow` class that draws a 3D arrow from the origin to a point, with a text label rotated to face the camera/be readable in 3D. Create a base class `Word2VecScene` (inheriting from `InteractiveScene`) that sets up a 3D coordinate system (`ThreeDAxes`) with custom ranges, loads or simulates 3D PCA-projected word vectors for 'King', 'Man', 'Woman', and 'Queen', and adds a background grid plane. Then, implement the subclass `KingQueenExample` which performs the following animation sequence: 1) Draw the 'King' and 'Man' vectors with labels. 2) Show the vector subtraction 'King - Man' by translating the negative 'Man' vector to the tip of 'King'. 3) Add the 'Woman' vector to the tip of the resulting vector. 4) Reveal the 'Queen' vector and show how the computed vector lands extremely close to 'Queen'. Throughout the animation, rotate the 3D camera to give a clear sense of depth and spatial relationships.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-131/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "Word2VecScene",
+      "KingQueenExample"
+    ],
+    "visual_techniques": [
+      "3D vector arithmetic",
+      "PCA projection of high-dimensional embeddings",
+      "Custom 3D labeled arrows",
+      "Dynamic camera rotation in 3D space",
+      "Grid plane overlays"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ThreeDAxes",
+      "NumberPlane",
+      "LabeledArrow",
+      "self.frame.animate.set_euler_angles"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing gensim or tiktoken dependencies during execution",
+      "severity": "high",
+      "note": "The code relies on external word embedding models. If offline or missing, mock embedding vectors must be provided as a fallback."
+    },
+    {
+      "pattern": "Incorrect 3D text rotation causing labels to be invisible or edge-on",
+      "severity": "medium",
+      "note": "Ensure label_rotation and camera angles are aligned so text remains readable."
+    }
+  ]
+}

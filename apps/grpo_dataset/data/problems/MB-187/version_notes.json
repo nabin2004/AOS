@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-187",
+  "conflicts": [
+    {
+      "category": "manim-community-vs-manimgl",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "text-rendering",
+      "gl_construct": "OldTexText",
+      "ce_equivalent": "Tex",
+      "severity": "medium"
+    },
+    {
+      "category": "layout",
+      "gl_construct": "arrange_in_grid",
+      "ce_equivalent": "arrange_submobjects",
+      "severity": "medium"
+    }
+  ]
+}

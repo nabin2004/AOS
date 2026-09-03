@@ -1,0 +1,71 @@
+{
+  "id": "MB-105",
+  "title": "Parameterizing a Loop and Unrolling to a Unit Interval",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Topology",
+    "Geometry"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or compatible Manim CE with appropriate fallbacks) that visualizes the parameterization of a closed loop and its transformation into a unit interval. \n\n1. **Setup the Loop and Interval**:\n   - Create a closed loop on the left side of the screen. Since external SVG assets like 'example_loop1' might not be available, procedurally generate a smooth, non-self-intersecting closed loop (e.g., using a distorted circle or custom Bezier curve points).\n   - Create a unit interval (a number line from 0 to 1) on the right side of the screen, complete with tick marks and labels.\n\n2. **Coordinate Tracking**:\n   - Add a tracker dot on the loop and a corresponding pointer (arrow tip) on the unit interval.\n   - Synchronize their positions using a ValueTracker ranging from 0 to 1. As the tracker value increases, the dot should trace the loop while the pointer moves along the unit interval. Display a decimal readout of the current parameter value next to the pointer.\n   - Animate this tracking motion smoothly from 0 to 1 and back.\n\n3. **Snipping the Loop**:\n   - Introduce a pair of scissors (procedurally drawn or using a simple SVG fallback) that cuts the loop at its start/end point.\n   - Animate the loop splitting at the cut, separating the start and end points slightly to show it is no longer closed.\n\n4. **Unrolling Transformation**:\n   - Morph/transform the snipped open loop into a straight line segment that perfectly aligns with the unit interval on the right.\n   - Use a curved path transformation (e.g., `path_arc`) to make the unrolling motion look natural and visually engaging.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-105/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "ParameterizeTheLoop"
+    ],
+    "visual_techniques": [
+      "ValueTracker-driven synchronized updaters",
+      "Procedural SVG path manipulation",
+      "Non-linear path morphing (Transform with path_arc)",
+      "Coordinate mapping between 1D intervals and 2D curves"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "UnitInterval",
+      "ArrowTip",
+      "DecimalNumber",
+      "there_and_back",
+      "f_always",
+      "always",
+      "Transform"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing SVG assets ('example_loop1', 'scissors') causing FileNotFoundError",
+      "severity": "high",
+      "note": "Always provide procedural fallbacks (e.g., VMobject with custom points for the loop, and simple VGroups of lines/circles for scissors) if external assets are missing."
+    },
+    {
+      "pattern": "Use of ManimGL-specific classes like UnitInterval or ArrowTip in Manim Community",
+      "severity": "high",
+      "note": "If running in Manim CE, replace UnitInterval with NumberLine and ArrowTip with standard Arrow or Triangle."
+    },
+    {
+      "pattern": "ManimGL-specific updater syntax (f_always, always) failing in Manim CE",
+      "severity": "high",
+      "note": "Use standard .add_updater() methods for cross-compatibility."
+    }
+  ]
+}

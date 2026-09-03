@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-109",
+  "conflicts": [
+    {
+      "category": "Framework Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Text Animation",
+      "gl_construct": "TransformMatchingStrings",
+      "ce_equivalent": "TransformMatchingShapes or TransformMatchingTex",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobject Methods",
+      "gl_construct": "replicate",
+      "ce_equivalent": "VGroup duplication using copy() and loop",
+      "severity": "medium"
+    },
+    {
+      "category": "Styling",
+      "gl_construct": "match_style",
+      "ce_equivalent": "match_style (supported in newer CE, but check compatibility)",
+      "severity": "low"
+    }
+  ]
+}

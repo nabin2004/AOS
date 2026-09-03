@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-082",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Fade in the main 2D function graph, its axes, and the s-plane grid populated with exponential icons.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "axes",
+        "graph",
+        "s_plane",
+        "exp_pieces",
+        "LaggedStart"
+      ],
+      "clip_query": "A 2D function graph fades in alongside an s-plane grid populated with small exponential graph icons."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Dim the non-contributing exponential icons on the s-plane, leaving only the key components highlighted.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "exp_pieces",
+        "generate_target",
+        "fade",
+        "key_pieces"
+      ],
+      "clip_query": "Most of the small exponential icons on the s-plane fade out, leaving only a few highlighted."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Display weight labels next to the highlighted exponential icons on the s-plane.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        6.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "weight_labels",
+        "Tex",
+        "next_to"
+      ],
+      "clip_query": "Mathematical weight labels appear next to the highlighted exponential icons on the s-plane."
+    }
+  ]
+}

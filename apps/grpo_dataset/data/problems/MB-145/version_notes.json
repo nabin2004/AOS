@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-145",
+  "conflicts": [
+    {
+      "category": "Mobject Type",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot",
+      "severity": "medium"
+    },
+    {
+      "category": "Updaters",
+      "gl_construct": "add_updater with dt",
+      "ce_equivalent": "add_updater(lambda m, dt: ...)",
+      "severity": "low"
+    }
+  ]
+}

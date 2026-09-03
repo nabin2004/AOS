@@ -1,0 +1,67 @@
+{
+  "id": "MB-092",
+  "title": "Euclid's Proof of Infinitely Many Primes",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Number Theory",
+    "Mathematics"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes Euclid's proof of the infinitude of primes. Create a scene named `EuclidProof` inheriting from `InteractiveScene` (or standard `Scene` if adapting to ManimCE). First, display a finite sequence of primes: '2, 3, 5, ..., p_n' in a large font size, positioned at the upper left. Add a yellow label 'All primes (suppose finite)' pointing to the sequence, and wrap the sequence in a yellow SurroundingRectangle. Next, construct the product 'N = 2 * 3 * 5 * ... * p_n' below the sequence, and animate the addition of '+1' to the right of it. Use TransformMatchingTex to transition the prime sequence copy into the product formula. Then, introduce the prime factorization of N as 'N = q_1 ... q_k' in red, pointing to it with a teal vector and a label 'Prime factors'. Finally, highlight 'q_1' with a white rectangle, show a label stating 'Cannot be in {2, 3, 5, ..., p_n}', and draw a large red-tinted contradiction box around the entire text group with a bold 'Contradiction!' title.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-092/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "EuclidProof"
+    ],
+    "visual_techniques": [
+      "Tex transformation matching",
+      "Surrounding rectangles with custom stroke and fill",
+      "FadeTransformPieces for smooth mathematical transitions",
+      "InteractiveScene layout alignment"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "Text",
+      "TexText",
+      "SurroundingRectangle",
+      "TransformMatchingTex",
+      "FadeTransformPieces",
+      "Vector",
+      "Arrow"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimGL-specific InteractiveScene or StringMobject in a standard Manim Community environment without adaptation",
+      "severity": "high",
+      "note": "InteractiveScene and StringMobject are unique to ManimGL/3b1b-videos. For ManimCE, use Scene and standard Mobjects."
+    },
+    {
+      "pattern": "Incorrect indexing of Tex elements during TransformMatchingTex",
+      "severity": "medium",
+      "note": "The code relies on specific string indexing like product[2:] or factor_eq['q_1']. If the Tex string is formatted differently, indexing will crash."
+    }
+  ]
+}

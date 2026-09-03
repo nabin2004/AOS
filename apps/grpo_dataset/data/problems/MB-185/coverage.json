@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-185",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "ComplexPlane coordinate mapping",
+        "Fifth roots of unity calculation using e^(i * theta)",
+        "Angle calculation (2 * pi / 5)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Teal pentagon with semi-transparent fill",
+        "Unit circle centered at origin",
+        "Arrows pointing from origin to roots",
+        "Glow dots or highlighted vertices"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Correct trigonometric/exponential coordinates for 5 vertices",
+        "Proper scaling of unit circle to match plane's unit size"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Complex plane positioned on the left",
+        "Function formula positioned on the right",
+        "Zeta labels aligned radially outward from vertices"
+      ]
+    }
+  }
+}

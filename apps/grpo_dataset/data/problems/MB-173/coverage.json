@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-173",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Lorentz force calculation",
+        "Acceleration vector normalization",
+        "Delay/retarded time calculation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "3D sphere (TrueDot) representing a charged particle",
+        "Dynamic pink vector (AccelerationVector) pinned to the particle",
+        "3D camera rotation/movement"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Euler integration steps for particle history",
+        "Distance adjustment to prevent division by zero near the origin"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "ChargedParticle class inheriting from Group",
+        "AccelerationVector class inheriting from Vector with custom updater",
+        "Introduce3dMovements scene class inheriting from Scene or ThreeDScene"
+      ]
+    }
+  }
+}

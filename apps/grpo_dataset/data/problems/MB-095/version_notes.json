@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-095",
+  "conflicts": [
+    {
+      "category": "grid_generation",
+      "gl_construct": "Square().get_grid(10, 10, buff=0)",
+      "ce_equivalent": "VGroup(*[Square() for _ in range(100)]).arrange_in_grid(10, 10, buff=0)",
+      "severity": "high"
+    },
+    {
+      "category": "scene_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_syntax",
+      "gl_construct": "to_remove.animate.set_color(RED)",
+      "ce_equivalent": "to_remove.animate.set_color(RED)",
+      "severity": "low"
+    }
+  ]
+}

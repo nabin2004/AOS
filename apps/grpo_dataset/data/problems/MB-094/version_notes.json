@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-094",
+  "conflicts": [
+    {
+      "category": "base_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "GlowDots",
+      "ce_equivalent": "VGroup of Dots with custom stroke/opacity or standard Dots",
+      "severity": "high"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform",
+      "severity": "medium"
+    },
+    {
+      "category": "style",
+      "gl_construct": "TexText",
+      "ce_equivalent": "Tex",
+      "severity": "low"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "id": "MB-063",
+  "title": "Visualizing Complex State Vector Components",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Quantum Computing",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a Manim scene named ComplexComponents that visualizes the components of a 4-dimensional quantum state vector. First, generate a random normalized 4D real vector and display it as a DecimalMatrix on the left side of the screen, labeled with 2-bit binary strings (00, 01, 10, 11) to represent the state indices. Next, create four parallel horizontal real number lines on the right side of the screen, each representing one component's value range from -1 to 1. Fade in these number lines along with real-number labels (R). Then, place glowing dots on these number lines corresponding to the vector's components, using a smooth FadeTransform from the matrix elements to the dots. Prepare a transition to 2D complex planes (C) for each component, setting up a ComplexValueTracker to dynamically update the dots' positions and draw connecting lines from the matrix elements to the dots on the planes.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-063/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "ComplexComponents"
+    ],
+    "visual_techniques": [
+      "Custom Updaters",
+      "Coordinate System Mapping (n2p)",
+      "Matrix-to-Graph Linking",
+      "Value Trackers"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "DecimalMatrix",
+      "ComplexPlane",
+      "NumberLine",
+      "ComplexValueTracker",
+      "GlowDot",
+      "FadeTransform"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing ComplexValueTracker in standard Manim Community Edition",
+      "severity": "high",
+      "note": "ComplexValueTracker is specific to ManimGL/3b1b's library. In standard CE, it must be simulated using two ValueTrackers (real and imaginary parts) or a custom class."
+    },
+    {
+      "pattern": "GlowDot undefined in standard Manim",
+      "severity": "medium",
+      "note": "GlowDot is a custom 3b1b mobject. Standard Dot with a background glow or simple Dot should be used as a fallback."
+    },
+    {
+      "pattern": "DecimalMatrix layout issues",
+      "severity": "medium",
+      "note": "Aligning BitString labels precisely next to DecimalMatrix elements requires careful coordinate matching (match_y, next_to)."
+    }
+  ]
+}

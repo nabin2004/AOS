@@ -1,0 +1,89 @@
+{
+  "problem_id": "MB-106",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Draw the 2D closed loop in the XY plane with a distinct stroke color.",
+      "weight": 0.15,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "loop",
+        "VMobject",
+        "stroke_color"
+      ],
+      "clip_query": "A 2D closed loop or curve is drawn on a flat plane."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Render the 3D parametric surface representing the midpoints and lengths of all chords of the loop.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "ParametricSurface",
+        "get_surface_func",
+        "midpoint",
+        "dist"
+      ],
+      "clip_query": "A 3D surface emerges above the 2D loop, showing varying heights."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Animate two tracking dots moving along the loop with a connecting chord line.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "always_redraw",
+        "Line",
+        "dots"
+      ],
+      "clip_query": "Two dots move along the loop with a line segment connecting them."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Display a tracking dot on the 3D surface that dynamically moves in sync with the chord's midpoint and length.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "surface_dot",
+        "midpoint",
+        "dist",
+        "always_redraw"
+      ],
+      "clip_query": "A dot moves on the 3D surface, tracking the midpoint and length of the chord below."
+    },
+    {
+      "event_id": "ev_05",
+      "description": "Rotate the 3D camera to show the surface from multiple angles, highlighting its topological structure.",
+      "weight": 0.1,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "camera",
+        "frame",
+        "increment_theta",
+        "increment_phi"
+      ],
+      "clip_query": "The camera rotates around the 3D surface to show its shape and height."
+    }
+  ]
+}

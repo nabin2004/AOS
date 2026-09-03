@@ -1,0 +1,45 @@
+{
+  "problem_id": "MB-154",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "\\lambda_1",
+        "\\lambda_2",
+        "\\theta_1",
+        "\\theta_2",
+        "Arc",
+        "rotate_vector"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Line",
+        "Square",
+        "Circle",
+        "Vector",
+        "always_redraw",
+        "highlight_intersection_points"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "1.5",
+        "0.6",
+        "-19.9",
+        "6.5"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene",
+        "get_line_group",
+        "save_state",
+        "Restore"
+      ]
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "MB-065",
+  "title": "Grover's Algorithm Runtime Quiz and Pi Creature Responses",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "interactive"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Computer Science",
+    "Physics"
+  ],
+  "full_prompt": "Write a complete ManimGL scene named `Quiz` that presents a multiple-choice question about Grover's algorithm runtime complexity. The choices are: A) $\\mathcal{O}(\\sqrt{N})$, B) $\\mathcal{O}(\\log(N))$, C) $\\mathcal{O}(\\log(\\log(N)))$, D) $\\mathcal{O}(1)$. Initially, the choices are covered by grey rectangles that slide/stretch open. To represent people answering the quiz, display a 6x6 grid of Randolph Pi Creatures. Assign each Pi Creature a random correct/incorrect status (20% correct, 80% incorrect), showing a green checkmark or red exmark next to them, and changing their expressions to 'hooray' or 'sad' accordingly. After fading out the Pi Creatures, show a question group consisting of a quantum computer symbol, a running clock, and a question mark. Finally, animate the covers stretching away to reveal the choices.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-065/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "Quiz"
+    ],
+    "visual_techniques": [
+      "Pi Creature Grid",
+      "Surrounding Rectangles as Covers",
+      "Clock Animation",
+      "LaggedStartMap Animations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Randolph",
+      "Exmark",
+      "Checkmark",
+      "ClockPassesTime",
+      "cycle_animation",
+      "LaggedStartMap",
+      "Restore",
+      "MoveToTarget"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom 3b1b assets like Randolph, Exmark, Checkmark, or get_quantum_computer_symbol",
+      "severity": "high",
+      "note": "These are custom mobjects defined in the 3b1b/videos repository. If running in standard Manim Community, they must be mocked or replaced with standard SVGMobjects/shapes."
+    },
+    {
+      "pattern": "Use of InteractiveScene and self.frame",
+      "severity": "high",
+      "note": "InteractiveScene and self.frame are specific to ManimGL. Standard Manim Community uses Scene and self.camera."
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "problem_id": "MB-196",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "ParametricSurface",
+        "sin",
+        "cos",
+        "u_range",
+        "v_range",
+        "delta_theta",
+        "get_sphere_slices",
+        "get_flattened_slices"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "TexturedSurface",
+        "SurfaceMesh",
+        "ReplacementTransform",
+        "FadeIn",
+        "FadeOut",
+        "color_slices",
+        "BLUE_D",
+        "BLUE_E",
+        "YELLOW"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "radius",
+        "n_slices",
+        "resolution",
+        "focal_distance",
+        "light_source"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene",
+        "construct",
+        "get_south_slices",
+        "camera",
+        "frame"
+      ]
+    }
+  }
+}

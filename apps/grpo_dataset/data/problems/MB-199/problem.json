@@ -1,0 +1,64 @@
+{
+  "id": "MB-199",
+  "title": "Visual Proof of Circle Area via Sector Rearrangement",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Geometry"
+  ],
+  "full_prompt": "Write a complete Manim script that visually demonstrates the classic proof of a circle's area by rearranging its sectors. First, draw a blue circle with a white border and display the text 'Area?' above it. Slice the circle into 20 equal sectors. Transition the original circle to the top-left corner and the question text to the top-right corner. Arrange a copy of the 20 sectors in a straight horizontal line at the bottom. Next, split this row of sectors into two halves of 10. Rotate the right half by 180 degrees (PI radians) and interlock it with the left half to form a near-rectangular shape. Highlight the top edge of this shape with a yellow line, and show that its length corresponds to half the circle's circumference (pi * R) by morphing the yellow line into a semi-circle over the original sliced circle. Highlight the height of the interlocked shape with a pink line, and show that its length corresponds to the radius (R) by morphing it into a radial line of the original circle. Finally, combine these dimensions to transform the 'Area?' text into the formula '= pi * R^2'. Note: Since 'get_sectors' is a custom helper, you must implement a robust method to generate the sector mobjects (e.g., using AnnularSector with inner_radius=0) so that they align perfectly when arranged.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-199/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "CircleExample"
+    ],
+    "visual_techniques": [
+      "Sector rearrangement",
+      "Interlocking animation",
+      "Dimension highlighting",
+      "Shape morphing"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "OldTex",
+      "ShowCreation",
+      "VShowPassingFlash",
+      "TransformFromCopy",
+      "MoveToTarget"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing implementation of custom get_sectors method",
+      "severity": "high",
+      "note": "The reference code relies on self.get_sectors which is not a standard Manim built-in. The agent must implement this helper using AnnularSector or Sector."
+    },
+    {
+      "pattern": "ManimCE compatibility issues with OldTex and ShowCreation",
+      "severity": "medium",
+      "note": "If compiling with ManimCE, OldTex must be replaced with Tex, and ShowCreation with Create."
+    }
+  ]
+}

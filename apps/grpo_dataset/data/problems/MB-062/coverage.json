@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-062",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Set notation {0, 1, ..., N-1}",
+        "Boolean function representation f(n) = (n == 12)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Central blackbox machine representation",
+        "Yellow key icon indicator",
+        "Grid layout transformation for non-target inputs",
+        "Code block overlay inside the machine"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Correct indexing of the target key (12)",
+        "Grid dimensions (e.g., 3 columns) for other inputs"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "Sequential evaluation loop structure",
+        "Proper cleanup of machine outputs between stages",
+        "Lagged animations for group transitions"
+      ]
+    }
+  }
+}

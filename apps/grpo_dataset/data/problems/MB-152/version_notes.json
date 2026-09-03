@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-152",
+  "conflicts": [
+    {
+      "category": "mobject_types",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot (with custom gradient or 3D sphere styling)",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_types",
+      "gl_construct": "Group",
+      "ce_equivalent": "VGroup (or Group if mixing VMobjects and 3D Mobjects)",
+      "severity": "medium"
+    },
+    {
+      "category": "imports",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "high"
+    },
+    {
+      "category": "updaters",
+      "gl_construct": "dt parameter in custom update methods",
+      "ce_equivalent": "dt parameter in add_updater(lambda m, dt: ...)",
+      "severity": "medium"
+    }
+  ]
+}

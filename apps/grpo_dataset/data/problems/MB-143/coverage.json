@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-143",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "sympy.primerange",
+        "prime race difference calculation",
+        "modulo 4 arithmetic"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "color interpolation from Blue to White to Red",
+        "FullScreenRectangle masking",
+        "dynamic horizontal stretching of VMobject",
+        "camera zoom and restore"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "prime counter updating dynamically up to 26863",
+        "correct mapping of coordinate points to axes"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene structure",
+        "custom update functions using UpdateFromAlphaFunc",
+        "VGroup grouping of axes and graph for simultaneous stretching"
+      ]
+    }
+  }
+}

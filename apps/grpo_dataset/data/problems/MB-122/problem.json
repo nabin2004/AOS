@@ -1,0 +1,70 @@
+{
+  "id": "MB-122",
+  "title": "Basic MLP Walkthrough and Matrix-Vector Multiplication",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Linear Algebra",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a Manim visualization demonstrating a step-by-step matrix-vector multiplication walkthrough, designed to explain the inner workings of a Multi-Layer Perceptron (MLP) layer. The visualization should include:\n1. A matrix and a vector positioned side-by-side, with an equals sign and a placeholder result vector (using a custom numeric embedding or decimal matrix representation).\n2. An interactive-style step-by-step calculation animation where yellow surrounding rectangles highlight the current row of the matrix and the corresponding elements of the input vector simultaneously.\n3. Dynamic updating of the resulting vector's elements: as the highlighting progresses across the row and vector, the corresponding entry in the result vector should smoothly interpolate and update its decimal value to reflect the partial dot product.\n4. A 'data modifying matrix' animation where small data particles or text elements fly out from the matrix elements to simulate data flow or transformation.\n5. A helper function to color-code values dynamically based on their positive or negative magnitudes (e.g., blue for positive, red for negative). Ensure the layout is clean, elements are properly aligned, and the animation transitions are smooth and sequential.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-122/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "BasicMLPWalkThrough"
+    ],
+    "visual_techniques": [
+      "Matrix-vector multiplication step-by-step highlighting",
+      "Dynamic decimal value updates via UpdateFromAlphaFunc",
+      "Lagged particle/data flying animations",
+      "Color-coded numeric embeddings based on value ranges"
+    ],
+    "manim_api_patterns": [
+      "ShowIncreasingSubsets",
+      "UpdateFromAlphaFunc",
+      "LaggedStart",
+      "SurroundingRectangle",
+      "DecimalNumber",
+      "NumericEmbedding"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom NumericEmbedding class in standard Manim CE",
+      "severity": "high",
+      "note": "NumericEmbedding is a custom 3b1b class. In standard Manim CE, this must be replaced with a standard Matrix or a VGroup of DecimalNumbers."
+    },
+    {
+      "pattern": "Use of is_fixed_in_frame or fix_in_frame() in standard 2D scenes",
+      "severity": "medium",
+      "note": "These methods are specific to ManimGL's 3D camera system and will cause attribute errors in standard Manim CE."
+    },
+    {
+      "pattern": "Incorrect indexing or type checking for DecimalNumber in the row-vector product loop",
+      "severity": "medium",
+      "note": "The code assumes elements are DecimalNumbers to extract values; if standard Tex or MathTex is used instead, get_value() will fail."
+    }
+  ]
+}

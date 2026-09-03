@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-115",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient",
+      "ce_equivalent": "self.set_camera_orientation / self.move_camera",
+      "severity": "high"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "DotCloud",
+      "ce_equivalent": "VGroup of Dot3D or PMobject",
+      "severity": "medium"
+    },
+    {
+      "category": "Rendering Settings",
+      "gl_construct": "set_anti_alias_width",
+      "ce_equivalent": "None (handled automatically in CE)",
+      "severity": "low"
+    }
+  ]
+}

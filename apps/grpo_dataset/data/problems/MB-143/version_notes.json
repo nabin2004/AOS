@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-143",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Manipulation",
+      "gl_construct": "self.frame",
+      "ce_equivalent": "self.camera.frame",
+      "severity": "high"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "FullScreenRectangle",
+      "ce_equivalent": "FullScreenRectangle (or FullScreenFadeRectangle / ScreenRectangle with custom scaling)",
+      "severity": "medium"
+    },
+    {
+      "category": "Text",
+      "gl_construct": "TexText",
+      "ce_equivalent": "Tex",
+      "severity": "low"
+    }
+  ]
+}

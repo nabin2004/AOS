@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-064",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Introduction of Randolph, Buddy, and the 3D-rotated laptop",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "Randolph",
+        "PiCreature",
+        "Laptop",
+        "LaggedStart"
+      ],
+      "clip_query": "Two cartoon creatures looking at a 3D-rotated laptop"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Appearance of the classical computer chip symbol",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "get_classical_computer_symbol",
+        "chip",
+        "laptop.animate.shift"
+      ],
+      "clip_query": "A computer chip symbol appearing next to a blue cartoon creature"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Factoring equation 91 = 7 x 13 and number transformation inside the chip",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "Tex",
+        "91 = 7 \\times 13",
+        "seven",
+        "product",
+        "ReplacementTransform",
+        "TransformFromCopy"
+      ],
+      "clip_query": "A math equation transforming into numbers inside a computer chip symbol"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Display of the logic gate circuit diagram SVG",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "Four_bit_adder_with_carry_lookahead",
+        "gates",
+        "Write"
+      ],
+      "clip_query": "A complex logic gate circuit diagram being drawn on screen"
+    }
+  ]
+}

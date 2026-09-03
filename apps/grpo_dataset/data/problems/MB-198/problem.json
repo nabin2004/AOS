@@ -1,0 +1,62 @@
+{
+  "id": "MB-198",
+  "title": "False Euclid Proof Annotation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    15.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script to visualize the geometric annotations for a false Euclid proof. \n\n1. Define the following 2D points:\n   - A = [-1.94444444, 1.44444444, 0]\n   - B = [-4.44444444, -0.02777778, 0]\n   - C = [-1.09722222, -0.48611111, 0]\n   - D = [-2.63888889, -0.27777778, 0]\n   - E = [-1.56944444, 0.55555556, 0]\n   - F = [-3.01388889, 0.83555556, 0]\n   - P = [-2.58333333, 0.122222, 0]\n\n2. Create colored polygons representing the triangles:\n   - Blue triangles: AFP, AEP\n   - Green triangles: BPD, CPD\n   - Red triangles: BFP, CEP\n   - Set all triangles to have a black stroke of width 1, and a fill opacity of 0.8.\n\n3. Create custom-aligned braces for the following lines: AF, FB, AB, AE, EC, AC.\n   - For each line, construct a brace by creating a horizontal line of the same length at the origin, adding a Brace pointing UP, rotating the brace to match the line's angle (normalized to the range [-PI/2, PI/2]), shifting it to the line's center, and setting its fill color to BLACK with opacity 1.\n\n4. Animate the braces as follows:\n   - Grow the AF brace from center, then grow the FB brace from center.\n   - Transform both the AF and FB braces simultaneously into the AB brace using a `path_arc` of 45 degrees.\n   - Grow the AE brace from center, then grow the EC brace from center.\n   - Transform both the AE and EC braces simultaneously into the AC brace using a `path_arc` of 45 degrees.\n\nEnsure the scene class is named `FalseEuclidProofAnnotation` and inherits from `InteractiveScene` (or `Scene` if adapting to ManimCE).",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-198/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 105,
+    "scene_classes": [
+      "FalseEuclidProofAnnotation"
+    ],
+    "visual_techniques": [
+      "Custom brace alignment and rotation",
+      "Simultaneous path-arc transformations",
+      "Color-coded polygon overlays"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Polygon",
+      "Brace",
+      "Transform",
+      "GrowFromCenter",
+      "path_arc"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.8,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect brace rotation angle calculation leading to upside-down or misaligned braces",
+      "severity": "high",
+      "note": "The angle normalization `(angle + PI / 2) % PI - PI / 2` is critical to keep the braces facing the correct direction relative to the lines."
+    },
+    {
+      "pattern": "Missing path_arc parameter in Transform animations",
+      "severity": "medium",
+      "note": "The arc path makes the brace merging animation look smooth and organic; linear interpolation looks rigid."
+    }
+  ]
+}

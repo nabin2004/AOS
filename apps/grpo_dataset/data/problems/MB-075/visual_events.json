@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-075",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Introduction of the general ODE with color-coded derivative terms, splitting and sliding into place.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ode",
+        "right_part",
+        "left_part",
+        "Restore",
+        "Write"
+      ],
+      "clip_query": "The general linear differential equation is introduced on screen with colored derivative terms."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Sequential highlighting of x-terms, coefficients, LHS, and RHS using yellow surrounding rectangles.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "x_rects",
+        "a_rects",
+        "full_rect",
+        "zero_rect"
+      ],
+      "clip_query": "Yellow rectangles highlight different parts of the differential equation sequentially."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Substitution of the exponential ansatz e^{st} into the ODE, transforming derivatives into powers of s.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "exp_version",
+        "FadeTransform",
+        "key_map"
+      ],
+      "clip_query": "The differential equation terms transform into exponential terms with powers of s."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Factoring out e^{st} using an arc-based transformation to isolate the characteristic polynomial.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "factored",
+        "TransformMatchingTex",
+        "path_arc",
+        "poly_rect"
+      ],
+      "clip_query": "The exponential term is factored out, leaving the characteristic polynomial highlighted."
+    }
+  ]
+}

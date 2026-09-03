@@ -1,0 +1,69 @@
+{
+  "id": "MB-162",
+  "title": "Simple Light Beam Wave Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes a propagating 3D electromagnetic wave (light beam). The visualization must include:\n1. A 3D coordinate system with axes and a background grid plane aligned with the axes.\n2. A custom `OscillatingWave` class (inheriting from `VMobject`) that represents a 3D sinusoidal wave propagating along the x-axis. The wave should support independent y and z amplitudes, phases, and a twist rate (polarization rotation) along the propagation direction. It must update dynamically over time using an updater function.\n3. A custom `GraphAsVectorField` class (inheriting from `VectorField`) that displays electric field vectors pointing from the propagation axis (x-axis) to the wave's position at discrete intervals.\n4. A scene class `SimpleLightBeam` that sets up the 3D camera, instantiates the axes, plane, oscillating wave with a spectral color gradient, and the corresponding vector field, and animates the propagation of the light wave.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-162/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "SimpleLightBeam"
+    ],
+    "visual_techniques": [
+      "3D Vector Fields",
+      "Parametric 3D Waves",
+      "Updaters for Wave Propagation",
+      "Spectral Color Mapping"
+    ],
+    "manim_api_patterns": [
+      "ThreeDAxes",
+      "NumberPlane",
+      "VMobject",
+      "VectorField",
+      "add_updater",
+      "c2p"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect 3D coordinate mapping using c2p inside updaters",
+      "severity": "high",
+      "note": "Ensure the wave points are correctly transformed from the mathematical coordinate space to the visual 3D space using axes.c2p."
+    },
+    {
+      "pattern": "Missing or broken time-dependent update loop",
+      "severity": "high",
+      "note": "The wave must continuously update its points based on dt to simulate propagation. If the clock is stopped or updater is not added, the wave remains static."
+    },
+    {
+      "pattern": "Incompatible colormap references",
+      "severity": "medium",
+      "note": "Using colormaps.get_cmap('Spectral') requires proper integration with matplotlib or ManimGL's internal color utilities."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "MB-189",
+  "title": "Dirichlet Series and Von Mangoldt Coefficients Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    20.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Number Theory",
+    "Calculus"
+  ],
+  "full_prompt": "Create a ManimGL scene named `DirichletSeries` that visualizes a Dirichlet series with Von Mangoldt coefficients. First, draw a horizontal dividing line across the screen with titles 'Our puzzle' and 'Studying primes' in the upper left. Construct a series of terms for n from 1 to 13 where the coefficients are the Von Mangoldt function values (e.g., ln(p) for prime powers, 0 otherwise) and the denominators are n^s. Color-code the terms: prime n in yellow, prime powers in teal, and others in white. Initially, display the numbers 1 to 13 pointing down to the coefficients with arrows. Display the definition of the Von Mangoldt function on the right side. Animate the numbers and arrows appearing, then transform the numbers into the denominators of the series while writing the fraction bars and plus signs. Finally, shift the completed series upwards, place a brace underneath it, and label it 'Dirichlet series'.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-189/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "DirichletSeries"
+    ],
+    "visual_techniques": [
+      "Mathematical typesetting with Tex",
+      "Color-coded mathematical terms based on number-theoretic properties",
+      "Complex coordinate alignment and transformations",
+      "Brace labeling",
+      "Incremental subset animations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ShowIncreasingSubsets",
+      "select_parts",
+      "select_part",
+      "time_span",
+      "time_range"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim CE syntax for select_parts/select_part which are ManimGL-specific",
+      "severity": "high",
+      "note": "ManimGL's Tex class has select_parts and select_part methods, which do not exist in Manim Community. If porting to CE, these must be replaced with get_parts_by_tex or manual indexing."
+    },
+    {
+      "pattern": "Using time_span or time_range arguments inside play() or Write() in standard Manim CE",
+      "severity": "high",
+      "note": "These are ManimGL-specific animation timing parameters. In CE, use AnimationGroup with lag_ratio or custom rate_functions."
+    }
+  ]
+}

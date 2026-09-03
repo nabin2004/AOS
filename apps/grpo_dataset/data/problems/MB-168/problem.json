@@ -1,0 +1,69 @@
+{
+  "id": "MB-168",
+  "title": "Jiggles in Calcite: Driven Harmonic Oscillator",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes a driven harmonic oscillator simulation in 3D, representing atoms jiggling in a lattice (like calcite) under external forces. \n\nYour implementation must include:\n1. A custom `Spring` class inheriting from `VMobject` that draws a 3D helical spring. It must dynamically update its length, orientation, and stretch factor to stay connected between a fixed base point and a moving mobject using updaters.\n2. A `HarmonicOscillator` class inheriting from a 3D dot/sphere class (e.g., `TrueDot` or `Sphere`) that simulates physical motion. It must track mass, damping, spring constant $k$, velocity, and external forces, updating its position at each frame using numerical integration (e.g., sub-stepping Euler integration) inside an updater.\n3. A `Molecule` class that groups atoms (spheres) and bonds (springs or lines) together based on 3D coordinates.\n4. A scene class `JigglesInCalcite` that instantiates these physical objects, sets up a 3D camera perspective, applies an external sinusoidal driving force (representing an light wave's electric field), and runs the physics simulation to show the atoms jiggling dynamically.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-168/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "JigglesInCalcite"
+    ],
+    "visual_techniques": [
+      "3D Physics Simulation",
+      "Dynamic Updaters",
+      "Parametric Helical Curves",
+      "Custom Mobject Composition"
+    ],
+    "manim_api_patterns": [
+      "ParametricCurve",
+      "TrueDot",
+      "add_updater",
+      "stretch",
+      "put_start_and_end_on",
+      "get_edge_center"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Numerical instability in physics updater due to large dt",
+      "severity": "high",
+      "note": "Ensure sub-stepping (dividing dt into smaller time steps) is used inside the update_position method."
+    },
+    {
+      "pattern": "Spring stretching along wrong axis",
+      "severity": "medium",
+      "note": "The stretch method must target the correct index (0 for X-axis alignment of the helix before rotation) and put_start_and_end_on must be called in the correct order."
+    },
+    {
+      "pattern": "Missing TrueDot or 3D shading support in standard ManimCE",
+      "severity": "high",
+      "note": "TrueDot and specific 3D shading parameters are unique to ManimGL; fallback to Sphere or standard Dot with 3D camera is required if porting to ManimCE."
+    }
+  ]
+}

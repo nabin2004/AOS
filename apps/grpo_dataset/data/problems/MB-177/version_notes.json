@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-177",
+  "conflicts": [
+    {
+      "category": "Framework Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Creation",
+      "gl_construct": "get_axes()",
+      "ce_equivalent": "Axes()",
+      "severity": "high"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Text Typesetting",
+      "gl_construct": "OldTex",
+      "ce_equivalent": "Tex or MathTex",
+      "severity": "medium"
+    },
+    {
+      "category": "Custom Mobjects",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with a larger, low-opacity Dot behind it",
+      "severity": "medium"
+    }
+  ]
+}

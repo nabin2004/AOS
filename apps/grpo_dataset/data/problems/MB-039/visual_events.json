@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-039",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Axes are created with x-axis numbers and labels for 'Dimension' and 'Volume of a unit ball'. The continuous volume graph is plotted.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Axes",
+        "get_graph",
+        "y_label",
+        "x_label"
+      ],
+      "clip_query": "A coordinate system showing a blue curve representing the volume of a unit ball across dimensions."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Sequential iteration through dimensions 0 to 10, showing a vertical line, a dot on the graph, the exact formula, and its decimal approximation.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "DecimalNumber",
+        "get_v_line_to_graph",
+        "formulas",
+        "approx"
+      ],
+      "clip_query": "An animation stepping through integer dimensions, showing formulas and decimal values next to points on the curve."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The individual dots and lines are dimmed, and the last formula transforms into the general formula for the volume of an n-ball.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "FadeTransform",
+        "gen_formula",
+        "set_stroke",
+        "opacity"
+      ],
+      "clip_query": "The specific dimension labels fade out, leaving a general algebraic formula next to the peak of the curve."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The recurrence relation formula V_n = (2*pi/n) * V_{n-2} is displayed in the top-right corner with yellow highlights.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        18.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "recurrence",
+        "to_corner",
+        "UR",
+        "t2c"
+      ],
+      "clip_query": "A recurrence relation formula appears in the upper right corner of the screen."
+    }
+  ]
+}

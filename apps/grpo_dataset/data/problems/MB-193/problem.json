@@ -1,0 +1,68 @@
+{
+  "id": "MB-193",
+  "title": "Vieta's Formulas and Symmetric Polynomials (Roots to Coefficients)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Algebra",
+    "Complex Analysis"
+  ],
+  "full_prompt": "Create a Manim scene named 'FactsAboutRootsToCoefficients' that visualizes the relationship between the roots of a polynomial and its coefficients (Vieta's formulas). The visualization must include:\n1. A helper function `get_symmetric_system` that dynamically generates a system of equations relating coefficients (left-hand side) to symmetric polynomials of roots (right-hand side). Roots should be color-coded using a color gradient.\n2. Support for expanding and abbreviating symmetric polynomials (using combinations of roots) so that for higher degrees, the terms are cleanly formatted with ellipses.\n3. Numerical utility functions to convert between roots and coefficients, including a custom root-finding algorithm (Newton's method) and polynomial division to factor out roots.\n4. An optimal transport utility (`optimal_transport`) that maps a set of dots (representing roots in the complex plane) to target points by minimizing the sum of Euclidean distances, ensuring smooth visual transitions during animations.\n5. The scene should display the system of equations, highlight the symmetric combinations of roots, and demonstrate how changing the roots dynamically updates the coefficients.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-193/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 145,
+    "scene_classes": [
+      "FactsAboutRootsToCoefficients"
+    ],
+    "visual_techniques": [
+      "Symmetric system of equations generation",
+      "Color-coded root variables with color gradients",
+      "Optimal transport sorting for smooth dot transitions",
+      "Dynamic root-to-coefficient numerical mapping"
+    ],
+    "manim_api_patterns": [
+      "OldTex",
+      "VGroup",
+      "color_gradient",
+      "arrange",
+      "shift"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Mismatch in equation alignment when using OldTex vs MathTex",
+      "severity": "medium",
+      "note": "OldTex alignment logic using coordinate shifts of specific indices might break if MathTex parses the LaTeX string differently."
+    },
+    {
+      "pattern": "Infinite loop or convergence failure in Newton's method find_root",
+      "severity": "high",
+      "note": "If the seed is poorly chosen or the polynomial has multiple roots close together, find_root might fail to converge within max_steps."
+    },
+    {
+      "pattern": "Optimal transport sorting index out of bounds",
+      "severity": "medium",
+      "note": "If the number of target points does not match the number of dots, sort_to_minimize_distances will fail."
+    }
+  ]
+}

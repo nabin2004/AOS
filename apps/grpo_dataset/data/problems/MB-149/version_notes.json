@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-149",
+  "conflicts": [
+    {
+      "category": "VectorField API",
+      "gl_construct": "VectorField(func=vector_func) with always(self.update_vectors)",
+      "ce_equivalent": "ArrowVectorField(func) or using add_updater to update vector positions manually",
+      "severity": "high"
+    },
+    {
+      "category": "3D Rendering",
+      "gl_construct": "set_flat_stroke(False) on VMobject",
+      "ce_equivalent": "Not directly supported in standard CE renderer; requires custom OpenGL settings or omitting flat stroke configuration",
+      "severity": "medium"
+    },
+    {
+      "category": "Colormaps",
+      "gl_construct": "colormaps.get_cmap(\"Spectral\")",
+      "ce_equivalent": "Requires importing matplotlib colormaps or defining a custom color interpolation function",
+      "severity": "medium"
+    }
+  ]
+}

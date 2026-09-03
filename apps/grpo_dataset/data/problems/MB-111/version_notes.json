@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-111",
+  "conflicts": [
+    {
+      "category": "framework_mismatch",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "syntax",
+      "gl_construct": "f_always / always",
+      "ce_equivalent": "add_updater",
+      "severity": "high"
+    },
+    {
+      "category": "missing_mobject",
+      "gl_construct": "TrueDot / GlowDot",
+      "ce_equivalent": "Dot with custom stroke/glow effects",
+      "severity": "medium"
+    },
+    {
+      "category": "asset_dependency",
+      "gl_construct": "SVGMobject('example_loop1')",
+      "ce_equivalent": "ParametricFunction or custom VMobject",
+      "severity": "high"
+    }
+  ]
+}

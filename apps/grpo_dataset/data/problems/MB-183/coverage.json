@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-183",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "3D change of basis",
+        "linear combination calculation",
+        "rotation matrix transformation",
+        "vector projection"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "ThreeDAxes",
+        "3D basis vectors (Red, Green, Blue)",
+        "Yellow signal vector",
+        "Dynamic component vectors",
+        "Rotating camera frame"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Vector coordinates",
+        "Decimal coefficients",
+        "Rotation matrix transpose"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "always_redraw updater",
+        "camera frame rotation updater",
+        "get_coefficients helper method",
+        "get_linear_combination helper method"
+      ]
+    }
+  }
+}

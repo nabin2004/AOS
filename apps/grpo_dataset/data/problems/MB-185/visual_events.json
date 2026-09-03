@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-185",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup of the Complex Plane on the left side with a unit circle and 'Complex plane' title.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "unit_circle",
+        "complex_plane_title"
+      ],
+      "clip_query": "A complex plane with a unit circle centered at the origin on the left side of the screen."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Drawing of the teal pentagon connecting the fifth roots of unity.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "pentagon",
+        "Polygon",
+        "TEAL"
+      ],
+      "clip_query": "A teal pentagon connecting five points on a unit circle."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Displaying the polynomial function label f(x) on the right side of the screen.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        4.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "function",
+        "Tex",
+        "sum"
+      ],
+      "clip_query": "A mathematical formula for a polynomial function f(x) displayed on the right side."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Adding the angle arc 2pi/5 and the zeta labels next to each root point.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "arc",
+        "zeta_labels",
+        "Arrow"
+      ],
+      "clip_query": "Angle arc and zeta labels appearing next to the vertices of the pentagon on the complex plane."
+    }
+  ]
+}

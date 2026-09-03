@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-142",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup of the race tracks with labels 'p = 1 mod 4' in blue and 'p = 3 mod 4' in red, separated by horizontal and vertical lines.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "Tex",
+        "Line",
+        "labels",
+        "h_line",
+        "v_line"
+      ],
+      "clip_query": "Two labeled horizontal tracks for prime race modulo 4"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Sequential fade-in and writing of the first 10 prime blocks in their respective tracks.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "Square",
+        "Integer",
+        "FadeIn",
+        "Write"
+      ],
+      "clip_query": "First ten prime blocks fading into the tracks"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Camera frame scales up and moves right while blocks 10 to 30 are revealed with a lagged start.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "frame",
+        "LaggedStartMap",
+        "MoveToTarget"
+      ],
+      "clip_query": "Camera zooming out and panning right as more prime blocks appear"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Rapid progression of the race using ShowIncreasingSubsets to reveal thousands of prime blocks while the camera tracks the leading edge.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        22.0,
+        85.0
+      ],
+      "keyword_bank": [
+        "ShowIncreasingSubsets",
+        "MoveToTarget",
+        "frame.target"
+      ],
+      "clip_query": "Fast-forwarding prime race with thousands of blocks passing by"
+    }
+  ]
+}

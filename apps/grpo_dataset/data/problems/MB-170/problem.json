@@ -1,0 +1,71 @@
+{
+  "id": "MB-170",
+  "title": "Optics Puzzles - Spiral Paths of Light and Optical Rotation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Chemistry",
+    "Calculus"
+  ],
+  "full_prompt": "Write a complete ManimGL script for a scene named 'SpiralPaths'. The scene should visualize the concept of optical rotation of light as it passes through an optically active medium (like a sucrose solution). \n\nYour script must include:\n1. The `Molecule` and `Sucrose` classes as defined in the reference code, which construct a 3D molecular model using `DotCloud` for atoms and `Line` segments for bonds, applying depth testing.\n2. A 3D space setup where a `Sucrose` molecule is displayed at the center, scaled appropriately.\n3. A 3D helical path (representing circularly polarized light or the rotating polarization plane of linearly polarized light) propagating along the Z-axis (or X-axis) through the molecule.\n4. A series of vector arrows along the propagation path that rotate dynamically, showing the helical 'spiral path' of the electric field vector.\n5. A smooth camera orbit animation that rotates the 3D view to showcase the helical structure of the light path and the 3D structure of the sucrose molecule from multiple angles.\n\nEnsure the code is fully compatible with ManimGL, utilizing its 3D rendering capabilities, depth testing, and shader-based `DotCloud` rendering.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-170/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "SpiralPaths"
+    ],
+    "visual_techniques": [
+      "3D Molecule Rendering",
+      "DotCloud with custom radii and RGBA arrays",
+      "Depth testing for 3D overlapping",
+      "Helical vector fields",
+      "3D Camera Orbiting"
+    ],
+    "manim_api_patterns": [
+      "DotCloud",
+      "apply_depth_test",
+      "color_to_rgba",
+      "normalize",
+      "Line",
+      "Group"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE's Sphere or Dot3D instead of ManimGL's DotCloud, leading to performance issues or missing attributes.",
+      "severity": "high",
+      "note": "The reference code relies heavily on DotCloud and custom RGBA arrays which are specific to ManimGL's modern shader architecture."
+    },
+    {
+      "pattern": "Incorrect 3D camera rotation syntax, mixing up self.camera.frame with self.set_camera_orientation.",
+      "severity": "medium",
+      "note": "ManimGL uses self.camera.frame for camera manipulation, whereas ManimCE uses self.set_camera_orientation."
+    },
+    {
+      "pattern": "Failing to apply depth testing, causing the 3D bonds and atoms to render out of order.",
+      "severity": "high",
+      "note": "Must call self.apply_depth_test() or set depth_test=True on the 3D groups."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-107",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Parametric surface equations",
+        "Midpoint and distance coordinate mapping",
+        "M\u00f6bius strip parameterization",
+        "Boundary identification"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "3D camera rotation",
+        "Glow dots for highlighted coordinates",
+        "Color-coded surface representing distance",
+        "Simultaneous 2D and 3D views"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for parameter u and v",
+        "Numerical sampling of the loop path",
+        "Distance calculation",
+        "Midpoint calculation"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene setup",
+        "Custom update functions with always_redraw",
+        "3D axes integration",
+        "Smooth interpolation of SVG paths"
+      ]
+    }
+  }
+}

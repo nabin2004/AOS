@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-089",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Setup of dual complex planes (s-plane on the left, output plane on the right) with coordinate labels and the initial zeta sum formula label.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "add_coordinate_labels",
+        "sum_tex"
+      ],
+      "clip_query": "Two complex planes side-by-side with a mathematical formula label at the top."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The complex tracker dot 's' on the left plane animates towards the first Riemann zeta zero.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "s_tracker",
+        "animate",
+        "zeta_zeros",
+        "set_value"
+      ],
+      "clip_query": "A yellow dot on the left complex plane moving upwards along the critical line."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The partial sum path on the right plane dynamically updates and morphs as the value of 's' changes.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "partial_sum_path",
+        "add_updater",
+        "set_points_as_corners",
+        "np.cumsum"
+      ],
+      "clip_query": "A complex, winding teal path on the right plane dynamically changing its shape."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The exponential constant 'c' is animated from 0 to 0.01, causing the partial sum path to contract or spiral tightly, and the decimal readout updates.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "exp_const_tracker",
+        "c_dec",
+        "set_value",
+        "0.01"
+      ],
+      "clip_query": "The winding path on the right plane contracting into a tight spiral as the decimal value of c increases."
+    }
+  ]
+}

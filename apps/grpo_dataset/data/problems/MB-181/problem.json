@@ -1,0 +1,73 @@
+{
+  "id": "MB-181",
+  "title": "Flower Symmetries and Rotations",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    45.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 2,
+  "domain": [
+    "Group Theory",
+    "Abstract Algebra",
+    "Geometry"
+  ],
+  "full_prompt": "Write a Manim script (compatible with ManimGL/Manim Community) that visualizes the rotational symmetries of a flower. Since external image assets may not be available, procedurally generate a stylized vector flower using standard Manim geometry (e.g., a central yellow circle surrounded by 8 overlapping pink/white ellipses as petals) to serve as the flower object. The flower should have a height of approximately 6.3 units.\n\n1. Display the flower at the center of the screen.\n2. Perform a sequence of rotations on the flower by the following angles in degrees: [45, 90, -45, 135, 180, -135].\n3. For each rotation:\n   - Draw a curved blue arrow (an Arc with a tip) indicating the direction and magnitude of the rotation. The arc should be positioned just outside the flower's radius.\n   - Display an integer label showing the rotation angle in degrees (e.g., '45\u00b0') positioned next to the midpoint of the arc.\n   - Animate the flower rotating, the arrow being created (using ShowCreation/Create), and the label fading in simultaneously.\n   - Wait briefly, then fade out the arrow and label before proceeding to the next rotation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-181/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 53,
+    "scene_classes": [
+      "FlowerSymmetries"
+    ],
+    "visual_techniques": [
+      "Procedural/Image rotation",
+      "Dynamic arc arrows with tips",
+      "Mathematical labels tracking rotation",
+      "Simultaneous animation of rotation and indicators"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ImageMobject",
+      "Rotate",
+      "ShowCreation",
+      "Arc",
+      "Integer",
+      "add_tip",
+      "pfp",
+      "match_color"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing asset file 'Flower' causing FileNotFoundError",
+      "severity": "high",
+      "note": "The reference code relies on a local image asset. The implementation must fallback to a procedurally generated vector flower to ensure executability."
+    },
+    {
+      "pattern": "Use of ShowCreation in Manim Community",
+      "severity": "medium",
+      "note": "ShowCreation is a ManimGL/classic API. In Manim Community, Create should be used."
+    },
+    {
+      "pattern": "Incorrect arc direction or radius calculation",
+      "severity": "medium",
+      "note": "The arc radius must scale dynamically with the flower size to avoid overlapping the petals."
+    }
+  ]
+}

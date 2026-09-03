@@ -1,0 +1,74 @@
+{
+  "id": "MB-118",
+  "title": "Sphere Strips and Archimedes Hat-Box Theorem",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script using InteractiveScene that visualizes a spherical strip (or band) on a sphere to demonstrate Archimedes' Hat-Box Theorem (that the surface area of a slice of a sphere depends only on its height, not its position). \n\nYour scene should:\n1. Set up a 3D environment with ThreeDAxes and a NumberPlane. Scale down the frame height to focus on the unit sphere.\n2. Add a 2D yellow circle and a semi-transparent 3D ParametricSurface representing a sphere. Apply camera-sorting and clip planes to the sphere to ensure clean rendering.\n3. Define a helper method or logic to generate a 3D spherical strip (a band of the sphere between two x-coordinates, e.g., x0 and x0 + delta_x).\n4. Initially display a flat 2D projection of this strip (pre_strip) on the plane.\n5. Reorient the camera in 3D space while expanding the flat strip into its actual 3D spherical band shape on the sphere using state restoration (Restore).\n6. Add a 3D-rotated brace labeled 'd' measuring the width of the strip, and a fixed-in-frame text label 'Area = \\pi d'.\n7. Use a ValueTracker to dynamically animate the strip and its brace sliding along the x-axis of the sphere, demonstrating that the width (and thus the surface area) remains constant regardless of the position along the sphere.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-118/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 145,
+    "scene_classes": [
+      "SphereStrips"
+    ],
+    "visual_techniques": [
+      "3D Camera Reorientation",
+      "Parametric Surface Clipping",
+      "State Saving and Restoration",
+      "Dynamic Updaters with ValueTracker",
+      "Fixed-in-frame 2D Overlays on 3D Scenes"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "self.frame.animate.reorient",
+      "ParametricSurface",
+      "always_sort_to_camera",
+      "set_clip_plane",
+      "Restore",
+      "save_state",
+      "ValueTracker",
+      "add_updater",
+      "fix_in_frame"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing implementation of the custom helper method `get_strip`",
+      "severity": "high",
+      "note": "The reference code calls `self.get_strip(...)` which must be defined or simulated using ParametricSurface segments."
+    },
+    {
+      "pattern": "Using ManimCE camera methods instead of ManimGL's `self.frame.animate.reorient`",
+      "severity": "high",
+      "note": "ManimGL uses `self.frame` for camera control, whereas ManimCE uses `self.set_camera_orientation`."
+    },
+    {
+      "pattern": "Incorrect 3D clipping or sorting causing visual artifacts",
+      "severity": "medium",
+      "note": "The sphere requires `always_sort_to_camera` and proper clip planes to render correctly in 3D."
+    }
+  ]
+}

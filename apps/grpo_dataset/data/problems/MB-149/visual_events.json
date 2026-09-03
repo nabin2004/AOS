@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-149",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of 3D axes and the primary incoming oscillating wave propagating along the x-axis.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "OscillatingWave",
+        "add_updater"
+      ],
+      "clip_query": "A 3D coordinate system showing a continuous oscillating wave propagating along the horizontal axis."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Addition of the dynamic vector field (OscillatingFieldWave) tracking the primary wave's displacement.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "OscillatingFieldWave",
+        "VectorField",
+        "always"
+      ],
+      "clip_query": "A 3D vector field of arrows oscillating up and down, tracking a propagating wave."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Introduction of a dielectric layer slab and the generation of a secondary, phase-shifted wave representing the medium's response.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "layer",
+        "secondary wave",
+        "phase_shift"
+      ],
+      "clip_query": "A transparent slab representing a medium layer with a secondary, smaller wave appearing inside it."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Superposition of the primary and secondary waves, showing the resultant wave with a shifted phase and modified amplitude.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        22.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "superposition",
+        "resultant wave",
+        "sum"
+      ],
+      "clip_query": "Two waves combining into a single resultant wave showing constructive or destructive interference."
+    }
+  ]
+}

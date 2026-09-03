@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-189",
+  "conflicts": [
+    {
+      "category": "Mobject Methods",
+      "gl_construct": "Tex.select_parts / Tex.select_part",
+      "ce_equivalent": "Tex.get_parts_by_tex / Tex.get_part_by_tex",
+      "severity": "high"
+    },
+    {
+      "category": "Animation",
+      "gl_construct": "ShowIncreasingSubsets",
+      "ce_equivalent": "ShowIncreasingSubsets (available in CE but behavior/arguments might differ slightly, or use custom lag_ratio animations)",
+      "severity": "medium"
+    },
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation Parameters",
+      "gl_construct": "time_span / time_range in play/Write",
+      "ce_equivalent": "rate_func with custom intervals or Succession/AnimationGroup with lag_ratio/offsets",
+      "severity": "high"
+    }
+  ]
+}

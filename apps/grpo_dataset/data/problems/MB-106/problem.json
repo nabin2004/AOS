@@ -1,0 +1,69 @@
+{
+  "id": "MB-106",
+  "title": "Visualizing the Surface of Chord Midpoints and Lengths (Inscribed Rectangle Theorem)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Geometry",
+    "Topology"
+  ],
+  "full_prompt": "Write a complete Manim script (compatible with ManimGL/Manim standard) that visualizes the topological surface associated with the Inscribed Rectangle Problem (Toeplitz' conjecture). \n\nYour visualization must include:\n1. A 2D closed loop (e.g., an ellipse or a smooth custom closed curve) lying in the XY plane.\n2. A 3D parametric surface defined over the domain [0, 1] x [0, 1]. For any pair of parameters (u, v) representing points P(u) and P(v) on the loop, the surface coordinates are defined as:\n   - X, Y: The coordinates of the midpoint of the chord connecting P(u) and P(v).\n   - Z: The Euclidean distance (length) between P(u) and P(v).\n3. To avoid redundancy and show the Mobius-like structure properly, use a coordinate transformation (like a half-parametric mapping where u <= v) to render only the unique pairs, or render the full surface with appropriate opacity so the structure is visible.\n4. Two tracking dots (e.g., colored red and blue) that move along the 2D loop, controlled by ValueTrackers for parameters u and v.\n5. A dynamic chord (line segment) connecting these two tracking dots.\n6. A 3D tracking dot on the parametric surface that dynamically updates to always stay at the coordinates (midpoint_x, midpoint_y, chord_length) corresponding to the current positions of the two loop dots.\n7. A smooth camera rotation in 3D space to showcase the height (representing chord length) and the overall geometry of the surface.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-106/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "ShowTheSurface"
+    ],
+    "visual_techniques": [
+      "3D Parametric Surface Rendering",
+      "Dynamic Mobject Updaters",
+      "ValueTracker-driven Coordinate Mapping",
+      "3D Camera Orbiting"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ParametricSurface",
+      "ValueTracker",
+      "always_redraw",
+      "get_norm",
+      "interpolate"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect parametric surface mapping leading to division by zero or NaN coordinates when u and v coincide.",
+      "severity": "high",
+      "note": "Ensure the distance calculation handles u=v gracefully, resulting in Z=0 without numerical instability."
+    },
+    {
+      "pattern": "Using ManimGL-specific TrueDot or GlowDot in standard Manim Community environments.",
+      "severity": "medium",
+      "note": "Fallback to standard Dot or Sphere if running on Manim Community."
+    },
+    {
+      "pattern": "Camera angles failing to show the 3D depth, making the Z-axis (distance) look flat.",
+      "severity": "medium",
+      "note": "Set an initial non-zero camera phi and theta angle, and rotate the camera during the animation."
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-196",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A flat 2D textured banner is displayed on screen and then morphs/transforms into a 3D textured sphere.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "TexturedSurface",
+        "ReplacementTransform",
+        "banner",
+        "sphere"
+      ],
+      "clip_query": "A flat rectangular map banner transforms into a 3D textured sphere"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A blue wireframe surface mesh is written/drawn over the textured sphere to highlight its geometry.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        3.0,
+        4.5
+      ],
+      "keyword_bank": [
+        "SurfaceMesh",
+        "Write",
+        "mesh"
+      ],
+      "clip_query": "A blue grid mesh is drawn over a 3D sphere"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The textured sphere and mesh fade out, replaced by a set of discrete 3D parametric slices (peels) of the sphere.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        4.5,
+        6.5
+      ],
+      "keyword_bank": [
+        "get_sphere_slices",
+        "FadeOut",
+        "FadeIn",
+        "slices"
+      ],
+      "clip_query": "The sphere is replaced by segmented vertical slices or peels"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A subset of the sphere slices are highlighted in yellow and scaled slightly outward to emphasize them.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        6.5,
+        8.0
+      ],
+      "keyword_bank": [
+        "slice_highlights",
+        "YELLOW",
+        "scale"
+      ],
+      "clip_query": "Several vertical peels of the sphere turn yellow and pop out slightly"
+    }
+  ]
+}

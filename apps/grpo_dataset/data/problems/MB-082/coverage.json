@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-082",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "complex exponentials",
+        "s-plane representation",
+        "linear combination of signals",
+        "decay and frequency parameters"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "2D function graph",
+        "s-plane grid",
+        "exponential graph icons with bounding boxes",
+        "dimming/highlighting animation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "complex coordinates for s-samples",
+        "weight coefficients",
+        "time range parameters"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene setup",
+        "LaggedStartMap or LaggedStart",
+        "save_state and generate_target pattern"
+      ]
+    }
+  }
+}

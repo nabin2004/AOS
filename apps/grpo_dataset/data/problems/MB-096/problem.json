@@ -1,0 +1,69 @@
+{
+  "id": "MB-096",
+  "title": "Full Diffraction Grating Wave Simulation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "drift-sensitive"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes wave diffraction and interference from a diffraction grating. \n\n1. Implement a custom `LightWaveSlice` class inheriting from `Mobject` that uses a custom GLSL shader (located in a folder named `diffraction_shader`) to render wave interference patterns in real-time.\n2. The `LightWaveSlice` must support rendering via `moderngl.TRIANGLE_STRIP` with a custom `data_dtype` containing 3D points.\n3. It must accept a `DotCloud` of point sources, and dynamically synchronize these source positions to shader uniforms (e.g., `point_source0`, `point_source1`, etc.) along with the total number of sources.\n4. Implement uniforms for `frequency`, `wave_number`, `max_amp`, `time`, `decay_factor`, and `show_intensity` (a boolean flag to toggle between amplitude and intensity rendering).\n5. Add an updater to increment the `time` uniform based on `dt` and `time_rate` to animate wave propagation.\n6. Create a scene `FullDiffractionGrating` that instantiates a set of point sources (representing a diffraction grating), adds a `LightWaveSlice` overlaying the screen, and animates the propagation of waves. Show the transition when changing parameters like frequency or toggling the intensity view.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-096/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "FullDiffractionGrating"
+    ],
+    "visual_techniques": [
+      "Custom GLSL Shaders",
+      "Triangle Strip Rendering",
+      "Real-time Wave Interference Simulation",
+      "Dynamic Uniform Updates"
+    ],
+    "manim_api_patterns": [
+      "Mobject custom shader_folder",
+      "moderngl.TRIANGLE_STRIP",
+      "set_uniforms",
+      "add_updater",
+      "always.sync_points"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing shader files or incorrect shader folder path",
+      "severity": "high",
+      "note": "The custom shader folder 'diffraction_shader' must exist and contain valid vertex/fragment shaders compatible with ManimGL's shader pipeline."
+    },
+    {
+      "pattern": "Uniform mismatch between Python and GLSL",
+      "severity": "high",
+      "note": "The number of point sources synced must match the uniform array size declared in the GLSL fragment shader."
+    },
+    {
+      "pattern": "ManimCE compatibility issues",
+      "severity": "high",
+      "note": "Using ManimGL-specific shader attributes, moderngl primitives, and 'always' updater syntax will fail in ManimCE."
+    }
+  ]
+}

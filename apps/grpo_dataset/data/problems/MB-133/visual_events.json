@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-133",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display 'Single head of attention' title and highlight the word 'head' with FlashAround.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "single_title",
+        "FlashAround",
+        "head"
+      ],
+      "clip_query": "A title reading 'Single head of attention' with a yellow flash highlighting the word 'head'"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Morph the title 'Single head of attention' into 'Multi-headed attention' using FadeTransform.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "FadeTransform",
+        "multiple_title",
+        "single_title"
+      ],
+      "clip_query": "Text morphing from 'Single head of attention' to 'Multi-headed attention'"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Reorient the camera frame to a 3D perspective (xz plane) while keeping the title fixed in the frame.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "set_floor_plane",
+        "reorient",
+        "frame",
+        "fix_in_frame"
+      ],
+      "clip_query": "Camera tilting and rotating into a 3D perspective view while the title remains flat on screen"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate a stack of multiple attention head layers fading in sequentially along the Z-axis (OUT direction).",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "LaggedStart",
+        "heads",
+        "arrange",
+        "OUT"
+      ],
+      "clip_query": "A series of parallel square layers stacking behind each other in 3D space"
+    }
+  ]
+}

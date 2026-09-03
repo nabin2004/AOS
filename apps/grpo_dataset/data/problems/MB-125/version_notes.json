@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-125",
+  "conflicts": [
+    {
+      "category": "framework_mismatch",
+      "gl_construct": "manim_imports_ext",
+      "ce_equivalent": "from manim import *",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobject",
+      "gl_construct": "DecimalMatrix",
+      "ce_equivalent": "Matrix with custom DecimalNumber elements",
+      "severity": "high"
+    },
+    {
+      "category": "custom_mobject",
+      "gl_construct": "NumericEmbedding",
+      "ce_equivalent": "Manual implementation using VGroup and DecimalNumber",
+      "severity": "high"
+    },
+    {
+      "category": "camera_control",
+      "gl_construct": "fix_in_frame()",
+      "ce_equivalent": "self.camera.frame.save_state() or standard 2D layout",
+      "severity": "medium"
+    }
+  ]
+}

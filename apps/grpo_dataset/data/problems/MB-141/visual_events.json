@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-141",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Draw circle diagram with 7 points and chords, and display the question 'How many pairs of points?' on the right.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "circle",
+        "chords",
+        "dots",
+        "numbers",
+        "question"
+      ],
+      "clip_query": "A circle with 7 numbered points and chords connecting them, with a text question on the right."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Iterate through all 21 pairs of points, highlighting the active chord and points while listing the coordinate pairs on the right.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "combinations",
+        "pair_labels",
+        "temp_line",
+        "set_opacity"
+      ],
+      "clip_query": "Sequentially highlighting chords on a circle while listing coordinate pairs in a grid."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Display the 'n choose 2' formula and label, then animate the count updating to 21.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        25.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "nc2",
+        "nc2_label",
+        "ChangeDecimalToValue",
+        "ShowIncreasingSubsets"
+      ],
+      "clip_query": "Displaying the 'n choose 2' formula and animating the count to 21."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate the algebraic calculation steps showing 7 * (7 - 1) / 2.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        40.0,
+        55.0
+      ],
+      "keyword_bank": [
+        "new_rhs",
+        "Write",
+        "over"
+      ],
+      "clip_query": "Writing out the algebraic formula for 7 choose 2."
+    }
+  ]
+}

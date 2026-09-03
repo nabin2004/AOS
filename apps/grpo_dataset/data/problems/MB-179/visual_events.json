@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-179",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation of the initial rectangular step function f_1(x) with a tracing glow dot.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "rect_func",
+        "rect_graph",
+        "GlowDot",
+        "ShowCreation"
+      ],
+      "clip_query": "A rectangular step function is plotted on a coordinate system with a glowing dot tracing its path."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Transition to a dual-axes layout, moving the original graph to the top and introducing a second set of axes below.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "low_axes",
+        "TransformFromCopy",
+        "f1_label_group"
+      ],
+      "clip_query": "The coordinate axes shrink and move to the top, and a second set of axes appears at the bottom."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Sliding window moving average animation showing the convolution process.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "show_moving_average",
+        "window_group",
+        "graphs"
+      ],
+      "clip_query": "A shaded vertical window slides across the top graph to generate a smooth convolution curve on the bottom graph."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Iterative generation of higher-order convolutions with plateau highlighting, braces, and f(0) value tracking.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        30.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "plateau",
+        "Brace",
+        "fn0_label",
+        "0.9999999999852937"
+      ],
+      "clip_query": "A yellow line highlights the flat top of the convolution curve, labeled with a brace, while the value of f(0) is tracked on screen."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "id": "MB-081",
+  "title": "Visualizing the S-Plane and Complex Exponentials",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Complex Analysis",
+    "Signal Processing"
+  ],
+  "full_prompt": "Create a Manim visualization that explains the concept of the s-plane and complex exponentials of the form e^{st}. The scene should contain three synchronized visual panels: \n1. An 's-plane' (a complex plane representing the variable s = sigma + i * omega) with a draggable/trackable dot and label showing the current value of s.\n2. An 'exponential plane' (a complex plane showing the trajectory of e^{st} as time t advances).\n3. A standard 2D graph plotting the real part of e^{st} over time t.\n\nImplement dynamic trackers for both the complex variable s (starting at -1) and time t (starting at 0). The trajectory on the exponential plane and the curve on the 2D graph must update dynamically as s and t change. \n\nAnimate the following sequence:\n- Initialize the layout with the s-plane, exponential plane, and 2D graph.\n- Move the s-tracker smoothly: from -1 to 0.2, then to 0, and finally to 1j (imaginary unit i).\n- Advance time t forward to show the trajectory tracing out a circle on the exponential plane and a sinusoidal wave on the 2D graph, while adjusting the camera frame to keep the expanding graph in view.\n- Reset time t to 0, move s to 2j, and update the label to e^{2it}.\n- Reposition the exponential plane and display the derivative equation d/dt(e^{2it}) = 2i * e^{2it} with smooth transitions and matching colors.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-081/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "DefineSPlane"
+    ],
+    "visual_techniques": [
+      "Multi-panel synchronized coordinate systems",
+      "Dynamic complex trajectory tracing",
+      "Camera frame panning and zooming",
+      "Mathematical LaTeX alignment and transformation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ComplexValueTracker",
+      "ValueTracker",
+      "Axes",
+      "Tex",
+      "self.frame.animate",
+      "play_time_forward"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.6,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimGL-specific InteractiveScene and self.frame in ManimCE without translation",
+      "severity": "high",
+      "note": "ManimCE uses Scene or MovingCameraScene, and self.camera.frame instead of self.frame."
+    },
+    {
+      "pattern": "Undefined custom helper method play_time_forward",
+      "severity": "high",
+      "note": "play_time_forward is a custom method in the 3b1b repository. It must be simulated in standard Manim using a ValueTracker animation on t."
+    },
+    {
+      "pattern": "ComplexValueTracker missing in standard ManimCE",
+      "severity": "medium",
+      "note": "ManimCE does not have ComplexValueTracker. Use a standard ValueTracker or separate trackers for real and imaginary parts."
+    }
+  ]
+}

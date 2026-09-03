@@ -1,0 +1,66 @@
+{
+  "id": "MB-146",
+  "title": "Adding Two Sine Waves",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Physics"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL that visualizes the addition of two sine waves. Create three vertically stacked coordinate axes. On the top axes, plot a blue sine wave representing f(t). On the middle axes, plot a yellow sine wave representing g(t). Animate their initial creation and parameter changes (amplitude, frequency, phase). On the bottom axes, plot a green wave representing the sum f(t) + g(t), which dynamically updates when the parameters of the first two waves change. Shift the camera frame to the left to make room for text annotations. Add text explaining that if both waves have matching frequencies (omega), then their sum is also a sine wave with the same frequency. Use SVG lock icons next to the frequency parameters of the first two waves to visually indicate that their frequencies are locked to the same value.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-146/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 135,
+    "scene_classes": [
+      "AddTwoSineWaves"
+    ],
+    "visual_techniques": [
+      "Interactive parameter updates",
+      "Multi-axes alignment",
+      "Dynamic wave summation",
+      "SVG lock icons",
+      "Text-to-mobject arrows"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "get_axes",
+      "get_graph",
+      "bind=True",
+      "TexText",
+      "FadeTransform",
+      "frame.animate"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom helper methods like get_variable_wave or change_wave_parameter",
+      "severity": "high",
+      "note": "These methods are defined in the parent class or imported from optics_puzzles. If recreating, they must be mocked or fully implemented."
+    },
+    {
+      "pattern": "Manim Community vs ManimGL API mismatch",
+      "severity": "high",
+      "note": "InteractiveScene, frame.animate, and bind=True are ManimGL specific features."
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "id": "MB-099",
+  "title": "Light Wave Slice and Film Exposure Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes light wave propagation and interference using a custom shader-based Mobject. Define a custom `LightWaveSlice` class inheriting from `Mobject` that interfaces with ModernGL to render a triangle strip. The class must accept a `DotCloud` of point sources and dynamically pass their coordinates as uniforms to a custom shader (e.g., 'diffraction_shader'). Implement uniforms for frequency, wave number, decay factor, time, and intensity mode. Create a scene named `LightExposingFilm` where multiple point sources are initialized, waves propagate outward from them, and the visualization toggles between showing wave amplitude and wave intensity to simulate film exposure.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-099/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "LightExposingFilm"
+    ],
+    "visual_techniques": [
+      "Custom ModernGL Shaders",
+      "Dynamic Uniform Updates",
+      "DotCloud Point Sources",
+      "Time-varying Wave Propagation"
+    ],
+    "manim_api_patterns": [
+      "Mobject subclassing",
+      "moderngl.TRIANGLE_STRIP",
+      "set_uniforms",
+      "add_updater",
+      "always.sync_points"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing shader files or incorrect shader folder path",
+      "severity": "high",
+      "note": "The custom LightWaveSlice relies on external GLSL shaders. If the shader folder is missing or incorrectly referenced, rendering will fail immediately."
+    },
+    {
+      "pattern": "ModernGL context mismatch or unsupported primitive type",
+      "severity": "high",
+      "note": "Using moderngl.TRIANGLE_STRIP requires proper vertex data initialization. Incorrect vertex array lengths will cause OpenGL draw errors."
+    },
+    {
+      "pattern": "Attempting to run in standard Manim Community (ManimCE)",
+      "severity": "high",
+      "note": "ManimCE does not natively support the same shader-uniform interface or Mobject structure as ManimGL/Manim-Cairo-Ev."
+    }
+  ]
+}

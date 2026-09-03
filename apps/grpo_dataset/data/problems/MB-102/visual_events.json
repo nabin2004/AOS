@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-102",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A set of point sources (dots) is initialized on screen, and a blue wave slice background appears, showing concentric circular wave patterns radiating from the sources.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "DotCloud",
+        "LightWaveSlice",
+        "point_sources",
+        "set_uniforms"
+      ],
+      "clip_query": "concentric blue wave patterns radiating from point sources"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The point sources are animated to move closer together or further apart, causing the interference fringes and wave superposition patterns to dynamically shift and update in real-time.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "animate",
+        "shift",
+        "sync_points",
+        "increment_time"
+      ],
+      "clip_query": "shifting wave interference patterns from moving point sources"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The wave visualization transitions to show intensity (squared amplitude) instead of raw amplitude, or parameters like frequency/wave number are adjusted, altering the fringe spacing.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "show_intensity",
+        "set_frequency",
+        "set_wave_number",
+        "decay_factor"
+      ],
+      "clip_query": "wave intensity interference fringes with high contrast"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-088",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "custom_assets",
+      "gl_construct": "self.get_machine()",
+      "ce_equivalent": "A custom VGroup combining RoundedRectangle, Circle, or stylized gears to represent a machine",
+      "severity": "high"
+    },
+    {
+      "category": "animation_api",
+      "gl_construct": "FadeOutToPoint / FadeInFromPoint",
+      "ce_equivalent": "Animate with scale=0 and target position, or custom UpdateFromAlpha function",
+      "severity": "medium"
+    },
+    {
+      "category": "text_styling",
+      "gl_construct": "Tex(..., t2c=...) with regex compilation",
+      "ce_equivalent": "Tex(..., substrings_to_color=...) or manual indexing of Tex parts",
+      "severity": "medium"
+    }
+  ]
+}

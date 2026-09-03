@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-128",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Matrix-vector multiplication equation",
+        "Dot product calculation",
+        "Decimal values and signs"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "Color-coded matrix elements (blue/red)",
+        "Surrounding highlighting rectangles",
+        "Aligned matrix, vector, equals sign, and result vector"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.25,
+      "expected": [
+        "Dynamic decimal value updates during multiplication",
+        "Correct calculation of partial dot products",
+        "Decimal number formatting with signs"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Sequential row-by-row animation loop",
+        "Custom WeightMatrix class implementation",
+        "Clean transition and fade-outs of temporary highlight boxes"
+      ]
+    }
+  }
+}

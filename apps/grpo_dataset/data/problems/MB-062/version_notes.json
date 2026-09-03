@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-062",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "custom_helpers",
+      "gl_construct": "get_blackbox_machine()",
+      "ce_equivalent": "Must be custom-built using standard Mobjects (e.g., RoundedRectangle, Text, and custom styling)",
+      "severity": "high"
+    },
+    {
+      "category": "custom_animations",
+      "gl_construct": "self.evaluation_animation()",
+      "ce_equivalent": "Must be manually implemented using standard animations (e.g., moving a number into the box, flashing green/red, and outputting a checkmark/cross)",
+      "severity": "high"
+    },
+    {
+      "category": "assets",
+      "gl_construct": "SVGMobject(\"key\")",
+      "ce_equivalent": "Requires a local 'key.svg' file or replacement with a standard shape/text character",
+      "severity": "medium"
+    }
+  ]
+}

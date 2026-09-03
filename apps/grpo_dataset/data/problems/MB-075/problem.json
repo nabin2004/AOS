@@ -1,0 +1,63 @@
+{
+  "id": "MB-075",
+  "title": "General Linear Differential Equation and Characteristic Polynomial",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or compatible Community Edition syntax) that visualizes the derivation of the characteristic polynomial from a general linear ordinary differential equation (ODE). \n\n1. **Setup Equations and Colors**:\n   - Define the general ODE: $a_n x^{n}(t) + \\cdots + a_2 x''(t) + a_1 x'(t) + a_0 x(t) = 0$.\n   - Define the substituted version where $x(t) = e^{st}$: $a_n (s^n e^{st}) + \\cdots + a_2 (s^2 e^{st}) + a_1 (s e^{st}) + a_0 e^{st} = 0$.\n   - Define the factored version: $e^{st} (a_n s^n + \\cdots + a_2 s^2 + a_1 s + a_0) = 0$.\n   - Apply a color gradient (e.g., from BLUE to TEAL) to the derivative terms ($x^{n}(t)$, $x''(t)$, $x'(t)$, $x(t)$) and color the variable $s$ YELLOW.\n\n2. **Animate Equation Introduction**:\n   - Initially split the ODE at the $a_2$ term. Fade in the right part of the equation centered on the screen.\n   - Shift the right part to its correct position while writing the left part of the equation.\n\n3. **Sequential Highlighting**:\n   - Create surrounding rectangles to highlight the $x(t)$ terms sequentially.\n   - Transform these rectangles to highlight the coefficients ($a_i$).\n   - Transform the coefficient highlights into a single rectangle covering the entire left-hand side (LHS).\n   - Transform the LHS rectangle to highlight the right-hand side (RHS) zero, then fade it out.\n\n4. **Substitution and Factoring**:\n   - Perform a mapped transition (using `FadeTransform` or equivalent) from the original ODE terms to the substituted exponential terms ($x(t) \\to e^{st}$ and its derivatives).\n   - Transform the substituted equation into the factored equation using a curved path (`path_arc = 45 * DEG`).\n   - Highlight the resulting characteristic polynomial inside the parentheses with a yellow rectangle while fading out the $e^{st}$ term and the parentheses.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-075/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 110,
+    "scene_classes": [
+      "GeneralLinearEquation"
+    ],
+    "visual_techniques": [
+      "Tex color mapping",
+      "SurroundingRectangle transitions",
+      "FadeTransform",
+      "TransformMatchingTex with path_arc"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "SurroundingRectangle",
+      "FadeTransform",
+      "TransformMatchingTex"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Mismatched Tex keys during TransformMatchingTex or FadeTransform",
+      "severity": "high",
+      "note": "If the LaTeX strings in key_map or matched_keys do not match the exact sub-elements of the Tex mobjects, the animation will crash or fail to align."
+    },
+    {
+      "pattern": "InteractiveScene API usage in standard Manim CE",
+      "severity": "medium",
+      "note": "Using InteractiveScene or ManimGL-specific methods like ShowCreation instead of Create in standard Manim Community Edition."
+    }
+  ]
+}

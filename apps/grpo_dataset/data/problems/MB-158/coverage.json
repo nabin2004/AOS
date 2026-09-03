@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-158",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Wave equation implementation with phase, frequency, and amplitude",
+        "3D rotation matrix or twist rate calculations for polarization",
+        "Vector field mapping from 1D axis to 3D space"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D rendering of axes and grid plane",
+        "Dynamic vector field arrows updating in real-time",
+        "Spectral color mapping based on wavelength",
+        "Smooth continuous wave propagation animation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Sampling resolution for smooth curve rendering",
+        "Time-delta integration for wave speed",
+        "Accurate vector length scaling"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom VMobject subclass for the oscillating wave",
+        "Custom VectorField subclass for the graph representation",
+        "Use of frame-by-frame updaters (add_updater)"
+      ]
+    }
+  }
+}

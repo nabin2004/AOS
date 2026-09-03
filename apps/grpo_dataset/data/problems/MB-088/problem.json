@@ -1,0 +1,70 @@
+{
+  "id": "MB-088",
+  "title": "The Laplace Transform Machine",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    45.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Calculus",
+    "Differential Equations"
+  ],
+  "full_prompt": "Write a complete Manim script to visualize the concept of the Laplace Transform as a 'machine' that processes functions and differential equations. \n\n1. **The Machine Setup**:\n   - Create a central 'machine' representation. Since a custom machine asset might not be available, construct a stylized machine using standard Manim shapes: a rounded rectangle with a thick border (e.g., blue or grey) and a large, elegant calligraphic 'L' (using LaTeX `\\mathcal{L}`) placed inside it.\n   - Position this machine at the center of the screen.\n\n2. **Input Function Processing**:\n   - Display an input function $x(t)$ above the machine. Color the variable $t$ in blue.\n   - Animate the writing of this function, then make it 'pump' into the machine by fading out towards the center/bottom of the machine (simulating it entering the machine).\n\n3. **ODE Processing**:\n   - Display a second-order linear differential equation: $m x''(t) + \\mu x'(t) + k x(t) = F_0 \\cos(\\omega t)$ above the machine.\n   - Animate this equation fading in, and then 'pump' it into the machine. To make this visually interesting, split the equation into pieces and animate each piece fading out towards a point inside the machine along curved paths (using varying arc angles to create a funneling effect).\n\n4. **Output Generation**:\n   - Animate the output function emerging from the bottom of the machine: $x(t) = c_1 e^{s_1 t} + c_2 e^{s_2 t} + c_3 e^{s_3 t} + c_4 e^{s_4 t}$.\n   - The output should appear to flow out of the bottom of the machine, with individual terms or characters emerging along curved paths (funneling outwards).\n   - Color the $s_i$ coefficients in yellow and the $c_i$ coefficients in a light grey/white.\n\n5. **Highlighting Coefficients**:\n   - Draw surrounding rectangles around all the $s_i$ coefficients in yellow.\n   - Transition these rectangles to highlight all the $c_i$ coefficients in white, fading out the previous highlights.\n\nEnsure smooth transitions, proper layering (z-index) so elements pass behind or into the machine correctly, and clear color-coding for variables and coefficients.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-088/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 102,
+    "scene_classes": [
+      "DesiredMachine"
+    ],
+    "visual_techniques": [
+      "Point-targeted fade animations (FadeOutToPoint, FadeInFromPoint)",
+      "Curved path transitions using path_arc",
+      "Regex-based Tex coloring for specific sub-strings",
+      "Surrounding rectangles for highlighting multiple formula elements simultaneously"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "FadeOutToPoint",
+      "FadeInFromPoint",
+      "LaggedStart",
+      "SurroundingRectangle",
+      "VGroup"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom get_machine method",
+      "severity": "high",
+      "note": "The reference code relies on self.get_machine() which is a custom 3b1b asset/method. The implementation must replace this with a procedural Mobject representation of a machine."
+    },
+    {
+      "pattern": "FadeOutToPoint and FadeInFromPoint compatibility",
+      "severity": "medium",
+      "note": "These methods are native to ManimGL but might not exist or behave differently in standard Manim Community Edition. Custom scale/shift animations should be used as fallbacks."
+    },
+    {
+      "pattern": "Regex-based Tex coloring failures",
+      "severity": "medium",
+      "note": "Using re.compile on Tex objects can fail if the LaTeX compilation structure does not map cleanly to the expected substrings. Explicitly splitting Tex arguments or using set_color_by_tex is safer."
+    }
+  ]
+}

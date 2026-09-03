@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-112",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Parametric mapping of midpoint: (x1+x2)/2, (y1+y2)/2",
+        "Distance mapping as z-coordinate: sqrt((x1-x2)^2 + (y1-y2)^2)",
+        "Half-parametric domain transformation to avoid double-covering"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "3D surface rendering with smooth shading",
+        "Distinct colors for the loop, tracking dots, and the surface",
+        "Camera rotation to highlight the 3D depth",
+        "Glow effects on tracking dots"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Accurate sampling of the loop path (e.g., 501 samples)",
+        "Smooth interpolation between discrete loop samples",
+        "Correct calculation of distances and midpoints for arbitrary loop shapes"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inheritance from InteractiveScene or 3D-compatible Scene class",
+        "Use of updaters or custom morph functions to link the surface geometry to the loop geometry",
+        "Clean transition between 2D and 3D views"
+      ]
+    }
+  }
+}

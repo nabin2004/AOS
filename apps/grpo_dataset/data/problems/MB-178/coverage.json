@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-178",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "np.sinc",
+        "\\frac{\\sin(\\pi x)}{\\pi x}",
+        "\\mathcal{F}",
+        "Fourier transform notation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Dual-column layout",
+        "Rectangular pulse graphs",
+        "Trapezoidal pulse graph",
+        "Curved connection arrows",
+        "Color-coded graphs (Blue, Yellow, Green)"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Axes coordinate ranges (-4 to 4 for left, -1 to 1 for right)",
+        "Precise step function coordinates for rectangular pulses",
+        "c2p coordinate mapping"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or Scene class structure",
+        "VGroup alignment and shifting",
+        "LaggedStartMap animation sequencing"
+      ]
+    }
+  }
+}

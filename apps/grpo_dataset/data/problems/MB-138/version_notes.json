@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-138",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "custom_assets",
+      "gl_construct": "Randolph / Mortimer",
+      "ce_equivalent": "Custom SVGMobject or standard shapes representing characters",
+      "severity": "high"
+    },
+    {
+      "category": "custom_animations",
+      "gl_construct": "Blink / TransformMatchingStrings",
+      "ce_equivalent": "Custom blink function / TransformMatchingTex or Transform",
+      "severity": "high"
+    }
+  ]
+}

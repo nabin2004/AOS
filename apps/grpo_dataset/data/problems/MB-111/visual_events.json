@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-111",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the loop curve and sampling of points along its path.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "get_quick_loop_func",
+        "smooth_index",
+        "SVGMobject"
+      ],
+      "clip_query": "A closed loop curve is drawn on screen with points sampled along its boundary."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Creation of a movable pair or quad of dots tracking along the loop using ValueTrackers.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "ValueTracker",
+        "get_dot_group",
+        "update_dots",
+        "add_updater"
+      ],
+      "clip_query": "Colored dots moving dynamically along the perimeter of a closed loop."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Drawing connecting lines and midpoints between the moving dots.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "get_connecting_line",
+        "get_midpoint_dot",
+        "f_always.put_start_and_end_on"
+      ],
+      "clip_query": "Lines connecting moving dots on a loop, with a midpoint dot tracking the center of the line."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Rendering a dynamic polygon connecting the quad of dots with tracking labels.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        30.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "get_dot_polygon",
+        "get_dot_labels",
+        "Polygon",
+        "Tex"
+      ],
+      "clip_query": "A dynamic polygon whose vertices are dots moving along a loop, with text labels tracking each vertex."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-116",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Probability interval notation P(a < x_1 < b) = b - a",
+        "Uniform distribution representation on [0, 1]",
+        "Coordinate mapping from numeric values to screen points"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "2D Axes with coordinate labels",
+        "ArrowTip indicators for variable values",
+        "GlowDot trails for sampling visualization",
+        "SurroundingRectangle highlighting intervals"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker state updates",
+        "Random number generation frequency control",
+        "Interpolation logic in custom animations"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom TrackingDots Animation class",
+        "Custom Randomize Animation class",
+        "InteractiveScene structure",
+        "Updaters for dynamic label positioning"
+      ]
+    }
+  }
+}

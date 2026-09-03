@@ -1,0 +1,53 @@
+{
+  "problem_id": "MB-167",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization and rendering of the row of charged particles along the X-axis",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ChargedParticle",
+        "TrueDot",
+        "RowOfChargesXAxis"
+      ],
+      "clip_query": "A row of red and blue charged particles appearing on the x-axis"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Rendering of the electric field vectors surrounding the charges",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "lorentz_force",
+        "VectorField",
+        "points_to_particle_info"
+      ],
+      "clip_query": "An electric field vector field showing arrows pointing away from positive charges and towards negative charges"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic update of the field vectors as charges interact or move",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "increment_clock",
+        "update",
+        "recent_positions"
+      ],
+      "clip_query": "The vector field dynamically changing and updating over time"
+    }
+  ]
+}

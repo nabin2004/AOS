@@ -1,0 +1,73 @@
+{
+  "id": "MB-059",
+  "title": "3D Quantum State Vector Visualization for Grover's Algorithm",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Quantum Computing",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Create a 3D visualization using ManimGL that demonstrates quantum state vectors in a 3-dimensional Hilbert space, representing states for Grover's algorithm. \n\nYour visualization must include the following components and behaviors:\n1. **Custom Ket Notation Mobjects**:\n   - Define a custom `Ket` class (inheriting from `Tex` or `MathTex`) that wraps a given mobject inside ket brackets: $| \\rangle$.\n   - Define a `KetGroup` class (inheriting from `VGroup`) that groups the ket brackets and the inner mobject together.\n\n2. **3D Scene Setup**:\n   - Use a 3D environment with `ThreeDAxes` (axis range -2 to 2 for x, y, and z) and a `NumberPlane` with faded blue grid lines.\n   - Set up a rotating camera frame. The camera should start at a specific orientation (e.g., theta=-31, phi=71) and continuously rotate around the Z-axis using a `ValueTracker` for velocity.\n\n3. **Dynamic Vector and Coordinate Matrix**:\n   - Add a 3D vector representing a state vector, initialized to a normalized direction (e.g., `[1, -1, 2]`). The vector should always face perpendicular to the camera to maintain a clean 3D appearance.\n   - Create a `DecimalMatrix` (3x1) fixed to the screen (upper-left corner) that dynamically displays the current x, y, and z coordinates of the vector. Use an updater to keep the matrix values synchronized with the vector's end point.\n\n4. **Animations**:\n   - Animate the vector rotating around the Z-axis for a full rotation while the coordinate matrix updates in real-time.\n   - Sequentially transition the vector to point directly along the three basis axes (representing states $|0\\rangle$, $|1\\rangle$, and $|2\\rangle$). As the vector points to each basis state, fade in the corresponding ket label next to the vector's tip.\n   - Highlight the $|2\\rangle$ state as a 'secret key' by adding a key icon next to its label and changing the label's color to yellow.\n   - Finally, transition the vector to the 'balanced state' (normalized vector `[1, 1, 1]`) and display a 'balanced state' text label next to it.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-059/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "ThreeDSample"
+    ],
+    "visual_techniques": [
+      "3D Camera Rotation",
+      "Dynamic Vector Tracking",
+      "Screen-Fixed Coordinate Matrix",
+      "Custom Ket Notation Rendering",
+      "Basis State Transitions"
+    ],
+    "manim_api_patterns": [
+      "ThreeDAxes",
+      "NumberPlane",
+      "ValueTracker",
+      "frame.reorient",
+      "frame.add_updater",
+      "Vector",
+      "DecimalMatrix",
+      "fix_in_frame",
+      "always.set_perpendicular_to_camera"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using standard Manim Community camera rotation methods inside a ManimGL script, leading to AttributeError.",
+      "severity": "high",
+      "note": "ManimGL uses `self.frame` for camera control, whereas Manim Community uses `self.camera` or `self.set_camera_orientation`."
+    },
+    {
+      "pattern": "Failing to fix the coordinate matrix in the frame, causing it to rotate in 3D space with the axes.",
+      "severity": "high",
+      "note": "Ensure `fix_in_frame()` is called on the DecimalMatrix so it remains static on the screen."
+    },
+    {
+      "pattern": "Incorrect vector normalization leading to incorrect coordinate matrix values.",
+      "severity": "medium",
+      "note": "Ensure vectors are properly normalized using `normalize()` before updating the matrix or transitioning."
+    }
+  ]
+}

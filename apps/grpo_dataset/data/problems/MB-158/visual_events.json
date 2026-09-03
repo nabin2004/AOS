@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-158",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the 3D axes and background grid plane, establishing the spatial coordinate system.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "ThreeDAxes",
+        "NumberPlane",
+        "get_axes_and_plane"
+      ],
+      "clip_query": "A 3D coordinate system with axes and a grid plane fading in."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Introduction of the continuous 3D oscillating wave propagating along the x-axis with spectral coloring.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "OscillatingWave",
+        "get_spectral_color",
+        "add_updater"
+      ],
+      "clip_query": "A colorful 3D wave oscillating and propagating along the horizontal axis."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Addition of the dynamic vector field (arrows) along the x-axis, representing the electric field vectors.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "GraphAsVectorField",
+        "VectorField",
+        "vectors"
+      ],
+      "clip_query": "A series of dynamic arrows oscillating up and down along the wave propagation axis."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Continuous propagation animation showing both the wave and the vector field wiggling in perfect synchronization.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "time",
+        "update_points",
+        "play"
+      ],
+      "clip_query": "A synchronized animation of a 3D wave and its corresponding vector field propagating together."
+    }
+  ]
+}

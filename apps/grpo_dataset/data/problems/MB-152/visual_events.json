@@ -1,0 +1,69 @@
+{
+  "problem_id": "MB-152",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "A red charged particle with a '+' sign is rendered at the center of a static Coulomb vector field.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "ChargedParticle",
+        "TrueDot",
+        "coulomb_force"
+      ],
+      "clip_query": "A red positive charge at the center of a radial electric vector field"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The charged particle begins to oscillate, and the surrounding vector field vectors start updating dynamically.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "add_updater",
+        "velocity",
+        "update"
+      ],
+      "clip_query": "An oscillating positive charge causing dynamic changes in the surrounding vector field"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "An expanding influence ring propagates outward from the particle's center, showing the speed of light delay.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "get_influence_ring",
+        "Circle",
+        "lorentz_force"
+      ],
+      "clip_query": "An expanding circular wavefront propagating outward from a moving charge"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Continuous harmonic oscillation of the charge creates a clear sinusoidal wave pattern in the electric field vectors.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "oscillation",
+        "wave",
+        "VectorField"
+      ],
+      "clip_query": "Sinusoidal electromagnetic wave propagation in a vector field"
+    }
+  ]
+}

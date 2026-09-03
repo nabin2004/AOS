@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-089",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Complex plane mapping",
+        "Zeta function sum formula",
+        "Riemann zeta zeros",
+        "Dirichlet series regularization"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Dual ComplexPlane layout",
+        "Dynamic VMobject path updating",
+        "ComplexValueTracker dot",
+        "ValueTracker for exponential constant"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Cumulative sum calculation",
+        "Zeta zero coordinates from mpmath",
+        "Exponential decay weights"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or Scene setup",
+        "Updaters for path and labels",
+        "Proper coordinate mapping using n2p"
+      ]
+    }
+  }
+}

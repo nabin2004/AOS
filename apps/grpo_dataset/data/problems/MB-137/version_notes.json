@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-137",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_api",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform (or custom FadeOut + FadeIn combination)",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_indexing",
+      "gl_construct": "top_eq[\"V\"][0]",
+      "ce_equivalent": "top_eq.get_part_by_tex(\"V\") or explicit index tracking",
+      "severity": "high"
+    },
+    {
+      "category": "animation_api",
+      "gl_construct": "FlashAround",
+      "ce_equivalent": "Flash or Circumscribe",
+      "severity": "medium"
+    }
+  ]
+}

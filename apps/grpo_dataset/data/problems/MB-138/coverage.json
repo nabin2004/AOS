@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-138",
+  "requirements": {
+    "Math": {
+      "weight": 0.1,
+      "expected": []
+    },
+    "Visual": {
+      "weight": 0.5,
+      "expected": [
+        "Randolph",
+        "Mortimer",
+        "Text",
+        "TransformMatchingStrings",
+        "Blink"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "font_size=72",
+        "path_arc=45 * DEGREES"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene",
+        "construct",
+        "self.play",
+        "self.wait"
+      ]
+    }
+  }
+}

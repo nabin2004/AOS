@@ -1,0 +1,42 @@
+{
+  "problem_id": "MB-091",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Prime number identification",
+        "Sieve of Eratosthenes",
+        "Modular arithmetic visualization",
+        "Grid-based modular columns"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "20x12 grid of squares",
+        "Integer labels inside squares",
+        "Opacity sifting effect",
+        "Row separation animation",
+        "SurroundingRectangle highlights"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Grid dimensions 20x12",
+        "Numbers 1 to 240",
+        "Opacity value 0.25 for non-primes",
+        "Row size 12"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene base class",
+        "Looping structure for prime reductions",
+        "Target-based row animations",
+        "VGroup grouping of rows and labels"
+      ]
+    }
+  }
+}

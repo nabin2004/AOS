@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-127",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "inverse_interpolate",
+        "interpolate_color_by_hsl",
+        "angle_of_vector",
+        "arc_angle calculation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Arc",
+        "Line",
+        "VShowPassingFlash",
+        "Needle color interpolation based on value",
+        "Concentric streak arcs"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Value mapping to dial coordinates",
+        "Tick mark distribution based on range step"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom Dial class inheriting from VGroup",
+        "animate_set_value returning AnimationGroup",
+        "ShowGPT3Numbers scene class"
+      ]
+    }
+  }
+}

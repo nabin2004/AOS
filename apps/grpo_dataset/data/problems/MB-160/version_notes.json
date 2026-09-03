@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-160",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.reorient",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    },
+    {
+      "category": "3D Extrusion",
+      "gl_construct": "Prismify",
+      "ce_equivalent": "Custom implementation using Extrusion or OpenGLVMobject",
+      "severity": "high"
+    },
+    {
+      "category": "Animation Updaters",
+      "gl_construct": "turn_animation_into_updater",
+      "ce_equivalent": "Mobject.add_updater or custom camera updater function",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Methods",
+      "gl_construct": "pfp (point from proportion)",
+      "ce_equivalent": "point_from_proportion",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation Names",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "low"
+    }
+  ]
+}

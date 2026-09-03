@@ -1,0 +1,53 @@
+{
+  "problem_id": "MB-190",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display of the factored polynomial P(x) with color-coded roots",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "factored_poly_tex",
+        "OldTex",
+        "color_gradient"
+      ],
+      "clip_query": "A factored polynomial expression with color-coded roots shown on screen"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Expansion of the factored polynomial into individual terms showing symmetric combinations",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "expanded_poly_tex",
+        "sym_poly_tex_args",
+        "VGroup"
+      ],
+      "clip_query": "The polynomial expanding into a sum of terms with symmetric combinations of roots"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Display of the symmetric system of equations (Vieta's formulas) relating coefficients to roots",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        40.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "get_symmetric_system",
+        "equations.arrange",
+        "aligned_edge"
+      ],
+      "clip_query": "A system of equations aligning coefficients with symmetric polynomial combinations of roots"
+    }
+  ]
+}

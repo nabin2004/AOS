@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-115",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "3D Cartesian coordinates",
+        "Projection matrix application",
+        "Diagonal vector [1, 1, 1]",
+        "Perpendicular plane projection"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "3D camera reorientation",
+        "Wireframe cube shell",
+        "Vertex dots (DotCloud)",
+        "Edge opacity and stroke width animation",
+        "3D text rotation"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Vertex coordinate tuples (0,0,0) to (1,1,1)",
+        "Camera orientation angles (azimuth, polar)",
+        "Matrix transformation values"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene subclass",
+        "Sequential camera movements",
+        "Edge sorting by Z-coordinate",
+        "Transformations from 3D to 2D projection"
+      ]
+    }
+  }
+}

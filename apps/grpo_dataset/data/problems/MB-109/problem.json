@@ -1,0 +1,71 @@
+{
+  "id": "MB-109",
+  "title": "Constructing a Klein Bottle from Two M\u00f6bius Strips",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Topology",
+    "Geometry"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class that visualizes the topological construction of a Klein bottle by gluing two M\u00f6bius strips along their boundary. \n\nYour script should implement the following visual sequence:\n1. Create a square diagram representing a M\u00f6bius strip. The square should have a dark grey fill and a diagonal red line running from the bottom-left to the top-right corner. Add arrows on the bottom and right edges to represent edge identifications. Add a label \"M\u00f6bius Strip\" with a curved arrow pointing to the diagram.\n2. Create a reflected copy of this M\u00f6bius strip diagram, flipped across the diagonal line. Color its boundary arrows pink and label it \"Reflected M\u00f6bius Strip\" with a corresponding pointing arrow.\n3. Animate the gluing process: shift the reflected diagram to align with the original diagram along their diagonal boundary. Display a temporary label \"Glue the boundaries\" rotated at 45 degrees along the diagonal. Once aligned, fade out the labels and the red diagonal boundary line to show they have been successfully glued.\n4. Prepare for cutting along a new direction by defining new triangles and yellow identification arrows along the cut.\n\nTo handle the arrowheads on the boundaries, implement a helper method `get_tri_arrow(p1, p2, color)` that returns a small triangle pointing in the direction from `p1` to `p2` placed at the midpoint of the segment.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-109/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 145,
+    "scene_classes": [
+      "ConstructKleinBottle"
+    ],
+    "visual_techniques": [
+      "Polygon manipulation",
+      "Reflections and coordinate transformations",
+      "Custom arrow-head indicators for topological gluing",
+      "LaggedStart animations for smooth transitions",
+      "Text and label transformations"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Polygon",
+      "VGroup",
+      "Arrow",
+      "TransformMatchingStrings",
+      "TransformFromCopy",
+      "LaggedStartMap"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing helper method get_tri_arrow",
+      "severity": "high",
+      "note": "The scene relies on self.get_tri_arrow to draw topological identification arrows. If not defined, the code will crash."
+    },
+    {
+      "pattern": "ManimCE compatibility issues with InteractiveScene",
+      "severity": "high",
+      "note": "InteractiveScene is exclusive to ManimGL/ManimCS. Running this in standard Manim Community Edition will fail unless ported to Scene."
+    },
+    {
+      "pattern": "TransformMatchingStrings missing in ManimCE",
+      "severity": "medium",
+      "note": "TransformMatchingStrings is a ManimGL-specific class; ManimCE uses TransformMatchingTex or TransformMatchingShapes."
+    }
+  ]
+}

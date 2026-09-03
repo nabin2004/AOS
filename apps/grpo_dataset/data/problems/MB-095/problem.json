@@ -1,0 +1,70 @@
+{
+  "id": "MB-095",
+  "title": "Sieve of Eratosthenes Grid Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Computer Science",
+    "Number Theory"
+  ],
+  "full_prompt": "Write a Manim script that visualizes the Sieve of Eratosthenes algorithm on a 10x10 grid containing numbers from 1 to 100. \n\n1. Create a 10x10 grid of squares spanning almost the full height of the frame. Inside each square, place an Integer representing its index (from 1 to 100). Hide the number 1 by setting its opacity to 0.\n2. Implement the sieve algorithm iteratively for a set number of iterations (e.g., 10 iterations).\n3. In each iteration, identify the current prime modulus (starting with 2). Find all remaining numbers in the grid that are multiples of this modulus.\n4. Highlight these multiples by turning their text color to RED and drawing a red SurroundingRectangle around each of them.\n5. Animate this highlighting phase with a slight lag ratio to create a sequential sweeping effect.\n6. In the next step of the iteration, fade out the red rectangles, fade out all the composite multiples (opacity to 0), but keep the prime number itself (the first multiple) visible by turning its color back to WHITE.\n7. Update the modulus to the next remaining number in the list and repeat the process.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-095/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 55,
+    "scene_classes": [
+      "SieveOfEratosthenes"
+    ],
+    "visual_techniques": [
+      "Grid layout generation",
+      "Iterative highlighting with SurroundingRectangle",
+      "Lagged animation of group elements",
+      "Selective opacity fading to filter elements"
+    ],
+    "manim_api_patterns": [
+      "Square().get_grid",
+      "Integer",
+      "SurroundingRectangle",
+      "VGroup",
+      "Write",
+      "FadeOut",
+      "InteractiveScene"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using get_grid on a Square object in Manim Community (which does not exist natively in standard VMobject)",
+      "severity": "high",
+      "note": "In Manim Community, a grid must be constructed manually using VGroups of Squares arranged via arrange_in_grid."
+    },
+    {
+      "pattern": "Fading out the prime number itself during the sieve step",
+      "severity": "medium",
+      "note": "The first element of the multiples group (the prime) must be restored to white and kept visible, while subsequent multiples are faded out."
+    },
+    {
+      "pattern": "Index errors when filtering the numbers list after all primes are processed",
+      "severity": "medium",
+      "note": "Ensure the loop safely terminates or handles empty lists if the number of iterations exceeds available numbers."
+    }
+  ]
+}

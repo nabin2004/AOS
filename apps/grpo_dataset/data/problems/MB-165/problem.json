@@ -1,0 +1,68 @@
+{
+  "id": "MB-165",
+  "title": "White Light as a Sum of Waves",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Create a 3D Manim visualization demonstrating how white light is formed by the superposition (sum) of multiple monochromatic waves of different wavelengths. \n\nYour implementation should include:\n1. A custom `OscillatingWave` class (inheriting from `VMobject`) that models a 3D wave propagating along an axis. It should support parameters for y-amplitude, z-amplitude, phase shifts, wavelength, twist rate (for polarization/helical waves), speed, and dynamic updaters to animate propagation over time.\n2. A spectral color mapping helper that maps wavelengths (e.g., between 0.5 and 1.5) to their corresponding physical colors using a spectral colormap.\n3. A custom `MeanWave` class (inheriting from `VMobject`) that takes a list of `OscillatingWave` instances and dynamically computes their average/summed position at each frame, representing the superposition of the waves.\n4. A custom `GraphAsVectorField` class that visualizes the electric field vectors along the wave path using a vector field.\n5. A scene `WhiteLightAsASum` that sets up a 3D coordinate system, instantiates multiple individual colored waves spanning the visible spectrum, animates them propagating, and then displays their combined 'mean' wave to show the resulting complex wave pattern.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-165/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "WhiteLightAsASum"
+    ],
+    "visual_techniques": [
+      "3D Wave Propagation",
+      "Dynamic Updaters",
+      "Spectral Color Mapping",
+      "Vector Fields along Curves"
+    ],
+    "manim_api_patterns": [
+      "VMobject custom update_points",
+      "ThreeDAxes",
+      "VectorField",
+      "colormaps.get_cmap"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect 3D coordinate mapping using c2p",
+      "severity": "high",
+      "note": "Ensure the wave's x, y, z coordinates are correctly transformed to the 3D scene space using the axes' c2p method."
+    },
+    {
+      "pattern": "Performance lag due to high sampling resolution",
+      "severity": "medium",
+      "note": "Keep sample_resolution balanced (e.g., 0.01 to 0.05) so that updating multiple waves simultaneously does not tank the frame rate."
+    },
+    {
+      "pattern": "Color mapping out of bounds",
+      "severity": "medium",
+      "note": "Ensure inverse interpolation of wavelengths is clamped or safely mapped to [0, 1] before passing to the colormap."
+    }
+  ]
+}

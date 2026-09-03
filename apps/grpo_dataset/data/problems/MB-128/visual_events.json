@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-128",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The weight matrix and input vector are rendered on screen, with matrix elements color-coded (blue for positive, red for negative).",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        3.0
+      ],
+      "keyword_bank": [
+        "WeightMatrix",
+        "DecimalMatrix",
+        "FadeIn"
+      ],
+      "clip_query": "A color-coded decimal matrix and a column vector appear on screen."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Yellow surrounding rectangles highlight the first row of the matrix and the elements of the input vector sequentially.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        3.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "ShowIncreasingSubsets",
+        "row_rects",
+        "vect_rects"
+      ],
+      "clip_query": "Yellow boxes highlight a row of the matrix and the vector elements step-by-step."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The first entry of the result vector dynamically updates its decimal value as the row-vector multiplication is computed.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        9.0
+      ],
+      "keyword_bank": [
+        "UpdateFromAlphaFunc",
+        "set_value",
+        "partial_values"
+      ],
+      "clip_query": "The first element of the output vector dynamically changes its numerical value."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The animation loops through subsequent rows, highlighting them and updating the corresponding result vector elements before fading out the active highlights.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        9.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "matrix_row_vector_product",
+        "FadeOut",
+        "last_rects"
+      ],
+      "clip_query": "The matrix-vector multiplication animation repeats for the remaining rows of the matrix."
+    }
+  ]
+}

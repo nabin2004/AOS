@@ -1,0 +1,66 @@
+{
+  "id": "MB-163",
+  "title": "Phase Kick Forward in Sliced Wave Propagation",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes a wave propagating through multiple thin layers (dielectric slices) where each slice introduces a phase shift ('kick forward') and damping. Use a custom `SlicedWave` class that groups an `OscillatingWave` and an `OscillatingFieldWave` (vector field representation). The wave should update dynamically over time using an updater. Create vertical lines to represent the boundaries of the layers. Animate the phase kick trackers to show how the wave's phase shifts forward as it crosses each boundary, and visualize the resulting wave profile.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-163/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 140,
+    "scene_classes": [
+      "KickForward"
+    ],
+    "visual_techniques": [
+      "Dynamic wave update via updaters",
+      "ValueTracker-controlled phase shifts",
+      "Custom VMobject for oscillating waves",
+      "Multi-layered boundary visualization"
+    ],
+    "manim_api_patterns": [
+      "VMobject",
+      "Group",
+      "ValueTracker",
+      "Line",
+      "axes.c2p",
+      "add_updater",
+      "set_points_as_corners"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect handling of custom updater with time delta dt leading to frozen waves",
+      "severity": "high",
+      "note": "Ensure the updater correctly increments self.time and updates points using set_points_as_corners."
+    },
+    {
+      "pattern": "Missing manim_imports_ext or Manim Community compatibility issues",
+      "severity": "high",
+      "note": "The code uses ManimGL-specific features like set_flat_stroke and colormaps.get_cmap. Porting to Manim Community requires replacing these with standard equivalents."
+    }
+  ]
+}

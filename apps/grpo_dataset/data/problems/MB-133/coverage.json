@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-133",
+  "requirements": {
+    "Math": {
+      "weight": 0.1,
+      "expected": [
+        "softmax function definition",
+        "W_Q, W_K, W_V matrix symbols"
+      ]
+    },
+    "Visual": {
+      "weight": 0.5,
+      "expected": [
+        "3D camera reorientation",
+        "FadeTransform text morphing",
+        "Stacked 3D layers along OUT axis",
+        "ScreenRectangle"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "n_heads = 15",
+        "reorient angles (41, -12, 0)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene",
+        "fix_in_frame",
+        "set_floor_plane"
+      ]
+    }
+  }
+}

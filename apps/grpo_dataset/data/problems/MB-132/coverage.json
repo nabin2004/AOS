@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-132",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "N-dimensional Space",
+        "90^\\circ apart",
+        "between 89^\\circ and 91^\\circ apart",
+        "Maximum \\# of vectors: N",
+        "\\approx \\exp(\\epsilon \\cdot N)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Undulating bubble or distorted circle",
+        "3D orthogonal vectors (X, Y, Z axes)",
+        "Right-angle elbow indicators",
+        "Fading concept labels with vectors"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "90 degrees",
+        "89 and 91 degrees",
+        "3D vector coordinates (RIGHT, UP, OUT)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Camera zoom/restore sequence",
+        "Lagged start animations for concept vectors",
+        "Clear separation between task 1 (orthogonal) and task 2 (almost orthogonal)"
+      ]
+    }
+  }
+}

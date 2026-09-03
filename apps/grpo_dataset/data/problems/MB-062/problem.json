@@ -1,0 +1,69 @@
+{
+  "id": "MB-062",
+  "title": "Grover's Algorithm: Needle in a Haystack Problem",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Computer Science",
+    "Quantum Computing"
+  ],
+  "full_prompt": "Create a Manim scene visualizing the 'needle in a haystack' problem as a blackbox function evaluation, typical of Grover's algorithm explanations. \n\n1. **Number Set Display**: At the top of the frame, display a set of numbers from 0 to 19 followed by '... N - 1' enclosed in curly braces: \\{0, 1, 2, ..., N-1\\}. Ensure the set is scaled to fit the frame width.\n2. **Blackbox Machine**: Place a central 'blackbox machine' Mobject in the middle of the screen. Initially, display three question marks '???' above or on it to represent its mystery nature, then fade them out.\n3. **Target Key Highlight**: Highlight a specific 'key' number (e.g., 12) in the set. Flash around it, turn it yellow, and place a yellow key icon (SVG) below it. \n4. **Single Evaluation**: Copy this key number, scale it up, move it to the left of the machine, and animate it passing through the machine (using a custom evaluation animation that indicates a 'True' or successful output).\n5. **Grid Evaluation**: Take all other numbers, arrange them in a compact grid to the left of the machine, and pass them through the machine sequentially or in a lagged stream, showing they all evaluate to 'False' (unsuccessful output). Clean up the machine's output state afterwards.\n6. **Reveal Innards**: Make the blackbox machine transparent to reveal its internal code: a Python snippet `def f(n): return (n == 12)`. After a brief pause, hide the code and restore the machine's opacity.\n7. **Sequential Guess and Check**: Simulate a classical linear search. Sequentially take numbers from 0 up to 12, move them to the machine, evaluate them, and show the output, demonstrating that we must check them one by one until we find the key.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-062/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "NeedleInAHaystackProblem"
+    ],
+    "visual_techniques": [
+      "Blackbox machine simulation",
+      "Code block overlay",
+      "Sequential evaluation loop",
+      "Grid layout transformation"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "get_blackbox_machine",
+      "evaluation_animation",
+      "FlashAround",
+      "LaggedStartMap",
+      "Code"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom helper functions `get_blackbox_machine` or `evaluation_animation` in standard Manim environments.",
+      "severity": "high",
+      "note": "These are custom 3b1b methods. If porting to community edition, they must be manually implemented using standard shapes and animations."
+    },
+    {
+      "pattern": "SVGMobject('key') missing file error.",
+      "severity": "medium",
+      "note": "Ensure a fallback shape or a standard key SVG path is provided if the asset is missing."
+    },
+    {
+      "pattern": "Incorrect alignment of the number set at the top of the frame.",
+      "severity": "medium",
+      "note": "Using `FRAME_WIDTH - 1` requires careful scaling to prevent clipping."
+    }
+  ]
+}

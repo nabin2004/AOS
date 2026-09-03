@@ -1,0 +1,74 @@
+{
+  "id": "MB-087",
+  "title": "Key Properties of the Laplace Transform",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Calculus",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a complete Manim script to visualize the key properties of the Laplace Transform. The scene should display a title 'Key Properties' at the top with an underline. Below the title, list three numbered properties vertically:\n1) The exponential shift property: e^{at} transforms to 1 / (s - a).\n2) The linearity property: a * f(t) + b * g(t) transforms to a * F(s) + b * G(s).\n3) The derivative property: f'(t) transforms to s * F(s) - f(0).\n\nUse a helper function to construct the Laplace transform groups, which consist of a source expression, a rightward vector arrow with a script 'L' symbol above it, and a target expression. Color-code the time variable '{t}' in blue and the frequency variable '{s}' in yellow.\n\nAnimate the presentation step-by-step:\n- First, reveal the title, underline, and the first two list numbers.\n- Write the source expression for the exponential property, grow the transform arrow, and write the target expression while animating a copy of the parameter 'a' transitioning from the exponent to the denominator.\n- Write the source expression for the linearity property, grow its arrow, and transform the source into the target using a matching-tex transition with a curved path.\n- Use surrounding rectangles to highlight the corresponding 'f(t)' -> 'F(s)' and 'g(t)' -> 'G(s)' terms sequentially.\n- Finally, introduce a character (like Mortimer or a simple Pi Creature) at the bottom right to react to the third property (the derivative property). If a Pi Creature class is not natively available in your environment, construct a simplified vector character with expressive eyes to represent the observer.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-087/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "KeyProperties"
+    ],
+    "visual_techniques": [
+      "Mathematical typesetting with custom color-coding",
+      "Aligned formula layouts with helper functions",
+      "TransformMatchingTex with custom key maps and path arcs",
+      "Sequential highlighting using SurroundingRectangle",
+      "Character integration (Mortimer) for narrative engagement"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "Vector",
+      "VGroup",
+      "LaggedStartMap",
+      "ShowCreation",
+      "GrowArrow",
+      "TransformMatchingTex",
+      "SurroundingRectangle",
+      "Mortimer"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing Mortimer or PiCreature class in standard Manim Community environments",
+      "severity": "high",
+      "note": "If running in Manim CE, Mortimer is not defined. The code must either define a custom PiCreature/character or replace it with a standard visual element like an arrow or a text bubble."
+    },
+    {
+      "pattern": "Use of ShowCreation instead of Create in Manim CE",
+      "severity": "medium",
+      "note": "ShowCreation is a ManimGL/classic API; Manim CE uses Create."
+    },
+    {
+      "pattern": "Incorrect syntax or keys in TransformMatchingTex",
+      "severity": "medium",
+      "note": "TransformMatchingTex key_map structure differs slightly between versions; ensure tex keys match exactly."
+    }
+  ]
+}

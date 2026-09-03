@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-142",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Prime number generation",
+        "Modulo 4 congruence classification",
+        "Correct mapping of primes to 1 mod 4 and 3 mod 4 tracks"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Color-coded blocks (blue for 1 mod 4, red for 3 mod 4)",
+        "Text labels with matching colors",
+        "Smooth camera tracking and scaling"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Correct integer values inside blocks",
+        "Accurate prime race length limit (26863)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Use of InteractiveScene or equivalent camera-tracking scene",
+        "Proper handling of large VGroups to avoid performance degradation"
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-100",
+  "conflicts": [
+    {
+      "category": "renderer",
+      "gl_construct": "Mobject custom shader attributes (shader_folder, data_dtype, render_primitive)",
+      "ce_equivalent": "ManimCE uses OpenGLMobject or custom shader wrappers which do not share the same declarative shader_folder API.",
+      "severity": "high"
+    },
+    {
+      "category": "updater",
+      "gl_construct": "self.always.sync_points()",
+      "ce_equivalent": "ManimCE requires explicit add_updater(lambda m: m.sync_points()) instead of the .always syntax.",
+      "severity": "medium"
+    },
+    {
+      "category": "uniforms",
+      "gl_construct": "self.set_uniform() / self.uniforms",
+      "ce_equivalent": "ManimCE handles shader uniforms via custom shader wrappers or direct moderngl program calls, not directly on standard Mobjects.",
+      "severity": "high"
+    }
+  ]
+}

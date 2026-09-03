@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-129",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Value Matrix $W_V$",
+        "Matrix-vector multiplication",
+        "Value vector $v_i$"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "SurroundingRectangle highlighting",
+        "Color-coded matrix entries",
+        "Token/word representation with background rectangles"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "DecimalNumber updates",
+        "Value-to-color mapping for positive/negative values"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "IntroduceValueMatrix class",
+        "Sequential row-by-column multiplication animation"
+      ]
+    }
+  }
+}

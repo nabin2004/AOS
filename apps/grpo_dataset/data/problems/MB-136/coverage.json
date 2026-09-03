@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-136",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Euler's formula equation V - E + F = 2",
+        "Dynamic integer counters for V, E, and F",
+        "Correct initial values (1, 0, 1) for a trivial graph"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Graph vertices represented as dots",
+        "Graph edges represented as lines",
+        "Sequential FlashAround animations on equation variables",
+        "Arrow pointing to the trivial graph vertex"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Dynamic decimal/integer value updates",
+        "Synchronized counter increments with graph changes"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Clear layout with equation at the top and graph visualization below",
+        "Smooth transitions and sequential animations using LaggedStart or sequential play calls"
+      ]
+    }
+  }
+}

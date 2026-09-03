@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-146",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Creation of the first two axes and their respective blue and yellow sine waves with parameter changes.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "axes1",
+        "axes2",
+        "wave1",
+        "wave2",
+        "change_all_parameters"
+      ],
+      "clip_query": "Two coordinate axes showing a blue sine wave and a yellow sine wave"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Creation of the third axes and the green sum wave f(t) + g(t) via transformation from the first two waves.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "axes3",
+        "wave3",
+        "f(t) + g(t)",
+        "TransformFromCopy"
+      ],
+      "clip_query": "A third green wave appearing as the sum of the blue and yellow waves"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic parameter changes of wave1 and wave2, showing the sum wave updating in real-time.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        30.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "change_wave_parameter",
+        "wave1",
+        "wave2"
+      ],
+      "clip_query": "Sine waves dynamically changing frequency and amplitude"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Locking the frequencies of both waves to omega, showing lock icons and explanatory text.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        45.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "omega_locks",
+        "lock",
+        "top_words",
+        "low_words",
+        "frame.animate"
+      ],
+      "clip_query": "Lock icons appearing next to wave equations with text explaining matching frequencies"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-105",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_difference",
+      "gl_construct": "UnitInterval",
+      "ce_equivalent": "NumberLine(x_range=[0, 1, 0.1])",
+      "severity": "high"
+    },
+    {
+      "category": "mobject_difference",
+      "gl_construct": "ArrowTip",
+      "ce_equivalent": "Triangle or custom Polygon representing a tip",
+      "severity": "medium"
+    },
+    {
+      "category": "updater_syntax",
+      "gl_construct": "f_always / always",
+      "ce_equivalent": "add_updater",
+      "severity": "high"
+    },
+    {
+      "category": "asset_dependency",
+      "gl_construct": "SVGMobject('example_loop1') / SVGMobject('scissors')",
+      "ce_equivalent": "Procedural VMobjects (e.g., ParametricFunction for the loop, VGroup of lines/circles for scissors)",
+      "severity": "high"
+    }
+  ]
+}

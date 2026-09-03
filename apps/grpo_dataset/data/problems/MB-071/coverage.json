@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-071",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Tex",
+        "t2c",
+        "Laplace transform notation",
+        "Differential equation terms"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "2x2 layout",
+        "Arrows with labels",
+        "FullScreenRectangle or equivalent background split",
+        "Color-coded domains (Time vs s-domain)"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Coordinate positioning using UL, DL, DR, UR",
+        "Arrow buff and thickness adjustments",
+        "Screen stretching factors (0.55 and 0.45)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "Class inheritance from PreviewStrategy",
+        "Custom helper methods for arrow creation and growth",
+        "LaggedStart and TransformMatchingStrings animations"
+      ]
+    }
+  }
+}

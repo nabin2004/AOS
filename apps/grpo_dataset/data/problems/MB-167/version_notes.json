@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-167",
+  "conflicts": [
+    {
+      "category": "Mobject",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot",
+      "severity": "medium"
+    },
+    {
+      "category": "Container",
+      "gl_construct": "Group",
+      "ce_equivalent": "VGroup / Group",
+      "severity": "low"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-110",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Inscribed rectangle theorem",
+        "Quadrilateral properties (equal diagonals, shared midpoint)",
+        "Parametric loop representation"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Smooth closed curve / loop",
+        "Four distinct colored dots with glow effects",
+        "Dynamic connecting lines forming a polygon",
+        "Smooth animation of vertices along the curve"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Optimization algorithm to find rectangle vertices (find_rectangle)",
+        "Angle calculations between diagonal vectors",
+        "Distance ratios for midpoints and diagonals"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or Scene class structure",
+        "ValueTracker for tracking parameter values on the loop",
+        "Updaters for dynamic line and dot positioning"
+      ]
+    }
+  }
+}

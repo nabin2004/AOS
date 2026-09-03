@@ -1,0 +1,70 @@
+{
+  "id": "MB-196",
+  "title": "Sphere Slicing and Flattening (Peeling the Sphere)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "direct-visualization"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Geometry",
+    "Calculus"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class that visualizes the process of slicing a sphere into vertical peels (slices) and preparing them to be flattened. \n\nYour script should include:\n1. Helper functions to generate 3D sphere slices (`get_sphere_slices`) and their corresponding 2D flattened slices (`get_flattened_slices`).\n   - `get_sphere_slices` should construct a set of 3D parametric surfaces representing the peels of a sphere of a given radius, divided into `n_slices`. The parametric function should map `(u, v)` to spherical coordinates: `[r * sin(v) * cos(u), r * sin(v) * sin(u), r * cos(v)]` where `u` ranges over each slice's angular width and `v` ranges from `0` to `PI / 2` (for the northern hemisphere), then mirrored for the southern hemisphere using a helper `get_south_slices`.\n   - `get_flattened_slices` should construct the flattened 2D representation of these slices using a parametric mapping like `[u * sin(v * PI / 2), 1 - v, 0]` to represent the tapered shape of peeled slices.\n   - Alternating colors (e.g., `BLUE_D` and `BLUE_E`) should be applied to the slices to make them distinct.\n   - An equator line should be added to both 3D and 2D slice groups.\n\n2. A main scene class `SphereExample` that:\n   - Configures the camera frame (focal distance, orientation) and light source.\n   - Starts with a 2D textured banner (`TexturedSurface` using a placeholder image path) representing a flat map/image.\n   - Transforms this 2D banner into a 3D textured sphere (`TexturedSurface` wrapped around a `Sphere`) using `ReplacementTransform`.\n   - Adds a `SurfaceMesh` overlay on top of the sphere to show its grid structure.\n   - Replaces the textured sphere and mesh with the 3D parametric sphere slices.\n   - Highlights a subset of these slices in yellow to emphasize the peeling structure.\n   - Prepares the layout for the transition to the flattened slices on the right side of the screen.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-196/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "SphereExample"
+    ],
+    "visual_techniques": [
+      "TexturedSurface mapping",
+      "ParametricSurface slicing",
+      "ReplacementTransform from 2D to 3D",
+      "SurfaceMesh overlay",
+      "Camera and lighting configuration"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "TexturedSurface",
+      "SurfaceMesh",
+      "ParametricSurface",
+      "self.camera.frame",
+      "self.camera.light_source"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing texture image file causing runtime file-not-found errors",
+      "severity": "high",
+      "note": "The code references a local absolute path for SimpleSphereQuestion.png. A robust implementation must handle missing assets gracefully or use a fallback procedural texture."
+    },
+    {
+      "pattern": "Attempting to run ManimGL code directly in ManimCE",
+      "severity": "high",
+      "note": "InteractiveScene, TexturedSurface, and SurfaceMesh are exclusive to ManimGL/Manim-Cairo and will fail with NameError in ManimCE."
+    },
+    {
+      "pattern": "Incorrect parametric ranges or resolution parameters causing gaps in the sphere slices",
+      "severity": "medium",
+      "note": "Ensure the u_range and v_range are correctly calculated and mapped to avoid overlapping or missing segments."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-158",
+  "conflicts": [
+    {
+      "category": "3D Rendering",
+      "gl_construct": "ThreeDAxes and set_flat_stroke(False)",
+      "ce_equivalent": "ThreeDAxes with standard stroke configurations (flat stroke is specific to ManimGL's shader-based renderer)",
+      "severity": "high"
+    },
+    {
+      "category": "Vector Field API",
+      "gl_construct": "VectorField with custom graph_func mapping",
+      "ce_equivalent": "ArrowVectorField or VectorField in Manim Community, which has a slightly different initialization signature",
+      "severity": "high"
+    },
+    {
+      "category": "Updaters",
+      "gl_construct": "self.add_updater(lambda m, dt: m.update_points(dt))",
+      "ce_equivalent": "Mobject.add_updater(lambda m, dt: ...) is fully compatible, but time tracking must be handled carefully to avoid frame-rate dependency",
+      "severity": "medium"
+    }
+  ]
+}

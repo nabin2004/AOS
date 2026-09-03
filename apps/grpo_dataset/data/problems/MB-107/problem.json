@@ -1,0 +1,69 @@
+{
+  "id": "MB-107",
+  "title": "Mapping the Loop Pair Strip onto a 3D Surface",
+  "youtube_video_id": "AmgkSDFyYQ8",
+  "video_timestamp_range": [
+    300.0,
+    450.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Topology",
+    "Geometry"
+  ],
+  "full_prompt": "Create a 3D Manim visualization demonstrating how pairs of points on a 2D loop map to a 3D surface. The x and y coordinates of the surface represent the midpoint of the two points on the loop, while the z coordinate represents the distance between them. \n\n1. Define a 2D closed loop (e.g., an ellipse or a custom smooth SVG loop) on a flat plane.\n2. Create two points, A and B, parameterized by u and v, which move along the loop. Show a line segment connecting them.\n3. Construct a 3D coordinate system. Define a parametric surface where each point (u, v) maps to (midpoint_x, midpoint_y, distance_AB).\n4. Render this parametric surface in 3D, showing how the boundary of the surface corresponds to u = v (where distance is 0, lying flat on the loop itself).\n5. Synchronize the movement of points A and B on the 2D loop with a glowing tracker dot on the 3D surface that represents their current midpoint and distance.\n6. Use a 3D camera rotation to showcase the topological structure of the surface, highlighting how it forms a strip (or M\u00f6bius strip representation) bounded by the loop itself.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-107/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 320,
+    "scene_classes": [
+      "MapTheStripOntoTheSurface"
+    ],
+    "visual_techniques": [
+      "3D Parametric Surfaces",
+      "Coordinate Mapping",
+      "Synchronized Mobject Updates",
+      "Custom Glow Dots"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ParametricSurface",
+      "ValueTracker",
+      "always_redraw",
+      "TrueDot",
+      "GlowDot"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Camera orientation conflicts between 2D loop display and 3D surface display",
+      "severity": "high",
+      "note": "Ensure the 2D loop is correctly projected or positioned in the 3D scene so it does not clip or disappear when the camera rotates."
+    },
+    {
+      "pattern": "Parametric surface rendering performance issues due to high sample density",
+      "severity": "medium",
+      "note": "Keep u and v resolution reasonable (e.g., 50x50) to avoid slow rendering times in Manim."
+    },
+    {
+      "pattern": "Discontinuity at the boundary of the loop parameterization",
+      "severity": "medium",
+      "note": "Ensure smooth interpolation of the loop points when u or v wraps around from 1.0 to 0.0."
+    }
+  ]
+}

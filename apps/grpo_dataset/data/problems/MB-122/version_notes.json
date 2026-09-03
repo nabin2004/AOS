@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-122",
+  "conflicts": [
+    {
+      "category": "Mobject Compatibility",
+      "gl_construct": "NumericEmbedding",
+      "ce_equivalent": "Matrix or VGroup of DecimalNumbers with custom background rectangles",
+      "severity": "high"
+    },
+    {
+      "category": "Camera and Frame API",
+      "gl_construct": "is_fixed_in_frame / fix_in_frame()",
+      "ce_equivalent": "Avoid 3D camera methods; use standard 2D layout or standard CE camera frame movement if needed",
+      "severity": "high"
+    },
+    {
+      "category": "Color Utilities",
+      "gl_construct": "interpolate_color_by_hsl",
+      "ce_equivalent": "interpolate_color (RGB-based) or custom HSL conversion helper",
+      "severity": "medium"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "problem_id": "MB-123",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the matrix, vector, equals sign, and empty result brackets on screen.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "matrix",
+        "vector",
+        "Tex",
+        "FadeIn"
+      ],
+      "clip_query": "A matrix and a vector displayed side-by-side with an equals sign and empty brackets for the result."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Sequential highlighting of matrix rows and vector elements using yellow surrounding rectangles.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "ShowIncreasingSubsets",
+        "row_rects",
+        "vect_rects"
+      ],
+      "clip_query": "Yellow rectangles highlighting elements of a matrix row and a vector simultaneously."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic numerical update of the resulting vector elements as the dot product calculation progresses.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "UpdateFromAlphaFunc",
+        "DecimalNumber",
+        "set_value",
+        "partial_values"
+      ],
+      "clip_query": "Numbers inside a vector dynamically changing and counting up to their final computed values."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Fading out of the temporary highlighting rectangles once the multiplication is complete.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        25.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "FadeOut",
+        "last_rects"
+      ],
+      "clip_query": "The yellow highlighting boxes fading away, leaving the completed matrix product."
+    }
+  ]
+}

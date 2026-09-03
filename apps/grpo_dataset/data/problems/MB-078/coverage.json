@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-078",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Complex exponentials",
+        "Differential equations",
+        "Simple harmonic motion ODE",
+        "Characteristic equation roots"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Spring-mass system rendering",
+        "Parametric spiral curves",
+        "Complex plane or 2D coordinate system",
+        "Vector updaters showing velocity or phase"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Numerical integration of ODE (Euler or Runge-Kutta sub-stepping)",
+        "Spring constant k and damping coefficient mu parameters",
+        "Time-stepping delta_t calculations"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Custom VGroup subclass for the spring-mass system",
+        "Updater functions for real-time animation",
+        "Color interpolation for family of curves"
+      ]
+    }
+  }
+}

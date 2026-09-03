@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-105",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Parameterization of a closed loop",
+        "Mapping interval [0, 1] to a 2D curve",
+        "Coordinate tracking"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Closed loop curve",
+        "Unit interval number line",
+        "Moving tracker dot and arrow pointer",
+        "Scissors cutting animation",
+        "Morphing transformation (loop to line)"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Value tracker from 0 to 1",
+        "Decimal coordinate display"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene or Scene setup",
+        "Updaters for synchronized tracking",
+        "Transform animations with path_arc"
+      ]
+    }
+  }
+}

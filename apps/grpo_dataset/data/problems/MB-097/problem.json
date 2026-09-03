@@ -1,0 +1,69 @@
+{
+  "id": "MB-097",
+  "title": "Plane Wave Through Zone Plate Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes a plane wave passing through a zone plate (diffraction grating) using custom shaders. Define a custom `LightWaveSlice` class inheriting from `Mobject` that interfaces with ModernGL to render wave interference from multiple point sources. The class should support custom uniforms such as frequency, wave number, decay factor, and time. Implement a scene `PlaneWaveThroughZonePlate` that sets up a grid of point sources representing the apertures of a zone plate, passes an incoming plane wave through them, and visualizes the resulting interference pattern and focusing effect. The wave slice should dynamically update its time uniform to animate wave propagation, and support toggling between showing wave amplitude and wave intensity.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-097/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "PlaneWaveThroughZonePlate"
+    ],
+    "visual_techniques": [
+      "Custom ModernGL Shaders",
+      "Dynamic Uniform Updates",
+      "Wave Interference Field Simulation",
+      "Real-time Shader Animation"
+    ],
+    "manim_api_patterns": [
+      "Mobject shader_folder",
+      "Mobject render_primitive",
+      "set_uniforms",
+      "add_updater",
+      "always.sync_points",
+      "apply_depth_test"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom shader files in the expected directory",
+      "severity": "high",
+      "note": "The custom LightWaveSlice relies on external GLSL shaders. If the shader folder is missing or incorrectly pathed, rendering will crash."
+    },
+    {
+      "pattern": "Incompatibility with Manim Community (CE)",
+      "severity": "high",
+      "note": "Manim CE does not natively support the same shader-based Mobject structure and uniform synchronization API as ManimGL."
+    },
+    {
+      "pattern": "Incorrect uniform names or types in shader synchronization",
+      "severity": "medium",
+      "note": "The sync_points method dynamically sets uniforms like point_source0, point_source1, etc. Discrepancies between Python and GLSL uniform names will cause WebGL/OpenGL compilation errors."
+    }
+  ]
+}

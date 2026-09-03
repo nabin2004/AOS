@@ -1,0 +1,75 @@
+{
+  "problem_id": "MB-177",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Sinc function graph is drawn outwards from the center in both directions smoothly.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "get_graph",
+        "sinc",
+        "ShowCreation",
+        "left_sinc",
+        "right_sinc"
+      ],
+      "clip_query": "A blue sinc function graph being drawn symmetrically outwards from the y-axis on a coordinate plane."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "A teal sine wave and a yellow 1/x envelope are displayed, and the sine wave transforms into the sinc function.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "one_over_x_graph",
+        "sine_wave",
+        "Transform",
+        "half_sinc"
+      ],
+      "clip_query": "A sine wave transforming into a damped sinc wave bounded by a yellow 1/x envelope."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A hollow dot appears at (0,1) with a limit equation, and two dots animate along the curve towards the hole.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "hole",
+        "lim",
+        "ValueTracker",
+        "dots",
+        "update"
+      ],
+      "clip_query": "Two dots sliding along a blue curve towards a hollow circle at the peak (0,1) as a limit equation is shown."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The area under the sinc curve is shaded, and the integral equation equaling pi is displayed.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        20.0,
+        30.0
+      ],
+      "keyword_bank": [
+        "get_area",
+        "area",
+        "int1",
+        "rhs"
+      ],
+      "clip_query": "The region under a blue sinc function graph being shaded with color, accompanied by an integral equation equaling pi."
+    }
+  ]
+}

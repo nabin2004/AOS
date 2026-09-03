@@ -1,0 +1,64 @@
+{
+  "id": "MB-140",
+  "title": "Moser's Circle Problem Sequence Pattern",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    22.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Combinatorics",
+    "Number Theory"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or compatible Manim Community syntax) that visualizes the sequence of Moser's circle problem. \n\n1. Define a helper function `moser(n)` that computes the number of regions: choose(n, 4) + choose(n, 2) + 1.\n2. Generate the first 11 values of this sequence: 1, 2, 4, 8, 16, 31, 57, 99, 163, 256, 386.\n3. Display these values as a comma-separated sequence with a trailing ellipsis at the top of the screen. Animate the terms fading in sequentially.\n4. Add a brace under the entire sequence with the text \"What is this pattern?\".\n5. Transform the brace to span only the first five terms (\"1,2,4,8,16\") with the text \"Coincidence?\".\n6. Transform the brace again to span the term \"256\" with the text \"And what's with this?\".\n7. Fade out the braces and text, then write the formula \"f(n) = ???\" below the sequence.\n8. Sequentially highlight each term in the sequence with a yellow surrounding rectangle and a label \"f(1)\", \"f(2)\", etc., below it, ensuring only one highlight is active at a time.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-140/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 85,
+    "scene_classes": [
+      "ShowPattern"
+    ],
+    "visual_techniques": [
+      "Sequential text rendering",
+      "Brace transformations",
+      "Surrounding rectangle highlighting",
+      "Sub-mobject indexing"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "Brace",
+      "FadeTransform",
+      "ReplacementTransform",
+      "SurroundingRectangle"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimGL-specific Tex string indexing in Manim Community",
+      "severity": "high",
+      "note": "ManimGL allows indexing Tex objects by substring (e.g., expression['1,2,4,8,16']). In Manim Community, this will raise a KeyError. Use isolate or manual slicing instead."
+    },
+    {
+      "pattern": "Missing definition of the choose function",
+      "severity": "medium",
+      "note": "Ensure math.comb or a custom choose function is defined to compute the Moser sequence values."
+    }
+  ]
+}

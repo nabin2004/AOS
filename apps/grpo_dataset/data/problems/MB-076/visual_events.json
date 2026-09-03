@@ -1,0 +1,77 @@
+{
+  "problem_id": "MB-076",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "The right part of the ODE fades in centered, then moves to the right as the left part is written in.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "ode",
+        "right_part",
+        "left_part",
+        "Restore",
+        "Write"
+      ],
+      "clip_query": "The right side of a differential equation fades in, then shifts right as the rest of the equation is written."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Yellow surrounding rectangles sequentially highlight the derivative terms, then transform to highlight the coefficients, and finally highlight the entire left and right sides.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        4.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "x_rects",
+        "a_rects",
+        "full_rect",
+        "zero_rect",
+        "ReplacementTransform"
+      ],
+      "clip_query": "Yellow boxes highlight different parts of a differential equation step-by-step."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The terms of the original ODE transform into the exponential ansatz version using a lagged fade transition.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "exp_version",
+        "key_map",
+        "FadeTransform",
+        "LaggedStart"
+      ],
+      "clip_query": "The terms of the differential equation transform into exponential terms with s variables."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The exponential equation factors out e^{st} using a curved matching transform, leaving the characteristic polynomial highlighted.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "factored",
+        "TransformMatchingTex",
+        "path_arc",
+        "poly_rect",
+        "FadeOut"
+      ],
+      "clip_query": "The exponential term is factored out of the equation along a curved path, leaving the polynomial highlighted."
+    }
+  ]
+}

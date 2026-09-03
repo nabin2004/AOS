@@ -1,0 +1,42 @@
+{
+  "problem_id": "MB-087",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Laplace transform notation \\mathcal{L}",
+        "Exponential shift formula e^{at} \\to \\frac{1}{s-a}",
+        "Linearity formula a f(t) + b g(t) \\to a F(s) + b G(s)",
+        "Derivative formula f'(t) \\to s F(s) - f(0)",
+        "Color-coded variables {t} and {s}"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Underlined title at the top",
+        "Vertically aligned numbered list of properties",
+        "Transform arrows with script L labels",
+        "Surrounding highlighting rectangles",
+        "Character reaction or visual focus shift at the end"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Correct font sizes (e.g., 72 for title, 60 for formulas)",
+        "Proper spacing and alignment offsets (e.g., buff, scale factors)",
+        "Arc angle of 45 degrees for matching tex transformation"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "Custom helper function for creating transform groups",
+        "Sequential animation flow using LaggedStart and Write",
+        "Clean transition between different mathematical properties",
+        "Handling of potential library version differences for character/mobjects"
+      ]
+    }
+  }
+}

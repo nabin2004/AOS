@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-178",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Text Mobjects",
+      "gl_construct": "OldTex",
+      "ce_equivalent": "MathTex",
+      "severity": "high"
+    },
+    {
+      "category": "Animations",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform",
+      "severity": "medium"
+    },
+    {
+      "category": "Global Constants",
+      "gl_construct": "FRAME_WIDTH",
+      "ce_equivalent": "config.frame_width",
+      "severity": "low"
+    }
+  ]
+}

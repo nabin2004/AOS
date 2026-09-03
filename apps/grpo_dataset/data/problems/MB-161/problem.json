@@ -1,0 +1,70 @@
+{
+  "id": "MB-161",
+  "title": "Circular Polarization 1D",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 5,
+  "domain": [
+    "Physics",
+    "Calculus",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes circular polarization in 1D. The scene should feature a charged particle moving in a circular path in the XY plane, and a series of electric field vectors distributed along a perpendicular propagation axis (e.g., the Z-axis or X-axis). These vectors must represent the radiative electric field (Lorentz force / acceleration-dependent field) produced by the particle, taking into account the finite speed of light propagation delay. Implement a custom `ChargedParticle` class that tracks its position and acceleration history, and a custom vector field or set of vectors that update dynamically using updaters. The camera should rotate in 3D space to clearly show the helical, three-dimensional nature of the circularly polarized wave propagating away from the source particle.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-161/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "CircularPolarization1D"
+    ],
+    "visual_techniques": [
+      "3D Vector Field",
+      "Dynamic Updaters",
+      "Retarded Time / Propagation Delay Simulation",
+      "Particle History Tracking"
+    ],
+    "manim_api_patterns": [
+      "TrueDot",
+      "VectorField",
+      "add_updater",
+      "put_start_and_end_on",
+      "make_3d"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect calculation of retarded time leading to discontinuous or non-propagating waves",
+      "severity": "high",
+      "note": "The delay calculation must correctly use the distance from the particle's past positions divided by the speed of light."
+    },
+    {
+      "pattern": "Vector field arrows blowing up to infinity near the source particle",
+      "severity": "medium",
+      "note": "Implement an adjusted norm or softening parameter to prevent division by zero near the particle's center."
+    },
+    {
+      "pattern": "Static camera angle failing to reveal the 3D helical structure of circular polarization",
+      "severity": "medium",
+      "note": "Ensure the 3D camera rotates or is positioned at an oblique angle to show both the circular motion and the linear propagation."
+    }
+  ]
+}

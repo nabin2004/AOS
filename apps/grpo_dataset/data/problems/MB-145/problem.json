@@ -1,0 +1,65 @@
+{
+  "id": "MB-145",
+  "title": "Introduction to Electric Fields and Electromagnetic Forces",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    120.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus",
+    "Computer Science"
+  ],
+  "full_prompt": "Create a Manim scene that introduces the concept of electric fields and electromagnetic force propagation. Define a custom `ChargedParticle` class (inheriting from `Group` or `VGroup`) that tracks its position and acceleration history. Create an `AccelerationVector` class (inheriting from `Vector`) that dynamically pins itself to the particle and updates its direction and magnitude based on the particle's acceleration (using a tanh normalization to prevent extreme lengths). Implement a function `get_influence_ring` that generates expanding concentric circles radiating from the particle's position to visualize the propagation of electromagnetic influence, where the stroke width decays as the radius increases. Finally, implement functions to calculate the Coulomb force and Lorentz force fields at arbitrary grid points, taking into account retarded time delays and avoiding singularities at the particle's exact position using an adjusted norm function. Animate the particle oscillating or moving, showing the dynamic updates of its acceleration vector, the emission of influence rings, and the surrounding force vector field.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-145/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 150,
+    "scene_classes": [
+      "IntroduceEField"
+    ],
+    "visual_techniques": [
+      "Dynamic Updaters",
+      "Custom Mobject Classes",
+      "Vector Fields",
+      "Wave Propagation Visualization"
+    ],
+    "manim_api_patterns": [
+      "TrueDot",
+      "Vector",
+      "Group",
+      "add_updater",
+      "put_start_and_end_on"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom history tracking in ChargedParticle causing Lorentz force calculations to crash",
+      "severity": "high",
+      "note": "The Lorentz force calculation depends on get_past_position and get_past_acceleration. If the ChargedParticle class does not properly track history, these methods will raise AttributeError."
+    },
+    {
+      "pattern": "Division by zero in Coulomb force calculation",
+      "severity": "medium",
+      "note": "Ensure points_to_particle_info uses the adjusted_norms logic to prevent division by zero when field points overlap with the particle center."
+    }
+  ]
+}

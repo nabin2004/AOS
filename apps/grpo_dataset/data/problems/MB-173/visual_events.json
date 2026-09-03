@@ -1,0 +1,70 @@
+{
+  "problem_id": "MB-173",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the 3D scene with a ChargedParticle at the origin and its AccelerationVector.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "ChargedParticle",
+        "AccelerationVector",
+        "add"
+      ],
+      "clip_query": "A 3D red sphere representing a positive charged particle with a pink acceleration vector pointing from its center."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The charged particle starts moving along a 3D trajectory (e.g., helical or sinusoidal path).",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "move_to",
+        "add_updater",
+        "velocity"
+      ],
+      "clip_query": "A red charged particle moving along a curved path in 3D space."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The 3D camera rotates to show the movement from different spatial angles.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "camera",
+        "frame",
+        "increment_theta",
+        "increment_phi"
+      ],
+      "clip_query": "The camera rotating around a moving 3D particle in a dark space."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The acceleration vector dynamically updates its direction and magnitude based on the particle's motion.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "pin_to_particle",
+        "put_start_and_end_on",
+        "get_acceleration"
+      ],
+      "clip_query": "A pink vector attached to a moving sphere dynamically changing its length and direction."
+    }
+  ]
+}

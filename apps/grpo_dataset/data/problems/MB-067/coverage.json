@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-067",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Parametric equations for a 3D cone",
+        "Parametric equations for a flat 2D sector",
+        "Calculation of sector angle theta based on cone dimensions"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D Axes and colored tracking dots",
+        "Grey parametric surface with shading",
+        "Red path line on the surface",
+        "Yellow dashed dividing line",
+        "Camera rotation and transition to top-down view"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Cone radius of 3.0",
+        "Theta angle calculation using TAU * sin(TAU / 8)",
+        "Camera orientation angles (e.g., reorienting to 0, 0, 0)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or ThreeDScene structure",
+        "Simultaneous Transform of surface and lines",
+        "Depth testing configuration for proper 3D layering"
+      ]
+    }
+  }
+}

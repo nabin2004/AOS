@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-168",
+  "conflicts": [
+    {
+      "category": "mobject_types",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot3D or Sphere",
+      "severity": "high"
+    },
+    {
+      "category": "shading",
+      "gl_construct": "shading=(0.25, 0.5, 0.5), glow_factor=0.25",
+      "ce_equivalent": "None (ManimCE does not support GL-specific shading parameters directly on VMobjects/Group)",
+      "severity": "medium"
+    },
+    {
+      "category": "vectorization",
+      "gl_construct": "append_vectorized_mobject",
+      "ce_equivalent": "add",
+      "severity": "medium"
+    },
+    {
+      "category": "rendering",
+      "gl_construct": "set_flat_stroke(False)",
+      "ce_equivalent": "None (ManimCE stroke rendering is flat by default, 3D strokes are handled differently)",
+      "severity": "low"
+    }
+  ]
+}

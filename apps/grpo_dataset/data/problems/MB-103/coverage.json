@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-103",
+  "requirements": {
+    "Math": {
+      "weight": 0.4,
+      "expected": [
+        "Complex wave equation representation",
+        "Complex conjugate expansion",
+        "FOIL algebraic expansion",
+        "Conjugate pair simplification to real numbers"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Highlighting rectangles around specific algebraic terms",
+        "Coordinated arrows pointing to terms",
+        "Smooth transitions between algebraic steps",
+        "Color-coded labels"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Correct alignment and spacing of multi-line equations",
+        "Accurate bounding box coordinates for term highlighting"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Sequential animation flow",
+        "Use of VGroups for managing complex equations",
+        "Proper clean-up of temporary visual guides (rectangles, arrows)"
+      ]
+    }
+  }
+}

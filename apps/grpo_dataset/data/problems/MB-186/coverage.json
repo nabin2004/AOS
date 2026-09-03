@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-186",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "factored formula f(x) = (1+x)(1+x^2)...",
+        "expanded formula with sum and coefficients",
+        "evaluation f(0) = c_0"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "NumberPlane with custom x and y ranges",
+        "Yellow graph of the product function",
+        "GlowDot and vertical tracking line",
+        "SurroundingRectangle with question marks"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for x moving from 0.5 to -0.5, then 0.7, then 0",
+        "Function evaluation using np.product"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene structure or Scene structure",
+        "Updaters on GlowDot and Line using i2gp and c2p",
+        "FadeTransform or ReplacementTransform for formula transitions"
+      ]
+    }
+  }
+}

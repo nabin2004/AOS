@@ -1,0 +1,55 @@
+{
+  "problem_id": "MB-193",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render and arrange the symmetric system of equations relating coefficients to roots (Vieta's formulas) with color-coded root variables.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "get_symmetric_system",
+        "OldTex",
+        "color_gradient",
+        "roots",
+        "lhss"
+      ],
+      "clip_query": "symmetric system of equations relating roots to coefficients"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animate the expansion of symmetric polynomials, showing terms like r_0 + r_1 and r_0 * r_1 with proper alignment.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "sym_poly_tex_args",
+        "abbreviate",
+        "combinations"
+      ],
+      "clip_query": "expansion of symmetric polynomials with color-coded variables"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Perform optimal transport sorting to map unordered roots to target points minimizing distance for smooth visual transition.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "optimal_transport",
+        "sort_to_minimize_distances",
+        "get_norm"
+      ],
+      "clip_query": "smooth transition of dots representing roots to target points"
+    }
+  ]
+}

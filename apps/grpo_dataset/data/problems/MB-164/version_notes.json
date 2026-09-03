@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-164",
+  "conflicts": [
+    {
+      "category": "mobject_compatibility",
+      "gl_construct": "TrueDot",
+      "ce_equivalent": "Dot",
+      "severity": "medium"
+    },
+    {
+      "category": "mobject_compatibility",
+      "gl_construct": "Group",
+      "ce_equivalent": "VGroup",
+      "severity": "low"
+    },
+    {
+      "category": "updater_syntax",
+      "gl_construct": "add_updater",
+      "ce_equivalent": "add_updater",
+      "severity": "low"
+    }
+  ]
+}

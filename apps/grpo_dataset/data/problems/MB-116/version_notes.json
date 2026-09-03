@@ -1,0 +1,26 @@
+{
+  "problem_id": "MB-116",
+  "conflicts": [
+    {
+      "category": "InteractiveScene",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high",
+      "note": "InteractiveScene is exclusive to ManimGL. In Manim Community, standard Scene must be used."
+    },
+    {
+      "category": "Mobject Updaters",
+      "gl_construct": "label.always.next_to(tip, -direction, buff=0.1)",
+      "ce_equivalent": "label.add_updater(lambda m: m.next_to(tip, -direction, buff=0.1))",
+      "severity": "high",
+      "note": "The '.always' syntax is a ManimGL shorthand. Manim Community requires explicit 'add_updater' calls."
+    },
+    {
+      "category": "GlowDot",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with a custom glow effect or standard Dot",
+      "severity": "medium",
+      "note": "GlowDot is a specialized mobject in ManimGL. In CE, it must be simulated using overlapping transparent circles or standard Dots."
+    }
+  ]
+}

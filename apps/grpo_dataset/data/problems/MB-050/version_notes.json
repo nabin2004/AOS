@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-050",
+  "conflicts": [
+    {
+      "category": "Base Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot with custom glow shader or multiple overlapping transparent circles",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "SurfaceMesh",
+      "ce_equivalent": "Surface with stroke parameters or manual curve plotting",
+      "severity": "medium"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "frame.reorient",
+      "ce_equivalent": "self.set_camera_orientation",
+      "severity": "high"
+    },
+    {
+      "category": "Rendering",
+      "gl_construct": "always_sort_to_camera",
+      "ce_equivalent": "None (handled automatically or requires manual sorting in older CE versions)",
+      "severity": "medium"
+    }
+  ]
+}

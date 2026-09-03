@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-061",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "KetGroup",
+        "Integer",
+        "BitString"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "SVGMobject",
+        "Square",
+        "Arrow",
+        "SurroundingRectangle",
+        "Checkmark"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "ChangeDecimalToValue",
+        "set_value"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene",
+        "FadeTransform",
+        "TransformFromCopy",
+        "MoveToTarget"
+      ]
+    }
+  }
+}

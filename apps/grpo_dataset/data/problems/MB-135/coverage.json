@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-135",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Linear regression equation y = wx + b",
+        "Dynamic calculation of line coordinates based on weight and bias",
+        "Residual/error distance calculation from points to the line"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "Custom Dial class with arc, ticks, and needle",
+        "Needle color interpolation based on value (blue for positive, red for negative)",
+        "Dynamic regression line updating in real-time",
+        "Residual lines connecting data points to the regression line"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Accurate mapping of dial values to slope and intercept",
+        "Correct coordinate transformations between data space and screen space"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "Dial class inheriting from VGroup",
+        "Use of updaters (e.g., always_redraw or add_updater) to link line and residuals to dial values",
+        "Smooth transition animations for dial parameter updates"
+      ]
+    }
+  }
+}

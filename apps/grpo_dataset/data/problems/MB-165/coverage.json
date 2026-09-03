@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-165",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "wave equation",
+        "superposition principle",
+        "spectral decomposition",
+        "phase and amplitude"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "3D axes",
+        "spectral color gradient",
+        "oscillating wave curves",
+        "vector field arrows"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "wavelength values (0.5 to 1.5)",
+        "wave speed",
+        "sampling resolution",
+        "amplitude scaling"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "custom VMobject classes",
+        "dynamic updaters",
+        "frame-by-frame wave updates",
+        "3D camera orientation"
+      ]
+    }
+  }
+}

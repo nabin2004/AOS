@@ -1,0 +1,71 @@
+{
+  "id": "MB-135",
+  "title": "Linear Regression and Parameter Tuning Visualization",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Calculus",
+    "Linear Algebra"
+  ],
+  "full_prompt": "Create a Manim scene demonstrating Linear Regression with interactive parameter tuning. The scene should feature a custom 'Dial' class (inheriting from VGroup) that represents model parameters (e.g., weight $w$ and bias $b$). The Dial should have a circular arc, tick marks, and a needle that rotates to point to the current value, changing color based on whether the value is positive (blue) or negative (red). Set up a coordinate system (Axes) with a scatter plot of data points. Display a regression line $y = wx + b$ whose slope and intercept are dynamically linked to the values of the dials. Animate the dials changing their values using a custom animation that shows passing flashes along the dial arc, and show the regression line and residual lines (connecting data points to the line) updating in real-time to reflect the new parameters.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-135/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 280,
+    "scene_classes": [
+      "LinearRegression"
+    ],
+    "visual_techniques": [
+      "Custom Dial Mobject with rotating needle",
+      "Dynamic parameter updates via Updaters",
+      "Scatter plot with dynamic fitting line",
+      "Residual lines (error bars) updating in real-time"
+    ],
+    "manim_api_patterns": [
+      "pfp",
+      "VShowPassingFlash",
+      "interpolate_color_by_hsl",
+      "inverse_interpolate",
+      "AnimationGroup",
+      "put_start_and_end_on"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using pfp instead of point_from_proportion in ManimCE environments",
+      "severity": "high",
+      "note": "pfp is a ManimGL-specific shorthand. In ManimCE, point_from_proportion must be used."
+    },
+    {
+      "pattern": "VShowPassingFlash undefined in ManimCE",
+      "severity": "high",
+      "note": "ManimCE uses ShowPassingFlash or custom flash animations instead of VShowPassingFlash."
+    },
+    {
+      "pattern": "Incorrect needle rotation math in Dial class",
+      "severity": "medium",
+      "note": "The needle's start and end points must be calculated correctly using the arc's proportion-from-point logic to avoid visual misalignment."
+    }
+  ]
+}

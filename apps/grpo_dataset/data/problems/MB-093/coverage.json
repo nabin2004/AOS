@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-093",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Prime number identification using sympy.isprime",
+        "Correct mathematical representation of the expected prime gap: E[gap] = \\ln(p)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Horizontal number line with custom range 99980 to 100100",
+        "Glow dots or highlighted dots at prime coordinates",
+        "Camera panning/zooming to focus on a specific prime",
+        "Brace indicating the gap between consecutive primes",
+        "Arrow pointing to the prime label"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Number line range exactly 99980 to 100100",
+        "Font size 48 for number line labels",
+        "Font size 96 for the 'Big prime, p' label",
+        "Camera height set to 11 during zoom"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Use of InteractiveScene (or MovingCameraScene in CE)",
+        "Smooth camera animation over 8 seconds",
+        "FadeTransform transitions for equation components"
+      ]
+    }
+  }
+}

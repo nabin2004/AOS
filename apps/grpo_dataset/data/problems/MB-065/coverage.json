@@ -1,0 +1,43 @@
+{
+  "problem_id": "MB-065",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "TexText",
+        "choices",
+        "O(\\sqrt{N})",
+        "O(\\log(N))"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Randolph",
+        "Exmark",
+        "Checkmark",
+        "Clock",
+        "get_quantum_computer_symbol",
+        "SurroundingRectangle"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "6x6 grid",
+        "20% probability",
+        "12 hours passed"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene",
+        "LaggedStartMap",
+        "cycle_animation",
+        "MoveToTarget",
+        "Restore"
+      ]
+    }
+  }
+}

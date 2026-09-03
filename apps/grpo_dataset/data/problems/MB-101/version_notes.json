@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-101",
+  "conflicts": [
+    {
+      "category": "Class Hierarchy",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "medium"
+    },
+    {
+      "category": "Mobjects",
+      "gl_construct": "GlowDot / TrueDot",
+      "ce_equivalent": "Dot (with custom glow effect using multiple overlapping dots or standard Dot)",
+      "severity": "high"
+    },
+    {
+      "category": "Animations",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Animations",
+      "gl_construct": "FadeTransformPieces",
+      "ce_equivalent": "TransformMatchingShapes or ReplacementTransform",
+      "severity": "medium"
+    },
+    {
+      "category": "Styling",
+      "gl_construct": "Vector.set_backstroke",
+      "ce_equivalent": "Vector.set_stroke (with background stroke parameters if supported, or manual layering)",
+      "severity": "low"
+    }
+  ]
+}

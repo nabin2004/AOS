@@ -1,0 +1,63 @@
+{
+  "id": "MB-183",
+  "title": "3D Change of Basis and Linear Combinations",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Linear Algebra"
+  ],
+  "full_prompt": "Write a ManimGL script that visualizes a 3D change of basis. First, set up a 3D scene with a slowly rotating camera frame. Add 3D axes, a coordinate plane, and three standard basis vectors colored Red, Green, and Blue for the X, Y, and Z axes respectively. Introduce a yellow 'Signal' vector with a dynamic label showing its current position. Calculate and display the linear combination components (projected vectors stacked tip-to-tail) that dynamically update to match the signal vector. Animate the initial construction of these components using a transform from the basis vectors. Then, animate the signal vector moving to several different 3D coordinates, showing how the components dynamically stretch and update. Next, perform a change of basis by rotating the basis vectors to a new set of orthogonal directions (using a rotation matrix). Show how the components dynamically adapt and project onto this new coordinate system as the signal vector moves to a new position.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-183/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "ThreeDChangeOfBasisExample"
+    ],
+    "visual_techniques": [
+      "3D Camera Rotation Updater",
+      "Dynamic Vector Projections",
+      "Basis Vector Transformation",
+      "Always Redraw Updaters",
+      "Depth Testing"
+    ],
+    "manim_api_patterns": [
+      "self.camera.frame",
+      "ThreeDAxes",
+      "always_redraw",
+      "apply_depth_test",
+      "DecimalNumber"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using Manim Community camera methods on ManimGL camera frame",
+      "severity": "high",
+      "note": "ManimGL uses self.camera.frame.reorient() and self.camera.frame.add_updater() instead of self.set_camera_orientation()."
+    },
+    {
+      "pattern": "Missing apply_depth_test on 3D mobjects",
+      "severity": "medium",
+      "note": "In 3D scenes, depth testing must be explicitly applied to mobjects to prevent rendering overlap issues."
+    }
+  ]
+}

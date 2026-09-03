@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-083",
+  "conflicts": [
+    {
+      "category": "framework_class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "mobject",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot (with custom glow/halo using standard mobjects or PMobject)",
+      "severity": "medium"
+    },
+    {
+      "category": "animation",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform",
+      "severity": "medium"
+    },
+    {
+      "category": "method",
+      "gl_construct": "ComplexPlane.n2p",
+      "ce_equivalent": "ComplexPlane.number_to_point",
+      "severity": "low"
+    }
+  ]
+}

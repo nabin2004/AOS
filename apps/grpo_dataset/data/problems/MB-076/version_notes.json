@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-076",
+  "conflicts": [
+    {
+      "category": "Base Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Creation Animation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "high"
+    },
+    {
+      "category": "Transform Type",
+      "gl_construct": "FadeTransform",
+      "ce_equivalent": "ReplacementTransform (with custom fade configurations)",
+      "severity": "medium"
+    },
+    {
+      "category": "Tex Matching",
+      "gl_construct": "TransformMatchingTex",
+      "ce_equivalent": "TransformMatchingTex (with slightly different key matching behavior)",
+      "severity": "medium"
+    }
+  ]
+}

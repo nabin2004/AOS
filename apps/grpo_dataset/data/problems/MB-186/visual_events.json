@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-186",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Display of factored and expanded formulas with labels 'What we know' and 'What we want' and connecting arrows.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "factored",
+        "expanded",
+        "factored_label",
+        "expanded_label",
+        "Arrow"
+      ],
+      "clip_query": "Factored and expanded polynomial formulas shown with labels 'What we know' and 'What we want'"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Creation of a black box with question marks covering the coefficients of the expanded polynomial.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "q_marks",
+        "box"
+      ],
+      "clip_query": "A black box with question marks covering the terms of a polynomial expansion"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Introduction of the coordinate plane and graph, with a vertical line and glowing dot tracking the function value as x varies.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        25.0,
+        45.0
+      ],
+      "keyword_bank": [
+        "NumberPlane",
+        "get_graph",
+        "ValueTracker",
+        "GlowDot",
+        "Line",
+        "i2gp"
+      ],
+      "clip_query": "A coordinate plane showing a yellow graph with a vertical line and dot tracking the curve"
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Plugging in x=0 to evaluate f(0) = 1 = c_0, with the tracker moving to x=0.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        45.0,
+        60.0
+      ],
+      "keyword_bank": [
+        "f0",
+        "c0_rhs",
+        "x_tracker"
+      ],
+      "clip_query": "Evaluating the polynomial at x=0 to find the constant term c_0"
+    }
+  ]
+}

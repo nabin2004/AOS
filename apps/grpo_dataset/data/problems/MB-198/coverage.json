@@ -1,0 +1,34 @@
+{
+  "problem_id": "MB-198",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Angle normalization using modulo arithmetic",
+        "Vector math for line lengths and angles"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Color-coded polygons (Blue, Green, Red) with 0.8 opacity",
+        "Black stroke outlines on polygons",
+        "Correctly oriented and positioned braces along angled lines"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Exact coordinate placement for points A, B, C, D, E, F, P",
+        "Path arc angle of 45 degrees for brace transformations"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Sequential and parallel animation blocks using self.play",
+        "Proper cleanup/return structure matching the reference scene"
+      ]
+    }
+  }
+}

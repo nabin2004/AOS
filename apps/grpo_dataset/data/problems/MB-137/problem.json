@@ -1,0 +1,65 @@
+{
+  "id": "MB-137",
+  "title": "Moser's Circle Problem - Final Rearrangement of Euler's Formula",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 3,
+  "domain": [
+    "Combinatorics",
+    "Geometry"
+  ],
+  "full_prompt": "Create a Manim scene named 'FinalRearrangment' that visualizes the algebraic substitution and simplification of Euler's formula for Moser's Circle Problem. Start with the formula F = E - V + 1 at the top of the screen. Introduce the expressions for V (vertices) and E (edges) as V = n + nC4 and E = nC2 + 2*nC4 + n, color-coded in TEAL and BLUE_B respectively. Animate the step-by-step substitution of V and then E into the main formula using smooth transitions (like FadeTransform). Once substituted, highlight the terms that cancel out (the 'n' terms and one of the 'nC4' terms) using a flash effect, and fade them out. Finally, rearrange the remaining terms into the simplified formula F = 1 + nC2 + nC4 using curved paths (path_arc) to make the movement of terms visually clear and elegant.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-137/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "FinalRearrangment"
+    ],
+    "visual_techniques": [
+      "Tex substitution",
+      "FadeTransform",
+      "FlashAround",
+      "Path arc transformation",
+      "Submobject indexing"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "Tex",
+      "FadeTransform",
+      "FlashAround",
+      "ReplacementTransform",
+      "LaggedStart"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect Tex indexing during substitution causing mismatched character animations",
+      "severity": "high",
+      "note": "Tex string parsing and indexing varies heavily between Manim versions and LaTeX engines. Hardcoded indices like top_eq3[14] are extremely fragile."
+    },
+    {
+      "pattern": "Missing FadeTransform implementation in ManimCE",
+      "severity": "medium",
+      "note": "FadeTransform is native to ManimGL but not directly available in ManimCE, requiring manual ReplacementTransform or custom animation groups."
+    }
+  ]
+}

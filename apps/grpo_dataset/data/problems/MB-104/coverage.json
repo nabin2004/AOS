@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-104",
+  "requirements": {
+    "Math": {
+      "weight": 0.15,
+      "expected": [
+        "CubicBezier"
+      ]
+    },
+    "Visual": {
+      "weight": 0.45,
+      "expected": [
+        "ScreenRectangle",
+        "ImageMobject",
+        "FullScreenRectangle",
+        "FadeIn",
+        "FadeOut",
+        "isolate"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "set_width(13)",
+        "buff=1.5",
+        "set_opacity",
+        "scale(0.75)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene",
+        "self.frame",
+        "LaggedStartMap",
+        "Restore"
+      ]
+    }
+  }
+}

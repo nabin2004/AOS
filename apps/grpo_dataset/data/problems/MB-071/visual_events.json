@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-071",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Create a 2x2 layout of terms (Differential Equation, Transformed Equation, Transformed Solution, Solution) and animate arrows connecting them sequentially.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "ode",
+        "lt_ode",
+        "lt_ans",
+        "ans",
+        "get_lt_arrow",
+        "grow_lt_arrow"
+      ],
+      "clip_query": "A 2x2 diagram showing the process of solving a differential equation using Laplace transforms with connecting arrows."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animate background rectangles and labels dividing the screen into 'Time domain' (top half) and 's domain' (bottom half).",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        18.0
+      ],
+      "keyword_bank": [
+        "FullScreenRectangle",
+        "time_domain",
+        "s_domain",
+        "time_label",
+        "s_label"
+      ],
+      "clip_query": "The screen is split into a blue top half labeled 'Time domain' and a yellow bottom half labeled 's domain'."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Display the second-order differential equation with color-coded terms at the top of the screen.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        18.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "ode",
+        "t2c",
+        "x_colors"
+      ],
+      "clip_query": "A second-order differential equation with mass, damping, and spring constants is displayed at the top of the screen."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Animate the term-by-term Laplace transform of the differential equation, showing the algebraic expansion.",
+      "weight": 0.25,
+      "critical": false,
+      "expected_time_range": [
+        25.0,
+        40.0
+      ],
+      "keyword_bank": [
+        "ode_lt_lhs",
+        "factored_ode_lt_lhs"
+      ],
+      "clip_query": "The Laplace transform of the differential equation is shown term-by-term with algebraic expansion."
+    }
+  ]
+}

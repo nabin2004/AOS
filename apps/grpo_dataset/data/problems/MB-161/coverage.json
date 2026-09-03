@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-161",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Lorentz force calculation",
+        "Retarded time delay formula",
+        "Acceleration-dependent radiative field",
+        "Circular motion kinematics"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D helical wave of vectors",
+        "Rotating charged particle",
+        "3D camera rotation and perspective",
+        "Dynamic vector updates"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Euler integration for particle history",
+        "Array-based distance and norm calculations",
+        "Softened denominator to prevent division by zero"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "Custom ChargedParticle class with history tracking",
+        "Custom VectorField or dynamic vector group",
+        "Frame updaters for continuous animation"
+      ]
+    }
+  }
+}

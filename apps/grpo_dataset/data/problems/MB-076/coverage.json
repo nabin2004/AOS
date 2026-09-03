@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-076",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "General linear ODE LaTeX representation",
+        "Exponential ansatz substitution with s parameters",
+        "Factored characteristic polynomial form"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Color gradient applied to derivative terms",
+        "Sequential SurroundingRectangle highlights",
+        "Curved path_arc transition during factoring"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Correct indexing of Tex submobjects for splitting",
+        "LaggedStart ratios and run times"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "Inherits from InteractiveScene",
+        "Uses FadeTransform for term-by-term mapping",
+        "Uses TransformMatchingTex with matched keys"
+      ]
+    }
+  }
+}

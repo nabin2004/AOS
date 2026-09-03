@@ -1,0 +1,56 @@
+{
+  "problem_id": "MB-130",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Render a color-coded WeightMatrix with blue positive entries and red negative entries, including ellipses for rows and columns.",
+      "weight": 0.4,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        2.0
+      ],
+      "keyword_bank": [
+        "WeightMatrix",
+        "DecimalMatrix",
+        "blue",
+        "red",
+        "ellipses"
+      ],
+      "clip_query": "A grid of decimal numbers colored in shades of blue and red representing a weight matrix"
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animate 'Data' text particles flying across the matrix using a lagged start animation.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "data_flying_animation",
+        "LaggedStart",
+        "Text",
+        "Data"
+      ],
+      "clip_query": "Small text labels saying 'Data' flying across a matrix"
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Simultaneously randomize or update the matrix entries to simulate training weight updates.",
+      "weight": 0.3,
+      "critical": false,
+      "expected_time_range": [
+        2.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "RandomizeMatrixEntries",
+        "reset_entry_colors",
+        "value_to_color"
+      ],
+      "clip_query": "The numbers inside a matrix rapidly changing values and colors"
+    }
+  ]
+}

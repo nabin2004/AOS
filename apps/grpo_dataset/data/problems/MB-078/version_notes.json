@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-078",
+  "conflicts": [
+    {
+      "category": "geometry",
+      "gl_construct": "ParametricCurve",
+      "ce_equivalent": "ParametricFunction",
+      "severity": "high"
+    },
+    {
+      "category": "style",
+      "gl_construct": "set_shading",
+      "ce_equivalent": "None (requires custom 3D lighting or custom VMobject fill settings in CE)",
+      "severity": "medium"
+    },
+    {
+      "category": "color",
+      "gl_construct": "interpolate_color_by_hsl",
+      "ce_equivalent": "interpolate_color (RGB-based, HSL requires manual conversion or custom utility in CE)",
+      "severity": "medium"
+    }
+  ]
+}

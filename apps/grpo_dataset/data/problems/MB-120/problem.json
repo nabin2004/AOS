@@ -1,0 +1,67 @@
+{
+  "id": "MB-120",
+  "title": "Covering a Circle with Strips (Tarski's Plank Problem Intro)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Puzzles"
+  ],
+  "full_prompt": "Write a Manim script (compatible with ManimGL/Manim) that visualizes the concept of covering a unit circle with strips (planks) of varying widths. First, draw a circle of radius 2.5 with a radial line and a label '1' indicating its radius. Animate the circle's creation by rotating the radial line 360 degrees. Next, introduce a single teal strip across the circle. Use ValueTrackers to dynamically animate the strip's boundaries, showing its width shrinking and expanding using a dynamic DecimalNumber label that updates in real-time. Replace this decimal label with 'd_1'. Then, add three more colored strips (green, dark blue, light blue) with labels 'd_2', 'd_3', and 'd_4' at different angles and positions. After that, generate 10 random, semi-transparent strips covering the circle to represent a dense covering. Finally, transition the individual strip labels ('d_1', 'd_2', 'd_3', 'd_4') to the top of the screen to form a summation expression: 'd_1 + d_2 + d_3 + d_4 + ... + d_n'. Ensure smooth transitions, clean updaters, and proper layering so the circle and labels remain clearly visible.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-120/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 115,
+    "scene_classes": [
+      "AskStripQuestion"
+    ],
+    "visual_techniques": [
+      "ValueTracker driven dynamic geometry",
+      "Custom strip generation",
+      "Mathematical expression alignment",
+      "Randomized distribution of geometric shapes"
+    ],
+    "manim_api_patterns": [
+      "always_redraw",
+      "ValueTracker",
+      "there_and_back",
+      "LaggedStart",
+      "MoveToTarget",
+      "DecimalNumber",
+      "Integer",
+      "Tex"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom helper method get_strip",
+      "severity": "high",
+      "note": "The reference code relies on self.get_strip which is defined elsewhere in the module. The agent must implement a robust equivalent of get_strip or mock it using standard Manim shapes."
+    },
+    {
+      "pattern": "Incorrect updater syntax for DecimalNumber",
+      "severity": "medium",
+      "note": "Using always_redraw or add_updater incorrectly can cause the width label to lag behind the strip's visual boundaries."
+    }
+  ]
+}

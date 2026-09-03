@@ -1,0 +1,77 @@
+{
+  "problem_id": "MB-066",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "16 squares are initially laid out horizontally and then smoothly reordered into 6 distinct groups along curved paths.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "squares",
+        "arrange",
+        "groups",
+        "MoveToTarget",
+        "path_arc"
+      ],
+      "clip_query": "A row of squares reordering and clustering into six separate groups along curved paths."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Rounded surrounding rectangles with a red-to-yellow gradient appear around each of the 6 groups.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "round_corners",
+        "set_submobject_colors_by_gradient",
+        "LaggedStartMap",
+        "ShowCreation"
+      ],
+      "clip_query": "Colored rounded rectangles appearing around groups of squares."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Integers '1' and plus signs appear above the groups, capped by a brace showing a sum of 6.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        6.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "Integer",
+        "Tex",
+        "Brace",
+        "ones",
+        "plusses",
+        "six"
+      ],
+      "clip_query": "Numbers and plus signs appearing above the groups with a brace on top labeled 6."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The integer '1' above each group transforms into individual fractions (like 1/4, 1/2) corresponding to the group sizes.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "ReplacementTransform",
+        "all_fractions",
+        "fraction_groups",
+        "new_plusses"
+      ],
+      "clip_query": "Integers transforming into fractional terms above the grouped squares."
+    }
+  ]
+}

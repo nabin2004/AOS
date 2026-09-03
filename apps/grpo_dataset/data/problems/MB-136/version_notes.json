@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-136",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Text Mobjects",
+      "gl_construct": "TexText",
+      "ce_equivalent": "Tex",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation Names",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    },
+    {
+      "category": "Rate Functions",
+      "gl_construct": "there_and_back",
+      "ce_equivalent": "there_and_back",
+      "severity": "low"
+    }
+  ]
+}

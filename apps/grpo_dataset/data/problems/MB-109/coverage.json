@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-109",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "M\u00f6bius strip edge identification",
+        "Klein bottle construction via gluing",
+        "Reflection symmetry across a diagonal boundary"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Square and Polygon mobjects representing topological spaces",
+        "Custom arrowheads indicating edge orientation",
+        "Color-coded boundaries (red, pink, yellow)",
+        "Smooth translation and rotation of 2D shapes"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "45-degree rotation for the glue label",
+        "Precise coordinate shifts for alignment (DR, UL, DL, UR)",
+        "Scale adjustments for labels"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "Use of InteractiveScene or standard Scene",
+        "Implementation of custom helper method for arrowheads",
+        "LaggedStart and LaggedStartMap for complex multi-object animations"
+      ]
+    }
+  }
+}

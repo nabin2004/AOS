@@ -1,0 +1,41 @@
+{
+  "problem_id": "MB-066",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Tex",
+        "Integer",
+        "Brace",
+        "1 \\over {n}",
+        "sum of fractions"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "SurroundingRectangle",
+        "gradient",
+        "path_arc",
+        "MoveToTarget",
+        "round_corners"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "16 squares",
+        "6 groups",
+        "group indices [0], [1, 2, 4, 8], [3, 6, 9, 12], [5, 10], [7, 11, 13, 14], [15]"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene or Scene",
+        "LaggedStartMap",
+        "ReplacementTransform"
+      ]
+    }
+  }
+}

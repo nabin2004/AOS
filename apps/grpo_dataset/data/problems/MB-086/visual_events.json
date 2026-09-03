@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-086",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Draw the limited domain graph of f(x) and highlight the 'Limited Domain' interval on the x-axis.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        4.0
+      ],
+      "keyword_bank": [
+        "axes",
+        "partial_graph",
+        "limited_domain_line",
+        "limited_domain_words"
+      ],
+      "clip_query": "A blue graph plotted on a set of axes over a limited domain with a label reading 'Limited Domain' below it."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Animate random extensions of the graph to the left and right, morphing through multiple configurations.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        4.0,
+        10.0
+      ],
+      "keyword_bank": [
+        "get_extension",
+        "extension",
+        "nudge_size",
+        "become"
+      ],
+      "clip_query": "Red curves extending from both ends of a blue graph, morphing and shifting randomly to show non-uniqueness."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "A tangent line slides smoothly along the blue limited domain graph.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        10.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "x_tracker",
+        "tan_line",
+        "get_tangent_line"
+      ],
+      "clip_query": "A white tangent line sliding along a blue curve on a set of mathematical axes."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "The extensions are replaced by a full graph that wiggles dynamically to represent alternative smooth extensions.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        23.0
+      ],
+      "keyword_bank": [
+        "tweaked_func",
+        "full_graph",
+        "modifed_graph",
+        "wiggle"
+      ],
+      "clip_query": "A red graph on axes whose outer ends wiggle up and down while the center remains perfectly still."
+    }
+  ]
+}

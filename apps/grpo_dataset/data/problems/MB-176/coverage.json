@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-176",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Fourier transform formulas",
+        "Sinc function definition",
+        "Rectangular function definition",
+        "Scaling property of Fourier transform"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Side-by-side coordinate axes",
+        "Dynamic graph updates",
+        "Color-coded mathematical terms",
+        "Custom gradient underline"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for parameter k",
+        "Coordinate mapping c2p",
+        "Correct scaling factors for rect function height and width"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "InteractiveScene class structure",
+        "Updaters for dynamic graph rendering",
+        "Grid alignment of mathematical expressions"
+      ]
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "MB-127",
+  "title": "GPT-3 Parameter Scale Visualization with Custom Dials",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL that visualizes neural network parameters (specifically GPT-3 scale numbers) using custom interactive-style dials. \n\nFirst, implement a helper function `value_to_color(value, ...)` that maps a numerical value to a color using HSL interpolation. Positive values should interpolate between a low positive color (dark blue) and a high positive color (light blue), while negative values interpolate between a low negative color (dark red) and a high negative color (light red).\n\nSecond, implement a custom `Dial` class inheriting from `VGroup`. The dial should consist of:\n1. An arc representing the gauge boundary (e.g., spanning 270 degrees, rotated to face upwards).\n2. Tick marks distributed evenly along the arc based on a specified value range (low, high, step).\n3. A needle (a line with varying stroke width from thick to thin) pointing from the center of the dial to the current value on the arc.\n4. A method `set_value(value)` that updates the needle's endpoint and color based on the value.\n5. An animation method `animate_set_value(value)` that returns an `AnimationGroup` containing the needle's transition and a set of concentric passing flash streaks (`VShowPassingFlash`) that sweep along the dial's radius to visually emphasize the value change.\n\nFinally, create a scene named `ShowGPT3Numbers` that instantiates multiple dials, arranges them in a grid or structured layout, labels them with text representing GPT-3 parameters or weights, and animates them changing values dynamically to show how the network's parameters shift.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-127/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "ShowGPT3Numbers"
+    ],
+    "visual_techniques": [
+      "Custom Vector Geometry",
+      "Dynamic Color Interpolation",
+      "Passing Flash Animations",
+      "Dial/Gauge Indicators"
+    ],
+    "manim_api_patterns": [
+      "Arc",
+      "Line",
+      "VGroup",
+      "VShowPassingFlash",
+      "AnimationGroup",
+      "interpolate_color_by_hsl"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect needle rotation math leading to the needle detaching from the dial center",
+      "severity": "high",
+      "note": "The needle must always start at the dial's center and end at the computed arc point."
+    },
+    {
+      "pattern": "Using ManimCE syntax for custom animations (e.g., self.animate.set_value) in a ManimGL context",
+      "severity": "high",
+      "note": "Ensure the custom animation syntax matches the target framework's API for custom properties."
+    },
+    {
+      "pattern": "Missing or misconfigured VShowPassingFlash parameters causing the streak animation to crash",
+      "severity": "medium",
+      "note": "Ensure the arcs created for the passing flash have valid angles and radii."
+    }
+  ]
+}

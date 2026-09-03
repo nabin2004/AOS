@@ -1,0 +1,63 @@
+{
+  "id": "MB-130",
+  "title": "Introduce Embedding Matrix",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "concept-exposition",
+    "direct-visualization"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "ML",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a Manim script that introduces an embedding matrix. Create a custom WeightMatrix class (inheriting from DecimalMatrix or implementing a custom matrix of DecimalNumbers) where each entry is color-coded based on its value: positive values should be colored with shades of blue (darker/lighter depending on magnitude) and negative values with shades of red. Implement a dynamic animation called 'data_modifying_matrix' where multiple small 'Data' text labels fly across the matrix from one side to another (using UpdateFromAlphaFunc and LaggedStart) while the matrix entries simultaneously randomize or update their values to simulate training or weight modification. The matrix should support ellipses in rows and columns to represent high-dimensional embedding spaces.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-130/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "IntroduceEmbeddingMatrix"
+    ],
+    "visual_techniques": [
+      "Color-coded decimal matrix entries",
+      "Flying text particle animation using UpdateFromAlphaFunc",
+      "Dynamic matrix entry randomization",
+      "Ellipses for high-dimensional matrix representation"
+    ],
+    "manim_api_patterns": [
+      "DecimalMatrix",
+      "UpdateFromAlphaFunc",
+      "LaggedStart",
+      "there_and_back",
+      "interpolate_color"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing custom WeightMatrix implementation or failing to color-code entries dynamically",
+      "severity": "high",
+      "note": "The color-coding of positive (blue) and negative (red) values is a core visual requirement of the embedding matrix."
+    },
+    {
+      "pattern": "Incorrect implementation of the flying 'Data' particles",
+      "severity": "medium",
+      "note": "Using standard MoveToTarget instead of a custom UpdateFromAlphaFunc with there_and_back opacity transitions makes the data flow look rigid."
+    }
+  ]
+}

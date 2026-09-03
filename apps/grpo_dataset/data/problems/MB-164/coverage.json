@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-164",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Lorentz force calculation",
+        "Retarded time delay",
+        "Sinusoidal oscillation kinematics"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Charged particle with sign",
+        "Dynamic vector field",
+        "Acceleration vector",
+        "Wave propagation effect"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Euler integration steps",
+        "History buffer size",
+        "Speed of light constant c",
+        "Epsilon0 scaling"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Updaters for dynamic vector updates",
+        "Custom ChargedParticle class",
+        "Custom AccelerationVector class"
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-193",
+  "conflicts": [
+    {
+      "category": "Text rendering",
+      "gl_construct": "OldTex",
+      "ce_equivalent": "MathTex",
+      "severity": "high"
+    },
+    {
+      "category": "Imports",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "high"
+    },
+    {
+      "category": "Color utilities",
+      "gl_construct": "color_gradient",
+      "ce_equivalent": "color_gradient (from manim.utils.color)",
+      "severity": "low"
+    }
+  ]
+}

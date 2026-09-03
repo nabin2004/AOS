@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-123",
+  "conflicts": [
+    {
+      "category": "mobject_compatibility",
+      "gl_construct": "NumericEmbedding",
+      "ce_equivalent": "Matrix or VGroup of DecimalNumbers",
+      "severity": "high"
+    },
+    {
+      "category": "camera_control",
+      "gl_construct": "fix_in_frame() / is_fixed_in_frame",
+      "ce_equivalent": "Standard 2D layout (or self.camera.frame.save_state() / restore() if using ThreeDScene)",
+      "severity": "medium"
+    },
+    {
+      "category": "animation_api",
+      "gl_construct": "ShowIncreasingSubsets",
+      "ce_equivalent": "ShowIncrementalSubsets (or custom sequential FadeIn animations)",
+      "severity": "medium"
+    },
+    {
+      "category": "color_utility",
+      "gl_construct": "interpolate_color_by_hsl",
+      "ce_equivalent": "interpolate_color (RGB-based interpolation in standard Manim)",
+      "severity": "low"
+    }
+  ]
+}

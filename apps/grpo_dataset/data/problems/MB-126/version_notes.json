@@ -1,0 +1,17 @@
+{
+  "problem_id": "MB-126",
+  "conflicts": [
+    {
+      "category": "camera_control",
+      "gl_construct": "self.camera.frame.animate.increment_theta",
+      "ce_equivalent": "self.begin_ambient_camera_rotation(rate=0.1)",
+      "severity": "high"
+    },
+    {
+      "category": "text_rendering",
+      "gl_construct": "Text mobjects automatically oriented in 3D or using frame updaters",
+      "ce_equivalent": "using always_rotate_mobject_to_face_camera or manual updaters",
+      "severity": "medium"
+    }
+  ]
+}

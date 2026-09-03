@@ -1,0 +1,63 @@
+{
+  "id": "MB-108",
+  "title": "Reframing to Pairs of Points (Inscribed Rectangle)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Topology"
+  ],
+  "full_prompt": "Write a ManimGL script using the InteractiveScene class that visualizes the concept of reframing pairs of points on a closed loop. The visualization should: \n1. Draw a non-trivial 2D closed loop (e.g., a distorted circle or custom parametric curve).\n2. Place a pair of movable dots (using custom GlowDot and TrueDot combinations for a high-quality glow effect) on the loop, controlled by a ValueTracker.\n3. Draw a dynamic connecting line between the two dots, along with a highlighted midpoint dot.\n4. Transition the scene into a 3D perspective, rotating the camera to show a 3D coordinate space.\n5. Map the pair of points on the 2D loop to a 3D point where the X and Y coordinates correspond to the midpoint of the chord, and the Z coordinate corresponds to the distance between the two points.\n6. Animate the pair of points moving along the loop while simultaneously tracing out the corresponding point on the 3D surface to show how the 2D loop pairs map to a 3D geometric representation.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-108/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 180,
+    "scene_classes": [
+      "ReframeToPairsOfPoints"
+    ],
+    "visual_techniques": [
+      "3D Camera Rotation",
+      "Dynamic Updaters",
+      "Glow Effects",
+      "Parametric Mapping"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ValueTracker",
+      "GlowDot",
+      "TrueDot",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE's ThreeDScene instead of ManimGL's InteractiveScene when GL-specific features like GlowDot are used",
+      "severity": "high",
+      "note": "The reference code relies heavily on ManimGL's InteractiveScene and custom shader-based dots (GlowDot, TrueDot)."
+    },
+    {
+      "pattern": "Incorrect updater binding for multi-variable ValueTrackers",
+      "severity": "medium",
+      "note": "Tracking multiple parameters (like u, v coordinates) in a single tracker requires careful array handling in updaters."
+    }
+  ]
+}

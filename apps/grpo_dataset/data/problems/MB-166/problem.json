@@ -1,0 +1,63 @@
+{
+  "id": "MB-166",
+  "title": "Linear Polarization as a Superposition of Circular Polarizations",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Create a Manim scene named `LinearAsASuperpositionOfCircular` that visualizes how a linearly polarized wave (or oscillating vector) can be decomposed into two counter-rotating circularly polarized waves (left-handed and right-handed circular components). The visualization should feature:\n1. A central coordinate system or origin.\n2. Two rotating vectors of equal magnitude: one rotating clockwise and the other counter-clockwise.\n3. A third vector representing their vector sum, which oscillates along a straight line (linear polarization).\n4. Traces or paths showing the circular trajectories of the two component vectors and the linear path of the sum vector.\n5. Clear labels for 'Left-handed circular', 'Right-handed circular', and 'Linear superposition' that track or point to the respective vectors.\nThe animation should smoothly transition from showing the individual circular components to showing their combined superposition, demonstrating that the horizontal components cancel out while the vertical components reinforce each other.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-166/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "LinearAsASuperpositionOfCircular"
+    ],
+    "visual_techniques": [
+      "Vector addition",
+      "Rotating vectors",
+      "Traced paths",
+      "Updaters for dynamic vector sum"
+    ],
+    "manim_api_patterns": [
+      "always_redraw",
+      "ValueTracker",
+      "Vector",
+      "TracedPath",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect rotation direction or phase mismatch between the two circular components, preventing perfect linear cancellation.",
+      "severity": "high",
+      "note": "Ensure one vector rotates at +omega and the other at -omega with identical starting phases."
+    },
+    {
+      "pattern": "Lagging or broken traced paths when using ValueTracker.",
+      "severity": "medium",
+      "note": "Use TracedPath or always_redraw to dynamically render the trajectories of the vector tips."
+    }
+  ]
+}

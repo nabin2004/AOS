@@ -1,0 +1,29 @@
+{
+  "problem_id": "MB-114",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "ThreeDScene",
+      "severity": "high"
+    },
+    {
+      "category": "Camera Control",
+      "gl_construct": "self.frame.animate.reorient",
+      "ce_equivalent": "self.set_camera_orientation or self.camera.set_euler_angles",
+      "severity": "high"
+    },
+    {
+      "category": "Updaters",
+      "gl_construct": "mobject.f_always.method / mobject.always.method",
+      "ce_equivalent": "mobject.add_updater(lambda m: m.method())",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Creation",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "medium"
+    }
+  ]
+}

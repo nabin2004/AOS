@@ -1,0 +1,39 @@
+{
+  "problem_id": "MB-150",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Phase shift calculation based on x-coordinate thresholds",
+        "Amplitude damping multiplication across multiple layers",
+        "Sine wave propagation equation incorporating speed and wavelength"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Continuous wave rendering using dynamic point updates",
+        "Vertical lines representing layer boundaries",
+        "Vector field arrows indicating wave amplitude along the x-axis",
+        "Spectral color mapping for the wave or vectors"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "ValueTracker values for phase kick-back",
+        "ValueTracker values for absorption/damping",
+        "Correct sample resolution for smooth wave rendering"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom SlicedWave Group class",
+        "Custom OscillatingWave VMobject class",
+        "Updaters linked to scene time (dt)",
+        "Clean transition animations between multi-layer and single-layer states"
+      ]
+    }
+  }
+}

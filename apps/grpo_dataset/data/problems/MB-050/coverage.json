@@ -1,0 +1,40 @@
+{
+  "problem_id": "MB-050",
+  "requirements": {
+    "Math": {
+      "weight": 0.25,
+      "expected": [
+        "Parametric surface equations for sphere patch",
+        "Inverse square law scaling relations",
+        "Spherical coordinates (theta, phi) mapping"
+      ]
+    },
+    "Visual": {
+      "weight": 0.35,
+      "expected": [
+        "3D camera reorientation and rotation",
+        "GlowDot central light source",
+        "SurfaceMesh wireframe overlay",
+        "Beaming glow effect with opacity tracking",
+        "Parametric curves for grid division"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Sphere radius of 2.0",
+        "Scaling factor of 2.0 for inverse square law demonstration",
+        "Parametric ranges (0 to 9 degrees, 90 to 99 degrees)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.25,
+      "expected": [
+        "InteractiveScene base class",
+        "Custom beaming_effect helper method",
+        "Use of ValueTracker (op_tracker) for animating opacity",
+        "Always sort to camera for 3D transparency rendering"
+      ]
+    }
+  }
+}

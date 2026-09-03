@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-134",
+  "conflicts": [
+    {
+      "category": "framework_migration",
+      "gl_construct": "DecimalMatrix",
+      "ce_equivalent": "Matrix with custom DecimalNumber mobjects",
+      "severity": "high"
+    },
+    {
+      "category": "color_interpolation",
+      "gl_construct": "interpolate_color_by_hsl",
+      "ce_equivalent": "interpolate_color",
+      "severity": "medium"
+    },
+    {
+      "category": "math_utility",
+      "gl_construct": "clip",
+      "ce_equivalent": "np.clip",
+      "severity": "low"
+    }
+  ]
+}

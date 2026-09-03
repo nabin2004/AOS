@@ -1,0 +1,72 @@
+{
+  "problem_id": "MB-083",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Complex plane is rendered at the bottom, and a yellow dot is placed at pi * i. The false equation e^x = e * e * ... * e with a brace and 'Nonsense' label appears at the top.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        8.0
+      ],
+      "keyword_bank": [
+        "ComplexPlane",
+        "GlowDot",
+        "false_eq",
+        "brace",
+        "nonsense"
+      ],
+      "clip_query": "A complex plane with a yellow dot at pi*i and a false equation about e^x being nonsense for complex numbers."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "The false equation transforms into the general Taylor series expansion for e^x.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        8.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "gen_poly",
+        "TransformFromCopy",
+        "FadeOut"
+      ],
+      "clip_query": "The false equation transforms into the infinite Taylor series expansion of e^x."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The terms of the Taylor series are substituted with pi * i, and vectors begin to draw on the complex plane, forming a spiral.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "epii",
+        "vectors",
+        "GrowArrow",
+        "dot.animate.move_to"
+      ],
+      "clip_query": "Vectors are drawn sequentially on a complex plane, forming a spiral that converges to -1."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Labels for each vector term are displayed, and the tracking dot moves to the tip of each added vector.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        35.0,
+        50.0
+      ],
+      "keyword_bank": [
+        "labels",
+        "FadeIn",
+        "FadeTransform"
+      ],
+      "clip_query": "Mathematical labels appear next to the spiral vectors on the complex plane."
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "problem_id": "MB-190",
+  "conflicts": [
+    {
+      "category": "LaTeX Engine",
+      "gl_construct": "OldTex",
+      "ce_equivalent": "Tex",
+      "severity": "high"
+    },
+    {
+      "category": "Color Utilities",
+      "gl_construct": "color_gradient",
+      "ce_equivalent": "color_gradient (requires manual import or different signature in older CE versions)",
+      "severity": "medium"
+    },
+    {
+      "category": "Imports",
+      "gl_construct": "from manim_imports_ext import *",
+      "ce_equivalent": "from manim import *",
+      "severity": "high"
+    }
+  ]
+}

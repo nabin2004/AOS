@@ -1,0 +1,74 @@
+{
+  "problem_id": "MB-122",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Initialization of the matrix, input vector, equals sign, and result vector brackets on screen.",
+      "weight": 0.2,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        5.0
+      ],
+      "keyword_bank": [
+        "matrix",
+        "vector",
+        "eq",
+        "rhs",
+        "FadeIn"
+      ],
+      "clip_query": "A matrix and a vector displayed side-by-side with an equals sign and empty brackets for the result vector."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Step-by-step highlighting of matrix rows and vector elements using yellow surrounding rectangles.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        20.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "row_rects",
+        "vect_rects",
+        "ShowIncreasingSubsets"
+      ],
+      "clip_query": "Yellow rectangular highlights moving sequentially across the rows of a matrix and elements of a vector."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "Dynamic updating of the result vector's decimal values in real-time as the dot product is calculated.",
+      "weight": 0.3,
+      "critical": true,
+      "expected_time_range": [
+        5.0,
+        25.0
+      ],
+      "keyword_bank": [
+        "UpdateFromAlphaFunc",
+        "partial_values",
+        "set_value",
+        "entry"
+      ],
+      "clip_query": "Decimal numbers inside a vector dynamically changing and updating their values."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "Data flying animation where small particles or text elements fly out from the matrix to simulate data flow.",
+      "weight": 0.2,
+      "critical": false,
+      "expected_time_range": [
+        25.0,
+        35.0
+      ],
+      "keyword_bank": [
+        "data_flying_animation",
+        "LaggedStart",
+        "points",
+        "shift_vect"
+      ],
+      "clip_query": "A stream of small particles or text elements flying across the screen from a matrix."
+    }
+  ]
+}

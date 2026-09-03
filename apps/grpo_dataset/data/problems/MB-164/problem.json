@@ -1,0 +1,69 @@
+{
+  "id": "MB-164",
+  "title": "Oscillating Electric Field on Y-Axis (1D Field Visualization)",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    30.0
+  ],
+  "category": [
+    "direct-visualization",
+    "concept-exposition",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Calculus"
+  ],
+  "full_prompt": "Create a ManimGL visualization demonstrating the propagation of an electromagnetic wave from an oscillating charged particle. Implement a custom `ChargedParticle` class that tracks its position and acceleration history to compute retarded time delays. Implement a custom `AccelerationVector` that remains pinned to the particle and dynamically scales with its acceleration. Define a 1D array of field vectors along the X-axis. Calculate the electric field at each point using the Lorentz force formula (taking into account the retarded time delay from the particle's history). Animate the charged particle oscillating sinusoidally along the Y-axis, and show how the transverse electric field wave propagates outward along the X-axis as a result of the acceleration.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-164/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 220,
+    "scene_classes": [
+      "OscillateOnYOneDField"
+    ],
+    "visual_techniques": [
+      "Retarded time physics simulation",
+      "Dynamic vector field updating",
+      "Custom particle history tracking",
+      "Wave propagation visualization"
+    ],
+    "manim_api_patterns": [
+      "TrueDot",
+      "Vector",
+      "add_updater",
+      "Group",
+      "put_start_and_end_on"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Incorrect calculation of retarded time / history lookup leading to NaN positions",
+      "severity": "high",
+      "note": "If the history buffer is not initialized or indexed correctly, the particle position lookup will fail, causing vectors to collapse to the origin."
+    },
+    {
+      "pattern": "Performance bottlenecks due to updating too many vectors per frame",
+      "severity": "medium",
+      "note": "Updating a dense grid of vectors with historical lookups can cause low frame rates. Keep the 1D array of vectors reasonably spaced."
+    },
+    {
+      "pattern": "Vector lengths blowing up near the particle",
+      "severity": "high",
+      "note": "Ensure the adjusted_norms function is used to prevent division by zero or extremely small distances near the particle's center."
+    }
+  ]
+}

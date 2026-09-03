@@ -1,0 +1,42 @@
+{
+  "problem_id": "MB-039",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "math.gamma",
+        "math.pi",
+        "V_n = {2\\pi \\over n} V_{n - 2}",
+        "\\pi^{n/2} \\over (n/2)!"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Axes",
+        "get_graph",
+        "Dot",
+        "DecimalNumber",
+        "BLUE",
+        "YELLOW"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "func(n)",
+        "range(len(formulas))",
+        "x_axis.add_numbers"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "zip(v_lines, dots, expressions)",
+        "self.remove(last_expression)",
+        "self.play",
+        "self.wait"
+      ]
+    }
+  }
+}

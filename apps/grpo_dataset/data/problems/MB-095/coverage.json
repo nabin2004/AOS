@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-095",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Sieve of Eratosthenes logic",
+        "Modulo filtering of composite numbers",
+        "Prime number identification"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "10x10 grid layout",
+        "Red SurroundingRectangles for highlighted elements",
+        "Selective opacity animation to hide composites",
+        "Color transition of prime numbers back to white"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Grid dimensions exactly 10x10",
+        "Numbers ranging from 1 to 100",
+        "Correct identification of primes and composites up to 100"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Iterative loop for sieve steps",
+        "Proper handling of VGroups for grid cells and numbers",
+        "Lagged animation execution for visual sweeping"
+      ]
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "problem_id": "MB-141",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "n choose 2 formula",
+        "7 * (7 - 1) / 2 calculation",
+        "coordinate pairs (i, j)"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Circle with 7 points",
+        "Chords connecting points",
+        "Sequential highlighting of chords",
+        "Grid of pair labels"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.15,
+      "expected": [
+        "Dynamic decimal updating to 21",
+        "Integer values for points"
+      ]
+    },
+    "Structural": {
+      "weight": 0.15,
+      "expected": [
+        "InteractiveScene or Scene structure",
+        "Looping over combinations",
+        "FadeIn/FadeOut transitions"
+      ]
+    }
+  }
+}

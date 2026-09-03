@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-140",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Moser's circle problem sequence calculation",
+        "f(n) function representation",
+        "Correct sequence values up to n=11"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "Sequential fade-in of sequence terms",
+        "Brace transformations with text labels",
+        "SurroundingRectangle highlighting terms sequentially"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "Sequence values: 1, 2, 4, 8, 16, 31, 57, 99, 163, 256, 386"
+      ]
+    },
+    "Structural": {
+      "weight": 0.3,
+      "expected": [
+        "InteractiveScene or Scene structure",
+        "Looping over sequence terms for highlighting",
+        "Smooth transitions between braces and text labels"
+      ]
+    }
+  }
+}

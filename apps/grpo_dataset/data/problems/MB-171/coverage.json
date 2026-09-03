@@ -1,0 +1,36 @@
+{
+  "problem_id": "MB-171",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Wave equation with phase shift and damping",
+        "Vectorized numpy operations for spatial coordinates",
+        "Cumulative phase and amplitude calculations across boundaries"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "Smoothly propagating wave using custom updaters",
+        "Distinct vertical boundary lines",
+        "Clear visual representation of phase shift and amplitude decay"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.1,
+      "expected": [
+        "ValueTracker values for phase shift and absorption",
+        "Wave parameters like wavelength, speed, and amplitude"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Custom SlicedWave class inheriting from Group",
+        "Custom OscillatingWave class inheriting from VMobject",
+        "Proper integration of updaters and trackers"
+      ]
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "MB-110",
+  "title": "Inscribed Rectangle Conjecture - State the Puzzle",
+  "youtube_video_id": "AmgkSdhK4K8",
+  "video_timestamp_range": [
+    0.0,
+    180.0
+  ],
+  "category": [
+    "geometric-derivation",
+    "concept-exposition"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Geometry",
+    "Topology"
+  ],
+  "full_prompt": "Write a Manim script using ManimGL (or standard Manim CE with appropriate adaptations) that visualizes the 'Inscribed Rectangle Problem' (Toeplitz's conjecture). The scene should define a smooth, closed loop (either loaded from an SVG or defined parametrically) and place four distinct, colored dots on it. Connect these dots with dynamic lines to form an inscribed quadrilateral. Implement a numerical solver (like the `find_rectangle` function in the reference) that searches the parameter space of the loop to find four points that form a perfect rectangle (where the diagonals are equal in length, share the same midpoint, and are perpendicular/at a target angle). Animate the dots moving smoothly along the loop from an arbitrary initial configuration to the solved rectangular configuration, highlighting the final rectangle with a distinct color or glow effect.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-110/reference.py",
+  "reference_code_analysis": {
+    "framework": "manimgl",
+    "total_lines": 150,
+    "scene_classes": [
+      "StateThePuzzle"
+    ],
+    "visual_techniques": [
+      "Parametric curve tracking",
+      "Dynamic geometry updaters",
+      "Glow effects for vertices",
+      "Numerical optimization for geometric constraints"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "ValueTracker",
+      "SVGMobject",
+      "GlowDot",
+      "TrueDot",
+      "add_updater"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.7,
+    "min_coverage": 0.5,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Missing SVG file 'example_loop1' causing runtime crash",
+      "severity": "high",
+      "note": "If the SVG is missing, the code should fallback to a parametric curve (like a deformed ellipse) to ensure executability."
+    },
+    {
+      "pattern": "Infinite loop or slow performance in find_rectangle optimization",
+      "severity": "medium",
+      "note": "Keep the number of refinements and samples low to avoid freezing the animation generation."
+    },
+    {
+      "pattern": "Updater functions referencing stale ValueTracker states",
+      "severity": "medium",
+      "note": "Ensure updaters correctly read the current value of the tracker on every frame."
+    }
+  ]
+}

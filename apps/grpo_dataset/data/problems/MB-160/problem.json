@@ -1,0 +1,71 @@
+{
+  "id": "MB-160",
+  "title": "Prism Light Dispersion and 3D Transition",
+  "youtube_video_id": "",
+  "video_timestamp_range": [
+    0.0,
+    60.0
+  ],
+  "category": [
+    "direct-visualization",
+    "geometric-derivation"
+  ],
+  "difficulty_level": 4,
+  "domain": [
+    "Physics",
+    "Computer Science"
+  ],
+  "full_prompt": "Write a complete ManimGL script that visualizes light refraction and dispersion through a triangular prism. The scene should transition from a 2D schematic to a 3D perspective. \n\nKey requirements:\n1. Create a flat 2D triangular prism using a `Triangle` mobject. \n2. Implement a custom ray-tracing function `get_beams` that calculates the refraction of light entering and exiting the prism based on Snell's Law. The function should support generating multiple beams (e.g., 200) with a range of refractive indices to simulate chromatic dispersion (spectral colors).\n3. Animate an incoming white light beam hitting the prism, which then splits into a beautiful spectrum of refracted beams inside and outside the prism.\n4. Briefly overlay a thick, magenta 'x-ray' beam to highlight a specific path, then fade it out.\n5. Transition the scene into 3D: fade out the flat triangle, fade in a 3D extruded prism (using `Prismify` or a custom 3D mesh), and animate the camera (`self.frame`) to a 3D perspective angle while keeping the dynamic light beams active.\n6. Animate the incoming beam's position shifting up and down, demonstrating how the refracted spectrum dynamically updates in real-time using `always_redraw`.\n7. Finally, return the camera and prism back to the original 2D flat state.",
+  "raw_code_status": "collected",
+  "raw_code_path": "data/problems/MB-160/reference.py",
+  "reference_code_analysis": {
+    "framework": "ManimGL",
+    "total_lines": 145,
+    "scene_classes": [
+      "Prism"
+    ],
+    "visual_techniques": [
+      "Snell's Law ray tracing",
+      "Chromatic dispersion visualization",
+      "2D to 3D camera transition",
+      "Dynamic updater-based redrawing",
+      "Spectral color mapping"
+    ],
+    "manim_api_patterns": [
+      "InteractiveScene",
+      "always_redraw",
+      "Prismify",
+      "self.frame.reorient",
+      "turn_animation_into_updater",
+      "pfp",
+      "put_start_and_end_on"
+    ]
+  },
+  "required_visual_events_path": "visual_events.json",
+  "coverage_requirements_path": "coverage.json",
+  "version_conflict_notes_path": "version_notes.json",
+  "reference_embeddings_path": "ref_embeddings.npy",
+  "success_criteria": {
+    "min_executability": 1.0,
+    "min_alignment": 0.8,
+    "min_coverage": 0.7,
+    "max_vcer": 0.0
+  },
+  "common_failure_modes": [
+    {
+      "pattern": "Using ManimCE camera API instead of ManimGL's self.frame",
+      "severity": "high",
+      "note": "The scene relies heavily on self.frame.reorient and turn_animation_into_updater which are specific to ManimGL."
+    },
+    {
+      "pattern": "Missing Prismify class or equivalent 3D extrusion",
+      "severity": "high",
+      "note": "Prismify is a ManimGL-specific 3D mobject generator. In ManimCE, a custom 3D mesh or extrusion must be constructed manually."
+    },
+    {
+      "pattern": "Incorrect vector math for refraction",
+      "severity": "medium",
+      "note": "The Snell's law calculation requires precise vector rotations and intersection finding with the prism's exit edge."
+    }
+  ]
+}

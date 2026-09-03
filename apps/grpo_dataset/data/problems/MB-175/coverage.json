@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-175",
+  "requirements": {
+    "Math": {
+      "weight": 0.2,
+      "expected": [
+        "Coordinate mapping from data space to axes space",
+        "Grid binning algorithm for density calculation",
+        "Depth sorting calculation relative to camera location"
+      ]
+    },
+    "Visual": {
+      "weight": 0.4,
+      "expected": [
+        "3D perspective camera reorientation",
+        "Basketball court image texture mapping",
+        "DotCloud rendering with low opacity",
+        "3D VCube bars representing density"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "Grid resolution dimensions (e.g., 50x94)",
+        "Year range loop from 1997 to 2022",
+        "Axes coordinate ranges (-250 to 250, -50 to 900)"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Inheritance from InteractiveScene and ThreeDScene",
+        "Data loading loop with FileNotFoundError handling",
+        "Dynamic updating of the year label fixed in frame"
+      ]
+    }
+  }
+}

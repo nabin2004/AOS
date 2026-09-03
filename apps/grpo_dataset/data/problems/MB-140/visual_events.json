@@ -1,0 +1,73 @@
+{
+  "problem_id": "MB-140",
+  "events": [
+    {
+      "event_id": "ev_01",
+      "description": "Sequential fade-in of the Moser sequence terms (1, 2, 4, 8, 16, 31, 57, 99, 163, 256, 386...) at the top of the frame.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        0.0,
+        6.0
+      ],
+      "keyword_bank": [
+        "values",
+        "expression",
+        "FadeIn",
+        "parts"
+      ],
+      "clip_query": "The sequence of numbers 1, 2, 4, 8, 16, 31, 57, 99, 163, 256, 386 fades in sequentially at the top of the screen."
+    },
+    {
+      "event_id": "ev_02",
+      "description": "Brace animations highlighting different parts of the sequence with corresponding text questions.",
+      "weight": 0.35,
+      "critical": true,
+      "expected_time_range": [
+        6.0,
+        12.0
+      ],
+      "keyword_bank": [
+        "Brace",
+        "ReplacementTransform",
+        "FadeTransform",
+        "coincidence",
+        "what"
+      ],
+      "clip_query": "A brace appears under the sequence asking 'What is this pattern?', then shifts to highlight '1,2,4,8,16' with 'Coincidence?', and finally highlights '256' with 'And what's with this?'."
+    },
+    {
+      "event_id": "ev_03",
+      "description": "The formula f(n) = ??? is written below the sequence.",
+      "weight": 0.15,
+      "critical": false,
+      "expected_time_range": [
+        12.0,
+        15.0
+      ],
+      "keyword_bank": [
+        "fn",
+        "Write",
+        "Tex"
+      ],
+      "clip_query": "The text f(n) = ??? is written in the center of the screen below the sequence."
+    },
+    {
+      "event_id": "ev_04",
+      "description": "A yellow surrounding rectangle and label f(n) sequentially highlight each term in the sequence.",
+      "weight": 0.25,
+      "critical": true,
+      "expected_time_range": [
+        15.0,
+        22.0
+      ],
+      "keyword_bank": [
+        "SurroundingRectangle",
+        "term",
+        "last_rect",
+        "last_term"
+      ],
+      "clip_query": "A yellow box and label f(1), f(2), etc., move from left to right, highlighting each term of the sequence one by one."
+    }
+  ]
+}

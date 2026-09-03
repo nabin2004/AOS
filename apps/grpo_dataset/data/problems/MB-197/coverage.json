@@ -1,0 +1,38 @@
+{
+  "problem_id": "MB-197",
+  "requirements": {
+    "Math": {
+      "weight": 0.3,
+      "expected": [
+        "Parametric equations of sphere slices",
+        "Varying width as a function of phi",
+        "Spherical coordinates integration concept"
+      ]
+    },
+    "Visual": {
+      "weight": 0.3,
+      "expected": [
+        "3D camera rotation",
+        "ParametricSurface rendering",
+        "Dynamic red width line",
+        "Opacity fading of non-isolated slices"
+      ]
+    },
+    "Numeric": {
+      "weight": 0.2,
+      "expected": [
+        "ValueTracker for phi angle",
+        "Resolution parameters for parametric surfaces",
+        "Radius and slice count parameters"
+      ]
+    },
+    "Structural": {
+      "weight": 0.2,
+      "expected": [
+        "Scene class structure",
+        "Helper functions for generating slices",
+        "Updaters for dynamic label positioning"
+      ]
+    }
+  }
+}

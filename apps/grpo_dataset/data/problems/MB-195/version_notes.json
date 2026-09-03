@@ -1,0 +1,35 @@
+{
+  "problem_id": "MB-195",
+  "conflicts": [
+    {
+      "category": "Scene Class",
+      "gl_construct": "InteractiveScene",
+      "ce_equivalent": "Scene",
+      "severity": "high"
+    },
+    {
+      "category": "Text Mobjects",
+      "gl_construct": "OldTex / OldTexText",
+      "ce_equivalent": "Tex / Tex",
+      "severity": "medium"
+    },
+    {
+      "category": "Animation Names",
+      "gl_construct": "ShowCreation",
+      "ce_equivalent": "Create",
+      "severity": "high"
+    },
+    {
+      "category": "Mobject Methods",
+      "gl_construct": "space_out_submobjects",
+      "ce_equivalent": "scale (with custom center or manual positioning)",
+      "severity": "medium"
+    },
+    {
+      "category": "Special Mobjects",
+      "gl_construct": "GlowDot",
+      "ce_equivalent": "Dot (with custom glow/halo effect using multiple overlapping dots)",
+      "severity": "medium"
+    }
+  ]
+}
