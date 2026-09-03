@@ -238,24 +238,29 @@ def main() -> int:
         except Exception as e:
             print(f"Notice: Using raw adapter identifier '{sft_lora}' ({e})")
 
-    # 6. Execute GRPO Training
+    # 6. Execute GRPO Training with Safety Backup
     output_path = Path(args.output_dir)
-    run_grpo_training(
-        base_model=args.base_model,
-        sft_lora=sft_lora,
-        output_dir=output_path,
-        dataset_repo=args.dataset_repo,
-        dual_gpu=dual_gpu,
-        smoke=args.smoke,
-        max_steps=args.max_steps,
-        render=args.render,
-        report_to=args.report_to,
-        run_name=args.run_name,
-    )
-
-    # 7. Push to Hugging Face Hub if requested
-    if args.push_to_hub and output_path.exists():
-        push_adapter_to_hub(output_path, repo_id=args.hub_repo)
+    try:
+        run_grpo_training(
+            base_model=args.base_model,
+            sft_lora=sft_lora,
+            output_dir=output_path,
+            dataset_repo=args.dataset_repo,
+            dual_gpu=dual_gpu,
+            smoke=args.smoke,
+            max_steps=args.max_steps,
+            render=args.render,
+            report_to=args.report_to,
+            run_name=args.run_name,
+        )
+    except KeyboardInterrupt:
+        print("\n⚠️ Training interrupted. Executing safety checkpoint upload to Hub...")
+    except Exception as exc:
+        print(f"\n⚠️ Training encountered an issue ({exc}). Executing safety checkpoint upload to Hub...")
+    finally:
+        # 7. Push to Hugging Face Hub if requested
+        if args.push_to_hub and output_path.exists():
+            push_adapter_to_hub(output_path, repo_id=args.hub_repo)
 
     print("\n🎉 GRPO Pipeline execution completed successfully!")
     return 0

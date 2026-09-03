@@ -110,6 +110,7 @@ def make_training_args(
         logging_steps=10,
         save_strategy="steps",
         save_steps=100,
+        save_total_limit=2,
     )
     if config.max_steps is not None:
         kwargs["max_steps"] = config.max_steps
