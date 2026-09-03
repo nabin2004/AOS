@@ -92,18 +92,29 @@ def setup_environment(force_reinstall_torch: bool = False) -> None:
     """Install requirements in Kaggle system Python without unnecessary torch reinstallation."""
     python_exe = sys.executable
 
-    if force_reinstall_torch or not is_cuda_working():
-        print("\n==> Installing PyTorch with CUDA support (cu118 for Pascal P100)...")
+    major = 99
+    try:
+        import torch
+        if torch.cuda.is_available():
+            major, _ = torch.cuda.get_device_capability(0)
+    except Exception:
+        pass
+
+    if force_reinstall_torch or major < 7 or not is_cuda_working():
+        print("\n==> Pinning system torch 2.7.1+cu118 for Kaggle P100 (sm_60)...")
+        subprocess.run(
+            [python_exe, "-m", "pip", "uninstall", "-y", "torch", "torchvision", "torchaudio"],
+            check=False,
+        )
         subprocess.run(
             [
                 python_exe,
                 "-m",
                 "pip",
                 "install",
-                "--upgrade",
-                "torch>=2.4.0",
-                "torchvision",
-                "torchaudio",
+                "torch==2.7.1",
+                "torchvision==0.22.1",
+                "torchaudio==2.7.1",
                 "--index-url",
                 "https://download.pytorch.org/whl/cu118",
             ],
@@ -148,6 +159,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--skip-sft", action="store_true", help="Skip Continued SFT stage")
     parser.add_argument("--skip-dpo", action="store_true", help="Skip DPO stage")
     parser.add_argument("--no-push", action="store_true", help="Do not push models to Hugging Face Hub")
+    parser.add_argument("--force-reinstall-torch", action="store_true", help="Force reinstall PyTorch cu118")
     return parser
 
 
@@ -164,7 +176,7 @@ def main() -> int:
 
     setup_kaggle_secrets()
     check_gpu_compatibility()
-    setup_environment()
+    setup_environment(force_reinstall_torch=args.force_reinstall_torch)
 
     # Step 1: Prepare datasets
     print("\n[Step 1/3] Preparing Aligned SFT & DPO Datasets...")
