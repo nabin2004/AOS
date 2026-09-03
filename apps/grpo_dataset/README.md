@@ -26,12 +26,14 @@ manibench-grpo/
 │   ├── alignment.py
 │   ├── clip_reward.py
 │   ├── coverage.py
+│   ├── narration.py
 │   └── aggregate.py
 ├── scripts/
 │   ├── render_sandbox.py
 │   ├── extract_and_embed_frames.py
 │   ├── build_dataset.py
-│   └── validate_dataset.py
+│   ├── validate_dataset.py
+│   └── test_narration_reward.py
 ├── configs/
 │   └── reward_weights.yaml
 └── rollouts/
@@ -183,6 +185,22 @@ def clip_alignment_score(rendered_video_path, visual_events, fps_sample=2):
 ```
 
 Combine this with `alignment.py`'s keyword-based score (e.g. `0.5 * keyword_align + 0.5 * clip_align`) in `aggregate.py` so a bad keyword match can still get partial credit from CLIP, and vice versa — that blended score is what goes into the GRPO reward alongside `executability` and `vcer` as hard gates (zero out reward if executability fails, regardless of alignment).
+
+---
+
+## Narration Reward (`reward_model/narration.py`)
+
+For multi-modal tasks using **Manim Voiceover**, code generations are also scored for proper voiceover and synchronization structure:
+- **`VoiceoverScene` Inheritance (0.25)**: Ensures the class derives from `VoiceoverScene`.
+- **Speech Service Setup (0.20)**: Checks for `self.set_speech_service(...)`.
+- **Voiceover Blocks (0.25)**: Evaluates use of `with self.voiceover(...)` blocks.
+- **SSML Bookmarks (0.15)**: Checks for precise narration timestamps via `<bookmark mark="..." />`.
+- **Bookmark Synchronization (0.15)**: Evaluates synchronization with `self.wait_until_bookmark(...)`.
+
+Run validation:
+```bash
+python scripts/test_narration_reward.py
+```
 
 ---
 

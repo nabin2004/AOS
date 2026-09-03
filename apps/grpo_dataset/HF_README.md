@@ -83,6 +83,14 @@ Topics include cross-entropy, print gallery / conformal maps, spheres, cosmic di
 
 `reference.py` keeps ManimGL APIs (`ShowCreation`, `Tex`, `self.frame.reorient`, …).
 
+## Narration and Multi-Modal Reward Integration
+
+The reward pipeline includes a specialized **Narration Scoring** component (`reward_model/narration.py`) designed for Manim Voiceover GRPO fine-tuning. It provides dense rewards for:
+- `VoiceoverScene` structure and lifecycle methods
+- Speech service binding via `self.set_speech_service(...)`
+- Multi-beat `self.voiceover(...)` blocks
+- SSML bookmarks (`<bookmark mark="..." />`) and synchronization points (`self.wait_until_bookmark(...)`)
+
 ## License and attribution
 
 Reference excerpts are derived from **[3b1b/videos](https://github.com/3b1b/videos)** © Grant Sanderson / 3Blue1Brown, licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). This dataset inherits those terms: attribution required, **non-commercial** use only, share-alike.

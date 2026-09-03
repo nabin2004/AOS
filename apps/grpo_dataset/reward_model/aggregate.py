@@ -10,6 +10,7 @@ class AggregateInputs:
     alignment_clip: float
     coverage: float
     vcer_penalty: float
+    narration: float = 0.0
 
 
 @dataclass
@@ -19,6 +20,7 @@ class AggregateWeights:
     alignment_clip: float
     coverage: float
     vcer_penalty: float
+    narration: float = 0.0
 
 
 @dataclass
@@ -37,6 +39,7 @@ def aggregate_reward(inputs: AggregateInputs, weights: AggregateWeights) -> Aggr
                 "alignment_clip": inputs.alignment_clip,
                 "coverage": inputs.coverage,
                 "vcer_penalty": inputs.vcer_penalty,
+                "narration": inputs.narration,
                 "final_reward": 0.0,
             },
         )
@@ -45,7 +48,12 @@ def aggregate_reward(inputs: AggregateInputs, weights: AggregateWeights) -> Aggr
         weights.alignment_keyword * inputs.alignment_keyword
         + weights.alignment_clip * inputs.alignment_clip
     )
-    reward = alignment + (weights.coverage * inputs.coverage) - (weights.vcer_penalty * inputs.vcer_penalty)
+    reward = (
+        alignment
+        + (weights.coverage * inputs.coverage)
+        + (weights.narration * inputs.narration)
+        - (weights.vcer_penalty * inputs.vcer_penalty)
+    )
     reward = max(0.0, min(1.0, reward))
 
     return AggregateResult(
@@ -54,6 +62,7 @@ def aggregate_reward(inputs: AggregateInputs, weights: AggregateWeights) -> Aggr
             "executability": inputs.executability,
             "alignment": alignment,
             "coverage": inputs.coverage,
+            "narration": inputs.narration,
             "vcer_penalty": inputs.vcer_penalty,
             "final_reward": reward,
         },
