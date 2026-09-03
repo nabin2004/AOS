@@ -84,11 +84,12 @@ class MyNarratedScene(VoiceoverScene):
 
 ## One-Click Super Simple Kaggle Notebook Code
 
-> [!IMPORTANT]
-> **Accelerator Requirement**: In Kaggle Notebook Settings (right sidebar), select **GPU T4 x2** (Turing `sm_75`).
-> Pascal P100 (`sm_60`) lacks the Tensor Core instructions required by modern `bitsandbytes` 4-bit NF4 QLoRA and will fail with `Error named symbol not found at line 74 in file /src/csrc/ops.cu`.
+> [!TIP]
+> **Dual Hardware Support (P100 & T4 x2)**:
+> - **GPU T4 x2 (Recommended)**: Automatically uses **4-bit NF4 QLoRA** (`sm_75` Tensor Cores, ultra-fast training).
+> - **GPU P100**: Automatically auto-detects Pascal (`sm_60`) and switches to **8-bit QLoRA** with float32 trainable weights (~9 GB VRAM, fully supported on P100 16 GB).
 
-In a Kaggle Notebook code cell with **GPU T4 x2** and **Internet ON**:
+In a Kaggle Notebook code cell with **GPU T4 x2 (or GPU P100)** and **Internet ON**:
 
 ```python
 # Cell 1: Setup Secrets

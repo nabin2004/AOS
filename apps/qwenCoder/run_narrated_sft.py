@@ -30,9 +30,8 @@ from transformers import (
     AutoTokenizer,
     BitsAndBytesConfig,
     PreTrainedTokenizerBase,
-    TrainingArguments,
 )
-from trl import SFTTrainer
+from trl import SFTConfig, SFTTrainer
 
 try:
     from huggingface_hub import HfApi, get_token
@@ -72,32 +71,43 @@ def load_policy_model(
     base_model_id: str,
     init_adapter: str | None = None,
     use_4bit: bool = True,
+    use_8bit: bool = False,
     lora_r: int = 32,
     lora_alpha: int = 64,
 ) -> Any:
-    """Load base model in QLoRA 4-bit and attach initial LoRA adapter (or create new)."""
+    """Load base model in QLoRA 4-bit or 8-bit and attach initial LoRA adapter (or create new)."""
     token = _resolve_hf_token()
     compute_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
 
+    # Auto-detect Pascal P100 (sm_60) or GPUs without Tensor Cores for 4-bit
+    if torch.cuda.is_available():
+        major, minor = torch.cuda.get_device_capability(0)
+        if major < 7 and use_4bit and not use_8bit:
+            device_name = torch.cuda.get_device_name(0)
+            print(
+                f"✔ Pascal GPU detected ({device_name}, sm_{major}{minor}). "
+                f"Auto-switching from 4-bit to 8-bit QLoRA for native sm_60 DP4A compatibility."
+            )
+            use_4bit = False
+            use_8bit = True
+
     bnb_config = None
     if use_4bit:
-        if torch.cuda.is_available():
-            major, minor = torch.cuda.get_device_capability(0)
-            if major < 7:
-                device_name = torch.cuda.get_device_name(0)
-                raise RuntimeError(
-                    f"\n❌ Incompatible GPU accelerator for 4-bit QLoRA: {device_name} (compute capability {major}.{minor}).\n"
-                    f"   Precompiled 'bitsandbytes' 4-bit NF4 kernels require Tensor Cores with compute capability >= 7.0 (sm_70+).\n"
-                    f"   On Kaggle, please switch Accelerator from 'GPU P100' to 'GPU T4 x2' in Notebook Settings."
-                )
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",
             bnb_4bit_compute_dtype=compute_dtype,
             bnb_4bit_use_double_quant=True,
         )
+    elif use_8bit:
+        bnb_config = BitsAndBytesConfig(
+            load_in_8bit=True,
+        )
 
-    print(f"Loading base model: {base_model_id} (compute_dtype: {compute_dtype})")
+    print(
+        f"Loading base model: {base_model_id} (compute_dtype: {compute_dtype}, "
+        f"4bit={use_4bit}, 8bit={use_8bit})"
+    )
     model = AutoModelForCausalLM.from_pretrained(
         base_model_id,
         quantization_config=bnb_config,
@@ -214,6 +224,17 @@ Fine-tuned LoRA adapter on **400 Narrated Manim Trajectories** using `manim-voic
     print(f"Successfully pushed adapter to: https://huggingface.co/{repo_id}")
 
 
+def _cast_trainable_fp32(model) -> None:
+    """Ensure trainable parameters are float32 for PyTorch AMP GradScaler on Pascal/Turing GPUs."""
+    n = 0
+    for param in model.parameters():
+        if param.requires_grad and param.dtype != torch.float32:
+            param.data = param.data.to(torch.float32)
+            n += 1
+    if n:
+        print(f"Cast {n} trainable adapter tensors to float32 for GradScaler")
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Continued SFT fine-tuning on 400 narrated Manim trajectories")
     parser.add_argument("--base-model", default=DEFAULT_BASE_MODEL, help=f"Base model ID (default: {DEFAULT_BASE_MODEL})")
@@ -226,6 +247,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--seq-len", type=int, default=2048, help="Sequence length (default: 2048)")
     parser.add_argument("--batch-size", type=int, default=1, help="Per-device batch size (default: 1)")
     parser.add_argument("--grad-accum", type=int, default=4, help="Gradient accumulation steps (default: 4)")
+    parser.add_argument("--use-8bit", action="store_true", help="Use 8-bit quantization (recommended for Pascal P100 sm_60)")
+    parser.add_argument("--no-4bit", action="store_true", help="Disable 4-bit quantization")
     parser.add_argument("--push-to-hub", action="store_true", help="Push trained adapter to Hugging Face Hub")
     parser.add_argument("--smoke", action="store_true", help="Smoke test (1 step, small dataset)")
     return parser
@@ -251,37 +274,47 @@ def main() -> int:
     print("=================================================================")
 
     tokenizer = load_tokenizer(args.base_model)
-    model = load_policy_model(args.base_model, init_adapter=args.init_adapter)
+    use_4bit = not args.no_4bit and not args.use_8bit
+    model = load_policy_model(
+        args.base_model,
+        init_adapter=args.init_adapter,
+        use_4bit=use_4bit,
+        use_8bit=args.use_8bit,
+    )
 
     train_dataset = prepare_chat_dataset(data_path, tokenizer)
     if args.smoke:
         train_dataset = train_dataset.select(range(min(4, len(train_dataset))))
         args.epochs = 1
 
-    training_args = TrainingArguments(
+    sft_config = SFTConfig(
         output_dir=str(output_dir),
         num_train_epochs=args.epochs,
         per_device_train_batch_size=args.batch_size,
         gradient_accumulation_steps=args.grad_accum,
+        gradient_checkpointing=True,
+        gradient_checkpointing_kwargs={"use_reentrant": False},
         learning_rate=args.lr,
         lr_scheduler_type="cosine",
-        warmup_ratio=0.05,
+        warmup_steps=10,
         logging_steps=10,
         save_strategy="epoch",
         optim="paged_adamw_8bit",
         fp16=not torch.cuda.is_bf16_supported(),
         bf16=torch.cuda.is_bf16_supported(),
         report_to="none",
+        max_length=args.seq_len,
+        dataset_text_field="text",
     )
 
     trainer = SFTTrainer(
         model=model,
         train_dataset=train_dataset,
-        dataset_text_field="text",
-        max_seq_length=args.seq_len,
-        tokenizer=tokenizer,
-        args=training_args,
+        processing_class=tokenizer,
+        args=sft_config,
     )
+
+    _cast_trainable_fp32(trainer.model)
 
     print("\nStarting training loop...")
     trainer.train()

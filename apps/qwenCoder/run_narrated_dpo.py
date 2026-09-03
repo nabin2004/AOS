@@ -70,32 +70,43 @@ def load_dpo_model(
     base_model_id: str,
     sft_adapter: str | None = None,
     use_4bit: bool = True,
+    use_8bit: bool = False,
     lora_r: int = 32,
     lora_alpha: int = 64,
 ) -> tuple[Any, LoraConfig | None]:
-    """Load base model in QLoRA 4-bit and attach SFT adapter or create fresh LoRA."""
+    """Load base model in QLoRA 4-bit or 8-bit and attach SFT adapter or create fresh LoRA."""
     token = _resolve_hf_token()
     compute_dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
 
+    # Auto-detect Pascal P100 (sm_60) or GPUs without Tensor Cores for 4-bit
+    if torch.cuda.is_available():
+        major, minor = torch.cuda.get_device_capability(0)
+        if major < 7 and use_4bit and not use_8bit:
+            device_name = torch.cuda.get_device_name(0)
+            print(
+                f"✔ Pascal GPU detected ({device_name}, sm_{major}{minor}). "
+                f"Auto-switching from 4-bit to 8-bit for native sm_60 DP4A compatibility."
+            )
+            use_4bit = False
+            use_8bit = True
+
     bnb_config = None
     if use_4bit:
-        if torch.cuda.is_available():
-            major, minor = torch.cuda.get_device_capability(0)
-            if major < 7:
-                device_name = torch.cuda.get_device_name(0)
-                raise RuntimeError(
-                    f"\n❌ Incompatible GPU accelerator for 4-bit QLoRA: {device_name} (compute capability {major}.{minor}).\n"
-                    f"   Precompiled 'bitsandbytes' 4-bit NF4 kernels require Tensor Cores with compute capability >= 7.0 (sm_70+).\n"
-                    f"   On Kaggle, please switch Accelerator from 'GPU P100' to 'GPU T4 x2' in Notebook Settings."
-                )
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",
             bnb_4bit_compute_dtype=compute_dtype,
             bnb_4bit_use_double_quant=True,
         )
+    elif use_8bit:
+        bnb_config = BitsAndBytesConfig(
+            load_in_8bit=True,
+        )
 
-    print(f"Loading DPO policy model: {base_model_id} (compute_dtype: {compute_dtype})")
+    print(
+        f"Loading DPO policy model: {base_model_id} (compute_dtype: {compute_dtype}, "
+        f"4bit={use_4bit}, 8bit={use_8bit})"
+    )
     model = AutoModelForCausalLM.from_pretrained(
         base_model_id,
         quantization_config=bnb_config,
@@ -201,6 +212,17 @@ Aligns the model to strongly prefer generating synchronized **`manim-voiceover`*
     print(f"Successfully pushed DPO adapter to: https://huggingface.co/{repo_id}")
 
 
+def _cast_trainable_fp32(model) -> None:
+    """Ensure trainable parameters are float32 for PyTorch AMP GradScaler on Pascal/Turing GPUs."""
+    n = 0
+    for param in model.parameters():
+        if param.requires_grad and param.dtype != torch.float32:
+            param.data = param.data.to(torch.float32)
+            n += 1
+    if n:
+        print(f"Cast {n} trainable adapter tensors to float32 for GradScaler")
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Direct Preference Optimization (DPO) for Manim Voiceover generation")
     parser.add_argument("--base-model", default=DEFAULT_BASE_MODEL, help=f"Base model ID (default: {DEFAULT_BASE_MODEL})")
@@ -215,6 +237,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--grad-accum", type=int, default=4, help="Gradient accumulation steps (default: 4)")
     parser.add_argument("--max-length", type=int, default=2048, help="Max total sequence length (default: 2048)")
     parser.add_argument("--max-prompt-length", type=int, default=512, help="Max prompt length (default: 512)")
+    parser.add_argument("--use-8bit", action="store_true", help="Use 8-bit quantization (recommended for Pascal P100 sm_60)")
+    parser.add_argument("--no-4bit", action="store_true", help="Disable 4-bit quantization")
     parser.add_argument("--push-to-hub", action="store_true", help="Push DPO adapter to Hugging Face")
     parser.add_argument("--smoke", action="store_true", help="Smoke test (1 step, small dataset)")
     return parser
@@ -242,7 +266,13 @@ def main() -> int:
     print("=================================================================")
 
     tokenizer = load_tokenizer(args.base_model)
-    model, peft_config = load_dpo_model(args.base_model, sft_adapter=args.sft_adapter)
+    use_4bit = not args.no_4bit and not args.use_8bit
+    model, peft_config = load_dpo_model(
+        args.base_model,
+        sft_adapter=args.sft_adapter,
+        use_4bit=use_4bit,
+        use_8bit=args.use_8bit,
+    )
 
     train_dataset = load_dataset("json", data_files=str(data_path), split="train")
     if args.smoke:
@@ -254,9 +284,11 @@ def main() -> int:
         num_train_epochs=args.epochs,
         per_device_train_batch_size=args.batch_size,
         gradient_accumulation_steps=args.grad_accum,
+        gradient_checkpointing=True,
+        gradient_checkpointing_kwargs={"use_reentrant": False},
         learning_rate=args.lr,
         lr_scheduler_type="cosine",
-        warmup_ratio=0.05,
+        warmup_steps=10,
         logging_steps=5,
         save_strategy="epoch",
         beta=args.beta,
@@ -277,6 +309,8 @@ def main() -> int:
         train_dataset=train_dataset,
         processing_class=tokenizer,
     )
+
+    _cast_trainable_fp32(trainer.model)
 
     print("\nStarting DPO training loop...")
     trainer.train()
