@@ -145,3 +145,31 @@ def test_prompt_requires_voiceover_and_numerical_ode_rules():
     assert "self.voiceover" in CODE_GENERATOR_INSTRUCTIONS
     assert "numerical integration" in CODE_GENERATOR_INSTRUCTIONS
     assert "Background(...)" in CODE_GENERATOR_INSTRUCTIONS
+
+
+def test_bookmark_validation_detects_undefined_bookmarks():
+    code = """\
+from manim import *
+from manim_voiceover import VoiceoverScene
+
+class MyScene(VoiceoverScene):
+    def construct(self):
+        with self.voiceover(text="Here is a step <bookmark mark='step1'/>") as tracker:
+            self.wait_until_bookmark("nonexistent_step")
+"""
+    errors = validate_generated_code(FinalCode(code=code, scene_name="MyScene"))
+    assert errors
+    assert any("undefined bookmark" in err.message for err in errors)
+
+
+def test_manim_voiceover_service_sandbox(tmp_path):
+    from pathlib import Path
+    from educlaw.sandbox.docker import DockerSandbox, ManimVoiceoverService
+
+    sandbox = DockerSandbox(tmp_path)
+    service = ManimVoiceoverService(sandbox, voice="alba")
+    cache_path = service.ensure_cache_dir()
+    assert cache_path.exists()
+    snippet = service.generate_service_code()
+    assert "set_speech_service" in snippet
+

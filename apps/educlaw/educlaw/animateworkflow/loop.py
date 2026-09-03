@@ -27,6 +27,9 @@ from educlaw.animateworkflow.prompts import (
     CODE_GENERATOR_INSTRUCTIONS,
     NARRATION_PLANNER_INSTRUCTIONS,
 )
+from educlaw.animateworkflow.components import get_components_prompt_injection
+from educlaw.animateworkflow.theme import EduClawTheme, get_theme
+from educlaw.animateworkflow.visual_qc import inspect_video_frames
 from educlaw.memory.files import append_memory_digest
 from educlaw.memory.store import IngestUnavailable
 from educlaw.settings import Settings
@@ -57,6 +60,10 @@ CATEGORY_GUIDANCE = {
     FailureCategory.RENDER_TIMEOUT: (
         "Render exceeded timeout limit. Reduce scene run_time durations, simplify complex loops, "
         "or lower point sampling resolution."
+    ),
+    FailureCategory.VISUAL_DEFECT: (
+        "Re-adjust element coordinates and layout to prevent overlapping or clipping off-screen. "
+        "Use .arrange(DOWN, buff=...) and keep formulas within bounding frame limits."
     ),
 }
 
@@ -141,11 +148,15 @@ class WorkflowOrchestrator:
         *,
         deps: AgentDeps | None = None,
         settings: Settings | None = None,
+        theme: str | EduClawTheme | None = None,
+        inspect_visual: bool = False,
         max_replans: int = MAX_COMPILATION_REPLANS,
     ) -> None:
         self.settings = settings or Settings.from_env()
         self.deps = deps
         self.agents = agents or build_agents(self.settings)
+        self.theme = theme if isinstance(theme, EduClawTheme) else get_theme(theme)
+        self.inspect_visual = inspect_visual
         self.max_replans = max_replans
         self.state = PipelineState()
         self.history: list[dict[str, Any]] = []
@@ -265,8 +276,14 @@ class WorkflowOrchestrator:
                 {"step": 4, "name": "code_generation", "attempt": attempt, "max": self.max_replans},
             )
 
+            theme_ctx = (
+                f"## Active Theme & Styling Constants:\n"
+                f"```python\n{self.theme.to_manim_constants()}```\n\n"
+                f"{get_components_prompt_injection()}"
+            )
             prompt_parts = [
                 f"User request:\n{user_request}",
+                theme_ctx,
                 f"Scene plan:\n{scene_plan_json}",
                 f"Narration plan:\n{narration_json}",
             ]
@@ -305,6 +322,38 @@ class WorkflowOrchestrator:
             last_compile_result = compile_result
 
             if compile_result.success:
+                # Multimodal Visual QA check if enabled
+                if self.inspect_visual and compile_result.output_path:
+                    qc_frames_dir = cwd / ".educlaw" / "qc_frames"
+                    is_mock = getattr(self.settings, "test_model", False) or False
+                    qc_report = await inspect_video_frames(
+                        Path(compile_result.output_path),
+                        qc_frames_dir,
+                        mock=is_mock,
+                    )
+                    self.state.visual_qc_report = qc_report
+                    if not qc_report.passed and attempt < self.max_replans:
+                        defect_descriptions = [
+                            f"At {f.timestamp_sec}s: {f.description}. Fix: {f.suggested_fix}"
+                            for f in qc_report.inspected_frames
+                            if f.has_overlaps or f.has_clipping or f.contrast_issue
+                        ]
+                        compile_error_details = (
+                            f"[VISUAL_DEFECT]: Visual inspection detected rendering defects:\n"
+                            + "\n".join(defect_descriptions)
+                        )
+                        self._emit(
+                            "workflow_step_complete",
+                            {
+                                "step": 5,
+                                "name": "compilation_verification",
+                                "attempt": attempt,
+                                "success": False,
+                                "visual_defects": defect_descriptions,
+                            },
+                        )
+                        continue
+
                 self._emit(
                     "workflow_step_complete",
                     {
@@ -388,4 +437,41 @@ class WorkflowOrchestrator:
         )
 
         await self.ingest_memory(user_request, self.state)
+        self.log_trajectory(user_request, workspace_dir=workspace_dir)
         return self.state
+
+    def log_trajectory(self, user_request: str, workspace_dir: Path | None = None) -> Path | None:
+        """Persist execution trajectory and prompt interaction to .aos/trajectories/ in JSONL format."""
+        import json
+        import time
+
+        cwd = workspace_dir or (self.deps.cwd if self.deps else Path.cwd())
+        traj_dir = cwd / ".aos" / "trajectories"
+        traj_dir.mkdir(parents=True, exist_ok=True)
+
+        video_id = str(self.state.request.video_id) if self.state.request else "unknown"
+        filename = f"traj_{int(time.time())}_{video_id[:8]}.jsonl"
+        traj_path = traj_dir / filename
+
+        entry = {
+            "timestamp": time.time(),
+            "request": user_request,
+            "topic": self.state.request.topic if self.state.request else "",
+            "theme": self.theme.name,
+            "success": self.state.compile_result.success if self.state.compile_result else False,
+            "scene_name": self.state.final_code.scene_name if self.state.final_code else "",
+            "history": self.history,
+            "final_code": self.state.final_code.code if self.state.final_code else "",
+            "compile_errors": [
+                err.model_dump() for err in self.state.compile_result.errors
+            ] if self.state.compile_result and self.state.compile_result.errors else [],
+        }
+
+        try:
+            with open(traj_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(entry, default=str) + "\n")
+            return traj_path
+        except Exception as exc:
+            logger.debug("Failed to write trajectory log: %s", exc)
+            return None
+

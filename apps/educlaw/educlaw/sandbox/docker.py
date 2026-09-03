@@ -133,3 +133,38 @@ class DockerSandbox:
         if len(text) > limit:
             return text[:limit] + "\n…[truncated]"
         return text
+
+
+class ManimVoiceoverService:
+    """Orchestrates audio voiceover synthesis and bookmark synchronization for the Manim Docker sandbox."""
+
+    def __init__(
+        self,
+        sandbox: DockerSandbox,
+        *,
+        backend: str = "pocket_tts",
+        voice: str = "alba",
+        cache_dir: str = ".voiceover_cache",
+    ) -> None:
+        self.sandbox = sandbox
+        self.backend = backend
+        self.voice = voice
+        self.cache_dir = cache_dir
+
+    def ensure_cache_dir(self) -> Path:
+        """Create and return host cache path for voiceover audio files."""
+        path = self.sandbox.cwd / self.cache_dir
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+
+    def generate_service_code(self) -> str:
+        """Generate Python code snippet to inject speech service into VoiceoverScene."""
+        return (
+            "# Native EduClaw Voiceover Service Binding\n"
+            "try:\n"
+            "    from manim_voiceover.services.gtts import GTTSService\n"
+            f"    self.set_speech_service(GTTSService(cache_dir='{self.cache_dir}'))\n"
+            "except Exception:\n"
+            "    pass\n"
+        )
+

@@ -191,3 +191,51 @@ def test_cli_animate_command(monkeypatch, tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert "Starting Animate Workflow" in result.output
     assert "Video rendered at" in result.output
+
+
+def test_cli_animate_theme_option(monkeypatch, tmp_path: Path) -> None:
+    from educlaw.animateworkflow.contracts import CompileResult, PipelineState
+
+    passed_theme = []
+
+    def fake_init(self, *args, **kwargs):
+        passed_theme.append(kwargs.get("theme"))
+        self.settings = kwargs.get("settings")
+
+    async def fake_run(self, prompt, workspace_dir=None):
+        return PipelineState(
+            compile_result=CompileResult(success=True, output_path=str(tmp_path / "test.mp4"))
+        )
+
+    monkeypatch.setattr("educlaw.animateworkflow.loop.WorkflowOrchestrator.__init__", fake_init)
+    monkeypatch.setattr("educlaw.animateworkflow.loop.WorkflowOrchestrator.run", fake_run)
+
+    result = runner.invoke(app, ["animate", "Teach Calculus", "--theme", "cyber_neon", "--cwd", str(tmp_path)])
+    assert result.exit_code == 0
+    assert "Theme: cyber_neon" in result.output
+    assert passed_theme == ["cyber_neon"]
+
+
+def test_cli_animate_inspect_visual_option(monkeypatch, tmp_path: Path) -> None:
+    from educlaw.animateworkflow.contracts import CompileResult, PipelineState
+
+    passed_flags = []
+
+    def fake_init(self, *args, **kwargs):
+        passed_flags.append(kwargs.get("inspect_visual"))
+        self.settings = kwargs.get("settings")
+
+    async def fake_run(self, prompt, workspace_dir=None):
+        return PipelineState(
+            compile_result=CompileResult(success=True, output_path=str(tmp_path / "test.mp4"))
+        )
+
+    monkeypatch.setattr("educlaw.animateworkflow.loop.WorkflowOrchestrator.__init__", fake_init)
+    monkeypatch.setattr("educlaw.animateworkflow.loop.WorkflowOrchestrator.run", fake_run)
+
+    result = runner.invoke(app, ["animate", "Teach Topology", "--inspect-visual", "--cwd", str(tmp_path)])
+    assert result.exit_code == 0
+    assert "Inspect Visual: True" in result.output
+    assert passed_flags == [True]
+
+

@@ -30,6 +30,7 @@ class FailureCategory(str, Enum):
     SYNTAX_ERROR = "syntax_error"
     RENDER_ERROR = "render_error"
     RENDER_TIMEOUT = "render_timeout"
+    VISUAL_DEFECT = "visual_defect"
 
 """
 USER: Teach me about the Lorenz attractor
@@ -286,11 +287,33 @@ class CompileResult(BaseModel):
         return self.success == (len(self.errors) == 0)
 
 
+class FrameInspection(BaseModel):
+    """Detailed visual defect inspection report for an individual video frame."""
+
+    timestamp_sec: float
+    frame_path: str
+    has_overlaps: bool = False
+    has_clipping: bool = False
+    contrast_issue: bool = False
+    description: str = ""
+    suggested_fix: str = ""
+
+
+class VisualQCReport(BaseModel):
+    """Multimodal visual quality assurance report across keyframes."""
+
+    video_path: str
+    passed: bool
+    inspected_frames: list[FrameInspection] = Field(default_factory=list)
+    summary: str = ""
+
+
 class PipelineState(BaseModel):
-    """Shared state threaded through your LangGraph nodes (1→2,3,4,5→6→7)."""
+    """Shared state threaded through your workflow nodes."""
     request: RequestClassification | None = None
     knowledge: KnowledgeResult | None = None
     lesson_plan: LessonPlan | None = None
     narration_plan: NarrationPlan | None = None
     final_code: FinalCode | None = None
     compile_result: CompileResult | None = None
+    visual_qc_report: VisualQCReport | None = None

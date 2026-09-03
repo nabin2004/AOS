@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import subprocess
+from pathlib import Path
 from pydantic_ai import Agent, RunContext
 
 from educlaw.agent.deps import AgentDeps
+from educlaw.animateworkflow.manim_kb import lookup_manim_symbol, search_manim_symbols
+from educlaw.animateworkflow.visual_qc import inspect_video_frames
 from educlaw.permissions.gate import PermissionAction, classify_command
 from educlaw.sandbox.docker import PathJailError
 
@@ -137,3 +141,111 @@ def register_tools(agent: Agent[AgentDeps, str]) -> None:
 
         _emit(ctx, "tool", {"name": "lsp_symbols", "query": query})
         return ctx.deps.lsp.workspace_symbols(query=query)
+
+    @agent.tool
+    async def manim_api_lookup(ctx: RunContext[AgentDeps], symbol_name: str) -> str:
+        """Lookup valid Manim Community classes, animations, transforms, and keyword arguments."""
+        doc = lookup_manim_symbol(symbol_name)
+        _emit(ctx, "tool", {"name": "manim_api_lookup", "symbol": symbol_name})
+        if not doc:
+            matches = search_manim_symbols(symbol_name)
+            if not matches:
+                return f"No Manim symbol found matching '{symbol_name}'."
+            suggestions = ", ".join(m.name for m in matches)
+            return f"Symbol '{symbol_name}' not found. Did you mean: {suggestions}?"
+
+        lines = [
+            f"Symbol: {doc.name} ({doc.symbol_type})",
+            f"Signature: {doc.signature}",
+            f"Description: {doc.description}",
+        ]
+        if doc.valid_kwargs:
+            lines.append(f"Supported kwargs: {', '.join(doc.valid_kwargs)}")
+        if doc.common_pitfalls:
+            lines.append("Pitfalls / Anti-patterns:")
+            for p in doc.common_pitfalls:
+                lines.append(f"  - {p}")
+        if doc.example_usage:
+            lines.append(f"Example:\n{doc.example_usage}")
+        return "\n".join(lines)
+
+    @agent.tool
+    async def manim_concat_scenes(
+        ctx: RunContext[AgentDeps],
+        scene_videos: list[str],
+        output_path: str = "final_lecture.mp4",
+    ) -> str:
+        """Stitch multiple scene video files into a single cohesive lecture MP4 via ffmpeg."""
+        action = PermissionAction(kind="bash", summary=f"concat {len(scene_videos)} videos -> {output_path}")
+        if not await ctx.deps.gate.approve(action, emit=ctx.deps.emit):
+            return "permission denied: concat"
+
+        try:
+            out_host = ctx.deps.sandbox.jail(output_path)
+            in_hosts = [ctx.deps.sandbox.jail(p) for p in scene_videos]
+        except PathJailError as exc:
+            return f"path rejected: {exc}"
+
+        success, result, msg = concat_scene_videos(in_hosts, out_host)
+        _emit(ctx, "tool", {"name": "manim_concat_scenes", "success": success, "output": str(result)})
+        if success:
+            return f"Successfully concatenated {len(in_hosts)} scenes into {out_host.as_posix()}."
+        return f"Warning: Concatenation failed ({msg}). Retaining individual scene videos: {[p.as_posix() for p in in_hosts]}."
+
+    @agent.tool
+    async def visual_qc_check(ctx: RunContext[AgentDeps], video_path: str) -> str:
+        """Inspect a rendered Manim MP4 video for visual collisions, off-screen clipping, and contrast issues."""
+        try:
+            host_video = ctx.deps.sandbox.jail(video_path)
+        except PathJailError as exc:
+            return f"path rejected: {exc}"
+
+        if not host_video.is_file():
+            return f"video file not found: {video_path}"
+
+        frames_dir = host_video.parent / "qc_frames"
+        is_mock = getattr(ctx.deps.settings, "test_model", False) or False
+        report = await inspect_video_frames(host_video, frames_dir, mock=is_mock)
+        _emit(ctx, "tool", {"name": "visual_qc_check", "passed": report.passed, "summary": report.summary})
+        return report.model_dump_json(indent=2)
+
+
+
+def concat_scene_videos(video_paths: list[Path], output_path: Path) -> tuple[bool, Path | list[Path], str]:
+    """Concatenate multiple scene videos using ffmpeg. Falls back to individual videos on failure."""
+    if not video_paths:
+        return False, [], "No video files provided for concatenation"
+    if len(video_paths) == 1:
+        return True, video_paths[0], "Single video, no concat needed"
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    list_file = output_path.parent / "concat_list.txt"
+    try:
+        lines = [f"file '{p.resolve().as_posix()}'" for p in video_paths]
+        list_file.write_text("\n".join(lines), encoding="utf-8")
+        cmd = [
+            "ffmpeg",
+            "-y",
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            str(list_file),
+            "-c",
+            "copy",
+            str(output_path),
+        ]
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        if res.returncode == 0 and output_path.exists() and output_path.stat().st_size > 0:
+            return True, output_path, "Concatenation succeeded"
+        return False, video_paths, f"ffmpeg concat failed (code {res.returncode}): {res.stderr.strip()}"
+    except Exception as exc:
+        return False, video_paths, f"ffmpeg invocation error: {exc}"
+    finally:
+        if list_file.exists():
+            try:
+                list_file.unlink()
+            except OSError:
+                pass
+

@@ -82,12 +82,36 @@ User Request
 Generate an animation directly from your terminal:
 
 ```bash
-# Render a video with default medium quality
+# Render a video with default medium quality and dark_glass theme
 educlaw animate "Teach the Lorenz Attractor chaos system visually"
 
-# Specify custom quality (l, m, h, k) or model
-educlaw animate "Teach BODMAS rules" --quality h --model openai:gpt-4o-mini
+# Select custom theme and enable visual inspection QA gate
+educlaw animate "Teach the Pythagorean Theorem" --theme solarized_math --inspect-visual
+
+# Specify custom quality (l, m, h, k) and concatenate multi-scene lectures
+educlaw animate "Teach BODMAS rules" --quality h --theme cyber_neon --concat
 ```
+
+### Pedagogical Themes & Visual Components
+
+EduClaw includes built-in declarative themes:
+- `dark_glass`: Modern dark backdrop with cyan/green/yellow accents.
+- `solarized_math`: Classic mathematical publication palette with dark cyan/gold accents.
+- `clean_pastel`: Soft modern Catppuccin-inspired educational palette.
+- `cyber_neon`: High-contrast vibrant neon styling for computing and physics.
+
+Injected visual components include `create_math_callout(...)`, `create_proof_step(...)`, `create_code_window(...)`, and `create_highlighted_number_line(...)`.
+
+### Multimodal Visual QC & Repair
+
+When `--inspect-visual` is specified:
+1. `ffmpeg` extracts keyframe snapshots at beat intervals.
+2. The vision model configured via `EDUCLAW_VISION_MODEL` analyzes frames for element collisions, clipping, and contrast defects.
+3. If defects are found, targeted fix recommendations are fed back into the code repair loop.
+
+### Trajectory Logging
+
+Execution traces and agent reasoning turns are automatically saved to `.aos/trajectories/` in JSONL format for fine-tuning with GEPA or DSPy.
 
 ### Python API
 
@@ -99,7 +123,11 @@ from educlaw.settings import Settings
 
 async def main():
     settings = Settings.from_env()
-    orchestrator = WorkflowOrchestrator(settings=settings)
+    orchestrator = WorkflowOrchestrator(
+        settings=settings,
+        theme="solarized_math",
+        inspect_visual=True,
+    )
     
     state = await orchestrator.run(
         "Teach Pythagoras theorem visually",
@@ -116,10 +144,11 @@ asyncio.run(main())
 
 ## Testing
 
-Unit tests for the workflow orchestrator are located in `tests/test_animateworkflow_loop.py`.
+Unit tests are located in `tests/test_animateworkflow_loop.py`, `tests/test_theme_and_components.py`, `tests/test_manim_kb.py`, and `tests/test_visual_qc.py`.
 
 Run tests locally:
 
 ```bash
-.venv\Scripts\python.exe -m pytest tests/test_animateworkflow_loop.py
+uv run pytest apps/educlaw/tests/
 ```
+

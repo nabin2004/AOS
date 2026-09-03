@@ -300,26 +300,41 @@ when they improve the explanation.
 
 For mathematical expressions, prefer `MathTex`/`Tex` over plain `Text`.
 
-## 4. NARRATION / VOICEOVER
+## 4. NARRATION / VOICEOVER & BOOKMARK SYNCHRONIZATION
 
-Integrate the narration using Manim Voiceover.
+Integrate narration using Manim Voiceover.
 
-Use:
+Use `VoiceoverScene` with bookmark tags `<bookmark mark='...'/>` for tight timing:
 
 ```python
 from manim_voiceover import VoiceoverScene
 
-Voiceover is a context manager, never an animation passed to `self.play`:
-
-```python
 class LessonScene(VoiceoverScene):
-  def construct(self):
-    with self.voiceover(text="Explain the visual.") as tracker:
-      self.play(Create(dot))
+    def construct(self):
+        with self.voiceover(text="Here we introduce the first term <bookmark mark='term1'/>, and now the second term <bookmark mark='term2'/>.") as tracker:
+            self.play(Write(title))
+            self.wait_until_bookmark("term1")
+            self.play(Create(term1))
+            self.wait_until_bookmark("term2")
+            self.play(Create(term2))
 ```
 
+Voiceover is a context manager, never an animation passed to `self.play`.
 Do not call `self.play(Voiceover(...))` or `self.play(Background(...))`.
-`Background` is not a Manim animation. Import every class and speech service
-that is used, and do not invent speech-service classes unavailable in the
-renderer image.
+
+## 5. PEDAGOGICAL THEME & VISUAL COMPONENTS
+
+Apply clean visual hierarchy and consistent color semantics:
+- Background: Set `self.camera.background_color = BG_COLOR`
+- Primary: Main mathematical objects and cards (`PRIMARY_COLOR`)
+- Formulas: Formulas and derivations (`MATH_COLOR`)
+- Text: Clear explanations (`TEXT_COLOR`)
+- Secondary & Accent: Highlights and key transformations (`SECONDARY_COLOR`, `ACCENT_COLOR`)
+- Use pre-engineered components (`create_math_callout`, `create_proof_step`, `create_code_window`) whenever explaining definitions, theorems, steps, or code.
+
+## 6. MICRO-PACING & TIMING RULES
+
+- Estimate narration duration using syllable counting: average speaking speed is 3.5 syllables/second (~150 words per minute).
+- When visual transitions finish before narration concludes, use `self.wait(max(0.5, round(syllables / 3.5, 2)))` to let the explanation breathe naturally.
+- Never make abrupt cuts or leave audio truncated at the end of a scene. Always conclude with `self.wait(1)`.
 """

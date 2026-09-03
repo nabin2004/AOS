@@ -540,6 +540,18 @@ def animate_command(
         str,
         typer.Option("-q", "--quality", help="Manim render quality: l, m, h, or k."),
     ] = "m",
+    theme: Annotated[
+        str,
+        typer.Option("-t", "--theme", help="Pedagogical visual theme: dark_glass, solarized_math, clean_pastel, cyber_neon."),
+    ] = "dark_glass",
+    concat: Annotated[
+        bool,
+        typer.Option("--concat/--no-concat", help="Whether to automatically concatenate multi-scene lecture videos via ffmpeg."),
+    ] = False,
+    inspect_visual: Annotated[
+        bool,
+        typer.Option("--inspect-visual/--no-inspect-visual", help="Enable multimodal keyframe visual QA gate to catch overlaps and clipping."),
+    ] = False,
 ) -> None:
     """Generate educational Manim animations using single-video or full course series mode."""
     resolved_cwd = (cwd or Path.cwd()).resolve()
@@ -587,11 +599,13 @@ def animate_command(
 
     orchestrator_single = WorkflowOrchestrator(
         settings=settings,
+        theme=theme,
+        inspect_visual=inspect_visual,
     )
 
     console.print(
         Panel(
-            f"[bold cyan]Prompt:[/] {prompt}\n[bold cyan]Mode:[/] single\n[bold cyan]Quality:[/] {quality}\n[bold cyan]Output dir:[/] {workspace_dir}",
+            f"[bold cyan]Prompt:[/] {prompt}\n[bold cyan]Mode:[/] single\n[bold cyan]Theme:[/] {theme}\n[bold cyan]Inspect Visual:[/] {inspect_visual}\n[bold cyan]Quality:[/] {quality}\n[bold cyan]Output dir:[/] {workspace_dir}",
             title="[bold magenta]Starting Animate Workflow (Single Mode)[/]",
             border_style="magenta",
         )

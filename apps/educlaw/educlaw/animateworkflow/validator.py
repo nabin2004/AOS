@@ -42,9 +42,53 @@ def validate_generated_code(final_code: FinalCode) -> list[CompileError]:
         if function_name == "ParametricFunction" and any(keyword.arg == "points" for keyword in node.keywords):
             errors.append(_error(node, FailureCategory.MALFORMED_POINT_ARRAYS, "ParametricFunction expects a function of t, not a points argument"))
 
+    # Ensure voiceover is not called as a standalone bare statement
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
+            if _call_name(node.value.func) == "voiceover":
+                errors.append(
+                    _error(
+                        node,
+                        FailureCategory.HALLUCINATED_KWARGS,
+                        "self.voiceover(...) must be used as a context manager ('with self.voiceover(...):')",
+                    )
+                )
+
+    # Validate bookmark synchronization
+    bookmarks, waited_bookmarks = _find_bookmarks_and_waits(tree)
+    undefined_bookmarks = waited_bookmarks - bookmarks
+    if undefined_bookmarks:
+        errors.append(
+            CompileError(
+                category=FailureCategory.HALLUCINATED_KWARGS,
+                message=f"wait_until_bookmark called for undefined bookmark(s): {', '.join(sorted(undefined_bookmarks))}",
+            )
+        )
+
     if _uses_voiceover(tree) and "VoiceoverScene" not in imported_names:
         errors.append(CompileError(category=FailureCategory.MISSING_IMPORTS, message="VoiceoverScene is used but not imported from manim_voiceover"))
     return errors
+
+
+def _find_bookmarks_and_waits(tree: ast.AST) -> tuple[set[str], set[str]]:
+    import re
+
+    bookmarks: set[str] = set()
+    waited_bookmarks: set[str] = set()
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            matches = re.findall(r"<bookmark\s+mark=['\"]([^'\"]+)['\"]\s*/>", node.value)
+            bookmarks.update(matches)
+        if isinstance(node, ast.Call):
+            name = _call_name(node.func)
+            if name == "wait_until_bookmark" and node.args:
+                first_arg = node.args[0]
+                if isinstance(first_arg, ast.Constant) and isinstance(first_arg.value, str):
+                    waited_bookmarks.add(first_arg.value)
+
+    return bookmarks, waited_bookmarks
+
 
 
 def _call_name(node: ast.expr) -> str | None:

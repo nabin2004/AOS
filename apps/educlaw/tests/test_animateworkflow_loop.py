@@ -256,3 +256,29 @@ async def test_full_workflow_run(monkeypatch, tmp_path):
     assert state.final_code.scene_name == "PendulumScene"
     assert state.compile_result.success
     assert len(events) > 0
+
+    # Verify trajectory logging hook
+    traj_dir = tmp_path / ".aos" / "trajectories"
+    assert traj_dir.exists()
+    traj_files = list(traj_dir.glob("*.jsonl"))
+    assert len(traj_files) == 1
+    content = traj_files[0].read_text(encoding="utf-8")
+    assert "Pendulum" in content
+    assert "PendulumScene" in content
+
+
+def test_concat_scene_videos_empty_and_single(tmp_path: Path):
+    from educlaw.agent.tools import concat_scene_videos
+
+    # Empty
+    success, res, msg = concat_scene_videos([], tmp_path / "out.mp4")
+    assert not success
+    assert "No video" in msg
+
+    # Single
+    fake_video = tmp_path / "scene1.mp4"
+    fake_video.write_text("fake video data")
+    success, res, msg = concat_scene_videos([fake_video], tmp_path / "out.mp4")
+    assert success
+    assert res == fake_video
+
