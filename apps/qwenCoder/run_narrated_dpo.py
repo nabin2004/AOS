@@ -224,6 +224,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--batch-size", type=int, default=1, help="Per-device batch size (default: 1)")
     parser.add_argument("--grad-accum", type=int, default=4, help="Gradient accumulation steps (default: 4)")
     parser.add_argument("--max-length", type=int, default=2048, help="Max total sequence length (default: 2048)")
+    parser.add_argument("--max-prompt-length", type=int, default=1024, help="Max prompt sequence length (default: 1024)")
     parser.add_argument("--use-4bit", action="store_true", default=True, help="Use 4-bit NF4 QLoRA (default: True)")
     parser.add_argument("--use-8bit", action="store_true", default=False, help="Use 8-bit quantization")
     parser.add_argument("--no-4bit", action="store_true", help="Disable 4-bit quantization")
