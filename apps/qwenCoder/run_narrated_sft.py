@@ -81,6 +81,15 @@ def load_policy_model(
 
     bnb_config = None
     if use_4bit:
+        if torch.cuda.is_available():
+            major, minor = torch.cuda.get_device_capability(0)
+            if major < 7:
+                device_name = torch.cuda.get_device_name(0)
+                raise RuntimeError(
+                    f"\n❌ Incompatible GPU accelerator for 4-bit QLoRA: {device_name} (compute capability {major}.{minor}).\n"
+                    f"   Precompiled 'bitsandbytes' 4-bit NF4 kernels require Tensor Cores with compute capability >= 7.0 (sm_70+).\n"
+                    f"   On Kaggle, please switch Accelerator from 'GPU P100' to 'GPU T4 x2' in Notebook Settings."
+                )
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",

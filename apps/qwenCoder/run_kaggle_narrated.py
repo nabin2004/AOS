@@ -72,6 +72,38 @@ def is_cuda_working() -> bool:
         return False
 
 
+def check_gpu_compatibility() -> None:
+    """Verify GPU compute capability meets bitsandbytes 4-bit requirements (sm >= 7.0)."""
+    try:
+        import torch
+
+        if not torch.cuda.is_available():
+            print("ERROR: No CUDA GPU detected!", file=sys.stderr)
+            sys.exit(1)
+
+        device_name = torch.cuda.get_device_name(0)
+        major, minor = torch.cuda.get_device_capability(0)
+        print(f"✔ Detected GPU: {device_name} (Compute Capability: {major}.{minor})")
+
+        if major < 7:
+            print(
+                f"\n========================================================================\n"
+                f"❌ INCOMPATIBLE ACCELERATOR FOR 4-BIT QLoRA: {device_name} (sm_{major}{minor})\n\n"
+                f"   Precompiled 'bitsandbytes' 4-bit NF4 kernels require Tensor Cores with\n"
+                f"   compute capability >= 7.0 (sm_70+). On Pascal P100 (sm_60), bitsandbytes\n"
+                f"   crashes with: 'Error named symbol not found at line 74 in file ops.cu'.\n\n"
+                f"👉 SOLUTION:\n"
+                f"   1. In the Kaggle notebook right sidebar -> 'Session options' / 'Settings'.\n"
+                f"   2. Under 'Accelerator', switch from 'GPU P100' to 'GPU T4 x2'.\n"
+                f"   3. Restart the session and re-run. T4 (sm_75) natively supports QLoRA!\n"
+                f"========================================================================\n",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+    except ImportError:
+        pass
+
+
 def setup_environment(force_reinstall_torch: bool = False) -> None:
     """Install requirements in Kaggle system Python without unnecessary torch reinstallation."""
     python_exe = sys.executable
@@ -145,6 +177,7 @@ def main() -> int:
     print("=================================================================")
 
     setup_kaggle_secrets()
+    check_gpu_compatibility()
     setup_environment()
 
     # Step 1: Prepare datasets
