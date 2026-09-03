@@ -283,6 +283,8 @@ def main() -> int:
         "logging_steps": 5,
         "save_strategy": "epoch",
         "beta": args.beta,
+        "max_length": args.max_length,
+        "max_prompt_length": args.max_prompt_length,
         "optim": "paged_adamw_8bit",
         "fp16": not torch.cuda.is_bf16_supported(),
         "bf16": torch.cuda.is_bf16_supported(),
@@ -290,20 +292,12 @@ def main() -> int:
         "remove_unused_columns": False,
     }
 
-    dpo_config_params = inspect.signature(DPOConfig.__init__).parameters
-    trainer_extra_kwargs = {}
-
-    if "max_length" in dpo_config_params:
-        dpo_kwargs["max_length"] = args.max_length
-    else:
-        trainer_extra_kwargs["max_length"] = args.max_length
-
-    if "max_prompt_length" in dpo_config_params:
-        dpo_kwargs["max_prompt_length"] = args.max_prompt_length
-    else:
-        trainer_extra_kwargs["max_prompt_length"] = args.max_prompt_length
-
-    dpo_config = DPOConfig(**dpo_kwargs)
+    try:
+        dpo_config = DPOConfig(**dpo_kwargs)
+    except TypeError:
+        dpo_kwargs.pop("max_length", None)
+        dpo_kwargs.pop("max_prompt_length", None)
+        dpo_config = DPOConfig(**dpo_kwargs)
 
     dpo_trainer_params = inspect.signature(DPOTrainer.__init__).parameters
     trainer_kwargs = {
@@ -312,13 +306,17 @@ def main() -> int:
         "peft_config": peft_config,
         "args": dpo_config,
         "train_dataset": train_dataset,
-        **trainer_extra_kwargs,
     }
 
     if "processing_class" in dpo_trainer_params:
         trainer_kwargs["processing_class"] = tokenizer
     elif "tokenizer" in dpo_trainer_params:
         trainer_kwargs["tokenizer"] = tokenizer
+
+    if "max_length" in dpo_trainer_params:
+        trainer_kwargs["max_length"] = args.max_length
+    if "max_prompt_length" in dpo_trainer_params:
+        trainer_kwargs["max_prompt_length"] = args.max_prompt_length
 
     trainer = DPOTrainer(**trainer_kwargs)
 
