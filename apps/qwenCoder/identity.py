@@ -28,15 +28,20 @@ HUB_QWEN3_8B_MERGED_REPO = "nabin2004/AOS-Qwen3-8B-Merged"
 HUB_QWEN3_8B_GGUF_REPO = "nabin2004/AOS-Qwen3-8B-GGUF"
 HUB_QWEN3_8B_DATASET_REPO = "nabin2004/manim-aos-5k400"
 
+HUB_QWEN25_CODER_7B_MERGED_REPO = "nabin2004/qwen2.5-coder-7b-manim-merged"
+
 HUB_QWEN3_8B_NARRATED_SFT_REPO = "nabin2004/AOS-qwen3-8b-narrated-adapter"
 HUB_QWEN3_8B_NARRATED_DPO_REPO = "nabin2004/AOS-qwen3-8b-narrated-dpo"
 HUB_QWEN3_8B_NARRATED_MERGED_REPO = "nabin2004/AOS-qwen3-8b-narrated-merged"
 HUB_QWEN3_8B_NARRATED_GGUF_REPO = "nabin2004/AOS-qwen3-8b-narrated-gguf"
+HUB_QWEN3_8B_NARRATED_SFT_MERGED_REPO = "nabin2004/AOS-qwen3-8b-narrated-sft-merged"
+HUB_QWEN3_8B_NARRATED_SFT_GGUF_REPO = "nabin2004/AOS-qwen3-8b-narrated-sft-gguf"
 
 OLLAMA_MODEL_TAG = "aos-qwen2.5-coder-7b-manim"
 OLLAMA_BASE_TAG = "qwen2.5-coder:7b"
 OLLAMA_QWEN3_8B_TAG = "aos-qwen3-8b-manim"
 OLLAMA_QWEN3_8B_NARRATED_TAG = "aos-qwen3-8b-narrated"
+OLLAMA_QWEN3_8B_NARRATED_SFT_TAG = "aos-qwen3-8b-narrated-sft"
 
 WANDB_SFT_RUN_NAME = "qwen2.5-coder-7b-manim-sft"
 WANDB_DPO_RUN_NAME = "qwen2.5-coder-7b-manim-dpo"
