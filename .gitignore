@@ -44,3 +44,12 @@ apps/educlaw/eval_output/
 apps/audio_service/delayed-streams-modeling/
 apps/grpo_dataset/raw/
 apps/grpo_dataset/.hf_stage/
+
+# Model checkpoints and GGUF quantization binaries
+*.gguf
+apps/qwenCoder/llama_bin/
+apps/qwenCoder/llama_repo/
+apps/qwenCoder/qwen3-8b-*/
+apps/qwenCoder/*-merged/
+apps/qwenCoder/*-gguf/
+

@@ -14,6 +14,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Ensure UTF-8 stdout/stderr on Windows console
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 # Disable torchvision if broken
 try:
     import torchvision  # noqa: F401
@@ -39,7 +45,7 @@ def render_template(template_path: Path, output_path: Path, **kwargs: str) -> No
     for k, v in kwargs.items():
         content = content.replace(f"{{{k}}}", v)
     output_path.write_text(content, encoding="utf-8")
-    print(f"✔ Rendered {output_path.name}")
+    print(f"[OK] Rendered {output_path.name}")
 
 
 def main() -> int:
@@ -57,7 +63,7 @@ def main() -> int:
     # STEP 1: Download Adapter Weights & Config
     # -------------------------------------------------------------------------
     print("\n=================================================================")
-    print("▶ STEP 1: Loading DPO LoRA Adapter...")
+    print("[Step 1/6] Loading DPO LoRA Adapter...")
     print("=================================================================")
     adapter_cfg_file = hf_hub_download(ADAPTER_REPO, "adapter_config.json", token=token)
     with open(adapter_cfg_file) as f:
@@ -71,13 +77,13 @@ def main() -> int:
     adapter_weights_file = hf_hub_download(ADAPTER_REPO, "adapter_model.safetensors", token=token)
     print("Loading adapter tensors...")
     adapter_tensors = load_file(adapter_weights_file)
-    print(f"✔ Adapter tensors loaded: {len(adapter_tensors)}")
+    print(f"[OK] Adapter tensors loaded: {len(adapter_tensors)}")
 
     # -------------------------------------------------------------------------
     # STEP 2: Download Base Metadata & Index
     # -------------------------------------------------------------------------
     print("\n=================================================================")
-    print("▶ STEP 2: Fetching Base Model Metadata...")
+    print("[Step 2/6] Fetching Base Model Metadata...")
     print("=================================================================")
     meta_files = [
         "config.json",
@@ -106,12 +112,12 @@ def main() -> int:
     # STEP 3: Streaming Layer-by-Layer Merging (<500MB RAM)
     # -------------------------------------------------------------------------
     print("\n=================================================================")
-    print("▶ STEP 3: Streaming Merge Shard by Shard...")
+    print("[Step 3/6] Streaming Merge Shard by Shard...")
     print("=================================================================")
     for i, shard_name in enumerate(all_shards, 1):
         target_shard = merged_dir / shard_name
         if target_shard.is_file() and target_shard.stat().st_size > 1e9:
-            print(f"[{i}/{len(all_shards)}] {shard_name} already exists. Skipping.")
+            print(f"[{i}/{len(all_shards)}] {shard_name} already exists. Skipping merge.")
             continue
 
         print(f"\n[{i}/{len(all_shards)}] Downloading base shard: {shard_name}...")
@@ -137,7 +143,7 @@ def main() -> int:
         print(f"Saving merged shard -> {target_shard} ({len(merged_shard_tensors)} tensors)...")
         save_file(merged_shard_tensors, str(target_shard))
         del merged_shard_tensors
-        print(f"✔ Completed shard {i}/{len(all_shards)}")
+        print(f"[OK] Completed shard {i}/{len(all_shards)}")
 
     # Render Merged Model Card
     render_template(
@@ -146,32 +152,44 @@ def main() -> int:
         hub_merged_repo=HUB_MERGED_REPO,
         hub_gguf_repo=HUB_GGUF_REPO,
     )
-    print("✔ Merged model is complete and ready locally.")
+    print("[OK] Merged model is complete and ready locally.")
 
     # -------------------------------------------------------------------------
     # STEP 4: Upload Merged Safetensors to Hugging Face Hub
     # -------------------------------------------------------------------------
-    print("\n=================================================================")
-    print(f"▶ STEP 4: Uploading Merged Model to https://huggingface.co/{HUB_MERGED_REPO}...")
-    print("=================================================================")
-    api.create_repo(HUB_MERGED_REPO, repo_type="model", exist_ok=True, token=token)
-    api.upload_folder(
-        folder_path=str(merged_dir),
-        repo_id=HUB_MERGED_REPO,
-        repo_type="model",
-        token=token,
-    )
-    print(f"🎉 Merged model successfully uploaded to https://huggingface.co/{HUB_MERGED_REPO}!")
+    try:
+        remote_files = api.list_repo_files(HUB_MERGED_REPO, token=token)
+        already_uploaded = all(s in remote_files for s in all_shards)
+    except Exception:
+        already_uploaded = False
+
+    if not already_uploaded:
+        print("\n=================================================================")
+        print(f"[Step 4/6] Uploading Merged Model to https://huggingface.co/{HUB_MERGED_REPO}...")
+        print("=================================================================")
+        api.create_repo(HUB_MERGED_REPO, repo_type="model", exist_ok=True, token=token)
+        api.upload_folder(
+            folder_path=str(merged_dir),
+            repo_id=HUB_MERGED_REPO,
+            repo_type="model",
+            token=token,
+        )
+        print(f"[SUCCESS] Merged model successfully uploaded to https://huggingface.co/{HUB_MERGED_REPO}!")
+    else:
+        print(f"\n[Step 4/6] Merged model already fully uploaded to https://huggingface.co/{HUB_MERGED_REPO}! Skipping upload.")
 
     # -------------------------------------------------------------------------
     # STEP 5: Convert to GGUF & Quantize (Q4_K_M & Q8_0)
     # -------------------------------------------------------------------------
     print("\n=================================================================")
-    print("▶ STEP 5: Converting to GGUF and Multi-Quantizing...")
+    print("[Step 5/6] Converting to GGUF and Multi-Quantizing...")
     print("=================================================================")
     llama_repo = QWEN_ROOT / "llama_repo"
     convert_py = llama_repo / "convert_hf_to_gguf.py"
-    quant_exe = llama_repo / "build" / "bin" / "llama-quantize.exe"
+    if (QWEN_ROOT / "llama_bin" / "llama-quantize.exe").is_file():
+        quant_exe = QWEN_ROOT / "llama_bin" / "llama-quantize.exe"
+    else:
+        quant_exe = llama_repo / "build" / "bin" / "llama-quantize.exe"
 
     f16_gguf = gguf_dir / f"{OLLAMA_TAG}-f16.gguf"
     q4_gguf = gguf_dir / f"{OLLAMA_TAG}-Q4_K_M.gguf"
@@ -192,17 +210,17 @@ def main() -> int:
                 ],
                 check=True,
             )
-            print(f"✔ Created F16 GGUF ({f16_gguf.stat().st_size / 1e9:.2f} GB)")
+            print(f"[OK] Created F16 GGUF ({f16_gguf.stat().st_size / 1e9:.2f} GB)")
 
         if not q4_gguf.is_file():
             print(f"\nQuantizing to Q4_K_M...")
             subprocess.run([str(quant_exe), str(f16_gguf), str(q4_gguf), "Q4_K_M"], check=True)
-            print(f"✔ Created Q4_K_M GGUF ({q4_gguf.stat().st_size / 1e9:.2f} GB)")
+            print(f"[OK] Created Q4_K_M GGUF ({q4_gguf.stat().st_size / 1e9:.2f} GB)")
 
         if not q8_gguf.is_file():
             print(f"\nQuantizing to Q8_0...")
             subprocess.run([str(quant_exe), str(f16_gguf), str(q8_gguf), "Q8_0"], check=True)
-            print(f"✔ Created Q8_0 GGUF ({q8_gguf.stat().st_size / 1e9:.2f} GB)")
+            print(f"[OK] Created Q8_0 GGUF ({q8_gguf.stat().st_size / 1e9:.2f} GB)")
 
         if f16_gguf.is_file():
             print(f"Cleaning up temporary F16 GGUF: {f16_gguf.name}")
@@ -221,13 +239,13 @@ def main() -> int:
         hub_gguf_repo=HUB_GGUF_REPO,
         ollama_tag=OLLAMA_TAG,
     )
-    print("✔ GGUF artifacts prepared locally.")
+    print("[OK] GGUF artifacts prepared locally.")
 
     # -------------------------------------------------------------------------
     # STEP 6: Upload GGUF Repository to Hugging Face Hub
     # -------------------------------------------------------------------------
     print("\n=================================================================")
-    print(f"▶ STEP 6: Uploading GGUF Models to https://huggingface.co/{HUB_GGUF_REPO}...")
+    print(f"[Step 6/6] Uploading GGUF Models to https://huggingface.co/{HUB_GGUF_REPO}...")
     print("=================================================================")
     api.create_repo(HUB_GGUF_REPO, repo_type="model", exist_ok=True, token=token)
     api.upload_folder(
@@ -237,10 +255,10 @@ def main() -> int:
         token=token,
         ignore_patterns=["*-f16.gguf"],
     )
-    print(f"🎉 GGUF models successfully uploaded to https://huggingface.co/{HUB_GGUF_REPO}!")
+    print(f"[SUCCESS] GGUF models successfully uploaded to https://huggingface.co/{HUB_GGUF_REPO}!")
 
     print("\n=================================================================")
-    print("✨ ALL MODELS PUSHED SUCCESSFULLY! ✨")
+    print("ALL MODELS PUSHED SUCCESSFULLY!")
     print(f"1. Merged Model: https://huggingface.co/{HUB_MERGED_REPO}")
     print(f"2. GGUF Models:  https://huggingface.co/{HUB_GGUF_REPO}")
     print("=================================================================\n")
