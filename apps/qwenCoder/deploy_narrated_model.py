@@ -145,9 +145,10 @@ def resolve_or_build_llama_cpp(requested_dir: Path | None) -> LlamaCppTools:
 def render_template(template_path: Path, output_path: Path, **kwargs: str) -> None:
     if not template_path.is_file():
         raise FileNotFoundError(f"Missing template: {template_path}")
-    raw = template_path.read_text(encoding="utf-8")
-    rendered = raw.format(**kwargs)
-    output_path.write_text(rendered, encoding="utf-8")
+    content = template_path.read_text(encoding="utf-8")
+    for key, value in kwargs.items():
+        content = content.replace(f"{{{key}}}", value)
+    output_path.write_text(content, encoding="utf-8")
     print(f"✔ Rendered {output_path.name} -> {output_path}")
 
 
