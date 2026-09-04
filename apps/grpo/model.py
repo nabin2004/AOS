@@ -98,8 +98,17 @@ def _load_qwen(config: TrainingConfig):
         )
 
     tokenizer = AutoTokenizer.from_pretrained(base, trust_remote_code=True, token=token)
-    if tokenizer.pad_token is None:
+    im_end_id = tokenizer.convert_tokens_to_ids("<|im_end|>")
+    endoftext_id = tokenizer.convert_tokens_to_ids("<|endoftext|>")
+    if im_end_id is not None and im_end_id != getattr(tokenizer, "unk_token_id", None):
+        tokenizer.eos_token = "<|im_end|>"
+        tokenizer.eos_token_id = im_end_id
+    if endoftext_id is not None and endoftext_id != getattr(tokenizer, "unk_token_id", None):
+        tokenizer.pad_token = "<|endoftext|>"
+        tokenizer.pad_token_id = endoftext_id
+    elif tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.pad_token_id = tokenizer.eos_token_id
 
     model = AutoModelForCausalLM.from_pretrained(base, **kwargs)
     model.config.use_cache = False

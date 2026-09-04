@@ -66,13 +66,28 @@ def main() -> int:
     model, tokenizer = load_model(config)
     
     if config.base_family == "qwen":
+        im_end_id = tokenizer.convert_tokens_to_ids("<|im_end|>")
+        endoftext_id = tokenizer.convert_tokens_to_ids("<|endoftext|>")
+
         tokenizer.eos_token = "<|im_end|>"
+        if im_end_id is not None and im_end_id != getattr(tokenizer, "unk_token_id", None):
+            tokenizer.eos_token_id = im_end_id
+
+        if endoftext_id is not None and endoftext_id != getattr(tokenizer, "unk_token_id", None):
+            tokenizer.pad_token = "<|endoftext|>"
+            tokenizer.pad_token_id = endoftext_id
+        elif tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+            tokenizer.pad_token_id = tokenizer.eos_token_id
+
         try:
-            im_end_id = tokenizer.convert_tokens_to_ids("<|im_end|>")
-            if hasattr(model, "generation_config") and im_end_id is not None:
-                # Ensure stopping criteria includes both the default eos and <|im_end|>
-                stop_ids = [tokenizer.eos_token_id, im_end_id]
-                model.generation_config.eos_token_id = list(set(stop_ids))
+            if hasattr(model, "generation_config"):
+                stop_ids = [tokenizer.eos_token_id]
+                if im_end_id is not None:
+                    stop_ids.append(im_end_id)
+                if endoftext_id is not None:
+                    stop_ids.append(endoftext_id)
+                model.generation_config.eos_token_id = list(set(s for s in stop_ids if s is not None))
                 model.generation_config.pad_token_id = tokenizer.pad_token_id
         except Exception as e:
             print(f"Warning: could not set generation config stop tokens: {e}", file=sys.stderr)

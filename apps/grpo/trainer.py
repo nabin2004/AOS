@@ -121,13 +121,36 @@ def make_training_args(
 def build_trainer(model, tokenizer, dataset, config: TrainingConfig, training_args):
     from trl import GRPOTrainer
 
-    return GRPOTrainer(
+    trainer = GRPOTrainer(
         model=model,
         args=training_args,
         reward_funcs=combined_reward,
         train_dataset=dataset,
         processing_class=tokenizer,
     )
+
+    # Ensure GRPOTrainer generation_config explicitly includes stop tokens (<|im_end|>)
+    # so rollouts terminate when the assistant finishes generating instead of running to completion cap!
+    if hasattr(trainer, "generation_config") and trainer.generation_config is not None:
+        stop_ids = []
+        if getattr(tokenizer, "eos_token_id", None) is not None:
+            stop_ids.append(tokenizer.eos_token_id)
+        try:
+            im_end_id = tokenizer.convert_tokens_to_ids("<|im_end|>")
+            if im_end_id is not None and im_end_id != getattr(tokenizer, "unk_token_id", None):
+                stop_ids.append(im_end_id)
+            endoftext_id = tokenizer.convert_tokens_to_ids("<|endoftext|>")
+            if endoftext_id is not None and endoftext_id != getattr(tokenizer, "unk_token_id", None):
+                stop_ids.append(endoftext_id)
+        except Exception:
+            pass
+
+        if stop_ids:
+            trainer.generation_config.eos_token_id = list(set(stop_ids))
+        if getattr(tokenizer, "pad_token_id", None) is not None:
+            trainer.generation_config.pad_token_id = tokenizer.pad_token_id
+
+    return trainer
 
 
 def train_and_save(trainer, model, tokenizer, config: TrainingConfig) -> None:

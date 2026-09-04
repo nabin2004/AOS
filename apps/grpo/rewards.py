@@ -55,9 +55,33 @@ def _normalize_completions(completions: list[object]) -> list[str]:
 
 
 def _extract_python(text: str) -> str:
+    # Strip thinking tags if present
+    text = re.sub(r"<think>[\s\S]*?</think>", "", text, flags=re.IGNORECASE).strip()
+
+    # 1. Closed code fence (standard ```python ... ```)
     m = _CODE_FENCE.search(text)
     if m:
         return m.group(1).strip()
+
+    # 2. Truncated code fence where closing ``` was never emitted
+    lowered = text.lower()
+    if "```python" in lowered:
+        idx = lowered.find("```python")
+        extracted = text[idx + len("```python"):].strip()
+        if "```" in extracted:
+            extracted = extracted[:extracted.find("```")].strip()
+        return extracted
+    elif "```" in text:
+        idx = text.find("```")
+        extracted = text[idx + 3:].strip()
+        lines = extracted.splitlines()
+        if lines and lines[0].strip().isalpha():
+            lines = lines[1:]
+        extracted = "\n".join(lines).strip()
+        if "```" in extracted:
+            extracted = extracted[:extracted.find("```")].strip()
+        return extracted
+
     return text.strip()
 
 
@@ -72,34 +96,48 @@ def _syntax_ok(source: str) -> bool:
 def _has_manim_scene(source: str) -> bool:
     try:
         tree = ast.parse(source)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                for base in node.bases:
+                    if isinstance(base, ast.Name) and base.id in ("Scene", "VoiceoverScene", "ThreeDScene", "MovingCameraScene"):
+                        return True
+                    if isinstance(base, ast.Attribute) and base.attr in ("Scene", "VoiceoverScene", "ThreeDScene", "MovingCameraScene"):
+                        return True
     except SyntaxError:
-        return False
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef):
-            for base in node.bases:
-                if isinstance(base, ast.Name) and base.id in ("Scene", "VoiceoverScene", "ThreeDScene", "MovingCameraScene"):
-                    return True
-                if isinstance(base, ast.Attribute) and base.attr in ("Scene", "VoiceoverScene", "ThreeDScene", "MovingCameraScene"):
-                    return True
-    return False
+        pass
+
+    # Fallback regex check: allows detecting Scene classes even if the file was truncated at the end
+    scene_pattern = re.compile(
+        r"class\s+\w+\s*\(\s*(?:[\w\.]*\.)?(?:Scene|VoiceoverScene|ThreeDScene|MovingCameraScene)\s*\)",
+        re.IGNORECASE,
+    )
+    return bool(scene_pattern.search(source))
 
 
 def _heuristic_exec_score(code: str) -> float:
     source = _extract_python(code)
-    
+
     score = 0.0
     # Baseline formatting rewards so truncated candidates don't flatline to 0.0
     if "```python" in code.lower() or "```" in code:
         score += 0.10
-    if "class " in code and "Scene" in code:
+    if "class " in code and any(s in code for s in ("Scene", "VoiceoverScene", "ThreeDScene", "MovingCameraScene")):
         score += 0.10
-        
+    if "def construct" in code:
+        score += 0.10
+    if "self.play(" in code or "self.add(" in code:
+        score += 0.10
+
+    has_scene = _has_manim_scene(source)
     if _syntax_ok(source):
-        score += 0.05
-        if _has_manim_scene(source):
+        score += 0.10
+        if has_scene:
+            score = max(score, HEURISTIC_EXEC_PARTIAL + 0.10)
+    else:
+        if has_scene:
             score = max(score, HEURISTIC_EXEC_PARTIAL)
-            
-    return score
+
+    return min(1.0, score)
 
 
 def _coverage_divisor() -> float:
@@ -188,10 +226,11 @@ def executability_reward(completions: list[object], **kwargs) -> list[float]:
                     mp4s = list(Path(tmpdir).rglob("*.mp4"))
                     rendered_videos.append(str(mp4s[0]) if mp4s else None)
                 else:
-                    rewards.append(0.0)
+                    # Non-rendering code receives partial heuristic score so reward doesn't collapse to 0.0
+                    rewards.append(0.5 * _heuristic_exec_score(code))
                     rendered_videos.append(None)
         except Exception:
-            rewards.append(0.0)
+            rewards.append(0.5 * _heuristic_exec_score(code))
             rendered_videos.append(None)
             
     # Stash rendered videos in kwargs for visual reward if passed as dict
@@ -341,11 +380,11 @@ def combined_reward(completions: list[object], **kwargs) -> list[float]:
     penalties = _length_penalty(kwargs.get("completion_ids"), n)
     combined = []
     for e, v, a, c, pen in zip(exec_r, vcer_r, align_r, cover_r, penalties):
-        # Hard executability gate: if code lacks basic format, reward is 0.0
-        if e < 0.15:
-            combined.append(0.0)
-            continue
         score = w["exec"] * e + w["align"] * a + w["vcer"] * v + w["cover"] * c - pen
+        # Soft penalty instead of hard collapse to 0.0:
+        # If code completely lacks basic structure (e < 0.10), dampen score by 75%
+        if e < 0.10:
+            score *= 0.25
         combined.append(max(0.0, min(1.0, score)))
 
     if _reward_debug_enabled() and combined:
