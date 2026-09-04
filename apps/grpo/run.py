@@ -64,6 +64,18 @@ def main() -> int:
         import unsloth  # noqa: F401 — must precede trl for Gemma/Unsloth path
 
     model, tokenizer = load_model(config)
+    
+    if config.base_family == "qwen":
+        tokenizer.eos_token = "<|im_end|>"
+        try:
+            im_end_id = tokenizer.convert_tokens_to_ids("<|im_end|>")
+            if hasattr(model, "generation_config") and im_end_id is not None:
+                # Ensure stopping criteria includes both the default eos and <|im_end|>
+                stop_ids = [tokenizer.eos_token_id, im_end_id]
+                model.generation_config.eos_token_id = list(set(stop_ids))
+                model.generation_config.pad_token_id = tokenizer.pad_token_id
+        except Exception as e:
+            print(f"Warning: could not set generation config stop tokens: {e}", file=sys.stderr)
     dataset = truncate_dataset_prompts(
         build_dataset(config),
         tokenizer,

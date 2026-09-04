@@ -215,8 +215,8 @@ def apply_dual_t4_preset(config: TrainingConfig) -> TrainingConfig:
         config,
         num_generations=4,
         max_prompt_length=1024,
-        max_completion_length=1024,
-        max_seq_length=2048,
+        max_completion_length=512,
+        max_seq_length=1536,
         load_in_4bit=True,
         report_to=report_to,
     )

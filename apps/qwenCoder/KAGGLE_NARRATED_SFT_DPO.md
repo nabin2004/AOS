@@ -43,12 +43,12 @@ End-to-end curriculum for converting, fine-tuning, and aligning **`Qwen/Qwen3-8B
 
 ---
 
-## Target Model Repositories on Hugging Face
-
-| Stage | Target Repository | Base LLM |
-|---|---|---|
-| **Stage 1 (Continued SFT)** | [`nabin2004/AOS-qwen3-8b-narrated-adapter`](https://huggingface.co/nabin2004/AOS-qwen3-8b-narrated-adapter) | `Qwen/Qwen3-8B` |
-| **Stage 2 (DPO Alignment)** | [`nabin2004/AOS-qwen3-8b-narrated-dpo`](https://huggingface.co/nabin2004/AOS-qwen3-8b-narrated-dpo) | `Qwen/Qwen3-8B` |
+| Stage | Target Repository | Base LLM | Format |
+|---|---|---|---|
+| **Stage 1 (Continued SFT)** | [`nabin2004/AOS-qwen3-8b-narrated-adapter`](https://huggingface.co/nabin2004/AOS-qwen3-8b-narrated-adapter) | `Qwen/Qwen3-8B` | LoRA Adapter |
+| **Stage 2 (DPO Alignment)** | [`nabin2004/AOS-qwen3-8b-narrated-dpo`](https://huggingface.co/nabin2004/AOS-qwen3-8b-narrated-dpo) | `Qwen/Qwen3-8B` | LoRA Adapter |
+| **Stage 3 (Merged Deployment)** | [`nabin2004/AOS-qwen3-8b-narrated-merged`](https://huggingface.co/nabin2004/AOS-qwen3-8b-narrated-merged) | `Qwen/Qwen3-8B` | Merged bf16 Safetensors |
+| **Stage 3 (GGUF / Ollama)** | [`nabin2004/AOS-qwen3-8b-narrated-gguf`](https://huggingface.co/nabin2004/AOS-qwen3-8b-narrated-gguf) | `Qwen/Qwen3-8B` | Q4_K_M & Q8_0 GGUF + Modelfile |
 
 ---
 
@@ -109,6 +109,16 @@ except Exception:
 !python3 /kaggle/working/AOS/apps/qwenCoder/run_kaggle_narrated.py
 ```
 
+### One-Click Kaggle Deployment (Stage 3: Merge, GGUF & Dual Hub Upload)
+
+Run in a fresh Kaggle code cell with **GPU (or CPU) and Internet ON**:
+
+```python
+# One-Click Stage 3: Merge LoRA + Convert to GGUF (Q4_K_M & Q8_0) + Push to Hugging Face
+!cd /kaggle/working && git clone https://github.com/nabin2004/AOS.git 2>/dev/null || git -C /kaggle/working/AOS pull
+!python3 /kaggle/working/AOS/apps/qwenCoder/run_kaggle_narrated_deploy.py
+```
+
 ---
 
 ## Standalone Commands (Local or Cloud)
@@ -142,4 +152,14 @@ uv run python run_narrated_dpo.py \
     --hub-dpo-repo nabin2004/AOS-qwen3-8b-narrated-dpo \
     --beta 0.1 \
     --push-to-hub
+```
+
+### 5. Master Deployment (Merge LoRA + GGUF Multi-Quant + Dual Hub Upload)
+```bash
+uv run python deploy_narrated_model.py \
+    --base-model Qwen/Qwen3-8B \
+    --adapter-id nabin2004/AOS-qwen3-8b-narrated-dpo \
+    --hub-merged-repo nabin2004/AOS-qwen3-8b-narrated-merged \
+    --hub-gguf-repo nabin2004/AOS-qwen3-8b-narrated-gguf \
+    --quantize-types Q4_K_M Q8_0
 ```

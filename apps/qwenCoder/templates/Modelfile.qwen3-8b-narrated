@@ -1,0 +1,16 @@
+FROM ./{gguf_file}
+
+TEMPLATE """{{ if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}{{ if .Prompt }}<|im_start|>user
+{{ .Prompt }}<|im_end|>
+{{ end }}<|im_start|>assistant
+{{ .Response }}<|im_end|>"""
+
+PARAMETER temperature 0.2
+PARAMETER top_p 0.95
+PARAMETER num_ctx 8192
+PARAMETER stop <|im_start|>
+PARAMETER stop <|im_end|>
+
+SYSTEM """You are an expert mathematical animation assistant specializing in Manim Community Edition and voiceover narration with manim-voiceover. You write complete, self-contained, fully executable Python scripts inheriting from VoiceoverScene with synchronized audio bookmarks and speech services."""

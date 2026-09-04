@@ -86,9 +86,20 @@ def _has_manim_scene(source: str) -> bool:
 
 def _heuristic_exec_score(code: str) -> float:
     source = _extract_python(code)
-    if not _syntax_ok(source) or not _has_manim_scene(source):
-        return 0.0
-    return HEURISTIC_EXEC_PARTIAL
+    
+    score = 0.0
+    # Baseline formatting rewards so truncated candidates don't flatline to 0.0
+    if "```python" in code.lower() or "```" in code:
+        score += 0.10
+    if "class " in code and "Scene" in code:
+        score += 0.10
+        
+    if _syntax_ok(source):
+        score += 0.05
+        if _has_manim_scene(source):
+            score = max(score, HEURISTIC_EXEC_PARTIAL)
+            
+    return score
 
 
 def _coverage_divisor() -> float:
@@ -330,8 +341,8 @@ def combined_reward(completions: list[object], **kwargs) -> list[float]:
     penalties = _length_penalty(kwargs.get("completion_ids"), n)
     combined = []
     for e, v, a, c, pen in zip(exec_r, vcer_r, align_r, cover_r, penalties):
-        # Hard executability gate: if code cannot execute, reward is 0.0
-        if e < 0.2:
+        # Hard executability gate: if code lacks basic format, reward is 0.0
+        if e < 0.15:
             combined.append(0.0)
             continue
         score = w["exec"] * e + w["align"] * a + w["vcer"] * v + w["cover"] * c - pen

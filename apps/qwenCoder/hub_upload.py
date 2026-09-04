@@ -65,6 +65,9 @@ def push_model_folder(
         ignore_patterns=patterns or None,
         path_in_repo=path_in_repo,
     )
+    if readme is None and (folder / "README.md").is_file():
+        readme = folder / "README.md"
+
     if readme is not None and readme.is_file():
         api.upload_file(
             path_or_fileobj=str(readme),
