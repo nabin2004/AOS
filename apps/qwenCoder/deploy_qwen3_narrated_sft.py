@@ -219,6 +219,13 @@ def main() -> int:
     if not any((gguf_dir / f"{args.ollama_tag}-{q}.gguf").is_file() for q in args.quantize_types):
         if not f16_gguf.is_file():
             print(f"Converting {merged_dir} to F16 GGUF...")
+            env = os.environ.copy()
+            llama_paths = [
+                str(convert_py.parent),
+                str(QWEN_ROOT / "llama_repo"),
+                str(QWEN_ROOT / "llama_repo" / "gguf-py"),
+            ]
+            env["PYTHONPATH"] = os.pathsep.join(llama_paths + [env.get("PYTHONPATH", "")])
             subprocess.run(
                 [
                     sys.executable,
@@ -229,6 +236,8 @@ def main() -> int:
                     "--outtype",
                     "f16",
                 ],
+                cwd=str(convert_py.parent),
+                env=env,
                 check=True,
             )
             print(f"✔ Created F16 GGUF ({f16_gguf.stat().st_size / 1e9:.2f} GB)")
