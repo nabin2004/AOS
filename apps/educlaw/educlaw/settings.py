@@ -44,7 +44,7 @@ class Settings:
         tail_raw = _env("EDUCLAW_COMPACTION_TAIL", "6")
         digest_raw = _env("EDUCLAW_MEMORY_DIGEST_EVERY", "3")
         harness_raw = _env("EDUCLAW_HARNESS_HOME")
-        model = _env("EDUCLAW_MODEL", "openai:gpt-4o-mini") or "openai:gpt-4o-mini"
+        model = _env("EDUCLAW_MODEL", "ollama:aos-qwen3-8b-narrated-sft") or "ollama:aos-qwen3-8b-narrated-sft"
         mode = (_env("EDUCLAW_PERMISSION_MODE", "default") or "default").lower()
         if mode not in {"default", "edit", "auto"}:
             mode = "default"
