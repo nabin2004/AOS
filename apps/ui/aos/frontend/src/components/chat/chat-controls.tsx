@@ -19,7 +19,9 @@ import {
   Film,
   Brain,
   Terminal,
+  Users,
 } from "lucide-react";
+
 import type { LucideIcon } from "lucide-react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui";
