@@ -229,3 +229,32 @@ class TestUserServicePostgresql:
 
             with pytest.raises(NotFoundError):
                 await user_service.delete(uuid4())
+
+
+@pytest.mark.anyio
+async def test_stream_tool_events_function_tool_result():
+    """Test streaming of FunctionToolResultEvent does not raise AttributeError."""
+    from pydantic_ai import FunctionToolCallEvent, FunctionToolResultEvent
+    from pydantic_ai.messages import ToolCallPart, ToolReturnPart
+    from app.services.agent_session import AgentSession
+
+    mock_ws = AsyncMock()
+    mock_user = MagicMock()
+    session = AgentSession(websocket=mock_ws, user=mock_user)
+
+    call_part = ToolCallPart(tool_name="ask_question", args={"q": "hi"}, tool_call_id="call_1")
+    return_part = ToolReturnPart(tool_name="ask_question", content="user response", tool_call_id="call_1")
+
+    call_ev = FunctionToolCallEvent(part=call_part)
+    result_ev = FunctionToolResultEvent(part=return_part, content="user response")
+
+    async def fake_stream():
+        yield call_ev
+        yield result_ev
+
+    collected = []
+    await session._stream_tool_events(fake_stream(), collected)
+
+    assert len(collected) == 1
+    assert collected[0]["result"] == "user response"
+

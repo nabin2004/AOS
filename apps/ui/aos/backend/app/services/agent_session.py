@@ -1403,13 +1403,19 @@ class AgentSession:
                 await send_event(self.websocket, "tool_call", tc)
             elif isinstance(tool_event, FunctionToolResultEvent):
                 tc = pending.get(tool_event.tool_call_id)
+                res_content = getattr(tool_event, "content", None)
+                if res_content is None and hasattr(tool_event, "part"):
+                    res_content = getattr(tool_event.part, "content", None)
+                if res_content is None and hasattr(tool_event, "result"):
+                    res_content = getattr(tool_event.result, "content", tool_event.result)
+                content_str = str(res_content) if res_content is not None else ""
                 if tc is not None:
-                    tc["result"] = str(tool_event.result.content)
+                    tc["result"] = content_str
                 await send_event(
                     self.websocket,
                     "tool_result",
                     {
                         "tool_call_id": tool_event.tool_call_id,
-                        "content": str(tool_event.result.content),
+                        "content": content_str,
                     },
                 )
