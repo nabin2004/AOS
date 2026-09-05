@@ -151,6 +151,10 @@ class AgentTurnHandler:
             prompt = self._compose_prompt(user_text, steer_texts)
             instructions = await self._build_instructions(user_text)
 
+            if self.deps.emit:
+                self.deps.emit("prompt_prep", {"prompt": prompt, "instructions": instructions})
+                self.deps.emit("model_start", {"model": str(self.settings.model)})
+
             result = await self.agent.run(
                 prompt,
                 message_history=self.message_history,

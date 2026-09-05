@@ -95,6 +95,20 @@ def _print_emit(event: str, payload: object, target_console: Console | None = No
         )
     elif event == "tool":
         out.print(f"[dim cyan][TOOL][/] [white]{payload}[/]")
+    elif event == "prompt_prep":
+        if isinstance(payload, dict):
+            prompt_val = payload.get("prompt", "")
+            instr_val = payload.get("instructions", "")
+            out.print(
+                Panel(
+                    f"[bold cyan]User Prompt / Input:[/]\n{prompt_val}\n\n[bold yellow]System Instructions & Injected Context:[/]\n{instr_val}",
+                    title="[bold magenta]EduClaw Harness Transparency View[/]",
+                    border_style="magenta",
+                )
+            )
+    elif event == "model_start":
+        model_name = payload.get("model", "") if isinstance(payload, dict) else str(payload)
+        out.print(f"[bold green][LLM][/] Executing turn with model [bold cyan]{model_name}[/]...")
     else:
         out.print(f"[dim][harness] {event}: {payload}[/]")
 
@@ -243,8 +257,8 @@ async def run_repl(
             continue
 
         try:
-            with out.status("[bold cyan]EduClaw is thinking...[/]", spinner="dots"):
-                output = await handler.run_turn(line)
+            out.print("[bold cyan]⠋ EduClaw executing turn...[/]")
+            output = await handler.run_turn(line)
         except Exception as exc:  # noqa: BLE001 — REPL stays alive on errors
             out.print(f"[bold red][ERR] [harness error]:[/] {exc}")
             continue
