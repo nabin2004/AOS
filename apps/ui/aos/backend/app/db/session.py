@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
+from app.core.exceptions import AppException
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,9 @@ async def _managed_session(
         try:
             yield session
             await session.commit()
+        except AppException:
+            await session.rollback()
+            raise
         except Exception:
             logger.exception("DB session error, rolling back")
             try:
