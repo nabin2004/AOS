@@ -12,10 +12,12 @@ EduClaw is built around several core components:
 - **Agent Harness** ([`educlaw/agent/`](file:///c:/Users/nabin/Desktop/myall/AOS/apps/educlaw/educlaw/agent)): Leverages `pydantic-ai` for tool integration, prompt framing, context compaction, and execution loops.
 - **Animate Workflow** ([`educlaw/animateworkflow/`](file:///c:/Users/nabin/Desktop/myall/AOS/apps/educlaw/educlaw/animateworkflow)): Contains scene generation logic, multi-agent animation orchestration, and Manim script creation workflows.
 - **Temporal Memory** ([`educlaw/memory/`](file:///c:/Users/nabin/Desktop/myall/AOS/apps/educlaw/educlaw/memory)): Integrates with the `dagestan` temporal graph storage at `<cwd>/.aos/memory/graph.json`.
-- **Sandbox Execution** ([`educlaw/sandbox/`](file:///c:/Users/nabin/Desktop/myall/AOS/apps/educlaw/educlaw/sandbox)): Safe containerized execution environment for rendering Manim scenes via Docker.
+- **Sandbox Execution & Keyframe Probing** ([`educlaw/sandbox/`](file:///c:/Users/nabin/Desktop/myall/AOS/apps/educlaw/educlaw/sandbox)): Safe containerized execution environment for rendering Manim scenes via Docker. Supports rapid `-ql -s` keyframe probing via `test_render_manim`.
+- **Manim Spatial Skills** ([`.agents/skills/manim-spatial-rules/SKILL.md`](file:///c:/Users/nabin/Desktop/myall/AOS/apps/educlaw/.agents/skills/manim-spatial-rules/SKILL.md)): On-demand spatial heuristics, 16:9 coordinate boundaries, and LaTeX raw-string rules.
 - **Durability Layer** ([`educlaw/durable.py`](file:///c:/Users/nabin/Desktop/myall/AOS/apps/educlaw/educlaw/durable.py)): Wraps Pydantic AI agents with `KitaruAgent` for fault-tolerant execution when `educlaw[durable]` is installed.
 
 ---
+
 
 ## 2. Environment & Tooling
 

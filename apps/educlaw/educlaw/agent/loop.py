@@ -109,8 +109,16 @@ class AgentTurnHandler:
         agents_md = load_agents_md(self.deps.cwd)
         strategy = await self.deps.memory.strategy()
         retrieved = await self.deps.memory.retrieve(user_text)
+        manim_operational_guidance = (
+            "## Manim Synthesis Operational Loop\n"
+            "1. **LSP Preflight**: Ensure imports (`from manim import *`) and syntax are clean.\n"
+            "2. **Keyframe Probe**: Invoke `test_render_manim(scene_name=..., code=...)` with `-ql -s` to test for LaTeX compilation errors and visual layout bounds before full render.\n"
+            "3. **Self-Healing Loop**: If `test_render_manim` fails, parse the stderr traceback, repair LaTeX raw strings `MathTex(r\"...\")` or coordinates, and re-test.\n"
+            "4. **Final Render**: Once keyframes pass validation, trigger full scene compilation via `manim_render`."
+        )
         parts = [
             "You are running inside the EduClaw harness.",
+            manim_operational_guidance,
         ]
         if agents_md.strip():
             parts.append("## AGENTS.md\n" + agents_md.strip())
@@ -119,6 +127,7 @@ class AgentTurnHandler:
         if retrieved:
             parts.append("## Retrieved memory\n" + str(retrieved).strip())
         return "\n\n".join(parts)
+
 
     def _compose_prompt(self, user_text: str, steer_texts: list[str]) -> str:
         if not steer_texts:

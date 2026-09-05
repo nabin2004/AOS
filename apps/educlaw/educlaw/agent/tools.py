@@ -95,6 +95,51 @@ def register_tools(agent: Agent[AgentDeps, str]) -> None:
         return ctx.deps.sandbox.format_result(proc)
 
     @agent.tool
+    async def test_render_manim(
+        ctx: RunContext[AgentDeps],
+        scene_name: str,
+        scene_file: str = "scene.py",
+        code: str = "",
+    ) -> str:
+        """Fast keyframe render probe (-ql -s) in sandbox to verify syntax, LaTeX, and visual layout before full render."""
+        if code.strip():
+            action = PermissionAction(kind="write", summary=f"write {scene_file}")
+            if not await ctx.deps.gate.approve(action, emit=ctx.deps.emit):
+                return "permission denied: write before test_render"
+            try:
+                host = ctx.deps.sandbox.jail(scene_file)
+                host.parent.mkdir(parents=True, exist_ok=True)
+                host.write_text(code, encoding="utf-8")
+                report = ctx.deps.lsp.after_write(host)
+                if report and "SyntaxError" in report:
+                    return f"LSP Preflight Syntax Failure:\n{report}"
+            except PathJailError as exc:
+                return f"path rejected: {exc}"
+
+        action = PermissionAction(
+            kind="render",
+            summary=f"keyframe render {scene_file}::{scene_name} -ql -s",
+        )
+        if not await ctx.deps.gate.approve(action, emit=ctx.deps.emit):
+            return "permission denied: test_render"
+
+        cmd = f"manim -ql -s --media_dir ./output {scene_file} {scene_name}"
+        argv = ctx.deps.sandbox.bash_argv(cmd)
+        _emit(ctx, "tool", {"name": "test_render_manim", "cmd": cmd})
+        try:
+            proc = ctx.deps.sandbox.run(argv, timeout=60)
+        except FileNotFoundError as exc:
+            return str(exc)
+
+        output = ctx.deps.sandbox.format_result(proc)
+        if proc.returncode != 0:
+            return f"Keyframe Probe Failed (exit code {proc.returncode}). Stderr trace:\n{output[-1500:]}"
+
+        keyframe_path = f"output/images/{Path(scene_file).stem}/{scene_name}.png"
+        return f"Keyframe Probe PASSED (exit code 0).\nKeyframe image generated: {keyframe_path}\nReady for full scene rendering via manim_render."
+
+    @agent.tool
+
     async def syntax_check(ctx: RunContext[AgentDeps], path: str) -> str:
         """Parse a Python file with ast. Cheap syntax feedback after edits."""
         try:
