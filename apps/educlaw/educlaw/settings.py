@@ -35,6 +35,7 @@ class Settings:
     manim_quality: str
     kitaru: bool
     logfire: bool
+    ollama_base_url: str | None = None
 
     @classmethod
     def from_env(cls) -> Settings:
@@ -47,6 +48,15 @@ class Settings:
         mode = (_env("EDUCLAW_PERMISSION_MODE", "default") or "default").lower()
         if mode not in {"default", "edit", "auto"}:
             mode = "default"
+        
+        ollama_url = _env("OLLAMA_BASE_URL")
+        if model.startswith("ollama:"):
+            if not ollama_url:
+                ollama_url = "http://localhost:11434/v1"
+                os.environ["OLLAMA_BASE_URL"] = ollama_url
+            elif "OLLAMA_BASE_URL" not in os.environ:
+                os.environ["OLLAMA_BASE_URL"] = ollama_url
+
         return cls(
             model=model,
             api_key=_env("EDUCLAW_API_KEY") or _env("OPENAI_API_KEY") or _env("ANTHROPIC_API_KEY"),
@@ -64,6 +74,7 @@ class Settings:
             manim_quality=_env("EDUCLAW_MANIM_QUALITY", "m") or "m",
             kitaru=_truthy(_env("EDUCLAW_KITARU", "0")),
             logfire=_truthy(_env("EDUCLAW_LOGFIRE", "0")) or bool(_env("LOGFIRE_TOKEN")),
+            ollama_base_url=ollama_url,
         )
 
 

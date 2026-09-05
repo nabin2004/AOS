@@ -1132,12 +1132,40 @@ def doctor_command(
     # Model configuration
     table.add_row("Agent Model", "[bold green][OK] Configured[/]", settings.model)
 
-    # API Keys
+    # API Keys & Local Ollama verification
+    is_ollama_model = settings.model.startswith("ollama:")
     has_key = bool(settings.api_key or os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY"))
-    if has_key or settings.test_model:
+    if is_ollama_model:
+        table.add_row("LLM API Key", "[bold green][OK] Local Ollama[/]", "Ollama endpoint active (no external API key required)")
+    elif has_key or settings.test_model:
         table.add_row("LLM API Key", "[bold green][OK] Configured[/]", "Present in environment or test model active")
     else:
         table.add_row("LLM API Key", "[bold yellow][WARN] Missing[/]", "Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or EDUCLAW_API_KEY")
+
+    # Local Ollama Health & Model Check
+    if is_ollama_model or settings.ollama_base_url:
+        import json
+        import urllib.request
+        base_url = settings.ollama_base_url or "http://localhost:11434/v1"
+        target_model = settings.model.removeprefix("ollama:")
+        # Convert http://localhost:11434/v1 -> http://localhost:11434/api/tags
+        host_url = base_url.rsplit("/v1", 1)[0].rstrip("/") + "/api/tags"
+        try:
+            req = urllib.request.Request(host_url, headers={"User-Agent": "EduClaw"})
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                if resp.status == 200:
+                    data = json.loads(resp.read().decode())
+                    models = [m.get("name", "") for m in data.get("models", [])]
+                    # Check matching model name or substring
+                    model_found = any(target_model in m or m.startswith(target_model) for m in models)
+                    if model_found:
+                        table.add_row("Ollama Service", "[bold green][OK] Running & Ready[/]", f"Model '{target_model}' found in local Ollama ({len(models)} models available)")
+                    else:
+                        table.add_row("Ollama Service", "[bold yellow][WARN] Model Missing[/]", f"Ollama is running, but '{target_model}' not found in local models: {', '.join(models[:3])}")
+                else:
+                    table.add_row("Ollama Service", "[bold yellow][WARN] HTTP Error[/]", f"Ollama endpoint responded with status {resp.status}")
+        except Exception as exc:
+            table.add_row("Ollama Service", "[bold yellow][WARN] Offline[/]", f"Could not connect to Ollama at {host_url}: {exc}")
 
     # Docker Daemon
     docker_bin = shutil.which("docker")

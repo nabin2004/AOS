@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -60,6 +61,30 @@ def maybe_wrap_kitaru(agent: Agent[AgentDeps, str], settings: Settings) -> Agent
         return KitaruAgent(agent)  # type: ignore[return-value]
 
 
+def resolve_educlaw_model(model_spec: str | object) -> str | object:
+    if isinstance(model_spec, str) and model_spec.startswith("ollama:"):
+        model_name = model_spec[len("ollama:") :]
+        if not os.getenv("OLLAMA_BASE_URL"):
+            os.environ["OLLAMA_BASE_URL"] = "http://localhost:11434/v1"
+        try:
+            from pydantic_ai.models.openai import OpenAIChatModel
+            from pydantic_ai.profiles import merge_profile
+            from pydantic_ai.profiles.openai import OpenAIModelProfile
+
+            base = OpenAIChatModel(model_name, provider="ollama")
+            return OpenAIChatModel(
+                model_name,
+                provider="ollama",
+                profile=merge_profile(
+                    base.profile,
+                    OpenAIModelProfile(openai_chat_send_back_thinking_parts=False),
+                ),
+            )
+        except Exception:
+            return model_spec
+    return model_spec
+
+
 def build_agent(
     settings: Settings | None = None,
     *,
@@ -70,11 +95,11 @@ def build_agent(
     settings = settings or Settings.from_env()
     resolved: str | object
     if model is not None:
-        resolved = model
+        resolved = resolve_educlaw_model(model)
     elif settings.test_model:
         resolved = TestModel(call_tools=[], custom_output_text="ok")
     else:
-        resolved = settings.model
+        resolved = resolve_educlaw_model(settings.model)
     agent = Agent(
         resolved,
         name="EduClaw",
