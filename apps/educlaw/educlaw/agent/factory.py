@@ -62,26 +62,55 @@ def maybe_wrap_kitaru(agent: Agent[AgentDeps, str], settings: Settings) -> Agent
 
 
 def resolve_educlaw_model(model_spec: str | object) -> str | object:
-    if isinstance(model_spec, str) and model_spec.startswith("ollama:"):
-        model_name = model_spec[len("ollama:") :]
-        if not os.getenv("OLLAMA_BASE_URL"):
-            os.environ["OLLAMA_BASE_URL"] = "http://localhost:11434/v1"
-        try:
-            from pydantic_ai.models.openai import OpenAIChatModel
-            from pydantic_ai.profiles import merge_profile
-            from pydantic_ai.profiles.openai import OpenAIModelProfile
-
-            base = OpenAIChatModel(model_name, provider="ollama")
-            return OpenAIChatModel(
-                model_name,
-                provider="ollama",
-                profile=merge_profile(
-                    base.profile,
-                    OpenAIModelProfile(openai_chat_send_back_thinking_parts=False),
-                ),
+    if isinstance(model_spec, str):
+        spec = model_spec.strip()
+        cloud_prefixes = (
+            "openai:",
+            "anthropic:",
+            "openrouter:",
+            "google-gla:",
+            "google-vertex:",
+            "gemini:",
+            "groq:",
+            "mistral:",
+            "cohere:",
+            "test:",
+        )
+        is_ollama = (
+            spec.startswith("ollama:")
+            or spec.startswith("aos-")
+            or spec.startswith("qwen")
+            or (
+                not any(spec.startswith(p) for p in cloud_prefixes)
+                and not spec.startswith(("gpt-", "claude-", "gemini-"))
+                and "/" not in spec
             )
-        except Exception:
-            return model_spec
+        )
+        if is_ollama:
+            model_name = spec[len("ollama:") :] if spec.startswith("ollama:") else spec
+            if not os.getenv("OLLAMA_BASE_URL"):
+                if Path("/.dockerenv").is_file() or Path("/app").is_dir():
+                    os.environ["OLLAMA_BASE_URL"] = "http://host.docker.internal:11434/v1"
+                else:
+                    os.environ["OLLAMA_BASE_URL"] = "http://localhost:11434/v1"
+            try:
+                from pydantic_ai.models.openai import OpenAIChatModel
+                from pydantic_ai.profiles import merge_profile
+                from pydantic_ai.profiles.openai import OpenAIModelProfile
+
+                base = OpenAIChatModel(model_name, provider="ollama")
+                return OpenAIChatModel(
+                    model_name,
+                    provider="ollama",
+                    profile=merge_profile(
+                        base.profile,
+                        OpenAIModelProfile(openai_chat_send_back_thinking_parts=False),
+                    ),
+                )
+            except Exception:
+                return f"ollama:{model_name}"
+        elif "/" in spec and not any(spec.startswith(p) for p in cloud_prefixes):
+            return f"openrouter:{spec}"
     return model_spec
 
 
