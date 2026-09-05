@@ -37,6 +37,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       # Inside Docker, MinIO is reached by service name (host .env uses localhost:9010).
       - S3_VIDEO_ENDPOINT=http://minio:9000
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - backend

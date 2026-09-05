@@ -88,11 +88,16 @@ def resolve_educlaw_model(model_spec: str | object) -> str | object:
         )
         if is_ollama:
             model_name = spec[len("ollama:") :] if spec.startswith("ollama:") else spec
-            if not os.getenv("OLLAMA_BASE_URL"):
+            ollama_url = os.getenv("OLLAMA_BASE_URL")
+            if not ollama_url:
                 if Path("/.dockerenv").is_file() or Path("/app").is_dir():
-                    os.environ["OLLAMA_BASE_URL"] = "http://host.docker.internal:11434/v1"
+                    ollama_url = "http://host.docker.internal:11434/v1"
                 else:
-                    os.environ["OLLAMA_BASE_URL"] = "http://localhost:11434/v1"
+                    ollama_url = "http://localhost:11434/v1"
+                os.environ["OLLAMA_BASE_URL"] = ollama_url
+            elif "localhost" in ollama_url and (Path("/.dockerenv").is_file() or Path("/app").is_dir()):
+                ollama_url = ollama_url.replace("localhost", "host.docker.internal").replace("127.0.0.1", "host.docker.internal")
+                os.environ["OLLAMA_BASE_URL"] = ollama_url
             try:
                 from pydantic_ai.models.openai import OpenAIChatModel
                 from pydantic_ai.profiles import merge_profile

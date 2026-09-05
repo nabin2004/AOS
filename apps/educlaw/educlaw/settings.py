@@ -50,12 +50,17 @@ class Settings:
             mode = "default"
         
         ollama_url = _env("OLLAMA_BASE_URL")
-        if model.startswith("ollama:"):
-            if not ollama_url:
+        if not ollama_url:
+            if Path("/.dockerenv").is_file() or Path("/app").is_dir():
+                ollama_url = "http://host.docker.internal:11434/v1"
+            else:
                 ollama_url = "http://localhost:11434/v1"
-                os.environ["OLLAMA_BASE_URL"] = ollama_url
-            elif "OLLAMA_BASE_URL" not in os.environ:
-                os.environ["OLLAMA_BASE_URL"] = ollama_url
+            os.environ["OLLAMA_BASE_URL"] = ollama_url
+        elif "localhost" in ollama_url and (Path("/.dockerenv").is_file() or Path("/app").is_dir()):
+            ollama_url = ollama_url.replace("localhost", "host.docker.internal").replace("127.0.0.1", "host.docker.internal")
+            os.environ["OLLAMA_BASE_URL"] = ollama_url
+        elif "OLLAMA_BASE_URL" not in os.environ:
+            os.environ["OLLAMA_BASE_URL"] = ollama_url
 
         return cls(
             model=model,

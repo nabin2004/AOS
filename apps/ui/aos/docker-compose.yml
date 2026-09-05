@@ -73,8 +73,10 @@ services:
     volumes:
       - ./backend/app:/app/app:ro
       - ./backend/cli:/app/cli:ro
+      - ../../educlaw:/app/apps/educlaw:ro
       - media_data:/app/media
       - ./emails:/app/emails:ro
+
     env_file:
       - ./backend/.env
     environment:
@@ -86,6 +88,7 @@ services:
       - MILVUS_PORT=19530
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --ws websockets-sansio
     networks:
       - backend
