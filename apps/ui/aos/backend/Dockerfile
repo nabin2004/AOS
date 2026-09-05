@@ -35,10 +35,11 @@ WORKDIR /app
 # blocking npm install on the first parse request from a fresh container.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates gnupg \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && npm install -g @llamaindex/liteparse \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Copy virtual environment from builder
 COPY --from=builder /app/.venv /app/.venv
