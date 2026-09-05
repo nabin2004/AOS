@@ -3,10 +3,26 @@ from pathlib import Path
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 
-# Ensure apps/educlaw is discoverable on sys.path
-educlaw_path = Path(__file__).resolve().parents[6] / "educlaw"
-if educlaw_path.is_dir() and str(educlaw_path) not in sys.path:
+def _find_educlaw_path() -> Path | None:
+    container_candidates = [Path("/app/apps/educlaw"), Path("/app/educlaw")]
+    for candidate in container_candidates:
+        if candidate.is_dir():
+            return candidate
+    curr = Path(__file__).resolve()
+    for parent in [curr, *curr.parents]:
+        candidate = parent / "apps" / "educlaw"
+        if candidate.is_dir():
+            return candidate
+        candidate_direct = parent / "educlaw"
+        if candidate_direct.is_dir():
+            return candidate_direct
+    return None
+
+
+educlaw_path = _find_educlaw_path()
+if educlaw_path and str(educlaw_path) not in sys.path:
     sys.path.insert(0, str(educlaw_path))
+
 
 from app.api.deps import CurrentUser
 from app.services.educlaw_service import EduClawService
@@ -40,7 +56,12 @@ async def get_educlaw_config(
     current_user: CurrentUser,
 ) -> dict[str, Any]:
     """Get active EduClaw harness configuration and settings."""
-    from educlaw.settings import Settings
+    from app.services.educlaw_service import HAS_EDUCLAW, Settings
+    if not HAS_EDUCLAW or Settings is None:
+        raise HTTPException(
+            status_code=503,
+            detail="EduClaw harness is not available on this server.",
+        )
     settings = Settings.from_env()
     return {
         "model": settings.model,

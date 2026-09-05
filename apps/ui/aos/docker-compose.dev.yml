@@ -19,6 +19,7 @@ services:
     volumes:
       - ./backend/app:/app/app:ro
       - ./backend/cli:/app/cli:ro
+      - ../../educlaw:/app/apps/educlaw:ro
       - media_data:/app/media
       # email/templates.py reads pre-compiled HTML/text from /app/emails/compiled.
       # Build context is ./backend so the dir isn't in the image — mount it.

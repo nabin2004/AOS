@@ -10,15 +10,44 @@ from typing import Any, Callable, Coroutine
 
 from fastapi import WebSocket
 
-# Ensure apps/educlaw is discoverable on sys.path
-educlaw_path = Path(__file__).resolve().parents[5] / "educlaw"
-if educlaw_path.is_dir() and str(educlaw_path) not in sys.path:
+def _find_educlaw_path() -> Path | None:
+    container_candidates = [
+        Path("/app/apps/educlaw"),
+        Path("/app/educlaw"),
+        Path("/educlaw"),
+    ]
+    for candidate in container_candidates:
+        if candidate.is_dir():
+            return candidate
+    curr = Path(__file__).resolve()
+    for parent in [curr, *curr.parents]:
+        candidate = parent / "apps" / "educlaw"
+        if candidate.is_dir():
+            return candidate
+        candidate_direct = parent / "educlaw"
+        if candidate_direct.is_dir():
+            return candidate_direct
+    return None
+
+educlaw_path = _find_educlaw_path()
+if educlaw_path and str(educlaw_path) not in sys.path:
     sys.path.insert(0, str(educlaw_path))
 
-from educlaw.agent.loop import AgentTurnHandler
-from educlaw.permissions.gate import PermissionAction
-from educlaw.session import create_session
-from educlaw.settings import Settings
+
+try:
+    from educlaw.agent.loop import AgentTurnHandler
+    from educlaw.permissions.gate import PermissionAction
+    from educlaw.session import create_session
+    from educlaw.settings import Settings
+    HAS_EDUCLAW = True
+except Exception as _err:
+    logging.getLogger(__name__).warning("EduClaw import failed: %s", _err)
+    HAS_EDUCLAW = False
+    AgentTurnHandler = None
+    PermissionAction = None
+    create_session = None
+    Settings = None
+
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +138,11 @@ class EduClawService:
             fut.set_result(approved)
 
     def get_handler(self) -> AgentTurnHandler:
+        if not HAS_EDUCLAW or Settings is None or create_session is None:
+            raise RuntimeError(
+                "EduClaw harness is not available in the backend environment. "
+                "Ensure apps/educlaw is mounted to /app/apps/educlaw."
+            )
         if self._handler is None:
             settings = Settings.from_env()
             if self.model_name:
