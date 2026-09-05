@@ -16,7 +16,7 @@ uv sync --package educlaw --extra durable --extra dev
 
 | Variable | Purpose |
 |----------|---------|
-| `EDUCLAW_MODEL` | Pydantic AI model string (e.g. `ollama:aos-qwen3-8b-narrated-sft`, `ollama:qwen2.5-coder:7b`, or `openai:gpt-4o-mini`) |
+| `EDUCLAW_MODEL` | Pydantic AI model string (e.g. `ollama:hf.co/nabin2004/AOS-qwen3-8b-narrated-sft-gguf`, `ollama:qwen2.5-coder:7b`, or `openai:gpt-4o-mini`) |
 | `OLLAMA_BASE_URL` | Ollama API endpoint (default `http://localhost:11434/v1`) |
 | `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `EDUCLAW_API_KEY` | Provider key (optional when using local Ollama) |
 | `EDUCLAW_HARNESS_HOME` | Graph + harness data (default `<cwd>/.aos`) |
@@ -37,7 +37,7 @@ To run EduClaw completely offline with a local model:
 
 ```bash
 # Set local model in env or pass via -m flag
-export EDUCLAW_MODEL=ollama:aos-qwen3-8b-narrated-sft
+export EDUCLAW_MODEL=ollama:hf.co/nabin2004/AOS-qwen3-8b-narrated-sft-gguf
 export OLLAMA_BASE_URL=http://localhost:11434/v1
 
 # Run health check

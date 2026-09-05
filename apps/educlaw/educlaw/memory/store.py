@@ -49,8 +49,10 @@ def _lock_for(path: str) -> threading.Lock:
 def make_extraction_client(model: str) -> LLMClient:
     """Sync callable Dagestan can use, backed by the same Pydantic AI model string."""
     from pydantic_ai import Agent
+    from educlaw.agent.factory import resolve_educlaw_model
 
-    extractor = Agent(model, name="educlaw-memory-extract")
+    resolved = resolve_educlaw_model(model)
+    extractor = Agent(resolved, name="educlaw-memory-extract")
 
     def client(system_prompt: str, user_prompt: str) -> str:
         result = extractor.run_sync(user_prompt, instructions=system_prompt)
