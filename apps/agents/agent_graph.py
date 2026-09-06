@@ -207,8 +207,23 @@ def _salvage_codemode_text_dump(
     summary: str,
     messages: list | None,
 ) -> None:
-    """If the model dumped run_code as chat text, write+compile without eval."""
+    """If the model dumped run_code as chat text or wrote a scene without compiling, compile."""
+    from tools.compile import compile_manim_code
+    from tools.manim_write import manim_write
+
     manifest = load_manifest(run_dir)
+    if manifest.get("scene_file") and not (manifest.get("last_compile") or {}).get("ok"):
+        scene_file = Path(run_dir) / manifest["scene_file"]
+        if scene_file.exists():
+            code = scene_file.read_text(encoding="utf-8")
+            scene_name = manifest.get("scene_name") or (manifest.get("last_write") or {}).get("scene_name") or "Scene"
+            compile_manim_code(
+                code=code,
+                scene_name=scene_name,
+                output_dir=str(run_dir),
+            )
+            return
+
     if manifest.get("scene_file") or (manifest.get("last_write") or {}).get("ok"):
         return
 
@@ -217,10 +232,14 @@ def _salvage_codemode_text_dump(
     if extracted is None:
         extracted = extract_codemode_dump(_assistant_text_from_messages(messages))
     if extracted is None:
+        for cand in Path(run_dir).glob("*.py"):
+            if cand.name not in ("__init__.py",):
+                cand_code = cand.read_text(encoding="utf-8")
+                extracted = extract_codemode_dump(cand_code)
+                if extracted:
+                    break
+    if extracted is None:
         return
-
-    from tools.compile import compile_manim_code
-    from tools.manim_write import manim_write
 
     manim_write(
         code=extracted.code,
@@ -243,12 +262,14 @@ async def run_coder_step(
     usage: RunUsage | None = None,
     user_prompt: str | None = None,
     prompt_index: int | None = None,
+    existing_run_dir: str | None = None,
+    feedback: str | None = None,
 ) -> CoderRunResult:
     """Write/compile Manim for a topic; shared by the graph node and web tools."""
     if dbos_enabled():
         ensure_dbos_launched()
 
-    run_dir = new_coder_run_dir(topic)
+    run_dir = Path(existing_run_dir) if existing_run_dir else new_coder_run_dir(topic)
 
     payload = plan_to_payload(plan)
     script_payload = teaching_script_to_payload(teaching_script)
@@ -263,6 +284,14 @@ async def run_coder_step(
         compact=local_coder,
         include_codemode_hint=local_coder,
     )
+    if feedback and existing_run_dir:
+        from pathlib import Path
+        code_file = Path(existing_run_dir) / "lecture.py"
+        if not code_file.exists():
+            code_file = Path(existing_run_dir) / "scene.py"
+        current_code = code_file.read_text(encoding="utf-8") if code_file.exists() else ""
+        prompt += f"\n\nExisting Code:\n```python\n{current_code}\n```\n\nUser Feedback for Revision:\n{feedback}\nRevise the code to address this feedback."
+
     if sft_batch_enabled():
         prompt += SFT_BATCH_ADDENDUM
 
@@ -287,6 +316,10 @@ async def run_coder_step(
         summary = stopped_reason
 
     _salvage_codemode_text_dump(run_dir, summary=summary, messages=messages)
+
+    manifest = load_manifest(run_dir)
+    if (manifest.get("last_compile") or {}).get("ok"):
+        stopped_reason = "completed"
 
     return arrange_coder_artifacts(
         run_dir,
@@ -529,9 +562,11 @@ animation_agent = Agent(
         "3. write_manim_animation with topic and subject only "
         "(the lecture plan and teaching script are stored automatically — "
         "do not pass plan text)\n"
+        "4. If the user provides feedback on an already generated animation (e.g. 'make the circle blue', 'fix the error'), call "
+        "revise_manim_animation with their feedback and the run_dir from the previous step.\n"
         "Between tools, at most one short status line "
-        "(e.g. 'Classifying…', 'Planning…', 'Writing Manim…').\n"
-        "After write_manim_animation, summarize only from the tool result: "
+        "(e.g. 'Classifying…', 'Planning…', 'Writing Manim…', 'Revising…').\n"
+        "After write_manim_animation or revise_manim_animation, summarize only from the tool result: "
         "stopped_reason, compile_ok, scene_name, run_dir, audio count. "
         "Do not invent paths or invent success if the tool reported failure."
     ),
@@ -630,6 +665,32 @@ async def write_manim_animation(
         state.lecture_plan,
         teaching_script=state.teaching_script,
         usage=ctx.usage,
+    )
+    return coder_result.model_dump(mode="json")
+
+
+@animation_agent.tool
+async def revise_manim_animation(
+    ctx: RunContext[PipelineDeps],
+    feedback: str,
+    run_dir: str,
+) -> dict:
+    """Revise an existing Manim animation based on user feedback."""
+    state = _pipeline_state_for(ctx)
+    if not state.topic or not state.subject or not state.lecture_plan:
+        return {
+            "ok": False,
+            "message": "Cannot revise: no lecture plan in current state. Please generate an animation first.",
+        }
+
+    coder_result = await run_coder_step(
+        state.topic,
+        state.subject,
+        state.lecture_plan,
+        teaching_script=state.teaching_script,
+        usage=ctx.usage,
+        existing_run_dir=run_dir,
+        feedback=feedback,
     )
     return coder_result.model_dump(mode="json")
 

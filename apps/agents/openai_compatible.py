@@ -105,11 +105,17 @@ def build_openai_provider(base_url: str, api_key: str) -> OpenAIProvider:
 
 
 def format_custom_endpoint_error(error: str, *, base_url: str | None = None) -> str:
-    """Replace empty 503 bodies with an actionable message."""
+    """Format 503 and 401 errors into clear, actionable messages."""
     text = (error or "").strip()
-    if "Custom LLM endpoint is unavailable" in text:
+    if "Custom LLM endpoint is unavailable" in text or "LLM authentication failed" in text:
         return text
     lowered = text.lower()
+    if "401" in lowered or "invalid_token" in lowered or "api key expired" in lowered or "unauthorized" in lowered:
+        return (
+            "LLM authentication failed (HTTP 401: API key expired or invalid). "
+            "Please configure a valid OPENROUTER_API_KEY in apps/ui/aos/backend/.env "
+            "or set your custom LLM provider in Settings."
+        )
     if "503" not in lowered and "service unavailable" not in lowered:
         return text or "custom_llm_failed"
     host = (base_url or openai_compatible_base_url() or "the custom LLM endpoint").rstrip("/")

@@ -188,8 +188,8 @@ coder_agent = Agent(
     description="Writes Manim from a lecture plan, compiles, and optionally synthesizes narration audio.",
     system_prompt=coder_system_prompt(),
     model_settings=settings_for("coder"),
-    retries=2,
-    capabilities=[CodeMode(max_retries=3)],
+    retries=5,
+    capabilities=[CodeMode(max_retries=8)],
     tools=[
         Tool(compile_manim_code),
         Tool(manim_read),

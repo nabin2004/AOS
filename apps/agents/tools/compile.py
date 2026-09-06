@@ -19,6 +19,13 @@ from tools.coder_workspace import (
 )
 from tools.manim_source import has_set_speech_service, prepare_manim_source
 from tools.voiceover_quality import FILLER_HINT, FILLER_VOICEOVER, filler_voiceover_error
+from ir.manim_ir import LectureIR
+
+def persist_lecture_ir(workspace_dir: Path, lecture_ir: LectureIR) -> Path:
+    """Write the IR json to the workspace."""
+    out = workspace_dir / "lecture_ir.json"
+    out.write_text(lecture_ir.model_dump_json(indent=2), encoding="utf-8")
+    return out
 
 _FAILURE_MARKERS = (
     "There are no scenes inside that module",
@@ -101,7 +108,7 @@ def _discover_scene_class(code: str, fallback: str) -> str:
 def _bases_include_voiceover(node: ast.ClassDef) -> bool:
     for base in node.bases:
         name = _base_name(base)
-        if name == "VoiceoverScene":
+        if name in ("VoiceoverScene", "VoiceoverSlideScene"):
             return True
     return False
 
@@ -139,13 +146,13 @@ def validate_voiceover_scene(code: str) -> str | None:
         if isinstance(node, ast.ClassDef) and _bases_include_voiceover(node):
             voiceover_classes.append(node)
 
-    # if not voiceover_classes:
-    #     return "missing_voiceover_scene"
+    if not voiceover_classes:
+        return "missing_voiceover_scene"
 
-    # if not any(_has_voiceover_call(cls) for cls in voiceover_classes):
-    #     return "missing_voiceover_calls"
-    # if not any(has_set_speech_service(cls) for cls in voiceover_classes):
-    #     return "missing_speech_service"
+    if not any(_has_voiceover_call(cls) for cls in voiceover_classes):
+        return "missing_voiceover_calls"
+    if not any(has_set_speech_service(cls) for cls in voiceover_classes):
+        return "missing_speech_service"
     filler = filler_voiceover_error(code)
     if filler is not None:
         return filler

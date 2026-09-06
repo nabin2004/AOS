@@ -91,7 +91,10 @@ def custom_endpoint_for_role(role: AgentRole) -> bool:
 
 
 def _ollama_model() -> str:
-    return _env("AOS_OLLAMA_MODEL", _DEFAULT_OLLAMA)
+    val = _env("AOS_OLLAMA_MODEL", _DEFAULT_OLLAMA)
+    if not val.startswith("ollama:"):
+        val = f"ollama:{val}"
+    return val
 
 
 def _openrouter_model() -> str:
@@ -167,7 +170,10 @@ def model_for_agent(role: AgentRole) -> str | object:
             raise PipelineEnvError(
                 "AOS_MODEL_PROFILE=openai_compatible requires AOS_OPENAI_BASE_URL"
             )
-        return build_openai_compatible_chat_model(model)
+        primary = build_openai_compatible_chat_model(model)
+        from pydantic_ai.models.fallback import FallbackModel
+        fallback = resolve_model(_openrouter_model())
+        return FallbackModel(primary, fallback)
     return resolve_model(model)
 
 
