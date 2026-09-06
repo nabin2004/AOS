@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional, List
-from manim import Scene, FadeIn, FadeOut, LEFT
+from manim import Scene, FadeIn, FadeOut, Group, LEFT
 
 from aos_manim_core import CueResolver, play_script, get_theme
 
@@ -48,6 +48,10 @@ class SlideScene(Scene):
         self.current_slide_idx = len(self.slides) - 1
 
         if old_slide is None:
+            residual = [m for m in self.mobjects if m != slide]
+            if residual:
+                self.play(FadeOut(Group(*residual), run_time=run_time * 0.5))
+                self.clear()
             self.play(FadeIn(slide, run_time=run_time))
         else:
             if transition == "wipe":
@@ -57,7 +61,7 @@ class SlideScene(Scene):
             elif transition == "fade":
                 fade_transition(self, old_slide, slide, run_time=run_time)
             else:
-                self.remove(old_slide)
+                self.clear()
                 self.add(slide)
 
         if lecture:

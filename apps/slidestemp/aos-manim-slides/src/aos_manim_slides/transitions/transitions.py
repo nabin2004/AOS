@@ -17,12 +17,17 @@ from manim import (
 
 
 def fade_transition(scene: Scene, old_mob: Mobject, new_mob: Mobject, run_time: float = 0.8) -> None:
-    """Smooth cross-fade between two slides or layouts."""
-    scene.play(
-        FadeOut(old_mob, run_time=run_time),
-        FadeIn(new_mob, run_time=run_time),
-    )
-    scene.remove(old_mob)
+    """Smooth, clean transition between slides: fades out existing elements, clears canvas, then fades in new slide."""
+    from manim import Group
+    to_fade = [m for m in scene.mobjects if m != new_mob]
+    fade_mob = Group(*to_fade) if to_fade else old_mob
+    half = max(run_time * 0.5, 0.2)
+    scene.play(FadeOut(fade_mob, run_time=half))
+    if hasattr(scene, "clear"):
+        scene.clear()
+    else:
+        scene.remove(fade_mob)
+    scene.play(FadeIn(new_mob, run_time=half))
 
 
 def wipe_transition(
