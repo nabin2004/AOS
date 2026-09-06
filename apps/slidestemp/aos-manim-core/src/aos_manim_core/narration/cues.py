@@ -64,13 +64,39 @@ def parse_bookmark_marks(text: str) -> List[str]:
 
 def inject_bookmarks(text: str, cues: Sequence[Cue]) -> str:
     """Ensure each cue has a bookmark tag. Existing tags are left in place."""
-    body = text or ""
+    body = (text or "").strip()
     present = set(parse_bookmark_marks(body))
     missing = [c for c in cues if c.mark not in present]
     if not missing:
         return body
-    suffix = "".join(f" <bookmark mark='{c.mark}'/>" for c in missing)
-    return (body.rstrip() + suffix).strip()
+    if not body:
+        return " ".join(f"<bookmark mark='{c.mark}'/>" for c in missing)
+
+    # Distribute missing cues across sentences/clauses rather than dumping at the end
+    import re
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?\n])\s+", body) if s.strip()]
+
+    if len(missing) == 1:
+        return f"<bookmark mark='{missing[0].mark}'/> {body}".strip()
+
+    if len(sentences) >= len(missing):
+        parts = []
+        for i, s in enumerate(sentences):
+            if i < len(missing):
+                parts.append(f"<bookmark mark='{missing[i].mark}'/> {s}")
+            else:
+                parts.append(s)
+        return " ".join(parts).strip()
+    else:
+        parts = []
+        for i, s in enumerate(sentences):
+            if i < len(sentences) - 1:
+                parts.append(f"<bookmark mark='{missing[i].mark}'/> {s}")
+            else:
+                remaining_cues = missing[i:]
+                prefix = " ".join(f"<bookmark mark='{c.mark}'/>" for c in remaining_cues)
+                parts.append(f"{prefix} {s}")
+        return " ".join(parts).strip()
 
 
 def bind_authored_script(
@@ -160,10 +186,15 @@ def apply_standard_cue(
 
     if cue.action == CueAction.REVEAL:
         try:
-            from manim import FadeIn, Create, Write
+            from manim import FadeIn, Create, Write, UP, Text, MathTex
+
+            target_opacity = float((cue.payload or {}).get("opacity", 1.0))
+            if hasattr(mob, "set_opacity"):
+                mob.set_opacity(target_opacity)
+
             use_draw = (cue.payload or {}).get("draw", False) or getattr(mob, "draw", False)
+            run_time = float((cue.payload or {}).get("run_time", 0.35))
             if use_draw:
-                from manim import Text, MathTex
                 has_text = False
                 try:
                     family = mob.get_family()
@@ -171,13 +202,13 @@ def apply_standard_cue(
                 except Exception:
                     pass
                 if has_text:
-                    anim = Write(mob)
+                    anim = Write(mob, run_time=run_time)
                 else:
-                    anim = Create(mob)
+                    anim = Create(mob, run_time=run_time)
             else:
-                anim = FadeIn(mob)
+                anim = FadeIn(mob, shift=UP * 0.2, run_time=run_time)
 
-            _play(scene, anim, run_time=float(cue.payload.get("run_time", 0.3)))
+            _play(scene, anim, run_time=run_time)
         except Exception:
             if hasattr(mob, "set_opacity"):
                 mob.set_opacity(1)

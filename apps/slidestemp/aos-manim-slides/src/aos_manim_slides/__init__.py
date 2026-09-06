@@ -2,7 +2,7 @@
 AOS Manim Slides: Presentation orchestration and slide templates for Manim.
 """
 
-from .scene import SlideScene, VoiceoverSlideScene
+from .scene import SlideScene, VoiceoverSlideScene, MarkdownVoiceoverDeck
 from .layouts.base_slide import Slide
 from .layouts.templates import (
     TitleSlide,
@@ -70,6 +70,7 @@ __version__ = "0.1.0"
 __all__ = [
     "SlideScene",
     "VoiceoverSlideScene",
+    "MarkdownVoiceoverDeck",
     "Slide",
     "TitleSlide",
     "SectionSlide",

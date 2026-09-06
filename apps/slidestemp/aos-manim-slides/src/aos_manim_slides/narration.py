@@ -194,16 +194,28 @@ def collect_cue_index(node: LayoutNode) -> Tuple[Dict[str, Any], Dict[str, Any]]
     return targets, cueables
 
 
+STRUCTURAL_CUE_IDS = {"title", "subtitle", "meta", "section", "header", "footer"}
+
+
 def hide_lecture_body(slide: Any) -> None:
+    """Hide dynamic lecture body elements prior to progressive reveal.
+
+    Structural elements such as headers, dividers, footers, and section titles
+    remain persistent and are never hidden.
+    """
     cueables = getattr(slide, "cueables", {}) or {}
     cue_index = getattr(slide, "cue_index", {}) or {}
     hidden_ids = set()
     for cid, obj in cueables.items():
+        if cid in STRUCTURAL_CUE_IDS:
+            continue
         for mob in obj.cue_targets().values():
             if hasattr(mob, "set_opacity"):
                 mob.set_opacity(0)
         hidden_ids.add(cid)
     for cid, mob in cue_index.items():
+        if cid in STRUCTURAL_CUE_IDS:
+            continue
         if cid in hidden_ids or "." in cid:
             continue
         if cid in cueables:

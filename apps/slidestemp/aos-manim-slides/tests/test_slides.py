@@ -405,3 +405,55 @@ def test_bullet_board_cue_ids_and_auto_voiceover_bookmarks():
     marks = [c.mark for c in auto.cues]
     assert any(m.startswith("li") for m in marks)
     assert "<bookmark" in auto.as_voiceover_text()
+
+
+def test_hide_lecture_body_preserves_structural_elements():
+    from aos_manim_slides.narration import hide_lecture_body
+    from aos_manim_slides import SectionSlide
+
+    sec_slide = SectionSlide("Conclusion", section_number=2)
+    # The section node has cue_id='section'
+    assert "section" in sec_slide.cue_index
+    section_mob = sec_slide.cue_index["section"]
+    initial_opacity = section_mob.get_fill_opacity() if hasattr(section_mob, "get_fill_opacity") else 1.0
+
+    hide_lecture_body(sec_slide)
+    # Structural element 'section' must NOT be hidden
+    assert section_mob.get_fill_opacity() == initial_opacity
+
+
+def test_intelligent_bookmark_injection_and_opacity_restore():
+    from aos_manim_core import Cue, CueAction, CueResolver, apply_standard_cue
+    from aos_manim_core.narration.cues import inject_bookmarks
+    from manim import Text
+
+    # Single missing cue -> placed at start of speech
+    text1 = inject_bookmarks("This is a conclusion.", [Cue(mark="section", target_id="section")])
+    assert text1.startswith("<bookmark mark='section'/>")
+
+    # Multiple missing cues -> distributed across sentences
+    text2 = inject_bookmarks(
+        "First point. Second point.",
+        [Cue(mark="li0", target_id="li0"), Cue(mark="li1", target_id="li1")],
+    )
+    assert "<bookmark mark='li0'/> First point." in text2
+    assert "<bookmark mark='li1'/> Second point." in text2
+
+    # Opacity restoration in apply_standard_cue
+    dummy_mob = Text("Bullet Text")
+    dummy_mob.set_opacity(0)
+    assert dummy_mob.get_fill_opacity() == 0.0
+
+    cue = Cue(mark="li0", target_id="li0", action=CueAction.REVEAL)
+    # Dummy scene with no-op play
+    class DummyScene:
+        def play(self, *anims, **kwargs):
+            for a in anims:
+                if hasattr(a, "interpolate"):
+                    a.begin()
+                    a.interpolate(1.0)
+                    a.finish()
+
+    apply_standard_cue(DummyScene(), cue, dummy_mob)
+    assert dummy_mob.get_fill_opacity() == 1.0
+

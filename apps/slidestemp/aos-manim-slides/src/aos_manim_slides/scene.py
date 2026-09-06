@@ -38,6 +38,11 @@ class SlideScene(Scene):
         lecture: bool = False,
     ) -> None:
         """Display a new slide using the specified transition."""
+        if lecture:
+            # Hide dynamic lecture body elements before the entrance transition
+            # so they never flash at frame zero.
+            hide_lecture_body(slide)
+
         old_slide = self.current_slide
         self.slides.append(slide)
         self.current_slide_idx = len(self.slides) - 1
@@ -59,7 +64,6 @@ class SlideScene(Scene):
             self._run_lecture(slide)
 
     def _run_lecture(self, slide: Slide) -> None:
-        hide_lecture_body(slide)
         spec = slide.spec
         if spec is None:
             return
@@ -85,11 +89,43 @@ class VoiceoverSlideScene(SlideScene, _VoiceoverScene):
         self.aos_voiceover_enabled = False
         self.lecture_gap = 0.35
 
-    def enable_voiceover(self, speech_service=None) -> bool:
-        if speech_service is not None and hasattr(self, "set_speech_service"):
+    def enable_voiceover(
+        self, speech_service=None, voice: str = "alba", cache_dir: str = "voiceover_cache"
+    ) -> bool:
+        if not hasattr(self, "set_speech_service"):
+            self.aos_voiceover_enabled = False
+            return False
+
+        if speech_service is None:
+            import sys
+            from pathlib import Path
+            
+            # Try loading AOSSpeechService, fallback to gTTS if unavailable
+            try:
+                try:
+                    from tools.aos_speech_service import AOSSpeechService
+                    speech_service = AOSSpeechService(voice=voice, cache_dir=cache_dir)
+                except ImportError:
+                    # Append apps/agents to path if not present (assuming monorepo layout)
+                    agent_tools_path = Path(__file__).resolve().parents[4] / "agents"
+                    if agent_tools_path.exists() and str(agent_tools_path) not in sys.path:
+                        sys.path.insert(0, str(agent_tools_path))
+                        from tools.aos_speech_service import AOSSpeechService
+                        speech_service = AOSSpeechService(voice=voice, cache_dir=cache_dir)
+                    else:
+                        raise ImportError
+            except ImportError:
+                try:
+                    from manim_voiceover.services.gtts import GTTSService
+                    speech_service = GTTSService(lang="en")
+                except ImportError:
+                    pass
+
+        if speech_service is not None:
             self.set_speech_service(speech_service)
             self.aos_voiceover_enabled = True
             return True
+
         self.aos_voiceover_enabled = False
         return False
 
@@ -123,3 +159,21 @@ class VoiceoverSlideScene(SlideScene, _VoiceoverScene):
         lecture: bool = True,
     ) -> None:
         super().show_slide(slide, transition=transition, run_time=run_time, lecture=lecture)
+
+
+class MarkdownVoiceoverDeck(VoiceoverSlideScene):
+    """Robust, agent-friendly scene to render a full Markdown deck with voiceover."""
+
+    markdown_file: str = "presentation.md"
+    voice: str = "alba"
+    voiceover_cache: str = "voiceover_cache"
+
+    def construct(self):
+        self.enable_voiceover(voice=self.voice, cache_dir=self.voiceover_cache)
+        
+        with open(self.markdown_file, "r", encoding="utf-8") as f:
+            md_content = f.read()
+            
+        for slide in Slide.deck_from_markdown(md_content):
+            self.show_slide(slide, transition="fade", lecture=True)
+            self.pause_slide(self.lecture_gap)
