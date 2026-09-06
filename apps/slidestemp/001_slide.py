@@ -10,6 +10,7 @@ COLOR_NAME = WHITE
 class Branding(Scene):
     def construct(self):
         # self.camera.background_color = COLOR_NAME
+        self.add_sound("audio/brand_music.mp3")
 
         brand = Text("RUKUMINI", font_size=70, color=BLUE)
         self.play(Write(brand))
@@ -333,3 +334,7 @@ class Proof(Scene):
 class Timeline(Scene):
     def construct(self):
         pass
+
+
+from backprop_presentation import BrandedBackpropDeck
+
