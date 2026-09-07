@@ -1,0 +1,1680 @@
+{
+  "Cameras": [
+    {
+      "class_name": "BackgroundColoredVMobjectDisplayer",
+      "module": "manim.camera.camera",
+      "parents": [],
+      "doc_summary": "Auxiliary class that handles displaying vectorized mobjects with"
+    },
+    {
+      "class_name": "Camera",
+      "module": "manim.camera.camera",
+      "parents": [],
+      "doc_summary": "Base camera class."
+    },
+    {
+      "class_name": "MappingCamera",
+      "module": "manim.camera.mapping_camera",
+      "parents": [
+        "Camera"
+      ],
+      "doc_summary": "Parameters"
+    },
+    {
+      "class_name": "MovingCamera",
+      "module": "manim.camera.moving_camera",
+      "parents": [
+        "Camera"
+      ],
+      "doc_summary": "A camera that follows and matches the size and position of its 'frame', a Rectangle (or similar Mobject)."
+    },
+    {
+      "class_name": "MultiCamera",
+      "module": "manim.camera.multi_camera",
+      "parents": [
+        "MovingCamera"
+      ],
+      "doc_summary": "Camera Object that allows for multiple perspectives."
+    },
+    {
+      "class_name": "SplitScreenCamera",
+      "module": "manim.camera.mapping_camera",
+      "parents": [
+        "OldMultiCamera"
+      ],
+      "doc_summary": "Initializes a split screen camera setup with two side-by-side cameras."
+    },
+    {
+      "class_name": "ThreeDCamera",
+      "module": "manim.camera.three_d_camera",
+      "parents": [
+        "Camera"
+      ],
+      "doc_summary": "ThreeDCamera"
+    }
+  ],
+  "Scenes": [
+    {
+      "class_name": "LinearTransformationScene",
+      "module": "manim.scene.vector_space_scene",
+      "parents": [
+        "VectorScene"
+      ],
+      "doc_summary": "This scene contains special methods that make it"
+    },
+    {
+      "class_name": "MovingCameraScene",
+      "module": "manim.scene.moving_camera_scene",
+      "parents": [
+        "Scene"
+      ],
+      "doc_summary": "This is a Scene, with special configurations and properties that"
+    },
+    {
+      "class_name": "Scene",
+      "module": "manim.scene.scene",
+      "parents": [],
+      "doc_summary": "A Scene is the canvas of your animation."
+    },
+    {
+      "class_name": "SceneInteractContinue",
+      "module": "manim.scene.scene",
+      "parents": [],
+      "doc_summary": "Object which, when encountered in :meth:`.Scene.interact`, triggers"
+    },
+    {
+      "class_name": "SceneInteractRerun",
+      "module": "manim.scene.scene",
+      "parents": [],
+      "doc_summary": "Object which, when encountered in :meth:`.Scene.interact`, triggers"
+    },
+    {
+      "class_name": "ThreeDScene",
+      "module": "manim.scene.three_d_scene",
+      "parents": [
+        "Scene"
+      ],
+      "doc_summary": "This is a Scene, with special configurations and properties that"
+    },
+    {
+      "class_name": "ZoomedScene",
+      "module": "manim.scene.zoomed_scene",
+      "parents": [
+        "MovingCameraScene"
+      ],
+      "doc_summary": "This is a Scene with special configurations made for when"
+    }
+  ],
+  "Animations": [
+    {
+      "class_name": "Add",
+      "module": "manim.animation.animation",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Add Mobjects to a scene, without animating them in any other way. This"
+    },
+    {
+      "class_name": "AddTextLetterByLetter",
+      "module": "manim.animation.creation",
+      "parents": [
+        "ShowIncreasingSubsets"
+      ],
+      "doc_summary": "Show a :class:`~.Text` letter by letter on the scene."
+    },
+    {
+      "class_name": "AddTextWordByWord",
+      "module": "manim.animation.creation",
+      "parents": [
+        "Succession"
+      ],
+      "doc_summary": "Show a :class:`~.Text` word by word on the scene. Note: currently broken."
+    },
+    {
+      "class_name": "AnimatedBoundary",
+      "module": "manim.animation.changing",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "Boundary of a :class:`.VMobject` with animated color change."
+    },
+    {
+      "class_name": "AnimationGroup",
+      "module": "manim.animation.composition",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Plays a group or series of :class:`~.Animation`."
+    },
+    {
+      "class_name": "ApplyComplexFunction",
+      "module": "manim.animation.transform",
+      "parents": [
+        "ApplyMethod"
+      ],
+      "doc_summary": "ApplyComplexFunction"
+    },
+    {
+      "class_name": "ApplyFunction",
+      "module": "manim.animation.transform",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "ApplyFunction"
+    },
+    {
+      "class_name": "ApplyMatrix",
+      "module": "manim.animation.transform",
+      "parents": [
+        "ApplyPointwiseFunction"
+      ],
+      "doc_summary": "Applies a matrix transform to an mobject."
+    },
+    {
+      "class_name": "ApplyWave",
+      "module": "manim.animation.indication",
+      "parents": [
+        "Homotopy"
+      ],
+      "doc_summary": "Send a wave through the Mobject distorting it temporarily."
+    },
+    {
+      "class_name": "Blink",
+      "module": "manim.animation.indication",
+      "parents": [
+        "Succession"
+      ],
+      "doc_summary": "Blink the mobject."
+    },
+    {
+      "class_name": "Broadcast",
+      "module": "manim.animation.specialized",
+      "parents": [
+        "LaggedStart"
+      ],
+      "doc_summary": "Broadcast a mobject starting from an ``initial_width``, up to the actual size of the mobject."
+    },
+    {
+      "class_name": "ChangeDecimalToValue",
+      "module": "manim.animation.numbers",
+      "parents": [
+        "ChangingDecimal"
+      ],
+      "doc_summary": "Animate a :class:`~.DecimalNumber` to a target value using linear interpolation."
+    },
+    {
+      "class_name": "ChangeSpeed",
+      "module": "manim.animation.speedmodifier",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Modifies the speed of passed animation."
+    },
+    {
+      "class_name": "ChangingDecimal",
+      "module": "manim.animation.numbers",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Animate a :class:`~.DecimalNumber` to values specified by a user-supplied function."
+    },
+    {
+      "class_name": "Circumscribe",
+      "module": "manim.animation.indication",
+      "parents": [
+        "Succession"
+      ],
+      "doc_summary": "Draw a temporary line surrounding the mobject."
+    },
+    {
+      "class_name": "ClockwiseTransform",
+      "module": "manim.animation.transform",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Transforms the points of a mobject along a clockwise oriented arc."
+    },
+    {
+      "class_name": "CounterclockwiseTransform",
+      "module": "manim.animation.transform",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Transforms the points of a mobject along a counterclockwise oriented arc."
+    },
+    {
+      "class_name": "Create",
+      "module": "manim.animation.creation",
+      "parents": [
+        "ShowPartial"
+      ],
+      "doc_summary": "Incrementally show a VMobject."
+    },
+    {
+      "class_name": "CyclicReplace",
+      "module": "manim.animation.transform",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "An animation moving mobjects cyclically."
+    },
+    {
+      "class_name": "DrawBorderThenFill",
+      "module": "manim.animation.creation",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Draw the border first and then show the fill."
+    },
+    {
+      "class_name": "FadeIn",
+      "module": "manim.animation.fading",
+      "parents": [],
+      "doc_summary": "Fade in :class:`~.Mobject` s."
+    },
+    {
+      "class_name": "FadeOut",
+      "module": "manim.animation.fading",
+      "parents": [],
+      "doc_summary": "Fade out :class:`~.Mobject` s."
+    },
+    {
+      "class_name": "FadeTransform",
+      "module": "manim.animation.transform",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Fades one mobject into another."
+    },
+    {
+      "class_name": "FadeTransformPieces",
+      "module": "manim.animation.transform",
+      "parents": [
+        "FadeTransform"
+      ],
+      "doc_summary": "Fades submobjects of one mobject into submobjects of another one."
+    },
+    {
+      "class_name": "Flash",
+      "module": "manim.animation.indication",
+      "parents": [
+        "AnimationGroup"
+      ],
+      "doc_summary": "Send out lines in all directions."
+    },
+    {
+      "class_name": "FocusOn",
+      "module": "manim.animation.indication",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Shrink a spotlight to a position."
+    },
+    {
+      "class_name": "GrowArrow",
+      "module": "manim.animation.growing",
+      "parents": [
+        "GrowFromPoint"
+      ],
+      "doc_summary": "Introduce an :class:`~.Arrow` by growing it from its start toward its tip."
+    },
+    {
+      "class_name": "GrowFromCenter",
+      "module": "manim.animation.growing",
+      "parents": [
+        "GrowFromPoint"
+      ],
+      "doc_summary": "Introduce an :class:`~.Mobject` by growing it from its center."
+    },
+    {
+      "class_name": "GrowFromEdge",
+      "module": "manim.animation.growing",
+      "parents": [
+        "GrowFromPoint"
+      ],
+      "doc_summary": "Introduce an :class:`~.Mobject` by growing it from one of its bounding box edges."
+    },
+    {
+      "class_name": "GrowFromPoint",
+      "module": "manim.animation.growing",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Introduce an :class:`~.Mobject` by growing it from a point."
+    },
+    {
+      "class_name": "Indicate",
+      "module": "manim.animation.indication",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Indicate a Mobject by temporarily resizing and recoloring it."
+    },
+    {
+      "class_name": "LaggedStart",
+      "module": "manim.animation.composition",
+      "parents": [
+        "AnimationGroup"
+      ],
+      "doc_summary": "Adjusts the timing of a series of :class:`~.Animation` according to ``lag_ratio``."
+    },
+    {
+      "class_name": "LaggedStartMap",
+      "module": "manim.animation.composition",
+      "parents": [
+        "LaggedStart"
+      ],
+      "doc_summary": "Plays a series of :class:`~.Animation` while mapping a function to submobjects."
+    },
+    {
+      "class_name": "MaintainPositionRelativeTo",
+      "module": "manim.animation.updaters.update",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "MaintainPositionRelativeTo"
+    },
+    {
+      "class_name": "MoveAlongPath",
+      "module": "manim.animation.movement",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Make one mobject move along the path of another mobject."
+    },
+    {
+      "class_name": "MoveToTarget",
+      "module": "manim.animation.transform",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Transforms a mobject to the mobject stored in its ``target`` attribute."
+    },
+    {
+      "class_name": "PhaseFlow",
+      "module": "manim.animation.movement",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "PhaseFlow"
+    },
+    {
+      "class_name": "RemoveTextLetterByLetter",
+      "module": "manim.animation.creation",
+      "parents": [
+        "AddTextLetterByLetter"
+      ],
+      "doc_summary": "Remove a :class:`~.Text` letter by letter from the scene."
+    },
+    {
+      "class_name": "ReplacementTransform",
+      "module": "manim.animation.transform",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Replaces and morphs a mobject into a target mobject."
+    },
+    {
+      "class_name": "Restore",
+      "module": "manim.animation.transform",
+      "parents": [
+        "ApplyMethod"
+      ],
+      "doc_summary": "Transforms a mobject to its last saved state."
+    },
+    {
+      "class_name": "Rotate",
+      "module": "manim.animation.rotation",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Animation that rotates a Mobject."
+    },
+    {
+      "class_name": "Rotating",
+      "module": "manim.animation.rotation",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Animation that rotates a Mobject."
+    },
+    {
+      "class_name": "ScaleInPlace",
+      "module": "manim.animation.transform",
+      "parents": [
+        "ApplyMethod"
+      ],
+      "doc_summary": "Animation that scales a mobject by a certain factor."
+    },
+    {
+      "class_name": "ShowIncreasingSubsets",
+      "module": "manim.animation.creation",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Show one submobject at a time, leaving all previous ones displayed on screen."
+    },
+    {
+      "class_name": "ShowPartial",
+      "module": "manim.animation.creation",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Abstract class for Animations that show the VMobject partially."
+    },
+    {
+      "class_name": "ShowPassingFlash",
+      "module": "manim.animation.indication",
+      "parents": [
+        "ShowPartial"
+      ],
+      "doc_summary": "Show only a sliver of the VMobject each frame."
+    },
+    {
+      "class_name": "ShowPassingFlashWithThinningStrokeWidth",
+      "module": "manim.animation.indication",
+      "parents": [
+        "AnimationGroup"
+      ],
+      "doc_summary": "ShowPassingFlashWithThinningStrokeWidth"
+    },
+    {
+      "class_name": "ShowSubmobjectsOneByOne",
+      "module": "manim.animation.creation",
+      "parents": [
+        "ShowIncreasingSubsets"
+      ],
+      "doc_summary": "Show one submobject at a time, removing all previously displayed ones from screen."
+    },
+    {
+      "class_name": "ShrinkToCenter",
+      "module": "manim.animation.transform",
+      "parents": [
+        "ScaleInPlace"
+      ],
+      "doc_summary": "Animation that makes a mobject shrink to center."
+    },
+    {
+      "class_name": "SpinInFromNothing",
+      "module": "manim.animation.growing",
+      "parents": [
+        "GrowFromCenter"
+      ],
+      "doc_summary": "Introduce an :class:`~.Mobject` spinning and growing it from its center."
+    },
+    {
+      "class_name": "SpiralIn",
+      "module": "manim.animation.creation",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Create the Mobject with sub-Mobjects flying in on spiral trajectories."
+    },
+    {
+      "class_name": "Succession",
+      "module": "manim.animation.composition",
+      "parents": [
+        "AnimationGroup"
+      ],
+      "doc_summary": "Plays a series of animations in succession."
+    },
+    {
+      "class_name": "Swap",
+      "module": "manim.animation.transform",
+      "parents": [
+        "CyclicReplace"
+      ],
+      "doc_summary": "Another name for :class:`~.CyclicReplace`, which is more understandable for two entries."
+    },
+    {
+      "class_name": "TracedPath",
+      "module": "manim.animation.changing",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "Traces the path of a point returned by a function call."
+    },
+    {
+      "class_name": "TransformFromCopy",
+      "module": "manim.animation.transform",
+      "parents": [
+        "Transform"
+      ],
+      "doc_summary": "Preserves a copy of the original VMobject and transforms only it's copy to the target VMobject"
+    },
+    {
+      "class_name": "TransformMatchingShapes",
+      "module": "manim.animation.transform_matching_parts",
+      "parents": [
+        "TransformMatchingAbstractBase"
+      ],
+      "doc_summary": "An animation trying to transform groups by matching the shape"
+    },
+    {
+      "class_name": "TransformMatchingTex",
+      "module": "manim.animation.transform_matching_parts",
+      "parents": [
+        "TransformMatchingAbstractBase"
+      ],
+      "doc_summary": "A transformation trying to transform rendered LaTeX strings."
+    },
+    {
+      "class_name": "TypeWithCursor",
+      "module": "manim.animation.creation",
+      "parents": [
+        "AddTextLetterByLetter"
+      ],
+      "doc_summary": "Similar to :class:`~.AddTextLetterByLetter` , but with an additional cursor mobject at the end."
+    },
+    {
+      "class_name": "Uncreate",
+      "module": "manim.animation.creation",
+      "parents": [
+        "Create"
+      ],
+      "doc_summary": "Like :class:`Create` but in reverse."
+    },
+    {
+      "class_name": "UntypeWithCursor",
+      "module": "manim.animation.creation",
+      "parents": [
+        "TypeWithCursor"
+      ],
+      "doc_summary": "Similar to :class:`~.RemoveTextLetterByLetter` , but with an additional cursor mobject at the end."
+    },
+    {
+      "class_name": "Unwrite",
+      "module": "manim.animation.creation",
+      "parents": [
+        "Write"
+      ],
+      "doc_summary": "Simulate erasing by hand a :class:`~.Text` or a :class:`~.VMobject`."
+    },
+    {
+      "class_name": "UpdateFromAlphaFunc",
+      "module": "manim.animation.updaters.update",
+      "parents": [
+        "UpdateFromFunc"
+      ],
+      "doc_summary": "UpdateFromAlphaFunc"
+    },
+    {
+      "class_name": "UpdateFromFunc",
+      "module": "manim.animation.updaters.update",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "update_function of the form func(mobject), presumably"
+    },
+    {
+      "class_name": "VGroup",
+      "module": "manim.mobject.types.vectorized_mobject",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A group of vectorized mobjects."
+    },
+    {
+      "class_name": "Wait",
+      "module": "manim.animation.animation",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "A &quot;no operation&quot; animation."
+    },
+    {
+      "class_name": "Wiggle",
+      "module": "manim.animation.indication",
+      "parents": [
+        "Animation"
+      ],
+      "doc_summary": "Wiggle a Mobject."
+    },
+    {
+      "class_name": "Write",
+      "module": "manim.animation.creation",
+      "parents": [
+        "DrawBorderThenFill"
+      ],
+      "doc_summary": "Simulate hand-writing a :class:`~.Text` or hand-drawing a :class:`~.VMobject`."
+    }
+  ],
+  "Mobjects": [
+    {
+      "class_name": "Angle",
+      "module": "manim.mobject.geometry.line",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A circular arc or elbow-type mobject representing an angle of two lines."
+    },
+    {
+      "class_name": "AnnotationDot",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "Dot"
+      ],
+      "doc_summary": "A dot with bigger radius and bold stroke to annotate scenes."
+    },
+    {
+      "class_name": "AnnularSector",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "Arc"
+      ],
+      "doc_summary": "A sector of an annulus."
+    },
+    {
+      "class_name": "Annulus",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "Circle"
+      ],
+      "doc_summary": "Region between two concentric :class:`Circles &lt;.Circle&gt;`."
+    },
+    {
+      "class_name": "Arc",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "TipableVMobject"
+      ],
+      "doc_summary": "A circular arc."
+    },
+    {
+      "class_name": "ArcBetweenPoints",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "Arc"
+      ],
+      "doc_summary": "Inherits from Arc and additionally takes 2 points between which the arc is spanned."
+    },
+    {
+      "class_name": "ArcBrace",
+      "module": "manim.mobject.svg.brace",
+      "parents": [
+        "Brace"
+      ],
+      "doc_summary": "Creates a :class:`~Brace` that wraps around an :class:`~.Arc`."
+    },
+    {
+      "class_name": "ArcPolygon",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A generalized polygon allowing for points to be connected with arcs."
+    },
+    {
+      "class_name": "ArcPolygonFromArcs",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A generalized polygon allowing for points to be connected with arcs."
+    },
+    {
+      "class_name": "Arrow",
+      "module": "manim.mobject.geometry.line",
+      "parents": [
+        "Line"
+      ],
+      "doc_summary": "An arrow."
+    },
+    {
+      "class_name": "Arrow3D",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "Line3D"
+      ],
+      "doc_summary": "An arrow made out of a cylindrical line and a conical tip."
+    },
+    {
+      "class_name": "ArrowCircleFilledTip",
+      "module": "manim.mobject.geometry.tips",
+      "parents": [
+        "ArrowCircleTip"
+      ],
+      "doc_summary": "Circular arrow tip with filled tip."
+    },
+    {
+      "class_name": "ArrowCircleTip",
+      "module": "manim.mobject.geometry.tips",
+      "parents": [
+        "Circle",
+        "ArrowTip"
+      ],
+      "doc_summary": "Circular arrow tip."
+    },
+    {
+      "class_name": "ArrowSquareFilledTip",
+      "module": "manim.mobject.geometry.tips",
+      "parents": [
+        "ArrowSquareTip"
+      ],
+      "doc_summary": "Square arrow tip with filled tip."
+    },
+    {
+      "class_name": "ArrowSquareTip",
+      "module": "manim.mobject.geometry.tips",
+      "parents": [
+        "ArrowTip",
+        "Square"
+      ],
+      "doc_summary": "Square arrow tip."
+    },
+    {
+      "class_name": "ArrowTip",
+      "module": "manim.mobject.geometry.tips",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "Base class for arrow tips."
+    },
+    {
+      "class_name": "ArrowTriangleFilledTip",
+      "module": "manim.mobject.geometry.tips",
+      "parents": [
+        "ArrowTriangleTip"
+      ],
+      "doc_summary": "Triangular arrow tip with filled tip."
+    },
+    {
+      "class_name": "ArrowTriangleTip",
+      "module": "manim.mobject.geometry.tips",
+      "parents": [
+        "ArrowTip",
+        "Triangle"
+      ],
+      "doc_summary": "Triangular arrow tip."
+    },
+    {
+      "class_name": "ArrowVectorField",
+      "module": "manim.mobject.vector_field",
+      "parents": [
+        "VectorField"
+      ],
+      "doc_summary": "A :class:`VectorField` represented by a set of change vectors."
+    },
+    {
+      "class_name": "Axes",
+      "module": "manim.mobject.graphing.coordinate_systems",
+      "parents": [
+        "VGroup",
+        "CoordinateSystem"
+      ],
+      "doc_summary": "Creates a set of axes."
+    },
+    {
+      "class_name": "BackgroundRectangle",
+      "module": "manim.mobject.geometry.shape_matchers",
+      "parents": [
+        "SurroundingRectangle"
+      ],
+      "doc_summary": "A background rectangle. Its default color is the background color"
+    },
+    {
+      "class_name": "BarChart",
+      "module": "manim.mobject.graphing.probability",
+      "parents": [
+        "Axes"
+      ],
+      "doc_summary": "Creates a bar chart. Inherits from :class:`~.Axes`, so it shares its methods"
+    },
+    {
+      "class_name": "Brace",
+      "module": "manim.mobject.svg.brace",
+      "parents": [
+        "VMobjectFromSVGPath"
+      ],
+      "doc_summary": "Takes a mobject and draws a brace adjacent to it."
+    },
+    {
+      "class_name": "BraceBetweenPoints",
+      "module": "manim.mobject.svg.brace",
+      "parents": [
+        "Brace"
+      ],
+      "doc_summary": "Similar to Brace, but instead of taking a mobject it uses 2"
+    },
+    {
+      "class_name": "BraceLabel",
+      "module": "manim.mobject.svg.brace",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "Create a brace with a label attached."
+    },
+    {
+      "class_name": "BraceText",
+      "module": "manim.mobject.svg.brace",
+      "parents": [
+        "BraceLabel"
+      ],
+      "doc_summary": "Create a brace with a text label attached."
+    },
+    {
+      "class_name": "BulletedList",
+      "module": "manim.mobject.text.tex_mobject",
+      "parents": [
+        "Tex"
+      ],
+      "doc_summary": "A bulleted list."
+    },
+    {
+      "class_name": "Circle",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "Arc"
+      ],
+      "doc_summary": "A circle."
+    },
+    {
+      "class_name": "Code",
+      "module": "manim.mobject.text.code_mobject",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A highlighted source code listing."
+    },
+    {
+      "class_name": "ComplexPlane",
+      "module": "manim.mobject.graphing.coordinate_systems",
+      "parents": [
+        "NumberPlane"
+      ],
+      "doc_summary": "A :class:`~.NumberPlane` specialized for use with complex numbers."
+    },
+    {
+      "class_name": "ComplexValueTracker",
+      "module": "manim.mobject.value_tracker",
+      "parents": [
+        "ValueTracker"
+      ],
+      "doc_summary": "Tracks a complex-valued parameter."
+    },
+    {
+      "class_name": "Cone",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "Surface"
+      ],
+      "doc_summary": "A circular cone."
+    },
+    {
+      "class_name": "ConvexHull",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "Polygram"
+      ],
+      "doc_summary": "Constructs a convex hull for a set of points in no particular order."
+    },
+    {
+      "class_name": "ConvexHull3D",
+      "module": "manim.mobject.three_d.polyhedra",
+      "parents": [
+        "Polyhedron"
+      ],
+      "doc_summary": "A convex hull for a set of points"
+    },
+    {
+      "class_name": "Cross",
+      "module": "manim.mobject.geometry.shape_matchers",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "Creates a cross."
+    },
+    {
+      "class_name": "Cube",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "A three-dimensional cube."
+    },
+    {
+      "class_name": "CubicBezier",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A cubic B&#233;zier curve."
+    },
+    {
+      "class_name": "CurvedArrow",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "ArcBetweenPoints"
+      ],
+      "doc_summary": "CurvedArrow"
+    },
+    {
+      "class_name": "CurvedDoubleArrow",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "CurvedArrow"
+      ],
+      "doc_summary": "CurvedDoubleArrow"
+    },
+    {
+      "class_name": "CurvesAsSubmobjects",
+      "module": "manim.mobject.types.vectorized_mobject",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "Convert a curve's elements to submobjects."
+    },
+    {
+      "class_name": "Cutout",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A shape with smaller cutouts."
+    },
+    {
+      "class_name": "Cylinder",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "Surface"
+      ],
+      "doc_summary": "A cylinder, defined by its height, radius and direction,"
+    },
+    {
+      "class_name": "DashedLine",
+      "module": "manim.mobject.geometry.line",
+      "parents": [
+        "Line"
+      ],
+      "doc_summary": "A dashed :class:`Line`."
+    },
+    {
+      "class_name": "DashedVMobject",
+      "module": "manim.mobject.types.vectorized_mobject",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A :class:`VMobject` composed of dashes instead of lines."
+    },
+    {
+      "class_name": "DecimalMatrix",
+      "module": "manim.mobject.matrix",
+      "parents": [
+        "Matrix"
+      ],
+      "doc_summary": "A mobject that displays a matrix with decimal entries on the screen."
+    },
+    {
+      "class_name": "DecimalNumber",
+      "module": "manim.mobject.text.numbers",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "An mobject representing a decimal number."
+    },
+    {
+      "class_name": "DecimalTable",
+      "module": "manim.mobject.table",
+      "parents": [
+        "Table"
+      ],
+      "doc_summary": "A specialized :class:`~.Table` mobject for use with :class:`~.DecimalNumber` to display decimal entries."
+    },
+    {
+      "class_name": "DiGraph",
+      "module": "manim.mobject.graph",
+      "parents": [
+        "GenericGraph"
+      ],
+      "doc_summary": "A directed graph."
+    },
+    {
+      "class_name": "Difference",
+      "module": "manim.mobject.geometry.boolean_ops",
+      "parents": [],
+      "doc_summary": "Subtracts one :class:`~.VMobject` from another one."
+    },
+    {
+      "class_name": "Dodecahedron",
+      "module": "manim.mobject.three_d.polyhedra",
+      "parents": [
+        "Polyhedron"
+      ],
+      "doc_summary": "A dodecahedron, one of the five platonic solids. It has 12 faces, 30 edges and 20 vertices."
+    },
+    {
+      "class_name": "Dot",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "Circle"
+      ],
+      "doc_summary": "A circle with a very small radius."
+    },
+    {
+      "class_name": "Dot3D",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "Sphere"
+      ],
+      "doc_summary": "A spherical dot."
+    },
+    {
+      "class_name": "DoubleArrow",
+      "module": "manim.mobject.geometry.line",
+      "parents": [
+        "Arrow"
+      ],
+      "doc_summary": "An arrow with tips on both ends."
+    },
+    {
+      "class_name": "Elbow",
+      "module": "manim.mobject.geometry.line",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "Two lines that create a right angle about each other: L-shape."
+    },
+    {
+      "class_name": "Ellipse",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "Circle"
+      ],
+      "doc_summary": "A circular shape; oval, circle."
+    },
+    {
+      "class_name": "Exclusion",
+      "module": "manim.mobject.geometry.boolean_ops",
+      "parents": [],
+      "doc_summary": "Find the XOR between two :class:`~.VMobject`."
+    },
+    {
+      "class_name": "FullScreenRectangle",
+      "module": "manim.mobject.frame",
+      "parents": [
+        "ScreenRectangle"
+      ],
+      "doc_summary": "FullScreenRectangle"
+    },
+    {
+      "class_name": "FunctionGraph",
+      "module": "manim.mobject.graphing.functions",
+      "parents": [
+        "ParametricFunction"
+      ],
+      "doc_summary": "A :class:`ParametricFunction` that spans the length of the scene by default."
+    },
+    {
+      "class_name": "GenericGraph",
+      "module": "manim.mobject.graph",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "Abstract base class for graphs (that is, a collection of vertices"
+    },
+    {
+      "class_name": "Graph",
+      "module": "manim.mobject.graph",
+      "parents": [
+        "GenericGraph"
+      ],
+      "doc_summary": "An undirected graph (vertices connected with edges)."
+    },
+    {
+      "class_name": "Group",
+      "module": "manim.mobject.mobject",
+      "parents": [
+        "Mobject"
+      ],
+      "doc_summary": "Groups together multiple :class:`Mobjects &lt;.Mobject&gt;`."
+    },
+    {
+      "class_name": "Icosahedron",
+      "module": "manim.mobject.three_d.polyhedra",
+      "parents": [
+        "Polyhedron"
+      ],
+      "doc_summary": "An icosahedron, one of the five platonic solids. It has 20 faces, 30 edges and 12 vertices."
+    },
+    {
+      "class_name": "ImageMobject",
+      "module": "manim.mobject.types.image_mobject",
+      "parents": [
+        "AbstractImageMobject"
+      ],
+      "doc_summary": "Displays an Image from a numpy array or a file."
+    },
+    {
+      "class_name": "ImageMobjectFromCamera",
+      "module": "manim.mobject.types.image_mobject",
+      "parents": [
+        "AbstractImageMobject"
+      ],
+      "doc_summary": "ImageMobjectFromCamera"
+    },
+    {
+      "class_name": "ImplicitFunction",
+      "module": "manim.mobject.graphing.functions",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "ImplicitFunction"
+    },
+    {
+      "class_name": "Integer",
+      "module": "manim.mobject.text.numbers",
+      "parents": [
+        "DecimalNumber"
+      ],
+      "doc_summary": "A class for displaying Integers."
+    },
+    {
+      "class_name": "IntegerMatrix",
+      "module": "manim.mobject.matrix",
+      "parents": [
+        "Matrix"
+      ],
+      "doc_summary": "A mobject that displays a matrix with integer entries on the screen."
+    },
+    {
+      "class_name": "IntegerTable",
+      "module": "manim.mobject.table",
+      "parents": [
+        "Table"
+      ],
+      "doc_summary": "A specialized :class:`~.Table` mobject for use with :class:`~.Integer`."
+    },
+    {
+      "class_name": "Intersection",
+      "module": "manim.mobject.geometry.boolean_ops",
+      "parents": [],
+      "doc_summary": "Find the intersection of two :class:`~.VMobject` s."
+    },
+    {
+      "class_name": "LabeledDot",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "Dot"
+      ],
+      "doc_summary": "A :class:`Dot` containing a label in its center."
+    },
+    {
+      "class_name": "LayoutFunction",
+      "module": "manim.mobject.graph",
+      "parents": [
+        "Protocol"
+      ],
+      "doc_summary": "A protocol for automatic layout functions that compute a layout for a graph to be used in :meth:`~.Graph.change_layout`."
+    },
+    {
+      "class_name": "Line",
+      "module": "manim.mobject.geometry.line",
+      "parents": [
+        "TipableVMobject"
+      ],
+      "doc_summary": "A straight or curved line segment between two points or mobjects."
+    },
+    {
+      "class_name": "Line3D",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "Cylinder"
+      ],
+      "doc_summary": "A cylindrical line, for use in ThreeDScene."
+    },
+    {
+      "class_name": "ManimBanner",
+      "module": "manim.mobject.logo",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "Convenience class representing Manim's banner."
+    },
+    {
+      "class_name": "MarkupText",
+      "module": "manim.mobject.text.text_mobject",
+      "parents": [
+        "SVGMobject"
+      ],
+      "doc_summary": "Display (non-LaTeX) text rendered using `Pango &lt;https://pango.org/&gt;`_."
+    },
+    {
+      "class_name": "MathTable",
+      "module": "manim.mobject.table",
+      "parents": [
+        "Table"
+      ],
+      "doc_summary": "A specialized :class:`~.Table` mobject for use with LaTeX."
+    },
+    {
+      "class_name": "MathTex",
+      "module": "manim.mobject.text.tex_mobject",
+      "parents": [
+        "SingleStringMathTex"
+      ],
+      "doc_summary": "A string compiled with LaTeX in math mode."
+    },
+    {
+      "class_name": "MathTexPart",
+      "module": "manim.mobject.text.tex_mobject",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "MathTexPart"
+    },
+    {
+      "class_name": "Matrix",
+      "module": "manim.mobject.matrix",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A mobject that displays a matrix on the screen."
+    },
+    {
+      "class_name": "MobjectMatrix",
+      "module": "manim.mobject.matrix",
+      "parents": [
+        "Matrix"
+      ],
+      "doc_summary": "A mobject that displays a matrix of mobject entries on the screen."
+    },
+    {
+      "class_name": "MobjectTable",
+      "module": "manim.mobject.table",
+      "parents": [
+        "Table"
+      ],
+      "doc_summary": "A specialized :class:`~.Table` mobject for use with :class:`~.Mobject`."
+    },
+    {
+      "class_name": "NumberLine",
+      "module": "manim.mobject.graphing.number_line",
+      "parents": [
+        "Line"
+      ],
+      "doc_summary": "Creates a number line with tick marks."
+    },
+    {
+      "class_name": "NumberPlane",
+      "module": "manim.mobject.graphing.coordinate_systems",
+      "parents": [
+        "Axes"
+      ],
+      "doc_summary": "Creates a cartesian plane with background lines."
+    },
+    {
+      "class_name": "Octahedron",
+      "module": "manim.mobject.three_d.polyhedra",
+      "parents": [
+        "Polyhedron"
+      ],
+      "doc_summary": "An octahedron, one of the five platonic solids. It has 8 faces, 12 edges and 6 vertices."
+    },
+    {
+      "class_name": "PGroup",
+      "module": "manim.mobject.types.point_cloud_mobject",
+      "parents": [
+        "PMobject"
+      ],
+      "doc_summary": "A group for several point mobjects."
+    },
+    {
+      "class_name": "Paragraph",
+      "module": "manim.mobject.text.text_mobject",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "Display a paragraph of text."
+    },
+    {
+      "class_name": "ParametricFunction",
+      "module": "manim.mobject.graphing.functions",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A parametric curve."
+    },
+    {
+      "class_name": "PointCloudDot",
+      "module": "manim.mobject.types.point_cloud_mobject",
+      "parents": [
+        "Mobject1D"
+      ],
+      "doc_summary": "A disc made of a cloud of dots."
+    },
+    {
+      "class_name": "PolarPlane",
+      "module": "manim.mobject.graphing.coordinate_systems",
+      "parents": [
+        "Axes"
+      ],
+      "doc_summary": "Creates a polar plane with background lines."
+    },
+    {
+      "class_name": "Polygon",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "Polygram"
+      ],
+      "doc_summary": "A shape consisting of one closed loop of vertices."
+    },
+    {
+      "class_name": "Polyhedron",
+      "module": "manim.mobject.three_d.polyhedra",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "An abstract polyhedra class."
+    },
+    {
+      "class_name": "Prism",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "Cube"
+      ],
+      "doc_summary": "A right rectangular prism (or rectangular cuboid)."
+    },
+    {
+      "class_name": "Rectangle",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "Polygon"
+      ],
+      "doc_summary": "A quadrilateral with two sets of parallel sides."
+    },
+    {
+      "class_name": "RegularPolygon",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "RegularPolygram"
+      ],
+      "doc_summary": "An n-sided regular :class:`Polygon`."
+    },
+    {
+      "class_name": "RegularPolygram",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "Polygram"
+      ],
+      "doc_summary": "A :class:`Polygram` with regularly spaced vertices."
+    },
+    {
+      "class_name": "RightAngle",
+      "module": "manim.mobject.geometry.line",
+      "parents": [
+        "Angle"
+      ],
+      "doc_summary": "An elbow-type mobject representing a right angle between two lines."
+    },
+    {
+      "class_name": "RoundedRectangle",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "Rectangle"
+      ],
+      "doc_summary": "A rectangle with rounded corners."
+    },
+    {
+      "class_name": "SampleSpace",
+      "module": "manim.mobject.graphing.probability",
+      "parents": [
+        "Rectangle"
+      ],
+      "doc_summary": "A mobject representing a twodimensional rectangular"
+    },
+    {
+      "class_name": "ScreenRectangle",
+      "module": "manim.mobject.frame",
+      "parents": [
+        "Rectangle"
+      ],
+      "doc_summary": "ScreenRectangle"
+    },
+    {
+      "class_name": "Sector",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "AnnularSector"
+      ],
+      "doc_summary": "A sector of a circle."
+    },
+    {
+      "class_name": "SingleStringMathTex",
+      "module": "manim.mobject.text.tex_mobject",
+      "parents": [
+        "SVGMobject"
+      ],
+      "doc_summary": "Elementary building block for rendering text with LaTeX."
+    },
+    {
+      "class_name": "Sphere",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "Surface"
+      ],
+      "doc_summary": "A three-dimensional sphere."
+    },
+    {
+      "class_name": "Square",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "Rectangle"
+      ],
+      "doc_summary": "A rectangle with equal side lengths."
+    },
+    {
+      "class_name": "Star",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "Polygon"
+      ],
+      "doc_summary": "A regular polygram without the intersecting lines."
+    },
+    {
+      "class_name": "StealthTip",
+      "module": "manim.mobject.geometry.tips",
+      "parents": [
+        "ArrowTip"
+      ],
+      "doc_summary": "'Stealth' fighter / kite arrow shape."
+    },
+    {
+      "class_name": "StreamLines",
+      "module": "manim.mobject.vector_field",
+      "parents": [
+        "VectorField"
+      ],
+      "doc_summary": "StreamLines represent the flow of a :class:`VectorField` using the trace of moving agents."
+    },
+    {
+      "class_name": "Surface",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "Creates a Parametric Surface using a checkerboard pattern."
+    },
+    {
+      "class_name": "SurroundingRectangle",
+      "module": "manim.mobject.geometry.shape_matchers",
+      "parents": [
+        "RoundedRectangle"
+      ],
+      "doc_summary": "A rectangle surrounding a :class:`~.Mobject`"
+    },
+    {
+      "class_name": "Table",
+      "module": "manim.mobject.table",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "A mobject that displays a table on the screen."
+    },
+    {
+      "class_name": "TangentLine",
+      "module": "manim.mobject.geometry.line",
+      "parents": [
+        "Line"
+      ],
+      "doc_summary": "Constructs a line tangent to a :class:`~.VMobject` at a specific point."
+    },
+    {
+      "class_name": "TangentialArc",
+      "module": "manim.mobject.geometry.arc",
+      "parents": [
+        "ArcBetweenPoints"
+      ],
+      "doc_summary": "Construct an arc that is tangent to two intersecting lines."
+    },
+    {
+      "class_name": "Tetrahedron",
+      "module": "manim.mobject.three_d.polyhedra",
+      "parents": [
+        "Polyhedron"
+      ],
+      "doc_summary": "A tetrahedron, one of the five platonic solids. It has 4 faces, 6 edges, and 4 vertices."
+    },
+    {
+      "class_name": "Tex",
+      "module": "manim.mobject.text.tex_mobject",
+      "parents": [
+        "MathTex"
+      ],
+      "doc_summary": "A string compiled with LaTeX in normal mode."
+    },
+    {
+      "class_name": "Text",
+      "module": "manim.mobject.text.text_mobject",
+      "parents": [
+        "SVGMobject"
+      ],
+      "doc_summary": "Display (non-LaTeX) text rendered using `Pango &lt;https://pango.org/&gt;`_."
+    },
+    {
+      "class_name": "ThreeDAxes",
+      "module": "manim.mobject.graphing.coordinate_systems",
+      "parents": [
+        "Axes"
+      ],
+      "doc_summary": "A 3-dimensional set of axes."
+    },
+    {
+      "class_name": "ThreeDVMobject",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "ThreeDVMobject"
+    },
+    {
+      "class_name": "Title",
+      "module": "manim.mobject.text.tex_mobject",
+      "parents": [
+        "Tex"
+      ],
+      "doc_summary": "A mobject representing an underlined title."
+    },
+    {
+      "class_name": "Torus",
+      "module": "manim.mobject.three_d.three_dimensions",
+      "parents": [
+        "Surface"
+      ],
+      "doc_summary": "A torus."
+    },
+    {
+      "class_name": "Triangle",
+      "module": "manim.mobject.geometry.polygram",
+      "parents": [
+        "RegularPolygon"
+      ],
+      "doc_summary": "An equilateral triangle."
+    },
+    {
+      "class_name": "Underline",
+      "module": "manim.mobject.geometry.shape_matchers",
+      "parents": [
+        "Line"
+      ],
+      "doc_summary": "Creates an underline."
+    },
+    {
+      "class_name": "Union",
+      "module": "manim.mobject.geometry.boolean_ops",
+      "parents": [],
+      "doc_summary": "Union of two or more :class:`~.VMobject` s. This returns the common region of"
+    },
+    {
+      "class_name": "UnitInterval",
+      "module": "manim.mobject.graphing.number_line",
+      "parents": [
+        "NumberLine"
+      ],
+      "doc_summary": "UnitInterval"
+    },
+    {
+      "class_name": "VDict",
+      "module": "manim.mobject.types.vectorized_mobject",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A VGroup-like class, also offering submobject access by"
+    },
+    {
+      "class_name": "VGroup",
+      "module": "manim.mobject.types.vectorized_mobject",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A group of vectorized mobjects."
+    },
+    {
+      "class_name": "VMobjectFromSVGPath",
+      "module": "manim.mobject.svg.svg_mobject",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A vectorized mobject representing an SVG path."
+    },
+    {
+      "class_name": "ValueTracker",
+      "module": "manim.mobject.value_tracker",
+      "parents": [
+        "Mobject"
+      ],
+      "doc_summary": "A mobject that can be used for tracking (real-valued) parameters."
+    },
+    {
+      "class_name": "Variable",
+      "module": "manim.mobject.text.numbers",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "A class for displaying text that shows &quot;label = value&quot; with"
+    },
+    {
+      "class_name": "Vector",
+      "module": "manim.mobject.geometry.line",
+      "parents": [
+        "Arrow"
+      ],
+      "doc_summary": "A vector specialized for use in graphs."
+    },
+    {
+      "class_name": "VectorField",
+      "module": "manim.mobject.vector_field",
+      "parents": [
+        "VGroup"
+      ],
+      "doc_summary": "A vector field."
+    },
+    {
+      "class_name": "VectorizedPoint",
+      "module": "manim.mobject.types.vectorized_mobject",
+      "parents": [
+        "VMobject"
+      ],
+      "doc_summary": "VectorizedPoint"
+    }
+  ]
+}
