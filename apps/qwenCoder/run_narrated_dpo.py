@@ -30,6 +30,18 @@ from transformers import (
     BitsAndBytesConfig,
     PreTrainedTokenizerBase,
 )
+
+# Compatibility shim: PyTorch < 2.6 does not export FSDPModule from torch.distributed.fsdp,
+# causing newer TRL versions to raise ImportError when importing trl.models.utils.
+try:
+    import torch.distributed.fsdp as _fsdp
+    if not hasattr(_fsdp, "FSDPModule"):
+        class _FSDPModuleShim:
+            pass
+        _fsdp.FSDPModule = _FSDPModuleShim
+except Exception:
+    pass
+
 from trl import DPOConfig, DPOTrainer
 
 try:
