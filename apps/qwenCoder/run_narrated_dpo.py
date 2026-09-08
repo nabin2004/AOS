@@ -44,8 +44,36 @@ REPO_ROOT = QWEN_ROOT.parent.parent
 DEFAULT_BASE_MODEL = "Qwen/Qwen3-8B"
 DEFAULT_SFT_ADAPTER = "nabin2004/AOS-qwen3-8b-narrated-adapter"
 DEFAULT_HUB_DPO_REPO = "nabin2004/AOS-qwen3-8b-narrated-dpo"
+DEFAULT_HF_DATASET_REPO = "nabin2004/manim-narrated-dpo-400"
 DEFAULT_DATA_PATH = QWEN_ROOT / "data_narrated_dpo" / "train.jsonl"
 DEFAULT_OUTPUT_DIR = QWEN_ROOT / "qwen3-8b-narrated-dpo"
+
+
+def setup_kaggle_secrets() -> None:
+    """Retrieve HF_TOKEN and WANDB_API_KEY from Kaggle UserSecretsClient if available."""
+    if "HF_TOKEN" not in os.environ:
+        try:
+            from kaggle_secrets import UserSecretsClient  # type: ignore
+
+            secrets = UserSecretsClient()
+            token = secrets.get_secret("HF_TOKEN")
+            if token:
+                os.environ["HF_TOKEN"] = token
+                print("✔ Successfully retrieved HF_TOKEN from Kaggle UserSecrets.")
+        except Exception:
+            pass
+
+    if "WANDB_API_KEY" not in os.environ:
+        try:
+            from kaggle_secrets import UserSecretsClient  # type: ignore
+
+            secrets = UserSecretsClient()
+            wandb_key = secrets.get_secret("WANDB_API_KEY")
+            if wandb_key:
+                os.environ["WANDB_API_KEY"] = wandb_key
+                print("✔ Successfully retrieved WANDB_API_KEY from Kaggle UserSecrets.")
+        except Exception:
+            pass
 
 
 def _resolve_hf_token() -> str | None:
@@ -216,17 +244,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--base-model", default=DEFAULT_BASE_MODEL, help=f"Base model ID (default: {DEFAULT_BASE_MODEL})")
     parser.add_argument("--sft-adapter", default=DEFAULT_SFT_ADAPTER, help=f"SFT adapter ID or path (default: {DEFAULT_SFT_ADAPTER})")
     parser.add_argument("--data-path", type=Path, default=DEFAULT_DATA_PATH, help=f"Preference JSONL path (default: {DEFAULT_DATA_PATH})")
+    parser.add_argument("--hf-dataset-repo", default=DEFAULT_HF_DATASET_REPO, help=f"Hugging Face dataset fallback (default: {DEFAULT_HF_DATASET_REPO})")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR, help=f"Output directory (default: {DEFAULT_OUTPUT_DIR})")
     parser.add_argument("--hub-dpo-repo", default=DEFAULT_HUB_DPO_REPO, help=f"HF DPO repo (default: {DEFAULT_HUB_DPO_REPO})")
     parser.add_argument("--beta", type=float, default=0.1, help="DPO temperature beta (default: 0.1)")
     parser.add_argument("--epochs", type=int, default=1, help="Training epochs (default: 1)")
     parser.add_argument("--lr", type=float, default=5e-6, help="Learning rate (default: 5e-6)")
     parser.add_argument("--batch-size", type=int, default=1, help="Per-device batch size (default: 1)")
-    parser.add_argument("--grad-accum", type=int, default=4, help="Gradient accumulation steps (default: 4)")
+    parser.add_argument("--grad-accum", type=int, default=8, help="Gradient accumulation steps (default: 8)")
     parser.add_argument("--max-length", type=int, default=2048, help="Max total sequence length (default: 2048)")
     parser.add_argument("--max-prompt-length", type=int, default=1024, help="Max prompt sequence length (default: 1024)")
-    parser.add_argument("--use-4bit", action="store_true", default=True, help="Use 4-bit NF4 QLoRA (default: True)")
-    parser.add_argument("--use-8bit", action="store_true", default=False, help="Use 8-bit quantization")
+    parser.add_argument("--use-4bit", action="store_true", default=True, help="Use 4-bit NF4 QLoRA (default: True on sm_75+)")
+    parser.add_argument("--use-8bit", action="store_true", default=False, help="Use 8-bit quantization (recommended for Pascal P100 sm_60)")
     parser.add_argument("--no-4bit", action="store_true", help="Disable 4-bit quantization")
     parser.add_argument("--push-to-hub", action="store_true", help="Push DPO adapter to Hugging Face")
     parser.add_argument("--smoke", action="store_true", help="Smoke test (1 step, small dataset)")
@@ -234,41 +263,63 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
+    setup_kaggle_secrets()
     args = build_arg_parser().parse_args()
     data_path = args.data_path.resolve()
     output_dir = args.output_dir.resolve()
-
-    if not data_path.is_file():
-        print(f"ERROR: DPO preference file not found at: {data_path}")
-        print("Run: uv run python prepare_narrated_datasets.py")
-        return 1
 
     print("=================================================================")
     print("🎯 Starting Direct Preference Optimization (DPO) Pipeline")
     print(f"Base Model:    {args.base_model}")
     print(f"SFT Adapter:   {args.sft_adapter}")
-    print(f"DPO Dataset:   {data_path}")
+    print(f"DPO Local:     {data_path}")
+    print(f"DPO Hub Fallback: {args.hf_dataset_repo}")
     print(f"Beta (KL):     {args.beta}")
     print(f"Learning Rate: {args.lr}")
     print(f"Output Dir:    {output_dir}")
     print(f"Hub Repo:      {args.hub_dpo_repo}")
     print("=================================================================")
 
+    # Hardware detection and Pascal (P100) auto-tuning
+    major = 99
+    if torch.cuda.is_available():
+        major, minor = torch.cuda.get_device_capability(0)
+        device_name = torch.cuda.get_device_name(0)
+        print(f"✔ Detected GPU: {device_name} (Compute Capability: {major}.{minor})")
+
+    if major < 7 and not args.no_4bit and not args.use_8bit:
+        print("⚡ Pascal architecture detected (< sm_70, e.g. Tesla P100). Auto-switching to 8-bit QLoRA + float16.")
+        use_8bit = True
+        use_4bit = False
+    else:
+        use_8bit = args.use_8bit
+        use_4bit = not args.no_4bit and not args.use_8bit
+
     tokenizer = load_tokenizer(args.base_model)
-    use_4bit = not args.no_4bit and not args.use_8bit
     model, peft_config = load_dpo_model(
         args.base_model,
         sft_adapter=args.sft_adapter,
         use_4bit=use_4bit,
-        use_8bit=args.use_8bit,
+        use_8bit=use_8bit,
     )
 
-    train_dataset = load_dataset("json", data_files=str(data_path), split="train")
+    # Load dataset from local file or download directly from Hub
+    if data_path.is_file():
+        print(f"Loading local DPO preference file: {data_path}")
+        train_dataset = load_dataset("json", data_files=str(data_path), split="train")
+    else:
+        print(f"Local file {data_path} not found. Loading from Hub repository: {args.hf_dataset_repo}")
+        token = _resolve_hf_token()
+        train_dataset = load_dataset(args.hf_dataset_repo, split="train", token=token)
+    print(f"✔ Successfully loaded DPO dataset with {len(train_dataset)} preference pairs.")
+
     if args.smoke:
         train_dataset = train_dataset.select(range(min(4, len(train_dataset))))
         args.epochs = 1
 
     import inspect
+
+    report_to = "wandb" if os.environ.get("WANDB_API_KEY") else "none"
 
     dpo_kwargs = {
         "output_dir": str(output_dir),
@@ -288,7 +339,8 @@ def main() -> int:
         "optim": "paged_adamw_8bit",
         "fp16": not torch.cuda.is_bf16_supported(),
         "bf16": torch.cuda.is_bf16_supported(),
-        "report_to": "none",
+        "report_to": report_to,
+        "run_name": "qwen3-8b-narrated-dpo",
         "remove_unused_columns": False,
     }
 

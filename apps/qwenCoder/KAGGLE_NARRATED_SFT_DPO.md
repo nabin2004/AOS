@@ -110,6 +110,23 @@ except Exception:
 !python3 /kaggle/working/AOS/apps/qwenCoder/run_kaggle_narrated.py
 ```
 
+### Dedicated One-Click Kaggle P100 DPO Training (Standalone)
+
+If you already have the SFT adapter and want to run **Direct Preference Optimization (DPO)** directly on a **GPU P100** (using 8-bit QLoRA and the clean 361-sample dataset from [`nabin2004/manim-narrated-dpo-400`](https://huggingface.co/datasets/nabin2004/manim-narrated-dpo-400)):
+
+```python
+# In a Kaggle Notebook with GPU P100 & Internet ON:
+import os
+from kaggle_secrets import UserSecretsClient
+
+secrets = UserSecretsClient()
+os.environ["HF_TOKEN"] = secrets.get_secret("HF_TOKEN")
+
+# Clone/pull repo and launch P100-optimized DPO training
+!cd /kaggle/working && git clone https://github.com/nabin2004/AOS.git 2>/dev/null || git -C /kaggle/working/AOS pull
+!python3 /kaggle/working/AOS/apps/qwenCoder/kaggle_p100_dpo.py
+```
+
 ### One-Click Kaggle Deployment (Stage 3: Merge, GGUF & Dual Hub Upload)
 
 Run in a fresh Kaggle code cell with **GPU (or CPU) and Internet ON**:
