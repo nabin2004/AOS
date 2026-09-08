@@ -37,7 +37,13 @@ except Exception:
 _CODE_FENCE = re.compile(r"```(?:python)?\s*([\s\S]*?)```", re.IGNORECASE)
 
 HEURISTIC_EXEC_PARTIAL = 0.3
-REWARD_WEIGHTS = {"exec": 0.50, "align": 0.25, "vcer": 0.15, "cover": 0.10}
+REWARD_WEIGHTS = {
+    "exec": 0.45,
+    "narration": 0.15,
+    "align": 0.20,
+    "vcer": 0.10,
+    "cover": 0.10,
+}
 DEFAULT_COVERAGE_DIVISOR = 20.0
 
 
@@ -253,6 +259,32 @@ def vcer_reward(completions: list[object], **kwargs) -> list[float]:
     return rewards
 
 
+def narration_reward(completions: list[object], **kwargs) -> list[float]:
+    """Rewards VoiceoverScene inheritance, speech service initialization, and synchronized voiceover context blocks."""
+    texts = _normalize_completions(completions)
+    rewards = []
+    for code in texts:
+        score = 0.0
+        # 1. VoiceoverScene inheritance
+        if re.search(r"class\s+\w+\s*\(\s*(?:[\w\.]*\.)?VoiceoverScene\s*\)", code):
+            score += 0.35
+        elif "VoiceoverScene" in code:
+            score += 0.20
+
+        # 2. Speech service setup (AOSSpeechService / GTTSService / RecorderService)
+        if any(term in code for term in ("set_speech_service", "AOSSpeechService", "GTTSService", "RecorderService")):
+            score += 0.25
+
+        # 3. Synchronized voiceover context block: with self.voiceover(...)
+        if re.search(r"with\s+self\.voiceover\s*\(", code):
+            score += 0.40
+        elif "voiceover(" in code:
+            score += 0.20
+
+        rewards.append(min(1.0, score))
+    return rewards
+
+
 def lexical_alignment_reward(completions: list[object], **kwargs) -> list[float]:
     """First-stage fast lexical presence check for ManiBench required_visual_events."""
     texts = _normalize_completions(completions)
@@ -371,6 +403,7 @@ def coverage_reward(completions: list[object], **kwargs) -> list[float]:
 def combined_reward(completions: list[object], **kwargs) -> list[float]:
     rendered_videos: list[Optional[str]] = []
     exec_r = executability_reward(completions, rendered_videos=rendered_videos, **kwargs)
+    narr_r = narration_reward(completions, **kwargs)
     vcer_r = vcer_reward(completions, **kwargs)
     align_r = alignment_reward(completions, rendered_videos=rendered_videos, **kwargs)
     cover_r = coverage_reward(completions, **kwargs)
@@ -379,8 +412,8 @@ def combined_reward(completions: list[object], **kwargs) -> list[float]:
     n = len(completions)
     penalties = _length_penalty(kwargs.get("completion_ids"), n)
     combined = []
-    for e, v, a, c, pen in zip(exec_r, vcer_r, align_r, cover_r, penalties):
-        score = w["exec"] * e + w["align"] * a + w["vcer"] * v + w["cover"] * c - pen
+    for e, nr, v, a, c, pen in zip(exec_r, narr_r, vcer_r, align_r, cover_r, penalties):
+        score = w["exec"] * e + w["narration"] * nr + w["align"] * a + w["vcer"] * v + w["cover"] * c - pen
         # Soft penalty instead of hard collapse to 0.0:
         # If code completely lacks basic structure (e < 0.10), dampen score by 75%
         if e < 0.10:
@@ -392,6 +425,7 @@ def combined_reward(completions: list[object], **kwargs) -> list[float]:
             f"[reward] min={min(combined):.3f} max={max(combined):.3f} "
             f"mean={sum(combined) / len(combined):.3f} "
             f"exec={sum(exec_r) / len(exec_r):.3f} "
+            f"narr={sum(narr_r) / len(narr_r):.3f} "
             f"align={sum(align_r) / len(align_r):.3f} "
             f"vcer={sum(vcer_r) / len(vcer_r):.3f} "
             f"cover={sum(cover_r) / len(cover_r):.3f}",

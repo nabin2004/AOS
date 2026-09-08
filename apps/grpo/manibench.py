@@ -249,27 +249,59 @@ def load_dataset_split(config: TrainingConfig, split_name: str = "train") -> lis
     # If not local, download from HF Hub
     if split_file_path is None:
         repo_id = config.dataset_repo or DEFAULT_GRPO_DATASET_REPO
+        token = hub_token()
+        candidates_filenames = [
+            f"data/splits/{split_name}.jsonl",
+            f"{split_name}.jsonl",
+            f"data/{split_name}.jsonl",
+        ]
+        for fname in candidates_filenames:
+            try:
+                downloaded = hf_hub_download(
+                    repo_id=repo_id,
+                    filename=fname,
+                    repo_type="dataset",
+                    token=token,
+                )
+                split_file_path = Path(downloaded)
+                break
+            except Exception:
+                continue
+
+    if split_file_path is None:
+        # Try Hugging Face datasets.load_dataset directly
+        try:
+            from datasets import load_dataset
+            ds = load_dataset(repo_id, split=split_name, token=hub_token())
+            loaded_rows: list[dict[str, Any]] = []
+            for item in ds:
+                pid = str(item.get("id") or item.get("problem_id") or "")
+                prompt = (
+                    item.get("prompt")
+                    or item.get("full_prompt")
+                    or item.get("user_prompt")
+                    or ""
+                )
+                if pid and pid not in _PROBLEM_INDEX:
+                    _PROBLEM_INDEX[pid] = _load_problem_meta(pid, config)
+                loaded_rows.append({"id": pid, "prompt": prompt, "full_prompt": prompt})
+            if loaded_rows:
+                return loaded_rows
+        except Exception:
+            pass
+
+        # Fallback to legacy pilot dataset
         try:
             downloaded = hf_hub_download(
-                repo_id=repo_id,
-                filename=f"data/splits/{split_name}.jsonl",
+                repo_id=PILOT_REPO,
+                filename=PILOT_FILE,
                 repo_type="dataset",
                 token=hub_token(),
             )
-            split_file_path = Path(downloaded)
-        except Exception:
-            # Fallback to legacy pilot dataset
-            try:
-                downloaded = hf_hub_download(
-                    repo_id=PILOT_REPO,
-                    filename=PILOT_FILE,
-                    repo_type="dataset",
-                    token=hub_token(),
-                )
-                payload = json.loads(Path(downloaded).read_text(encoding="utf-8"))
-                return payload.get("problems", [])
-            except Exception as e:
-                raise FileNotFoundError(f"Failed to load dataset from local or HF: {e}")
+            payload = json.loads(Path(downloaded).read_text(encoding="utf-8"))
+            return payload.get("problems", [])
+        except Exception as e:
+            raise FileNotFoundError(f"Failed to load dataset from local or HF: {e}")
 
     rows: list[dict[str, Any]] = []
     with open(split_file_path, "r", encoding="utf-8") as f:

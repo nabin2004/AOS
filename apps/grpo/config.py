@@ -28,10 +28,10 @@ GRPO_ADAPTER = "default"
 
 @dataclass
 class TrainingConfig:
-    sft_lora_path: Path = GRPO_ROOT / ".." / "sft" / SFT_OUTPUT_DIR_NAME
+    sft_lora_path: Path | str = GRPO_ROOT / ".." / "sft" / SFT_OUTPUT_DIR_NAME
     base_model: str | None = None
     base_family: str = "gemma"  # gemma | qwen
-    dataset_repo: str = "nabin2004/ManiBench"
+    dataset_repo: str = "nabin2004/Manim-grpo-dataset-200"
     dataset_path: Path | None = None
     prompts_path: Path | None = None
     output_dir: Path = GRPO_ROOT / "grpo_manim"
@@ -46,6 +46,7 @@ class TrainingConfig:
     smoke: bool = False
     max_steps: int | None = None
     grpo_only: bool = False
+    stack_lora: bool = False
     render: bool = False
     no_render: bool = False
     reward_debug: bool = False
@@ -103,8 +104,10 @@ class TrainingConfig:
             config = apply_dual_t4_preset(config)
         if getattr(args, "p100", False):
             config = apply_p100_preset(config)
+        if getattr(args, "stack_lora", False):
+            config = replace(config, stack_lora=True)
         if args.sft_lora is not None:
-            config = replace(config, sft_lora_path=_resolve_path(Path(args.sft_lora)))
+            config = replace(config, sft_lora_path=_resolve_path(args.sft_lora))
         if args.base is not None:
             family = str(args.base).lower().strip()
             if family not in ("gemma", "qwen"):
@@ -113,15 +116,18 @@ class TrainingConfig:
             if family == "qwen":
                 qwen_sft = GRPO_ROOT / ".." / "qwenCoder" / "qwen2.5-coder-7b-manim-ft"
                 qwen_dpo_local = GRPO_ROOT / ".." / "dpo" / "qwen2.5-coder-7b-manim-dpo"
-                qwen_dpo_narrated = GRPO_ROOT / ".." / "qwenCoder" / "data_narrated_dpo"
+                qwen3_dpo_local = GRPO_ROOT / ".." / "dpo" / "qwen3-8b-narrated-dpo"
+                qwen3_dpo_hub = "nabin2004/AOS-qwen3-8b-narrated-dpo"
                 
-                # Priority: local narrated DPO -> local DPO -> remote DPO hub -> local SFT
-                if qwen_dpo_narrated.is_dir():
-                    qwen_default = qwen_dpo_narrated
+                # Priority: local Qwen3 narrated DPO -> remote Qwen3 DPO hub -> local DPO -> local SFT
+                if qwen3_dpo_local.is_dir():
+                    qwen_default = qwen3_dpo_local
                 elif qwen_dpo_local.is_dir():
                     qwen_default = qwen_dpo_local
-                else:
+                elif qwen_sft.is_dir():
                     qwen_default = qwen_sft
+                else:
+                    qwen_default = qwen3_dpo_hub
 
                 updates: dict = {
                     "run_name": "qwen3-8b-manim-dpo-grpo",
@@ -250,10 +256,19 @@ def hub_token() -> str | None:
     return raw.strip() or None
 
 
-def _resolve_path(path: Path) -> Path:
-    if path.is_absolute():
-        return path.resolve()
-    return (Path.cwd() / path).resolve()
+def _resolve_path(path: Path | str) -> Path | str:
+    if isinstance(path, str):
+        # If it's a Hugging Face repo ID (e.g. "nabin2004/AOS-qwen3-8b-narrated-dpo"), preserve it as str
+        if "/" in path and not Path(path).exists() and not Path(path).is_absolute():
+            return path
+        p = Path(path)
+    else:
+        p = path
+    if p.is_absolute():
+        return p.resolve()
+    if p.exists():
+        return p.resolve()
+    return (Path.cwd() / p).resolve()
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -361,6 +376,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--grpo-only",
         action="store_true",
         help="Train GRPO LoRA on base only (skip frozen SFT adapter)",
+    )
+    parser.add_argument(
+        "--stack-lora",
+        action="store_true",
+        help="Train a fresh delta LoRA stacked on top of frozen SFT/DPO adapter (default: False, continues training SFT/DPO LoRA directly)",
     )
     parser.add_argument(
         "--reward-debug",

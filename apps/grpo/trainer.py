@@ -2,6 +2,17 @@ from __future__ import annotations
 
 import sys
 
+# Compatibility shim for environments with PyTorch < 2.6 where FSDPModule is missing
+try:
+    import torch.distributed.fsdp as _fsdp
+    if not hasattr(_fsdp, "FSDPModule"):
+        class FSDPModule: pass
+        _fsdp.FSDPModule = FSDPModule
+except Exception:
+    pass
+
+import torch
+
 from config import DEFAULT_BETA, DEFAULT_LEARNING_RATE, GRPO_ADAPTER, TrainingConfig
 from rewards import combined_reward
 
@@ -72,6 +83,9 @@ def make_training_args(
 ) -> object:
     from trl import GRPOConfig
 
+    use_bf16 = torch.cuda.is_available() and torch.cuda.is_bf16_supported()
+    use_fp16 = torch.cuda.is_available() and not use_bf16
+
     common = dict(
         output_dir=str(config.output_dir),
         optim="paged_adamw_8bit",
@@ -80,7 +94,8 @@ def make_training_args(
         use_vllm=False,
         report_to=config.report_to,
         run_name=config.run_name,
-        bf16=True,
+        bf16=use_bf16,
+        fp16=use_fp16,
         gradient_checkpointing=True,
         max_completion_length=max_completion_length,
         num_generations=config.num_generations,

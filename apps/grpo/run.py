@@ -12,6 +12,16 @@ from __future__ import annotations
 
 import os
 import sys
+
+# Compatibility shim for environments with PyTorch < 2.6 where FSDPModule is missing
+try:
+    import torch.distributed.fsdp as _fsdp
+    if not hasattr(_fsdp, "FSDPModule"):
+        class FSDPModule: pass
+        _fsdp.FSDPModule = FSDPModule
+except Exception:
+    pass
+
 from dataclasses import replace
 from pathlib import Path
 

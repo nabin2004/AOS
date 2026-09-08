@@ -1,19 +1,27 @@
-# Running ManiBench GRPO on Kaggle (Dual T4 / P100)
+# Running ManiBench GRPO on Kaggle (GPU T4 x2)
 
-This guide details how to run the end-to-end Group Relative Policy Optimization (GRPO) training pipeline for mathematical animation synthesis on Kaggle GPU instances.
+This guide details how to run the end-to-end Group Relative Policy Optimization (GRPO) training pipeline on top of the Stage 2 DPO'ed model on Kaggle GPU instances.
 
 ---
 
 ## 1. Accelerator Recommendation
 
-- **Recommended**: **GPU T4 x 2** (Dual NVIDIA T4, 32 GB total VRAM).
-  - *Why*: GRPO samples multiple completions per prompt ($G=4$ to $8$ parallel generations). Dual T4 provides 32 GB total VRAM, native bfloat16/4-bit QLoRA support with `bitsandbytes`, and fast parallel rollouts.
-- **Alternative**: **GPU P100** (Single NVIDIA Tesla P100, 16 GB VRAM).
-  - *Why*: Supported fallback for single-GPU budget training.
+- **Required**: **GPU T4 x 2** (Dual NVIDIA T4, 32 GB total VRAM).
+  - *Why*: GRPO samples multiple completions per prompt ($G=4$ parallel generations). Dual T4 provides 32 GB total VRAM and native 4-bit NF4 QLoRA support with Turing Tensor Cores (`sm_75`).
+- **Notice on Tesla P100 (`sm_60`)**:
+  - NVIDIA Tesla P100 lacks hardware Tensor Cores. Running `bitsandbytes` 4-bit quantized GEMM on P100 will fail with `cuBLAS status 15`. Always select **GPU T4 x2** in the Kaggle sidebar.
 
 ---
 
-## 2. Kaggle Notebook Setup
+## 2. Model Lineage & Staged Curriculum
+
+1. **Stage 1 (SFT)**: `Qwen/Qwen3-8B` + Manim SFT Dataset → `nabin2004/AOS-qwen3-8b-narrated-adapter`
+2. **Stage 2 (DPO)**: SFT Adapter + 361 Curated Preference Pairs → `nabin2004/AOS-qwen3-8b-narrated-dpo`
+3. **Stage 3 (GRPO)**: DPO Adapter + Group Relative Policy Optimization on 200 Animation Tasks → `nabin2004/AOS-qwen3-8b-grpo`
+
+---
+
+## 3. Kaggle Notebook Setup
 
 ### Step 1: Create Notebook & Configure Hardware
 1. Go to [kaggle.com/code](https://www.kaggle.com/code) → **New Notebook**.

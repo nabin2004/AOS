@@ -1,8 +1,18 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
+
+# Compatibility shim for environments with PyTorch < 2.6 where FSDPModule is missing
+try:
+    import torch.distributed.fsdp as _fsdp
+    if not hasattr(_fsdp, "FSDPModule"):
+        class FSDPModule: pass
+        _fsdp.FSDPModule = FSDPModule
+except Exception:
+    pass
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
@@ -73,27 +83,34 @@ def _base_model_for_adapter(adapter_path: Path | str, fallback: str) -> str:
 
 def _load_qwen(config: TrainingConfig):
     """Qwen path: transformers CausalLM + PEFT (no Unsloth FastVisionModel)."""
-    from peft import PeftModel
+    from peft import PeftModel, get_peft_model
 
+    default_fallback = "Qwen/Qwen3-8B"
     if config.grpo_only:
-        base = config.base_model or "Qwen/Qwen2.5-Coder-7B-Instruct"
+        base = config.base_model or default_fallback
     else:
         base = config.base_model or _base_model_for_adapter(
             config.sft_lora_path,
-            "Qwen/Qwen2.5-Coder-7B-Instruct",
+            default_fallback,
         )
+
     token = hub_token()
+
+    # Hardware compute dtype selection: bf16 if supported (Ampere+), fp16 for Turing (T4)
+    use_bf16 = torch.cuda.is_available() and torch.cuda.is_bf16_supported()
+    compute_dtype = torch.bfloat16 if use_bf16 else torch.float16
+
     kwargs: dict = {
         "trust_remote_code": True,
         "token": token,
         "device_map": "auto",
-        "torch_dtype": torch.bfloat16,
+        "torch_dtype": compute_dtype,
     }
     if config.load_in_4bit:
         kwargs["quantization_config"] = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",
-            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_compute_dtype=compute_dtype,
             bnb_4bit_use_double_quant=True,
         )
 
@@ -114,9 +131,11 @@ def _load_qwen(config: TrainingConfig):
     model.config.use_cache = False
     grpo_config = _grpo_lora_config()
 
-    if config.grpo_only:
-        model = PeftModel(model, grpo_config, adapter_name=GRPO_ADAPTER)
-    else:
+    if config.grpo_only or not config.sft_lora_path:
+        model = get_peft_model(model, grpo_config, adapter_name=GRPO_ADAPTER)
+    elif config.stack_lora:
+        # Stacked mode: load initial DPO adapter frozen under 'sft', add new trainable 'default' adapter
+        print(f"Stacking new LoRA adapter on top of frozen adapter: {config.sft_lora_path}")
         model = PeftModel.from_pretrained(
             model,
             str(config.sft_lora_path),
@@ -127,14 +146,24 @@ def _load_qwen(config: TrainingConfig):
             if "sft" in name:
                 param.requires_grad = False
         model.add_adapter(GRPO_ADAPTER, grpo_config)
+        model.set_adapter(GRPO_ADAPTER)
+    else:
+        # Continual mode (default): load DPO adapter directly as trainable policy adapter
+        print(f"Loading initial policy adapter from DPO checkpoint: {config.sft_lora_path} (is_trainable=True)")
+        model = PeftModel.from_pretrained(
+            model,
+            str(config.sft_lora_path),
+            is_trainable=True,
+            adapter_name=GRPO_ADAPTER,
+            token=token,
+        )
 
-    model.set_adapter(GRPO_ADAPTER)
     model.train()
     return model, tokenizer
 
 
 def _load_gemma(config: TrainingConfig):
-    from peft import PeftModel
+    from peft import PeftModel, get_peft_model
     from unsloth import FastVisionModel
 
     if config.grpo_only:
@@ -159,9 +188,9 @@ def _load_gemma(config: TrainingConfig):
     grpo_config = _grpo_lora_config()
     sft_path = str(config.sft_lora_path)
 
-    if config.grpo_only:
-        model = PeftModel(model, grpo_config, adapter_name=GRPO_ADAPTER)
-    else:
+    if config.grpo_only or not config.sft_lora_path:
+        model = get_peft_model(model, grpo_config, adapter_name=GRPO_ADAPTER)
+    elif config.stack_lora:
         model = PeftModel.from_pretrained(
             model,
             sft_path,
@@ -172,8 +201,16 @@ def _load_gemma(config: TrainingConfig):
             if "sft" in name:
                 param.requires_grad = False
         model.add_adapter(GRPO_ADAPTER, grpo_config)
+        model.set_adapter(GRPO_ADAPTER)
+    else:
+        model = PeftModel.from_pretrained(
+            model,
+            sft_path,
+            is_trainable=True,
+            adapter_name=GRPO_ADAPTER,
+            token=token,
+        )
 
-    model.set_adapter(GRPO_ADAPTER)
     model.train()
     return model, tokenizer
 

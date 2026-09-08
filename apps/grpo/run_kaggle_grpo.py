@@ -25,6 +25,15 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Compatibility shim for environments with PyTorch < 2.6 where FSDPModule is missing
+try:
+    import torch.distributed.fsdp as _fsdp
+    if not hasattr(_fsdp, "FSDPModule"):
+        class FSDPModule: pass
+        _fsdp.FSDPModule = FSDPModule
+except Exception:
+    pass
+
 GRPO_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = GRPO_ROOT.parent.parent
 
@@ -84,6 +93,15 @@ def detect_gpu_hardware() -> tuple[int, str]:
         for i in range(count):
             mem_gb = torch.cuda.get_device_properties(i).total_memory / (1024**3)
             print(f"   GPU {i}: {torch.cuda.get_device_name(i)} ({mem_gb:.1f} GB VRAM)")
+
+        if "P100" in name:
+            print("\n" + "=" * 65)
+            print("⚠️ WARNING: Detected NVIDIA Tesla P100 (Pascal architecture).")
+            print("Tesla P100 lacks Tensor Cores required by bitsandbytes 4-bit NF4 GEMM.")
+            print("For seamless execution without cuBLAS status 15 errors, switch to:")
+            print("   👉 Kaggle Notebook Accelerator: 'GPU T4 x2'")
+            print("=" * 65 + "\n")
+
         return count, name
     except Exception as e:
         print(f"Notice: GPU detection encountered: {e}")
@@ -91,14 +109,15 @@ def detect_gpu_hardware() -> tuple[int, str]:
 
 
 def setup_environment() -> None:
-    """Install required packages in Kaggle system Python."""
+    """Install required packages in Kaggle system Python with pinned dependencies."""
     python_exe = sys.executable
     required_packages = [
-        "trl>=0.14.0",
-        "peft>=0.14.0",
+        "transformers>=4.48.0,<5.0.0",
+        "trl>=0.12.0,<1.0.0",
+        "peft>=0.12.0",
+        "accelerate>=0.34.0",
         "bitsandbytes>=0.45.0",
         "datasets>=3.0.0",
-        "accelerate>=1.2.0",
         "huggingface-hub>=0.28.0",
         "open-clip-torch>=2.24.0",
         "wandb",
@@ -121,6 +140,7 @@ def run_grpo_training(
     render: bool,
     report_to: str,
     run_name: str,
+    stack_lora: bool = False,
 ) -> None:
     """Execute GRPO training via subprocess or direct module invocation."""
     python_exe = sys.executable
@@ -142,6 +162,9 @@ def run_grpo_training(
         "--run-name",
         run_name,
     ]
+
+    if stack_lora:
+        cmd.append("--stack-lora")
 
     if dual_gpu:
         cmd.append("--dual-t4")
@@ -198,6 +221,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--push-to-hub", action="store_true", help="Push trained adapter to Hugging Face Hub")
     parser.add_argument("--smoke", action="store_true", help="Run a single-step smoke test")
     parser.add_argument("--max-steps", type=int, default=None, help="Max GRPO optimization steps")
+    parser.add_argument("--stack-lora", action="store_true", help="Train a fresh delta LoRA stacked on top of frozen SFT/DPO adapter")
     parser.add_argument("--render", action="store_true", help="Enable live Manim rendering & OpenCLIP visual reward")
     parser.add_argument("--report-to", default="wandb", help="Logging backend ('wandb' or 'none')")
     parser.add_argument("--run-name", default="qwen3-8b-manim-grpo-kaggle", help="Run name for W&B logging")
@@ -252,6 +276,7 @@ def main() -> int:
             render=args.render,
             report_to=args.report_to,
             run_name=args.run_name,
+            stack_lora=args.stack_lora,
         )
     except KeyboardInterrupt:
         print("\n⚠️ Training interrupted. Executing safety checkpoint upload to Hub...")
