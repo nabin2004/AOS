@@ -297,15 +297,13 @@ def main() -> int:
     if torch.cuda.is_available():
         major, minor = torch.cuda.get_device_capability(0)
         device_name = torch.cuda.get_device_name(0)
-        print(f"✔ Detected GPU: {device_name} (Compute Capability: {major}.{minor})")
+    if major < 7:
+        print("⚠️  Warning: Pascal GPU detected (< sm_70, e.g. Tesla P100).")
+        print("   Tesla P100 lacks Tensor Cores. bitsandbytes quantized GEMM operations often fail with status 15.")
+        print("   👉 Solution: Switch Kaggle Accelerator to 'GPU T4 x2' (sm_75) for native 4-bit NF4 Tensor Core support.")
 
-    if major < 7 and not args.no_4bit and not args.use_8bit:
-        print("⚡ Pascal architecture detected (< sm_70, e.g. Tesla P100). Auto-switching to 8-bit QLoRA + float16.")
-        use_8bit = True
-        use_4bit = False
-    else:
-        use_8bit = args.use_8bit
-        use_4bit = not args.no_4bit and not args.use_8bit
+    use_8bit = args.use_8bit
+    use_4bit = not args.no_4bit and not args.use_8bit
 
     tokenizer = load_tokenizer(args.base_model)
     model, peft_config = load_dpo_model(

@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-"""One-Click Kaggle P100 GPU Runner for Manim Voiceover DPO Training.
+"""One-Click Kaggle GPU Runner for Manim Voiceover DPO Training (T4 x2 / P100).
 
-Specifically tailored for NVIDIA Tesla P100 (Pascal sm_60, 16 GB VRAM) on Kaggle:
-1. Auto-retrieves HF_TOKEN and WANDB_API_KEY from Kaggle UserSecretsClient.
-2. Fast CUDA preflight: skips redundant 2.5 GB torch downloads if CUDA works.
-3. Installs/updates required packages (transformers, trl, peft, bitsandbytes, datasets).
-4. Launches 8-bit QLoRA Direct Preference Optimization (DPO) using the clean
-   361-sample preference dataset from `nabin2004/manim-narrated-dpo-400`.
-5. Pushes the aligned DPO LoRA adapter to Hugging Face Hub: `nabin2004/AOS-qwen3-8b-narrated-dpo`.
+Optimized for Kaggle GPU environments:
+- GPU T4 x2 (Recommended): Automatically uses 4-bit NF4 QLoRA with hardware Tensor Cores (sm_75).
+- Auto-retrieves HF_TOKEN and WANDB_API_KEY from Kaggle UserSecretsClient.
+- Streams the clean 361-sample preference dataset from `nabin2004/manim-narrated-dpo-400`.
+- Pushes the aligned DPO LoRA adapter to Hugging Face Hub: `nabin2004/AOS-qwen3-8b-narrated-dpo`.
 
-Usage in a Kaggle Notebook code cell (with GPU P100 & Internet ON):
-    !python3 apps/qwenCoder/kaggle_p100_dpo.py
+Usage in Kaggle Notebook (with GPU T4 x2 & Internet ON):
+    !python3 apps/qwenCoder/kaggle_dpo.py
 """
 
 from __future__ import annotations
@@ -73,7 +71,7 @@ def is_cuda_working() -> bool:
 
 
 def setup_environment(force_reinstall_torch: bool = False) -> None:
-    """Prepare Python environment on Kaggle without slow wheel redownloads."""
+    """Prepare Python environment on Kaggle with stable package pins."""
     python_exe = sys.executable
 
     print("\n[1/3] Checking GPU and PyTorch environment...")
@@ -85,7 +83,7 @@ def setup_environment(force_reinstall_torch: bool = False) -> None:
         print(f"✔ Active GPU: {name} (Compute Capability {major}.{minor})")
         print("✔ PyTorch CUDA is already operational. Skipping 2.5 GB torch wheel re-download.")
     else:
-        print("⚡ Setting up PyTorch with cu118 for Kaggle Pascal P100...")
+        print("⚡ Ensuring PyTorch with CUDA support...")
         subprocess.run(
             [python_exe, "-m", "pip", "uninstall", "-y", "torch", "torchvision", "torchaudio"],
             check=False,
@@ -100,7 +98,7 @@ def setup_environment(force_reinstall_torch: bool = False) -> None:
                 "torchvision==0.20.1",
                 "torchaudio==2.5.1",
                 "--index-url",
-                "https://download.pytorch.org/whl/cu118",
+                "https://download.pytorch.org/whl/cu121",
             ],
             check=True,
         )
@@ -127,7 +125,7 @@ def setup_environment(force_reinstall_torch: bool = False) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="One-Click Kaggle P100 DPO Trainer for Qwen3-8B Narrated Manim"
+        description="One-Click Kaggle DPO Trainer for Qwen3-8B Narrated Manim"
     )
     parser.add_argument("--base-model", default=DEFAULT_BASE_MODEL, help=f"Base model ID (default: {DEFAULT_BASE_MODEL})")
     parser.add_argument("--sft-adapter", default=DEFAULT_SFT_ADAPTER, help=f"SFT adapter ID (default: {DEFAULT_SFT_ADAPTER})")
@@ -140,9 +138,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--grad-accum", type=int, default=8, help="Gradient accumulation steps (default: 8)")
     parser.add_argument("--max-length", type=int, default=2048, help="Max sequence length (default: 2048)")
     parser.add_argument("--max-prompt-length", type=int, default=1024, help="Max prompt length (default: 1024)")
+    parser.add_argument("--use-4bit", action="store_true", default=True, help="Use 4-bit NF4 QLoRA (default: True on sm_75+)")
+    parser.add_argument("--use-8bit", action="store_true", default=False, help="Use 8-bit quantization")
     parser.add_argument("--no-push", action="store_true", help="Do not upload DPO LoRA to Hugging Face")
     parser.add_argument("--smoke", action="store_true", help="Smoke test (1 step, small dataset)")
-    parser.add_argument("--force-reinstall-torch", action="store_true", help="Force reinstall PyTorch cu118")
+    parser.add_argument("--force-reinstall-torch", action="store_true", help="Force reinstall PyTorch")
     return parser
 
 
@@ -150,16 +150,35 @@ def main() -> int:
     args = build_parser().parse_args()
 
     print("=================================================================")
-    print("🚀 Kaggle P100 Direct Preference Optimization (DPO) Runner")
+    print("🚀 One-Click Kaggle DPO Alignment Runner (Qwen3-8B Narrated)")
     print(f"Base LLM:      {args.base_model}")
     print(f"SFT Adapter:   {args.sft_adapter}")
     print(f"Dataset Hub:   {args.hf_dataset}")
     print(f"Target DPO:    {args.hub_dpo_repo}")
-    print(f"Quantization:  8-bit QLoRA (Pascal sm_60 optimized)")
     print("=================================================================")
 
     setup_kaggle_secrets()
     setup_environment(force_reinstall_torch=args.force_reinstall_torch)
+
+    import torch
+
+    major = 99
+    if torch.cuda.is_available():
+        major, minor = torch.cuda.get_device_capability(0)
+        device_name = torch.cuda.get_device_name(0)
+        print(f"\n✔ Target GPU: {device_name} (Compute Capability: {major}.{minor})")
+
+    # Detect Pascal P100 limitation
+    if major < 7:
+        print("\n" + "=" * 65)
+        print("⚠️  NOTICE: Tesla P100 (sm_60) detected!")
+        print("NVIDIA Pascal GPUs lack Tensor Cores. As a result, bitsandbytes")
+        print("cuBLASLt INT8/FP4 matrix operations will fail with status 15.")
+        print("\n👉 HIGHLY RECOMMENDED FIX:")
+        print("   Switch your Kaggle Accelerator to 'GPU T4 x2' (or 'GPU T4').")
+        print("   In Kaggle: Notebook settings (right panel) -> Accelerator -> 'GPU T4 x2'.")
+        print("   Tesla T4 has Turing Tensor Cores (sm_75) and runs 4-bit NF4 QLoRA flawlessly.")
+        print("=" * 65 + "\n")
 
     output_adapter_dir = QWEN_ROOT / "qwen3-8b-narrated-dpo"
 
@@ -193,15 +212,10 @@ def main() -> int:
         str(args.max_prompt_length),
     ]
 
-    import torch
-    major = 99
-    if torch.cuda.is_available():
-        major, _ = torch.cuda.get_device_capability(0)
-
-    if major >= 7:
-        dpo_cmd.append("--use-4bit")
-    else:
+    if args.use_8bit:
         dpo_cmd.append("--use-8bit")
+    else:
+        dpo_cmd.append("--use-4bit")
 
     if not args.no_push and os.environ.get("HF_TOKEN"):
         dpo_cmd.append("--push-to-hub")
@@ -211,7 +225,7 @@ def main() -> int:
 
     res = subprocess.run(dpo_cmd)
     if res.returncode != 0:
-        print(f"❌ DPO training exited with error code {res.returncode}", file=sys.stderr)
+        print(f"\n❌ DPO training exited with error code {res.returncode}", file=sys.stderr)
         return res.returncode
 
     print("\n=================================================================")

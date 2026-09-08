@@ -110,21 +110,25 @@ except Exception:
 !python3 /kaggle/working/AOS/apps/qwenCoder/run_kaggle_narrated.py
 ```
 
-### Dedicated One-Click Kaggle P100 DPO Training (Standalone)
+### Dedicated One-Click Kaggle DPO Alignment (GPU T4 x2 Recommended)
 
-If you already have the SFT adapter and want to run **Direct Preference Optimization (DPO)** directly on a **GPU P100** (using 8-bit QLoRA and the clean 361-sample dataset from [`nabin2004/manim-narrated-dpo-400`](https://huggingface.co/datasets/nabin2004/manim-narrated-dpo-400)):
+> [!IMPORTANT]
+> **Hardware Notice**:
+> Tesla P100 (Pascal, `sm_60`) lacks the Tensor Cores required for `bitsandbytes` quantized GEMM (`cublasLt` fails with status 15).
+> Always select **GPU T4 x2** (or GPU T4) in Kaggle's right panel under **Accelerator**.
+> Tesla T4 has Turing Tensor Cores (`sm_75`) and trains 4-bit NF4 QLoRA ultra-fast (~5.5 GB VRAM).
 
 ```python
-# In a Kaggle Notebook with GPU P100 & Internet ON:
+# In a Kaggle Notebook with GPU T4 x2 & Internet ON:
 import os
 from kaggle_secrets import UserSecretsClient
 
 secrets = UserSecretsClient()
 os.environ["HF_TOKEN"] = secrets.get_secret("HF_TOKEN")
 
-# Clone/pull repo and launch P100-optimized DPO training
+# Clone/pull repo and launch T4-optimized DPO training
 !cd /kaggle/working && git clone https://github.com/nabin2004/AOS.git 2>/dev/null || git -C /kaggle/working/AOS pull
-!python3 /kaggle/working/AOS/apps/qwenCoder/kaggle_p100_dpo.py
+!python3 /kaggle/working/AOS/apps/qwenCoder/kaggle_dpo.py
 ```
 
 ### One-Click Kaggle Deployment (Stage 3: Merge, GGUF & Dual Hub Upload)
