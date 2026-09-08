@@ -40,6 +40,17 @@ except Exception:
     compute_video_clip_reward = None
     compute_prompt_image_clip_reward = None
 
+try:
+    from vlm_judge import (
+        DEFAULT_VLM_MODEL,
+        DEFAULT_VLM_THRESHOLD,
+        evaluate_cascading_ensemble,
+        get_gemma_judge,
+    )
+except Exception:
+    get_gemma_judge = None
+    evaluate_cascading_ensemble = None
+
 _RENDER_BASE_DIR = Path(tempfile.gettempdir()) / "aos_grpo_renders"
 
 
@@ -326,12 +337,18 @@ def lexical_alignment_reward(completions: list[object], **kwargs) -> list[float]
     return rewards
 
 
-def clip_visual_reward(
+def visual_alignment_reward(
     completions: list[object],
     rendered_videos: Optional[list[Optional[str]]] = None,
     **kwargs,
 ) -> list[float]:
-    """Live visual alignment reward strictly evaluated on GPU 1 (reward device: cuda:1)."""
+    """Live visual alignment reward strictly evaluated on GPU 1 (cuda:1).
+
+    Supports:
+    - mode="ensemble" (default): Cascading Reward Filter (OpenCLIP fast filter + Gemma 4/PaliGemma expert grader)
+    - mode="gemma": Pure Gemma/PaliGemma VLM layout and correctness judge
+    - mode="clip": Pure OpenCLIP semantic frame similarity
+    """
     texts = _normalize_completions(completions)
     problem_ids = kwargs.get("problem_id", [""] * len(texts))
     prompts = kwargs.get("prompts", kwargs.get("prompt", [""] * len(texts)))
@@ -346,6 +363,10 @@ def clip_visual_reward(
         import torch
         reward_device = "cuda:1" if torch.cuda.is_available() and torch.cuda.device_count() >= 2 else "cuda:0"
 
+    judge_mode = os.environ.get("AOS_VLM_JUDGE", "ensemble").lower().strip()
+    vlm_model = os.environ.get("AOS_VLM_MODEL")
+    threshold = float(os.environ.get("AOS_VLM_THRESHOLD", "0.15"))
+
     rewards = []
 
     for idx, (code, pid, prompt_text) in enumerate(zip(texts, problem_ids, prompts_text)):
@@ -356,8 +377,29 @@ def clip_visual_reward(
             continue
 
         ve_path = _find_visual_events_path(pid)
+
         try:
-            if ve_path and compute_video_clip_reward is not None:
+            # 1. Cascading Ensemble Mode (OpenCLIP fast filter -> Gemma VLM expert layout grader)
+            if judge_mode == "ensemble" and evaluate_cascading_ensemble is not None:
+                score, meta = evaluate_cascading_ensemble(
+                    video_path=video_path,
+                    prompt=prompt_text,
+                    threshold=threshold,
+                    device=reward_device,
+                    model_id=vlm_model,
+                )
+                if _reward_debug_enabled():
+                    print(f"  [vlm-ensemble] {meta}", file=sys.stderr, flush=True)
+                rewards.append(float(score))
+
+            # 2. Pure Gemma / PaliGemma VLM Judge Mode
+            elif judge_mode == "gemma" and get_gemma_judge is not None:
+                judge = get_gemma_judge(model_id=vlm_model, device=reward_device)
+                score = judge.evaluate_video(video_path, prompt_text)
+                rewards.append(float(score))
+
+            # 3. Fast OpenCLIP Baseline Mode
+            elif ve_path and compute_video_clip_reward is not None:
                 res = compute_video_clip_reward(video_path, ve_path, fps=2.0, device=reward_device)
                 rewards.append(float(res.score))
             elif compute_prompt_image_clip_reward is not None:
@@ -365,14 +407,20 @@ def clip_visual_reward(
                 rewards.append(float(score))
             else:
                 rewards.append(0.5)
-        except Exception:
+        except Exception as e:
+            if _reward_debug_enabled():
+                print(f"  [visual-reward-error] {e}", file=sys.stderr, flush=True)
             rewards.append(0.0)
 
     return rewards
 
 
+# Retain clip_visual_reward as backward-compatible alias
+clip_visual_reward = visual_alignment_reward
+
+
 def alignment_reward(completions: list[object], **kwargs) -> list[float]:
-    """Composite alignment combining fast lexical filter and live OpenCLIP visual reward."""
+    """Composite alignment combining fast lexical filter and live VLM / OpenCLIP visual reward."""
     lexical_r = lexical_alignment_reward(completions, **kwargs)
     use_clip = os.environ.get("MANIBENCH_GRPO_CLIP_REWARD", "0") == "1"
     
@@ -380,11 +428,12 @@ def alignment_reward(completions: list[object], **kwargs) -> list[float]:
         return lexical_r
         
     rendered_videos = kwargs.get("rendered_videos")
-    clip_r = clip_visual_reward(completions, rendered_videos=rendered_videos, **kwargs)
+    vis_r = visual_alignment_reward(completions, rendered_videos=rendered_videos, **kwargs)
     
-    # Blend: 50% lexical presence + 50% semantic OpenCLIP temporal alignment
-    blended = [0.50 * lex + 0.50 * vis for lex, vis in zip(lexical_r, clip_r)]
+    # Blend: 50% lexical presence + 50% visual alignment (evaluated strictly on cuda:1)
+    blended = [0.50 * lex + 0.50 * vis for lex, vis in zip(lexical_r, vis_r)]
     return blended
+
 
 
 _FALLBACK_PATTERNS = {

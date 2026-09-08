@@ -49,6 +49,9 @@ class TrainingConfig:
     stack_lora: bool = False
     policy_device: str = "cuda:0"
     reward_device: str = "cuda:1"
+    vlm_judge: str = "ensemble"  # clip | gemma | ensemble
+    vlm_model: str = "google/paligemma2-3b-pt-224"
+    vlm_threshold: float = 0.15
     render: bool = False
     no_render: bool = False
     reward_debug: bool = False
@@ -78,6 +81,9 @@ class TrainingConfig:
         os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
         os.environ["AOS_POLICY_DEVICE"] = self.policy_device
         os.environ["AOS_REWARD_DEVICE"] = self.reward_device
+        os.environ["AOS_VLM_JUDGE"] = self.vlm_judge
+        os.environ["AOS_VLM_MODEL"] = self.vlm_model
+        os.environ["AOS_VLM_THRESHOLD"] = str(self.vlm_threshold)
 
         if self.render:
             os.environ["MANIBENCH_GRPO_RENDER"] = "1"
@@ -201,6 +207,12 @@ class TrainingConfig:
             config = replace(config, report_to=args.report_to)
         if args.run_name is not None:
             config = replace(config, run_name=args.run_name)
+        if getattr(args, "vlm_judge", None) is not None:
+            config = replace(config, vlm_judge=args.vlm_judge)
+        if getattr(args, "vlm_model", None) is not None:
+            config = replace(config, vlm_model=args.vlm_model)
+        if getattr(args, "vlm_threshold", None) is not None:
+            config = replace(config, vlm_threshold=args.vlm_threshold)
         return apply_vertex_env(config)
 
 
@@ -223,7 +235,7 @@ def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
 def apply_dual_t4_preset(config: TrainingConfig) -> TrainingConfig:
     """Kaggle Dual NVIDIA T4 (2x 16 GB = 32 GB VRAM) Disaggregated RITL GRPO preset.
     GPU 0 (cuda:0): Qwen3-8B DPO (4-bit) Policy Model Trainer
-    GPU 1 (cuda:1): OpenCLIP / VLM Visual Reward Server
+    GPU 1 (cuda:1): Cascading VLM Reward Judge (OpenCLIP + 4-bit Gemma 4 / PaliGemma)
     CPU: Sandboxed Headless Manim Renderer
     """
     report_to = config.report_to
@@ -238,9 +250,11 @@ def apply_dual_t4_preset(config: TrainingConfig) -> TrainingConfig:
         load_in_4bit=True,
         policy_device="cuda:0",
         reward_device="cuda:1",
+        vlm_judge="ensemble",
         render=True,
         report_to=report_to,
     )
+
 
 
 def apply_p100_preset(config: TrainingConfig) -> TrainingConfig:
@@ -406,6 +420,23 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--reward-device",
         default=None,
         help="Device for visual reward server (default: cuda:1 on multi-GPU)",
+    )
+    parser.add_argument(
+        "--vlm-judge",
+        choices=["clip", "gemma", "ensemble"],
+        default=None,
+        help="Visual reward judge type: 'ensemble' (cascading filter), 'gemma', or 'clip' (default: ensemble)",
+    )
+    parser.add_argument(
+        "--vlm-model",
+        default=None,
+        help="HuggingFace model ID for VLM judge (default: google/paligemma2-3b-pt-224)",
+    )
+    parser.add_argument(
+        "--vlm-threshold",
+        type=float,
+        default=None,
+        help="OpenCLIP similarity threshold to trigger Gemma VLM evaluation in ensemble mode (default: 0.15)",
     )
     parser.add_argument(
         "--reward-debug",

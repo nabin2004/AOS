@@ -336,19 +336,24 @@ def compute_video_clip_reward(
     return res
 
 
-def compute_prompt_image_clip_reward(
+def compute_prompt_image_clip_reward_with_frame(
     video_path: Union[str, Path],
     prompt: str,
     fps: float = 2.0,
     device: Optional[str] = None,
-) -> float:
-    """Computes direct semantic visual alignment between rendered video frames and prompt text on reward device."""
+) -> Tuple[float, Optional[Any]]:
+    """Computes direct semantic visual alignment between rendered video frames and prompt text.
+
+    Returns:
+        Tuple of (scaled_score, peak_frame_image) where peak_frame_image is the PIL Image
+        exhibiting the highest cosine similarity with the prompt.
+    """
     if not prompt or not prompt.strip():
-        return 0.5
+        return 0.5, None
 
     frames = extract_frames_from_video(video_path, fps=fps)
     if not frames:
-        return 0.0
+        return 0.0, None
 
     target_device = device or _get_device()
     model, preprocess, tokenizer = load_clip_model(device=target_device)
@@ -381,11 +386,32 @@ def compute_prompt_image_clip_reward(
             sims = [sims]
 
     if not sims:
-        return 0.0
+        return 0.0, None
 
     raw_peak = max(sims)
+    peak_idx = sims.index(raw_peak)
+    peak_frame = pil_images[peak_idx]
+
     raw_avg = sum(sims) / len(sims)
     # Scale from standard CLIP range [0.12, 0.30] to [0.0, 1.0]
     scaled_peak = max(0.0, min(1.0, (raw_peak - 0.12) / 0.18))
     scaled_avg = max(0.0, min(1.0, (raw_avg - 0.12) / 0.18))
-    return round(0.70 * scaled_peak + 0.30 * scaled_avg, 4)
+    score = round(0.70 * scaled_peak + 0.30 * scaled_avg, 4)
+    return score, peak_frame
+
+
+def compute_prompt_image_clip_reward(
+    video_path: Union[str, Path],
+    prompt: str,
+    fps: float = 2.0,
+    device: Optional[str] = None,
+) -> float:
+    """Computes direct semantic visual alignment between rendered video frames and prompt text on reward device."""
+    score, _ = compute_prompt_image_clip_reward_with_frame(
+        video_path=video_path,
+        prompt=prompt,
+        fps=fps,
+        device=device,
+    )
+    return score
+

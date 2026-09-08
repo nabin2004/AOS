@@ -106,7 +106,7 @@ def detect_gpu_hardware() -> tuple[int, str]:
             print("\n" + "=" * 70)
             print("🚀 Disaggregated Dual-GPU (T4 x2) RITL Architecture Activated:")
             print(f"   • T4 #1 (cuda:0): Qwen3-8B DPO Policy Trainer (4-bit QLoRA) [~8-10 GB]")
-            print(f"   • T4 #2 (cuda:1): OpenCLIP / VLM Visual Reward Judge        [~2-4 GB]")
+            print(f"   • T4 #2 (cuda:1): Cascading VLM Reward Judge (OpenCLIP + 4-bit Gemma/PaliGemma) [~2-4 GB]")
             print(f"   • CPU / RAM:      Renderer-in-the-Loop (Manim Cairo Engine)  [Isolated]")
             print("=" * 70 + "\n")
 
@@ -149,6 +149,9 @@ def run_grpo_training(
     report_to: str,
     run_name: str,
     stack_lora: bool = False,
+    vlm_judge: str = "ensemble",
+    vlm_model: str = "google/paligemma2-3b-pt-224",
+    vlm_threshold: float = 0.15,
 ) -> None:
     """Execute GRPO training via subprocess or direct module invocation."""
     python_exe = sys.executable
@@ -169,7 +172,14 @@ def run_grpo_training(
         report_to,
         "--run-name",
         run_name,
+        "--vlm-judge",
+        vlm_judge,
+        "--vlm-model",
+        vlm_model,
+        "--vlm-threshold",
+        str(vlm_threshold),
     ]
+
 
     if stack_lora:
         cmd.append("--stack-lora")
@@ -230,7 +240,24 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--smoke", action="store_true", help="Run a single-step smoke test")
     parser.add_argument("--max-steps", type=int, default=None, help="Max GRPO optimization steps")
     parser.add_argument("--stack-lora", action="store_true", help="Train a fresh delta LoRA stacked on top of frozen SFT/DPO adapter")
-    parser.add_argument("--render", action="store_true", help="Enable live Manim rendering & OpenCLIP visual reward")
+    parser.add_argument("--render", action="store_true", help="Enable live Manim rendering & visual evaluation")
+    parser.add_argument(
+        "--vlm-judge",
+        choices=["clip", "gemma", "ensemble"],
+        default="ensemble",
+        help="Visual reward judge: 'ensemble' (cascading filter), 'gemma', or 'clip' (default: ensemble)",
+    )
+    parser.add_argument(
+        "--vlm-model",
+        default="google/paligemma2-3b-pt-224",
+        help="VLM model ID on Hugging Face (default: google/paligemma2-3b-pt-224)",
+    )
+    parser.add_argument(
+        "--vlm-threshold",
+        type=float,
+        default=0.15,
+        help="OpenCLIP cutoff threshold to trigger Gemma VLM (default: 0.15)",
+    )
     parser.add_argument("--report-to", default="wandb", help="Logging backend ('wandb' or 'none')")
     parser.add_argument("--run-name", default="qwen3-8b-manim-grpo-kaggle", help="Run name for W&B logging")
     return parser
@@ -285,7 +312,11 @@ def main() -> int:
             report_to=args.report_to,
             run_name=args.run_name,
             stack_lora=args.stack_lora,
+            vlm_judge=args.vlm_judge,
+            vlm_model=args.vlm_model,
+            vlm_threshold=args.vlm_threshold,
         )
+
     except KeyboardInterrupt:
         print("\n⚠️ Training interrupted. Executing safety checkpoint upload to Hub...")
     except Exception as exc:
