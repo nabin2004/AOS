@@ -14,9 +14,11 @@ import ast
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -30,9 +32,20 @@ if str(GRPO_DATASET_ROOT) not in sys.path:
     sys.path.insert(0, str(GRPO_DATASET_ROOT))
 
 try:
-    from reward_model.clip_reward import compute_video_clip_reward
+    from reward_model.clip_reward import (
+        compute_prompt_image_clip_reward,
+        compute_video_clip_reward,
+    )
 except Exception:
     compute_video_clip_reward = None
+    compute_prompt_image_clip_reward = None
+
+_RENDER_BASE_DIR = Path(tempfile.gettempdir()) / "aos_grpo_renders"
+
+
+def _ensure_render_dir() -> Path:
+    _RENDER_BASE_DIR.mkdir(parents=True, exist_ok=True)
+    return _RENDER_BASE_DIR
 
 _CODE_FENCE = re.compile(r"```(?:python)?\s*([\s\S]*?)```", re.IGNORECASE)
 
@@ -210,31 +223,38 @@ def executability_reward(completions: list[object], **kwargs) -> list[float]:
     run_render = os.environ.get("MANIBENCH_GRPO_RENDER", "0") == "1"
     rewards = []
     rendered_videos = []
+
+    batch_dir = kwargs.get("batch_dir")
+    if batch_dir is None:
+        batch_token = kwargs.get("batch_id") or uuid.uuid4().hex[:8]
+        batch_dir = _ensure_render_dir() / f"batch_{batch_token}"
+        batch_dir.mkdir(parents=True, exist_ok=True)
     
-    for code in texts:
+    for idx, code in enumerate(texts):
         if not run_render:
             rewards.append(_heuristic_exec_score(code))
             rendered_videos.append(None)
             continue
         try:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                script = Path(tmpdir) / "scene.py"
-                script.write_text(_extract_python(code), encoding="utf-8")
-                result = subprocess.run(
-                    ["manim", "-pql", "--media_dir", str(tmpdir), str(script)],
-                    capture_output=True,
-                    text=True,
-                    timeout=60,
-                    cwd=tmpdir,
-                )
-                if result.returncode == 0:
-                    rewards.append(1.0)
-                    mp4s = list(Path(tmpdir).rglob("*.mp4"))
-                    rendered_videos.append(str(mp4s[0]) if mp4s else None)
-                else:
-                    # Non-rendering code receives partial heuristic score so reward doesn't collapse to 0.0
-                    rewards.append(0.5 * _heuristic_exec_score(code))
-                    rendered_videos.append(None)
+            comp_dir = batch_dir / f"comp_{idx}"
+            comp_dir.mkdir(parents=True, exist_ok=True)
+            script = comp_dir / "scene.py"
+            script.write_text(_extract_python(code), encoding="utf-8")
+            result = subprocess.run(
+                ["manim", "-pql", "--media_dir", str(comp_dir), str(script)],
+                capture_output=True,
+                text=True,
+                timeout=60,
+                cwd=str(comp_dir),
+            )
+            if result.returncode == 0:
+                rewards.append(1.0)
+                mp4s = list(comp_dir.rglob("*.mp4"))
+                rendered_videos.append(str(mp4s[0]) if mp4s else None)
+            else:
+                # Non-rendering code receives partial heuristic score so reward doesn't collapse to 0.0
+                rewards.append(0.5 * _heuristic_exec_score(code))
+                rendered_videos.append(None)
         except Exception:
             rewards.append(0.5 * _heuristic_exec_score(code))
             rendered_videos.append(None)
@@ -311,25 +331,40 @@ def clip_visual_reward(
     rendered_videos: Optional[list[Optional[str]]] = None,
     **kwargs,
 ) -> list[float]:
-    """Second-stage live OpenCLIP visual reward on rendered video frames."""
+    """Live visual alignment reward strictly evaluated on GPU 1 (reward device: cuda:1)."""
     texts = _normalize_completions(completions)
     problem_ids = kwargs.get("problem_id", [""] * len(texts))
+    prompts = kwargs.get("prompts", kwargs.get("prompt", [""] * len(texts)))
+    if isinstance(prompts, (str, dict)):
+        prompts = [prompts] * len(texts)
+    prompts_text = [_completion_text(p) for p in prompts]
+    if len(prompts_text) < len(texts):
+        prompts_text.extend([""] * (len(texts) - len(prompts_text)))
+
+    reward_device = os.environ.get("AOS_REWARD_DEVICE")
+    if not reward_device:
+        import torch
+        reward_device = "cuda:1" if torch.cuda.is_available() and torch.cuda.device_count() >= 2 else "cuda:0"
+
     rewards = []
-    
-    if compute_video_clip_reward is None:
-        return [0.0] * len(texts)
 
-    for idx, (code, pid) in enumerate(zip(texts, problem_ids)):
+    for idx, (code, pid, prompt_text) in enumerate(zip(texts, problem_ids, prompts_text)):
         video_path = rendered_videos[idx] if rendered_videos and idx < len(rendered_videos) else None
-        ve_path = _find_visual_events_path(pid)
 
-        if not video_path or not Path(video_path).is_file() or not ve_path:
+        if not video_path or not Path(video_path).is_file():
             rewards.append(0.0)
             continue
 
+        ve_path = _find_visual_events_path(pid)
         try:
-            res = compute_video_clip_reward(video_path, ve_path, fps=2.0)
-            rewards.append(float(res.score))
+            if ve_path and compute_video_clip_reward is not None:
+                res = compute_video_clip_reward(video_path, ve_path, fps=2.0, device=reward_device)
+                rewards.append(float(res.score))
+            elif compute_prompt_image_clip_reward is not None:
+                score = compute_prompt_image_clip_reward(video_path, prompt_text, fps=2.0, device=reward_device)
+                rewards.append(float(score))
+            else:
+                rewards.append(0.5)
         except Exception:
             rewards.append(0.0)
 
@@ -401,35 +436,46 @@ def coverage_reward(completions: list[object], **kwargs) -> list[float]:
 
 
 def combined_reward(completions: list[object], **kwargs) -> list[float]:
+    batch_token = uuid.uuid4().hex[:8]
+    batch_dir = _ensure_render_dir() / f"batch_{batch_token}"
+    batch_dir.mkdir(parents=True, exist_ok=True)
     rendered_videos: list[Optional[str]] = []
-    exec_r = executability_reward(completions, rendered_videos=rendered_videos, **kwargs)
-    narr_r = narration_reward(completions, **kwargs)
-    vcer_r = vcer_reward(completions, **kwargs)
-    align_r = alignment_reward(completions, rendered_videos=rendered_videos, **kwargs)
-    cover_r = coverage_reward(completions, **kwargs)
-    
-    w = REWARD_WEIGHTS
-    n = len(completions)
-    penalties = _length_penalty(kwargs.get("completion_ids"), n)
-    combined = []
-    for e, nr, v, a, c, pen in zip(exec_r, narr_r, vcer_r, align_r, cover_r, penalties):
-        score = w["exec"] * e + w["narration"] * nr + w["align"] * a + w["vcer"] * v + w["cover"] * c - pen
-        # Soft penalty instead of hard collapse to 0.0:
-        # If code completely lacks basic structure (e < 0.10), dampen score by 75%
-        if e < 0.10:
-            score *= 0.25
-        combined.append(max(0.0, min(1.0, score)))
 
-    if _reward_debug_enabled() and combined:
-        print(
-            f"[reward] min={min(combined):.3f} max={max(combined):.3f} "
-            f"mean={sum(combined) / len(combined):.3f} "
-            f"exec={sum(exec_r) / len(exec_r):.3f} "
-            f"narr={sum(narr_r) / len(narr_r):.3f} "
-            f"align={sum(align_r) / len(align_r):.3f} "
-            f"vcer={sum(vcer_r) / len(vcer_r):.3f} "
-            f"cover={sum(cover_r) / len(cover_r):.3f}",
-            file=sys.stderr,
-            flush=True,
-        )
-    return combined
+    try:
+        kwargs["batch_dir"] = batch_dir
+        kwargs["batch_id"] = batch_token
+
+        exec_r = executability_reward(completions, rendered_videos=rendered_videos, **kwargs)
+        narr_r = narration_reward(completions, **kwargs)
+        vcer_r = vcer_reward(completions, **kwargs)
+        align_r = alignment_reward(completions, rendered_videos=rendered_videos, **kwargs)
+        cover_r = coverage_reward(completions, **kwargs)
+        
+        w = REWARD_WEIGHTS
+        n = len(completions)
+        penalties = _length_penalty(kwargs.get("completion_ids"), n)
+        combined = []
+        for e, nr, v, a, c, pen in zip(exec_r, narr_r, vcer_r, align_r, cover_r, penalties):
+            score = w["exec"] * e + w["narration"] * nr + w["align"] * a + w["vcer"] * v + w["cover"] * c - pen
+            # Soft penalty instead of hard collapse to 0.0:
+            # If code completely lacks basic structure (e < 0.10), dampen score by 75%
+            if e < 0.10:
+                score *= 0.25
+            combined.append(max(0.0, min(1.0, score)))
+
+        if _reward_debug_enabled() and combined:
+            print(
+                f"[reward] min={min(combined):.3f} max={max(combined):.3f} "
+                f"mean={sum(combined) / len(combined):.3f} "
+                f"exec={sum(exec_r) / len(exec_r):.3f} "
+                f"narr={sum(narr_r) / len(narr_r):.3f} "
+                f"align={sum(align_r) / len(align_r):.3f} "
+                f"vcer={sum(vcer_r) / len(vcer_r):.3f} "
+                f"cover={sum(cover_r) / len(cover_r):.3f}",
+                file=sys.stderr,
+                flush=True,
+            )
+        return combined
+    finally:
+        if batch_dir.exists():
+            shutil.rmtree(batch_dir, ignore_errors=True)

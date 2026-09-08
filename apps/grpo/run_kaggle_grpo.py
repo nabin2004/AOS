@@ -102,6 +102,14 @@ def detect_gpu_hardware() -> tuple[int, str]:
             print("   👉 Kaggle Notebook Accelerator: 'GPU T4 x2'")
             print("=" * 65 + "\n")
 
+        if count >= 2:
+            print("\n" + "=" * 70)
+            print("🚀 Disaggregated Dual-GPU (T4 x2) RITL Architecture Activated:")
+            print(f"   • T4 #1 (cuda:0): Qwen3-8B DPO Policy Trainer (4-bit QLoRA) [~8-10 GB]")
+            print(f"   • T4 #2 (cuda:1): OpenCLIP / VLM Visual Reward Judge        [~2-4 GB]")
+            print(f"   • CPU / RAM:      Renderer-in-the-Loop (Manim Cairo Engine)  [Isolated]")
+            print("=" * 70 + "\n")
+
         return count, name
     except Exception as e:
         print(f"Notice: GPU detection encountered: {e}")

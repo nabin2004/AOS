@@ -40,8 +40,12 @@ _DEVICE = None
 def _get_device() -> str:
     global _DEVICE
     if _DEVICE is None:
-        if torch is not None and torch.cuda.is_available():
-            _DEVICE = "cuda"
+        reward_dev = os.environ.get("AOS_REWARD_DEVICE", "").strip()
+        if reward_dev:
+            _DEVICE = reward_dev
+        elif torch is not None and torch.cuda.is_available():
+            # In multi-GPU environments, default visual reward server to GPU 1 (cuda:1)
+            _DEVICE = "cuda:1" if torch.cuda.device_count() >= 2 else "cuda:0"
         else:
             _DEVICE = "cpu"
     return _DEVICE
@@ -330,3 +334,58 @@ def compute_video_clip_reward(
         "video_duration_sampled": max(frame_timestamps) if frame_timestamps else 0.0,
     }
     return res
+
+
+def compute_prompt_image_clip_reward(
+    video_path: Union[str, Path],
+    prompt: str,
+    fps: float = 2.0,
+    device: Optional[str] = None,
+) -> float:
+    """Computes direct semantic visual alignment between rendered video frames and prompt text on reward device."""
+    if not prompt or not prompt.strip():
+        return 0.5
+
+    frames = extract_frames_from_video(video_path, fps=fps)
+    if not frames:
+        return 0.0
+
+    target_device = device or _get_device()
+    model, preprocess, tokenizer = load_clip_model(device=target_device)
+
+    pil_images = [img for _, img in frames]
+    clean_prompt = prompt.split("Output a complete Scene class in a ```python fence.")[-1].strip()
+    if not clean_prompt:
+        clean_prompt = prompt[:200]
+
+    with torch.no_grad():
+        if _CLIP_BACKEND == "open_clip":
+            img_tensors = torch.stack([preprocess(img) for img in pil_images]).to(target_device)
+            image_features = model.encode_image(img_tensors)
+            image_features /= image_features.norm(dim=-1, keepdim=True)
+
+            text_tokens = tokenizer([clean_prompt[:250]]).to(target_device)
+            text_features = model.encode_text(text_tokens)
+            text_features /= text_features.norm(dim=-1, keepdim=True)
+        else:
+            inputs = preprocess(images=pil_images, return_tensors="pt").to(target_device)
+            image_features = model.get_image_features(**inputs)
+            image_features /= image_features.norm(dim=-1, keepdim=True)
+
+            text_inputs = tokenizer([clean_prompt[:250]], padding=True, return_tensors="pt").to(target_device)
+            text_features = model.get_text_features(**text_inputs)
+            text_features /= text_features.norm(dim=-1, keepdim=True)
+
+        sims = (image_features @ text_features.T).squeeze(-1).cpu().tolist()
+        if isinstance(sims, float):
+            sims = [sims]
+
+    if not sims:
+        return 0.0
+
+    raw_peak = max(sims)
+    raw_avg = sum(sims) / len(sims)
+    # Scale from standard CLIP range [0.12, 0.30] to [0.0, 1.0]
+    scaled_peak = max(0.0, min(1.0, (raw_peak - 0.12) / 0.18))
+    scaled_avg = max(0.0, min(1.0, (raw_avg - 0.12) / 0.18))
+    return round(0.70 * scaled_peak + 0.30 * scaled_avg, 4)

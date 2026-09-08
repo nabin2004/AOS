@@ -100,10 +100,24 @@ def _load_qwen(config: TrainingConfig):
     use_bf16 = torch.cuda.is_available() and torch.cuda.is_bf16_supported()
     compute_dtype = torch.bfloat16 if use_bf16 else torch.float16
 
+    gpu_count = torch.cuda.device_count() if torch.cuda.is_available() else 0
+    policy_dev = getattr(config, "policy_device", None) or os.environ.get("AOS_POLICY_DEVICE")
+    if policy_dev == "cuda:0" or (gpu_count >= 2 and (not policy_dev or policy_dev == "cuda:0")):
+        device_map = {"": 0}
+        print("✔ Disaggregated RITL active: Policy model locked strictly to GPU 0 (cuda:0).")
+    elif policy_dev and policy_dev.startswith("cuda:"):
+        cuda_idx = int(policy_dev.split(":")[1])
+        device_map = {"": cuda_idx}
+        print(f"✔ Policy model locked strictly to GPU {cuda_idx} ({policy_dev}).")
+    elif gpu_count == 1:
+        device_map = {"": 0}
+    else:
+        device_map = "auto"
+
     kwargs: dict = {
         "trust_remote_code": True,
         "token": token,
-        "device_map": "auto",
+        "device_map": device_map,
         "torch_dtype": compute_dtype,
     }
     if config.load_in_4bit:

@@ -47,6 +47,8 @@ class TrainingConfig:
     max_steps: int | None = None
     grpo_only: bool = False
     stack_lora: bool = False
+    policy_device: str = "cuda:0"
+    reward_device: str = "cuda:1"
     render: bool = False
     no_render: bool = False
     reward_debug: bool = False
@@ -74,6 +76,8 @@ class TrainingConfig:
 
     def apply_env(self) -> None:
         os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+        os.environ["AOS_POLICY_DEVICE"] = self.policy_device
+        os.environ["AOS_REWARD_DEVICE"] = self.reward_device
 
         if self.render:
             os.environ["MANIBENCH_GRPO_RENDER"] = "1"
@@ -104,6 +108,10 @@ class TrainingConfig:
             config = apply_dual_t4_preset(config)
         if getattr(args, "p100", False):
             config = apply_p100_preset(config)
+        if getattr(args, "policy_device", None) is not None:
+            config = replace(config, policy_device=args.policy_device)
+        if getattr(args, "reward_device", None) is not None:
+            config = replace(config, reward_device=args.reward_device)
         if getattr(args, "stack_lora", False):
             config = replace(config, stack_lora=True)
         if args.sft_lora is not None:
@@ -213,7 +221,11 @@ def apply_rtx3060_preset(config: TrainingConfig) -> TrainingConfig:
 
 
 def apply_dual_t4_preset(config: TrainingConfig) -> TrainingConfig:
-    """Kaggle Dual NVIDIA T4 (2x 16 GB = 32 GB VRAM) GRPO preset."""
+    """Kaggle Dual NVIDIA T4 (2x 16 GB = 32 GB VRAM) Disaggregated RITL GRPO preset.
+    GPU 0 (cuda:0): Qwen3-8B DPO (4-bit) Policy Model Trainer
+    GPU 1 (cuda:1): OpenCLIP / VLM Visual Reward Server
+    CPU: Sandboxed Headless Manim Renderer
+    """
     report_to = config.report_to
     if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
         report_to = "none"
@@ -224,6 +236,9 @@ def apply_dual_t4_preset(config: TrainingConfig) -> TrainingConfig:
         max_completion_length=512,
         max_seq_length=1536,
         load_in_4bit=True,
+        policy_device="cuda:0",
+        reward_device="cuda:1",
+        render=True,
         report_to=report_to,
     )
 
@@ -381,6 +396,16 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--stack-lora",
         action="store_true",
         help="Train a fresh delta LoRA stacked on top of frozen SFT/DPO adapter (default: False, continues training SFT/DPO LoRA directly)",
+    )
+    parser.add_argument(
+        "--policy-device",
+        default=None,
+        help="Device for policy model training (default: cuda:0 on multi-GPU)",
+    )
+    parser.add_argument(
+        "--reward-device",
+        default=None,
+        help="Device for visual reward server (default: cuda:1 on multi-GPU)",
     )
     parser.add_argument(
         "--reward-debug",
