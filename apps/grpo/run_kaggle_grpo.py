@@ -34,6 +34,8 @@ try:
 except Exception:
     pass
 
+import shutil
+
 GRPO_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = GRPO_ROOT.parent.parent
 
@@ -41,6 +43,45 @@ DEFAULT_BASE_MODEL = "Qwen/Qwen3-8B"
 DEFAULT_INIT_ADAPTER = "nabin2004/AOS-qwen3-8b-narrated-dpo"
 DEFAULT_DATASET_REPO = "nabin2004/Manim-grpo-dataset-200"
 DEFAULT_HUB_OUTPUT_REPO = "nabin2004/AOS-qwen3-8b-grpo"
+
+
+def is_cuda_working(py_exe: str | None = None) -> bool:
+    """Test whether PyTorch can perform CUDA operations."""
+    if py_exe is None or py_exe == sys.executable:
+        try:
+            import torch
+
+            if not torch.cuda.is_available():
+                return False
+            x = torch.randn(16, 16, device="cuda")
+            _ = x @ x
+            torch.cuda.synchronize()
+            return True
+        except Exception:
+            return False
+    else:
+        try:
+            cmd = [
+                py_exe,
+                "-c",
+                "import torch; assert torch.cuda.is_available(); x = torch.randn(16, 16, device='cuda'); _ = x @ x; torch.cuda.synchronize()",
+            ]
+            res = subprocess.run(cmd, capture_output=True, timeout=15)
+            return res.returncode == 0
+        except Exception:
+            return False
+
+
+def check_and_switch_interpreter() -> None:
+    """If running inside an isolated venv on Kaggle lacking CUDA PyTorch, auto-switch to Kaggle base python."""
+    if not is_cuda_working():
+        candidates = ["/opt/conda/bin/python3", "/opt/conda/bin/python", "/usr/bin/python3"]
+        for cand in candidates:
+            if os.path.exists(cand) and cand != sys.executable:
+                if is_cuda_working(cand):
+                    print(f"✔ Detected Kaggle base environment with working CUDA PyTorch: {cand}")
+                    print(f"  Switching execution from {sys.executable} -> {cand}...")
+                    os.execv(cand, [cand] + sys.argv)
 
 
 def setup_kaggle_secrets() -> None:
@@ -72,6 +113,7 @@ def setup_kaggle_secrets() -> None:
     if os.environ.get("WANDB_API_KEY"):
         try:
             import wandb
+
             wandb.login(key=os.environ["WANDB_API_KEY"], relogin=True)
             print("✔ Authenticated Weights & Biases (W&B) session.")
         except Exception as e:
@@ -116,9 +158,51 @@ def detect_gpu_hardware() -> tuple[int, str]:
         return 1, "Unknown GPU"
 
 
+def get_install_cmd() -> list[str]:
+    """Resolve a working package manager (python -m pip, uv pip, or ensurepip)."""
+    python_exe = sys.executable
+
+    # 1. Try python -m pip
+    try:
+        res = subprocess.run([python_exe, "-m", "pip", "--version"], capture_output=True)
+        if res.returncode == 0:
+            return [python_exe, "-m", "pip", "install"]
+    except Exception:
+        pass
+
+    # 2. Try uv
+    uv_path = shutil.which("uv")
+    if uv_path:
+        return [uv_path, "pip", "install", "--python", python_exe]
+
+    # 3. Bootstrap ensurepip
+    print("Notice: 'pip' module missing in current Python. Attempting ensurepip...")
+    try:
+        subprocess.run([python_exe, "-m", "ensurepip", "--default-pip"], check=True)
+        return [python_exe, "-m", "pip", "install"]
+    except Exception as e:
+        print(f"Notice: ensurepip failed ({e}). Checking system pip...")
+
+    # 4. Fallback to system pip
+    pip_path = shutil.which("pip3") or shutil.which("pip")
+    if pip_path:
+        return [pip_path, "install"]
+
+    raise RuntimeError("No package manager (pip/uv) found or bootstrapable in this Python environment.")
+
+
 def setup_environment() -> None:
     """Install required packages in Kaggle system Python with pinned dependencies."""
-    python_exe = sys.executable
+    install_cmd = get_install_cmd()
+
+    # Ensure PyTorch is available if missing
+    if not is_cuda_working():
+        try:
+            import torch  # noqa: F401
+        except ImportError:
+            print("Notice: PyTorch not found. Installing PyTorch...")
+            subprocess.check_call(install_cmd + ["torch", "torchvision", "torchaudio"])
+
     required_packages = [
         "transformers>=4.48.0,<5.0.0",
         "trl>=0.12.0,<1.0.0",
@@ -132,7 +216,7 @@ def setup_environment() -> None:
     ]
 
     print(f"Checking and installing GRPO dependencies...")
-    cmd = [python_exe, "-m", "pip", "install", "-q"] + required_packages
+    cmd = install_cmd + ["-q"] + required_packages
     subprocess.check_call(cmd)
     print("✔ GRPO dependencies installed.")
 
@@ -324,18 +408,21 @@ def main() -> int:
     print("  ManiBench-GRPO End-to-End Kaggle Runner")
     print("=" * 70)
 
-    # 1. Setup Kaggle secrets
+    # 1. Environment & interpreter check (ensures Kaggle base python with CUDA PyTorch is used)
+    check_and_switch_interpreter()
+
+    # 2. Setup dependencies (auto-detects pip, uv, or bootstraps ensurepip)
+    setup_environment()
+
+    # 3. Setup Kaggle secrets & authenticate W&B
     setup_kaggle_secrets()
 
-    # 2. Memory optimizations
+    # 4. Memory optimizations
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
-    # 3. Detect GPU
+    # 5. Detect GPU hardware
     gpu_count, gpu_name = detect_gpu_hardware()
     dual_gpu = gpu_count >= 2
-
-    # 4. Setup dependencies
-    setup_environment()
 
     # 5. Resolve initial adapter (download from HF if remote repo ID)
     sft_lora = args.sft_lora
