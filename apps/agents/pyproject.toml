@@ -104,3 +104,7 @@ torch = { index = "pytorch-cu124" }
 aos-manim-core = { workspace = true }
 aos-manim-slides = { workspace = true }
 educlaw = { workspace = true }
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests", "tools/tests"]

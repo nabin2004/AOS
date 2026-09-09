@@ -6,6 +6,7 @@ import json
 from typing import Any
 
 from cinematic_hints import CINEMATIC_HINT_LEGEND, annotate_teaching_script
+from video_templates import get_template_for_duration
 
 _LOCAL_PLAN_KEYS = (
     "topic",
@@ -22,24 +23,31 @@ _LOCAL_PLAN_KEYS = (
 
 CODER_SCRIPT_HINT = (
     "VOICEOVER, PACING & PEDAGOGY CONTRACT (CRITICAL):\n"
-    "1. Every animation beat MUST be wrapped inside `with self.voiceover(text=\"...\") as tracker:` blocks.\n"
-    "2. Implement Plan.teaching_script narration lines verbatim in sequential order.\n"
-    "3. CALM PACING: Allow each concept to breathe! Use run_time=max(2.0, tracker.duration * 0.85) for animations. "
-    "   Always add a calm pause `self.wait(1.5)` to `self.wait(2.5)` after each beat before moving to the next.\n"
-    "4. NO SPATIAL OVERLAPS / CLEAR BOARD: When transitioning to a new coordinate plane, 3D axes, or visual section, "
-    "   explicitly FadeOut previous equations/text (`self.play(FadeOut(prev_mobjects))`) or move them to a top corner. "
-    "   NEVER create 3D axes directly over equations in the center of the screen! NEVER call FadeOut on Scene() or python lists!\n"
-    "5. DYNAMIC SYSTEMS & SIMULATIONS (e.g. Lorenz Attractor):\n"
-    "   - For chaotic systems or ODEs, compute real numerical trajectories with simple float loop:\n"
+    "1. DUAL INHERITANCE (CRITICAL FOR 3D & CAMERA MOVEMENT):\n"
+    "   - Whenever using 3D axes (ThreeDAxes), camera moves (move_camera), or rotations (begin_ambient_camera_rotation),\n"
+    "     your scene MUST subclass both: `class MyScene(VoiceoverScene, ThreeDScene):`.\n"
+    "   - This gives access to 3D coordinate projection AND automated voiceover speech synthesis.\n"
+    "2. FLAWLESS AUDIO SYNCHRONIZATION:\n"
+    "   - Every animation beat MUST be wrapped inside `with self.voiceover(text=\"...\") as tracker:` blocks.\n"
+    "   - Tie visual animation durations directly to tracker.duration! E.g. `self.play(..., run_time=tracker.duration)`.\n"
+    "   - NEVER put hardcoded self.wait(...) inside a voiceover block. Let the voiceover tracker determine the beat length!\n"
+    "3. SCREEN HYGIENE (NO SPATIAL OVERLAPS):\n"
+    "   - When transitioning to a new coordinate plane, 3D axes, or visual section, explicitly clear the board:\n"
+    "     `self.play(FadeOut(Group(*self.mobjects)))` or fade out previous equations/text.\n"
+    "   - NEVER create 3D axes directly over equations in the center of the screen!\n"
+    "4. DYNAMIC UPDATERS & STATE MANAGEMENT:\n"
+    "   - Use ValueTracker and always_redraw() for continuously updating math, tangent lines, and indicators.\n"
+    "   - For chaotic systems or ODEs (e.g. Lorenz Attractor), compute numerical trajectories in numpy:\n"
     "     sigma, rho, beta = 10.0, 28.0, 8.0/3.0\n"
     "     dt, x, y, z = 0.01, 0.1, 0.1, 0.1\n"
-    "     points = [(x*0.12, y*0.12, (z-25)*0.12)]\n"
+    "     pts = [axes.c2p(x, y, z)]\n"
     "     for _ in range(2000):\n"
     "         dx = sigma*(y - x)*dt; dy = (x*(rho - z) - y)*dt; dz = (x*y - beta*z)*dt\n"
     "         x += dx; y += dy; z += dz\n"
-    "         points.append((x*0.12, y*0.12, (z-25)*0.12))\n"
-    "     curve = VMobject(color=BLUE).set_points_smoothly(np.array(points))\n"
-    "   - For Butterfly Effect, trace second trajectory starting at x+0.001 in YELLOW diverging!\n"
+    "         pts.append(axes.c2p(x, y, z))\n"
+    "     curve = VMobject(color=BLUE).set_points_smoothly(pts)\n"
+    "   - For chaos/butterfly effect, trace a second nearby trajectory (e.g. x+0.0001 in RED) to show divergence!\n"
+    "5. Implement Plan.teaching_script narration lines verbatim in sequential order.\n"
     "6. Silent self.play(...) without a voiceover block will fail static validation.\n"
 )
 
@@ -161,6 +169,10 @@ def build_coder_user_prompt(
         bits.append(LOCAL_CODER_CODEMODE_HINT.rstrip("\n"))
     bits.append(CODER_SCRIPT_HINT.rstrip("\n"))
     bits.append(CINEMATIC_HINT_LEGEND.rstrip("\n"))
+    template_boilerplate = get_template_for_duration(length or "medium")
+    bits.append(
+        f"RECOMMENDED PRODUCTION TEMPLATE (Strictly adhere to this architecture):\n```python\n{template_boilerplate}\n```"
+    )
     bits.append(f"Plan:\n{plan_text}")
     return "\n".join(bits) + "\n"
 

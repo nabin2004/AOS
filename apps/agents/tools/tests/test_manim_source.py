@@ -388,6 +388,57 @@ def test_validate_manim_code_static_rejects_top_level_await():
     assert "syntax_error" in err or "await" in err
 
 
+def test_ensure_voiceover_scene_upgrades_to_dual_inheritance_3d():
+    source = (
+        "from manim import *\n"
+        "from manim_voiceover import VoiceoverScene\n"
+        "from tools.aos_speech_service import AOSSpeechService\n\n"
+        "class LorenzAttractorScene(VoiceoverScene):\n"
+        "    def construct(self):\n"
+        "        self.set_speech_service(AOSSpeechService(voice='alba'))\n"
+        "        with self.voiceover(text='Phase space') as tracker:\n"
+        "            axes = ThreeDAxes()\n"
+        "            self.play(Create(axes))\n"
+    )
+    prepared = prepare_manim_source(source)
+    assert "class LorenzAttractorScene(VoiceoverScene, ThreeDScene):" in prepared
+
+
+def test_sync_voiceover_durations_injects_tracker_duration():
+    source = (
+        "from manim import *\n"
+        "from manim_voiceover import VoiceoverScene\n"
+        "from tools.aos_speech_service import AOSSpeechService\n\n"
+        "class TestScene(VoiceoverScene):\n"
+        "    def construct(self):\n"
+        "        self.set_speech_service(AOSSpeechService(voice='alba'))\n"
+        "        with self.voiceover(text='Testing sync') as tracker:\n"
+        "            dot = Dot()\n"
+        "            self.play(FadeIn(dot))\n"
+    )
+    prepared = prepare_manim_source(source)
+    assert "run_time=tracker.duration" in prepared
+
+
+def test_video_templates_for_duration():
+    from video_templates import (
+        get_template_for_duration,
+        TEMPLATE_MICRO_LESSON,
+        TEMPLATE_STANDARD_EXPLAINER,
+        TEMPLATE_DEEP_DIVE_MASTERCLASS,
+    )
+    assert get_template_for_duration("1m") == TEMPLATE_MICRO_LESSON
+    assert get_template_for_duration("short") == TEMPLATE_MICRO_LESSON
+    assert get_template_for_duration("5m") == TEMPLATE_STANDARD_EXPLAINER
+    assert get_template_for_duration("10m") == TEMPLATE_DEEP_DIVE_MASTERCLASS
+    assert get_template_for_duration("15m") == TEMPLATE_DEEP_DIVE_MASTERCLASS
+    assert "(VoiceoverScene, ThreeDScene)" in TEMPLATE_MICRO_LESSON
+    assert "(VoiceoverScene, ThreeDScene)" in TEMPLATE_STANDARD_EXPLAINER
+    assert "(VoiceoverScene, ThreeDScene)" in TEMPLATE_DEEP_DIVE_MASTERCLASS
+    assert "always_redraw" in TEMPLATE_STANDARD_EXPLAINER
+    assert "chapter_1_introduction" in TEMPLATE_DEEP_DIVE_MASTERCLASS
+
+
 if __name__ == "__main__":
     tests = [
         test_valid_source_unchanged,

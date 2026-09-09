@@ -249,27 +249,30 @@ def teaching_script_user_prompt(
     else:
         plan = {"raw": str(lecture)}
 
-    is_long = length in ("long", "10m", "10min", "10")
+    is_long = length in ("long", "10m", "10min", "10", "15m", "15min", "15")
     is_medium = length in ("medium", "5m", "5min", "5", "default")
 
     if is_long:
         pacing_guide = (
-            "Target duration: 5–10 minutes (Comprehensive In-Depth Masterclass).\n"
-            "- Generate 12–16 comprehensive, sequentially progressive teaching beats.\n"
+            "Target duration: 10–15 minutes (Comprehensive In-Depth Masterclass).\n"
+            "- Generate 12–16 comprehensive, sequentially progressive teaching beats grouped conceptually into 4–5 Chapters.\n"
             "- Every beat MUST be calm, patient, and thorough: 3–5 full sentences (50–80 words) per beat.\n"
-            "- Take time to thoroughly explain the physical intuition, mathematical mechanism, and geometric behavior."
+            "- Take time to thoroughly explain the physical intuition, mathematical mechanism, and geometric behavior.\n"
+            "- Allow cognitive pauses between major concepts."
         )
     elif is_medium:
         pacing_guide = (
-            "Target duration: 3–5 minutes (Calm, In-Depth Lecture).\n"
+            "Target duration: 3–5 minutes (Calm, In-Depth Explainer).\n"
             "- Generate 8–12 distinct teaching beats.\n"
             "- Every beat MUST be calm and explanatory: 3–5 full sentences (40–70 words) per beat.\n"
-            "- Take time to explain what each symbol means physically before moving to the next concept."
+            "- Take time to explain what each symbol means physically before moving to the next concept.\n"
+            "- Maintain clean screen transitions between 2D math and 3D simulations."
         )
     else:
         pacing_guide = (
-            "Target duration: 1–2 minutes (Concise Overview).\n"
+            "Target duration: 1–2 minutes (High-Impact Micro-Lesson).\n"
             "- Generate 4–6 clear, focused beats.\n"
+            "- Fast attention-grabbing hook, single core equation, immediate 3D visual payoff, and clean takeaway.\n"
             "- Each beat contains 2–3 sentences of clear conceptual intuition."
         )
 

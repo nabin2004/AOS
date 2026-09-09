@@ -32,12 +32,13 @@ STRING RULES (CRITICAL):
 - Never call run_code from inside code passed to run_code, manim_write, or compile_manim_code.
 
 Voiceover, Pacing & Pedagogy (required — copy Plan.teaching_script):
-- Scene MUST subclass VoiceoverScene (from manim_voiceover), call set_speech_service(AOSSpeechService(voice="alba", cache_dir="voiceover_cache")).
+- Dual Inheritance: If using 3D axes, cameras, or 3D rotations, your scene MUST subclass both: `class MyScene(VoiceoverScene, ThreeDScene):`
+- Call set_speech_service(AOSSpeechService(voice="alba", cache_dir="voiceover_cache")) in construct().
 - Wrap EVERY animation beat in `with self.voiceover(text="...") as tracker:` blocks.
-- Use teaching_script narration VERBATIM from the plan. Do not invent filler narration.
-- CALM PACING: Allow concepts to breathe! Use run_time=max(2.0, tracker.duration * 0.85) for animations. Add a calm pause `self.wait(1.5)` to `self.wait(2.5)` after each beat.
-- SCREEN HYGIENE (NO OVERLAPS): Explicitly clear/FadeOut previous elements before drawing new coordinate frames or 3D axes. NEVER create 3D axes on top of equations in the center!
-- DYNAMIC SYSTEMS (e.g. Lorenz Attractor): Compute actual numerical trajectories with numpy (e.g. integrate dx/dt=sigma*(y-x), dy/dt=x*(rho-z)-y, dz/dt=x*y-beta*z for 2000 steps). Scale coordinates by 0.12 and center. Create with VMobject().set_points_smoothly(points) and Create(curve, run_time=tracker.duration). For chaos, show two nearby trajectories (0.001 apart) diverging!
+- Exact Audio Sync: Always tie visual animation duration directly to tracker.duration! E.g. `self.play(..., run_time=tracker.duration)`.
+- Never put hardcoded self.wait(...) inside with self.voiceover(...) blocks!
+- SCREEN HYGIENE (NO OVERLAPS): Explicitly clear/FadeOut previous elements (`self.play(FadeOut(Group(*self.mobjects)))`) before drawing new coordinate frames or 3D axes. NEVER create 3D axes on top of equations in the center!
+- DYNAMIC SYSTEMS & UPDATERS: Use ValueTracker, always_redraw, or numpy integration for ODEs/attractors.
 - Silent self.play without voiceover will fail compile.
 
 Example skeleton:
@@ -46,16 +47,18 @@ from manim import *
 from manim_voiceover import VoiceoverScene
 from tools.aos_speech_service import AOSSpeechService
 
-class EulersFormulaScene(VoiceoverScene):
+class EulersFormulaScene(VoiceoverScene, ThreeDScene):
     def construct(self):
         self.set_speech_service(AOSSpeechService(voice="alba", cache_dir="voiceover_cache"))
         
-        # Beat 1: Intro and formula
+        # Beat 1: Intro and formula (synced to voiceover duration)
         with self.voiceover(text="Euler's formula reveals a profound bridge connecting exponential growth to trigonometry in the complex plane.") as tracker:
             title = Text("Euler's Formula", font_size=40).to_edge(UP)
             formula = MathTex(r"e^{i\\theta} = \\cos(\\theta) + i\\sin(\\theta)", font_size=42)
-            self.play(Write(title), Write(formula))
-            self.wait(1)
+            self.play(Write(title), Write(formula), run_time=tracker.duration)
+
+        # Clear board before geometric demonstration
+        self.play(FadeOut(title), FadeOut(formula))
 '''
 await manim_write(code=code, scene_name='EulersFormulaScene', output_dir=output_dir)
 await compile_manim_code(code=code, scene_name='EulersFormulaScene', output_dir=output_dir)

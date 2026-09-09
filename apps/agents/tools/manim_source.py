@@ -629,7 +629,7 @@ def _passes_voiceover_gate(code: str) -> bool:
         n
         for n in tree.body
         if isinstance(n, ast.ClassDef)
-        and any(_base_id(b) == "VoiceoverScene" for b in n.bases)
+        and any(_base_id(b) in ("VoiceoverScene", "VoiceoverSlideScene") for b in n.bases)
     ]
     if not classes:
         return False
@@ -638,6 +638,15 @@ def _passes_voiceover_gate(code: str) -> bool:
     has_sp_import = any("AOSSpeechService" in l or "aos_speech_service" in l for l in import_lines)
     if not (has_vo_import and has_sp_import):
         return False
+
+    # Check if any scene class uses 3D features without inheriting from ThreeDScene
+    for cls in classes:
+        has_3d = any(_base_id(b) == "ThreeDScene" for b in cls.bases)
+        if not has_3d:
+            cls_str = ast.unparse(cls)
+            if any(k in cls_str for k in ("ThreeDAxes", "move_camera", "begin_ambient_camera_rotation", "stop_ambient_camera_rotation", "set_camera_orientation", "add_fixed_in_frame_mobjects")):
+                return False
+
     return any(
         _has_voiceover_call(cls) and _has_set_speech_service(cls) for cls in classes
     )
@@ -671,18 +680,51 @@ def _upgrade_scene_bases(tree: ast.Module) -> None:
     for node in tree.body:
         if not isinstance(node, ast.ClassDef):
             continue
-        if any(_base_id(b) == "VoiceoverScene" for b in node.bases):
+        has_vo = any(_base_id(b) in ("VoiceoverScene", "VoiceoverSlideScene") for b in node.bases)
+        has_3d = any(_base_id(b) == "ThreeDScene" for b in node.bases)
+
+        # Detect 3D usage in class AST
+        uses_3d = has_3d
+        for sub in ast.walk(node):
+            if isinstance(sub, ast.Name) and sub.id in ("ThreeDAxes", "ThreeDScene", "Surface", "Sphere"):
+                uses_3d = True
+                break
+            if isinstance(sub, ast.Attribute) and sub.attr in (
+                "move_camera",
+                "begin_ambient_camera_rotation",
+                "stop_ambient_camera_rotation",
+                "set_camera_orientation",
+                "add_fixed_in_frame_mobjects",
+            ):
+                uses_3d = True
+                break
+            if isinstance(sub, ast.keyword) and sub.arg in ("phi", "theta"):
+                uses_3d = True
+                break
+
+        if has_vo and (not uses_3d or has_3d):
             continue
-        if any(_base_id(b) == "ThreeDScene" for b in node.bases):
-            continue
-        node.bases = [
-            ast.Name(id="VoiceoverScene", ctx=ast.Load())
-            if _base_id(b) == "Scene"
-            else b
-            for b in node.bases
-        ]
-        if not node.bases:
-            node.bases = [ast.Name(id="VoiceoverScene", ctx=ast.Load())]
+
+        new_bases: list[ast.expr] = []
+        if not has_vo:
+            new_bases.append(ast.Name(id="VoiceoverScene", ctx=ast.Load()))
+        for b in node.bases:
+            b_id = _base_id(b)
+            if b_id == "Scene":
+                continue
+            if b_id in ("VoiceoverScene", "VoiceoverSlideScene"):
+                new_bases.append(b)
+            elif b_id == "ThreeDScene":
+                new_bases.append(b)
+            else:
+                new_bases.append(b)
+
+        if uses_3d and not any(_base_id(b) == "ThreeDScene" for b in new_bases):
+            new_bases.append(ast.Name(id="ThreeDScene", ctx=ast.Load()))
+
+        if not new_bases:
+            new_bases = [ast.Name(id="VoiceoverScene", ctx=ast.Load())]
+        node.bases = new_bases
 
 
 def _ensure_construct_speech(tree: ast.Module) -> None:
@@ -897,6 +939,78 @@ def enrich_existing_voiceovers(code: str, teaching_beats: list[str] | None = Non
         return code
 
 
+def sync_voiceover_durations(code: str) -> str:
+    """Ensure animations inside with self.voiceover(...) as tracker: synchronize to tracker.duration."""
+    if not isinstance(code, str) or not code.strip():
+        return code if isinstance(code, str) else ""
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return code
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.With):
+            continue
+        tracker_name = None
+        for item in node.items:
+            ctx = item.context_expr
+            if isinstance(ctx, ast.Call):
+                cname = getattr(ctx.func, "id", "") or getattr(ctx.func, "attr", "")
+                if cname == "voiceover":
+                    if isinstance(item.optional_vars, ast.Name):
+                        tracker_name = item.optional_vars.id
+                    else:
+                        tracker_name = "tracker"
+                        item.optional_vars = ast.Name(id="tracker", ctx=ast.Store())
+                    break
+        if not tracker_name:
+            continue
+
+        play_calls: list[ast.Call] = []
+        for stmt in node.body:
+            if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
+                func = stmt.value.func
+                if getattr(func, "attr", "") == "play":
+                    play_calls.append(stmt.value)
+
+        num_plays = len(play_calls)
+        for pcall in play_calls:
+            has_runtime = any(kw.arg == "run_time" for kw in pcall.keywords)
+            if not has_runtime:
+                if num_plays == 1:
+                    pcall.keywords.append(
+                        ast.keyword(
+                            arg="run_time",
+                            value=ast.Attribute(
+                                value=ast.Name(id=tracker_name, ctx=ast.Load()),
+                                attr="duration",
+                                ctx=ast.Load(),
+                            ),
+                        )
+                    )
+                else:
+                    pcall.keywords.append(
+                        ast.keyword(
+                            arg="run_time",
+                            value=ast.BinOp(
+                                left=ast.Attribute(
+                                    value=ast.Name(id=tracker_name, ctx=ast.Load()),
+                                    attr="duration",
+                                    ctx=ast.Load(),
+                                ),
+                                op=ast.Div(),
+                                right=ast.Constant(value=float(num_plays)),
+                            ),
+                        )
+                    )
+
+    ast.fix_missing_locations(tree)
+    try:
+        return ast.unparse(tree) + "\n"
+    except Exception:
+        return code
+
+
 def prepare_manim_source(code: str, teaching_beats: list[str] | None = None) -> str:
     """Normalize LLM source, sanitize animation calls, ensure VoiceoverScene, and enrich voiceovers."""
     code = normalize_manim_source(code)
@@ -910,6 +1024,7 @@ def prepare_manim_source(code: str, teaching_beats: list[str] | None = None) -> 
         code = color_header + code
     code = sanitize_manim_animations(code)
     code = ensure_voiceover_scene(code)
+    code = sync_voiceover_durations(code)
     if teaching_beats:
         code = enrich_existing_voiceovers(code, teaching_beats)
     return code
