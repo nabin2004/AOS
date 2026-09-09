@@ -340,7 +340,26 @@ def compile_manim_code(
         print(f"-> VALIDATING_CODE Validating {scene_class} static syntax…", file=sys.stderr, flush=True)
         valid_static, static_err = validate_manim_code_static(code, scene_name)
         if not valid_static and static_err == "missing_voiceover_calls":
-            auto_wrapped = auto_wrap_missing_voiceovers(code, scene_class)
+            manifest = load_manifest(workspace)
+            teaching_beats: list[str] = []
+            script = manifest.get("teaching_script")
+            ts_path = workspace / "teaching_script.json"
+            if not script and ts_path.exists():
+                try:
+                    import json
+                    script = json.loads(ts_path.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+            if script and isinstance(script, dict):
+                beats = script.get("beats") or []
+                for b in beats:
+                    if isinstance(b, dict) and b.get("narration"):
+                        teaching_beats.append(str(b["narration"]))
+                    elif isinstance(b, str) and b.strip():
+                        teaching_beats.append(b.strip())
+
+            topic = manifest.get("topic") or scene_class
+            auto_wrapped = auto_wrap_missing_voiceovers(code, topic=topic, teaching_beats=teaching_beats)
             valid_recheck, _ = validate_manim_code_static(auto_wrapped, scene_name)
             if valid_recheck:
                 code = auto_wrapped

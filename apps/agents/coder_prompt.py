@@ -19,11 +19,11 @@ _LOCAL_PLAN_KEYS = (
 )
 
 CODER_SCRIPT_HINT = (
-    "VOICEOVER CONTRACT (CRITICAL): Every animation beat MUST be wrapped inside "
-    "with self.voiceover(text=\"...\") as tracker: blocks. "
-    "Implement teaching_script narration verbatim (or very close). "
-    "Do not invent filler voiceover. Map each beat's visual to Manim. "
-    "Silent self.play(...) without a voiceover block is forbidden and will fail validation.\n"
+    "VOICEOVER & PEDAGOGY CONTRACT (CRITICAL):\n"
+    "1. Every animation beat MUST be wrapped inside `with self.voiceover(text=\"...\") as tracker:` blocks.\n"
+    "2. Implement Plan.teaching_script narration lines verbatim (or very close) in sequential order.\n"
+    "3. Map each beat's visual to clear, focused Manim animations (axes, unit circle, rotating vector, angles).\n"
+    "4. Silent self.play(...) without a voiceover block will fail static validation.\n"
 )
 
 _LIST_CAPS: dict[str, int] = {

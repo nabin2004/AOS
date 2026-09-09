@@ -149,44 +149,86 @@ def _heuristic_teaching_script(
     clean_topic = re.sub(r"[^A-Za-z0-9 ]", "", topic).strip() or "Mathematical Principles"
     clean_title = topic.replace("'", "").title()
     scene_name = f"{re.sub(r'[^A-Za-z0-9]', '', clean_title) or 'Main'}Scene"
-    beats = [
-        TeachingBeat(
-            id="intro",
-            takeaway=f"Introduction to {clean_topic}",
-            visual=f"Title card displaying {clean_topic} and educational objective",
-            narration=f"In this lesson, we explore the core intuition and beauty of {clean_topic}.",
-        ),
-        TeachingBeat(
-            id="setup",
-            takeaway="Foundational components",
-            visual="Coordinate frame and essential mathematical components",
-            narration=f"To understand {clean_topic}, we first establish the foundational geometric framework.",
-        ),
-        TeachingBeat(
-            id="formula",
-            takeaway="The central relationship",
-            visual="Key mathematical formula written and highlighted",
-            narration="Notice how this fundamental relationship connects distinct branches of mathematics together.",
-        ),
-        TeachingBeat(
-            id="intuition",
-            takeaway="Visual intuition",
-            visual="Transformation illustrating the behavior of the expression",
-            narration="When we trace this operation visually, the underlying geometric harmony becomes clear.",
-        ),
-        TeachingBeat(
-            id="synthesis",
-            takeaway="Synthesis of concepts",
-            visual="Combined visualization showing the complete structure",
-            narration="This perspective bridges algebraic calculation directly with geometric insight.",
-        ),
-        TeachingBeat(
-            id="conclusion",
-            takeaway="Summary and key takeaway",
-            visual="Final summary card with highlighted conclusion",
-            narration=f"In conclusion, {clean_topic} reveals how elegant relationships unify mathematical thinking.",
-        ),
-    ]
+
+    topic_lower = topic.lower()
+    if "euler" in topic_lower:
+        beats = [
+            TeachingBeat(
+                id="intro",
+                takeaway="Euler's formula unites exponential growth and circular trigonometry.",
+                visual="Title displaying Euler's Formula and master equation e^{i theta} = cos(theta) + i sin(theta)",
+                narration="Euler's formula reveals a profound bridge connecting exponential growth directly to trigonometry in the complex plane.",
+            ),
+            TeachingBeat(
+                id="complex_plane",
+                takeaway="In the complex plane, multiplying by i rotates by 90 degrees.",
+                visual="Draw complex coordinate axes with Real horizontal axis and Imaginary vertical axis.",
+                narration="In the complex plane, the horizontal axis represents real numbers and the vertical axis represents imaginary numbers. Multiplying by i corresponds to a 90-degree rotation.",
+            ),
+            TeachingBeat(
+                id="unit_circle",
+                takeaway="Points on the unit circle are parameterized by (cos theta, sin theta).",
+                visual="Unit circle with radius 1, angle theta arc, and coordinates (cos theta, sin theta)",
+                narration="On the unit circle, every point at an angle theta has coordinates cosine theta along the real axis, and sine theta along the imaginary axis.",
+            ),
+            TeachingBeat(
+                id="continuous_rotation",
+                takeaway="Imaginary velocity is perpendicular to position, creating uniform circular motion.",
+                visual="Rotating vector along the unit circle showing perpendicular velocity vector",
+                narration="Because multiplying by i turns velocity perpendicular to position, e to the i theta drives continuous circular motion at unit speed.",
+            ),
+            TeachingBeat(
+                id="formula_synthesis",
+                takeaway="Euler's formula connects exponential growth and circular coordinates.",
+                visual="Formula highlighted: e^{i theta} = cos(theta) + i sin(theta)",
+                narration="Euler's formula synthesizes these insights: e to the i theta equals cosine theta plus i sine theta.",
+            ),
+            TeachingBeat(
+                id="identity_takeaway",
+                takeaway="Setting theta = pi yields Euler's identity uniting 5 fundamental constants.",
+                visual="Highlight theta = pi rotating to -1, revealing e^{i pi} + 1 = 0",
+                narration="Setting theta equal to pi rotates halfway around the circle to minus one, giving Euler's identity: e to the i pi plus one equals zero.",
+            ),
+        ]
+    else:
+        beats = [
+            TeachingBeat(
+                id="intro",
+                takeaway=f"Introduction to {clean_topic}",
+                visual=f"Title card displaying {clean_topic} and educational objective",
+                narration=f"In this lesson, we explore the core intuition and geometric beauty of {clean_topic}.",
+            ),
+            TeachingBeat(
+                id="setup",
+                takeaway="Foundational components",
+                visual="Coordinate frame and essential mathematical components",
+                narration=f"To understand {clean_topic}, we first establish the foundational coordinate framework.",
+            ),
+            TeachingBeat(
+                id="formula",
+                takeaway="The central relationship",
+                visual="Key mathematical formula written and highlighted",
+                narration="Notice how this fundamental relationship connects distinct branches of mathematics together.",
+            ),
+            TeachingBeat(
+                id="intuition",
+                takeaway="Visual intuition",
+                visual="Transformation illustrating the behavior of the expression",
+                narration="When we trace this operation visually, the underlying geometric harmony becomes clear.",
+            ),
+            TeachingBeat(
+                id="synthesis",
+                takeaway="Synthesis of concepts",
+                visual="Combined visualization showing the complete structure",
+                narration="This perspective bridges algebraic calculation directly with geometric insight.",
+            ),
+            TeachingBeat(
+                id="conclusion",
+                takeaway="Summary and key takeaway",
+                visual="Final summary card with highlighted conclusion",
+                narration=f"In conclusion, {clean_topic} reveals how elegant relationships unify mathematical thinking.",
+            ),
+        ]
     return TeachingScript(
         scene_class_name=scene_name,
         throughline=f"A step-by-step visual exploration of {clean_topic}.",
@@ -360,6 +402,16 @@ async def run_coder_step(
     script_payload = teaching_script_to_payload(teaching_script)
     if script_payload:
         payload["teaching_script"] = script_payload
+        try:
+            (run_dir / "teaching_script.json").write_text(
+                json.dumps(script_payload, indent=2), encoding="utf-8"
+            )
+            manifest = load_manifest(run_dir)
+            manifest["teaching_script"] = script_payload
+            manifest["topic"] = topic
+            save_manifest(run_dir, manifest)
+        except Exception:
+            pass
     local_coder = is_ollama(model_for("coder"))
     prompt = build_coder_user_prompt(
         topic=topic,

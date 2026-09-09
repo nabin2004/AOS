@@ -731,6 +731,24 @@ def prepare_manim_source(code: str) -> str:
 def _math_to_speech(tex: str, topic: str = "") -> str:
     """Convert a math formula or LaTeX string into natural spoken English for voiceover."""
     t = tex.strip()
+    # Specific pedagogical translations for core mathematical expressions
+    if "e^{i" in t or "e^{ix" in t or "e^{i\\theta" in t:
+        if "cos" in t and "sin" in t:
+            return "Euler's formula connects the complex exponential e to the i theta directly to cosine theta plus i sine theta."
+        if "\\pi" in t and ("-1" in t or "= 0" in t or "+ 1" in t):
+            return "Evaluating at pi yields Euler's identity: e to the i pi plus one equals zero."
+        return "The complex exponential e to the i theta describes rotation along the unit circle."
+    if "\\text{Re}" in t or "Re(" in t:
+        return "The horizontal axis represents the real component of the complex number."
+    if "\\text{Im}" in t or "Im(" in t:
+        return "The vertical axis represents the imaginary component of the complex number."
+    if "|z| = 1" in t or "|z|=1" in t:
+        return "On the unit circle, every point has distance one from the origin."
+    if "\\frac{\\pi}{2}" in t:
+        return "An angle of pi over two represents a ninety degree rotation counterclockwise."
+    if "\\pi" in t and ("\\theta" in t or "=" in t):
+        return "Setting theta equal to pi rotates halfway around the unit circle to negative one."
+
     replacements = [
         (r"\\cos", " cosine "),
         (r"\\sin", " sine "),
@@ -758,8 +776,8 @@ def _math_to_speech(tex: str, topic: str = "") -> str:
     t = re.sub(r"[{}\\$]", " ", t)
     t = re.sub(r"\s+", " ", t).strip()
     if len(t) < 4:
-        return f"Notice this key relationship for {topic}." if topic else "Notice this key relationship."
-    return f"Notice this expression: {t}."
+        return f"Observe how this foundational property governs {topic}." if topic else "Observe how this foundational property governs the system."
+    return f"We examine the relationship where {t}, revealing the underlying mathematical structure."
 
 
 def _extract_text_constant(node: ast.AST) -> str | None:
@@ -818,12 +836,12 @@ def auto_wrap_missing_voiceovers(
         new_body: list[ast.stmt] = []
         beat_idx = 0
         default_pedagogy = [
-            f"In this lesson, we explore the foundations of {clean_topic}.",
-            f"Here we observe the core principles and relationships that define {clean_topic}.",
-            f"Notice how the visual components interact to illustrate this concept.",
+            f"In this lesson, we explore the foundations and visual intuition of {clean_topic}.",
+            f"We first establish the coordinate framework to visualize how {clean_topic} behaves.",
+            f"Notice how the visual components interact to illustrate this central concept.",
             f"Examining this step closely provides clear geometric and algebraic intuition.",
-            f"This relationship unifies the individual parts into a cohesive framework.",
-            f"This concludes our overview, showing how {clean_topic} brings these ideas into harmony.",
+            f"This relationship unifies the individual parts into a single cohesive framework.",
+            f"This completes our visual exploration, demonstrating the deep mathematical harmony of {clean_topic}.",
         ]
 
         for stmt in construct_fn.body:
@@ -863,9 +881,12 @@ def auto_wrap_missing_voiceovers(
                     else:
                         clean_extracted = re.sub(r"[^A-Za-z0-9 ,.'-]", "", play_text).strip()
                         if clean_extracted and len(clean_extracted) >= 4:
-                            narration = f"Here we see: {clean_extracted}."
-                            if narration.lower().startswith("here we have"):
-                                narration = f"Notice {clean_extracted}."
+                            if any(k in clean_extracted.lower() for k in ("euler", "formula", "identity", "equation")):
+                                narration = f"We introduce {clean_extracted}, connecting core mathematical principles."
+                            elif any(k in clean_extracted.lower() for k in ("complex", "trigonometry", "circle")):
+                                narration = f"This visual highlights the bridge between {clean_extracted} and geometry."
+                            else:
+                                narration = f"Consider {clean_extracted}, observing how it clarifies the underlying relationship."
                         else:
                             narration = default_pedagogy[min(beat_idx, len(default_pedagogy) - 1)]
                 else:

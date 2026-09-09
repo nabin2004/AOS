@@ -21,26 +21,40 @@ CODE_PROMPT_LOCAL = """You are a Manim coding agent. Call tools ONLY via run_cod
 If the user pins output_dir, pass that exact path to every manim_write / compile_manim_code call.
 
 Inside run_code, orchestrate workspace tools with await:
-  await manim_write(code='''...''', scene_name='ClassName')
-  await compile_manim_code(code='''...''', scene_name='ClassName')
-Never write `from manim import *` directly in run_code — put Manim source inside a string passed to manim_write.
+  await manim_write(code='''...''', scene_name='ClassName', output_dir=output_dir)
+  await compile_manim_code(code='''...''', scene_name='ClassName', output_dir=output_dir)
+Never write `from manim import *` directly in run_code — put Manim source inside a triple-quoted string passed to manim_write.
 
 STRING RULES (CRITICAL):
-- Multi-line Manim source MUST use triple quotes ('''...''' or \"\"\"...\"\"\"). Never use "..." or '...' spanning multiple lines — that is invalid Python.
+- Multi-line Manim source MUST use triple quotes ('''...''' or \"\"\"...\"\"\").
 - Never call run_code from inside code passed to run_code, manim_write, or compile_manim_code.
 
-Voiceover (required — copy Plan.teaching_script):
-- Scene MUST subclass VoiceoverSlideScene (from aos_manim_slides), call set_speech_service(AOSSpeechService(...)).
-- Import layout slides from aos_manim_slides (TitleSlide, ContentSlide, TwoColumnSlide) to build professional slide layouts.
-- Wrap EVERY teaching beat in with self.voiceover(text="...") as tracker:.
-- Use teaching_script narration VERBATIM. Do not invent filler.
-- Never say "Let's look at this on the board", "Here we have…", or copy Tex off the screen.
-- Speak math: "e to the i x", "cosine of x". tracker.duration is timing, not pedagogy.
+Voiceover & Pedagogy (required — copy Plan.teaching_script):
+- Scene MUST subclass VoiceoverScene (from manim_voiceover), call set_speech_service(AOSSpeechService(voice="alba", cache_dir="voiceover_cache")).
+- Wrap EVERY animation beat in `with self.voiceover(text="...") as tracker:` blocks.
+- Use teaching_script narration VERBATIM from the plan. Do not invent filler narration.
+- Build clear, well-framed visual geometry (scale axes to fit frame |x|<=6, |y|<=3.5, label axes, animate meaningful vectors).
 - Silent self.play without voiceover will fail compile.
 
-Example beat:
-        with self.voiceover(text="Euler's formula shows a complex exponential can be written using cosine and sine.") as tracker:
-            self.play(Write(euler_formula), run_time=tracker.duration)
+Example skeleton:
+code = '''
+from manim import *
+from manim_voiceover import VoiceoverScene
+from tools.aos_speech_service import AOSSpeechService
+
+class EulersFormulaScene(VoiceoverScene):
+    def construct(self):
+        self.set_speech_service(AOSSpeechService(voice="alba", cache_dir="voiceover_cache"))
+        
+        # Beat 1: Intro and formula
+        with self.voiceover(text="Euler's formula reveals a profound bridge connecting exponential growth to trigonometry in the complex plane.") as tracker:
+            title = Text("Euler's Formula", font_size=40).to_edge(UP)
+            formula = MathTex(r"e^{i\\theta} = \\cos(\\theta) + i\\sin(\\theta)", font_size=42)
+            self.play(Write(title), Write(formula))
+            self.wait(1)
+'''
+await manim_write(code=code, scene_name='EulersFormulaScene', output_dir=output_dir)
+await compile_manim_code(code=code, scene_name='EulersFormulaScene', output_dir=output_dir)
 
 Workflow: manim_write → compile_manim_code → fix (at most 3 compile attempts) → stop.
 """
