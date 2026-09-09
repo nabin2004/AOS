@@ -87,7 +87,8 @@ def compact_plan_for_local_coder(payload: dict[str, Any]) -> dict[str, Any]:
 LOCAL_CODER_CODEMODE_HINT = (
     "Call tools ONLY via run_code (CodeMode): wrap Manim source in triple-quoted "
     "strings and await manim_write / compile_manim_code. "
-    "Never put from manim import * at the top level of run_code.\n"
+    "Never put from manim import * at the top level of run_code. "
+    "Do not use input() as this runs headlessly.\n"
 )
 
 

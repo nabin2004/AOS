@@ -39,7 +39,8 @@ from narration_planner_agent import narration_planner_agent
 from scene_planner_agent import scene_planner_agent
 from storyboard_planner import storyboard_planner_agent
 from tools import ToolDeps
-from tools.compile import persist_compiled_lecture, persist_lecture_ir
+from tools.compile import persist_lecture_ir
+from tools.manim_write import write_lecture_py_for_ir
 from tools.narrate import narrate_scenes
 from tools.render import render_scenes_for_deps
 from tools.validate import validate_lecture_ir_data
@@ -1012,8 +1013,8 @@ class Inspect(BaseNode[AnimationState, None, str]):
             return End(summary)
 
         deps = _run_tool_deps(ctx.state)
-        lecture_path = persist_compiled_lecture(deps.workspace_dir, draft)
         persist_lecture_ir(deps.workspace_dir, draft)
+        lecture_path = await write_lecture_py_for_ir(draft, deps)
         print(f"[compile] wrote {lecture_path}")
 
         scene_classes = [s.class_name for s in draft.scenes]

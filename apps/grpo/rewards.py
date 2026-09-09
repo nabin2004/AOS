@@ -427,8 +427,7 @@ def alignment_reward(completions: list[object], **kwargs) -> list[float]:
     if not use_clip:
         return lexical_r
         
-    rendered_videos = kwargs.get("rendered_videos")
-    vis_r = visual_alignment_reward(completions, rendered_videos=rendered_videos, **kwargs)
+    vis_r = visual_alignment_reward(completions, **kwargs)
     
     # Blend: 50% lexical presence + 50% visual alignment (evaluated strictly on cuda:1)
     blended = [0.50 * lex + 0.50 * vis for lex, vis in zip(lexical_r, vis_r)]

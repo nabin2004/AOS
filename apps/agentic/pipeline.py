@@ -24,7 +24,15 @@ import os
 import re
 from pathlib import Path
 from typing import Optional
+from dotenv import load_dotenv
 from pydantic_ai import Agent
+
+load_dotenv()
+# Map GEMINI_API_KEY to GOOGLE_API_KEY for Pydantic AI's Google provider if needed
+if os.getenv("GEMINI_API_KEY") and not os.getenv("GOOGLE_API_KEY"):
+    os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
+elif os.getenv("GOOGLE_API_KEY") and not os.getenv("GEMINI_API_KEY"):
+    os.environ["GEMINI_API_KEY"] = os.getenv("GOOGLE_API_KEY")
 
 from validation import (
     registry,
@@ -42,8 +50,18 @@ from validation import (
 )
 from layout_critic import layout_critic, SceneLayoutState
 
-# Model configuration: defaults to 'test' if no live API key is set
-DEFAULT_MODEL = os.getenv("AOS_LLM_MODEL", "test")
+# Model configuration: auto-detect Gemini if GOOGLE_API_KEY / GEMINI_API_KEY is set
+def _resolve_default_model() -> str:
+    explicit = os.getenv("AOS_LLM_MODEL")
+    if explicit:
+        if explicit.startswith("gemini"):
+            return f"google:{explicit}"
+        return explicit
+    if os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY"):
+        return "google:gemini-2.5-flash"
+    return "test"
+
+DEFAULT_MODEL = _resolve_default_model()
 
 # ---------------------------------------------------------------------------
 # 1. Deterministic Architect (No LLM needed)
@@ -374,13 +392,16 @@ def diagnose_error(error_msg: str) -> str:
 def synthesize_scene_pipeline(
     pedagogical_prompt: str,
     audio_script: str = "",
-    use_mock_agents: bool = True,
+    use_mock_agents: Optional[bool] = None,
     max_repairs: int = 2,
 ) -> dict:
     """Chains Architect -> Prop Master -> Layout Critic -> Choreographer -> Assembler -> Repair.
 
     v2: Deterministic Architect, structured output, repair loop.
     """
+
+    if use_mock_agents is None:
+        use_mock_agents = (DEFAULT_MODEL == "test")
 
     # Step 1: Architect (Deterministic — no LLM call)
     env = determine_scene_environment(pedagogical_prompt, has_audio=bool(audio_script))
@@ -437,7 +458,8 @@ def synthesize_scene_pipeline(
             f"Prompt: {pedagogical_prompt}\n"
             f"Environment: {env.model_dump_json()}"
         )
-        mobjects_roster = prop_master_agent.run_sync(prop_context).data
+        prop_res = prop_master_agent.run_sync(prop_context)
+        mobjects_roster = getattr(prop_res, "output", getattr(prop_res, "data", None))
 
     # Step 3: Layout Critic (Deterministic Spatial Engine)
     roster_dicts = [m.model_dump() for m in mobjects_roster.mobjects]
@@ -494,7 +516,8 @@ def synthesize_scene_pipeline(
             f"Mobjects: {mobjects_roster.model_dump_json()}\n"
             f"Resolved Layout Code:\n" + "\n".join(layout_state.layout_code)
         )
-        choreography = choreographer_agent.run_sync(choreography_context).data
+        choreo_res = choreographer_agent.run_sync(choreography_context)
+        choreography = getattr(choreo_res, "output", getattr(choreo_res, "data", None))
 
     # Step 4b: Cross-validate choreography against roster
     validation_errors = validate_choreography_against_roster(choreography, mobjects_roster)

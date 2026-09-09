@@ -111,20 +111,15 @@ def _strip_ansi(text: str) -> str:
 def _resolve_agents_dir() -> Path:
     if settings.AGENTS_DIR:
         return Path(settings.AGENTS_DIR).resolve()
-    # backend/app/worker/tasks/video_tasks.py → apps/agents
     here = Path(__file__).resolve()
-    candidates = [
-        here.parents[6] / "agents",  # .../apps/ui/aos/backend/app/worker/tasks → apps
-        here.parents[5] / "agents",
-        Path.cwd().parent.parent.parent / "agents",
-        Path.cwd() / "apps" / "agents",
-    ]
-    for path in candidates:
-        if (path / "cli.py").is_file():
-            return path.resolve()
+    for parent in [here, *here.parents]:
+        for candidate in (parent / "apps" / "agents", parent / "agents"):
+            if (candidate / "cli.py").is_file():
+                return candidate.resolve()
     raise FileNotFoundError(
         "Could not locate apps/agents (cli.py). Set AGENTS_DIR in the backend .env."
     )
+
 
 
 def _persist_progress_sync(

@@ -89,5 +89,152 @@
     },
     "original_audio": "now-let-s-change-the-color-of-the-circle-to-blue-fdbed8b7.wav",
     "final_audio": "now-let-s-change-the-color-of-the-circle-to-blue-fdbed8b7.wav"
+  },
+  {
+    "input_text": "Let's visualize the sigmoid function. <bookmarkmark='show_axes'/> Here is our coordinate system. <bookmarkmark='show_curve'/> We plot the curve defined by the function sigma of xequals one over one plus e to the negative x. <bookmark mark='move_dot'/> And we can track a point as it moves along the curve.",
+    "input_data": {
+      "input_text": "Let's visualize the sigmoid function.  Here is our coordinate system.  We plot the curve defined by the function sigma of xequals one over one plus e to the negative x.  And we can track a point as it moves along the curve.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 22400000,
+        "text_offset": 38,
+        "word_length": 38,
+        "text": "Let's visualize the sigmoid function. ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 39200000,
+        "text_offset": 70,
+        "word_length": 32,
+        "text": " Here is our coordinate system. ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 99200000,
+        "text_offset": 169,
+        "word_length": 99,
+        "text": " We plot the curve defined by the function sigma of xequals one over one plus e to the negative x. ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 124800000,
+        "text_offset": 223,
+        "word_length": 54,
+        "text": " And we can track a point as it moves along the curve.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "let-s-visualize-the-sigmoid-function-here-is-our-44cb03ac.wav",
+    "final_audio": "let-s-visualize-the-sigmoid-function-here-is-our-44cb03ac.wav"
+  },
+  {
+    "input_text": "Welcome! Today we will learn the BODMAS rule for order of operations. <bookmark mark='SHOW_LADDER'/> BODMAS stands for Brackets, Orders, Division, Multiplication, Addition, and Subtraction. <bookmark mark='SHOW_EQ'/> Let's solve this expression together.",
+    "input_data": {
+      "input_text": "Welcome! Today we will learn the BODMAS rule for order of operations.  BODMAS stands for Brackets, Orders, Division, Multiplication, Addition, and Subtraction.  Let's solve this expression together.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null,
+        "alignment": "segment_split"
+      }
+    },
+    "word_boundaries": [
+      {
+        "audio_offset": 0,
+        "text_offset": 0,
+        "word_length": 0,
+        "text": "",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 43200000,
+        "text_offset": 70,
+        "word_length": 70,
+        "text": "Welcome! Today we will learn the BODMAS rule for order of operations. ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 114400000,
+        "text_offset": 160,
+        "word_length": 90,
+        "text": " BODMAS stands for Brackets, Orders, Division, Multiplication, Addition, and Subtraction. ",
+        "boundary_type": "Word"
+      },
+      {
+        "audio_offset": 132800000,
+        "text_offset": 198,
+        "word_length": 38,
+        "text": " Let's solve this expression together.",
+        "boundary_type": "Word"
+      }
+    ],
+    "original_audio": "welcome-today-we-will-learn-the-bodmas-rule-for-bdd28deb.wav",
+    "final_audio": "welcome-today-we-will-learn-the-bodmas-rule-for-bdd28deb.wav"
+  },
+  {
+    "input_text": "First, we evaluate the Brackets. Five minus three equals two.",
+    "input_data": {
+      "input_text": "First, we evaluate the Brackets. Five minus three equals two.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "first-we-evaluate-the-brackets-five-minus-three-e29614ee.wav",
+    "final_audio": "first-we-evaluate-the-brackets-five-minus-three-e29614ee.wav"
+  },
+  {
+    "input_text": "Next are Orders, or powers. Two squared equals four.",
+    "input_data": {
+      "input_text": "Next are Orders, or powers. Two squared equals four.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "next-are-orders-or-powers-two-squared-equals-four-3ddd81b7.wav",
+    "final_audio": "next-are-orders-or-powers-two-squared-equals-four-3ddd81b7.wav"
+  },
+  {
+    "input_text": "Now we handle Multiplication and Division from left to right. Two times four is eight, and eight divided by four is two.",
+    "input_data": {
+      "input_text": "Now we handle Multiplication and Division from left to right. Two times four is eight, and eight divided by four is two.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "now-we-handle-multiplication-and-division-from-b70f6425.wav",
+    "final_audio": "now-we-handle-multiplication-and-division-from-b70f6425.wav"
+  },
+  {
+    "input_text": "Finally, we perform Addition. Eight plus two gives our final answer, ten.",
+    "input_data": {
+      "input_text": "Finally, we perform Addition. Eight plus two gives our final answer, ten.",
+      "service": "aos",
+      "config": {
+        "voice": "alba",
+        "language": null
+      }
+    },
+    "original_audio": "finally-we-perform-addition-eight-plus-two-gives-f62958b4.wav",
+    "final_audio": "finally-we-perform-addition-eight-plus-two-gives-f62958b4.wav"
   }
 ]

@@ -12,6 +12,44 @@ from tools.coder_workspace import (
     scene_file_path,
 )
 from tools.manim_source import prepare_manim_source
+from ir.manim_ir import LectureIR
+from tools.deps import ToolDeps
+
+async def write_lecture_py_for_ir(lecture_ir: LectureIR, deps: ToolDeps) -> str:
+    """Use coder agent to generate the python script for the given IR."""
+    from coder_run import arrange_coder_artifacts
+    from coder_agent import coder_agent
+    from coder_prompt import build_coder_user_prompt, plan_to_payload
+    from llm_config import is_ollama, model_for
+    
+    run_dir = deps.workspace_dir
+    payload = plan_to_payload(lecture_ir.lecture)
+    # Add scene plans so coder agent knows what scenes to generate
+    payload["scenes"] = [s.model_dump(mode="json") for s in lecture_ir.scenes]
+    
+    local_coder = is_ollama(model_for("coder"))
+    prompt = build_coder_user_prompt(
+        topic=lecture_ir.lecture.title,
+        subject=lecture_ir.lecture.subject,
+        output_dir=run_dir,
+        plan_payload=payload,
+        compact=local_coder,
+        include_codemode_hint=local_coder,
+    )
+    result = await coder_agent.run(prompt)
+    
+    # Try to extract codemode text
+    summary = str(result.output)
+    from tools.manim_source import extract_codemode_dump
+    extracted = extract_codemode_dump(summary)
+    
+    code = extracted.code if extracted else summary
+    # write it out
+    scene_name = "lecture"
+    scene_path = run_dir / f"{scene_name}.py"
+    code = prepare_manim_source(code)
+    scene_path.write_text(code, encoding="utf-8")
+    return str(scene_path)
 
 
 @DBOS.step()

@@ -59,4 +59,5 @@ members = [
     "apps/slidestemp/aos-manim-slides",
     "apps/qwenCoder",
     "apps/dpo",
+    "apps/videos",
 ]
