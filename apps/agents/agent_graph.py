@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import re
 import sys
+from typing import Any
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -34,6 +35,7 @@ from tools.manim_source import extract_codemode_dump
 from classifier_agent import classifier_agent
 from lecture_planner import lecture_planner_agent, Lecture
 from teaching_script import (
+    TeachingBeat,
     TeachingScript,
     teaching_script_agent,
     teaching_script_to_payload,
@@ -137,6 +139,58 @@ def _heuristic_lecture_plan(topic: str, subject: Subject | str) -> Lecture:
         objectives=[f"Understand the core intuition behind {topic}"],
         opener=f"You will see the fundamental principles of {topic} visualized step by step.",
         learning_outcomes=[f"Explain the key intuition behind {topic}"],
+    )
+
+
+def _heuristic_teaching_script(
+    topic: str, subject: Subject | str, plan: Any = None
+) -> TeachingScript:
+    """Generate a clean, structured default TeachingScript if the teaching script agent fails."""
+    clean_topic = re.sub(r"[^A-Za-z0-9 ]", "", topic).strip() or "Mathematical Principles"
+    clean_title = topic.replace("'", "").title()
+    scene_name = f"{re.sub(r'[^A-Za-z0-9]', '', clean_title) or 'Main'}Scene"
+    beats = [
+        TeachingBeat(
+            id="intro",
+            takeaway=f"Introduction to {clean_topic}",
+            visual=f"Title card displaying {clean_topic} and educational objective",
+            narration=f"In this lesson, we explore the core intuition and beauty of {clean_topic}.",
+        ),
+        TeachingBeat(
+            id="setup",
+            takeaway="Foundational components",
+            visual="Coordinate frame and essential mathematical components",
+            narration=f"To understand {clean_topic}, we first establish the foundational geometric framework.",
+        ),
+        TeachingBeat(
+            id="formula",
+            takeaway="The central relationship",
+            visual="Key mathematical formula written and highlighted",
+            narration="Notice how this fundamental relationship connects distinct branches of mathematics together.",
+        ),
+        TeachingBeat(
+            id="intuition",
+            takeaway="Visual intuition",
+            visual="Transformation illustrating the behavior of the expression",
+            narration="When we trace this operation visually, the underlying geometric harmony becomes clear.",
+        ),
+        TeachingBeat(
+            id="synthesis",
+            takeaway="Synthesis of concepts",
+            visual="Combined visualization showing the complete structure",
+            narration="This perspective bridges algebraic calculation directly with geometric insight.",
+        ),
+        TeachingBeat(
+            id="conclusion",
+            takeaway="Summary and key takeaway",
+            visual="Final summary card with highlighted conclusion",
+            narration=f"In conclusion, {clean_topic} reveals how elegant relationships unify mathematical thinking.",
+        ),
+    ]
+    return TeachingScript(
+        scene_class_name=scene_name,
+        throughline=f"A step-by-step visual exploration of {clean_topic}.",
+        beats=beats,
     )
 
 
@@ -469,6 +523,17 @@ class PlanTeachingScriptNode(BaseNode[AnimationState, None, str]):
                 flush=True,
             )
             ctx.state.teaching_script = None
+
+        if ctx.state.teaching_script is None:
+            print(
+                f"-> TeachingScriptFallback {classification.subject} {classification.topic}",
+                file=sys.stderr,
+                flush=True,
+            )
+            ctx.state.teaching_script = _heuristic_teaching_script(
+                classification.topic, classification.subject, plan
+            )
+
         return CodeAgent()
 
 

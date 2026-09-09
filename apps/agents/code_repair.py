@@ -23,6 +23,7 @@ from llm_config import model_for_agent, settings_for
 from llm_retry import execute_with_llm_retry
 from reliability_config import CODE_REPAIR_MAX_ATTEMPTS
 from tools.compile import compile_manim_code, validate_manim_code_static
+from tools.manim_source import auto_wrap_missing_voiceovers, prepare_manim_source
 from video_validator import validate_video_file
 
 logger = logging.getLogger(__name__)
@@ -101,6 +102,16 @@ def build_repair_prompt(
     if len(safe_code) > 20000:
         safe_code = safe_code[:20000] + "\n# ... [code truncated to prevent context overflow]"
 
+    voiceover_guidance = ""
+    if "missing_voiceover_calls" in safe_traceback or "missing_voiceover_scene" in safe_traceback:
+        voiceover_guidance = """
+=== CRITICAL VOICEOVER CONTRACT REQUIREMENT ===
+The scene MUST subclass VoiceoverScene and wrap animation calls inside voiceover blocks:
+    with self.voiceover(text="Explain the concept shown on screen...") as tracker:
+        self.play(..., run_time=tracker.duration)
+Do NOT call self.play(...) bare without a voiceover block! Every main beat must have voiceover.
+"""
+
     return f"""The following Manim scene failed to compile or validate (Attempt {attempt} of {max_attempts}).
 
 === ORIGINAL USER GOAL ===
@@ -111,7 +122,7 @@ def build_repair_prompt(
 
 === COMPILER DIAGNOSTIC / TRACEBACK ===
 {safe_traceback}
-
+{voiceover_guidance}
 === BROKEN SOURCE CODE ===
 ```python
 {safe_code}
@@ -139,6 +150,13 @@ async def run_manim_repair_loop(
     current_code = broken_code
     current_error = error_summary
 
+    # Fast deterministic pre-healing for missing voiceovers
+    if "missing_voiceover_calls" in current_error:
+        healed = auto_wrap_missing_voiceovers(current_code, scene_name)
+        valid_healed, _ = validate_manim_code_static(healed, scene_name)
+        if valid_healed:
+            current_code = healed
+
     for attempt in range(1, max_attempts + 1):
         progress_msg = f"AOS is fixing the animation code automatically… (Repair attempt {attempt} of {max_attempts})"
         print(f"-> CODE_REPAIRING {progress_msg}", file=sys.stderr, flush=True)
@@ -147,31 +165,37 @@ async def run_manim_repair_loop(
         attempt_dir = workspace / f"repair_attempt_{attempt}"
         attempt_dir.mkdir(parents=True, exist_ok=True)
 
-        repair_prompt = build_repair_prompt(
-            original_prompt=original_prompt,
-            broken_code=current_code,
-            traceback=current_error,
-            attempt=attempt,
-            max_attempts=max_attempts,
-            scene_name=scene_name,
-        )
-
         try:
-            # Wrap repair model execution with LLM cold-start/transient retry
-            async def _call_repair() -> str:
-                res = await get_repair_agent().run(repair_prompt)
-                return str(res.output) if res.output is not None else ""
+            # If already healed statically, skip LLM call and proceed directly to compile
+            valid_fast, _ = validate_manim_code_static(current_code, scene_name)
+            if valid_fast and "missing_voiceover_calls" in current_error:
+                pass
+            else:
+                repair_prompt = build_repair_prompt(
+                    original_prompt=original_prompt,
+                    broken_code=current_code,
+                    traceback=current_error,
+                    attempt=attempt,
+                    max_attempts=max_attempts,
+                    scene_name=scene_name,
+                )
 
-            raw_output = await execute_with_llm_retry(
-                _call_repair,
-                operation_name=f"Manim Code Repair (Attempt {attempt})",
-            )
-            candidate_code = extract_python_code(raw_output)
-            if not candidate_code:
-                current_error = "Repair model returned empty code."
-                continue
+                async def _call_repair() -> str:
+                    res = await get_repair_agent().run(repair_prompt)
+                    return str(res.output) if res.output is not None else ""
 
-            current_code = candidate_code
+                raw_output = await execute_with_llm_retry(
+                    _call_repair,
+                    operation_name=f"Manim Code Repair (Attempt {attempt})",
+                )
+                candidate_code = extract_python_code(raw_output)
+                if not candidate_code:
+                    current_error = "Repair model returned empty code."
+                    continue
+
+                current_code = auto_wrap_missing_voiceovers(
+                    prepare_manim_source(candidate_code), scene_name
+                )
 
             # 1. Static pre-validation
             print(f"-> VALIDATING_CODE Validating repaired code syntax (attempt {attempt})…", file=sys.stderr, flush=True)

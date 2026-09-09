@@ -19,10 +19,11 @@ _LOCAL_PLAN_KEYS = (
 )
 
 CODER_SCRIPT_HINT = (
+    "VOICEOVER CONTRACT (CRITICAL): Every animation beat MUST be wrapped inside "
+    "with self.voiceover(text=\"...\") as tracker: blocks. "
     "Implement teaching_script narration verbatim (or very close). "
     "Do not invent filler voiceover. Map each beat's visual to Manim. "
-    "Use <bookmark mark='…'/> only where bookmark_marks are set. "
-    "Narration must teach; never copy on-screen Tex into speech.\n"
+    "Silent self.play(...) without a voiceover block is forbidden and will fail validation.\n"
 )
 
 _LIST_CAPS: dict[str, int] = {
@@ -81,6 +82,21 @@ def compact_plan_for_local_coder(payload: dict[str, Any]) -> dict[str, Any]:
             for b in beats[:8]
             if isinstance(b, dict)
         ]
+        return compact
+
+    # Synthesize fallback teaching beats so local coder always has voiceovers
+    topic_name = str(compact.get("topic") or "this topic")
+    compact["teaching_script"] = {
+        "scene_class_name": str((compact.get("class_names") or ["MainScene"])[0]),
+        "throughline": f"Visual exploration of {topic_name}.",
+        "beats": [
+            {"id": "b1", "visual": "Title and core concept", "narration": f"In this lesson, we explore the foundations of {topic_name}."},
+            {"id": "b2", "visual": "Setup components and frame", "narration": f"We begin by establishing the essential framework of {topic_name}."},
+            {"id": "b3", "visual": "Key mathematical relationship", "narration": "Notice how this fundamental formula connects the components together."},
+            {"id": "b4", "visual": "Visual transformation and insight", "narration": "Observing this transformation gives clear geometric intuition."},
+            {"id": "b5", "visual": "Summary and conclusion", "narration": f"This completes our visual walkthrough of {topic_name}."},
+        ],
+    }
     return compact
 
 
@@ -103,7 +119,6 @@ def build_coder_user_prompt(
     include_codemode_hint: bool = False,
 ) -> str:
     payload = dict(plan_payload)
-    script_payload = payload.get("teaching_script")
     if compact:
         payload = compact_plan_for_local_coder(payload)
     plan_text = json.dumps(payload, indent=2)
@@ -116,8 +131,7 @@ def build_coder_user_prompt(
     ]
     if include_codemode_hint:
         bits.append(LOCAL_CODER_CODEMODE_HINT.rstrip("\n"))
-    if script_payload:
-        bits.append(CODER_SCRIPT_HINT.rstrip("\n"))
+    bits.append(CODER_SCRIPT_HINT.rstrip("\n"))
     bits.append(f"Plan:\n{plan_text}")
     return "\n".join(bits) + "\n"
 

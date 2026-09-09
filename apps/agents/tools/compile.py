@@ -18,7 +18,7 @@ from tools.coder_workspace import (
     save_manifest,
     scene_file_path,
 )
-from tools.manim_source import has_set_speech_service, prepare_manim_source
+from tools.manim_source import auto_wrap_missing_voiceovers, has_set_speech_service, prepare_manim_source
 from tools.voiceover_quality import FILLER_HINT, FILLER_VOICEOVER, filler_voiceover_error
 from ir.manim_ir import LectureIR
 from reliability_config import RENDER_TIMEOUT_SECONDS
@@ -339,6 +339,14 @@ def compile_manim_code(
         # Static pre-validation before invoking subprocess
         print(f"-> VALIDATING_CODE Validating {scene_class} static syntax…", file=sys.stderr, flush=True)
         valid_static, static_err = validate_manim_code_static(code, scene_name)
+        if not valid_static and static_err == "missing_voiceover_calls":
+            auto_wrapped = auto_wrap_missing_voiceovers(code, scene_class)
+            valid_recheck, _ = validate_manim_code_static(auto_wrapped, scene_name)
+            if valid_recheck:
+                code = auto_wrapped
+                scene_path.write_text(code, encoding="utf-8")
+                valid_static = True
+                static_err = None
         if not valid_static and static_err is not None:
             manifest = load_manifest(workspace)
             manifest["output_dir"] = str(workspace)

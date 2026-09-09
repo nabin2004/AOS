@@ -633,6 +633,11 @@ def _passes_voiceover_gate(code: str) -> bool:
     ]
     if not classes:
         return False
+    import_lines = {ast.unparse(n) for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))}
+    has_vo_import = any("VoiceoverScene" in l for l in import_lines)
+    has_sp_import = any("AOSSpeechService" in l or "aos_speech_service" in l for l in import_lines)
+    if not (has_vo_import and has_sp_import):
+        return False
     return any(
         _has_voiceover_call(cls) and _has_set_speech_service(cls) for cls in classes
     )
@@ -721,3 +726,187 @@ def ensure_voiceover_scene(code: str) -> str:
 def prepare_manim_source(code: str) -> str:
     """Normalize LLM source then ensure VoiceoverScene + speech service."""
     return ensure_voiceover_scene(normalize_manim_source(code))
+
+
+def _math_to_speech(tex: str, topic: str = "") -> str:
+    """Convert a math formula or LaTeX string into natural spoken English for voiceover."""
+    t = tex.strip()
+    replacements = [
+        (r"\\cos", " cosine "),
+        (r"\\sin", " sine "),
+        (r"\\tan", " tangent "),
+        (r"\\pi", " pi "),
+        (r"\\theta", " theta "),
+        (r"\\alpha", " alpha "),
+        (r"\\beta", " beta "),
+        (r"\\times", " times "),
+        (r"\\cdot", " dot "),
+        (r"\\approx", " approximately equals "),
+        (r"\\rightarrow", " approaches "),
+        (r"\\int", " the integral of "),
+        (r"\\sum", " the sum of "),
+        (r"\\infty", " infinity "),
+        (r"\^", " to the "),
+        (r"=", " equals "),
+        (r"\+", " plus "),
+        (r"-", " minus "),
+        (r"/", " over "),
+    ]
+    for pattern, repl in replacements:
+        t = re.sub(pattern, repl, t)
+    t = re.sub(r"\\[a-zA-Z]+", " ", t)
+    t = re.sub(r"[{}\\$]", " ", t)
+    t = re.sub(r"\s+", " ", t).strip()
+    if len(t) < 4:
+        return f"Notice this key relationship for {topic}." if topic else "Notice this key relationship."
+    return f"Notice this expression: {t}."
+
+
+def _extract_text_constant(node: ast.AST) -> str | None:
+    for child in ast.walk(node):
+        if isinstance(child, ast.Constant) and isinstance(child.value, str):
+            val = child.value.strip()
+            if len(val) >= 3 and not val.startswith(("#", "\\begin", "\\end")):
+                return val
+    return None
+
+
+def auto_wrap_missing_voiceovers(
+    code: str,
+    topic: str = "this concept",
+    teaching_beats: list[str] | None = None,
+) -> str:
+    """Wrap bare self.play(...) calls in VoiceoverScene with with self.voiceover(text=...): blocks."""
+    if not isinstance(code, str) or not code.strip():
+        return code if isinstance(code, str) else ""
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return code
+
+    voiceover_classes = [
+        n
+        for n in tree.body
+        if isinstance(n, ast.ClassDef)
+        and any(_base_id(b) in ("VoiceoverScene", "VoiceoverSlideScene") for b in n.bases)
+    ]
+    if not voiceover_classes:
+        return code
+    if any(_has_voiceover_call(cls) for cls in voiceover_classes):
+        return code
+
+    clean_topic = re.sub(r"[^A-Za-z0-9 ]", "", topic).strip() or "this mathematical concept"
+
+    for cls in voiceover_classes:
+        construct_fn = None
+        for item in cls.body:
+            if isinstance(item, ast.FunctionDef) and item.name == "construct":
+                construct_fn = item
+                break
+        if not construct_fn:
+            continue
+
+        var_text: dict[str, str] = {}
+        for stmt in construct_fn.body:
+            if isinstance(stmt, ast.Assign):
+                for target in stmt.targets:
+                    if isinstance(target, ast.Name):
+                        txt = _extract_text_constant(stmt.value)
+                        if txt:
+                            var_text[target.id] = txt
+
+        new_body: list[ast.stmt] = []
+        beat_idx = 0
+        default_pedagogy = [
+            f"In this lesson, we explore the foundations of {clean_topic}.",
+            f"Here we observe the core principles and relationships that define {clean_topic}.",
+            f"Notice how the visual components interact to illustrate this concept.",
+            f"Examining this step closely provides clear geometric and algebraic intuition.",
+            f"This relationship unifies the individual parts into a cohesive framework.",
+            f"This concludes our overview, showing how {clean_topic} brings these ideas into harmony.",
+        ]
+
+        for stmt in construct_fn.body:
+            is_play = False
+            is_fade_out = False
+            play_text = None
+            if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
+                func = stmt.value.func
+                if isinstance(func, ast.Attribute) and func.attr == "play":
+                    is_play = True
+                    for arg in stmt.value.args:
+                        if isinstance(arg, ast.Call):
+                            cname = getattr(arg.func, "id", "") or getattr(arg.func, "attr", "")
+                            if cname in ("FadeOut", "Uncreate", "ShrinkToCenter"):
+                                is_fade_out = True
+                        for sub in ast.walk(arg):
+                            if isinstance(sub, ast.Name) and sub.id in var_text:
+                                play_text = var_text[sub.id]
+                                break
+                            elif isinstance(sub, ast.Constant) and isinstance(sub.value, str):
+                                if len(sub.value.strip()) >= 4:
+                                    play_text = sub.value.strip()
+                                    break
+                        if play_text:
+                            break
+
+            if is_play and is_fade_out and beat_idx > 0:
+                new_body.append(stmt)
+                continue
+
+            if is_play:
+                if teaching_beats and beat_idx < len(teaching_beats):
+                    narration = teaching_beats[beat_idx]
+                elif play_text:
+                    if any(sym in play_text for sym in ("\\", "=", "+", "^", "_")):
+                        narration = _math_to_speech(play_text, clean_topic)
+                    else:
+                        clean_extracted = re.sub(r"[^A-Za-z0-9 ,.'-]", "", play_text).strip()
+                        if clean_extracted and len(clean_extracted) >= 4:
+                            narration = f"Here we see: {clean_extracted}."
+                            if narration.lower().startswith("here we have"):
+                                narration = f"Notice {clean_extracted}."
+                        else:
+                            narration = default_pedagogy[min(beat_idx, len(default_pedagogy) - 1)]
+                else:
+                    narration = default_pedagogy[min(beat_idx, len(default_pedagogy) - 1)]
+                beat_idx += 1
+
+                if narration.lower().startswith("here we have"):
+                    narration = "Notice " + narration[12:]
+                elif narration.lower().startswith("let's look at this on the board"):
+                    narration = f"Now we examine the structure of {clean_topic}."
+
+                with_stmt = ast.With(
+                    items=[
+                        ast.withitem(
+                            context_expr=ast.Call(
+                                func=ast.Attribute(
+                                    value=ast.Name(id="self", ctx=ast.Load()),
+                                    attr="voiceover",
+                                    ctx=ast.Load(),
+                                ),
+                                args=[],
+                                keywords=[
+                                    ast.keyword(
+                                        arg="text",
+                                        value=ast.Constant(value=narration),
+                                    )
+                                ],
+                            ),
+                            optional_vars=ast.Name(id="tracker", ctx=ast.Store()),
+                        )
+                    ],
+                    body=[stmt],
+                )
+                new_body.append(with_stmt)
+            else:
+                new_body.append(stmt)
+
+        construct_fn.body = new_body
+
+    ast.fix_missing_locations(tree)
+    try:
+        return ast.unparse(tree) + "\n"
+    except Exception:
+        return code

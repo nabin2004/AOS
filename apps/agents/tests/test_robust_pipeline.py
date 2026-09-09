@@ -241,3 +241,59 @@ def test_build_repair_prompt_contains_all_context():
     assert "Attempt 2 of 3" in prompt
     assert "WrongMethod" in prompt
     assert "EulerScene" in prompt
+
+
+def test_build_repair_prompt_contains_voiceover_guidance():
+    prompt = build_repair_prompt(
+        original_prompt="Explain Euler formula",
+        broken_code="class S(VoiceoverScene): pass",
+        traceback="Static validation failed: missing_voiceover_calls",
+        attempt=1,
+        max_attempts=3,
+        scene_name="EulerScene",
+    )
+    assert "CRITICAL VOICEOVER CONTRACT REQUIREMENT" in prompt
+    assert "self.voiceover" in prompt
+
+
+def test_auto_wrap_missing_voiceovers_heals_bare_play():
+    from tools.manim_source import auto_wrap_missing_voiceovers
+    from tools.compile import validate_voiceover_scene, validate_manim_code_static
+    from tools.voiceover_quality import filler_voiceover_error
+
+    bare_code = """from manim import *
+from manim_voiceover import VoiceoverScene
+from tools.aos_speech_service import AOSSpeechService
+
+class DemoScene(VoiceoverScene):
+    def construct(self):
+        self.set_speech_service(AOSSpeechService(voice='alba'))
+        title = Text("Demo Euler")
+        self.play(Write(title))
+        self.wait(1)
+        self.play(FadeOut(title))
+"""
+    # Raw code has missing voiceover calls
+    assert validate_voiceover_scene(bare_code) == "missing_voiceover_calls"
+
+    # Auto-wrap heals it
+    healed = auto_wrap_missing_voiceovers(bare_code, "Demo Euler")
+    assert validate_voiceover_scene(healed) is None
+    ok, err = validate_manim_code_static(healed, "DemoScene")
+    assert ok is True
+    assert err is None
+    assert filler_voiceover_error(healed) is None
+    assert "self.voiceover" in healed
+
+
+def test_heuristic_teaching_script_fallback():
+    from agent_graph import _heuristic_teaching_script
+    from teaching_script import is_filler_narration
+    from ir.manim_ir import Subject
+
+    script = _heuristic_teaching_script("Euler's Formula", Subject.MATH)
+    assert 6 <= len(script.beats) <= 10
+    assert script.scene_class_name == "EulersFormulaScene"
+    for beat in script.beats:
+        assert not is_filler_narration(beat.narration)
+        assert len(beat.narration) > 15

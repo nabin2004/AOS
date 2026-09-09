@@ -116,6 +116,9 @@ def _resolve_profile_model(role: AgentRole) -> str:
     if profile == "cloud":
         return _openrouter_model()
     # hybrid: OpenRouter classify/plan/animation; Ollama coder
+    # If OPENROUTER_API_KEY is not set or empty, and OLLAMA_BASE_URL is available, fall back to Ollama!
+    if not os.getenv("OPENROUTER_API_KEY", "").strip() and os.getenv("OLLAMA_BASE_URL", "").strip():
+        return _ollama_model()
     models = _PROFILES["hybrid"].copy()
     models["coder"] = _ollama_model()
     for r in ("classifier", "planner", "animation"):
@@ -180,6 +183,15 @@ def model_for_agent(role: AgentRole) -> str | object:
             fallback = resolve_model(_openrouter_model())
             return FallbackModel(primary, fallback)
         return primary
+    # If using OpenRouter model, but OLLAMA_BASE_URL is configured, wrap with FallbackModel!
+    if not is_ollama(model) and os.getenv("OLLAMA_BASE_URL", "").strip():
+        from pydantic_ai.models.fallback import FallbackModel
+        try:
+            primary = resolve_model(model)
+            secondary = resolve_model(_ollama_model())
+            return FallbackModel(primary, secondary)
+        except Exception:
+            return resolve_model(_ollama_model())
     return resolve_model(model)
 
 
@@ -217,10 +229,11 @@ def validate_pipeline_env() -> dict[str, str]:
             needs_openrouter = True
 
     if needs_openrouter and not os.getenv("OPENROUTER_API_KEY", "").strip():
-        errors.append(
-            "OPENROUTER_API_KEY is required (profile uses OpenRouter models). "
-            "Set it in apps/agents/.env"
-        )
+        if not os.getenv("OLLAMA_BASE_URL", "").strip():
+            errors.append(
+                "OPENROUTER_API_KEY is required (profile uses OpenRouter models). "
+                "Set it in apps/agents/.env"
+            )
 
     if needs_ollama and not os.getenv("OLLAMA_BASE_URL", "").strip():
         errors.append(
