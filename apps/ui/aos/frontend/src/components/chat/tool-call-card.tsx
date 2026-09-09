@@ -323,7 +323,7 @@ export function ToolCallCard({ toolCall }: ToolCallCardProps) {
             <EduClawToolResult
               name={toolCall.name}
               args={toolCall.args}
-              result={toolCall.result}
+              result={toolCall.result as string | Record<string, any> | undefined}
               status={toolCall.status}
             />
           ) : isListSkills ? null : (
