@@ -6,8 +6,8 @@ import { Button } from "@/components/ui";
 
 interface EduClawToolProps {
   name: string;
-  args?: Record<string, any>;
-  result?: string | Record<string, any>;
+  args?: Record<string, unknown>;
+  result?: string | Record<string, unknown>;
   status?: "pending" | "running" | "completed" | "error";
 }
 

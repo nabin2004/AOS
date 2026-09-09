@@ -8,7 +8,6 @@ import {
   Copy,
   Check,
   Loader2,
-  RefreshCw,
   Sparkles,
   Terminal,
   Wrench,

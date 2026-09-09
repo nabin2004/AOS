@@ -21,7 +21,7 @@ interface MemoryEdge {
 interface MemoryData {
   nodes?: MemoryNode[];
   edges?: MemoryEdge[];
-  concepts?: Record<string, any>;
+  concepts?: Record<string, unknown>;
   facts?: string[];
 }
 
