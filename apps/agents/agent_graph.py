@@ -9,7 +9,7 @@ load_dotenv()
 from pydantic_graph import BaseNode, End, EndMarker, GraphBuilder, GraphRunContext
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.exceptions import UsageLimitExceeded
-from pydantic_ai.usage import RunUsage
+from pydantic_ai.usage import RunUsage, UsageLimits
 
 from observability import configure_logfire, sft_batch_enabled
 from llm_config import is_ollama, model_for, model_for_agent, settings_for, model_for_agent, settings_for
@@ -329,10 +329,12 @@ async def run_coder_step(
     run_usage = usage
     summary = ""
     stopped_reason = "completed"
+    request_limit = int(os.getenv("AOS_CODER_MAX_REQUESTS", "6"))
+    coder_limits = UsageLimits(request_limit=request_limit)
 
     try:
         async def _call_coder():
-            return await _run_coder().run(prompt, usage=usage)
+            return await _run_coder().run(prompt, usage=usage, usage_limits=coder_limits)
 
         result = await execute_with_llm_retry(_call_coder, operation_name="Coder Agent")
         messages = result.all_messages()
@@ -357,7 +359,7 @@ async def run_coder_step(
         usage=run_usage,
         summary=summary,
         stopped_reason=stopped_reason,
-        request_limit=None,
+        request_limit=request_limit,
         tool_calls_limit=None,
         user_prompt=user_prompt or topic,
         prompt_index=prompt_index,

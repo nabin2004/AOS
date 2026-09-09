@@ -88,6 +88,7 @@ LOCAL_CODER_CODEMODE_HINT = (
     "Call tools ONLY via run_code (CodeMode): wrap Manim source in triple-quoted "
     "strings and await manim_write / compile_manim_code. "
     "Never put from manim import * at the top level of run_code. "
+    "Never put await manim_write inside the code string itself. "
     "Do not use input() as this runs headlessly.\n"
 )
 

@@ -61,9 +61,15 @@ _IDENT_DOT = re.compile(r"[A-Za-z_]\w*\.")
 
 def _parses(code: str) -> bool:
     try:
-        ast.parse(code)
+        compile(code, "<string>", "exec")
+        tree = ast.parse(code)
+        for node in tree.body:
+            if isinstance(node, (ast.Expr, ast.Assign)) and any(
+                isinstance(child, ast.Await) for child in ast.walk(node)
+            ):
+                return False
         return True
-    except SyntaxError:
+    except (SyntaxError, Exception):
         return False
 
 
@@ -370,6 +376,72 @@ def _indent_construct_body(code: str) -> str:
     return "\n".join(out)
 
 
+_TOOL_CALL_PREFIXES = (
+    "await manim_write",
+    "await compile_manim_code",
+    "await manim_read",
+    "await synthesize_narration",
+    "await run_code",
+    "manim_write(",
+    "compile_manim_code(",
+    "run_code(",
+)
+
+
+def _strip_toplevel_tool_calls(code: str) -> str:
+    """Strip orchestrator tool calls (e.g. await manim_write(...)) mistakenly placed at top level."""
+    lines = code.split("\n")
+    cleaned: list[str] = []
+    skipping_call = False
+    paren_depth = 0
+    for line in lines:
+        stripped = line.strip()
+        if not skipping_call:
+            if stripped.startswith("await ") or any(stripped.startswith(p) for p in _TOOL_CALL_PREFIXES):
+                paren_depth = stripped.count("(") - stripped.count(")")
+                if paren_depth > 0:
+                    skipping_call = True
+                continue
+            cleaned.append(line)
+        else:
+            paren_depth += stripped.count("(") - stripped.count(")")
+            if paren_depth <= 0:
+                skipping_call = False
+            continue
+    return "\n".join(cleaned)
+
+
+def _strip_toplevel_awaits_ast(code: str) -> str:
+    """AST-level safety net: strip any top-level Expr/Assign nodes containing an Await or tool call."""
+    try:
+        tree = ast.parse(code)
+    except Exception:
+        return code
+    new_body = []
+    changed = False
+    for node in tree.body:
+        if isinstance(node, ast.Expr) and (
+            isinstance(node.value, ast.Await)
+            or any(isinstance(child, ast.Await) for child in ast.walk(node))
+        ):
+            changed = True
+            continue
+        if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
+            func = node.value.func
+            name = func.id if isinstance(func, ast.Name) else (func.attr if isinstance(func, ast.Attribute) else "")
+            if name in ("manim_write", "compile_manim_code", "run_code", "manim_read", "synthesize_narration"):
+                changed = True
+                continue
+        new_body.append(node)
+    if changed:
+        tree.body = new_body
+        try:
+            return ast.unparse(tree) + "\n"
+        except Exception:
+            return code
+    return code
+
+
 def normalize_manim_source(code: str) -> str:
     """Repair common LLM formatting issues; leave already-valid source unchanged."""
     if not isinstance(code, str) or not code.strip():
@@ -379,6 +451,10 @@ def normalize_manim_source(code: str) -> str:
         return original
 
     candidate = original.replace("\r\n", "\n")
+    candidate = _strip_toplevel_tool_calls(candidate)
+    if _parses(candidate):
+        return candidate
+
     steps = (
         _strip_markdown_fences,
         textwrap.dedent,
@@ -388,6 +464,7 @@ def normalize_manim_source(code: str) -> str:
         _split_comments_then_code,
         _break_adjacent_statements,
         _indent_construct_body,
+        _strip_toplevel_tool_calls,
         textwrap.dedent,
     )
     for step in steps:
@@ -399,6 +476,7 @@ def normalize_manim_source(code: str) -> str:
 
     # Apply remaining transforms even if an earlier one did not change text.
     candidate = _strip_markdown_fences(original.replace("\r\n", "\n"))
+    candidate = _strip_toplevel_tool_calls(candidate)
     candidate = textwrap.dedent(candidate)
     if "\\n" in candidate or "\\t" in candidate:
         candidate = _unescape_outside_strings(candidate)
@@ -407,9 +485,16 @@ def normalize_manim_source(code: str) -> str:
     candidate = _split_comments_then_code(candidate)
     candidate = _break_adjacent_statements(candidate)
     candidate = _indent_construct_body(candidate)
+    candidate = _strip_toplevel_tool_calls(candidate)
     candidate = textwrap.dedent(candidate)
     if _parses(candidate):
         return candidate
+
+    # AST-level safety net
+    ast_cleaned = _strip_toplevel_awaits_ast(candidate)
+    if _parses(ast_cleaned):
+        return ast_cleaned
+
     return candidate if candidate.strip() else original
 
 

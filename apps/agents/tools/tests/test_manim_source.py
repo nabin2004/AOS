@@ -358,6 +358,36 @@ def test_bodmas_oneline_dump_normalizes() -> None:
     assert "self.voiceover(" not in wrapped
 
 
+def test_strip_toplevel_await_tool_calls():
+    source = (
+        "from manim import *\n"
+        "from aos_manim_slides import VoiceoverSlideScene\n"
+        "class TitleScene(VoiceoverSlideScene):\n"
+        "    def construct(self):\n"
+        "        pass\n"
+        "await manim_write(code=code, scene_name='TitleScene')\n"
+    )
+    normalized = normalize_manim_source(source)
+    assert "await manim_write" not in normalized
+    assert "class TitleScene" in normalized
+    compile(normalized, "<string>", "exec")
+
+
+def test_validate_manim_code_static_rejects_top_level_await():
+    from tools.compile import validate_manim_code_static
+    source = (
+        "from manim import *\n"
+        "class MyScene(Scene):\n"
+        "    def construct(self):\n"
+        "        pass\n"
+        "await manim_write(code=code, scene_name='MyScene')\n"
+    )
+    ok, err = validate_manim_code_static(source, "MyScene")
+    assert not ok
+    assert err is not None
+    assert "syntax_error" in err or "await" in err
+
+
 if __name__ == "__main__":
     tests = [
         test_valid_source_unchanged,
@@ -374,6 +404,8 @@ if __name__ == "__main__":
         test_euler_tex_not_copied_into_voiceover,
         test_injects_set_speech_service_when_voiceover_present,
         test_bodmas_oneline_dump_normalizes,
+        test_strip_toplevel_await_tool_calls,
+        test_validate_manim_code_static_rejects_top_level_await,
     ]
     for fn in tests:
         fn()

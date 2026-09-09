@@ -65,6 +65,18 @@ _STAGE_MESSAGES: dict[str, str] = {
     "VIDEO_VALIDATION_FAILED": "Validating video output…",
 }
 
+_REPEATABLE_STAGES: set[str] = {
+    "VALIDATING_CODE",
+    "RENDERING",
+    "CODE_REPAIRING",
+    "RENDER_RETRYING",
+    "LLM_COLD_START",
+    "LLM_RETRYING",
+    "WAITING_FOR_LLM",
+    "RATE_LIMIT_WAIT",
+    "VALIDATING_VIDEO",
+}
+
 
 def _resolve_scene_file_for_upload(
     artifact: dict[str, Any],
@@ -336,7 +348,7 @@ def _run_agents_cli(
             return
         stage, custom_msg = parsed
         message = custom_msg or _friendly_stage_message(stage)
-        if stage in seen_stages and not custom_msg:
+        if stage in seen_stages and not custom_msg and stage not in _REPEATABLE_STAGES:
             return
         if message == last_stage_message:
             return

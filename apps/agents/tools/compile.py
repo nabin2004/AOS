@@ -4,6 +4,7 @@ import ast
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 from dbos_setup import DBOS
 from error_feedback import summarize_diagnostic_output
@@ -166,15 +167,22 @@ def validate_manim_code_static(code: str, scene_name: str = "scene") -> tuple[bo
     if not isinstance(code, str) or not code.strip():
         return False, "empty_code"
 
+    if "run_code(" in code:
+        return False, "invalid_call: run_code cannot be invoked inside Manim source code"
+
     try:
+        compile(code, f"{scene_name}.py", "exec")
         tree = ast.parse(code)
     except SyntaxError as exc:
         return False, f"syntax_error: {exc.msg} at line {exc.lineno}"
     except Exception as exc:
         return False, f"ast_parse_error: {exc}"
 
-    if "run_code(" in code:
-        return False, "invalid_call: run_code cannot be invoked inside Manim source code"
+    for node in tree.body:
+        if isinstance(node, (ast.Expr, ast.Assign)) and any(
+            isinstance(child, ast.Await) for child in ast.walk(node)
+        ):
+            return False, "syntax_error: 'await' outside function (orchestrator tool call mistakenly in Manim source)"
 
     has_scene = any(
         isinstance(node, ast.ClassDef) and _is_scene_class(node)
@@ -329,6 +337,7 @@ def compile_manim_code(
         scene_path.write_text(code, encoding="utf-8")
 
         # Static pre-validation before invoking subprocess
+        print(f"-> VALIDATING_CODE Validating {scene_class} static syntax…", file=sys.stderr, flush=True)
         valid_static, static_err = validate_manim_code_static(code, scene_name)
         if not valid_static and static_err is not None:
             manifest = load_manifest(workspace)
@@ -356,6 +365,7 @@ def compile_manim_code(
             hint = FILLER_HINT if static_err == FILLER_VOICEOVER else (
                 _VOICEOVER_HINT if "voiceover" in static_err else f"Static code validation failed: {static_err}"
             )
+            print(f"-> CODE_REPAIRING Static validation failed ({static_err}). Automatic repair requested…", file=sys.stderr, flush=True)
             return result_json(
                 ok=False,
                 step="compile",
@@ -372,6 +382,7 @@ def compile_manim_code(
         cmd = ["uv", "run", "manim", f"-q{quality}", scene_path.name, scene_class]
 
         timed_out = False
+        print(f"-> RENDERING Rendering animation scene {scene_class}…", file=sys.stderr, flush=True)
         try:
             proc = subprocess.run(
                 cmd,
@@ -399,6 +410,9 @@ def compile_manim_code(
             failure_marker = _output_indicates_failure(output)
             ok = returncode == 0 and failure_marker is None
             tex_failure = _is_tex_failure(failure_marker, output)
+
+        if not ok:
+            print(f"-> CODE_REPAIRING Manim rendering needs correction ({failure_marker or 'error'}). Retrying…", file=sys.stderr, flush=True)
 
         video_path: str | None = None
         has_audio: bool | None = None

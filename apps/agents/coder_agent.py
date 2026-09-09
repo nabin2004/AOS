@@ -85,6 +85,8 @@ await manim_write(code=code, scene_name='MyScene')
 await compile_manim_code(code=code, scene_name='MyScene')
 
 - Wrong (will fail type-check): starting run_code with `from manim import *` or a class Scene(...).
+- CRITICAL: Never put `await manim_write(...)` or `await compile_manim_code(...)` inside the Manim Python file string itself.
+  Tool calls belong strictly in the outer orchestrator, never inside `code`. Top-level `await` inside the Python scene file is a fatal syntax error.
 - STRING RULES (CRITICAL):
   - Multi-line Manim source MUST use triple quotes ('''...''' or \"\"\"...\"\"\"). Never use "..." or '...' spanning multiple lines — that is invalid Python.
   - Never call run_code from inside code passed to run_code, manim_write, or compile_manim_code.
