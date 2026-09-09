@@ -429,17 +429,28 @@ class AgentSession:
 
         try:
             # 1) Persist pending row + in-flight assistant message (survives refresh).
+            is_duplicate = False
             async with get_db_context() as db:
                 svc = VideoGenerationService(db)
-                row = await svc.create_pending(
+                active_row = await svc.get_active_generation(
                     user_id=self.user.id,
-                    data=VideoGenerationCreate(
-                        prompt=user_message,
-                        mode=video_mode,  # type: ignore[arg-type]
-                        conversation_id=UUIDType(self.current_conversation_id),
-                        user_message_id=UUIDType(user_message_id) if user_message_id else None,
-                    ),
+                    conversation_id=UUIDType(self.current_conversation_id),
+                    prompt=user_message,
                 )
+                if active_row:
+                    logger.info("Re-attaching to in-flight video generation %s", active_row.id)
+                    row = active_row
+                    is_duplicate = True
+                else:
+                    row = await svc.create_pending(
+                        user_id=self.user.id,
+                        data=VideoGenerationCreate(
+                            prompt=user_message,
+                            mode=video_mode,  # type: ignore[arg-type]
+                            conversation_id=UUIDType(self.current_conversation_id),
+                            user_message_id=UUIDType(user_message_id) if user_message_id else None,
+                        ),
+                    )
                 generation_id = str(row.id)
                 generation_uuid = row.id
 
@@ -578,50 +589,51 @@ class AgentSession:
             except TimeoutError:
                 logger.warning("Redis video_status subscribe timed out; enqueueing anyway")
 
-            # 3) Enqueue Celery after the client has UI + Redis watcher is ready.
-            try:
-                async with get_db_context() as db:
-                    svc = VideoGenerationService(db)
-                    task_id = svc.enqueue(
-                        generation_uuid,
-                        llm_base_url=llm_base_url,
-                        llm_api_key=llm_api_key,
-                        model_name=model_name,
+            task_id = None
+            if not is_duplicate:
+                try:
+                    async with get_db_context() as db:
+                        svc = VideoGenerationService(db)
+                        task_id = svc.enqueue(
+                            generation_uuid,
+                            llm_base_url=llm_base_url,
+                            llm_api_key=llm_api_key,
+                            model_name=model_name,
+                        )
+                        await svc.set_celery_task(generation_uuid, task_id)
+                        enqueued_msg = "Queued — waiting for an available generation worker…"
+                        await svc.set_progress(
+                            generation_uuid,
+                            stage="enqueued",
+                            message=enqueued_msg,
+                        )
+                except Exception as e:
+                    logger.exception("Failed to enqueue video generation")
+                    watch_task.cancel()
+                    err = f"Failed to enqueue video job: {e}"
+                    async with get_db_context() as db:
+                        await VideoGenerationService(db).mark_failed(
+                            generation_uuid, error_message=err
+                        )
+                    await self._emit_video_terminal(
+                        generation_id=generation_id,
+                        tool_call_id=tool_call_id,
+                        prompt=user_message,
+                        status="failed",
+                        mode=video_mode,
+                        error=err,
+                        message=err,
+                        stage="enqueue_failed",
                     )
-                    await svc.set_celery_task(generation_uuid, task_id)
-                    enqueued_msg = (
-                        f"Queued in Celery ({task_id}) — waiting for a worker…"
+                    await send_event(self.websocket, "final_result", {"output": ""})
+                    await send_event(
+                        self.websocket,
+                        "complete",
+                        {"conversation_id": self.current_conversation_id},
                     )
-                    await svc.set_progress(
-                        generation_uuid,
-                        stage="enqueued",
-                        message=enqueued_msg,
-                    )
-            except Exception as e:
-                logger.exception("Failed to enqueue video generation")
-                watch_task.cancel()
-                err = f"Failed to enqueue video job: {e}"
-                async with get_db_context() as db:
-                    await VideoGenerationService(db).mark_failed(
-                        generation_uuid, error_message=err
-                    )
-                await self._emit_video_terminal(
-                    generation_id=generation_id,
-                    tool_call_id=tool_call_id,
-                    prompt=user_message,
-                    status="failed",
-                    mode=video_mode,
-                    error=err,
-                    message=err,
-                    stage="enqueue_failed",
-                )
-                await send_event(self.websocket, "final_result", {"output": ""})
-                await send_event(
-                    self.websocket,
-                    "complete",
-                    {"conversation_id": self.current_conversation_id},
-                )
-                return
+                    return
+            else:
+                enqueued_msg = "Re-attached to existing video generation job in progress…"
 
             await send_event(
                 self.websocket,

@@ -17,6 +17,7 @@ import redis
 import redis.asyncio as aioredis
 from celery import shared_task
 
+from app.agents.error_classifier import classify_error
 from app.agents.openai_compatible_client import format_custom_endpoint_error
 from app.core.config import settings
 from app.db.session import get_worker_db_context
@@ -25,7 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 def _pipeline_error_message(error: str, *, base_url: str | None = None) -> str:
-    return format_custom_endpoint_error(error, base_url=base_url)
+    classified = classify_error(error)
+    return classified.user_message
 
 
 VIDEO_STATUS_CHANNEL = "video_status"
@@ -34,8 +36,8 @@ VIDEO_STATUS_CHANNEL = "video_status"
 _SOFT_LIMIT = 50 * 60
 _HARD_LIMIT = 60 * 60
 
-# Agents CLI prints ``-> {node_id}`` (Rich may wrap with ANSI); strip and map.
-_NODE_PROGRESS_RE = re.compile(r"->\s*([A-Za-z0-9_]+)")
+# Agents CLI prints ``-> {node_id} [message]`` (Rich may wrap with ANSI); strip and map.
+_NODE_PROGRESS_RE = re.compile(r"->\s*([A-Za-z0-9_]+)(?:\s+(.+))?")
 _ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
 _STAGE_MESSAGES: dict[str, str] = {
@@ -51,6 +53,16 @@ _STAGE_MESSAGES: dict[str, str] = {
     "render": "Rendering video…",
     "assemble": "Assembling final video…",
     "upload": "Uploading video…",
+    "LLM_COLD_START": "Starting the AI model… The service was asleep and is waking up.",
+    "LLM_RETRYING": "The AI service is waking up. Retrying automatically…",
+    "WAITING_FOR_LLM": "Waiting for AI model readiness…",
+    "RATE_LIMIT_WAIT": "AI service is at capacity. Waiting before retrying…",
+    "VALIDATING_CODE": "Validating animation code syntax…",
+    "CODE_REPAIRING": "The animation had a rendering issue. Fixing code automatically…",
+    "RENDERING": "Rendering animation scene…",
+    "RENDER_RETRYING": "Re-rendering repaired animation…",
+    "VALIDATING_VIDEO": "Validating output animation video…",
+    "VIDEO_VALIDATION_FAILED": "Validating video output…",
 }
 
 
@@ -180,12 +192,14 @@ def _notify_video_status_sync(payload: dict[str, Any]) -> None:
     )
 
 
-def _parse_progress_stage(line: str) -> str | None:
+def _parse_progress_stage(line: str) -> tuple[str, str | None] | None:
     cleaned = _strip_ansi(line).strip()
     match = _NODE_PROGRESS_RE.search(cleaned)
     if not match:
         return None
-    return match.group(1)
+    stage = match.group(1)
+    custom_msg = (match.group(2) or "").strip() or None
+    return stage, custom_msg
 
 
 def _run_agents_cli(
@@ -317,11 +331,14 @@ def _run_agents_cli(
 
     def _on_progress_line(line: str) -> None:
         nonlocal last_stage_message
-        stage = _parse_progress_stage(line)
-        if not stage:
+        parsed = _parse_progress_stage(line)
+        if not parsed:
             return
-        message = _friendly_stage_message(stage)
-        if stage in seen_stages or message == last_stage_message:
+        stage, custom_msg = parsed
+        message = custom_msg or _friendly_stage_message(stage)
+        if stage in seen_stages and not custom_msg:
+            return
+        if message == last_stage_message:
             return
         seen_stages.add(stage)
         last_stage_message = message

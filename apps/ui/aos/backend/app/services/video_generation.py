@@ -45,6 +45,54 @@ class VideoGenerationService:
             status="pending",
         )
 
+    async def get_active_generation(
+        self, user_id: UUID, conversation_id: UUID, prompt: str
+    ) -> VideoGeneration | None:
+        """Find an in-flight video generation for this prompt in the conversation."""
+        from sqlalchemy import select, and_
+        stmt = (
+            select(VideoGeneration)
+            .where(
+                and_(
+                    VideoGeneration.user_id == user_id,
+                    VideoGeneration.conversation_id == conversation_id,
+                    VideoGeneration.prompt == prompt,
+                    VideoGeneration.status.in_(["pending", "running"]),
+                )
+            )
+            .order_by(VideoGeneration.created_at.desc())
+            .limit(1)
+        )
+        res = await self.db.execute(stmt)
+        return res.scalar_one_or_none()
+
+    async def recover_stale_jobs(self, timeout_seconds: int = 1200) -> int:
+        """Watchdog: detect and gracefully fail jobs stuck in pending/running."""
+        from datetime import datetime, timezone, timedelta
+        from sqlalchemy import select, and_
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=timeout_seconds)
+        stmt = (
+            select(VideoGeneration)
+            .where(
+                and_(
+                    VideoGeneration.status.in_(["pending", "running"]),
+                    VideoGeneration.updated_at < cutoff,
+                )
+            )
+        )
+        res = await self.db.execute(stmt)
+        stale_jobs = res.scalars().all()
+        for job in stale_jobs:
+            await video_repo.update(
+                self.db,
+                job,
+                status="failed",
+                error_message="Generation timed out after automated recovery attempts. Your prompt was preserved.",
+                progress_stage="failed",
+                progress_message="Generation timed out after automated recovery attempts. Your prompt was preserved.",
+            )
+        return len(stale_jobs)
+
     async def get_for_user(self, generation_id: UUID, user_id: UUID) -> VideoGeneration:
         row = await video_repo.get_by_id(self.db, generation_id)
         if row is None or row.user_id != user_id:

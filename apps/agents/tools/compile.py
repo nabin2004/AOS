@@ -20,6 +20,8 @@ from tools.coder_workspace import (
 from tools.manim_source import has_set_speech_service, prepare_manim_source
 from tools.voiceover_quality import FILLER_HINT, FILLER_VOICEOVER, filler_voiceover_error
 from ir.manim_ir import LectureIR
+from reliability_config import RENDER_TIMEOUT_SECONDS
+from video_validator import validate_video_file
 
 def persist_lecture_ir(workspace_dir: Path, lecture_ir: LectureIR) -> Path:
     """Write the IR json to the workspace."""
@@ -157,6 +159,35 @@ def validate_voiceover_scene(code: str) -> str | None:
     if filler is not None:
         return filler
     return None
+
+
+def validate_manim_code_static(code: str, scene_name: str = "scene") -> tuple[bool, str | None]:
+    """Perform static Python AST validation and Manim scene sanity checks prior to rendering."""
+    if not isinstance(code, str) or not code.strip():
+        return False, "empty_code"
+
+    try:
+        tree = ast.parse(code)
+    except SyntaxError as exc:
+        return False, f"syntax_error: {exc.msg} at line {exc.lineno}"
+    except Exception as exc:
+        return False, f"ast_parse_error: {exc}"
+
+    if "run_code(" in code:
+        return False, "invalid_call: run_code cannot be invoked inside Manim source code"
+
+    has_scene = any(
+        isinstance(node, ast.ClassDef) and _is_scene_class(node)
+        for node in tree.body
+    )
+    if not has_scene:
+        return False, "no_scene_class_found: code does not define any Scene or VoiceoverScene subclass"
+
+    voiceover_error = validate_voiceover_scene(code)
+    if voiceover_error is not None:
+        return False, voiceover_error
+
+    return True, None
 
 
 def _find_scene_mp4(workspace: Path, scene_class: str) -> Path | None:
@@ -297,8 +328,9 @@ def compile_manim_code(
         scene_class = _discover_scene_class(code, fallback_class)
         scene_path.write_text(code, encoding="utf-8")
 
-        voiceover_error = validate_voiceover_scene(code)
-        if voiceover_error is not None:
+        # Static pre-validation before invoking subprocess
+        valid_static, static_err = validate_manim_code_static(code, scene_name)
+        if not valid_static and static_err is not None:
             manifest = load_manifest(workspace)
             manifest["output_dir"] = str(workspace)
             manifest["scene_file"] = str(scene_path.relative_to(workspace))
@@ -307,7 +339,7 @@ def compile_manim_code(
                 "returncode": None,
                 "scene_name": scene_name,
                 "scene_class": scene_class,
-                "failure_marker": voiceover_error,
+                "failure_marker": static_err,
                 "tex_failure": False,
             }
             save_manifest(workspace, manifest)
@@ -317,19 +349,21 @@ def compile_manim_code(
                 {
                     "ok": False,
                     "scene_file": manifest["scene_file"],
-                    "failure_marker": voiceover_error,
+                    "failure_marker": static_err,
                     "scene_class": scene_class,
                 },
             )
-            hint = FILLER_HINT if voiceover_error == FILLER_VOICEOVER else _VOICEOVER_HINT
+            hint = FILLER_HINT if static_err == FILLER_VOICEOVER else (
+                _VOICEOVER_HINT if "voiceover" in static_err else f"Static code validation failed: {static_err}"
+            )
             return result_json(
                 ok=False,
                 step="compile",
                 output_dir=str(workspace),
                 scene_file=manifest["scene_file"],
                 scene_class=scene_class,
-                error=voiceover_error,
-                failure_marker=voiceover_error,
+                error=static_err,
+                failure_marker=static_err,
                 message=f"Compilation refused: {hint}",
             )
 
@@ -337,20 +371,35 @@ def compile_manim_code(
         quality = _manim_quality_flag()
         cmd = ["uv", "run", "manim", f"-q{quality}", scene_path.name, scene_class]
 
-        proc = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-            cwd=workspace,
-            env=_manim_env(),
-        )
-        output = proc.stdout + proc.stderr
+        timed_out = False
+        try:
+            proc = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                check=False,
+                cwd=workspace,
+                env=_manim_env(),
+                timeout=RENDER_TIMEOUT_SECONDS,
+            )
+            output = proc.stdout + proc.stderr
+            returncode = proc.returncode
+        except subprocess.TimeoutExpired as exc:
+            timed_out = True
+            output = (exc.stdout or "") + (exc.stderr or "") + f"\nRendering timed out after {RENDER_TIMEOUT_SECONDS}s."
+            returncode = -1
+
         log_path.write_text(output, encoding="utf-8")
 
-        failure_marker = _output_indicates_failure(output)
-        ok = proc.returncode == 0 and failure_marker is None
-        tex_failure = _is_tex_failure(failure_marker, output)
+        if timed_out:
+            failure_marker = "render_timeout"
+            ok = False
+            tex_failure = False
+        else:
+            failure_marker = _output_indicates_failure(output)
+            ok = returncode == 0 and failure_marker is None
+            tex_failure = _is_tex_failure(failure_marker, output)
+
         video_path: str | None = None
         has_audio: bool | None = None
 
@@ -358,13 +407,21 @@ def compile_manim_code(
             mp4 = _find_scene_mp4(workspace, scene_class)
             if mp4 is not None:
                 video_path = str(mp4.resolve())
-                has_audio = mp4_has_audio_stream(mp4)
-                if has_audio is False:
+                # Deep video validation
+                val_res = validate_video_file(mp4)
+                if not val_res.ok:
                     ok = False
-                    failure_marker = "no_audio_stream"
-                    # Surface SoX / voiceover hints that often appear in manim logs.
-                    if "sox" in output.lower() and "not found" in output.lower():
-                        failure_marker = "no_audio_stream_sox_missing"
+                    failure_marker = f"video_validation_failed: {val_res.error}"
+                else:
+                    has_audio = val_res.has_audio
+                    if has_audio is False:
+                        ok = False
+                        failure_marker = "no_audio_stream"
+                        if "sox" in output.lower() and "not found" in output.lower():
+                            failure_marker = "no_audio_stream_sox_missing"
+            else:
+                ok = False
+                failure_marker = "no_mp4_found"
 
         if ok:
             message = "Compilation successful."

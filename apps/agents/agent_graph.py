@@ -14,6 +14,7 @@ from pydantic_ai.usage import RunUsage
 from observability import configure_logfire, sft_batch_enabled
 from llm_config import is_ollama, model_for, model_for_agent, settings_for, model_for_agent, settings_for
 from openai_compatible import format_custom_endpoint_error
+from llm_retry import execute_with_llm_retry
 from coder_prompt import (
     build_coder_user_prompt,
     plan_to_payload,
@@ -330,10 +331,10 @@ async def run_coder_step(
     stopped_reason = "completed"
 
     try:
-        result = await _run_coder().run(
-            prompt,
-            usage=usage,
-        )
+        async def _call_coder():
+            return await _run_coder().run(prompt, usage=usage)
+
+        result = await execute_with_llm_retry(_call_coder, operation_name="Coder Agent")
         messages = result.all_messages()
         run_usage = result.usage
         summary = str(result.output) if result.output is not None else ""
@@ -372,7 +373,10 @@ class ClassifyNode(BaseNode[AnimationState, None, str]):
             ensure_dbos_launched()
         classify_error: str | None = None
         try:
-            result = await _run_classifier().run(ctx.state.user_query)
+            async def _call_classify():
+                return await _run_classifier().run(ctx.state.user_query)
+
+            result = await execute_with_llm_retry(_call_classify, operation_name="Classifier Agent")
             ctx.state.classification = result.output
         except Exception as exc:
             classify_error = format_custom_endpoint_error(exc)
@@ -410,10 +414,13 @@ class PlanLectureNode(BaseNode[AnimationState, None, str]):
         topic = classification.topic if classification else "Math Topic"
         subject = classification.subject if classification else Subject.MATH
         try:
-            result = await _run_planner().run(
-                f"Topic: {topic}\n"
-                f"Subject: {subject}"
-            )
+            async def _call_planner():
+                return await _run_planner().run(
+                    f"Topic: {topic}\n"
+                    f"Subject: {subject}"
+                )
+
+            result = await execute_with_llm_retry(_call_planner, operation_name="Lecture Planner Agent")
             ctx.state.plan = result.output
         except Exception as exc:
             plan_error = format_custom_endpoint_error(exc)
@@ -441,13 +448,16 @@ class PlanTeachingScriptNode(BaseNode[AnimationState, None, str]):
         if classification is None or plan is None:
             return CodeAgent()
         try:
-            result = await _run_teaching_script().run(
-                teaching_script_user_prompt(
-                    classification.topic,
-                    _subject_str(classification.subject),
-                    plan,
+            async def _call_teaching_script():
+                return await _run_teaching_script().run(
+                    teaching_script_user_prompt(
+                        classification.topic,
+                        _subject_str(classification.subject),
+                        plan,
+                    )
                 )
-            )
+
+            result = await execute_with_llm_retry(_call_teaching_script, operation_name="Teaching Script Agent")
             ctx.state.teaching_script = result.output
         except Exception as exc:
             print(

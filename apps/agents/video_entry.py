@@ -14,6 +14,9 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
+from code_repair import run_manim_repair_loop
+from video_validator import validate_video_file
+
 
 Mode = Literal["animate", "lecture"]
 
@@ -224,19 +227,54 @@ async def run_animate(
     trajectory_path = _trajectory_path(run_dir)
 
     if not result.get("compile_ok"):
-        return VideoArtifact(
-            ok=False,
-            mode="animate",
-            run_dir=run_dir,
-            scene_file=scene_file,
-            scene_path=scene_file,
-            has_audio=has_audio,
-            trajectory_path=trajectory_path,
-            error=format_custom_endpoint_error(
-                _compile_failure_error(result, run_dir)
-            ),
-            detail=result if isinstance(result, dict) else {},
-        )
+        # Attempt self-healing code repair before giving up
+        broken_code = ""
+        if scene_file and Path(scene_file).is_file():
+            broken_code = Path(scene_file).read_text(encoding="utf-8")
+        elif result.get("code"):
+            broken_code = result.get("code")
+
+        if broken_code and run_dir:
+            repair_res = await run_manim_repair_loop(
+                original_prompt=prompt,
+                broken_code=broken_code,
+                error_summary=_compile_failure_error(result, run_dir),
+                run_dir=run_dir,
+                scene_name=scene_name or "Scene",
+            )
+            if repair_res.ok and repair_res.video_path:
+                result["compile_ok"] = True
+                result["repaired"] = True
+                result["video_path"] = repair_res.video_path
+                scene_file = repair_res.scene_path or scene_file
+            else:
+                return VideoArtifact(
+                    ok=False,
+                    mode="animate",
+                    run_dir=run_dir,
+                    scene_file=scene_file,
+                    scene_path=scene_file,
+                    has_audio=has_audio,
+                    trajectory_path=trajectory_path,
+                    error=format_custom_endpoint_error(
+                        repair_res.final_error or _compile_failure_error(result, run_dir)
+                    ),
+                    detail=result if isinstance(result, dict) else {},
+                )
+        else:
+            return VideoArtifact(
+                ok=False,
+                mode="animate",
+                run_dir=run_dir,
+                scene_file=scene_file,
+                scene_path=scene_file,
+                has_audio=has_audio,
+                trajectory_path=trajectory_path,
+                error=format_custom_endpoint_error(
+                    _compile_failure_error(result, run_dir)
+                ),
+                detail=result if isinstance(result, dict) else {},
+            )
 
     manifest_video = None
     if run_dir:
@@ -256,6 +294,29 @@ async def run_animate(
         or find_mp4(media_hint, scene_name=scene_name)
         or find_mp4(run_dir, scene_name=scene_name)
     )
+
+    # Validate found MP4 or trigger repair if corrupt / missing
+    if mp4 is None or not validate_video_file(mp4).ok:
+        broken_code = ""
+        if scene_file and Path(scene_file).is_file():
+            broken_code = Path(scene_file).read_text(encoding="utf-8")
+        elif result.get("code"):
+            broken_code = result.get("code")
+
+        if broken_code and run_dir and not result.get("repaired"):
+            curr_err = "No playable MP4 found after compilation" if mp4 is None else f"Video validation failed: {validate_video_file(mp4).error}"
+            repair_res = await run_manim_repair_loop(
+                original_prompt=prompt,
+                broken_code=broken_code,
+                error_summary=curr_err,
+                run_dir=run_dir,
+                scene_name=scene_name or "Scene",
+            )
+            if repair_res.ok and repair_res.video_path:
+                mp4 = Path(repair_res.video_path)
+                scene_file = repair_res.scene_path or scene_file
+                result["repaired"] = True
+
     if mp4 is None:
         return VideoArtifact(
             ok=False,
@@ -269,10 +330,26 @@ async def run_animate(
             detail=result if isinstance(result, dict) else {},
         )
 
+    val_res = validate_video_file(mp4)
+    if not val_res.ok:
+        return VideoArtifact(
+            ok=False,
+            mode="animate",
+            run_dir=run_dir,
+            scene_file=scene_file,
+            scene_path=scene_file,
+            has_audio=has_audio,
+            trajectory_path=trajectory_path,
+            error=f"video_validation_failed: {val_res.error}",
+            detail=result if isinstance(result, dict) else {},
+        )
+
     video_path = str(mp4.resolve())
     detail: dict[str, Any] = {
         "scene_name": scene_name,
         "stopped_reason": result.get("stopped_reason"),
+        "file_size_bytes": val_res.file_size_bytes,
+        "duration_seconds": val_res.duration_seconds,
     }
 
     if output_dir is not None:
