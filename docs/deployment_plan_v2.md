@@ -542,28 +542,79 @@ nabin2004/AOS-qwen3-8b-grpo          Final GRPO adapter
 
 ## 9. Layer 7 — Web UI & Frontend
 
-### Service: Vercel (apps/ui)
+### Service: Vercel (`apps/ui/aos/frontend`)
 
-**Free Tier:** 100 GB bandwidth/month, unlimited deployments, automatic HTTPS.
+**Why Vercel:** Vercel delivers zero-configuration Next.js 14 hosting, edge routing, global CDN caching for video player assets, automatic SSL/TLS certificates, and branch preview deployments.
 
-```bash
-cd apps/ui
-npx vercel --prod
+**Free Tier:** 100 GB bandwidth/month, unlimited static deployments, automatic HTTPS, unlimited preview URLs.
+
+#### Monorepo Root Directory Configuration
+Because AOS is organized as a UV/Python monorepo containing a Next.js frontend, the Vercel project **Root Directory** must explicitly point to `apps/ui/aos/frontend`:
+- **Framework Preset**: `Next.js`
+- **Root Directory**: `apps/ui/aos/frontend`
+- **Build Command**: `bun run build` (or `npm run build`)
+- **Output Directory**: `.next`
+- **Install Command**: `bun install` (or `npm install`)
+
+#### Vercel Configuration File (`apps/ui/aos/frontend/vercel.json`)
+```json
+{
+  "framework": "nextjs",
+  "buildCommand": "bun run build",
+  "installCommand": "bun install",
+  "outputDirectory": ".next"
+}
 ```
 
-**Vercel Environment Variables:**
+#### Production Environment Variables
+Configure these variables in **Project Settings** → **Environment Variables** (or via Vercel CLI):
 
-| Variable | Value |
-|---|---|
-| `NEXT_PUBLIC_API_URL` | `https://aos-api--fastapi-app.modal.run` |
-| `NEXT_PUBLIC_WS_URL` | `wss://aos-api--fastapi-app.modal.run/ws` |
+| Variable | Target Environment | Purpose | Production Value Example |
+|---|---|---|---|
+| `NEXT_PUBLIC_API_URL` | Production & Preview | Public REST API base URL for agent orchestration | `https://<account>--aos-api-fastapi-app.modal.run` |
+| `NEXT_PUBLIC_WS_URL` | Production & Preview | Public WebSocket endpoint for real-time trace streaming | `wss://<account>--aos-api-fastapi-app.modal.run` |
+| `NEXT_PUBLIC_STORAGE_CDN_URL` | Production & Preview | Public CDN base URL for R2 video/audio playback | `https://pub-<hash>.r2.dev` |
+| `BACKEND_URL` | Production & Preview | Server-side API endpoint for Next.js SSR requests | `https://<account>--aos-api-fastapi-app.modal.run` |
+| `NEXT_PUBLIC_AUTH_ENABLED` | Production & Preview | Toggle user authentication / guest mode | `false` (or `true` if JWT enabled) |
+| `NEXT_PUBLIC_RAG_ENABLED` | Production & Preview | Toggle RAG retrieval context injection | `true` |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Production & Preview | Logfire / OpenTelemetry telemetry endpoint | `https://logfire-api.pydantic.dev` |
+| `OTEL_EXPORTER_OTLP_HEADERS` | Production & Preview | Authorization header for Logfire instrumentation | `Authorization=your-logfire-write-token` |
+
+#### Content Security Policy (CSP) for Video Streaming & WebSockets
+In `apps/ui/aos/frontend/next.config.ts`, ensure `connect-src` and `media-src` allow the Modal backend and Cloudflare R2:
+```typescript
+// Required CSP directives for streaming video and WebSocket agents
+const ContentSecurityPolicy = `
+  default-src 'self';
+  script-src 'self' 'unsafe-eval' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' blob: data: https:;
+  font-src 'self' data:;
+  connect-src 'self' ws: wss: https://*.modal.run wss://*.modal.run https://*.r2.cloudflarestorage.com https://*.r2.dev;
+  media-src 'self' blob: data: https://*.r2.dev https://*.r2.cloudflarestorage.com;
+  base-uri 'self';
+  form-action 'self';
+`;
+```
+
+#### CLI Deployment Commands
+```bash
+# Navigate to the frontend directory
+cd apps/ui/aos/frontend
+
+# Link project and pull settings
+vercel link
+
+# Deploy directly to production
+vercel --prod --yes
+```
 
 ### Fallback: Cloudflare Pages
 
 ```bash
-cd apps/ui
+cd apps/ui/aos/frontend
 npm run build
-npx wrangler pages deploy ./out --project-name aos-ui
+npx wrangler pages deploy .next --project-name aos-ui
 ```
 
 ---
@@ -690,6 +741,40 @@ jobs:
         env:
           MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
           MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+```
+
+**`deploy_ui.yml`:**
+
+```yaml
+name: Deploy Next.js Web UI to Vercel
+on:
+  push:
+    branches: [master]
+    paths: ['apps/ui/aos/frontend/**']
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/ui/aos/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 ```
 
 **`kaggle_train.yml`:**
@@ -1222,28 +1307,65 @@ Expected JSON response:
 
 ### Stage 4: Web UI Frontend Deployment (Vercel)
 
-The AOS user interface is a modern Next.js application located in `apps/ui/aos/frontend`.
+The AOS user interface is a modern Next.js 14 application located at [`apps/ui/aos/frontend`](file:///C:/Users/nabin/Desktop/myall/AOS/apps/ui/aos/frontend). It features a dark-mode cinematic interface, real-time agent trace streaming via WebSockets, and HTML5 video streaming from Cloudflare R2.
 
-#### Step 4.1: Bind Environment Variables to Vercel
-Change directory to the frontend app:
+---
+
+#### Step 4.1: Pre-Deployment Build Verification
+Before deploying to Vercel, navigate to the frontend directory and verify that the application compiles without TypeScript or lint errors:
+
 ```bash
 cd apps/ui/aos/frontend
+
+# Install dependencies with Bun or npm
+bun install
+# or: npm install --legacy-peer-deps
+
+# Run type-check and production build locally
+bun run type-check
+bun run build
 ```
 
-Set the production environment variables:
+Verify that the `.next` directory is generated with static and standalone server chunks.
+
+---
+
+#### Step 4.2: Deployment Path A — Automated Vercel CLI (Recommended)
+
+##### 1. Link Project to Vercel
+Authenticate and link the frontend directory:
 ```bash
-vercel env add NEXT_PUBLIC_API_URL production
-# When prompted, enter: https://<account>--aos-api-fastapi-app.modal.run
-
-vercel env add NEXT_PUBLIC_WS_URL production
-# When prompted, enter: wss://<account>--aos-api-fastapi-app.modal.run
-
-vercel env add NEXT_PUBLIC_STORAGE_CDN_URL production
-# When prompted, enter: https://pub-<hash>.r2.dev
+cd apps/ui/aos/frontend
+vercel link --yes --project aos-frontend
 ```
 
-#### Step 4.2: Build and Deploy to Production
-Run the automated deployment:
+##### 2. Inject Production Environment Variables Non-Interactively
+Inject all required environment variables into the Vercel project:
+
+```bash
+# Public REST API endpoint (Modal backend)
+printf "https://<account>--aos-api-fastapi-app.modal.run" | vercel env add NEXT_PUBLIC_API_URL production
+
+# Public WebSocket endpoint (real-time agent progress & logfire traces)
+printf "wss://<account>--aos-api-fastapi-app.modal.run" | vercel env add NEXT_PUBLIC_WS_URL production
+
+# Cloudflare R2 public CDN base URL (video MP4 streaming)
+printf "https://pub-<hash>.r2.dev" | vercel env add NEXT_PUBLIC_STORAGE_CDN_URL production
+
+# Server-side API endpoint for Next.js SSR requests
+printf "https://<account>--aos-api-fastapi-app.modal.run" | vercel env add BACKEND_URL production
+
+# Auth and feature toggles
+printf "false" | vercel env add NEXT_PUBLIC_AUTH_ENABLED production
+printf "true" | vercel env add NEXT_PUBLIC_RAG_ENABLED production
+
+# OpenTelemetry / Logfire instrumentation
+printf "https://logfire-api.pydantic.dev" | vercel env add OTEL_EXPORTER_OTLP_ENDPOINT production
+printf "Authorization=your-logfire-write-token" | vercel env add OTEL_EXPORTER_OTLP_HEADERS production
+```
+
+##### 3. Deploy Directly to Production
+Trigger the production build and deployment:
 ```bash
 vercel --prod --yes
 ```
@@ -1254,11 +1376,80 @@ Expected output:
 ✅ Production: https://aos-frontend.vercel.app [copied to clipboard]
 ```
 
-#### Step 4.3: Validate Web App Connectivity
-Open `https://aos-frontend.vercel.app` in your browser. Verify:
-1. Navigation bar and dark-mode aesthetic load cleanly.
-2. The UI connects to the Modal backend API without CORS errors in DevTools Console.
-3. The prompt input box is ready to submit lecture visualization requests.
+---
+
+#### Step 4.3: Deployment Path B — Vercel Web Dashboard (Git Push Integration)
+
+If connecting via the Vercel Web Dashboard:
+
+1. **Import Git Repository**:
+   - Go to [vercel.com/new](https://vercel.com/new).
+   - Select the `nabin2004/AOS` repository and click **Import**.
+
+2. **Configure Monorepo Settings (Crucial)**:
+   - **Root Directory**: Click **Edit** and set to `apps/ui/aos/frontend`.
+   - Check the box: **"Include source files outside of the Root Directory in the Build Step"** (ensures workspace dependencies resolve correctly).
+   - **Framework Preset**: `Next.js`.
+
+3. **Build and Output Settings**:
+   - **Build Command**: `bun run build` (or leave default if Bun is configured via `vercel.json`).
+   - **Output Directory**: `.next`.
+   - **Install Command**: `bun install` (or `npm install`).
+
+4. **Environment Variables**:
+   Add the following key-value pairs in the **Environment Variables** panel:
+   - `NEXT_PUBLIC_API_URL`: `https://<account>--aos-api-fastapi-app.modal.run`
+   - `NEXT_PUBLIC_WS_URL`: `wss://<account>--aos-api-fastapi-app.modal.run`
+   - `NEXT_PUBLIC_STORAGE_CDN_URL`: `https://pub-<hash>.r2.dev`
+   - `BACKEND_URL`: `https://<account>--aos-api-fastapi-app.modal.run`
+   - `NEXT_PUBLIC_AUTH_ENABLED`: `false`
+   - `NEXT_PUBLIC_RAG_ENABLED`: `true`
+
+5. **Deploy**:
+   - Click **Deploy**. Vercel will build and assign the production URL `https://aos-frontend.vercel.app`.
+
+---
+
+#### Step 4.4: Custom Domain & Production SSL Provisioning
+
+To bind a custom domain (e.g. `app.aos.education` or `aos.yourdomain.com`):
+
+```bash
+# Add custom domain via Vercel CLI
+vercel domains add app.aos.education
+```
+
+Configure your DNS provider (e.g. Cloudflare DNS):
+| Type | Name | Content | Proxy status |
+|---|---|---|---|
+| `CNAME` | `app` | `cname.vercel-dns.com` | DNS only (Grey Cloud) |
+
+Vercel will automatically provision a Let's Encrypt SSL/TLS certificate within 60 seconds.
+
+---
+
+#### Step 4.5: Browser Verification & End-to-End Handshake
+
+Open `https://aos-frontend.vercel.app` in your browser and perform the following checks:
+
+1. **HTTP/HTTPS Status**: Ensure the page loads over HTTPS with HTTP/2 or HTTP/3.
+2. **WebSocket Handshake**: Open browser DevTools (`F12`) → **Network** → **WS**. Verify that connecting to `wss://<account>--aos-api-fastapi-app.modal.run` succeeds with status `101 Switching Protocols`.
+3. **Video Stream Byte-Range Requests**:
+   - In DevTools → **Network** → **Media**.
+   - Trigger a preview or playback of a rendered video from R2.
+   - Verify responses return `HTTP 206 Partial Content` with `Accept-Ranges: bytes` and `Content-Range: bytes 0-.../...`.
+
+---
+
+#### Step 4.6: Vercel Production Troubleshooting & Gotchas
+
+| Issue | Root Cause | Solution |
+|---|---|---|
+| **Build fails: "Cannot find module"** | Root Directory not set to `apps/ui/aos/frontend` in Vercel project settings. | In Vercel Project Settings → General → Root Directory, set to `apps/ui/aos/frontend`. |
+| **CORS error on API requests** | Modal FastAPI backend does not allow Vercel origin. | In `apps/server/modal_app.py`, ensure `CORSMiddleware` has `allow_origins=["*"]` or includes your Vercel domain. |
+| **WebSocket connection fails** | Protocol mismatch (`http://` instead of `wss://`). | Ensure `NEXT_PUBLIC_WS_URL` begins with `wss://` on HTTPS production deployments. |
+| **Video fails to play (CORS / Black screen)** | Cloudflare R2 bucket missing CORS configuration for `<video>` tags. | Re-run `wrangler r2 bucket cors set aos-artifacts --file cors.json` with `AllowedOrigins: ["*"]` and `AllowedHeaders: ["*"]`. |
+| **CSP connect-src error in console** | Content Security Policy in `next.config.ts` blocking Modal or R2 domains. | Ensure `next.config.ts` includes `https://*.modal.run wss://*.modal.run https://*.r2.dev https://*.cloudflarestorage.com` in `connect-src` and `media-src`. |
 
 ---
 
