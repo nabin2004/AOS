@@ -170,6 +170,16 @@ def arrange_coder_artifacts(
     compile_ok = _compile_ok(manifest)
     has_audio = _has_audio(manifest)
 
+    # If nothing was written/compiled but the agent claimed "completed",
+    # mark it honestly so downstream surfaces a real error message.
+    if (
+        not compile_ok
+        and not manifest.get("scene_file")
+        and not (manifest.get("last_write") or {}).get("ok")
+        and stopped_reason == "completed"
+    ):
+        stopped_reason = "no_scene_written"
+
     from trajectory_recorder import default_recorder
 
     default_recorder.save_run(

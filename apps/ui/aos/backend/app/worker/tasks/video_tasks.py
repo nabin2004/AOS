@@ -544,6 +544,14 @@ async def _run_generate_video(
             or artifact.get("stopped_reason")
             or "video_pipeline_failed"
         )
+        # Guard against the literal string "None" leaking from str(None).
+        if error in ("None", "none"):
+            summary_hint = (artifact.get("summary") or "").strip()[:400]
+            error = (
+                f"pipeline_no_output: {summary_hint}"
+                if summary_hint
+                else "pipeline_no_output"
+            )
         if error == "completed" and not artifact.get("video_path"):
             summary = (artifact.get("summary") or artifact.get("message") or "").strip()
             error = (

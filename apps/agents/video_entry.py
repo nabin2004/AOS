@@ -163,11 +163,15 @@ def _compile_failure_error(result: dict[str, Any], run_dir: str | Path | None) -
     stopped = (result.get("stopped_reason") or "").strip()
     if stopped and stopped != "completed":
         return stopped
-    return str(
-        result.get("message")
-        or last.get("message")
-        # or "compile_failed"
-    )
+    msg = result.get("message") or last.get("message")
+    if msg:
+        return str(msg)
+    # No scene was written — include summary excerpt for diagnosis.
+    summary = (result.get("summary") or "").strip()
+    if summary:
+        return f"no_scene_written: {summary[:400]}"
+    return "compile_failed"
+
 
 
 def _stage_output_dir(

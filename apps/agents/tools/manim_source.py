@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import json as _json
 import re
 import textwrap
 from dataclasses import dataclass
@@ -28,6 +29,10 @@ _INLINE_WRITE = re.compile(
 )
 _SCENE_NAME = re.compile(
     r"scene_name\s*=\s*['\"](?P<name>[A-Za-z_][A-Za-z0-9_]*)['\"]"
+)
+_TOOL_CALL_RE = re.compile(
+    r"<tool_call>\s*(?P<payload>\{.*?\})\s*</tool_call>",
+    re.DOTALL,
 )
 _CLASS_NAME = re.compile(
     r"^class\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(",
@@ -434,11 +439,43 @@ def _first_scene_class_name(code: str) -> str | None:
     return _first_class_name(code)
 
 
+def _extract_from_tool_call(text: str) -> ExtractedCodemode | None:
+    """Parse `<tool_call>{"name":"manim_write","arguments":{...}}</tool_call>` dumps."""
+    for match in _TOOL_CALL_RE.finditer(text):
+        payload = match.group("payload")
+        # LLMs often incorrectly emit \' inside JSON strings.
+        payload = payload.replace(r"\'", "'")
+        try:
+            obj = _json.loads(payload)
+        except (_json.JSONDecodeError, ValueError):
+            continue
+        name = obj.get("name", "")
+        if name not in ("manim_write", "compile_manim_code"):
+            continue
+        args = obj.get("arguments") or {}
+        raw_code = args.get("code", "")
+        if not raw_code or not isinstance(raw_code, str):
+            continue
+        code = normalize_manim_source(raw_code)
+        if not _looks_like_manim_module(code):
+            continue
+        scene_name = args.get("scene_name") or _first_scene_class_name(code)
+        if not scene_name:
+            continue
+        return ExtractedCodemode(code=code, scene_name=scene_name)
+    return None
+
+
 def extract_codemode_dump(text: str) -> ExtractedCodemode | None:
     """Pull Manim source + scene_name from dumped CodeMode or raw Manim (no eval)."""
     if not isinstance(text, str) or not text.strip():
         return None
     raw = text.strip()
+
+    # Try <tool_call> JSON format first (SFT models may emit these as text).
+    tc = _extract_from_tool_call(raw)
+    if tc is not None:
+        return tc
     body: str | None = None
     assign = _CODE_ASSIGN.search(raw)
     if assign:
