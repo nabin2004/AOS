@@ -16,6 +16,8 @@ apps/agents/workspace/
 apps/agents/output/
 apps/agents/voiceover_cache/
 apps/agents/media/
+apps/agentic/workspace/
+*.log
 
 # Generated training traces and rendered media (>1MB)
 apps/agents/training_data/
