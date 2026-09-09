@@ -7,6 +7,8 @@ from tools import compile_manim_code, manim_write
 from tools.manim_read import manim_read
 from tools.manim_docs import manim_doc_rag
 from tools.voiceover import voiceover_tools
+from cinematic_hints import CINEMATIC_HINT_LEGEND
+
 
 from observability import configure_logfire
 
@@ -192,8 +194,9 @@ SFT batch mode:
 def coder_system_prompt() -> str:
     """Full cloud prompt, or compact local prompt when the coder is Ollama/GGUF."""
     if is_ollama(model_for("coder")):
-        return CODE_PROMPT_LOCAL
-    return CODE_PROMPT
+        return CODE_PROMPT_LOCAL + "\n\n" + CINEMATIC_HINT_LEGEND
+    return CODE_PROMPT + "\n\n" + CINEMATIC_HINT_LEGEND
+
 
 
 def coder_prompt_variant() -> str:

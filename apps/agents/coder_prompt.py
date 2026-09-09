@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from cinematic_hints import CINEMATIC_HINT_LEGEND, annotate_teaching_script
+
 _LOCAL_PLAN_KEYS = (
     "topic",
     "subject",
@@ -135,6 +137,12 @@ def build_coder_user_prompt(
     length: str | None = None,
 ) -> str:
     payload = dict(plan_payload)
+    # Annotate teaching_script beats with cinematic hint tags before compacting.
+    script = payload.get("teaching_script")
+    if isinstance(script, dict):
+        payload["teaching_script"] = annotate_teaching_script(
+            script, topic=topic, subject=str(subject)
+        )
     if compact:
         payload = compact_plan_for_local_coder(payload)
     plan_text = json.dumps(payload, indent=2)
@@ -152,6 +160,7 @@ def build_coder_user_prompt(
     if include_codemode_hint:
         bits.append(LOCAL_CODER_CODEMODE_HINT.rstrip("\n"))
     bits.append(CODER_SCRIPT_HINT.rstrip("\n"))
+    bits.append(CINEMATIC_HINT_LEGEND.rstrip("\n"))
     bits.append(f"Plan:\n{plan_text}")
     return "\n".join(bits) + "\n"
 
