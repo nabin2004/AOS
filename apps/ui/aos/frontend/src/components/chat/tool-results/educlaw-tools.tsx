@@ -24,8 +24,8 @@ export function EduClawToolResult({ name, args, result, status }: EduClawToolPro
   };
 
   if (name === "sandbox_write" || name === "sandbox_read") {
-    const path = args?.path || "file";
-    const content = args?.content || rawResult;
+    const path = typeof args?.path === "string" ? args.path : "file";
+    const content = typeof args?.content === "string" ? args.content : rawResult;
     return (
       <div className="flex flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3 text-xs">
         <div className="flex items-center justify-between border-b border-border/40 pb-2">
@@ -53,7 +53,7 @@ export function EduClawToolResult({ name, args, result, status }: EduClawToolPro
   }
 
   if (name === "sandbox_bash") {
-    const cmd = args?.command || "";
+    const cmd = typeof args?.command === "string" ? args.command : "";
     return (
       <div className="flex flex-col gap-2 rounded-lg border border-border/50 bg-black/70 p-3 text-xs font-mono">
         <div className="flex items-center justify-between border-b border-border/40 pb-2">
@@ -71,7 +71,9 @@ export function EduClawToolResult({ name, args, result, status }: EduClawToolPro
   }
 
   if (name === "manim_render") {
-    const scene = `${args?.scene_file || ""}::${args?.scene_name || ""}`;
+    const sceneFile = typeof args?.scene_file === "string" ? args.scene_file : "";
+    const sceneName = typeof args?.scene_name === "string" ? args.scene_name : "";
+    const scene = `${sceneFile}::${sceneName}`;
     return (
       <div className="flex flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3 text-xs">
         <div className="flex items-center justify-between border-b border-border/40 pb-2">
@@ -101,7 +103,7 @@ export function EduClawToolResult({ name, args, result, status }: EduClawToolPro
   }
 
   if (name === "syntax_check" || name === "lsp_diagnostics") {
-    const path = args?.path || "";
+    const path = typeof args?.path === "string" ? args.path : "";
     return (
       <div className="flex flex-col gap-2 rounded-lg border border-border/50 bg-background/50 p-3 text-xs font-mono">
         <div className="flex items-center justify-between border-b border-border/40 pb-2">

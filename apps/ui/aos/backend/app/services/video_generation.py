@@ -246,6 +246,29 @@ class VideoGenerationService:
         storage = get_video_storage()
         return storage.open_stream(row.minio_key)
 
+    def open_code_stream_for(self, row: VideoGeneration) -> BinaryIO:
+        import io
+        from pathlib import Path
+
+        if row.code_minio_key:
+            try:
+                storage = get_video_storage()
+                return storage.open_stream(row.code_minio_key)
+            except Exception:
+                pass
+
+        if row.run_dir:
+            run_path = Path(row.run_dir)
+            for candidate_name in ("scene.py", "lecture.py"):
+                candidate = run_path / candidate_name
+                if candidate.is_file():
+                    return open(candidate, "rb")
+
+        raise NotFoundError(
+            message="Scene code not available",
+            details={"id": str(row.id)},
+        )
+
     def enqueue(
         self,
         generation_id: UUID,

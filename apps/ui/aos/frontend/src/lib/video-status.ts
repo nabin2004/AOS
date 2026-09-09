@@ -1,4 +1,5 @@
-import type { ChatMessage, ToolCall } from "@/types";
+import type { ChatMessage, ToolCall, GenerationStageEvent } from "@/types";
+import { accumulateGenerationEvent } from "@/lib/generation-events";
 
 export interface VideoGenerationDto {
   id: string;
@@ -31,7 +32,22 @@ export function videoProgressCopy(video: VideoGenerationDto): string {
   return "Queued… preparing animation pipeline.";
 }
 
-function videoResultPayload(video: VideoGenerationDto) {
+function videoResultPayload(
+  video: VideoGenerationDto,
+  existing?: Record<string, unknown> | null,
+) {
+  const prevEvents = (existing?.events as GenerationStageEvent[] | undefined) || [];
+  const events = accumulateGenerationEvent(prevEvents, {
+    video_generation_id: video.id,
+    status: video.status,
+    stage: video.progress_stage,
+    message: videoProgressCopy(video),
+    error: video.error_message,
+    celery_task_id: video.celery_task_id,
+    mode: video.mode,
+    prompt: video.prompt,
+  });
+
   return {
     kind: "video" as const,
     video_generation_id: video.id,
@@ -43,6 +59,9 @@ function videoResultPayload(video: VideoGenerationDto) {
     stage: video.progress_stage ?? video.status,
     message: videoProgressCopy(video),
     celery_task_id: video.celery_task_id,
+    events,
+    code: existing?.code,
+    run_dir: existing?.run_dir,
   };
 }
 
@@ -52,7 +71,6 @@ export function applyVideoStatusToMessage(
   video: VideoGenerationDto,
 ): ChatMessage {
   const toolCallId = `generate_video_${video.id}`;
-  const resultPayload = videoResultPayload(video);
   const toolStatus: ToolCall["status"] =
     video.status === "completed"
       ? "completed"
@@ -60,21 +78,33 @@ export function applyVideoStatusToMessage(
         ? "error"
         : "running";
 
-  const patchTool = (tc: ToolCall): ToolCall =>
-    tc.id === toolCallId || tc.name === "generate_video"
-      ? {
-          ...tc,
-          id: toolCallId,
-          status: toolStatus,
-          result: JSON.stringify(resultPayload),
-          args: {
-            ...tc.args,
-            mode: video.mode,
-            video_generation_id: video.id,
-            prompt: video.prompt,
-          },
-        }
-      : tc;
+  const patchTool = (tc: ToolCall): ToolCall => {
+    if (tc.id !== toolCallId && tc.name !== "generate_video") {
+      return tc;
+    }
+    let existingObj: Record<string, unknown> | null = null;
+    if (typeof tc.result === "string") {
+      try {
+        existingObj = JSON.parse(tc.result);
+      } catch {}
+    } else if (tc.result && typeof tc.result === "object") {
+      existingObj = tc.result as Record<string, unknown>;
+    }
+    const resultPayload = videoResultPayload(video, existingObj);
+
+    return {
+      ...tc,
+      id: toolCallId,
+      status: toolStatus,
+      result: JSON.stringify(resultPayload),
+      args: {
+        ...tc.args,
+        mode: video.mode,
+        video_generation_id: video.id,
+        prompt: video.prompt,
+      },
+    };
+  };
 
   return {
     ...msg,

@@ -89,6 +89,18 @@ def build_repair_prompt(
     scene_name: str | None = None,
 ) -> str:
     """Build a comprehensive context for the repair model."""
+    safe_traceback = str(traceback).strip()
+    if len(safe_traceback) > 8000:
+        safe_traceback = (
+            safe_traceback[:3000]
+            + "\n\n... [intermediate compiler logs truncated for context budget] ...\n\n"
+            + safe_traceback[-5000:]
+        )
+
+    safe_code = str(broken_code).strip()
+    if len(safe_code) > 20000:
+        safe_code = safe_code[:20000] + "\n# ... [code truncated to prevent context overflow]"
+
     return f"""The following Manim scene failed to compile or validate (Attempt {attempt} of {max_attempts}).
 
 === ORIGINAL USER GOAL ===
@@ -98,11 +110,11 @@ def build_repair_prompt(
 {scene_name or 'Scene'}
 
 === COMPILER DIAGNOSTIC / TRACEBACK ===
-{traceback}
+{safe_traceback}
 
 === BROKEN SOURCE CODE ===
 ```python
-{broken_code}
+{safe_code}
 ```
 
 === REPAIR INSTRUCTIONS ===

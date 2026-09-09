@@ -19,6 +19,7 @@ class ErrorCategory(str, Enum):
     MANIM_RENDER_ERROR = "MANIM_RENDER_ERROR"
     RENDER_TIMEOUT = "RENDER_TIMEOUT"
     VIDEO_VALIDATION_ERROR = "VIDEO_VALIDATION_ERROR"
+    CONTEXT_LENGTH_ERROR = "CONTEXT_LENGTH_ERROR"
     STORAGE_ERROR = "STORAGE_ERROR"
     INTERNAL_ERROR = "INTERNAL_ERROR"
 
@@ -39,6 +40,7 @@ _RE_COLD_START = re.compile(r"(cold start|scaling up|waking up|serverless contai
 _RE_RATE_LIMIT = re.compile(r"\b(429|rate limit|quota exceeded|too many requests|tokens per minute)\b", re.I)
 _RE_AUTH = re.compile(r"\b(401|403|unauthorized|forbidden|invalid[ _]?api[ _]?key|expired token|authentication failed)\b", re.I)
 _RE_NETWORK = re.compile(r"(connecterror|connection refused|connect timeout|econnrefused|econnreset|connection reset|dns lookup|nodename nor servname)", re.I)
+_RE_CONTEXT_LEN = re.compile(r"(context length|maximum context length|tokens? and your prompt contains|context limit|context window|exceeded.*token)", re.I)
 _RE_SYNTAX = re.compile(r"(syntaxerror|indentationerror|parse error|invalid syntax)", re.I)
 _RE_MANIM = re.compile(r"(manim|latex error|standalone\.cls|mobject|scene|cannot find font|tex expression|error while rendering)", re.I)
 _RE_TIMEOUT = re.compile(r"(render timeout|timeoutexpired|process timed out|timed out after)", re.I)
@@ -63,6 +65,17 @@ def classify_error(error: Exception | str | None) -> ClassifiedError:
         raw_error = str(error).strip()
 
     lowered = raw_error.lower()
+
+    # 1. Context length overflow
+    if _RE_CONTEXT_LEN.search(lowered):
+        return ClassifiedError(
+            category=ErrorCategory.CONTEXT_LENGTH_ERROR,
+            is_retryable=False,
+            is_repairable=True,
+            user_message="The request was too large for the model context window. AOS is attempting to compress context…",
+            developer_details=raw_error,
+            raw_error=raw_error,
+        )
 
     # 1. Authentication errors (Non-retryable)
     if _RE_AUTH.search(lowered):

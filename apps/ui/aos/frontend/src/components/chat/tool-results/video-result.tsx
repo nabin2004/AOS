@@ -4,32 +4,26 @@ import { useState } from "react";
 import {
   AlertCircle,
   CheckCircle2,
-  ChevronDown,
-  Copy,
-  Check,
-  Loader2,
-  Sparkles,
-  Terminal,
-  Wrench,
+  Clapperboard,
+  RotateCcw,
+  AlertTriangle,
 } from "lucide-react";
 
 import { AppVideoPlayer } from "@/components/media/video-player";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { GenerationStageEvent, VideoToolResult } from "@/types";
+import {
+  PromptViewer,
+  GenerationTimeline,
+  ManimCodeViewer,
+  SelfHealingBanner,
+  ColdStartBanner,
+  DiagnosticDrawer,
+} from "@/components/chat/generation";
+import { accumulateGenerationEvent } from "@/lib/generation-events";
 
-export interface VideoToolResult {
-  kind: "video";
-  video_generation_id: string;
-  minio_key?: string | null;
-  mode?: string;
-  prompt?: string | null;
-  status?: string;
-  stage?: string | null;
-  message?: string | null;
-  error?: string | null;
-  celery_task_id?: string | null;
-  error_category?: string | null;
-}
+export type { VideoToolResult };
 
 /** Parse a `generate_video` tool result into a VideoToolResult, or null. */
 export function parseVideoResult(result: unknown): VideoToolResult | null {
@@ -57,216 +51,305 @@ export function getVideoStreamUrl(videoGenerationId: string): string {
   return `/api/videos/${videoGenerationId}/stream`;
 }
 
-export function VideoResult({ data }: { data: VideoToolResult }) {
-  const [copied, setCopied] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+interface VideoResultProps {
+  data: VideoToolResult;
+  onRetry?: (prompt: string) => void;
+}
 
-  const handleCopyPrompt = () => {
+export function VideoResult({ data, onRetry }: VideoResultProps) {
+  const [selectedStage, setSelectedStage] = useState<GenerationStageEvent | null>(null);
+
+  // Compute accumulated events from data.events or construct initial events
+  const events: GenerationStageEvent[] =
+    data.events && data.events.length > 0
+      ? data.events
+      : accumulateGenerationEvent([], {
+          video_generation_id: data.video_generation_id,
+          status: data.status,
+          stage: data.stage,
+          message: data.message,
+          error: data.error,
+          prompt: data.prompt,
+          mode: data.mode,
+          celery_task_id: data.celery_task_id,
+          code: data.code,
+          run_dir: data.run_dir,
+        });
+
+  const isColdStart =
+    data.stage === "LLM_COLD_START" ||
+    data.stage === "WAITING_FOR_LLM" ||
+    data.stage === "LLM_RETRYING";
+
+  const isRepairing =
+    data.stage === "CODE_REPAIRING" ||
+    data.stage === "RENDER_RETRYING" ||
+    (data.repair_attempts != null && data.repair_attempts > 0);
+
+  const isContextOverflow =
+    data.error_category === "CONTEXT_LENGTH_ERROR" ||
+    (data.error && /context length|maximum context length|32768/i.test(data.error));
+
+  const handleRetry = () => {
     if (data.prompt) {
-      navigator.clipboard.writeText(data.prompt);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (onRetry) {
+        onRetry(data.prompt);
+      } else {
+        window.dispatchEvent(
+          new CustomEvent("aos:retry-prompt", { detail: { prompt: data.prompt } }),
+        );
+      }
     }
   };
 
+  // ─────────────────────────────────────────────────────────────
   // 1. Terminal Failure State
+  // ─────────────────────────────────────────────────────────────
   if (data.status === "failed") {
+    const friendlyReason =
+      isContextOverflow
+        ? "The request exceeded the AI model's context window. AOS could not complete rendering."
+        : data.error_category === "AUTHENTICATION_ERROR"
+        ? "AI service credentials are invalid or expired."
+        : data.error_category === "RATE_LIMIT"
+        ? "The AI model is currently at maximum capacity."
+        : data.error_category === "CODE_VALIDATION_ERROR"
+        ? "The generated Manim code could not be validated after automated repair attempts."
+        : data.error_category === "MANIM_RENDER_ERROR"
+        ? "Manim could not render the animation scene."
+        : data.error_category === "VIDEO_VALIDATION_ERROR"
+        ? "The rendered video did not pass playability verification."
+        : data.message || "Generation could not complete after automated recovery attempts.";
+
     return (
-      <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 space-y-3">
-        <div className="flex items-start gap-3">
-          <div className="rounded-full bg-destructive/10 p-2 text-destructive shrink-0 mt-0.5">
-            <AlertCircle className="h-4 w-4" />
+      <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 space-y-3.5 shadow-sm">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="rounded-full bg-destructive/10 p-2 text-destructive shrink-0 mt-0.5">
+              <AlertCircle className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <span>Generation Could Not Complete</span>
+              </h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {friendlyReason}
+              </p>
+            </div>
           </div>
-          <div className="space-y-1 flex-1">
-            <h4 className="text-sm font-semibold text-foreground">
-              Generation Could Not Complete
-            </h4>
-            <p className="text-sm text-muted-foreground">
-              {data.message ||
-                "We couldn't generate the animation after multiple automated recovery attempts. Your prompt has been preserved."}
-            </p>
-          </div>
+
+          <Badge variant="destructive" className="text-[10px] uppercase font-mono tracking-wider shrink-0">
+            Failed
+          </Badge>
         </div>
 
-        {data.prompt ? (
-          <div className="rounded-lg bg-background/80 border p-3 space-y-1.5">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span className="font-medium">Preserved Prompt</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs gap-1"
-                onClick={handleCopyPrompt}
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-3 w-3 text-emerald-500" />
-                    <span>Copied</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3 w-3" />
-                    <span>Copy</span>
-                  </>
-                )}
-              </Button>
+        {/* Context overflow alert banner if applicable */}
+        {isContextOverflow && (
+          <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs flex items-start gap-2.5 text-amber-700 dark:text-amber-300">
+            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="space-y-0.5 flex-1 leading-relaxed">
+              <div className="font-semibold">Generation context is too large</div>
+              <p className="text-[11px] text-muted-foreground">
+                AOS could not send this request to the model because the generated context exceeded the model&apos;s context limit.
+              </p>
             </div>
-            <p className="text-sm text-foreground/90 font-mono whitespace-pre-wrap">
-              {data.prompt}
-            </p>
           </div>
-        ) : null}
+        )}
 
-        {/* Collapsible Technical / Developer Details */}
-        <div className="pt-1">
-          <button
+        {/* Preserved User Prompt */}
+        <PromptViewer prompt={data.prompt} defaultExpanded={true} />
+
+        {/* Action Controls */}
+        <div className="flex items-center gap-2 pt-1">
+          <Button
             type="button"
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium"
-            onClick={() => setDetailsOpen(!detailsOpen)}
+            variant="default"
+            size="sm"
+            onClick={handleRetry}
+            className="h-8 px-3 text-xs gap-1.5 font-medium shadow-sm"
           >
-            <Terminal className="h-3.5 w-3.5" />
-            <span>Developer / Diagnostic Details</span>
-            <ChevronDown
-              className={`h-3 w-3 transition-transform ${
-                detailsOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-
-          {detailsOpen ? (
-            <div className="mt-2 rounded-md bg-muted/60 border p-3 space-y-1.5 text-xs font-mono text-muted-foreground overflow-x-auto">
-              <div>
-                <span className="text-foreground/70 font-semibold">Job ID: </span>
-                {data.video_generation_id}
-              </div>
-              {data.stage ? (
-                <div>
-                  <span className="text-foreground/70 font-semibold">Failed Stage: </span>
-                  {data.stage}
-                </div>
-              ) : null}
-              {data.celery_task_id ? (
-                <div>
-                  <span className="text-foreground/70 font-semibold">Task ID: </span>
-                  {data.celery_task_id}
-                </div>
-              ) : null}
-              {data.error ? (
-                <div className="pt-1">
-                  <span className="text-foreground/70 font-semibold">Raw Diagnostics: </span>
-                  <pre className="mt-1 whitespace-pre-wrap text-destructive/90 bg-background/50 p-2 rounded border border-border/50">
-                    {data.error}
-                  </pre>
-                </div>
-              ) : null}
-            </div>
-          ) : null}
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span>Try Again</span>
+          </Button>
         </div>
+
+        {/* Timeline preserving all stages executed before failure */}
+        <GenerationTimeline
+          events={events}
+          currentStatus="failed"
+          onSelectStage={setSelectedStage}
+          selectedStageId={selectedStage?.id}
+        />
+
+        {/* Failed Manim Code Viewer if code was produced */}
+        {(data.code || data.error) && (
+          <ManimCodeViewer
+            code={data.code}
+            videoGenerationId={data.video_generation_id}
+            validationFailed={true}
+            validationError={data.error}
+            repairAttempt={data.repair_attempts}
+            maxRepairAttempts={data.max_repair_attempts ?? 3}
+          />
+        )}
+
+        {/* Collapsible Developer / Diagnostic Details */}
+        <DiagnosticDrawer
+          jobId={data.video_generation_id}
+          taskId={data.celery_task_id}
+          stage={data.stage}
+          mode={data.mode}
+          runDir={data.run_dir}
+          rawError={data.error}
+          errorCategory={data.error_category}
+          durationSeconds={data.duration_seconds}
+          retryCount={data.repair_attempts}
+          contextUsage={data.context_usage}
+        />
       </div>
     );
   }
 
+  // ─────────────────────────────────────────────────────────────
   // 2. In-Flight Running / Pending State
+  // ─────────────────────────────────────────────────────────────
   if (data.status && data.status !== "completed") {
-    const isColdStart =
-      data.stage === "LLM_COLD_START" ||
-      data.stage === "WAITING_FOR_LLM" ||
-      data.stage === "LLM_RETRYING";
-    const isRepairing =
-      data.stage === "CODE_REPAIRING" || data.stage === "RENDER_RETRYING";
-
     return (
-      <div className="rounded-xl border bg-card/60 p-4 space-y-3 shadow-sm backdrop-blur-sm">
-        {data.prompt ? (
-          <p className="text-xs text-muted-foreground font-mono truncate">
-            Prompt: &quot;{data.prompt}&quot;
-          </p>
-        ) : null}
-
-        <div className="flex items-center gap-3">
-          <div className="relative flex items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-primary shrink-0" />
-            {isRepairing ? (
-              <Wrench className="h-2.5 w-2.5 absolute text-amber-500" />
-            ) : isColdStart ? (
-              <Sparkles className="h-2.5 w-2.5 absolute text-blue-500" />
-            ) : null}
+      <div className="rounded-xl border border-border/70 bg-card/60 p-4 space-y-3.5 shadow-sm backdrop-blur-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
+            <Clapperboard className="h-4 w-4 text-primary animate-pulse" />
+            <span>Generating Animation</span>
           </div>
 
-          <div className="space-y-0.5 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground">
-                {data.message ||
-                  (data.stage ? `${data.stage}…` : "Generating your animation…")}
-              </span>
-              {isColdStart ? (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20">
-                  Model Booting
-                </Badge>
-              ) : isRepairing ? (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20">
-                  Self-Healing
-                </Badge>
-              ) : null}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {isColdStart
-                ? "The model is waking up from sleep. Your generation will proceed automatically."
-                : isRepairing
-                ? "Fixing code and re-verifying animation scene."
-                : "Rendering mathematics and visual elements into high-definition video."}
-            </p>
+          <div className="flex items-center gap-2">
+            {data.mode && (
+              <Badge variant="outline" className="text-[10px] uppercase font-mono tracking-wider">
+                {data.mode}
+              </Badge>
+            )}
+            <Badge variant="secondary" className="text-[10px] font-mono animate-pulse">
+              In Progress
+            </Badge>
           </div>
         </div>
 
-        {/* Collapsible details for in-flight debug info */}
-        <div className="pt-1 border-t border-border/40">
-          <button
-            type="button"
-            className="flex items-center gap-1 text-[11px] text-muted-foreground/70 hover:text-muted-foreground transition-colors"
-            onClick={() => setDetailsOpen(!detailsOpen)}
-          >
-            <span>Job: {data.video_generation_id.slice(0, 8)}…</span>
-            <ChevronDown
-              className={`h-2.5 w-2.5 transition-transform ${
-                detailsOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          {detailsOpen ? (
-            <div className="mt-1 text-[11px] font-mono text-muted-foreground/80 space-y-0.5">
-              <div>Stage: {data.stage || "initializing"}</div>
-              <div>Mode: {data.mode || "animate"}</div>
-              <div>Full ID: {data.video_generation_id}</div>
-            </div>
-          ) : null}
-        </div>
+        {/* Preserved Prompt (Collapsible) */}
+        <PromptViewer prompt={data.prompt} defaultExpanded={false} />
+
+        {/* Cold Start / Booting Banner */}
+        <ColdStartBanner
+          active={isColdStart}
+          isRetry={data.stage === "LLM_RETRYING"}
+          attempt={data.cold_start_attempts ?? 1}
+        />
+
+        {/* Self-Healing Repair Banner */}
+        <SelfHealingBanner
+          active={isRepairing}
+          attempt={data.repair_attempts ?? 1}
+          maxAttempts={data.max_repair_attempts ?? 3}
+          errorDetails={data.error}
+        />
+
+        {/* Live Generation Timeline */}
+        <GenerationTimeline
+          events={events}
+          currentStatus="running"
+          onSelectStage={setSelectedStage}
+          selectedStageId={selectedStage?.id}
+        />
+
+        {/* Code viewer (shows intermediate or synthesized code if available) */}
+        {data.code && (
+          <ManimCodeViewer
+            code={data.code}
+            videoGenerationId={data.video_generation_id}
+            repaired={Boolean(data.repair_attempts && data.repair_attempts > 0)}
+            repairAttempt={data.repair_attempts}
+            maxRepairAttempts={data.max_repair_attempts ?? 3}
+          />
+        )}
+
+        {/* Collapsible Diagnostic Drawer */}
+        <DiagnosticDrawer
+          jobId={data.video_generation_id}
+          taskId={data.celery_task_id}
+          stage={data.stage}
+          mode={data.mode}
+          runDir={data.run_dir}
+          durationSeconds={data.duration_seconds}
+          contextUsage={data.context_usage}
+        />
       </div>
     );
   }
 
-  // 3. Completed Playable Video
+  // ─────────────────────────────────────────────────────────────
+  // 3. Completed State: Playable Video & Comprehensive Details
+  // ─────────────────────────────────────────────────────────────
   return (
-    <div className="rounded-xl border bg-card/80 p-3.5 space-y-2.5 shadow-sm">
+    <div className="rounded-xl border border-border/70 bg-card/80 p-4 space-y-4 shadow-sm">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+        <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-semibold">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           <span>Animation Ready</span>
         </div>
-        {data.mode ? (
-          <Badge variant="outline" className="text-[10px] uppercase font-mono tracking-wider">
-            {data.mode}
-          </Badge>
-        ) : null}
+
+        <div className="flex items-center gap-2">
+          {data.duration_seconds ? (
+            <span className="text-xs font-mono text-muted-foreground">
+              {data.duration_seconds.toFixed(1)}s
+            </span>
+          ) : null}
+          {data.mode && (
+            <Badge variant="outline" className="text-[10px] uppercase font-mono tracking-wider">
+              {data.mode}
+            </Badge>
+          )}
+        </div>
       </div>
 
-      {data.prompt ? (
-        <p className="text-foreground/90 text-sm font-medium">{data.prompt}</p>
-      ) : null}
+      {/* Preserved Prompt */}
+      <PromptViewer prompt={data.prompt} defaultExpanded={false} />
 
-      <AppVideoPlayer
-        src={getVideoStreamUrl(data.video_generation_id)}
-        className="overflow-hidden rounded-lg shadow-sm"
+      {/* Video Player */}
+      <div className="overflow-hidden rounded-xl border border-border/60 shadow-sm bg-black/90">
+        <AppVideoPlayer
+          src={getVideoStreamUrl(data.video_generation_id)}
+          className="overflow-hidden rounded-lg w-full aspect-video"
+        />
+      </div>
+
+      {/* Full Generation Timeline (Completed) */}
+      <GenerationTimeline
+        events={events}
+        currentStatus="completed"
+        onSelectStage={setSelectedStage}
+        selectedStageId={selectedStage?.id}
+      />
+
+      {/* Dedicated Collapsible Manim Code Viewer */}
+      <ManimCodeViewer
+        code={data.code}
+        videoGenerationId={data.video_generation_id}
+        repaired={Boolean(data.repair_attempts && data.repair_attempts > 0)}
+        repairAttempt={data.repair_attempts}
+        maxRepairAttempts={data.max_repair_attempts ?? 3}
+      />
+
+      {/* Developer / Diagnostic Details */}
+      <DiagnosticDrawer
+        jobId={data.video_generation_id}
+        taskId={data.celery_task_id}
+        stage={data.stage}
+        mode={data.mode}
+        runDir={data.run_dir}
+        durationSeconds={data.duration_seconds}
+        contextUsage={data.context_usage}
       />
     </div>
   );

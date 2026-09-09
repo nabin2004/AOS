@@ -61,3 +61,27 @@ async def stream_video(
         "Cache-Control": "private, max-age=3600",
     }
     return StreamingResponse(body, media_type="video/mp4", headers=headers)
+
+
+@router.get("/{video_id}/code", response_model=None)
+async def get_video_code(
+    video_id: UUID,
+    service: VideoGenerationSvc,
+    user: CurrentUser,
+) -> Any:
+    """Auth-gated proxy stream of the generated Manim / Python scene source code."""
+    try:
+        row = await service.get_for_user(video_id, user.id)
+        body = service.open_code_stream_for(row)
+    except NotFoundError:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scene code not found") from None
+
+    headers = {
+        "Content-Disposition": f'inline; filename="{video_id}.py"',
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "private, max-age=3600",
+    }
+    return StreamingResponse(body, media_type="text/plain; charset=utf-8", headers=headers)
+

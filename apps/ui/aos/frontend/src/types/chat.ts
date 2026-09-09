@@ -139,15 +139,73 @@ export type WSEventType =
   | "llm_completed"
   | "video_status";
 
+export type GenerationStage =
+  | "QUEUED"
+  | "STARTING"
+  | "CLASSIFYING"
+  | "PLANNING_LECTURE"
+  | "WRITING_TEACHING_SCRIPT"
+  | "WRITING_MANIM_CODE"
+  | "VALIDATING_CODE"
+  | "CODE_REPAIRING"
+  | "LLM_COLD_START"
+  | "LLM_RETRYING"
+  | "RENDERING"
+  | "VALIDATING_VIDEO"
+  | "COMPLETED"
+  | "FAILED";
+
+export type GenerationStageStatus =
+  | "waiting"
+  | "running"
+  | "completed"
+  | "failed"
+  | "retrying";
+
+export interface GenerationStageEvent {
+  id: string;
+  stage: GenerationStage;
+  rawStage?: string;
+  name: string;
+  status: GenerationStageStatus;
+  message?: string;
+  timestamp: number;
+  duration_ms?: number;
+  attempt?: number;
+  maxAttempts?: number;
+  input?: string | Record<string, unknown>;
+  output?: string | Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  error?: string;
+}
+
 /** Structured video payload from the Manim generate_video tool. */
-export interface VideoSpec {
+export interface VideoToolResult {
   kind: "video";
   video_generation_id: string;
   minio_key?: string | null;
+  code_minio_key?: string | null;
   mode?: string;
+  prompt?: string | null;
   status?: string;
+  stage?: string | null;
+  message?: string | null;
   error?: string | null;
+  celery_task_id?: string | null;
+  error_category?: string | null;
+  code?: string | null;
+  run_dir?: string | null;
+  duration_seconds?: number | null;
+  events?: GenerationStageEvent[];
+  model?: string | null;
+  provider?: string | null;
+  repair_attempts?: number;
+  max_repair_attempts?: number;
+  cold_start_attempts?: number;
+  context_usage?: { used: number; max: number } | null;
 }
+
+export type VideoSpec = VideoToolResult;
 
 export interface WSEvent {
   type: WSEventType;

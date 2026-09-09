@@ -71,6 +71,27 @@ def test_classify_video_validation_error():
     assert res.is_repairable is True
 
 
+def test_classify_context_length_error():
+    error_str = "This model's maximum context length is 32768 tokens. However, you requested 0 output tokens and your prompt contains at least 32769 input tokens."
+    res = classify_error(error_str)
+    assert res.category == ErrorCategory.CONTEXT_LENGTH_ERROR
+    assert "context" in res.user_message.lower()
+
+
+def test_repair_prompt_truncation():
+    giant_traceback = "Traceback error line...\n" * 1000  # > 20,000 chars
+    prompt = build_repair_prompt(
+        original_prompt="Explain Fourier Transform",
+        broken_code="from manim import *",
+        traceback=giant_traceback,
+        attempt=1,
+        max_attempts=3,
+    )
+    assert len(prompt) < 15000
+    assert "intermediate compiler logs truncated for context budget" in prompt
+
+
+
 # -----------------------------------------------------------------------------
 # 2. LLM Cold Start & Transient Retry Tests
 # -----------------------------------------------------------------------------

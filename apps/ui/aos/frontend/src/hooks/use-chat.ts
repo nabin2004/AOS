@@ -26,7 +26,8 @@ import {
   videoProgressCopy,
   type VideoGenerationDto,
 } from "@/lib/video-status";
-import type { ContextUsage, ResearchTodo, SubagentStatus } from "@/types";
+import { accumulateGenerationEvent } from "@/lib/generation-events";
+import type { ContextUsage, GenerationStageEvent, ResearchTodo, SubagentStatus } from "@/types";
 /** A message the user typed while the agent was busy / socket offline.
  *  Held outside the chat history until the drainer ships it. */
 export interface QueuedMessage {
@@ -322,7 +323,14 @@ export function useChat(options: UseChatOptions = {}) {
             stage?: string;
             message?: string;
             minio_key?: string;
+            code_minio_key?: string;
+            code?: string;
+            run_dir?: string;
             celery_task_id?: string;
+            error_category?: string;
+            repair_attempts?: number;
+            cold_start_attempts?: number;
+            duration_seconds?: number;
           };
           if (!data.video_generation_id) break;
           const toolCallId = `generate_video_${data.video_generation_id}`;
@@ -331,68 +339,73 @@ export function useChat(options: UseChatOptions = {}) {
             findMessageIdForVideo(store.messages, data.video_generation_id) ||
             currentMessageIdRef.current;
           if (!msgId) break;
+
+          // Retrieve existing tool call result to preserve prior events & state
+          const targetMsg = store.messages.find((m) => m.id === msgId);
+          const existingTool =
+            targetMsg?.parts?.find((p) => p.type === "tool" && p.toolCall?.id === toolCallId)?.toolCall ||
+            targetMsg?.toolCalls?.find((tc) => tc.id === toolCallId);
+
+          let prevResult: Record<string, unknown> | null = null;
+          if (existingTool?.result) {
+            try {
+              prevResult = typeof existingTool.result === "string" ? JSON.parse(existingTool.result) : existingTool.result as Record<string, unknown>;
+            } catch {}
+          }
+
+          const prevEvents = (prevResult?.events as GenerationStageEvent[] | undefined) || [];
+          const updatedEvents = accumulateGenerationEvent(prevEvents, {
+            video_generation_id: data.video_generation_id,
+            status: data.status,
+            stage: data.stage,
+            message: data.message,
+            error: data.error,
+            prompt: data.prompt || (prevResult?.prompt as string | undefined),
+            mode: data.mode || (prevResult?.mode as string | undefined),
+            celery_task_id: data.celery_task_id || (prevResult?.celery_task_id as string | undefined),
+            code: data.code || (prevResult?.code as string | undefined),
+            run_dir: data.run_dir || (prevResult?.run_dir as string | undefined),
+          });
+
+          const resultPayload = {
+            kind: "video",
+            video_generation_id: data.video_generation_id,
+            mode: data.mode || prevResult?.mode,
+            prompt: data.prompt || prevResult?.prompt,
+            status: data.status,
+            stage: data.stage || prevResult?.stage,
+            message: data.message || prevResult?.message,
+            error: data.error,
+            minio_key: data.minio_key || prevResult?.minio_key,
+            code_minio_key: data.code_minio_key || prevResult?.code_minio_key,
+            code: data.code || prevResult?.code,
+            run_dir: data.run_dir || prevResult?.run_dir,
+            celery_task_id: data.celery_task_id || prevResult?.celery_task_id,
+            error_category: data.error_category || prevResult?.error_category,
+            repair_attempts: data.repair_attempts ?? prevResult?.repair_attempts,
+            cold_start_attempts: data.cold_start_attempts ?? prevResult?.cold_start_attempts,
+            duration_seconds: data.duration_seconds ?? prevResult?.duration_seconds,
+            events: updatedEvents,
+          };
+
           if (data.status === "running" || data.status === "pending") {
-            const progressMessage =
-              data.message ||
-              (data.status === "pending" ? "Queued…" : "Generating video…");
             updateToolCallPart(msgId, toolCallId, {
               status: "running",
-              result: JSON.stringify({
-                kind: "video",
-                video_generation_id: data.video_generation_id,
-                mode: data.mode,
-                prompt: data.prompt,
-                status: data.status,
-                stage: data.stage,
-                message: progressMessage,
-                celery_task_id: data.celery_task_id,
-              }),
+              result: JSON.stringify(resultPayload),
             });
-            if (lastVideoStageRef.current.get(data.video_generation_id) !== progressMessage) {
-              lastVideoStageRef.current.set(data.video_generation_id, progressMessage);
-              appendTextDelta(msgId, `\n${progressMessage}`);
-            }
             startVideoPoll(data.video_generation_id);
           } else if (data.status === "failed") {
             updateToolCallPart(msgId, toolCallId, {
               status: "error",
-              result: JSON.stringify({
-                kind: "video",
-                video_generation_id: data.video_generation_id,
-                mode: data.mode,
-                prompt: data.prompt,
-                status: "failed",
-                stage: data.stage,
-                message: data.message,
-                error: data.error,
-              }),
+              result: JSON.stringify(resultPayload),
             });
-            const failMsg = data.message || `Video generation failed: ${data.error || "unknown error"}`;
-            if (lastVideoStageRef.current.get(data.video_generation_id) !== failMsg) {
-              lastVideoStageRef.current.delete(data.video_generation_id);
-              appendTextDelta(msgId, `\n${failMsg}`);
-            } else {
-              lastVideoStageRef.current.delete(data.video_generation_id);
-            }
+            lastVideoStageRef.current.delete(data.video_generation_id);
             stopVideoPoll(data.video_generation_id);
           } else if (data.status === "completed") {
             updateToolCallPart(msgId, toolCallId, {
               status: "completed",
-              result: JSON.stringify({
-                kind: "video",
-                video_generation_id: data.video_generation_id,
-                mode: data.mode,
-                prompt: data.prompt,
-                status: "completed",
-                stage: data.stage || "completed",
-                message: data.message || "Your video is ready.",
-                minio_key: data.minio_key,
-              }),
+              result: JSON.stringify(resultPayload),
             });
-            const doneMsg = data.message || "Your video is ready.";
-            if (lastVideoStageRef.current.get(data.video_generation_id) !== doneMsg) {
-              appendTextDelta(msgId, `\n${doneMsg}`);
-            }
             lastVideoStageRef.current.delete(data.video_generation_id);
             stopVideoPoll(data.video_generation_id);
           }
@@ -685,6 +698,17 @@ export function useChat(options: UseChatOptions = {}) {
     messageQueueRef.current = [];
     setQueuedMessages([]);
   }, []);
+
+  useEffect(() => {
+    const handleRetry = (e: Event) => {
+      const customEvent = e as CustomEvent<{ prompt: string }>;
+      if (customEvent.detail?.prompt) {
+        sendChatMessage(customEvent.detail.prompt);
+      }
+    };
+    window.addEventListener("aos:retry-prompt", handleRetry);
+    return () => window.removeEventListener("aos:retry-prompt", handleRetry);
+  }, [sendChatMessage]);
 
   const sendResumeDecisions = useCallback(
     (decisions: Decision[]) => {

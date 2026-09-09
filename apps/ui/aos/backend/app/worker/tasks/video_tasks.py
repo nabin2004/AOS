@@ -710,6 +710,15 @@ async def _run_generate_video(
             code_minio_key=code_minio_key,
         )
 
+    code_content: str | None = None
+    if scene_path and Path(scene_path).is_file():
+        try:
+            raw_code = Path(scene_path).read_text(encoding="utf-8")
+            if len(raw_code) <= 120_000:
+                code_content = raw_code
+        except Exception:
+            pass
+
     await _notify_video_status(
         {
             "type": "video_status",
@@ -723,6 +732,8 @@ async def _run_generate_video(
             "prompt": prompt,
             "minio_key": object_key,
             "code_minio_key": code_minio_key,
+            "code": code_content,
+            "run_dir": run_dir,
             "assistant_message_id": str(assistant_id) if assistant_id else None,
         }
     )
@@ -730,6 +741,8 @@ async def _run_generate_video(
         "status": "completed",
         "minio_key": object_key,
         "code_minio_key": code_minio_key,
+        "code": code_content,
+        "run_dir": run_dir,
     }
 
 
