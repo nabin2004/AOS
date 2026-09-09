@@ -16,6 +16,22 @@ import torch
 from config import DEFAULT_BETA, DEFAULT_LEARNING_RATE, GRPO_ADAPTER, TrainingConfig
 from rewards import combined_reward
 
+import time
+from transformers import TrainerCallback, TrainerControl, TrainerState, TrainingArguments
+
+class KaggleTimeLimitCallback(TrainerCallback):
+    """Stops training cleanly and forces a save/push when time limit is reached."""
+    def __init__(self, max_hours: float):
+        self.max_hours = max_hours
+        self.start_time = time.time()
+        
+    def on_step_end(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
+        elapsed_hours = (time.time() - self.start_time) / 3600.0
+        if elapsed_hours >= self.max_hours:
+            print(f"\n⚠️ Reached time limit ({elapsed_hours:.2f} hrs >= {self.max_hours:.2f} hrs). Forcing save and graceful exit...")
+            control.should_save = True
+            control.should_training_stop = True
+
 
 def _prompt_token_len(tokenizer, prompt: list) -> int:
     ids = tokenizer.apply_chat_template(
@@ -126,6 +142,9 @@ def make_training_args(
         save_strategy="steps",
         save_steps=100,
         save_total_limit=2,
+        push_to_hub=config.push_to_hub,
+        hub_model_id=config.hub_repo,
+        hub_strategy="checkpoint",
     )
     if config.max_steps is not None:
         kwargs["max_steps"] = config.max_steps
@@ -165,11 +184,20 @@ def build_trainer(model, tokenizer, dataset, config: TrainingConfig, training_ar
         if getattr(tokenizer, "pad_token_id", None) is not None:
             trainer.generation_config.pad_token_id = tokenizer.pad_token_id
 
+    # Add the Kaggle Time Limit Callback
+    if config.max_runtime_hours is not None and config.max_runtime_hours > 0:
+        trainer.add_callback(KaggleTimeLimitCallback(max_hours=config.max_runtime_hours))
+
     return trainer
 
 
 def train_and_save(trainer, model, tokenizer, config: TrainingConfig) -> None:
-    trainer.train()
+    resume_val = None
+    if config.resume_from_checkpoint:
+        # If the string is "True", cast to boolean True to let HF auto-detect latest checkpoint
+        resume_val = True if config.resume_from_checkpoint.lower() == "true" else config.resume_from_checkpoint
+    
+    trainer.train(resume_from_checkpoint=resume_val)
     model.save_pretrained(str(config.output_dir), adapter_name=GRPO_ADAPTER)
     tokenizer.save_pretrained(str(config.output_dir))
     print(f"GRPO LoRA saved to {config.output_dir}")

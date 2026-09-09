@@ -152,6 +152,11 @@ def run_grpo_training(
     vlm_judge: str = "ensemble",
     vlm_model: str = "google/paligemma2-3b-pt-224",
     vlm_threshold: float = 0.15,
+    push_to_hub: bool = False,
+    hub_repo: str | None = None,
+    max_runtime_hours: float | None = 11.0,
+    resume_from_checkpoint: str | None = None,
+    num_generations: int | None = None,
 ) -> None:
     """Execute GRPO training via subprocess or direct module invocation."""
     python_exe = sys.executable
@@ -179,6 +184,17 @@ def run_grpo_training(
         "--vlm-threshold",
         str(vlm_threshold),
     ]
+
+    if push_to_hub:
+        cmd.append("--push-to-hub")
+    if hub_repo:
+        cmd.extend(["--hub-repo", hub_repo])
+    if max_runtime_hours is not None:
+        cmd.extend(["--max-runtime-hours", str(max_runtime_hours)])
+    if resume_from_checkpoint:
+        cmd.extend(["--resume-from-checkpoint", resume_from_checkpoint])
+    if num_generations is not None:
+        cmd.extend(["--num-generations", str(num_generations)])
 
 
     if stack_lora:
@@ -229,6 +245,42 @@ def push_adapter_to_hub(adapter_dir: Path, repo_id: str) -> None:
         print(f"Failed to push GRPO adapter to Hub: {e}", file=sys.stderr)
 
 
+def download_latest_checkpoint_from_hub(repo_id: str, output_dir: Path) -> bool:
+    """Check the remote Hub repo for checkpoint folders and download the latest one to output_dir."""
+    try:
+        from huggingface_hub import HfApi, snapshot_download
+
+        token = os.environ.get("HF_TOKEN")
+        api = HfApi(token=token)
+        
+        try:
+            api.repo_info(repo_id=repo_id, repo_type="model")
+        except Exception:
+            return False  # Repo does not exist yet
+            
+        files = api.list_repo_files(repo_id=repo_id, repo_type="model")
+        checkpoints = set(f.split("/")[0] for f in files if f.startswith("checkpoint-") and "/" in f)
+        
+        if not checkpoints:
+            return False
+            
+        # Find the latest checkpoint by step number
+        latest_ckpt = max(checkpoints, key=lambda c: int(c.split("-")[1]))
+        print(f"\n📥 Found latest checkpoint '{latest_ckpt}' in {repo_id}. Downloading to resume...")
+        
+        snapshot_download(
+            repo_id=repo_id,
+            allow_patterns=f"{latest_ckpt}/*",
+            local_dir=str(output_dir),
+            token=token,
+        )
+        print(f"✔ Successfully downloaded {latest_ckpt} to {output_dir}")
+        return True
+    except Exception as e:
+        print(f"Notice: Failed to auto-resume from hub: {e}")
+        return False
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Kaggle End-to-End GRPO Pipeline Runner")
     parser.add_argument("--base-model", default=DEFAULT_BASE_MODEL, help="Base policy model ID")
@@ -260,6 +312,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--report-to", default="wandb", help="Logging backend ('wandb' or 'none')")
     parser.add_argument("--run-name", default="qwen3-8b-manim-grpo-kaggle", help="Run name for W&B logging")
+    parser.add_argument("--max-runtime-hours", type=float, default=11.0, help="Maximum Kaggle hours before forcing a clean checkpoint save (default: 11.0)")
+    parser.add_argument("--num-generations", type=int, default=None, help="GRPO samples per prompt (defaults to 4 on Kaggle T4)")
     return parser
 
 
@@ -299,6 +353,13 @@ def main() -> int:
 
     # 6. Execute GRPO Training with Safety Backup
     output_path = Path(args.output_dir)
+    
+    # Check for auto-resume if pushing to hub is enabled
+    resume_flag = None
+    if args.push_to_hub and args.hub_repo:
+        if download_latest_checkpoint_from_hub(args.hub_repo, output_path):
+            resume_flag = "True"
+
     try:
         run_grpo_training(
             base_model=args.base_model,
@@ -315,6 +376,11 @@ def main() -> int:
             vlm_judge=args.vlm_judge,
             vlm_model=args.vlm_model,
             vlm_threshold=args.vlm_threshold,
+            push_to_hub=args.push_to_hub,
+            hub_repo=args.hub_repo,
+            max_runtime_hours=args.max_runtime_hours,
+            resume_from_checkpoint=resume_flag,
+            num_generations=args.num_generations,
         )
 
     except KeyboardInterrupt:

@@ -61,6 +61,10 @@ class TrainingConfig:
     wandb_project: str = "aos-grpo"
     wandb_group: str = WANDB_RUN_GROUP
     wandb_tags: tuple[str, ...] = WANDB_TAGS
+    resume_from_checkpoint: str | None = None
+    push_to_hub: bool = False
+    hub_repo: str | None = None
+    max_runtime_hours: float = 11.0
 
     def resolve_paths(self) -> TrainingConfig:
         dataset_path = self.dataset_path
@@ -213,6 +217,14 @@ class TrainingConfig:
             config = replace(config, vlm_model=args.vlm_model)
         if getattr(args, "vlm_threshold", None) is not None:
             config = replace(config, vlm_threshold=args.vlm_threshold)
+        if getattr(args, "resume_from_checkpoint", None) is not None:
+            config = replace(config, resume_from_checkpoint=args.resume_from_checkpoint)
+        if getattr(args, "push_to_hub", False):
+            config = replace(config, push_to_hub=True)
+        if getattr(args, "hub_repo", None) is not None:
+            config = replace(config, hub_repo=args.hub_repo)
+        if getattr(args, "max_runtime_hours", None) is not None:
+            config = replace(config, max_runtime_hours=args.max_runtime_hours)
         return apply_vertex_env(config)
 
 
@@ -458,5 +470,26 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--run-name",
         default=None,
         help=f'W&B run name (default: "{WANDB_GRPO_RUN_NAME}")',
+    )
+    parser.add_argument(
+        "--resume-from-checkpoint",
+        default=None,
+        help="Path or True to resume from the latest checkpoint",
+    )
+    parser.add_argument(
+        "--push-to-hub",
+        action="store_true",
+        help="Push checkpoints and final model to Hugging Face Hub during training",
+    )
+    parser.add_argument(
+        "--hub-repo",
+        default=None,
+        help="Hugging Face repo ID for pushing (e.g. 'nabin2004/AOS-qwen3-8b-grpo')",
+    )
+    parser.add_argument(
+        "--max-runtime-hours",
+        type=float,
+        default=None,
+        help="Maximum hours before forcing a clean checkpoint save and exit (default: 11.0)",
     )
     return parser
