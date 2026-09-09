@@ -149,7 +149,19 @@ def make_training_args(
     if config.max_steps is not None:
         kwargs["max_steps"] = config.max_steps
         kwargs.pop("num_train_epochs", None)
-    return GRPOConfig(**kwargs)
+
+    grpo_config = GRPOConfig(**kwargs)
+
+    # CRITICAL: Prevent HF Trainer from wrapping the 4-bit quantized model in
+    # nn.DataParallel on multi-GPU setups. The policy model is pinned to cuda:0
+    # via device_map={"":0}, while cuda:1 is reserved for the VLM reward judge.
+    # DataParallel tries to replicate quantized weights across GPUs, which causes
+    # "CUDA error: illegal memory access" because bitsandbytes NF4 tensors have
+    # device-pinned quantization state that cannot be scattered.
+    if torch.cuda.device_count() >= 2:
+        grpo_config._n_gpu = 1
+
+    return grpo_config
 
 
 def build_trainer(model, tokenizer, dataset, config: TrainingConfig, training_args):
