@@ -50,7 +50,7 @@ class TrainingConfig:
     policy_device: str = "cuda:0"
     reward_device: str = "cuda:1"
     vlm_judge: str = "ensemble"  # clip | gemma | ensemble
-    vlm_model: str = "google/paligemma2-3b-mix-448"
+    vlm_model: str = "google/gemma-4-e2b-it"
     vlm_threshold: float = 0.15
     render: bool = False
     no_render: bool = False

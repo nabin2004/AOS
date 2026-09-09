@@ -1,13 +1,13 @@
-"""Gemma / PaliGemma Visual-Language Model (VLM) Judge for GRPO.
+"""Gemma 4 E2B / PaliGemma 2 Visual-Language Model (VLM) Judge for GRPO.
 
 Disaggregated multi-modal evaluator running strictly on GPU 1 (cuda:1):
 - Evaluates spatial alignment, mathematical correctness, layout clarity, and label placement.
-- Operates in 4-bit NF4 quantization (~2.2-2.5 GB VRAM footprint on 16 GB card).
-- Uses 448px resolution (paligemma2-3b-mix-448) for high visual acuity on LaTeX notation.
+- Operates in 4-bit NF4 quantization (~1.5 GB footprint for Gemma 4 E2B, ~2.5 GB for PaliGemma 2).
+- Primary: google/gemma-4-e2b-it for native multimodal layout understanding and variable image resolution.
 - Employs single-forward-pass direct logit scoring over rating tokens (1..5) to achieve ~15-25ms latency with 100% deterministic, continuous scoring without autoregressive decode hangs.
 - Supports Cascading Reward Filter (Ensemble):
     Stage 1: OpenCLIP fast filter (< 0.15 similarity drops immediately).
-    Stage 2: PaliGemma Expert Grader on candidate frames passing threshold.
+    Stage 2: VLM Expert Grader on candidate frames passing threshold.
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ except ImportError:
 # Global cached judge instance (singleton per process on reward device)
 _GLOBAL_GEMMA_JUDGE: Optional["GemmaVisualJudge"] = None
 
-DEFAULT_VLM_MODEL = "google/paligemma2-3b-mix-448"
+DEFAULT_VLM_MODEL = "google/gemma-4-e2b-it"
 DEFAULT_VLM_THRESHOLD = 0.15
 
 
@@ -164,11 +164,11 @@ class GemmaVisualJudge:
             trust_remote_code=True,
         )
 
-        # 2. Load model (prefer PaliGemmaForConditionalGeneration, fallback to Vision2Seq or AutoModel)
+        # 2. Load model (prefer AutoModelForMultimodalLM, fallback to PaliGemmaForConditionalGeneration, etc.)
         try:
-            from transformers import PaliGemmaForConditionalGeneration
+            from transformers import AutoModelForMultimodalLM
 
-            self.model = PaliGemmaForConditionalGeneration.from_pretrained(
+            self.model = AutoModelForMultimodalLM.from_pretrained(
                 self.model_id,
                 device_map=device_map,
                 quantization_config=quant_config,
@@ -178,9 +178,9 @@ class GemmaVisualJudge:
             )
         except Exception:
             try:
-                from transformers import AutoModelForVision2Seq
+                from transformers import PaliGemmaForConditionalGeneration
 
-                self.model = AutoModelForVision2Seq.from_pretrained(
+                self.model = PaliGemmaForConditionalGeneration.from_pretrained(
                     self.model_id,
                     device_map=device_map,
                     quantization_config=quant_config,
@@ -189,16 +189,28 @@ class GemmaVisualJudge:
                     trust_remote_code=True,
                 )
             except Exception:
-                from transformers import AutoModelForCausalLM
+                try:
+                    from transformers import AutoModelForVision2Seq
 
-                self.model = AutoModelForCausalLM.from_pretrained(
-                    self.model_id,
-                    device_map=device_map,
-                    quantization_config=quant_config,
-                    torch_dtype=compute_dtype,
-                    token=token,
-                    trust_remote_code=True,
-                )
+                    self.model = AutoModelForVision2Seq.from_pretrained(
+                        self.model_id,
+                        device_map=device_map,
+                        quantization_config=quant_config,
+                        torch_dtype=compute_dtype,
+                        token=token,
+                        trust_remote_code=True,
+                    )
+                except Exception:
+                    from transformers import AutoModelForCausalLM
+
+                    self.model = AutoModelForCausalLM.from_pretrained(
+                        self.model_id,
+                        device_map=device_map,
+                        quantization_config=quant_config,
+                        torch_dtype=compute_dtype,
+                        token=token,
+                        trust_remote_code=True,
+                    )
 
         self.model.eval()
 
@@ -255,11 +267,31 @@ class GemmaVisualJudge:
             if target_device.startswith("cuda:") and int(target_device.split(":")[1]) >= torch.cuda.device_count():
                 target_device = "cuda:0"
 
-            inputs = self.processor(
-                text=eval_prompt,
-                images=pil_img,
-                return_tensors="pt",
-            )
+            if "gemma-4" in self.model_id.lower():
+                # Gemma 4 expects chat templates
+                messages = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image"},
+                            {"type": "text", "text": eval_prompt},
+                        ],
+                    }
+                ]
+                try:
+                    text_prompt = self.processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+                    inputs = self.processor(text=text_prompt, images=pil_img, return_tensors="pt")
+                except Exception:
+                    # Fallback if apply_chat_template fails
+                    inputs = self.processor(text=eval_prompt, images=pil_img, return_tensors="pt")
+            else:
+                # PaliGemma generic fallback
+                inputs = self.processor(
+                    text=eval_prompt,
+                    images=pil_img,
+                    return_tensors="pt",
+                )
+
             inputs = {k: v.to(target_device) if hasattr(v, "to") else v for k, v in inputs.items()}
 
             # 1. Direct logit evaluation (Single forward pass, ~15-25ms latency, deterministic)
