@@ -18,6 +18,7 @@ from typing import Any
 
 from pydantic_ai import Agent
 
+from cinematic_hints import CINEMATIC_HINT_LEGEND
 from error_classifier import ErrorCategory, classify_error
 from llm_config import model_for_agent, settings_for
 from llm_retry import execute_with_llm_retry
@@ -41,7 +42,12 @@ RULES:
 5. If LaTeX fails (e.g. LaTeX Error or standalone.cls), replace MathTex with simple Tex or Text to guarantee compilation.
 6. Check all coordinates: keep visuals inside |x| <= 6.5, |y| <= 3.5.
 7. Wrap your entire code in a ```python ... ``` markdown code block. Do NOT include commentary outside the code block.
-"""
+8. PRESERVE all cinematic patterns from the original code — camera orbits, updaters, traced paths,
+   particle fields, equation morphs, split screens, etc. Do NOT remove them unless they are the
+   direct cause of the error.
+
+""" + CINEMATIC_HINT_LEGEND
+
 
 _repair_agent: Agent | None = None
 

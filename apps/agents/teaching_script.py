@@ -33,6 +33,26 @@ Pacing, Calmness & Depth (CRITICAL):
 - For dynamic systems (e.g. Lorenz attractor): explain the physical motivation (atmospheric convection rolls), the 3 variables, why deterministic equations create non-repeating bounded trajectories, and the essence of the butterfly effect.
 - Clear screen between acts: do not crowd everything together.
 
+Visual Design Language (use rich, specific descriptions — the coder reads these):
+- For 3D topics (attractors, surfaces, orbital mechanics, wave packets):
+  write "Introduce the [object] in 3D, rotating slowly" or "Show the trajectory from above as the camera orbits" — this triggers camera rotation.
+- For equations being derived step-by-step:
+  write "Step-by-step derivation: [eq] becomes [eq]" — this triggers equation morphing animations.
+- For moving quantities (angle theta, time t, variable x):
+  write "A moving dot traces the path as theta increases from 0 to 2π" — this triggers updater animations.
+- For dramatic reveals of key terms:
+  write "Highlight the key term [term]" or "Emphasize [concept]" — this triggers Indicate+Flash pulses.
+- For comparisons:
+  write "Compare [A] and [B] side by side" — this triggers a split-screen layout.
+- For particle/field topics (EM field, wave propagation, quantum probability):
+  write "A field of particles shows the distribution" — this triggers animated particle fields.
+- For any path/trajectory being traced over time:
+  write "Trace the path of the point as it moves" — this triggers TracedPath.
+- For lists appearing gradually:
+  write "Each property appears one by one" — this triggers a slow-reveal LaggedStart.
+- For overview moments:
+  write "Pull back to show the full picture" or "Zoom out to see the complete structure" — this triggers camera zoom-out.
+
 Rules:
 - Every beat answers: what should the student learn from this visual?
 - Never copy on-screen titles, Tex, or bullet text into narration.
@@ -65,24 +85,25 @@ Expected output structure:
     {
       "id": "b3",
       "takeaway": "The unit circle defines points at distance 1 with coordinates (cos theta, sin theta).",
-      "visual": "Unit circle with angle theta arc and coordinates.",
+      "visual": "A moving dot traces the unit circle path as theta increases from 0 to 2 pi.",
       "narration": "On the unit circle, an angle theta traces a point whose coordinates are cosine theta and sine theta."
     },
     {
       "id": "b4",
       "takeaway": "Continuous imaginary growth produces steady rotation at speed 1.",
-      "visual": "Rotating vector along the unit circle at angle theta.",
+      "visual": "Rotating vector along the unit circle, highlighting the key relationship e to i theta.",
       "narration": "Because multiplying by i is perpendicular to position, e to the i theta produces continuous circular motion."
     },
     {
       "id": "b5",
       "takeaway": "Euler's identity unites 5 fundamental constants.",
-      "visual": "Highlight theta = pi yielding e^{i pi} + 1 = 0.",
+      "visual": "Pull back to show the full picture: theta = pi yielding e^{i pi} + 1 = 0.",
       "narration": "When theta equals pi, we reach minus 1, giving Euler's identity: e to the i pi plus 1 equals zero."
     }
   ]
 }
 """
+
 
 
 class TeachingBeat(BaseModel):
