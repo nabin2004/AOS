@@ -385,8 +385,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--vlm-model",
-        default="google/paligemma2-3b-mix-448",
-        help="VLM model ID on Hugging Face (default: google/paligemma2-3b-mix-448)",
+        default="google/gemma-4-e2b-it",
+        help="VLM model ID on Hugging Face (default: google/gemma-4-e2b-it)",
     )
     parser.add_argument(
         "--vlm-threshold",
