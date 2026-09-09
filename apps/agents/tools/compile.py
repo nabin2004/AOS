@@ -525,7 +525,7 @@ def compile_manim_code(
             tex_failure=tex_failure,
             video_path=video_path,
             has_audio=has_audio,
-            log_excerpt=summarize_diagnostic_output(output, max_chars=1200),
+            log_excerpt=summarize_diagnostic_output(output, max_chars=2500),
             message=message,
         )
     except OutputDirError as e:

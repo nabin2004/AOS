@@ -749,11 +749,47 @@ def sanitize_manim_animations(code: str) -> str:
                     if isinstance(target, ast.Name):
                         non_mobjects.add(target.id)
 
-    # 2. NodeTransformer to clean up animation calls
+    # 2. NodeTransformer to clean up animation calls and coordinate dimensions
     class AnimationSanitizer(ast.NodeTransformer):
         def visit_Call(self, node: ast.Call) -> ast.AST:
             self.generic_visit(node)
             cname = getattr(node.func, "id", "") or getattr(node.func, "attr", "")
+
+            # Auto-sanitize 2D coordinate sampling: np.random.uniform(..., 2) -> np.random.uniform(..., 3)
+            if cname in ("uniform", "rand", "randn"):
+                if len(node.args) >= 3 and isinstance(node.args[2], ast.Constant) and node.args[2].value == 2:
+                    node.args[2] = ast.Constant(value=3)
+                elif cname in ("rand", "randn") and len(node.args) == 1 and isinstance(node.args[0], ast.Constant) and node.args[0].value == 2:
+                    node.args[0] = ast.Constant(value=3)
+                for kw in node.keywords:
+                    if kw.arg == "size" and isinstance(kw.value, ast.Constant) and kw.value.value == 2:
+                        kw.value = ast.Constant(value=3)
+                    elif kw.arg == "size" and isinstance(kw.value, (ast.Tuple, ast.List)) and len(kw.value.elts) == 1 and isinstance(kw.value.elts[0], ast.Constant) and kw.value.elts[0].value == 2:
+                        kw.value.elts[0] = ast.Constant(value=3)
+
+            # Auto-pad 2D coordinate literals [x, y] -> [x, y, 0] for Dot, Line, Arrow
+            def _pad_2d_coord(expr: ast.expr) -> ast.expr:
+                if isinstance(expr, ast.List) and len(expr.elts) == 2:
+                    return ast.List(elts=[expr.elts[0], expr.elts[1], ast.Constant(value=0)], ctx=expr.ctx)
+                if isinstance(expr, ast.Tuple) and len(expr.elts) == 2:
+                    return ast.Tuple(elts=[expr.elts[0], expr.elts[1], ast.Constant(value=0)], ctx=expr.ctx)
+                return expr
+
+            if cname == "Dot":
+                if node.args and isinstance(node.args[0], (ast.List, ast.Tuple)) and len(node.args[0].elts) == 2:
+                    node.args[0] = _pad_2d_coord(node.args[0])
+                for kw in node.keywords:
+                    if kw.arg == "point":
+                        kw.value = _pad_2d_coord(kw.value)
+            elif cname in ("Line", "Arrow"):
+                if len(node.args) >= 1:
+                    node.args[0] = _pad_2d_coord(node.args[0])
+                if len(node.args) >= 2:
+                    node.args[1] = _pad_2d_coord(node.args[1])
+                for kw in node.keywords:
+                    if kw.arg in ("start", "end"):
+                        kw.value = _pad_2d_coord(kw.value)
+
             if cname in ("FadeOut", "FadeIn", "Create", "Uncreate", "Transform"):
                 new_args: list[ast.expr] = []
                 for arg in node.args:

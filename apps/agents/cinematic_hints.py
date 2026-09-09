@@ -327,8 +327,8 @@ CINEMATIC HINT TAGS (inline stage-directions — implement each tag in Manim):
                            self.play(tracker.animate.set_value(end), run_time=duration)
                            obj.remove_updater(...)  # after the beat
   [BACKGROUND: <color>] -> self.camera.background_color = <color>  (set at top of construct)
-  [PARTICLE_FIELD]      -> dots = VGroup(*[Dot(radius=0.04).move_to(np.random.uniform(-6,6,3)*[1,1,0])
-                               for _ in range(120)]); self.play(LaggedStart(*[FadeIn(d) for d in dots], lag_ratio=0.02))
+  [PARTICLE_FIELD]      -> dots = VGroup(*[Dot(point=[np.random.uniform(-5,5), np.random.uniform(-3,3), 0], radius=0.04)
+                               for _ in range(40)]); self.play(LaggedStart(*[FadeIn(d) for d in dots], lag_ratio=0.02))
   [TRACE_PATH]          -> trace = TracedPath(moving_dot.get_center, dissipating_time=2.0, stroke_color=BLUE)
                            self.add(trace); self.play(MoveAlongPath(moving_dot, path, run_time=...))
   [MORPH_EQUATION]      -> Use TransformMatchingTex(eq_old, eq_new) or ReplacementTransform;
@@ -339,4 +339,6 @@ CINEMATIC HINT TAGS (inline stage-directions — implement each tag in Manim):
   [SPLIT_SCREEN]        -> left_grp = VGroup(...).to_edge(LEFT, buff=0.5)
                            right_grp = VGroup(...).to_edge(RIGHT, buff=0.5)
                            self.play(FadeIn(left_grp), FadeIn(right_grp))
+
+CRITICAL: All Manim positions and points MUST be 3D coordinates (e.g. [x, y, 0] or np.random.uniform(-3, 3, 3)). Never pass 2D arrays to Dot(point=...), Line, or Arrow.
 """

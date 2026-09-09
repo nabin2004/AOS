@@ -57,3 +57,23 @@ def test_keeps_init_voiceover_exception() -> None:
     assert "init_voiceover" in summary
     assert "You need to call init_voiceover" in summary
 
+
+def test_rich_traceback_with_sox_warning() -> None:
+    text = (
+        "[09/09/26 21:32:44] WARNING  SoX could not be found!             __init__.py:10\n"
+        "                                 If you do not have SoX, proceed\n"
+        "                             here: http://sox.sourceforge.net/\n"
+        "Manim Community v0.20.1\n"
+        "+--------------------- Traceback (most recent call last) ---------------------+\n"
+        "| scene.py:16 in construct                                                    |\n"
+        "|   pos = np.random.uniform(-3, 3, 2)                                         |\n"
+        "|   charge = Dot(point=pos, color=WHITE)                                      |\n"
+        "+-----------------------------------------------------------------------------+\n"
+        "ValueError: operands could not be broadcast together with shapes (32,3) (2,)\n"
+    )
+    summary = summarize_diagnostic_output(text, max_chars=1200, max_errors=3)
+    assert "ValueError: operands could not be broadcast" in summary
+    assert "Dot(point=pos" in summary
+    assert "SoX could not be found" not in summary
+
+
