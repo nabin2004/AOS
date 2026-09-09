@@ -723,9 +723,160 @@ def ensure_voiceover_scene(code: str) -> str:
         return code
 
 
-def prepare_manim_source(code: str) -> str:
-    """Normalize LLM source then ensure VoiceoverScene + speech service."""
-    return ensure_voiceover_scene(normalize_manim_source(code))
+def sanitize_manim_animations(code: str) -> str:
+    """Strip invalid arguments (e.g. lists, tuples, raw coordinates) from FadeOut/FadeIn/Create/Write."""
+    if not isinstance(code, str) or not code.strip():
+        return code if isinstance(code, str) else ""
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return code
+
+    # 1. Collect names of variables assigned to non-mobject literals/data structures
+    non_mobjects: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            val = node.value
+            is_non_mob = False
+            if isinstance(val, (ast.List, ast.Tuple, ast.Dict, ast.Set, ast.Constant)):
+                is_non_mob = True
+            elif isinstance(val, ast.Call):
+                cname = getattr(val.func, "id", "") or getattr(val.func, "attr", "")
+                if cname in ("array", "zeros", "arange", "linspace", "zeros_like", "ones"):
+                    is_non_mob = True
+            if is_non_mob:
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        non_mobjects.add(target.id)
+
+    # 2. NodeTransformer to clean up animation calls
+    class AnimationSanitizer(ast.NodeTransformer):
+        def visit_Call(self, node: ast.Call) -> ast.AST:
+            self.generic_visit(node)
+            cname = getattr(node.func, "id", "") or getattr(node.func, "attr", "")
+            if cname in ("FadeOut", "FadeIn", "Create", "Uncreate", "Transform"):
+                new_args: list[ast.expr] = []
+                for arg in node.args:
+                    if isinstance(arg, ast.Call):
+                        called = getattr(arg.func, "id", "") or getattr(arg.func, "attr", "")
+                        if called in ("Scene", "VoiceoverScene", "ThreeDScene", "VoiceoverSlideScene"):
+                            continue
+                    if isinstance(arg, ast.Name) and (arg.id in non_mobjects or arg.id in ("Scene", "VoiceoverScene", "ThreeDScene", "self")):
+                        continue  # drop non-mobject variable (e.g. coordinate list, Scene class)
+                    if isinstance(arg, (ast.List, ast.Tuple, ast.Constant)):
+                        continue  # drop literal list/tuple/number
+                    new_args.append(arg)
+                node.args = new_args
+            return node
+
+        def visit_Expr(self, node: ast.Expr) -> ast.AST | None:
+            self.generic_visit(node)
+            if isinstance(node.value, ast.Call):
+                cname = getattr(node.value.func, "id", "") or getattr(node.value.func, "attr", "")
+                if cname == "play":
+                    valid_play_args: list[ast.expr] = []
+                    for arg in node.value.args:
+                        if isinstance(arg, ast.Call):
+                            aname = getattr(arg.func, "id", "") or getattr(arg.func, "attr", "")
+                            if aname in ("FadeOut", "FadeIn", "Create", "Uncreate") and not arg.args:
+                                continue  # drop empty animation calls like FadeOut()
+                        valid_play_args.append(arg)
+                    if not valid_play_args:
+                        return None  # remove empty self.play() completely
+                    node.value.args = valid_play_args
+            return node
+
+    sanitizer = AnimationSanitizer()
+    tree = sanitizer.visit(tree)
+    ast.fix_missing_locations(tree)
+    try:
+        return ast.unparse(tree) + "\n"
+    except Exception:
+        return code
+
+
+def enrich_existing_voiceovers(code: str, teaching_beats: list[str] | None = None) -> str:
+    """Enrich short or truncated voiceover lines with full pedagogical teaching script narration, and enforce calm pauses."""
+    if not isinstance(code, str) or not code.strip():
+        return code if isinstance(code, str) else ""
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return code
+
+    beat_idx = 0
+    for node in ast.walk(tree):
+        if isinstance(node, ast.With):
+            for item in node.items:
+                ctx = item.context_expr
+                if isinstance(ctx, ast.Call):
+                    cname = getattr(ctx.func, "id", "") or getattr(ctx.func, "attr", "")
+                    if cname == "voiceover":
+                        curr_text = ""
+                        text_kw = None
+                        for kw in ctx.keywords:
+                            if kw.arg == "text" and isinstance(kw.value, ast.Constant):
+                                curr_text = str(kw.value.value)
+                                text_kw = kw
+                                break
+                        if not text_kw and ctx.args and isinstance(ctx.args[0], ast.Constant):
+                            curr_text = str(ctx.args[0].value)
+
+                        if teaching_beats and beat_idx < len(teaching_beats):
+                            target_narration = teaching_beats[beat_idx]
+                            # Replace if current text is short (< 15 words) or generic
+                            if len(curr_text.split()) < 15 or len(curr_text) < 80:
+                                if text_kw:
+                                    text_kw.value = ast.Constant(value=target_narration)
+                                elif ctx.args:
+                                    ctx.args[0] = ast.Constant(value=target_narration)
+                        beat_idx += 1
+
+                        # Ensure calm pause at the end of each beat
+                        has_wait = False
+                        if node.body:
+                            last_stmt = node.body[-1]
+                            if isinstance(last_stmt, ast.Expr) and isinstance(last_stmt.value, ast.Call):
+                                fname = getattr(last_stmt.value.func, "id", "") or getattr(last_stmt.value.func, "attr", "")
+                                if fname == "wait":
+                                    has_wait = True
+                                    if last_stmt.value.args and isinstance(last_stmt.value.args[0], ast.Constant):
+                                        if isinstance(last_stmt.value.args[0].value, (int, float)) and last_stmt.value.args[0].value < 1.5:
+                                            last_stmt.value.args[0] = ast.Constant(value=2.0)
+                        if not has_wait:
+                            node.body.append(
+                                ast.Expr(
+                                    value=ast.Call(
+                                        func=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="wait", ctx=ast.Load()),
+                                        args=[ast.Constant(value=2.0)],
+                                        keywords=[],
+                                    )
+                                )
+                            )
+
+    ast.fix_missing_locations(tree)
+    try:
+        return ast.unparse(tree) + "\n"
+    except Exception:
+        return code
+
+
+def prepare_manim_source(code: str, teaching_beats: list[str] | None = None) -> str:
+    """Normalize LLM source, sanitize animation calls, ensure VoiceoverScene, and enrich voiceovers."""
+    code = normalize_manim_source(code)
+    # Define common missing color constants or imports that LLMs frequently use (e.g. CYAN)
+    color_header = ""
+    if "CYAN" in code and not re.search(r"^\s*CYAN\s*=", code, re.MULTILINE):
+        color_header += 'CYAN = "#00FFFF"\n'
+    if "MAGENTA" in code and not re.search(r"^\s*MAGENTA\s*=", code, re.MULTILINE):
+        color_header += 'MAGENTA = "#FF00FF"\n'
+    if color_header:
+        code = color_header + code
+    code = sanitize_manim_animations(code)
+    code = ensure_voiceover_scene(code)
+    if teaching_beats:
+        code = enrich_existing_voiceovers(code, teaching_beats)
+    return code
 
 
 def _math_to_speech(tex: str, topic: str = "") -> str:
@@ -746,8 +897,14 @@ def _math_to_speech(tex: str, topic: str = "") -> str:
         return "On the unit circle, every point has distance one from the origin."
     if "\\frac{\\pi}{2}" in t:
         return "An angle of pi over two represents a ninety degree rotation counterclockwise."
-    if "\\pi" in t and ("\\theta" in t or "=" in t):
-        return "Setting theta equal to pi rotates halfway around the unit circle to negative one."
+    if "\\frac{dx}{dt}" in t or "sigma(y" in t or "\\sigma(y" in t:
+        return "The rate of change of x is proportional to the difference between y and x, governed by the Prandtl number sigma."
+    if "\\frac{dy}{dt}" in t or "(\\rho - z)" in t or "(rho - z)" in t:
+        return "The rate of change of y incorporates convection driven by rho, tempered by the nonlinear term x times z."
+    if "\\frac{dz}{dt}" in t or "xy - \\beta" in t or "xy - beta" in t:
+        return "The vertical temperature distortion z grows with x times y and decays proportionally to beta times z."
+    if "\\vec{v}" in t:
+        return "We track the instantaneous phase space state vector as it moves through the vector field."
 
     replacements = [
         (r"\\cos", " cosine "),

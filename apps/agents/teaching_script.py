@@ -18,7 +18,7 @@ load_dotenv()
 TEACHING_SCRIPT_PROMPT = """\
 You write the spoken teaching script for one AOS Manim animation.
 
-Given a topic, subject, and lecture plan (objectives, opener, formulas),
+Given a topic, subject, lecture plan, and target duration/pacing,
 produce a TeachingScript. You decide WHAT the teacher says and WHY.
 A later coding agent will implement Manim. Do not write Python.
 
@@ -26,21 +26,24 @@ Narration is the teacher. Visuals are the demonstration.
 Never generate narration whose sole purpose is to announce that an object
 is appearing.
 
+Pacing, Calmness & Depth (CRITICAL):
+- Speak with calm, patient clarity like 3Blue1Brown or a master lecturer.
+- Never compress complex ideas into a single rushed sentence.
+- Allow ideas to breathe: each beat should have 3 to 5 full sentences (40–70 words) explaining the physical, algebraic, and geometric intuition behind every equation, variable, and dynamic transformation.
+- For dynamic systems (e.g. Lorenz attractor): explain the physical motivation (atmospheric convection rolls), the 3 variables, why deterministic equations create non-repeating bounded trajectories, and the essence of the butterfly effect.
+- Clear screen between acts: do not crowd everything together.
+
 Rules:
 - Every beat answers: what should the student learn from this visual?
 - Never copy on-screen titles, Tex, or bullet text into narration.
 - Never use filler: "Let's look at this on the board", "Here we have…",
   "As you can see", "Let's explore this", "Isn't that amazing?"
 - Interpret relationships; do not read equations or bullets verbatim.
-- Write for the ear: short sentences, contractions (it's, that's, we're).
-- Speak math: "e to the i x", "cosine of x", "sine of x",
-  "e to the i pi, plus one, equals zero".
+- Write for the ear: spoken English with natural rhythm and contractions.
+- Speak math: "e to the i x", "d x over d t equals sigma times y minus x".
 - Last beat is a conceptual takeaway, not empty praise.
-- 4–8 beats. Follow: what are we looking at → what it means → why it
-  matters → what changes → what to notice → takeaway.
-- bookmark_marks: only for sequential teaching highlights (introduce,
-  highlight a part, consequence). Not every FadeIn/scale/color.
-- scene_class_name: PascalCase ending with Scene (e.g. EulersFormulaScene).
+- bookmark_marks: only for sequential teaching highlights.
+- scene_class_name: PascalCase ending with Scene (e.g. LorenzAttractorScene).
 
 Expected output structure:
 {
@@ -215,6 +218,8 @@ def teaching_script_user_prompt(
     topic: str,
     subject: str,
     lecture: Any,
+    *,
+    length: str = "medium",
 ) -> str:
     if hasattr(lecture, "model_dump"):
         plan = lecture.model_dump(mode="json")
@@ -222,8 +227,34 @@ def teaching_script_user_prompt(
         plan = lecture
     else:
         plan = {"raw": str(lecture)}
+
+    is_long = length in ("long", "10m", "10min", "10")
+    is_medium = length in ("medium", "5m", "5min", "5", "default")
+
+    if is_long:
+        pacing_guide = (
+            "Target duration: 5–10 minutes (Comprehensive In-Depth Masterclass).\n"
+            "- Generate 12–16 comprehensive, sequentially progressive teaching beats.\n"
+            "- Every beat MUST be calm, patient, and thorough: 3–5 full sentences (50–80 words) per beat.\n"
+            "- Take time to thoroughly explain the physical intuition, mathematical mechanism, and geometric behavior."
+        )
+    elif is_medium:
+        pacing_guide = (
+            "Target duration: 3–5 minutes (Calm, In-Depth Lecture).\n"
+            "- Generate 8–12 distinct teaching beats.\n"
+            "- Every beat MUST be calm and explanatory: 3–5 full sentences (40–70 words) per beat.\n"
+            "- Take time to explain what each symbol means physically before moving to the next concept."
+        )
+    else:
+        pacing_guide = (
+            "Target duration: 1–2 minutes (Concise Overview).\n"
+            "- Generate 4–6 clear, focused beats.\n"
+            "- Each beat contains 2–3 sentences of clear conceptual intuition."
+        )
+
     return (
         f"Topic: {topic}\n"
         f"Subject: {subject}\n"
+        f"Pacing & Duration Guidelines:\n{pacing_guide}\n\n"
         f"Lecture plan:\n{json.dumps(plan, indent=2)}"
     )

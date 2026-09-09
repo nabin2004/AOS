@@ -150,7 +150,21 @@ def _trajectory_path(run_dir: str | Path | None) -> str | None:
 
 
 def _compile_failure_error(result: dict[str, Any], run_dir: str | Path | None) -> str:
-    """Prefer last_compile.failure_marker over stopped_reason=completed."""
+    """Prefer the real python traceback or error from compile.log over generic markers or SoX warnings."""
+    if run_dir:
+        log_file = Path(run_dir) / "logs" / "compile.log"
+        if log_file.is_file():
+            try:
+                raw_log = log_file.read_text(encoding="utf-8", errors="replace")
+                tb_match = re.search(r"(Traceback \(most recent call last\):.*)", raw_log, re.DOTALL)
+                if tb_match:
+                    return tb_match.group(1)[-1500:].strip()
+                latex_match = re.search(r"(!\s+LaTeX Error:.*)", raw_log)
+                if latex_match:
+                    return latex_match.group(1)[:400].strip()
+            except Exception:
+                pass
+
     last: dict[str, Any] = {}
     if run_dir:
         manifest_path = Path(run_dir) / "manifest.json"
@@ -162,14 +176,20 @@ def _compile_failure_error(result: dict[str, Any], run_dir: str | Path | None) -
                 last = {}
     marker = last.get("failure_marker") or result.get("failure_marker")
     if marker:
-        return str(marker)
+        marker_str = str(marker)
+        if "Traceback" in marker_str:
+            tb = re.search(r"(Traceback \(most recent call last\):.*)", marker_str, re.DOTALL)
+            if tb:
+                return tb.group(1)[-1500:].strip()
+        if "SoX could not be found" in marker_str and len(marker_str) > 200:
+            return "Manim rendering encountered a runtime error (see compile.log)"
+        return marker_str[:400]
     stopped = (result.get("stopped_reason") or "").strip()
     if stopped and stopped != "completed":
         return stopped
     msg = result.get("message") or last.get("message")
     if msg:
         return str(msg)
-    # No scene was written — include summary excerpt for diagnosis.
     summary = (result.get("summary") or "").strip()
     if summary:
         return f"no_scene_written: {summary[:400]}"
@@ -205,13 +225,14 @@ async def run_animate(
     prompt: str,
     *,
     output_dir: str | Path | None = None,
+    length: str = "medium",
 ) -> VideoArtifact:
     """Classify → plan → Manim coder/compile; resolve scene MP4."""
     from agent_graph import run_pipeline
     from openai_compatible import format_custom_endpoint_error
 
     try:
-        result = await run_pipeline(prompt)
+        result = await run_pipeline(prompt, length=length)
     except Exception as exc:
         return VideoArtifact(
             ok=False,

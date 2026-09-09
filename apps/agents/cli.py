@@ -84,12 +84,12 @@ async def _run_full_pipeline(user_request: str, max_validation_attempts: int):
     return state, output
 
 
-async def _run_animate_pipeline(user_request: str) -> dict:
+async def _run_animate_pipeline(user_request: str, length: str = "medium") -> dict:
     from agent_graph import animation_graph as animate_graph
     from agent_graph import AnimationState as AnimateState
     from ir.manim_ir import Subject
 
-    state = AnimateState(user_query=user_request)
+    state = AnimateState(user_query=user_request, target_length=length)
     async with animate_graph.iter(state=state) as run:
         async for step in run:
             if isinstance(step, EndMarker):
@@ -198,6 +198,12 @@ def animate(
         "--output-dir",
         help="Copy/symlink final video + scene into this directory when compile succeeds",
     ),
+    length: str = typer.Option(
+        "medium",
+        "--length",
+        "-l",
+        help="Target video length / pacing: 'short' (~1-2m), 'medium' / '5m' (~3-5m), 'long' / '10m' (~5-10m), or explicit duration e.g. '5m', '10m', '300s'",
+    ),
 ) -> None:
     """Run the animation pipeline (classify → plan → Manim coder → compile)."""
     import os
@@ -206,6 +212,21 @@ def animate(
 
     if fast:
         os.environ["AOS_SFT_BATCH"] = "1"
+
+    req_lower = request.lower()
+    chosen_length = length
+    if chosen_length == "medium":
+        if any(k in req_lower for k in ("10 minutes", "10 minute", "10m", "long video")):
+            chosen_length = "10m"
+        elif any(k in req_lower for k in ("5 minutes", "5 minute", "5m", "at least 5")):
+            chosen_length = "5m"
+        elif any(k in req_lower for k in ("1 minute", "quick", "short", "brief")):
+            chosen_length = "short"
+
+    if chosen_length in ("10m", "long", "10"):
+        os.environ["AOS_RENDER_TIMEOUT_SECONDS"] = os.getenv("AOS_RENDER_TIMEOUT_SECONDS", "1200")
+    elif chosen_length in ("5m", "medium", "5"):
+        os.environ["AOS_RENDER_TIMEOUT_SECONDS"] = os.getenv("AOS_RENDER_TIMEOUT_SECONDS", "900")
 
     if as_json:
         from video_entry import run_animate
@@ -229,7 +250,7 @@ def animate(
             )
             raise typer.Exit(code=1) from exc
 
-        artifact = asyncio.run(run_animate(request, output_dir=output_dir))
+        artifact = asyncio.run(run_animate(request, output_dir=output_dir, length=chosen_length))
         payload = artifact.model_dump(mode="json")
         _emit_json(payload)
         # Fail when compile failed, missing video, or MP4 has no audio stream.
@@ -249,7 +270,7 @@ def animate(
 
     console.print(
         Panel.fit(
-            f"[bold]{request}[/]\n[dim]profile={env['profile']}[/]",
+            f"[bold]{request}[/]\n[dim]profile={env['profile']} length={chosen_length}[/]",
             title="Animating",
         )
     )
@@ -257,7 +278,7 @@ def animate(
         console.print(f"[dim]  {role}: {env[role]}[/]")
 
     try:
-        result = asyncio.run(_run_animate_pipeline(request))
+        result = asyncio.run(_run_animate_pipeline(request, length=chosen_length))
     except Exception as exc:
         console.print(f"[bold red]Pipeline failed:[/] {exc}")
         raise typer.Exit(code=1) from exc

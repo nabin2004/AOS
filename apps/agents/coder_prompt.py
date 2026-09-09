@@ -19,11 +19,26 @@ _LOCAL_PLAN_KEYS = (
 )
 
 CODER_SCRIPT_HINT = (
-    "VOICEOVER & PEDAGOGY CONTRACT (CRITICAL):\n"
+    "VOICEOVER, PACING & PEDAGOGY CONTRACT (CRITICAL):\n"
     "1. Every animation beat MUST be wrapped inside `with self.voiceover(text=\"...\") as tracker:` blocks.\n"
-    "2. Implement Plan.teaching_script narration lines verbatim (or very close) in sequential order.\n"
-    "3. Map each beat's visual to clear, focused Manim animations (axes, unit circle, rotating vector, angles).\n"
-    "4. Silent self.play(...) without a voiceover block will fail static validation.\n"
+    "2. Implement Plan.teaching_script narration lines verbatim in sequential order.\n"
+    "3. CALM PACING: Allow each concept to breathe! Use run_time=max(2.0, tracker.duration * 0.85) for animations. "
+    "   Always add a calm pause `self.wait(1.5)` to `self.wait(2.5)` after each beat before moving to the next.\n"
+    "4. NO SPATIAL OVERLAPS / CLEAR BOARD: When transitioning to a new coordinate plane, 3D axes, or visual section, "
+    "   explicitly FadeOut previous equations/text (`self.play(FadeOut(prev_mobjects))`) or move them to a top corner. "
+    "   NEVER create 3D axes directly over equations in the center of the screen! NEVER call FadeOut on Scene() or python lists!\n"
+    "5. DYNAMIC SYSTEMS & SIMULATIONS (e.g. Lorenz Attractor):\n"
+    "   - For chaotic systems or ODEs, compute real numerical trajectories with simple float loop:\n"
+    "     sigma, rho, beta = 10.0, 28.0, 8.0/3.0\n"
+    "     dt, x, y, z = 0.01, 0.1, 0.1, 0.1\n"
+    "     points = [(x*0.12, y*0.12, (z-25)*0.12)]\n"
+    "     for _ in range(2000):\n"
+    "         dx = sigma*(y - x)*dt; dy = (x*(rho - z) - y)*dt; dz = (x*y - beta*z)*dt\n"
+    "         x += dx; y += dy; z += dz\n"
+    "         points.append((x*0.12, y*0.12, (z-25)*0.12))\n"
+    "     curve = VMobject(color=BLUE).set_points_smoothly(np.array(points))\n"
+    "   - For Butterfly Effect, trace second trajectory starting at x+0.001 in YELLOW diverging!\n"
+    "6. Silent self.play(...) without a voiceover block will fail static validation.\n"
 )
 
 _LIST_CAPS: dict[str, int] = {
@@ -66,7 +81,7 @@ def compact_plan_for_local_coder(payload: dict[str, Any]) -> dict[str, Any]:
                     "narration": str(b.get("narration") or ""),
                     "bookmark_marks": b.get("bookmark_marks") or [],
                 }
-                for b in (script.get("beats") or [])[:10]
+                for b in (script.get("beats") or [])[:16]
                 if isinstance(b, dict)
             ],
         }
@@ -117,6 +132,7 @@ def build_coder_user_prompt(
     plan_payload: dict[str, Any],
     compact: bool = False,
     include_codemode_hint: bool = False,
+    length: str | None = None,
 ) -> str:
     payload = dict(plan_payload)
     if compact:
@@ -129,9 +145,14 @@ def build_coder_user_prompt(
         f"Use output_dir={output_dir!s} for every manim_write / compile_manim_code / "
         f"manim_read / synthesize_narration call.",
     ]
+    if length:
+        bits.append(
+            f"Target Video Length: {length} (Pace animations and voiceovers calmly, with natural pauses and full explanations to fill this educational duration with deep clarity)."
+        )
     if include_codemode_hint:
         bits.append(LOCAL_CODER_CODEMODE_HINT.rstrip("\n"))
     bits.append(CODER_SCRIPT_HINT.rstrip("\n"))
     bits.append(f"Plan:\n{plan_text}")
     return "\n".join(bits) + "\n"
+
 

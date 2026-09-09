@@ -79,6 +79,14 @@ def _heuristic_classification(user_query: str) -> Classification | None:
         "identity",
         "fourier",
         "de moivre",
+        "lorenz",
+        "attractor",
+        "chaos",
+        "differential",
+        "dynamical",
+        "physics",
+        "gravity",
+        "system",
     )
     cs_hints = (
         "algorithm",
@@ -98,20 +106,30 @@ def _heuristic_classification(user_query: str) -> Classification | None:
         "transformer",
         "llm",
     )
-    if any(h in q for h in math_hints):
-        topic = "Math Topic"
-        if "bodmas" in q:
-            topic = "BODMAS"
-        elif "pemdas" in q:
-            topic = "PEMDAS"
-        elif "euler" in q:
-            topic = "Eulers Formula"
-        return Classification(subject=Subject.MATH, topic=topic)
+    extracted_topic = re.sub(
+        r"^(teach\s+me\s+about|explain|animate|visualize|what\s+is|show\s+me|create\s+a\s+video\s+about|lecture\s+on)\s+",
+        "",
+        user_query.strip(),
+        flags=re.IGNORECASE,
+    ).strip() or user_query.strip()
+
     if any(h in q for h in cs_hints):
-        return Classification(subject=Subject.CS, topic="Computer Science Topic")
+        return Classification(subject=Subject.CS, topic=extracted_topic.title() or "Computer Science Topic")
     if any(h in q for h in ai_hints):
-        return Classification(subject=Subject.AI, topic="AI Topic")
-    return None
+        return Classification(subject=Subject.AI, topic=extracted_topic.title() or "AI Topic")
+
+    topic = extracted_topic.title() if extracted_topic else "Math Topic"
+    if "bodmas" in q:
+        topic = "BODMAS"
+    elif "pemdas" in q:
+        topic = "PEMDAS"
+    elif "euler" in q:
+        topic = "Eulers Formula"
+    elif "lorenz" in q:
+        topic = "Lorenz Attractor"
+
+    return Classification(subject=Subject.MATH, topic=topic)
+
 
 
 def _heuristic_lecture_plan(topic: str, subject: Subject | str) -> Lecture:
@@ -129,7 +147,7 @@ def _heuristic_lecture_plan(topic: str, subject: Subject | str) -> Lecture:
         greeting=f"In this lesson, you will explore {topic}.",
         needed_formulas=[],
         class_names=[scene_name],
-        does_it_needs_3d=False,
+        does_it_needs_3d=any(k in topic.lower() for k in ("3d", "lorenz", "space", "sphere")),
         assumptions=[],
         list_of_external_library_needed=[],
         animation_needed=["Write", "FadeIn", "Create", "Transform"],
@@ -188,6 +206,57 @@ def _heuristic_teaching_script(
                 takeaway="Setting theta = pi yields Euler's identity uniting 5 fundamental constants.",
                 visual="Highlight theta = pi rotating to -1, revealing e^{i pi} + 1 = 0",
                 narration="Setting theta equal to pi rotates halfway around the circle to minus one, giving Euler's identity: e to the i pi plus one equals zero.",
+            ),
+        ]
+    elif "lorenz" in topic_lower or "attractor" in topic_lower or "chaos" in topic_lower:
+        beats = [
+            TeachingBeat(
+                id="intro",
+                takeaway="The Lorenz attractor reveals deterministic chaos arising from simple fluid convection equations.",
+                visual="Title card: The Lorenz Attractor, with subtitle: Order, Chaos, and the Butterfly Effect.",
+                narration="In 1963, meteorologist Edward Lorenz was studying a simplified mathematical model of atmospheric thermal convection. He simplified fluid dynamics into three coupled nonlinear differential equations. What he discovered revolutionized science: completely deterministic equations could produce behavior so unpredictable that it birthed modern chaos theory.",
+            ),
+            TeachingBeat(
+                id="equations",
+                takeaway="The Lorenz system consists of three coupled ordinary differential equations with parameters sigma, rho, and beta.",
+                visual="Display the three equations: dx/dt = sigma(y - x), dy/dt = x(rho - z) - y, dz/dt = xy - beta z with parameters sigma=10, rho=28, beta=8/3.",
+                narration="Here are the three governing equations. The variable x represents convective circulation speed, y measures horizontal temperature variation, and z represents vertical temperature distortion. The constants sigma, rho, and beta define physical fluid properties. Notice the nonlinear products, x times z and x times y; these two terms are the mathematical engine generating chaos.",
+            ),
+            TeachingBeat(
+                id="phase_space",
+                takeaway="In three-dimensional phase space, every point uniquely represents an instantaneous fluid state.",
+                visual="Fade out equations and set up 3D coordinate frame with X, Y, and Z axes.",
+                narration="To understand this dynamic system, we step into three-dimensional phase space. Here, each axis represents one of our three variables. Every single point in this space corresponds to a complete instantaneous state of the fluid. At every location, our equations assign a velocity vector dictating where the system travels next.",
+            ),
+            TeachingBeat(
+                id="numerical_trajectory",
+                takeaway="A trajectory spirals outward around one unstable focus until crossing over to the other.",
+                visual="Trace a trajectory spiraling outward around the left focus, then crossing over to the right focus.",
+                narration="Let us trace the path of a fluid state starting near the origin. The point spirals outward around one focal point as circulation intensifies. Once its amplitude grows large enough, it flings across to the second focus, beginning another outward spiral. The trajectory endlessly loops between the two sides, never settling into equilibrium and never repeating.",
+            ),
+            TeachingBeat(
+                id="butterfly_geometry",
+                takeaway="The full Lorenz attractor forms a double-lobed strange attractor resembling the wings of a butterfly.",
+                visual="Display the full iconic butterfly attractor with dense orbital ribbons in yellow and cyan.",
+                narration="When we trace thousands of steps, the iconic butterfly silhouette emerges. Mathematicians call this a strange attractor. It is an attractor because trajectories across phase space are pulled toward it; and it is strange because its geometric structure is a fractal, possessing infinite detail within a strictly bounded volume.",
+            ),
+            TeachingBeat(
+                id="butterfly_effect",
+                takeaway="The Butterfly Effect: trajectories starting exponentially close diverge into completely different states.",
+                visual="Animate two trajectories starting 0.001 apart in contrasting colors, tracing together and then diverging to opposite wings.",
+                narration="Now observe the defining hallmark of chaos: sensitive dependence on initial conditions, commonly called the Butterfly Effect. We release two trajectories differing by just one thousandth of a unit. At first, they trace identical paths side by side. But exponential divergence soon takes over; within moments, one trajectory turns left while the other turns right, ending on completely opposite wings.",
+            ),
+            TeachingBeat(
+                id="bounded_fractal",
+                takeaway="Because trajectories never intersect, the attractor has a fractional dimension between 2 and 3.",
+                visual="Gently rotate view around the attractor, showing that sheets of trajectories never cross.",
+                narration="A remarkable consequence of determinism is that the trajectory can never intersect itself, because that would mean two identical states having different futures. Since it loops forever within finite space without intersecting or repeating, the attractor cannot be a simple two-dimensional surface. It is a fractal manifold with a dimension of approximately 2.06.",
+            ),
+            TeachingBeat(
+                id="conclusion",
+                takeaway="Deterministic chaos reveals fundamental predictability horizons in nature.",
+                visual="Final summary card: Determinism Does Not Imply Predictability.",
+                narration="The Lorenz attractor taught humanity a profound truth: determinism does not guarantee predictability. Even with flawless mathematical laws, tiny measurement uncertainties inevitably blind our forecasts over time. In this balance of order and chaos, mathematics reveals its deepest elegance.",
             ),
         ]
     else:
@@ -296,6 +365,7 @@ def _pipeline_state_for(ctx: RunContext[PipelineDeps]) -> PipelineDeps:
 @dataclass
 class AnimationState:
     user_query: str
+    target_length: str = "medium"
     classification: Classification | None = None
     plan: Lecture | None = None
     teaching_script: TeachingScript | None = None
@@ -391,6 +461,7 @@ async def run_coder_step(
     prompt_index: int | None = None,
     existing_run_dir: str | None = None,
     feedback: str | None = None,
+    length: str = "medium",
 ) -> CoderRunResult:
     """Write/compile Manim for a topic; shared by the graph node and web tools."""
     if dbos_enabled():
@@ -420,6 +491,7 @@ async def run_coder_step(
         plan_payload=payload,
         compact=local_coder,
         include_codemode_hint=local_coder,
+        length=length,
     )
     if feedback and existing_run_dir:
         from pathlib import Path
@@ -563,6 +635,7 @@ class PlanTeachingScriptNode(BaseNode[AnimationState, None, str]):
                         classification.topic,
                         _subject_str(classification.subject),
                         plan,
+                        length=ctx.state.target_length,
                     )
                 )
 
@@ -599,6 +672,7 @@ class CodeAgent(BaseNode[AnimationState, None, str]):
             teaching_script=ctx.state.teaching_script,
             user_prompt=ctx.state.user_query,
             prompt_index=ctx.state.prompt_index,
+            length=ctx.state.target_length,
         )
         ctx.state.run_dir = coder_result.run_dir
         ctx.state.coder_result = coder_result
@@ -663,11 +737,16 @@ def _find_compiled_video(run_dir: str | None) -> Path | None:
 async def run_pipeline(
     user_query: str,
     *,
+    length: str = "medium",
     prompt_index: int | None = None,
 ) -> dict:
     if dbos_enabled():
         ensure_dbos_launched()
-    state = AnimationState(user_query=user_query, prompt_index=prompt_index)
+    state = AnimationState(
+        user_query=user_query,
+        target_length=length,
+        prompt_index=prompt_index,
+    )
     # Prefer iter so UI/Celery can stream ``-> {node_id}`` on stderr.
     summary = ""
     try:

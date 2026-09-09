@@ -150,6 +150,9 @@ async def run_manim_repair_loop(
     current_code = broken_code
     current_error = error_summary
 
+    from tools.manim_source import sanitize_manim_animations
+    current_code = sanitize_manim_animations(current_code)
+
     # Fast deterministic pre-healing for missing voiceovers
     if "missing_voiceover_calls" in current_error:
         healed = auto_wrap_missing_voiceovers(current_code, scene_name)

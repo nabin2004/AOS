@@ -330,8 +330,26 @@ def compile_manim_code(
             )
 
         workspace = resolve_output_dir(output_dir)
+        manifest = load_manifest(workspace)
+        teaching_beats: list[str] = []
+        script = manifest.get("teaching_script")
+        ts_path = workspace / "teaching_script.json"
+        if not script and ts_path.exists():
+            try:
+                import json
+                script = json.loads(ts_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        if script and isinstance(script, dict):
+            beats = script.get("beats") or []
+            for b in beats:
+                if isinstance(b, dict) and b.get("narration"):
+                    teaching_beats.append(str(b["narration"]))
+                elif isinstance(b, str) and b.strip():
+                    teaching_beats.append(b.strip())
+
         scene_path = scene_file_path(workspace, scene_name)
-        code = prepare_manim_source(code)
+        code = prepare_manim_source(code, teaching_beats=teaching_beats)
         fallback_class = _scene_class_name(scene_name)
         scene_class = _discover_scene_class(code, fallback_class)
         scene_path.write_text(code, encoding="utf-8")
@@ -340,23 +358,6 @@ def compile_manim_code(
         print(f"-> VALIDATING_CODE Validating {scene_class} static syntax…", file=sys.stderr, flush=True)
         valid_static, static_err = validate_manim_code_static(code, scene_name)
         if not valid_static and static_err == "missing_voiceover_calls":
-            manifest = load_manifest(workspace)
-            teaching_beats: list[str] = []
-            script = manifest.get("teaching_script")
-            ts_path = workspace / "teaching_script.json"
-            if not script and ts_path.exists():
-                try:
-                    import json
-                    script = json.loads(ts_path.read_text(encoding="utf-8"))
-                except Exception:
-                    pass
-            if script and isinstance(script, dict):
-                beats = script.get("beats") or []
-                for b in beats:
-                    if isinstance(b, dict) and b.get("narration"):
-                        teaching_beats.append(str(b["narration"]))
-                    elif isinstance(b, str) and b.strip():
-                        teaching_beats.append(b.strip())
 
             topic = manifest.get("topic") or scene_class
             auto_wrapped = auto_wrap_missing_voiceovers(code, topic=topic, teaching_beats=teaching_beats)
@@ -410,6 +411,7 @@ def compile_manim_code(
 
         timed_out = False
         print(f"-> RENDERING Rendering animation scene {scene_class}…", file=sys.stderr, flush=True)
+        render_timeout = int(os.getenv("AOS_RENDER_TIMEOUT_SECONDS", str(RENDER_TIMEOUT_SECONDS)))
         try:
             proc = subprocess.run(
                 cmd,
@@ -418,13 +420,13 @@ def compile_manim_code(
                 check=False,
                 cwd=workspace,
                 env=_manim_env(),
-                timeout=RENDER_TIMEOUT_SECONDS,
+                timeout=render_timeout,
             )
             output = proc.stdout + proc.stderr
             returncode = proc.returncode
         except subprocess.TimeoutExpired as exc:
             timed_out = True
-            output = (exc.stdout or "") + (exc.stderr or "") + f"\nRendering timed out after {RENDER_TIMEOUT_SECONDS}s."
+            output = (exc.stdout or "") + (exc.stderr or "") + f"\nRendering timed out after {render_timeout}s."
             returncode = -1
 
         log_path.write_text(output, encoding="utf-8")

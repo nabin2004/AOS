@@ -29,11 +29,13 @@ STRING RULES (CRITICAL):
 - Multi-line Manim source MUST use triple quotes ('''...''' or \"\"\"...\"\"\").
 - Never call run_code from inside code passed to run_code, manim_write, or compile_manim_code.
 
-Voiceover & Pedagogy (required — copy Plan.teaching_script):
+Voiceover, Pacing & Pedagogy (required — copy Plan.teaching_script):
 - Scene MUST subclass VoiceoverScene (from manim_voiceover), call set_speech_service(AOSSpeechService(voice="alba", cache_dir="voiceover_cache")).
 - Wrap EVERY animation beat in `with self.voiceover(text="...") as tracker:` blocks.
 - Use teaching_script narration VERBATIM from the plan. Do not invent filler narration.
-- Build clear, well-framed visual geometry (scale axes to fit frame |x|<=6, |y|<=3.5, label axes, animate meaningful vectors).
+- CALM PACING: Allow concepts to breathe! Use run_time=max(2.0, tracker.duration * 0.85) for animations. Add a calm pause `self.wait(1.5)` to `self.wait(2.5)` after each beat.
+- SCREEN HYGIENE (NO OVERLAPS): Explicitly clear/FadeOut previous elements before drawing new coordinate frames or 3D axes. NEVER create 3D axes on top of equations in the center!
+- DYNAMIC SYSTEMS (e.g. Lorenz Attractor): Compute actual numerical trajectories with numpy (e.g. integrate dx/dt=sigma*(y-x), dy/dt=x*(rho-z)-y, dz/dt=x*y-beta*z for 2000 steps). Scale coordinates by 0.12 and center. Create with VMobject().set_points_smoothly(points) and Create(curve, run_time=tracker.duration). For chaos, show two nearby trajectories (0.001 apart) diverging!
 - Silent self.play without voiceover will fail compile.
 
 Example skeleton:
