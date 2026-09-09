@@ -137,9 +137,13 @@ def model_for(role: AgentRole) -> str:
 
 
 def _max_tokens_for(role: AgentRole) -> int:
+    num_ctx = _ollama_num_ctx()
     if role == "coder":
-        return int(_env("AOS_CODER_MAX_TOKENS", "2048"))
-    return int(_env("AOS_MAX_TOKENS", "2048"))
+        raw = int(_env("AOS_CODER_MAX_TOKENS", "4096"))
+    else:
+        raw = int(_env("AOS_MAX_TOKENS", "4096"))
+    # Defensive clamp: completion tokens cannot exceed half the total context length
+    return min(raw, max(2048, num_ctx // 2))
 
 
 def _ollama_num_ctx() -> int:
