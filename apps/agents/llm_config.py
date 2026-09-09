@@ -171,9 +171,11 @@ def model_for_agent(role: AgentRole) -> str | object:
                 "AOS_MODEL_PROFILE=openai_compatible requires AOS_OPENAI_BASE_URL"
             )
         primary = build_openai_compatible_chat_model(model)
-        from pydantic_ai.models.fallback import FallbackModel
-        fallback = resolve_model(_openrouter_model())
-        return FallbackModel(primary, fallback)
+        if os.getenv("OPENROUTER_API_KEY", "").strip():
+            from pydantic_ai.models.fallback import FallbackModel
+            fallback = resolve_model(_openrouter_model())
+            return FallbackModel(primary, fallback)
+        return primary
     return resolve_model(model)
 
 

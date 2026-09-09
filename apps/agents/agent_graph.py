@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+import re
 import sys
 from dotenv import load_dotenv
 
@@ -107,6 +108,34 @@ def _heuristic_classification(user_query: str) -> Classification | None:
     if any(h in q for h in ai_hints):
         return Classification(subject=Subject.AI, topic="AI Topic")
     return None
+
+
+def _heuristic_lecture_plan(topic: str, subject: Subject | str) -> Lecture:
+    """Generate a clean, valid default Lecture plan if the planner LLM fails."""
+    subj = (
+        Subject(subject)
+        if isinstance(subject, str) and subject in Subject._value2member_map_
+        else (subject if isinstance(subject, Subject) else Subject.MATH)
+    )
+    clean_topic = re.sub(r"[^A-Za-z0-9]", "", topic.title()) or "Main"
+    scene_name = f"{clean_topic}Scene"
+    return Lecture(
+        topic=topic,
+        subject=subj,
+        greeting=f"In this lesson, you will explore {topic}.",
+        needed_formulas=[],
+        class_names=[scene_name],
+        does_it_needs_3d=False,
+        assumptions=[],
+        list_of_external_library_needed=[],
+        animation_needed=["Write", "FadeIn", "Create", "Transform"],
+        animation_updaters_needed=[],
+        camera_needed=[],
+        Mobjects_needed=["Title", "Text", "MathTex", "VGroup"],
+        objectives=[f"Understand the core intuition behind {topic}"],
+        opener=f"You will see the fundamental principles of {topic} visualized step by step.",
+        learning_outcomes=[f"Explain the key intuition behind {topic}"],
+    )
 
 
 def _run_classifier():
@@ -312,7 +341,7 @@ async def run_coder_step(
         stopped_reason = f"usage_limit: {exc}"
         summary = stopped_reason
     except Exception as exc:
-        stopped_reason = format_custom_endpoint_error(f"error: {exc}")
+        stopped_reason = format_custom_endpoint_error(exc)
         summary = stopped_reason
 
     _salvage_codemode_text_dump(run_dir, summary=summary, messages=messages)
@@ -346,7 +375,7 @@ class ClassifyNode(BaseNode[AnimationState, None, str]):
             result = await _run_classifier().run(ctx.state.user_query)
             ctx.state.classification = result.output
         except Exception as exc:
-            classify_error = format_custom_endpoint_error(str(exc))
+            classify_error = format_custom_endpoint_error(exc)
             print(f"classifier error: {classify_error}", file=sys.stderr, flush=True)
             ctx.state.classification = None
 
@@ -376,14 +405,29 @@ class PlanLectureNode(BaseNode[AnimationState, None, str]):
     async def run(self, ctx: GraphRunContext[AnimationState]) -> "PlanTeachingScriptNode":
         if dbos_enabled():
             ensure_dbos_launched()
+        plan_error: str | None = None
+        classification = ctx.state.classification
+        topic = classification.topic if classification else "Math Topic"
+        subject = classification.subject if classification else Subject.MATH
         try:
             result = await _run_planner().run(
-                f"Topic: {ctx.state.classification.topic}\n"
-                f"Subject: {ctx.state.classification.subject}"
+                f"Topic: {topic}\n"
+                f"Subject: {subject}"
             )
+            ctx.state.plan = result.output
         except Exception as exc:
-            raise RuntimeError(format_custom_endpoint_error(str(exc))) from exc
-        ctx.state.plan = result.output
+            plan_error = format_custom_endpoint_error(exc)
+            print(f"planner error: {plan_error}", file=sys.stderr, flush=True)
+            ctx.state.plan = None
+
+        if ctx.state.plan is None:
+            print(
+                f"-> PlanFallback {subject} {topic}",
+                file=sys.stderr,
+                flush=True,
+            )
+            ctx.state.plan = _heuristic_lecture_plan(topic, subject)
+
         return PlanTeachingScriptNode()
 
 
@@ -505,7 +549,7 @@ async def run_pipeline(
                 for task in step:
                     print(f"-> {task.node_id}", file=sys.stderr, flush=True)
     except Exception as exc:
-        raise RuntimeError(format_custom_endpoint_error(str(exc))) from exc
+        raise RuntimeError(format_custom_endpoint_error(exc)) from exc
     if state.coder_result is not None:
         result = state.coder_result.model_dump(mode="json")
         if prompt_index is not None:

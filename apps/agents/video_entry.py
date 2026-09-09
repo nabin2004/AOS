@@ -213,7 +213,7 @@ async def run_animate(
         return VideoArtifact(
             ok=False,
             mode="animate",
-            error=format_custom_endpoint_error(str(exc)),
+            error=format_custom_endpoint_error(exc),
         )
 
     run_dir = result.get("run_dir")

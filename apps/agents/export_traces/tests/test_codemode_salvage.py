@@ -137,3 +137,59 @@ def test_salvage_tool_call_summary(tmp_path: Path):
         assert "class EulerScene" in write_kwargs["code"]
         assert write_kwargs["scene_name"] == "EulerScene"
         assert mock_compile.called, "compile_manim_code should have been called after salvage"
+
+
+# ---- FallbackModel and PlanFallback tests ----
+
+def test_format_custom_endpoint_error_exception_group():
+    """format_custom_endpoint_error should unpack sub-exceptions from ExceptionGroup."""
+    from openai_compatible import format_custom_endpoint_error
+
+    exc = ExceptionGroup("All models from FallbackModel failed", [
+        RuntimeError("503 Service Unavailable"),
+        RuntimeError("401 Unauthorized API key expired"),
+    ])
+    formatted = format_custom_endpoint_error(exc)
+    assert "Custom LLM endpoint is unavailable" in formatted or "503" in formatted
+    assert "LLM authentication failed" in formatted or "401" in formatted
+
+
+def test_heuristic_lecture_plan():
+    """_heuristic_lecture_plan should return a valid Lecture IR object."""
+    from agent_graph import _heuristic_lecture_plan
+    from ir.manim_ir import Subject
+
+    plan = _heuristic_lecture_plan("Euler's Formula", Subject.MATH)
+    assert plan.topic == "Euler's Formula"
+    assert plan.subject == Subject.MATH
+    assert len(plan.class_names) == 1
+    assert plan.does_it_needs_3d is False
+
+
+@pytest.mark.asyncio
+async def test_plan_lecture_node_fallback():
+    """PlanLectureNode should fall back to _heuristic_lecture_plan when LLM planner fails."""
+    from agent_graph import AnimationState, PlanLectureNode
+    from ir.manim_ir import Classification, Subject
+
+    state = AnimationState(user_query="Teach me about the Euler's formula")
+    state.classification = Classification(subject=Subject.MATH, topic="Euler's Formula")
+
+    with patch("agent_graph._run_planner") as mock_planner:
+        mock_agent = AsyncMock()
+        mock_agent.run.side_effect = RuntimeError("All models from FallbackModel failed")
+        mock_planner.return_value = mock_agent
+
+        node = PlanLectureNode()
+
+        class MockCtx:
+            def __init__(self, s):
+                self.state = s
+
+        ctx = MockCtx(state)
+        await node.run(ctx)
+
+        assert ctx.state.plan is not None
+        assert ctx.state.plan.topic == "Euler's Formula"
+        assert ctx.state.plan.subject == Subject.MATH
+

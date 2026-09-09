@@ -40,7 +40,9 @@ _ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
 _STAGE_MESSAGES: dict[str, str] = {
     "ClassifyNode": "Classifying topic…",
+    "ClassifyFallback": "Classifying topic (fallback)…",
     "PlanLectureNode": "Planning the lecture…",
+    "PlanFallback": "Planning the lecture (fallback)…",
     "PlanTeachingScriptNode": "Writing the teaching script…",
     "CodeAgent": "Writing Manim code…",
     "CodeAgentNode": "Writing Manim code…",
@@ -240,6 +242,12 @@ def _run_agents_cli(
                 "AOS_ANIMATION_MODEL",
             ):
                 env[role_env] = custom_model
+        openrouter_key = (
+            getattr(settings, "OPENROUTER_API_KEY", "")
+            or os.getenv("OPENROUTER_API_KEY", "").strip()
+        )
+        if openrouter_key:
+            env["OPENROUTER_API_KEY"] = openrouter_key
     else:
         # UI Animate path: force OpenRouter for the full Classify→Plan→Code graph
         # (default agents profile is hybrid and expects Ollama for the coder).

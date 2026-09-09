@@ -104,9 +104,23 @@ def build_openai_provider(base_url: str, api_key: str) -> OpenAIProvider:
         )
 
 
-def format_custom_endpoint_error(error: str, *, base_url: str | None = None) -> str:
-    """Format 503 and 401 errors into clear, actionable messages."""
-    text = (error or "").strip()
+def format_custom_endpoint_error(
+    error: str | Exception,
+    *,
+    base_url: str | None = None,
+) -> str:
+    """Format 503, 401, timeout, and fallback errors into clear, actionable messages."""
+    if isinstance(error, BaseException):
+        if hasattr(error, "exceptions"):
+            subs = [
+                format_custom_endpoint_error(sub, base_url=base_url)
+                for sub in getattr(error, "exceptions", [])
+            ]
+            return f"All models failed: {' | '.join(subs)}"
+        text = str(error).strip()
+    else:
+        text = str(error or "").strip()
+
     if "Custom LLM endpoint is unavailable" in text or "LLM authentication failed" in text:
         return text
     lowered = text.lower()
@@ -116,16 +130,16 @@ def format_custom_endpoint_error(error: str, *, base_url: str | None = None) -> 
             "Please configure a valid OPENROUTER_API_KEY in apps/ui/aos/backend/.env "
             "or set your custom LLM provider in Settings."
         )
-    if "503" not in lowered and "service unavailable" not in lowered:
-        return text or "custom_llm_failed"
-    host = (base_url or openai_compatible_base_url() or "the custom LLM endpoint").rstrip("/")
-    return (
-        "Custom LLM endpoint is unavailable (HTTP 503). "
-        "The Modal app may be scaled to zero or still loading — wait and retry, "
-        "or redeploy nabinoli2004--aos-qwen-coder-server and confirm the UI base URL "
-        f"ends with /v1 ({host}). "
-        f"Original: {text[:400]}"
-    )
+    if any(k in lowered for k in ("503", "502", "504", "service unavailable", "connecterror", "connection refused", "timeout")):
+        host = (base_url or openai_compatible_base_url() or "the custom LLM endpoint").rstrip("/")
+        return (
+            f"Custom LLM endpoint is unavailable or timed out ({host}). "
+            "The Modal app may be scaled to zero or still loading — wait and retry, "
+            "or redeploy nabinoli2004--aos-qwen-coder-server and confirm the UI base URL "
+            "ends with /v1. "
+            f"Original: {text[:400]}"
+        )
+    return text or "custom_llm_failed"
 
 
 def build_openai_compatible_chat_model(model: str) -> OpenAIChatModel:
