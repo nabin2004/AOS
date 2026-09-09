@@ -140,7 +140,7 @@ def make_training_args(
         learning_rate=config.learning_rate or DEFAULT_LEARNING_RATE,
         logging_steps=10,
         save_strategy="steps",
-        save_steps=100,
+        save_steps=50,
         save_total_limit=2,
         push_to_hub=config.push_to_hub,
         hub_model_id=config.hub_repo,

@@ -252,7 +252,7 @@ def executability_reward(completions: list[object], **kwargs) -> list[float]:
             script = comp_dir / "scene.py"
             script.write_text(_extract_python(code), encoding="utf-8")
             result = subprocess.run(
-                ["manim", "-pql", "--media_dir", str(comp_dir), str(script)],
+                ["manim", "-ql", "-s", "--media_dir", str(comp_dir), str(script)],
                 capture_output=True,
                 text=True,
                 timeout=60,
