@@ -84,12 +84,14 @@ async def _run_full_pipeline(user_request: str, max_validation_attempts: int):
     return state, output
 
 
-async def _run_animate_pipeline(user_request: str, length: str = "medium") -> dict:
+async def _run_animate_pipeline(user_request: str, length: str = "medium", cinematic: bool = False) -> dict:
     from agent_graph import animation_graph as animate_graph
     from agent_graph import AnimationState as AnimateState
+    from cinematic_director import is_cinematic_mode
     from ir.manim_ir import Subject
 
-    state = AnimateState(user_query=user_request, target_length=length)
+    cinematic_active = is_cinematic_mode(user_request, flag=cinematic)
+    state = AnimateState(user_query=user_request, target_length=length, cinematic=cinematic_active)
     async with animate_graph.iter(state=state) as run:
         async for step in run:
             if isinstance(step, EndMarker):
@@ -188,6 +190,15 @@ def animate(
             "Does NOT disable VoiceoverScene / in-scene voiceover."
         ),
     ),
+    cinematic: bool = typer.Option(
+        False,
+        "--cinematic",
+        "-c",
+        help=(
+            "Enable cinematic mode: high-production visual aesthetic, multi-axis camera orbits, "
+            "and SciPy/NumPy velocity gradient simulation."
+        ),
+    ),
     as_json: bool = typer.Option(
         False,
         "--json",
@@ -208,10 +219,13 @@ def animate(
     """Run the animation pipeline (classify → plan → Manim coder → compile)."""
     import os
 
+    from cinematic_director import is_cinematic_mode
     from llm_config import PipelineEnvError, validate_pipeline_env
 
     if fast:
         os.environ["AOS_SFT_BATCH"] = "1"
+    if cinematic or is_cinematic_mode(request):
+        os.environ["AOS_CINEMATIC_MODE"] = "1"
 
     req_lower = request.lower()
     chosen_length = length
@@ -250,7 +264,7 @@ def animate(
             )
             raise typer.Exit(code=1) from exc
 
-        artifact = asyncio.run(run_animate(request, output_dir=output_dir, length=chosen_length))
+        artifact = asyncio.run(run_animate(request, output_dir=output_dir, length=chosen_length, cinematic=cinematic))
         payload = artifact.model_dump(mode="json")
         _emit_json(payload)
         # Fail when compile failed, missing video, or MP4 has no audio stream.

@@ -134,6 +134,14 @@ LOCAL_CODER_CODEMODE_HINT = (
 )
 
 
+from cinematic_director import (
+    CINEMATIC_MANIMCE_CONTEXT,
+    get_mathematical_model,
+    get_numerical_simulation_recipe,
+    is_cinematic_mode,
+)
+
+
 def build_coder_user_prompt(
     *,
     topic: str,
@@ -143,8 +151,11 @@ def build_coder_user_prompt(
     compact: bool = False,
     include_codemode_hint: bool = False,
     length: str | None = None,
+    cinematic: bool = False,
 ) -> str:
     payload = dict(plan_payload)
+    cinematic_active = cinematic or is_cinematic_mode(topic)
+
     # Annotate teaching_script beats with cinematic hint tags before compacting.
     script = payload.get("teaching_script")
     if isinstance(script, dict):
@@ -165,11 +176,21 @@ def build_coder_user_prompt(
         bits.append(
             f"Target Video Length: {length} (Pace animations and voiceovers calmly, with natural pauses and full explanations to fill this educational duration with deep clarity)."
         )
+    if cinematic_active:
+        bits.append(
+            "*** CINEMATIC VISUALIZATION MODE ACTIVE ***\n"
+            "Style Contract: Deep high-contrast dark aesthetic (#050814), multi-axis camera orbits, "
+            "velocity gradient color mapping (PRIMARY -> SECONDARY -> HIGHLIGHT), continuous particle updaters, "
+            "and mathematical rigor."
+        )
+        bits.append(CINEMATIC_MANIMCE_CONTEXT.rstrip("\n"))
+        bits.append(f"DATA ENGINEER NUMERICAL SIMULATION RECIPE:\n{get_numerical_simulation_recipe(topic).strip()}")
+
     if include_codemode_hint:
         bits.append(LOCAL_CODER_CODEMODE_HINT.rstrip("\n"))
     bits.append(CODER_SCRIPT_HINT.rstrip("\n"))
     bits.append(CINEMATIC_HINT_LEGEND.rstrip("\n"))
-    template_boilerplate = get_template_for_duration(length or "medium")
+    template_boilerplate = get_template_for_duration(length or "medium", cinematic=cinematic_active)
     bits.append(
         f"RECOMMENDED PRODUCTION TEMPLATE (Strictly adhere to this architecture):\n```python\n{template_boilerplate}\n```"
     )

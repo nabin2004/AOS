@@ -366,6 +366,7 @@ def _pipeline_state_for(ctx: RunContext[PipelineDeps]) -> PipelineDeps:
 class AnimationState:
     user_query: str
     target_length: str = "medium"
+    cinematic: bool = False
     classification: Classification | None = None
     plan: Lecture | None = None
     teaching_script: TeachingScript | None = None
@@ -462,6 +463,7 @@ async def run_coder_step(
     existing_run_dir: str | None = None,
     feedback: str | None = None,
     length: str = "medium",
+    cinematic: bool = False,
 ) -> CoderRunResult:
     """Write/compile Manim for a topic; shared by the graph node and web tools."""
     if dbos_enabled():
@@ -492,6 +494,7 @@ async def run_coder_step(
         compact=local_coder,
         include_codemode_hint=local_coder,
         length=length,
+        cinematic=cinematic,
     )
     if feedback and existing_run_dir:
         from pathlib import Path
@@ -636,6 +639,7 @@ class PlanTeachingScriptNode(BaseNode[AnimationState, None, str]):
                         _subject_str(classification.subject),
                         plan,
                         length=ctx.state.target_length,
+                        cinematic=ctx.state.cinematic,
                     )
                 )
 
@@ -673,6 +677,7 @@ class CodeAgent(BaseNode[AnimationState, None, str]):
             user_prompt=ctx.state.user_query,
             prompt_index=ctx.state.prompt_index,
             length=ctx.state.target_length,
+            cinematic=ctx.state.cinematic,
         )
         ctx.state.run_dir = coder_result.run_dir
         ctx.state.coder_result = coder_result
@@ -738,13 +743,17 @@ async def run_pipeline(
     user_query: str,
     *,
     length: str = "medium",
+    cinematic: bool = False,
     prompt_index: int | None = None,
 ) -> dict:
     if dbos_enabled():
         ensure_dbos_launched()
+    from cinematic_director import is_cinematic_mode
+    cinematic_active = is_cinematic_mode(user_query, flag=cinematic)
     state = AnimationState(
         user_query=user_query,
         target_length=length,
+        cinematic=cinematic_active,
         prompt_index=prompt_index,
     )
     # Prefer iter so UI/Celery can stream ``-> {node_id}`` on stderr.

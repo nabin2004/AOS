@@ -241,7 +241,10 @@ def teaching_script_user_prompt(
     lecture: Any,
     *,
     length: str = "medium",
+    cinematic: bool = False,
 ) -> str:
+    from cinematic_director import is_cinematic_mode
+
     if hasattr(lecture, "model_dump"):
         plan = lecture.model_dump(mode="json")
     elif isinstance(lecture, dict):
@@ -251,6 +254,7 @@ def teaching_script_user_prompt(
 
     is_long = length in ("long", "10m", "10min", "10", "15m", "15min", "15")
     is_medium = length in ("medium", "5m", "5min", "5", "default")
+    cinematic_active = cinematic or is_cinematic_mode(topic)
 
     if is_long:
         pacing_guide = (
@@ -276,9 +280,18 @@ def teaching_script_user_prompt(
             "- Each beat contains 2–3 sentences of clear conceptual intuition."
         )
 
+    cinematic_block = ""
+    if cinematic_active:
+        cinematic_block = (
+            "\nCinematic Director Aesthetics:\n"
+            "- Visuals must specify 3D sweeping camera movements (e.g. 'Camera orbits slowly around the 3D attractor').\n"
+            "- Visuals must include velocity-based color grading and trajectory tracing.\n"
+            "- Narration must evoke profound mathematical beauty and physical intuition.\n"
+        )
+
     return (
         f"Topic: {topic}\n"
         f"Subject: {subject}\n"
-        f"Pacing & Duration Guidelines:\n{pacing_guide}\n\n"
+        f"Pacing & Duration Guidelines:\n{pacing_guide}{cinematic_block}\n\n"
         f"Lecture plan:\n{json.dumps(plan, indent=2)}"
     )
