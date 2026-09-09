@@ -38,6 +38,10 @@ apps/qwenCoder/data_narrated_dpo/
 .pytest_cache/
 media/
 narration_demo.wav
+**/voiceover_cache/
+*.wav
+*.mp3
+apps/videos/
 
 # Eval outputs and external reference clones
 apps/educlaw/eval_output/
