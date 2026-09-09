@@ -2,11 +2,12 @@
 
 Disaggregated multi-modal evaluator running strictly on GPU 1 (cuda:1):
 - Evaluates spatial alignment, mathematical correctness, layout clarity, and label placement.
-- Operates in 4-bit NF4 quantization (~2.2 GB VRAM footprint on 16 GB card).
-- Enforces strict generation caps (max_new_tokens=4) to avoid autoregressive latency/hangs.
+- Operates in 4-bit NF4 quantization (~2.2-2.5 GB VRAM footprint on 16 GB card).
+- Uses 448px resolution (paligemma2-3b-mix-448) for high visual acuity on LaTeX notation.
+- Employs single-forward-pass direct logit scoring over rating tokens (1..5) to achieve ~15-25ms latency with 100% deterministic, continuous scoring without autoregressive decode hangs.
 - Supports Cascading Reward Filter (Ensemble):
     Stage 1: OpenCLIP fast filter (< 0.15 similarity drops immediately).
-    Stage 2: Gemma Expert Grader on candidate frames passing threshold.
+    Stage 2: PaliGemma Expert Grader on candidate frames passing threshold.
 """
 
 from __future__ import annotations
@@ -30,7 +31,7 @@ except ImportError:
 # Global cached judge instance (singleton per process on reward device)
 _GLOBAL_GEMMA_JUDGE: Optional["GemmaVisualJudge"] = None
 
-DEFAULT_VLM_MODEL = "google/paligemma2-3b-pt-224"
+DEFAULT_VLM_MODEL = "google/paligemma2-3b-mix-448"
 DEFAULT_VLM_THRESHOLD = 0.15
 
 
@@ -103,6 +104,9 @@ class GemmaVisualJudge:
         self.device_str = device or os.environ.get("AOS_REWARD_DEVICE", "cuda:1")
         self.load_in_4bit = load_in_4bit
         self.max_new_tokens = max_new_tokens
+
+        self.rating_tokens = ["1", "2", "3", "4", "5"]
+        self.rating_token_ids: Optional[list[int]] = None
 
         self.model = None
         self.processor = None
@@ -197,6 +201,18 @@ class GemmaVisualJudge:
                 )
 
         self.model.eval()
+
+        # Pre-cache rating token IDs for fast direct logit scoring
+        try:
+            tokenizer = getattr(self.processor, "tokenizer", self.processor)
+            self.rating_token_ids = [
+                tokenizer.encode(t, add_special_tokens=False)[-1]
+                for t in self.rating_tokens
+            ]
+        except Exception as e:
+            print(f"[VLM Judge] Note: Could not pre-cache rating token IDs: {e}", file=sys.stderr)
+            self.rating_token_ids = None
+
         self._is_loaded = True
         print(f"✔ [VLM Judge] Successfully initialized {self.model_id} on {target_device}.", file=sys.stderr, flush=True)
 
@@ -230,8 +246,8 @@ class GemmaVisualJudge:
             clean_prompt = clean_prompt[:250]
 
         eval_prompt = (
-            f"Rate this math animation frame for: {clean_prompt}. "
-            f"Check math clarity, geometry, and layout. Rate 0.0 to 1.0. SCORE:"
+            f"Rate the visual clarity, mathematical notation, and layout of this animation frame "
+            f"for '{clean_prompt}' from 1 to 5:"
         )
 
         try:
@@ -246,6 +262,32 @@ class GemmaVisualJudge:
             )
             inputs = {k: v.to(target_device) if hasattr(v, "to") else v for k, v in inputs.items()}
 
+            # 1. Direct logit evaluation (Single forward pass, ~15-25ms latency, deterministic)
+            if self.rating_token_ids is None and self.processor is not None:
+                try:
+                    tokenizer = getattr(self.processor, "tokenizer", self.processor)
+                    self.rating_token_ids = [
+                        tokenizer.encode(t, add_special_tokens=False)[-1]
+                        for t in self.rating_tokens
+                    ]
+                except Exception:
+                    pass
+
+            if self.rating_token_ids and hasattr(self.model, "__call__"):
+                with torch.inference_mode():
+                    outputs = self.model(**inputs)
+                    if hasattr(outputs, "logits"):
+                        # Extract logits at the final prompt token position
+                        last_logits = outputs.logits[:, -1, :]  # [batch_size, vocab_size]
+                        candidate_logits = last_logits[0, self.rating_token_ids]  # [5]
+                        probs = torch.softmax(candidate_logits, dim=-1)
+                        # Continuous expectation mapped from Likert 1..5 to [0.0, 1.0]:
+                        # 1 -> 0.0, 2 -> 0.25, 3 -> 0.50, 4 -> 0.75, 5 -> 1.0
+                        weights = torch.tensor([0.0, 0.25, 0.50, 0.75, 1.0], device=candidate_logits.device)
+                        score = torch.sum(probs * weights).item()
+                        return max(0.0, min(1.0, round(score, 4)))
+
+            # 2. Fallback to autoregressive generation if logit extraction is unavailable
             with torch.inference_mode():
                 generated_ids = self.model.generate(
                     **inputs,

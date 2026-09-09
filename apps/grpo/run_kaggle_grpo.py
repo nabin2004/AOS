@@ -234,7 +234,7 @@ def run_grpo_training(
     run_name: str,
     stack_lora: bool = False,
     vlm_judge: str = "ensemble",
-    vlm_model: str = "google/paligemma2-3b-pt-224",
+    vlm_model: str = "google/paligemma2-3b-mix-448",
     vlm_threshold: float = 0.15,
     push_to_hub: bool = False,
     hub_repo: str | None = None,
@@ -385,8 +385,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--vlm-model",
-        default="google/paligemma2-3b-pt-224",
-        help="VLM model ID on Hugging Face (default: google/paligemma2-3b-pt-224)",
+        default="google/paligemma2-3b-mix-448",
+        help="VLM model ID on Hugging Face (default: google/paligemma2-3b-mix-448)",
     )
     parser.add_argument(
         "--vlm-threshold",
