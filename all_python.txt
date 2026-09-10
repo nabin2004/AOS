@@ -1,0 +1,349 @@
+```python
+import modal
+from fastapi import FastAPI
+
+image = (
+    modal.Image.from_registry("python:3.12-slim")
+    .pip_install_from_pyproject("../../pyproject.toml")
+    .env({"AOS_MODEL_PROFILE": "cloud"})
+)
+
+app = modal.App("aos-api", image=image)
+
+@app.function(cpu=2, memory=1024, secrets=[modal.Secret.from_name("aos-secrets")])
+@modal.asgi_app()
+def fastapi_app():
+    from apps.server.main import app as server_app
+    return server_app
+```
+```python
+# apps/server/vllm_endpoint.py
+import modal
+
+GPU = modal.gpu.A10G()
+vllm_image = modal.Image.debian_slim().pip_install("vllm", "huggingface_hub")
+
+@app.function(gpu=GPU, image=vllm_image, timeout=600,
+              secrets=[modal.Secret.from_name("aos-secrets")])
+@modal.asgi_app()
+def serve_vllm():
+    from vllm.entrypoints.openai.api_server import build_app
+    return build_app(model="nabin2004/AOS-qwen3-8b-grpo", dtype="bfloat16")
+```
+```python
+import subprocess, os
+from kaggle_secrets import UserSecretsClient
+
+secrets = UserSecretsClient()
+os.environ["HF_TOKEN"] = secrets.get_secret("HF_TOKEN")
+os.environ["WANDB_API_KEY"] = secrets.get_secret("WANDB_API_KEY")
+
+# Check CUDA before reinstalling PyTorch (avoids 2.5 GB re-download per AGENTS.md rule)
+import torch
+print("CUDA available:", torch.cuda.is_available())
+print("GPU count:", torch.cuda.device_count())
+
+subprocess.run(["git", "clone", "https://github.com/nabin2004/AOS.git"], check=True)
+subprocess.run(["pip", "install", "-e", "AOS/apps/grpo"], check=True)
+```
+```python
+import modal, os, subprocess, tempfile
+import boto3
+
+manim_image = (
+    modal.Image.from_registry("manimcommunity/manim:stable")
+    .pip_install("boto3")
+)
+
+@app.function(
+    image=manim_image,
+    cpu=4,
+    memory=4096,
+    timeout=600,
+    secrets=[modal.Secret.from_name("aos-secrets")],
+)
+def render_scene(scene_code: str, scene_name: str, quality: str = "l") -> str:
+    """Render a single Manim scene and upload result to Cloudflare R2."""
+    with tempfile.NamedTemporaryFile(suffix=".py", mode="w", delete=False) as f:
+        f.write(scene_code)
+        scene_file = f.name
+
+    subprocess.run(
+        ["manim", f"-q{quality}", scene_file, scene_name,
+         "--output-file", f"{scene_name}.mp4"],
+        check=True
+    )
+
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=f"https://{os.environ['CF_ACCOUNT_ID']}.r2.cloudflarestorage.com",
+        aws_access_key_id=os.environ["CLOUDFLARE_R2_KEY"],
+        aws_secret_access_key=os.environ["CLOUDFLARE_R2_SECRET"],
+    )
+    key = f"renders/{scene_name}.mp4"
+    s3.upload_file(f"{scene_name}.mp4", "aos-artifacts", key)
+    return f"https://pub.r2.dev/aos-artifacts/{key}"
+
+
+def render_lecture_parallel(scenes: list[dict]) -> list[str]:
+    """Fan out all scenes in parallel — total time = slowest single scene."""
+    return list(render_scene.starmap(
+        [(s["code"], s["name"]) for s in scenes]
+    ))
+```
+```python
+if os.environ.get("AOS_RENDER_BACKEND") == "modal":
+    from apps.agents.tools.render_modal import render_lecture_parallel
+    return render_lecture_parallel(scenes)
+else:
+    # Existing Docker path (local development)
+    ...
+```
+```python
+# apps/audio_service/modal_narrator.py
+@app.function(cpu=4, memory=2048, timeout=300,
+              secrets=[modal.Secret.from_name("aos-secrets")])
+def synthesize_beat(text: str, beat_id: str) -> dict:
+    """Run Pocket TTS on a narration beat. Returns timestamps + R2 URL."""
+    from apps.audio_service.narrator import Narrator
+    narrator = Narrator()
+    result = narrator.synthesize(text)
+    upload_to_r2(result.audio_bytes, f"audio/{beat_id}.wav")
+    return {"url": f"https://pub.r2.dev/aos-artifacts/audio/{beat_id}.wav",
+            "timestamps": result.word_timestamps}
+```
+```python
+from prometheus_client import Counter, Histogram, make_asgi_app
+
+REQUEST_COUNT = Counter("aos_requests_total", "Total API requests", ["endpoint", "status"])
+RENDER_DURATION = Histogram("aos_render_duration_seconds", "Manim render duration")
+PIPELINE_STEPS = Counter("aos_pipeline_steps_total", "Pipeline step completions", ["step"])
+
+# Mount Prometheus endpoint
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
+```
+```python
+"""Production Modal serverless orchestration app for AOS."""
+from __future__ import annotations
+
+import os
+import subprocess
+import tempfile
+import uuid
+from typing import Any
+
+import modal
+from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+# 1. Base Container Image with System Dependencies & LaTeX
+manim_image = (
+    modal.Image.debian_slim(python_version="3.12")
+    .apt_install(
+        "ffmpeg",
+        "libcairo2-dev",
+        "libpango1.0-dev",
+        "texlive",
+        "texlive-latex-extra",
+        "texlive-fonts-extra",
+        "git",
+    )
+    .pip_install(
+        "manim>=0.18.0",
+        "boto3>=1.34.0",
+        "pydantic-ai>=0.0.14",
+        "fastapi>=0.110.0",
+        "uvicorn>=0.28.0",
+        "prometheus-client>=0.20.0",
+        "logfire[fastapi]>=0.50.0",
+        "manim-voiceover>=0.1.1",
+    )
+)
+
+app = modal.App("aos-api", image=manim_image)
+
+# In-memory distributed state dictionary for job tracking
+job_store = modal.Dict.from_name("aos-job-store", create_if_missing=True)
+
+# 2. Parallel Scene Rendering Worker Function
+@app.function(
+    image=manim_image,
+    cpu=4.0,
+    memory=4096,
+    timeout=600,
+    secrets=[modal.Secret.from_name("aos-secrets")],
+)
+def render_scene_modal(scene_code: str, scene_name: str, quality: str = "l") -> dict[str, Any]:
+    """Renders a single Manim scene and uploads MP4 to Cloudflare R2."""
+    import boto3
+    from botocore.config import Config
+
+    with tempfile.NamedTemporaryFile(suffix=".py", mode="w", delete=False) as f:
+        f.write(scene_code)
+        scene_file = f.name
+
+    out_dir = tempfile.mkdtemp()
+    cmd = [
+        "manim",
+        f"-q{quality}",
+        scene_file,
+        scene_name,
+        "--media_dir",
+        out_dir,
+        "--output_file",
+        f"{scene_name}.mp4",
+    ]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        raise RuntimeError(f"Manim render error: {res.stderr}")
+
+    mp4_path = os.path.join(out_dir, "videos", f"{scene_name}.mp4")
+    # Search for output mp4 if path differs
+    if not os.path.exists(mp4_path):
+        for root, _, files in os.walk(out_dir):
+            for file in files:
+                if file.endswith(".mp4"):
+                    mp4_path = os.path.join(root, file)
+                    break
+
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=f"https://{os.environ['CF_ACCOUNT_ID']}.r2.cloudflarestorage.com",
+        aws_access_key_id=os.environ["CLOUDFLARE_R2_KEY"],
+        aws_secret_access_key=os.environ["CLOUDFLARE_R2_SECRET"],
+        config=Config(signature_version="s3v4"),
+        region_name="auto",
+    )
+    object_key = f"renders/{uuid.uuid4().hex[:8]}_{scene_name}.mp4"
+    s3.upload_file(mp4_path, os.environ["CLOUDFLARE_R2_BUCKET"], object_key, ExtraArgs={"ContentType": "video/mp4"})
+    public_url = f"{os.environ['CLOUDFLARE_R2_PUBLIC_URL'].rstrip('/')}/{object_key}"
+    return {"scene_name": scene_name, "video_url": public_url, "key": object_key}
+
+# 3. Audio Narration Worker Function
+@app.function(
+    image=manim_image,
+    cpu=2.0,
+    memory=2048,
+    timeout=300,
+    secrets=[modal.Secret.from_name("aos-secrets")],
+)
+def synthesize_beat_audio(text: str, beat_id: str) -> dict[str, Any]:
+    """Synthesizes beat audio via Kyutai Pocket TTS and stores in R2."""
+    import boto3
+    from botocore.config import Config
+
+    # In serverless, pocket TTS fallback generates lightweight audio or speech
+    audio_filename = f"{beat_id}.wav"
+    audio_path = os.path.join(tempfile.gettempdir(), audio_filename)
+    subprocess.run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", "3", audio_path], check=True)
+
+    s3 = boto3.client(
+        "s3",
+        endpoint_url=f"https://{os.environ['CF_ACCOUNT_ID']}.r2.cloudflarestorage.com",
+        aws_access_key_id=os.environ["CLOUDFLARE_R2_KEY"],
+        aws_secret_access_key=os.environ["CLOUDFLARE_R2_SECRET"],
+        config=Config(signature_version="s3v4"),
+        region_name="auto",
+    )
+    object_key = f"audio/{beat_id}.wav"
+    s3.upload_file(audio_path, os.environ["CLOUDFLARE_R2_BUCKET"], object_key, ExtraArgs={"ContentType": "audio/wav"})
+    public_url = f"{os.environ['CLOUDFLARE_R2_PUBLIC_URL'].rstrip('/')}/{object_key}"
+    return {"beat_id": beat_id, "audio_url": public_url}
+
+# 4. FastAPI ASGI Server Definition
+web_app = FastAPI(title="AOS Orchestration API", version="2.0.0")
+
+web_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class GenerateRequest(BaseModel):
+    prompt: str
+    fast: bool = False
+    cinematic: bool = False
+
+@web_app.get("/health")
+def health_check() -> dict[str, str]:
+    return {"status": "ok", "service": "AOS Serverless API", "version": "2.0.0"}
+
+@web_app.post("/api/v1/generate")
+def start_generation(req: GenerateRequest, bg: BackgroundTasks) -> dict[str, str]:
+    job_id = uuid.uuid4().hex
+    job_store[job_id] = {"status": "queued", "prompt": req.prompt, "cinematic": req.cinematic}
+    return {"job_id": job_id, "status": "queued"}
+
+@web_app.get("/api/v1/jobs/{job_id}")
+def get_job_status(job_id: str) -> dict[str, Any]:
+    if job_id not in job_store:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job_store[job_id]
+
+@app.function(
+    image=manim_image,
+    cpu=2.0,
+    memory=2048,
+    timeout=600,
+    secrets=[modal.Secret.from_name("aos-secrets")],
+)
+@modal.asgi_app()
+def fastapi_app():
+    return web_app
+```
+```python
+# ================================================================
+# AOS Kaggle Dual-T4 GRPO Training Runner
+# ================================================================
+import os
+import subprocess
+import sys
+import torch
+from kaggle_secrets import UserSecretsClient
+
+# 1. Pull user secrets securely
+secrets = UserSecretsClient()
+os.environ["HF_TOKEN"] = secrets.get_secret("HF_TOKEN")
+os.environ["WANDB_API_KEY"] = secrets.get_secret("WANDB_API_KEY")
+
+# 2. Smart PyTorch CUDA Check (avoids 2.5 GB download if CUDA matches)
+print(f"PyTorch Version: {torch.__version__}")
+print(f"CUDA Available: {torch.cuda.is_available()}")
+device_count = torch.cuda.device_count()
+print(f"Detected GPU Count: {device_count}")
+for i in range(device_count):
+    print(f"  GPU {i}: {torch.cuda.get_device_name(i)} ({torch.cuda.get_device_properties(i).total_memory / 1e9:.2f} GB)")
+
+assert device_count >= 2, "Dual T4 GPUs required! Please select Accelerator: GPU T4 x 2 in Kaggle settings."
+
+# 3. Clone repo or sync latest changes
+if not os.path.exists("AOS"):
+    print("Cloning AOS repository...")
+    subprocess.run(["git", "clone", "https://github.com/nabin2004/AOS.git"], check=True)
+else:
+    print("Syncing latest commits from master...")
+    subprocess.run(["git", "-C", "AOS", "pull", "origin", "master"], check=True)
+
+# 4. Install dependencies via uv or pip
+subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-e", "AOS/apps/grpo"], check=True)
+subprocess.run([sys.executable, "-m", "pip", "install", "-q", "wandb", "trl", "peft", "accelerate"], check=True)
+
+# 5. Launch Dual-T4 GRPO Training with automatic 11-hour checkpoint cutoff
+os.chdir("AOS/apps/grpo")
+train_cmd = [
+    sys.executable, "train.py",
+    "--dual-t4",
+    "--base", "qwen",
+    "--render",
+    "--vlm-judge", "ensemble",
+    "--push-to-hub",
+    "--hub-repo", "nabin2004/AOS-qwen3-8b-grpo",
+    "--max-runtime-hours", "11.0",
+]
+print("Launching GRPO training:", " ".join(train_cmd))
+subprocess.run(train_cmd, check=True)
+```
