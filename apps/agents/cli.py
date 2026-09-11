@@ -84,14 +84,24 @@ async def _run_full_pipeline(user_request: str, max_validation_attempts: int):
     return state, output
 
 
-async def _run_animate_pipeline(user_request: str, length: str = "medium", cinematic: bool = False) -> dict:
+async def _run_animate_pipeline(
+    user_request: str,
+    length: str = "medium",
+    cinematic: bool = False,
+    mode: str = "keyframe",
+) -> dict:
     from agent_graph import animation_graph as animate_graph
     from agent_graph import AnimationState as AnimateState
     from cinematic_director import is_cinematic_mode
     from ir.manim_ir import Subject
 
     cinematic_active = is_cinematic_mode(user_request, flag=cinematic)
-    state = AnimateState(user_query=user_request, target_length=length, cinematic=cinematic_active)
+    state = AnimateState(
+        user_query=user_request,
+        target_length=length,
+        cinematic=cinematic_active,
+        animation_mode=mode,
+    )
     async with animate_graph.iter(state=state) as run:
         async for step in run:
             if isinstance(step, EndMarker):
@@ -215,6 +225,15 @@ def animate(
         "-l",
         help="Target video length / pacing: 'short' (~1-2m), 'medium' / '5m' (~3-5m), 'long' / '10m' (~5-10m), or explicit duration e.g. '5m', '10m', '300s'",
     ),
+    mode: str = typer.Option(
+        "keyframe",
+        "--mode",
+        "-m",
+        help=(
+            "Animation architecture mode: 'keyframe' (discrete pedagogical state-machine keyframes "
+            "+ synchronized voiceover narration with bookmark anchors), or 'continuous' (monolithic script)."
+        ),
+    ),
 ) -> None:
     """Run the animation pipeline (classify → plan → Manim coder → compile)."""
     import os
@@ -226,6 +245,8 @@ def animate(
         os.environ["AOS_SFT_BATCH"] = "1"
     if cinematic or is_cinematic_mode(request):
         os.environ["AOS_CINEMATIC_MODE"] = "1"
+    if mode:
+        os.environ["AOS_ANIMATION_MODE"] = mode
 
     req_lower = request.lower()
     chosen_length = length
@@ -264,7 +285,15 @@ def animate(
             )
             raise typer.Exit(code=1) from exc
 
-        artifact = asyncio.run(run_animate(request, output_dir=output_dir, length=chosen_length, cinematic=cinematic))
+        artifact = asyncio.run(
+            run_animate(
+                request,
+                output_dir=output_dir,
+                length=chosen_length,
+                cinematic=cinematic,
+                mode=mode,
+            )
+        )
         payload = artifact.model_dump(mode="json")
         _emit_json(payload)
         # Fail when compile failed, missing video, or MP4 has no audio stream.
@@ -284,7 +313,7 @@ def animate(
 
     console.print(
         Panel.fit(
-            f"[bold]{request}[/]\n[dim]profile={env['profile']} length={chosen_length}[/]",
+            f"[bold]{request}[/]\n[dim]profile={env['profile']} length={chosen_length} mode={mode}[/]",
             title="Animating",
         )
     )
@@ -292,7 +321,11 @@ def animate(
         console.print(f"[dim]  {role}: {env[role]}[/]")
 
     try:
-        result = asyncio.run(_run_animate_pipeline(request, length=chosen_length))
+        result = asyncio.run(
+            _run_animate_pipeline(
+                request, length=chosen_length, cinematic=cinematic, mode=mode
+            )
+        )
     except Exception as exc:
         console.print(f"[bold red]Pipeline failed:[/] {exc}")
         raise typer.Exit(code=1) from exc

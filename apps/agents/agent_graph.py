@@ -374,6 +374,7 @@ class AnimationState:
     run_dir: str | None = None
     coder_result: CoderRunResult | None = None
     prompt_index: int | None = None
+    animation_mode: str = "keyframe"
 
 
 def _subject_str(subject: str | Subject) -> str:
@@ -464,6 +465,7 @@ async def run_coder_step(
     feedback: str | None = None,
     length: str = "medium",
     cinematic: bool = False,
+    animation_mode: str = "keyframe",
 ) -> CoderRunResult:
     """Write/compile Manim for a topic; shared by the graph node and web tools."""
     if dbos_enabled():
@@ -495,6 +497,7 @@ async def run_coder_step(
         include_codemode_hint=local_coder,
         length=length,
         cinematic=cinematic,
+        mode=animation_mode,
     )
     if feedback and existing_run_dir:
         from pathlib import Path
@@ -678,6 +681,7 @@ class CodeAgent(BaseNode[AnimationState, None, str]):
             prompt_index=ctx.state.prompt_index,
             length=ctx.state.target_length,
             cinematic=ctx.state.cinematic,
+            animation_mode=ctx.state.animation_mode,
         )
         ctx.state.run_dir = coder_result.run_dir
         ctx.state.coder_result = coder_result
@@ -745,6 +749,7 @@ async def run_pipeline(
     length: str = "medium",
     cinematic: bool = False,
     prompt_index: int | None = None,
+    mode: str = "keyframe",
 ) -> dict:
     if dbos_enabled():
         ensure_dbos_launched()
@@ -755,6 +760,7 @@ async def run_pipeline(
         target_length=length,
         cinematic=cinematic_active,
         prompt_index=prompt_index,
+        animation_mode=mode,
     )
     # Prefer iter so UI/Celery can stream ``-> {node_id}`` on stderr.
     summary = ""

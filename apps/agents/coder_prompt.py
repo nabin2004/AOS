@@ -142,6 +142,25 @@ from cinematic_director import (
 )
 
 
+KEYFRAME_MODE_HINT = (
+    "*** KEYFRAME STATE-MACHINE & SYNCHRONIZED NARRATION ARCHITECTURE (MANDATORY) ***\n"
+    "1. DISCRETE STATE GENERATION (ELIMINATES RUNTIME CRASHES & SYNTAX ERRORS):\n"
+    "   - Instead of complex, fragile frame-by-frame micro-calculations, model the scene as a sequence of discrete, pedagogically rich visual keyframes.\n"
+    "   - Define high-impact visual states (equations, geometric constructions, coordinate frames, phase plots).\n"
+    "   - Transitions between keyframe states MUST use robust primitives: Write(), Transform(), FadeIn(..., shift=...), Create().\n"
+    "2. EXACT AUDIO-VISUAL HOLD SYNCHRONIZATION:\n"
+    "   - Every keyframe state MUST be wrapped inside `with self.voiceover(text=\"...\") as tracker:`.\n"
+    "   - Synchronize animations to the tracker: run_time=min(2.0, tracker.duration * 0.7) or run_time=tracker.duration.\n"
+    "   - The visual state automatically holds on screen while the narration delivers the explanation.\n"
+    "   - Use bookmark tags <bookmark mark=\"v1\"/> in narration paired with self.wait_until_bookmark(\"v1\") for exact word-level reveals when applicable.\n"
+    "3. CHAPTER MODULARITY FOR LONG DURATIONS (e.g. 10m / 5m):\n"
+    "   - Long lectures MUST be structured into distinct modular chapter methods (e.g. self.chapter_1_intro(), self.chapter_2_dynamics(), etc.).\n"
+    "4. SCREEN HYGIENE & CLEAN TRANSITIONS:\n"
+    "   - Before introducing 3D phase space (such as the Lorenz Attractor), clear previous equations: `self.play(FadeOut(Group(*self.mobjects)))`.\n"
+    "   - Use numerical NumPy/SciPy integration to generate chaotic attractors smoothly and trace divergence.\n"
+)
+
+
 def build_coder_user_prompt(
     *,
     topic: str,
@@ -152,9 +171,13 @@ def build_coder_user_prompt(
     include_codemode_hint: bool = False,
     length: str | None = None,
     cinematic: bool = False,
+    mode: str = "keyframe",
 ) -> str:
+    import os
+
     payload = dict(plan_payload)
     cinematic_active = cinematic or is_cinematic_mode(topic)
+    effective_mode = mode or os.getenv("AOS_ANIMATION_MODE", "keyframe")
 
     # Annotate teaching_script beats with cinematic hint tags before compacting.
     script = payload.get("teaching_script")
@@ -176,6 +199,8 @@ def build_coder_user_prompt(
         bits.append(
             f"Target Video Length: {length} (Pace animations and voiceovers calmly, with natural pauses and full explanations to fill this educational duration with deep clarity)."
         )
+    if effective_mode == "keyframe":
+        bits.append(KEYFRAME_MODE_HINT.rstrip("\n"))
     if cinematic_active:
         bits.append(
             "*** CINEMATIC VISUALIZATION MODE ACTIVE ***\n"

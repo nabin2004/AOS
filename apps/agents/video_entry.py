@@ -229,13 +229,14 @@ async def run_animate(
     output_dir: str | Path | None = None,
     length: str = "medium",
     cinematic: bool = False,
+    mode: str = "keyframe",
 ) -> VideoArtifact:
     """Classify → plan → Manim coder/compile; resolve scene MP4."""
     from agent_graph import run_pipeline
     from openai_compatible import format_custom_endpoint_error
 
     try:
-        result = await run_pipeline(prompt, length=length, cinematic=cinematic)
+        result = await run_pipeline(prompt, length=length, cinematic=cinematic, mode=mode)
     except Exception as exc:
         return VideoArtifact(
             ok=False,

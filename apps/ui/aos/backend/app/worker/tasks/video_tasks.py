@@ -243,6 +243,7 @@ def _run_agents_cli(
     ]
     if mode == "animate":
         cmd.append("--fast")
+        cmd.extend(["--mode", "keyframe"])
 
     logger.info("Running agents CLI in %s: %s …", agents_dir, command)
     env = os.environ.copy()

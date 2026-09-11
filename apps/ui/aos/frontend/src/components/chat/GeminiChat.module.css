@@ -1,0 +1,108 @@
+.chatContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  font-family: 'Inter', sans-serif;
+  color: #f0f0f0;
+}
+
+.messagesArea {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.message {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  line-height: 1.5;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.userMessage {
+  align-self: flex-end;
+  background-color: #3b82f6;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.geminiMessage {
+  align-self: flex-start;
+  background-color: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-bottom-left-radius: 4px;
+}
+
+.geminiCode {
+  background-color: #111;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.9em;
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.inputArea {
+  padding: 16px;
+  background-color: #252525;
+  border-top: 1px solid #333;
+  display: flex;
+  gap: 12px;
+}
+
+.inputField {
+  flex-grow: 1;
+  background-color: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 24px;
+  padding: 12px 20px;
+  color: white;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.inputField:focus {
+  border-color: #3b82f6;
+}
+
+.sendButton {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.sendButton:hover {
+  background-color: #2563eb;
+}
+
+.sendButton:active {
+  transform: scale(0.95);
+}
+
+.sendButton:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
