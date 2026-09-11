@@ -158,6 +158,58 @@ uv run aos celery flower                    # Start Flower UI
 uv run aos celery flower --port 5556        # Custom Flower port
 ```
 
+### Video & Lecture Generation Commands
+
+#### Live Sequential Streaming Engine (EduClaw)
+
+The streaming engine serves real-time, slide-by-slide chunked MP4 video with synchronized voiceover. The Next.js frontend acts as the playback orchestrator, seamlessly displaying CRT TV static during buffer underruns.
+
+```bash
+# 1. Start the backend with WebSocket orchestrator (/ws/generate_lecture) and static /media serving
+cd backend
+uv run aos server run --reload
+
+# Or run the standalone streaming engine API service directly:
+uv run python -m apps.educlaw.streaming_engine.api
+
+# 2. Start Celery worker for asynchronous video generation and heavy tasks
+uv run aos celery worker --loglevel debug
+
+# 3. Start the Next.js frontend development server (http://localhost:3000)
+cd ../frontend
+npm run dev
+
+# Open EduClaw Streaming Studio in browser:
+# http://localhost:3000/conversation
+```
+
+#### Animation & Lecture Generation CLI
+
+AOS provides an agentic CLI to generate visual lectures with fine-grained mode control:
+
+```bash
+# Generate lecture using the sequential keyframe architecture with voiceover (Default UI mode):
+uv run python cli.py animate "Comprehensive lecture on Lorenz attractor" --mode keyframe --length 10m --fast --json --no-banner
+
+# Generate lecture using continuous Manim animation transitions:
+uv run python cli.py animate "Comprehensive lecture on Lorenz attractor" --mode continuous
+
+# Run full multi-agent lecture pipeline (classify -> plan -> storyboard -> scenes -> beats -> narrate):
+cd apps/agents
+uv run python cli.py generate "Explain the Fourier Transform"
+```
+
+#### Verification & Testing Commands
+
+```bash
+# Run streaming engine unit tests
+uv run pytest tests/test_streaming_engine.py
+
+# Run frontend TypeScript type checking
+cd apps/ui/aos/frontend
+npx tsc --noEmit
+```
+
 ### Custom Commands
 
 Custom commands are auto-discovered from `app/commands/`. Run them via:
