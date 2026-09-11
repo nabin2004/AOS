@@ -1,0 +1,411 @@
+# ==============================================================================
+# AOS (Agentic Orchestration System) - Unified Root Docker Compose
+# ==============================================================================
+# Run everything from one command:
+#   docker compose up -d --build
+#
+# Update webapp containers after code changes:
+#   docker compose up -d --build
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Next.js Web Frontend
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./apps/ui/aos/frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-ws://localhost:8000}
+        - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+        - NEXT_PUBLIC_MAX_UPLOAD_SIZE_MB=${NEXT_PUBLIC_MAX_UPLOAD_SIZE_MB:-50}
+        - NEXT_PUBLIC_OAUTH_PROVIDERS=google
+        - NEXT_PUBLIC_RAG_ENABLED=${NEXT_PUBLIC_RAG_ENABLED:-true}
+    image: aos_frontend:latest
+    container_name: aos_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - BACKEND_URL=http://app:8000
+      - BACKEND_WS_URL=ws://app:8000
+      - NEXT_PUBLIC_RAG_ENABLED=${NEXT_PUBLIC_RAG_ENABLED:-true}
+    networks:
+      - aos_net
+    depends_on:
+      app:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "fetch('http://localhost:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+
+  # ----------------------------------------------------------------------------
+  # Database Migration Init (One-shot Alembic runner)
+  # ----------------------------------------------------------------------------
+  init_db:
+    build:
+      context: ./apps/ui/aos/backend
+      dockerfile: Dockerfile
+    image: aos_backend:latest
+    container_name: aos_init_db
+    command: alembic upgrade head
+    volumes:
+      - ./apps/ui/aos/backend/app:/app/app:ro
+      - ./apps/ui/aos/backend/alembic:/app/alembic:ro
+      - ./apps/ui/aos/backend/alembic.ini:/app/alembic.ini:ro
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-aos}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production-use-openssl-rand-hex-32}
+    networks:
+      - aos_net
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ----------------------------------------------------------------------------
+  # FastAPI Application Backend
+  # ----------------------------------------------------------------------------
+  app:
+    build:
+      context: ./apps/ui/aos/backend
+      dockerfile: Dockerfile
+    image: aos_backend:latest
+    container_name: aos_backend
+    ports:
+      - "8000:8000"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --ws websockets-sansio
+    volumes:
+      - ./apps/ui/aos/backend/app:/app/app:ro
+      - ./apps/ui/aos/backend/cli:/app/cli:ro
+      - ./apps/ui/aos/emails:/app/emails:ro
+      - ./apps/educlaw:/app/apps/educlaw:ro
+      - ./apps/agents:/app/apps/agents:ro
+      - ./packages:/app/packages:ro
+      - media_data:/app/media
+    environment:
+      - DEBUG=${DEBUG:-true}
+      - ENVIRONMENT=${ENVIRONMENT:-local}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-aos}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - S3_VIDEO_ENDPOINT=http://minio:9000
+      - S3_VIDEO_ACCESS_KEY=${S3_VIDEO_ACCESS_KEY:-minioadmin}
+      - S3_VIDEO_SECRET_KEY=${S3_VIDEO_SECRET_KEY:-minioadmin}
+      - S3_VIDEO_BUCKET=${S3_VIDEO_BUCKET:-aos-videos}
+      - S3_RAG_ENDPOINT=http://minio:9000
+      - S3_RAG_ACCESS_KEY=${S3_RAG_ACCESS_KEY:-minioadmin}
+      - S3_RAG_SECRET_KEY=${S3_RAG_SECRET_KEY:-minioadmin}
+      - S3_RAG_BUCKET=${S3_RAG_BUCKET:-aos-rag}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production-use-openssl-rand-hex-32}
+      - API_KEY=${API_KEY:-change-me-in-production}
+      - AGENTS_DIR=/app/apps/agents
+      - AGENTS_UV_CMD=${AGENTS_UV_CMD:-uv}
+      - PYTHONPATH=/app:/app/apps/agents:/app/packages/ir/src:/app/packages/store/src
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - aos_net
+    depends_on:
+      init_db:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      milvus:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # Celery Worker (Video generation, agents execution, RAG pipelines)
+  # ----------------------------------------------------------------------------
+  celery_worker:
+    image: aos_backend:latest
+    pull_policy: build
+    container_name: aos_celery_worker
+    command: celery -A app.worker.celery_app worker --loglevel=info
+    volumes:
+      - ./apps/ui/aos/backend/app:/app/app:ro
+      - ./apps/ui/aos/backend/cli:/app/cli:ro
+      - ./apps/ui/aos/emails:/app/emails:ro
+      - ./apps/educlaw:/app/apps/educlaw:ro
+      - ./apps/agents:/app/apps/agents:rw
+      - ./apps/slidestemp:/app/apps/slidestemp:ro
+      - ./packages:/app/packages:ro
+      - media_data:/app/media
+    environment:
+      - DEBUG=${DEBUG:-true}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-aos}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - S3_VIDEO_ENDPOINT=http://minio:9000
+      - S3_VIDEO_ACCESS_KEY=${S3_VIDEO_ACCESS_KEY:-minioadmin}
+      - S3_VIDEO_SECRET_KEY=${S3_VIDEO_SECRET_KEY:-minioadmin}
+      - S3_VIDEO_BUCKET=${S3_VIDEO_BUCKET:-aos-videos}
+      - S3_RAG_ENDPOINT=http://minio:9000
+      - S3_RAG_ACCESS_KEY=${S3_RAG_ACCESS_KEY:-minioadmin}
+      - S3_RAG_SECRET_KEY=${S3_RAG_SECRET_KEY:-minioadmin}
+      - S3_RAG_BUCKET=${S3_RAG_BUCKET:-aos-rag}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production-use-openssl-rand-hex-32}
+      - AGENTS_DIR=/app/apps/agents
+      - AGENTS_UV_CMD=${AGENTS_UV_CMD:-uv}
+      - PYTHONPATH=/app:/app/apps/agents:/app/packages/ir/src:/app/packages/store/src
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - aos_net
+    depends_on:
+      app:
+        condition: service_started
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      milvus:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # Celery Beat (Periodic task scheduler)
+  # ----------------------------------------------------------------------------
+  celery_beat:
+    image: aos_backend:latest
+    pull_policy: build
+    container_name: aos_celery_beat
+    command: celery -A app.worker.celery_app beat --loglevel=info
+    volumes:
+      - ./apps/ui/aos/backend/app:/app/app:ro
+    environment:
+      - DEBUG=${DEBUG:-true}
+      - REDIS_HOST=redis
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - aos_net
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # Celery Flower (Real-time task monitoring dashboard)
+  # ----------------------------------------------------------------------------
+  flower:
+    image: aos_backend:latest
+    pull_policy: build
+    container_name: aos_flower
+    command: celery -A app.worker.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      - DEBUG=${DEBUG:-true}
+      - REDIS_HOST=redis
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - aos_net
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # PostgreSQL Database
+  # ----------------------------------------------------------------------------
+  db:
+    image: postgres:17-alpine
+    container_name: aos_db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-aos}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # Redis Cache & Broker
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7.4-alpine
+    container_name: aos_redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # MinIO (S3 Video & Asset Storage)
+  # ----------------------------------------------------------------------------
+  minio:
+    image: minio/minio:RELEASE.2025-02-18T16-25-55Z
+    container_name: aos_minio
+    ports:
+      - "${MINIO_API_PORT:-9010}:9000"
+      - "${MINIO_CONSOLE_PORT:-9011}:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+    command: server /data --console-address ":9001"
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # MinIO Bucket Auto-Provisioner (One-shot)
+  # ----------------------------------------------------------------------------
+  create_buckets:
+    image: minio/mc:latest
+    container_name: aos_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb --ignore-existing myminio/aos-videos;
+      /usr/bin/mc mb --ignore-existing myminio/aos-rag;
+      /usr/bin/mc anonymous set download myminio/aos-videos;
+      exit 0;
+      "
+    networks:
+      - aos_net
+
+  # ----------------------------------------------------------------------------
+  # etcd (Metadata backend for Milvus)
+  # ----------------------------------------------------------------------------
+  etcd:
+    image: quay.io/coreos/etcd:v3.6.13
+    container_name: aos_etcd
+    command: >
+      etcd --advertise-client-urls http://etcd:2379
+      --listen-client-urls http://0.0.0.0:2379
+      --data-dir /var/lib/etcd
+    volumes:
+      - etcd_data:/var/lib/etcd
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # Milvus (Standalone Vector Database for RAG)
+  # ----------------------------------------------------------------------------
+  milvus:
+    image: milvusdb/milvus:v2.6.19
+    container_name: aos_milvus
+    command: ["milvus", "run", "standalone"]
+    ports:
+      - "${MILVUS_PORT:-19530}:19530"
+      - "9091:9091"
+    volumes:
+      - milvus_data:/var/lib/milvus
+    environment:
+      - ETCD_ENDPOINTS=etcd:2379
+      - MINIO_ADDRESS=minio:9000
+    depends_on:
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      start_period: 90s
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+networks:
+  aos_net:
+    driver: bridge
+
+volumes:
+  media_data:
+  postgres_data:
+  redis_data:
+  etcd_data:
+  minio_data:
+  milvus_data:

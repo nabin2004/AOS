@@ -1,6 +1,33 @@
 # AOS
 
-## Setup
+## 🚀 Quickstart: Run Full WebApp with One Command (Docker)
+
+You can spin up the entire platform (Next.js Frontend, FastAPI Backend, Celery Worker with Agents/Manim support, PostgreSQL, Redis, MinIO S3, and Milvus Vector DB) using a single command from the repository root:
+
+```bash
+# 1. Setup environment variables
+cp .env.example .env    # Windows: copy .env.example .env
+
+# 2. Run the whole application
+docker compose up -d --build
+```
+
+- **Next.js Web UI**: [http://localhost:3000](http://localhost:3000)
+- **FastAPI API & WebSocket Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Celery Task Monitor (Flower)**: [http://localhost:5555](http://localhost:5555)
+- **MinIO Storage Console**: [http://localhost:9011](http://localhost:9011)
+
+### Updating Containers When Code Changes
+```bash
+# Single command to rebuild and update running containers
+docker compose up -d --build
+```
+
+📖 **For full deployment details, architecture diagrams, and service management, see the comprehensive [DOCKER_GUIDE.md](DOCKER_GUIDE.md).**
+
+---
+
+## Local Python CLI Setup (Without Docker)
 
 ```bash
 uv sync

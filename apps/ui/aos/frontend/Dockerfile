@@ -4,12 +4,15 @@ FROM oven/bun:1.2-alpine AS base
 FROM base AS deps
 WORKDIR /app
 
-# Copy package files (bun.lock is the current text lockfile; bun.lockb is the
-# legacy binary one — match both so --frozen-lockfile has a lockfile to use).
-COPY package.json bun.lock* ./
+# Copy package files (supports bun.lock, bun.lockb, or package-lock.json)
+COPY package.json package-lock.json* bun.lock* ./
 
 # Install dependencies (ignoring dev lifecycle scripts like husky)
-RUN bun install --frozen-lockfile --ignore-scripts
+RUN if [ -f bun.lock ] || [ -f bun.lockb ]; then \
+      bun install --frozen-lockfile --ignore-scripts; \
+    else \
+      bun install --ignore-scripts; \
+    fi
 
 
 # Rebuild the source code only when needed

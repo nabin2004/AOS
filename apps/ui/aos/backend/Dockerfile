@@ -31,10 +31,15 @@ FROM python:3.12-slim
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
-# LiteParse needs the Node.js CLI. Pre-installing here avoids a 30-60s
-# blocking npm install on the first parse request from a fresh container.
+
+# Install uv in runtime so Celery worker and agents sub-processes can execute uv commands
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+# System dependencies:
+# - ffmpeg, libcairo2, libpango for Manim, audio and media processing
+# - nodejs & @llamaindex/liteparse for LiteParse PDF parser
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl ca-certificates gnupg \
+    curl ca-certificates gnupg git ffmpeg libcairo2 libpango-1.0-0 libpangocairo-1.0-0 \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && npm install -g @llamaindex/liteparse \
