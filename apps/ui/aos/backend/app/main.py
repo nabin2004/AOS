@@ -231,6 +231,38 @@ AI Explainer
 
     app.include_router(api_router, prefix=settings.API_V1_STR)
 
+    # Mount EduClaw streaming engine WebSocket router & static media
+    try:
+        import sys
+        from pathlib import Path
+        curr = Path(__file__).resolve()
+        for parent in [curr, *curr.parents]:
+            if (parent / "pyproject.toml").is_file() and (parent / "apps").is_dir():
+                if str(parent) not in sys.path:
+                    sys.path.insert(0, str(parent))
+                break
+        from apps.educlaw.streaming_engine.api import router as streaming_router
+        app.include_router(streaming_router)
+    except Exception as exc:
+        logger.warning("Could not include streaming_engine router: %s", exc)
+
+    try:
+        from fastapi.staticfiles import StaticFiles
+        from pathlib import Path
+        curr = Path(__file__).resolve()
+        repo_root = None
+        for parent in [curr, *curr.parents]:
+            if (parent / "pyproject.toml").is_file() and (parent / "apps").is_dir():
+                repo_root = parent
+                break
+        root = repo_root or Path.cwd()
+        media_root = (root / "media").resolve()
+        media_root.mkdir(parents=True, exist_ok=True)
+        (media_root / "streaming").mkdir(parents=True, exist_ok=True)
+        app.mount("/media", StaticFiles(directory=str(media_root)), name="media")
+    except Exception as exc:
+        logger.warning("Could not mount /media static files: %s", exc)
+
     add_pagination(app)
 
     return app
