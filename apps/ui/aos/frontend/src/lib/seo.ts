@@ -14,30 +14,33 @@ import { APP_NAME } from "@/lib/constants";
 import { defaultLocale, locales } from "@/i18n";
 
 export const SITE = {
-  name: APP_NAME,
+  name: "AOS",
   /** Tagline used in title templates + OG defaults. */
-  tagline: "AI assistant for modern teams",
+  tagline: "Agentic Orchestration System for 3Blue1Brown-quality STEM Animations",
   /** One-paragraph default description (≤160 chars for SERP truncation). */
   description:
-    "Plug in your docs, your tools, and your data. Ask anything — get answers grounded in everything your team has ever shipped.",
+    "Transform STEM prompts, LaTeX formulas, or lecture outlines into professional Manim animations with millisecond-accurate narration in minutes.",
   /** Canonical absolute origin. NO trailing slash. */
   url:
     (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") as string | undefined) ??
-    "http://localhost:3000",
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "https://aos.olinabin.com.np"),
   /** Twitter handle for `twitter:site` (with @). Empty string disables. */
   twitter: "",
   /** Theme color used in PWA manifest + browser chrome. */
   themeColor: "#0E0E0C",
   /** Long-form keywords. Light SEO weight today; useful for clarity. */
   keywords: [
-    "AI assistant",
-    "team knowledge",
-    "AI agent",
-    "RAG",
-    "team productivity",
-    "knowledge base",
-    "internal search",
-    "B2B SaaS",
+    "Manim animation",
+    "3Blue1Brown style",
+    "STEM education",
+    "Pydantic AI",
+    "Kyutai TTS",
+    "LaTeX MathTex",
+    "Lecture generation",
+    "AI agents",
+    "Educational video",
   ],
   /** Locale defaults — pulls from your i18n config. */
   defaultLocale,

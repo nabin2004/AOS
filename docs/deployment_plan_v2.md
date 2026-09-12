@@ -571,6 +571,7 @@ Configure these variables in **Project Settings** → **Environment Variables** 
 
 | Variable | Target Environment | Purpose | Production Value Example |
 |---|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Production & Preview | Canonical production origin for metadata, sitemap & OG | `https://aos.olinabin.com.np` |
 | `NEXT_PUBLIC_API_URL` | Production & Preview | Public REST API base URL for agent orchestration | `https://<account>--aos-api-fastapi-app.modal.run` |
 | `NEXT_PUBLIC_WS_URL` | Production & Preview | Public WebSocket endpoint for real-time trace streaming | `wss://<account>--aos-api-fastapi-app.modal.run` |
 | `NEXT_PUBLIC_STORAGE_CDN_URL` | Production & Preview | Public CDN base URL for R2 video/audio playback | `https://pub-<hash>.r2.dev` |
@@ -1343,6 +1344,9 @@ vercel link --yes --project aos-frontend
 Inject all required environment variables into the Vercel project:
 
 ```bash
+# Canonical site origin (for SEO, sitemaps, OpenGraph)
+printf "https://aos.olinabin.com.np" | vercel env add NEXT_PUBLIC_SITE_URL production
+
 # Public REST API endpoint (Modal backend)
 printf "https://<account>--aos-api-fastapi-app.modal.run" | vercel env add NEXT_PUBLIC_API_URL production
 
@@ -1364,16 +1368,19 @@ printf "https://logfire-api.pydantic.dev" | vercel env add OTEL_EXPORTER_OTLP_EN
 printf "Authorization=your-logfire-write-token" | vercel env add OTEL_EXPORTER_OTLP_HEADERS production
 ```
 
-##### 3. Deploy Directly to Production
+##### 3. Deploy Directly to Production & Connect Custom Domain
 Trigger the production build and deployment:
 ```bash
 vercel --prod --yes
+
+# Assign custom production domain
+vercel domains add aos.olinabin.com.np
 ```
 
 Expected output:
 ```text
 🔍 Inspect: https://vercel.com/<account>/aos-frontend/<deployment-id>
-✅ Production: https://aos-frontend.vercel.app [copied to clipboard]
+✅ Production: https://aos.olinabin.com.np [copied to clipboard]
 ```
 
 ---
