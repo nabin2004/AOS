@@ -234,6 +234,7 @@ def _run_agents_cli(
     cmd = [
         settings.AGENTS_UV_CMD,
         "run",
+        "--frozen",
         "python",
         "cli.py",
         command,

@@ -49,10 +49,6 @@ celery_app.conf.beat_schedule = {
         "task": "app.worker.tasks.cleanup_tasks.cleanup_usage_events_task",
         "schedule": crontab(hour=3, minute=0, day_of_week=0),
     },
-    "detect-usage-spikes": {
-        "task": "app.worker.tasks.anomaly_tasks.detect_usage_spikes_task",
-        "schedule": crontab(minute=15),
-    },
     "refresh-usage-matview": {
         "task": "app.worker.tasks.cleanup_tasks.refresh_usage_matview_task",
         "schedule": 300.0,  # 5 minutes

@@ -96,11 +96,15 @@ services:
       - ./apps/ui/aos/backend/app:/app/app:ro
       - ./apps/ui/aos/backend/cli:/app/cli:ro
       - ./apps/ui/aos/emails:/app/emails:ro
-      - ./apps/educlaw:/app/apps/educlaw:ro
-      - ./apps/agents:/app/apps/agents:ro
-      - ./packages:/app/packages:ro
+      - ./apps/educlaw:/app/apps/educlaw:rw
+      - ./apps/agents:/app/apps/agents:rw
+      - ./apps/slidestemp:/app/apps/slidestemp:rw
+      - ./apps/audio_service:/app/apps/audio_service:rw
+      - ./apps/mcpservers:/app/apps/mcpservers:rw
+      - ./apps/training:/app/apps/training:ro
+      - ./packages:/app/packages:rw
       - ./pyproject.toml:/app/pyproject.toml:ro
-      - ./uv.lock:/app/uv.lock:ro
+      - ./uv.lock:/app/uv.lock:rw
       - media_data:/app/media
     environment:
       - DEBUG=${DEBUG:-true}
@@ -163,12 +167,15 @@ services:
       - ./apps/ui/aos/backend/app:/app/app:ro
       - ./apps/ui/aos/backend/cli:/app/cli:ro
       - ./apps/ui/aos/emails:/app/emails:ro
-      - ./apps/educlaw:/app/apps/educlaw:ro
+      - ./apps/educlaw:/app/apps/educlaw:rw
       - ./apps/agents:/app/apps/agents:rw
-      - ./apps/slidestemp:/app/apps/slidestemp:ro
-      - ./packages:/app/packages:ro
+      - ./apps/slidestemp:/app/apps/slidestemp:rw
+      - ./apps/audio_service:/app/apps/audio_service:rw
+      - ./apps/mcpservers:/app/apps/mcpservers:rw
+      - ./apps/training:/app/apps/training:ro
+      - ./packages:/app/packages:rw
       - ./pyproject.toml:/app/pyproject.toml:ro
-      - ./uv.lock:/app/uv.lock:ro
+      - ./uv.lock:/app/uv.lock:rw
       - media_data:/app/media
     environment:
       - DEBUG=${DEBUG:-true}
@@ -215,6 +222,8 @@ services:
         condition: service_healthy
       milvus:
         condition: service_healthy
+    healthcheck:
+      disable: true
     restart: unless-stopped
 
   # ----------------------------------------------------------------------------
@@ -232,6 +241,8 @@ services:
       - REDIS_HOST=redis
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    healthcheck:
+      disable: true
     networks:
       - aos_net
     depends_on:
@@ -256,6 +267,8 @@ services:
       - REDIS_HOST=redis
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    healthcheck:
+      disable: true
     networks:
       - aos_net
     depends_on:
