@@ -34,7 +34,9 @@ async function main() {
 
   const wslInfo = getWslInfo(projectRoot);
   if (wslInfo) {
-    const forwardedArgs = globalThis.__PROJECT_ARGS__ ?? process.argv.slice(2);
+    const forwardedArgs = (Array.isArray(globalThis.__PROJECT_ARGS__) && globalThis.__PROJECT_ARGS__.length > 0)
+      ? globalThis.__PROJECT_ARGS__
+      : process.argv.slice(2);
     const shellCommand = buildShellCommand(wslInfo.wslProjectRoot, forwardedArgs);
     const child = spawn("wsl.exe", ["-d", wslInfo.distro, "--", "bash", "-lc", shellCommand], {
       stdio: "inherit",
@@ -59,7 +61,9 @@ async function main() {
 
   const nextBin = resolve(projectRoot, "node_modules/next/dist/bin/next");
   const command = process.execPath;
-  const forwardedArgs = globalThis.__PROJECT_ARGS__ ?? process.argv.slice(2);
+  const forwardedArgs = (Array.isArray(globalThis.__PROJECT_ARGS__) && globalThis.__PROJECT_ARGS__.length > 0)
+    ? globalThis.__PROJECT_ARGS__
+    : process.argv.slice(2);
   const args = [nextBin, ...forwardedArgs];
 
   const child = spawn(command, args, {

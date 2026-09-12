@@ -7,7 +7,9 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(scriptDirectory, "..");
 
 async function main() {
-  const forwardedArgs = globalThis.__PROJECT_ARGS__ ?? process.argv.slice(2);
+  const forwardedArgs = (Array.isArray(globalThis.__PROJECT_ARGS__) && globalThis.__PROJECT_ARGS__.length > 0)
+    ? globalThis.__PROJECT_ARGS__
+    : process.argv.slice(2);
   const [command, ...args] = forwardedArgs;
 
   if (!command) {
