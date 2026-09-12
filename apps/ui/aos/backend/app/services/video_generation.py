@@ -13,11 +13,11 @@ from app.core.exceptions import BadRequestError, NotFoundError
 from app.db.models.video_generation import VideoGeneration
 from app.repositories import video_generation as video_repo
 from app.schemas.video_generation import VideoGenerationCreate, VideoGenerationList, VideoGenerationRead
-from app.services.video_storage import code_object_key, get_video_storage, video_object_key
+from app.services.video_storage import code_object_key, get_video_storage, slide_object_key, video_object_key
 
 logger = logging.getLogger(__name__)
 
-VALID_MODES = frozenset({"animate", "lecture"})
+VALID_MODES = frozenset({"animate", "lecture", "teaching"})
 
 
 class VideoGenerationService:
@@ -283,6 +283,32 @@ class VideoGenerationService:
         raise NotFoundError(
             message="Scene code not available",
             details={"id": str(row.id)},
+        )
+
+    def open_slide_stream_for(self, row: VideoGeneration, slide_num: int) -> BinaryIO:
+        """Stream an individual slide segment MP4 from MinIO or fallback run_dir."""
+        from pathlib import Path
+
+        slide_key = slide_object_key(
+            user_id=row.user_id,
+            conversation_id=row.conversation_id,
+            generation_id=row.id,
+            slide_num=slide_num,
+        )
+        try:
+            storage = get_video_storage()
+            return storage.open_stream(slide_key)
+        except Exception as exc:
+            logger.debug("MinIO open_slide_stream failed for %s (%s); checking run_dir", slide_key, exc)
+
+        if row.run_dir:
+            candidate = Path(row.run_dir) / f"slide_{slide_num}.mp4"
+            if candidate.is_file():
+                return open(candidate, "rb")
+
+        raise NotFoundError(
+            message=f"Slide {slide_num} video not found",
+            details={"id": str(row.id), "slide_num": slide_num},
         )
 
     def enqueue(

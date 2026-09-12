@@ -179,6 +179,20 @@ export interface GenerationStageEvent {
   error?: string;
 }
 
+export interface TeachingSlideInfo {
+  slide_num: number;
+  narration?: string;
+  code?: string;
+  visual_duration?: number;
+  narration_duration?: number;
+  total_duration?: number;
+  hold_duration?: number;
+  minio_key?: string;
+  chunk_path?: string;
+  key_definitions?: Record<string, string>;
+  layout_type?: string;
+}
+
 /** Structured video payload from the Manim generate_video tool. */
 export interface VideoToolResult {
   kind: "video";
@@ -203,6 +217,8 @@ export interface VideoToolResult {
   max_repair_attempts?: number;
   cold_start_attempts?: number;
   context_usage?: { used: number; max: number } | null;
+  slides?: TeachingSlideInfo[];
+  teaching_segments?: unknown[];
 }
 
 export type VideoSpec = VideoToolResult;

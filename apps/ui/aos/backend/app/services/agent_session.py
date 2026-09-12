@@ -190,7 +190,7 @@ class AgentSession:
             )
             return
 
-        if video_mode in ("animate", "lecture") and self.current_conversation_id:
+        if video_mode in ("animate", "teaching", "lecture") and self.current_conversation_id:
             await self._process_video_turn(
                 user_message=user_message,
                 video_mode=video_mode,

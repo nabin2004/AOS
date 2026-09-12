@@ -43,17 +43,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="relative z-10">
             <span className="eyebrow-badge inline-flex items-center gap-2">
               <Sparkles className="h-3 w-3" aria-hidden />
-              An AI assistant that knows your team&apos;s work
+              Your Manimator 😉
             </span>
           </div>
 
           <div className="relative z-10 max-w-[28rem]">
             <h2 className="text-display-lg text-foreground [&_em]:font-accent mb-6 leading-[1.05] [&_em]:font-normal [&_em]:italic">
-              Ship the AI feature <em>your team</em> actually wants.
+              One step closer <em>to</em> creating amazing animations....
             </h2>
             <p className="text-foreground/65 max-w-md text-base leading-relaxed">
-              Auth, billing, vector search, agents — already wired. You ship the product, not the
-              plumbing.
+              Turn complex math and STEM concepts into Manim animations with
+              millisecond-accurate narration in minutes.
             </p>
 
             <ul className="mt-10 space-y-3">

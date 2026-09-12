@@ -37,6 +37,17 @@ def code_object_key(
     return f"videos/{user_id}/{conversation_id}/{generation_id}.py"
 
 
+def slide_object_key(
+    *,
+    user_id: UUID | str,
+    conversation_id: UUID | str,
+    generation_id: UUID | str,
+    slide_num: int,
+) -> str:
+    """Canonical object key for an individual slide/teaching segment MP4."""
+    return f"videos/{user_id}/{conversation_id}/{generation_id}_slide_{slide_num}.mp4"
+
+
 class VideoStorage:
     """Upload / stream compiled videos from the configured S3-compatible bucket."""
 

@@ -22,6 +22,7 @@ import {
   DiagnosticDrawer,
 } from "@/components/chat/generation";
 import { accumulateGenerationEvent } from "@/lib/generation-events";
+import { TeachingSegmentsExplorer } from "./teaching-segments-explorer";
 
 export type { VideoToolResult };
 
@@ -323,6 +324,14 @@ export function VideoResult({ data, onRetry }: VideoResultProps) {
           className="overflow-hidden rounded-lg w-full aspect-video"
         />
       </div>
+
+      {/* Teaching Segments & Visual Anchors Explorer */}
+      {data.slides && data.slides.length > 0 && (
+        <TeachingSegmentsExplorer
+          slides={data.slides}
+          videoGenerationId={data.video_generation_id}
+        />
+      )}
 
       {/* Full Generation Timeline (Completed) */}
       <GenerationTimeline

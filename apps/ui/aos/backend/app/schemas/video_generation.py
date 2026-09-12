@@ -8,7 +8,7 @@ from pydantic import Field
 
 from app.schemas.base import BaseSchema
 
-VideoMode = Literal["animate", "lecture"]
+VideoMode = Literal["animate", "lecture", "teaching"]
 VideoStatus = Literal["pending", "running", "completed", "failed"]
 
 

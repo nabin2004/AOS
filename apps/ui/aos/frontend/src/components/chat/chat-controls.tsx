@@ -171,6 +171,7 @@ export function ChatControls({
     const parts: string[] = [];
     if (deepResearch) parts.push("Research");
     if (videoMode === "animate") parts.push("Animate");
+    if (videoMode === "teaching") parts.push("Teaching");
     if (videoMode === "lecture") parts.push("Lecture");
     if (activeCount > 0) parts.push(`${activeCount} KB${activeCount === 1 ? "" : "s"}`);
     if (customProvider) parts.push("BYOK");
@@ -641,11 +642,12 @@ function SettingsPanel({
             Video generation
           </span>
         </div>
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-4 gap-1">
           {(
             [
               { value: "off", label: "Off", hint: "Normal chat" },
               { value: "animate", label: "Animate", hint: "Fast Manim scene" },
+              { value: "teaching", label: "Teaching", hint: "Visual anchor + extended narration" },
               { value: "lecture", label: "Lecture", hint: "Full IR + assemble" },
             ] as const
           ).map((opt) => (
@@ -670,7 +672,9 @@ function SettingsPanel({
             ? "Chat replies normally without compiling a video."
             : videoMode === "animate"
               ? "Your next prompt runs the animate pipeline (classify → plan → Manim compile)."
-              : "Your next prompt runs the full lecture pipeline (IR → render → ffmpeg assemble)."}
+              : videoMode === "teaching"
+                ? "Visual Anchor mode: Informative Manim visual anchor + decoupled in-depth teaching narration."
+                : "Your next prompt runs the full lecture pipeline (IR → render → ffmpeg assemble)."}
         </p>
       </div>
 

@@ -63,6 +63,30 @@ async def stream_video(
     return StreamingResponse(body, media_type="video/mp4", headers=headers)
 
 
+@router.get("/{video_id}/slides/{slide_num}/stream", response_model=None)
+async def stream_slide_video(
+    video_id: UUID,
+    slide_num: int,
+    service: VideoGenerationSvc,
+    user: CurrentUser,
+) -> Any:
+    """Auth-gated proxy stream for an individual slide/teaching segment MP4."""
+    try:
+        row = await service.get_for_user(video_id, user.id)
+        body = service.open_slide_stream_for(row, slide_num)
+    except NotFoundError:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Slide {slide_num} not found") from None
+
+    headers = {
+        "Content-Disposition": f'inline; filename="{video_id}_slide_{slide_num}.mp4"',
+        "Accept-Ranges": "bytes",
+        "Cache-Control": "private, max-age=3600",
+    }
+    return StreamingResponse(body, media_type="video/mp4", headers=headers)
+
+
 @router.get("/{video_id}/code", response_model=None)
 async def get_video_code(
     video_id: UUID,

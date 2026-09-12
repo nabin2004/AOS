@@ -230,7 +230,7 @@ def _run_agents_cli(
     Streams ``-> {node}`` progress lines to Redis while the process runs.
     """
     agents_dir = _resolve_agents_dir()
-    command = "animate" if mode == "animate" else "generate"
+    command = "animate" if mode in ("animate", "teaching") else "generate"
     cmd = [
         settings.AGENTS_UV_CMD,
         "run",
@@ -241,7 +241,7 @@ def _run_agents_cli(
         "--json",
         "--no-banner",
     ]
-    if mode == "animate":
+    if mode in ("animate", "teaching"):
         cmd.append("--fast")
         cmd.extend(["--mode", "keyframe"])
 
@@ -439,6 +439,8 @@ async def _persist_assistant_result(
     minio_key: str | None,
     error: str | None,
     existing_assistant_message_id: UUID | None = None,
+    slides: list[dict[str, Any]] | None = None,
+    teaching_segments: list[dict[str, Any]] | None = None,
 ) -> UUID | None:
     """Persist or update assistant message + generate_video tool call; return message id."""
     from datetime import UTC, datetime
@@ -448,16 +450,19 @@ async def _persist_assistant_result(
 
     if ok:
         content = f"Your {mode} video is ready."
-        tool_result = json.dumps(
-            {
-                "kind": "video",
-                "video_generation_id": str(generation_id),
-                "minio_key": minio_key,
-                "mode": mode,
-                "prompt": prompt,
-                "status": "completed",
-            }
-        )
+        tool_res_dict: dict[str, Any] = {
+            "kind": "video",
+            "video_generation_id": str(generation_id),
+            "minio_key": minio_key,
+            "mode": mode,
+            "prompt": prompt,
+            "status": "completed",
+        }
+        if slides:
+            tool_res_dict["slides"] = slides
+        if teaching_segments:
+            tool_res_dict["teaching_segments"] = teaching_segments
+        tool_result = json.dumps(tool_res_dict)
         success = True
     else:
         content = f"Video generation failed: {error or 'unknown error'}"
@@ -649,6 +654,21 @@ async def _run_generate_video(
         )
         storage = get_video_storage()
         storage.upload_file(video_path, object_key, content_type="video/mp4")
+
+        slides = artifact.get("slides") or artifact.get("detail", {}).get("slides")
+        teaching_segments = artifact.get("teaching_segments") or artifact.get("detail", {}).get("teaching_segments")
+        if slides and isinstance(slides, list):
+            for s in slides:
+                chunk = s.get("chunk_path")
+                s_num = s.get("slide_num")
+                if chunk and Path(chunk).is_file() and s_num:
+                    s_key = f"videos/{user_id}/{conversation_id}/{generation_id}_slide_{s_num}.mp4"
+                    try:
+                        storage.upload_file(chunk, s_key, content_type="video/mp4")
+                        s["minio_key"] = s_key
+                    except Exception as upload_err:
+                        logger.warning("MinIO upload for slide %s failed: %s", s_num, upload_err)
+
         scene_path = _resolve_scene_file_for_upload(artifact, run_dir)
         if scene_path is not None:
             try:
@@ -684,6 +704,8 @@ async def _run_generate_video(
         minio_key=object_key,
         error=None,
         existing_assistant_message_id=existing_assistant_message_id,
+        slides=slides if isinstance(slides, list) else None,
+        teaching_segments=teaching_segments if isinstance(teaching_segments, list) else None,
     )
     async with get_worker_db_context() as db:
         await VideoGenerationService(db).mark_completed(
@@ -703,30 +725,35 @@ async def _run_generate_video(
         except Exception:
             pass
 
-    await _notify_video_status(
-        {
-            "type": "video_status",
-            "video_generation_id": generation_id,
-            "conversation_id": str(conversation_id),
-            "user_id": str(user_id),
-            "status": "completed",
-            "stage": "completed",
-            "message": "Your video is ready.",
-            "mode": mode,
-            "prompt": prompt,
-            "minio_key": object_key,
-            "code_minio_key": code_minio_key,
-            "code": code_content,
-            "run_dir": run_dir,
-            "assistant_message_id": str(assistant_id) if assistant_id else None,
-        }
-    )
+    notify_payload = {
+        "type": "video_status",
+        "video_generation_id": generation_id,
+        "conversation_id": str(conversation_id),
+        "user_id": str(user_id),
+        "status": "completed",
+        "stage": "completed",
+        "message": "Your video is ready.",
+        "mode": mode,
+        "prompt": prompt,
+        "minio_key": object_key,
+        "code_minio_key": code_minio_key,
+        "code": code_content,
+        "run_dir": run_dir,
+        "assistant_message_id": str(assistant_id) if assistant_id else None,
+    }
+    if slides:
+        notify_payload["slides"] = slides
+    if teaching_segments:
+        notify_payload["teaching_segments"] = teaching_segments
+
+    await _notify_video_status(notify_payload)
     return {
         "status": "completed",
         "minio_key": object_key,
         "code_minio_key": code_minio_key,
         "code": code_content,
         "run_dir": run_dir,
+        "slides": slides,
     }
 
 

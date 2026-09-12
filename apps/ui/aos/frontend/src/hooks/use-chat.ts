@@ -659,7 +659,7 @@ export function useChat(options: UseChatOptions = {}) {
       if (activeKBIds.length) payload.active_knowledge_base_ids = activeKBIds;
       payload.deep_research = useChatModeStore.getState().deepResearch;
       const videoMode = useChatModeStore.getState().videoMode;
-      if (videoMode === "animate" || videoMode === "lecture") {
+      if (videoMode === "animate" || videoMode === "teaching" || videoMode === "lecture") {
         payload.video_mode = videoMode;
       }
       const harnessMode = useChatModeStore.getState().harnessMode;
