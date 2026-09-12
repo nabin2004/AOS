@@ -385,6 +385,8 @@ export function useChat(options: UseChatOptions = {}) {
             repair_attempts: data.repair_attempts ?? prevResult?.repair_attempts,
             cold_start_attempts: data.cold_start_attempts ?? prevResult?.cold_start_attempts,
             duration_seconds: data.duration_seconds ?? prevResult?.duration_seconds,
+            slides: (data as { slides?: unknown }).slides || prevResult?.slides,
+            teaching_segments: (data as { teaching_segments?: unknown }).teaching_segments || prevResult?.teaching_segments,
             events: updatedEvents,
           };
 

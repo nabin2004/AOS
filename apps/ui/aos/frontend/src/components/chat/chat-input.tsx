@@ -14,6 +14,7 @@ import {
   type SlashCommandContext,
 } from "./slash-commands";
 import { SlashCommandPalette } from "./slash-command-palette";
+import { useChatModeStore } from "@/stores";
 
 interface ChatInputProps {
   onSend: (message: string, fileIds?: string[], files?: FileUploadResponse[]) => void;
@@ -35,6 +36,7 @@ export function ChatInput({
   slashContext,
   commands,
 }: ChatInputProps) {
+  const videoMode = useChatModeStore((s) => s.videoMode);
   const [message, setMessage] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<FileUploadResponse[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -328,7 +330,11 @@ export function ChatInput({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type a message..."
+          placeholder={
+            videoMode === "animate"
+              ? "Describe what you want to animate (e.g. Teach me about Euler's formula)..."
+              : "Type a message..."
+          }
           disabled={disabled}
           rows={1}
           className="placeholder:text-muted-foreground min-h-[40px] flex-1 resize-none scrollbar-thin bg-transparent py-2.5 text-sm focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:text-base"

@@ -106,6 +106,7 @@ export function normalizeStage(rawStage?: string | null): GenerationStage {
     case "assemble":
     case "upload":
     case "RENDERING":
+    case "TIMELINE_HOLD":
       return "RENDERING";
     case "VALIDATING_VIDEO":
     case "VIDEO_VALIDATION_FAILED":

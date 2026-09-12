@@ -15,10 +15,7 @@ import {
   Settings2,
   Sliders,
   Sparkles,
-  Telescope,
   Film,
-  Brain,
-  Terminal,
   Users,
 } from "lucide-react";
 
@@ -30,7 +27,6 @@ import { useKnowledgeBases, useConversations } from "@/hooks";
 import { useConversationStore, useKBSelectionStore } from "@/stores";
 import { useChatModeStore, useLlmProviderStore } from "@/stores";
 import { LlmProviderForm } from "@/components/settings/llm-provider-form";
-import { MemoryDrawer } from "./memory-drawer";
 import { cn } from "@/lib/utils";
 import type { KBScope, KnowledgeBase } from "@/types";
 import Link from "next/link";
@@ -169,7 +165,6 @@ export function ChatControls({
 
   const triggerSummary = useMemo(() => {
     const parts: string[] = [];
-    if (deepResearch) parts.push("Research");
     if (videoMode === "animate") parts.push("Animate");
     if (videoMode === "teaching") parts.push("Teaching");
     if (videoMode === "lecture") parts.push("Lecture");
@@ -179,7 +174,6 @@ export function ChatControls({
     if (settingsOverridden) parts.push("Custom");
     return parts.length ? parts.join(" · ") : "Controls";
   }, [
-    deepResearch,
     videoMode,
     activeCount,
     customProvider,
@@ -188,7 +182,6 @@ export function ChatControls({
   ]);
 
   const hasOverrides =
-    deepResearch ||
     videoMode !== "off" ||
     activeCount > 0 ||
     selectedModel.value !== "" ||
@@ -502,138 +495,11 @@ function SettingsPanel({
   onTemperatureChange: (v: number | null) => void;
   onEffortChange: (v: ThinkingEffort) => void;
 }) {
-  const deepResearch = useChatModeStore((s) => s.deepResearch);
-  const setDeepResearch = useChatModeStore((s) => s.setDeepResearch);
   const videoMode = useChatModeStore((s) => s.videoMode);
   const setVideoMode = useChatModeStore((s) => s.setVideoMode);
-  const harnessMode = useChatModeStore((s) => s.harnessMode);
-  const setHarnessMode = useChatModeStore((s) => s.setHarnessMode);
-  const headless = useChatModeStore((s) => s.headless);
-  const setHeadless = useChatModeStore((s) => s.setHeadless);
-  const autoApprove = useChatModeStore((s) => s.autoApprove);
-  const setAutoApprove = useChatModeStore((s) => s.setAutoApprove);
-  const [memoryOpen, setMemoryOpen] = useState(false);
 
   return (
     <div className="space-y-6">
-      <MemoryDrawer isOpen={memoryOpen} onClose={() => setMemoryOpen(false)} />
-
-      {/* EduClaw Coding Harness */}
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-foreground inline-flex items-center gap-1.5 text-sm font-semibold">
-            <Terminal className="h-3.5 w-3.5 text-purple-400" />
-            EduClaw Harness
-          </span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={harnessMode === "educlaw"}
-            onClick={() => setHarnessMode(harnessMode === "educlaw" ? "off" : "educlaw")}
-            className={cn(
-              "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
-              harnessMode === "educlaw" ? "bg-purple-600" : "bg-foreground/20",
-            )}
-          >
-            <span
-              className={cn(
-                "bg-background inline-block h-4 w-4 transform rounded-full shadow transition-transform",
-                harnessMode === "educlaw" ? "translate-x-4" : "translate-x-0.5",
-              )}
-            />
-          </button>
-        </div>
-        <p className="text-foreground/55 text-[11px] leading-relaxed">
-          {harnessMode === "educlaw"
-            ? "Interactive coding harness with Docker sandboxing, AST diagnostics, and Dagestan graph memory."
-            : "EduClaw harness inactive."}
-        </p>
-
-        {harnessMode === "educlaw" && (
-          <div className="space-y-2 rounded-md border border-purple-500/20 bg-purple-500/5 p-2.5 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-foreground/80">Headless Execution</span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={headless}
-                onClick={() => setHeadless(!headless)}
-                className={cn(
-                  "relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors",
-                  headless ? "bg-purple-600" : "bg-foreground/20",
-                )}
-              >
-                <span
-                  className={cn(
-                    "bg-background inline-block h-3 w-3 transform rounded-full shadow transition-transform",
-                    headless ? "translate-x-3.5" : "translate-x-0.5",
-                  )}
-                />
-              </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-foreground/80">Auto-Approve Tools</span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={autoApprove}
-                onClick={() => setAutoApprove(!autoApprove)}
-                className={cn(
-                  "relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors",
-                  autoApprove ? "bg-purple-600" : "bg-foreground/20",
-                )}
-              >
-                <span
-                  className={cn(
-                    "bg-background inline-block h-3 w-3 transform rounded-full shadow transition-transform",
-                    autoApprove ? "translate-x-3.5" : "translate-x-0.5",
-                  )}
-                />
-              </button>
-            </div>
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={() => setMemoryOpen(true)}
-                className="w-full flex items-center justify-center gap-1.5 rounded bg-purple-500/20 py-1 font-medium text-purple-300 hover:bg-purple-500/30 transition-colors"
-              >
-                <Brain className="h-3.5 w-3.5" />
-                View Dagestan Memory
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-foreground inline-flex items-center gap-1.5 text-sm font-semibold">
-            <Telescope className="h-3.5 w-3.5" />
-            Deep research
-          </span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={deepResearch}
-            onClick={() => setDeepResearch(!deepResearch)}
-            className={cn(
-              "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
-              deepResearch ? "bg-primary" : "bg-foreground/20",
-            )}
-          >
-            <span
-              className={cn(
-                "bg-background inline-block h-4 w-4 transform rounded-full shadow transition-transform",
-                deepResearch ? "translate-x-4" : "translate-x-0.5",
-              )}
-            />
-          </button>
-        </div>
-        <p className="text-foreground/55 text-[11px] leading-relaxed">
-          {deepResearch
-            ? "Plans the work, delegates to parallel subagents, then composes a cited report — asking you to clarify the scope first when the request is vague."
-            : "Answers directly in a single fast pass, with no planning or delegation."}
-        </p>
-      </div>
 
       <div className="space-y-2.5">
         <div className="flex items-baseline justify-between">

@@ -62,6 +62,8 @@ function videoResultPayload(
     events,
     code: existing?.code,
     run_dir: existing?.run_dir,
+    slides: (existing as { slides?: unknown } | undefined)?.slides,
+    teaching_segments: (existing as { teaching_segments?: unknown } | undefined)?.teaching_segments,
   };
 }
 

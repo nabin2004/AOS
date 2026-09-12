@@ -63,6 +63,7 @@ _STAGE_MESSAGES: dict[str, str] = {
     "RENDER_RETRYING": "Re-rendering repaired animation…",
     "VALIDATING_VIDEO": "Validating output animation video…",
     "VIDEO_VALIDATION_FAILED": "Validating video output…",
+    "TIMELINE_HOLD": "Synchronizing visual anchor with in-depth narration…",
 }
 
 _REPEATABLE_STAGES: set[str] = {
@@ -75,6 +76,9 @@ _REPEATABLE_STAGES: set[str] = {
     "WAITING_FOR_LLM",
     "RATE_LIMIT_WAIT",
     "VALIDATING_VIDEO",
+    "TIMELINE_HOLD",
+    "PlanTeachingScriptNode",
+    "CodeAgent",
 }
 
 
@@ -280,7 +284,14 @@ def _run_agents_cli(
         # UI Animate path: force OpenRouter for the full Classify→Plan→Code graph
         # (default agents profile is hybrid and expects Ollama for the coder).
         env["AOS_MODEL_PROFILE"] = "cloud"
-        openrouter_key = custom_key or settings.OPENROUTER_API_KEY
+        openrouter_key = custom_key or settings.OPENROUTER_API_KEY or os.getenv("OPENROUTER_API_KEY", "").strip()
+        if not openrouter_key:
+            agents_env = agents_dir / ".env"
+            if agents_env.is_file():
+                for line in agents_env.read_text(encoding="utf-8").splitlines():
+                    if line.strip().startswith("OPENROUTER_API_KEY="):
+                        openrouter_key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                        break
         if openrouter_key:
             env["OPENROUTER_API_KEY"] = openrouter_key
         if custom_model:

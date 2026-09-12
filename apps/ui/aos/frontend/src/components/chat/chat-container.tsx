@@ -15,12 +15,14 @@ import { SubagentFeed } from "./subagent-feed";
 import { SubagentPanel } from "./subagent-panel";
 import { ToolApprovalDialog } from "./tool-approval-dialog";
 import { QuestionPrompt } from "@/components/ui";
+import { Film } from "lucide-react";
 import type { PendingApproval, AskUserQuestion, AskUserAnswer, Decision } from "@/types";
-import { useConversationStore, useChatStore } from "@/stores";
+import { useConversationStore, useChatStore, useChatModeStore } from "@/stores";
 import { useResearchStore } from "@/stores";
 import { useConversations } from "@/hooks";
 import { useSlashCommands } from "@/hooks";
 import { apiClient } from "@/lib/api-client";
+import { cn } from "@/lib/utils";
 import {
   applyVideoStatusToMessage,
   videoGenerationToChatMessage,
@@ -352,6 +354,8 @@ function ChatUI({
   onStop,
 }: ChatUIProps) {
   const tc = useTranslations("common");
+  const videoMode = useChatModeStore((s) => s.videoMode);
+  const setVideoMode = useChatModeStore((s) => s.setVideoMode);
   const currentTurnId = useResearchStore((s) => s.currentTurnId);
   const hasPlanData = useResearchStore((s) => {
     if (!s.currentTurnId) return false;
@@ -426,7 +430,7 @@ function ChatUI({
               />
             </div>
             <div className="border-foreground/8 flex items-center justify-between border-t px-3 py-2 sm:px-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <span
                   className={`inline-flex items-center gap-1.5 font-mono text-[10px] tracking-wider uppercase ${isConnected ? "text-muted-foreground" : "text-destructive"}`}
                 >
@@ -437,6 +441,30 @@ function ChatUI({
                   />
                   {isConnected ? tc("live") : tc("offline")}
                 </span>
+
+                <div className="bg-foreground/10 h-3 w-px" />
+
+                <button
+                  type="button"
+                  onClick={() => setVideoMode(videoMode === "animate" ? "off" : "animate")}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[11px] font-medium tracking-wider transition-all",
+                    videoMode === "animate"
+                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25 ring-1 ring-primary/30"
+                      : "bg-foreground/5 text-foreground/60 hover:bg-foreground/10 hover:text-foreground",
+                  )}
+                  title={
+                    videoMode === "animate"
+                      ? "Animate Mode is ON: Generates Manim animations + synchronized voiceover. Click to switch to normal chat."
+                      : "Click to enable Animate Mode (generates Manim animations + voice narration)"
+                  }
+                >
+                  <Film className="h-3.5 w-3.5" />
+                  <span>Animate</span>
+                  {videoMode === "animate" && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  )}
+                </button>
               </div>
               <div className="flex items-center gap-1">
                 <ChatControls
