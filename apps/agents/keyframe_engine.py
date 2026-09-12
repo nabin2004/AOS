@@ -1,8 +1,13 @@
-"""Native Keyframe Producer-Consumer Manim Engine for AOS Animation Pipeline.
+"""Native Keyframe & Teaching Segment Engine for AOS Animation Pipeline.
 
-Generates discrete pedagogical keyframe slides with synchronized Pocket TTS voiceover,
-renders each slide into an individual MP4 chunk, and concatenates all chunks into
-a seamless final video. Entirely self-contained in apps/agents (no educlaw dependency).
+Decouples visual animation duration from detailed pedagogical narration:
+1. Renders the visual anchor animation once using Manim (clean, fast, ~5-10s).
+2. Generates an in-depth pedagogical teaching narration informed by the visual anchor
+   (explains symbols, intuition, geometric meaning, analogies, avoiding redundancy).
+3. Synthesizes authoritative Pocket TTS audio and measures its exact duration (e.g. 60-90s).
+4. Freezes the final visual frame using FFmpeg (`tpad=stop_mode=clone`) for the
+   remaining duration without re-running Manim.
+5. Assembles all TeachingSegments into a cohesive, high-production lesson video.
 """
 
 from __future__ import annotations
@@ -18,28 +23,35 @@ import threading
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 from manim import *
-from manim_voiceover import VoiceoverScene
 from openai import OpenAI
+
+from ir import SemanticEvent, TeachingSegment, VisualAnchor
+from tools.timeline_assembler import (
+    assemble_segments,
+    get_media_duration,
+    hold_final_state,
+)
 
 
 @dataclass
 class SlideData:
+    """Legacy compatibility bridge for existing callers."""
     slide_num: int
     narration: str
     python_code: str
     is_final_slide: bool = False
     chunk_path: str | None = None
+    teaching_segment: TeachingSegment | None = None
 
 
 def get_speech_service():
     """Initializes the resident Pocket TTS voiceover service."""
     try:
         from tools.aos_speech_service import AOSSpeechService
-
         return AOSSpeechService()
     except Exception as exc:
         print(f"[Keyframe Engine] Speech service init note: {exc}", file=sys.stderr)
@@ -113,224 +125,368 @@ def get_llm_client(
     return client, effective_model
 
 
-SYSTEM_PROMPT = """You are an expert mathematical animator and computer science educator writing Manim Community Edition code with synchronized voiceover.
-Output your response using the following format:
+VISUAL_PLANNER_PROMPT = """You are an expert mathematical animator creating concise visual slides in Manim Community Edition.
+Your job is ONLY to build a clean, elegant visual anchor (equations, diagrams, titles).
+Do NOT write narration here. Keep the animation short, focused, and elegant (5-10 seconds total).
 
-<narration>
-Natural, conversational, highly engaging spoken explanation. You can insert <bookmark mark="v1"/>, <bookmark mark="v2"/> to sync visual animations with speech.
-</narration>
+Output format:
+<visual_anchor>
+{
+  "type": "formula" | "diagram" | "geometry" | "concept",
+  "title": "Short Descriptive Title",
+  "latex": "Primary equation if applicable or empty string",
+  "visible_elements": ["list", "of", "symbols", "and", "labels"],
+  "visual_purpose": "Pedagogical role of this visual anchor"
+}
+</visual_anchor>
 
 ```python
-# Self-contained Manim animation snippet for this specific slide.
-# Do NOT define a Scene class. Assume you are inside Scene.construct(self).
-# Use self.play(...), self.wait_until_bookmark("v1"), self.wait(...) directly.
+# Self-contained Manim code for Scene.construct(self).
+# Use self.play(...) and self.wait(...) directly.
+# Coordinate bounds: x in [-6, 6], y in [-3.5, 3.5].
+# Palette: BLUE, YELLOW, TEAL, GREEN, GOLD, RED, WHITE.
 ```
+"""
 
-Rules:
-1. Always keep animations elegant, centered, and mathematically precise.
-2. Use MathTex for equations, Text for readable titles.
-3. Coordinate bounds: x in [-6, 6], y in [-3.5, 3.5].
-4. Color palette: BLUE, YELLOW, TEAL, GREEN, GOLD, RED, WHITE.
+NARRATION_PLANNER_PROMPT = """You are a master university professor and educator.
+The student is currently looking at a visual slide on screen.
+Your job is to provide an IN-DEPTH, DETAILED teaching lecture explaining the concept thoroughly.
+
+CRITICAL ANTI-REDUNDANCY RULE:
+- Do NOT simply read or transcribe the equation or labels already visible on screen!
+- (BAD: "Here we see e to the i theta equals cosine theta plus i sine theta.")
+- (GOOD: Explain what each symbol means, why the relationship exists, provide physical and geometric intuition, real-world relevance, analogies, and connections.)
+
+PEDAGOGICAL STRUCTURE TO FOLLOW:
+1. INTRODUCE: What fundamental insight are we examining, and why is it important?
+2. OBSERVE: Guide the student's eye to key components.
+3. DEFINE: Deep dive into the meaning of each symbol (e.g. what e, i, theta, cos, sin actually do).
+4. BREAK DOWN & EXPLAIN: Why does this equality hold? How do algebra and geometry unify here?
+5. INTUITION: What is the geometric picture or physical analogy (e.g. circular motion, rotation)?
+6. EXAMPLE & CONNECTION: A notable case (e.g. Euler's identity), application, or historical context.
+7. RECAP: The core conceptual takeaway.
+
+Length: Write a comprehensive, conversational explanation (around 120-200 words, ~45-90 seconds of speech).
+Wrap your output in <narration> ... </narration> tags.
 """
 
 
-def _parse_markdown(markdown_output: str) -> Tuple[str, str]:
-    narration = ""
-    code = ""
-    narration_match = re.search(r"<narration>(.*?)</narration>", markdown_output, re.DOTALL | re.IGNORECASE)
-    if narration_match:
-        narration = narration_match.group(1).strip()
+def _parse_visual_output(text: str) -> Tuple[VisualAnchor, str]:
+    """Extracts VisualAnchor metadata and Python code from LLM output."""
+    anchor = VisualAnchor(type="formula", visual_purpose="Core concept visualization")
+    anchor_match = re.search(r"<visual_anchor>(.*?)</visual_anchor>", text, re.DOTALL | re.IGNORECASE)
+    if anchor_match:
+        try:
+            raw_json = anchor_match.group(1).strip()
+            data = json.loads(raw_json)
+            anchor = VisualAnchor(**data)
+        except Exception:
+            pass
 
-    code_match = re.search(r"```(?:python)?(.*?)```", markdown_output, re.DOTALL)
+    code = ""
+    code_match = re.search(r"```(?:python)?(.*?)```", text, re.DOTALL)
     if code_match:
         code = code_match.group(1).strip()
 
-    return narration, code
+    return anchor, code
 
 
-def _build_curated_fallback_slide(prompt: str, slide_num: int, total_slides: int) -> Tuple[str, str]:
-    """Curated, high-fidelity STEM fallback slides with rich LaTeX and diagrams."""
+def _parse_narration_output(text: str) -> str:
+    """Extracts pedagogical narration from LLM output."""
+    narr_match = re.search(r"<narration>(.*?)</narration>", text, re.DOTALL | re.IGNORECASE)
+    if narr_match:
+        return narr_match.group(1).strip()
+    clean = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+    return clean.strip()
+
+
+def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: int) -> TeachingSegment:
+    """Curated, high-fidelity STEM TeachingSegments with rich visual anchors and detailed ~60-90s pedagogy."""
     p_lower = prompt.lower()
     if "euler" in p_lower:
         if slide_num == 1:
-            narration = "Euler's formula reveals one of the most profound bridges in mathematics, establishing an unexpected equality between exponential growth and circular trigonometry."
+            anchor = VisualAnchor(
+                type="formula",
+                title="Euler's Formula",
+                latex=r"e^{i\theta} = \cos(\theta) + i\sin(\theta)",
+                visible_elements=["e", "i", "theta", "cos(theta)", "sin(theta)"],
+                visual_purpose="Introduce the fundamental bridge between exponential growth and circular trigonometry.",
+            )
             code = (
                 'title = Text("Euler\'s Formula", font_size=40, color=YELLOW).to_edge(UP)\n'
                 'formula = MathTex(r"e^{i\\theta} = \\cos(\\theta) + i\\sin(\\theta)", font_size=48, color=BLUE)\n'
                 'box = SurroundingRectangle(formula, color=GOLD, buff=0.35)\n'
                 'self.play(Write(title))\n'
-                'self.play(Create(box), Write(formula))\n'
-                'self.wait(1)\n'
+                'self.play(Write(formula))\n'
+                'self.play(Create(box))\n'
+                'self.wait(1.0)\n'
+            )
+            narration = (
+                "Euler's formula stands as one of the most profound bridges in all of mathematics, "
+                "establishing an astonishing equality between exponential growth and circular trigonometry. "
+                "To truly understand what this equation tells us, let us look beyond the symbols. "
+                "The constant e is the natural base of growth, usually associated with continuous compounding in one dimension. "
+                "The imaginary unit i, on the other hand, represents orthogonal rotation by ninety degrees in the complex plane. "
+                "When we place i in the exponent multiplied by the angle theta, growth ceases to be exponential expansion along a line, "
+                "and instead transforms into continuous rotation around a circle. "
+                "The real part gives us the horizontal projection, cosine of theta, while the imaginary part gives the vertical component, sine of theta. "
+                "In a single stroke, this unified two completely separate branches of mathematics that mathematicians had studied for centuries."
             )
         elif slide_num == 2:
-            narration = "Geometrically, as theta varies, this represents uniform motion along the unit circle in the complex plane, with horizontal component cosine and vertical component sine."
+            anchor = VisualAnchor(
+                type="geometry",
+                title="Geometric Interpretation in the Complex Plane",
+                latex=r"e^{i\theta}",
+                visible_elements=["ComplexPlane", "Circle", "e^{i\\theta}", "cos(\\theta)", "sin(\\theta)"],
+                visual_purpose="Visualize uniform rotation on the unit circle as theta varies.",
+            )
             code = (
-                'plane = ComplexPlane(x_range=[-2, 2, 1], y_range=[-2, 2, 1]).scale(0.8)\n'
-                'circle = Circle(radius=1.6, color=TEAL)\n'
+                'title = Text("Geometric Interpretation", font_size=36, color=TEAL).to_edge(UP)\n'
+                'plane = ComplexPlane(x_range=[-2, 2, 1], y_range=[-2, 2, 1]).scale(0.75).shift(DOWN*0.3)\n'
+                'circle = Circle(radius=1.5, color=TEAL).move_to(plane.n2p(0))\n'
                 'dot = Dot(circle.point_at_angle(PI/4), color=RED)\n'
                 'label = MathTex(r"e^{i\\theta}", color=RED).next_to(dot, UR, buff=0.15)\n'
                 'line = Line(plane.n2p(0), dot.get_center(), color=YELLOW)\n'
+                'self.play(Write(title))\n'
                 'self.play(Create(plane), Create(circle))\n'
                 'self.play(Create(line), FadeIn(dot), Write(label))\n'
-                'self.wait(1)\n'
+                'self.wait(1.0)\n'
+            )
+            narration = (
+                "Now, let us examine the geometric picture of Euler's formula in the complex plane. "
+                "As the parameter theta increases continuously, the expression e to the i theta traces out a path "
+                "with constant distance equal to one from the origin. In other words, it is tracing the unit circle. "
+                "If you track the shadow of this moving point along the horizontal real axis, it oscillates precisely according to the cosine function. "
+                "Meanwhile, its shadow along the vertical imaginary axis oscillates according to the sine function. "
+                "This means that complex exponentiation is simply uniform circular motion in disguise. "
+                "Engineers and physicists rely on this exact insight every day to model alternating currents, quantum wavefunctions, and acoustic vibrations, "
+                "turning complicated trigonometric differential equations into simple algebraic multiplications."
             )
         else:
-            narration = "Setting theta equal to pi yields Euler's identity, famously uniting five of the most fundamental constants in all of mathematics: e, i, pi, 1, and 0."
+            anchor = VisualAnchor(
+                type="formula",
+                title="Euler's Identity",
+                latex=r"e^{i\pi} + 1 = 0",
+                visible_elements=["e", "i", "pi", "1", "0"],
+                visual_purpose="Present the most famous special case uniting five fundamental mathematical constants.",
+            )
             code = (
                 'identity = MathTex(r"e^{i\\pi} + 1 = 0", font_size=56, color=YELLOW)\n'
                 'box = SurroundingRectangle(identity, color=GREEN, buff=0.4)\n'
                 'caption = Text("The Most Beautiful Theorem in Mathematics", font_size=26, color=WHITE).next_to(box, DOWN, buff=0.5)\n'
-                'self.play(Create(box), Write(identity))\n'
+                'self.play(Write(identity))\n'
+                'self.play(Create(box))\n'
                 'self.play(FadeIn(caption))\n'
-                'self.wait(1)\n'
+                'self.wait(1.0)\n'
+            )
+            narration = (
+                "When we evaluate Euler's formula at the specific angle theta equals pi radians, we arrive at Euler's identity. "
+                "Richard Feynman called this the most remarkable formula in mathematics, and it is easy to see why. "
+                "It brings together the five most fundamental constants of our universe: "
+                "e, the foundation of calculus and growth; i, the seed of imaginary numbers; pi, the ratio of circular geometry; "
+                "1, the multiplicative identity; and 0, the additive identity. "
+                "Geometrically, an angle of pi radians is a half-circle rotation, which points directly in the negative real direction, landing on negative one. "
+                "Adding one returns us perfectly to zero. It is a stunning testimony to the hidden harmony and coherence of mathematics."
             )
     elif "fourier" in p_lower:
         if slide_num == 1:
-            narration = "The Fourier Transform decomposes any signal or function into a continuous spectrum of sinusoidal frequencies."
+            anchor = VisualAnchor(
+                type="formula",
+                title="The Fourier Transform",
+                latex=r"\hat{f}(\xi) = \int_{-\infty}^{\infty} f(t) e^{-2\pi i t \xi} dt",
+                visible_elements=["f(t)", "hat{f}(xi)", "integral", "e^{-2pi i t xi}"],
+                visual_purpose="Formulate the frequency decomposition of a continuous time-domain signal.",
+            )
             code = (
                 'title = Text("The Fourier Transform", font_size=40, color=YELLOW).to_edge(UP)\n'
                 'formula = MathTex(r"\\hat{f}(\\xi) = \\int_{-\\infty}^{\\infty} f(t) e^{-2\\pi i t \\xi} dt", font_size=44, color=BLUE)\n'
                 'box = SurroundingRectangle(formula, color=GOLD, buff=0.35)\n'
                 'self.play(Write(title))\n'
-                'self.play(Create(box), Write(formula))\n'
-                'self.wait(1)\n'
+                'self.play(Write(formula))\n'
+                'self.play(Create(box))\n'
+                'self.wait(1.0)\n'
+            )
+            narration = (
+                "The Fourier Transform is one of the most transformative mathematical tools ever conceived, allowing us to decompose any complex signal into a spectrum of pure frequencies. "
+                "Rather than viewing a sound, an image, or a physical vibration merely as an amplitude unfolding across time, the Fourier Transform asks a deeper question: "
+                "which pure sinusoidal tones must be combined together to create this exact signal? "
+                "The term e to the minus two pi i t xi acts as a winding mechanism that wraps the signal around the complex plane at frequency xi. "
+                "By integrating over all time, we calculate the center of mass of this winding, which spikes dramatically only when the frequency matches an inherent component of the signal."
             )
         elif slide_num == 2:
-            narration = "Each frequency component corresponds to wrapping the signal around the complex origin at frequency xi and finding the center of mass."
+            anchor = VisualAnchor(
+                type="diagram",
+                title="Time Domain vs Frequency Spectrum",
+                latex="",
+                visible_elements=["Time Signal", "Frequency Peaks"],
+                visual_purpose="Illustrate the dual perspectives of time and frequency.",
+            )
             code = (
                 'axes = Axes(x_range=[0, 4, 1], y_range=[-1.5, 1.5, 1], x_length=7, y_length=3).shift(UP*0.5)\n'
                 'sine = axes.plot(lambda x: np.sin(2 * PI * x), color=TEAL)\n'
                 'label = Text("Time Domain Signal", font_size=24, color=TEAL).next_to(axes, DOWN, buff=0.3)\n'
                 'self.play(Create(axes), Create(sine))\n'
                 'self.play(Write(label))\n'
-                'self.wait(1)\n'
+                'self.wait(1.0)\n'
+            )
+            narration = (
+                "Consider the difference between a musical chord played on a piano and its sheet music. "
+                "In the time domain, you perceive a complex, oscillating wave of air pressure that is difficult to untangle with the naked eye. "
+                "In the frequency domain, that very same sound separates neatly into individual notes: the fundamental root, the third, and the fifth. "
+                "This dual perspective is the bedrock of modern signal processing, digital audio compression like MP3, medical imaging in MRI scanners, and telecommunications."
             )
         else:
-            narration = "Through the inverse Fourier transform, the original time-domain function can be reconstructed perfectly by integrating over all frequencies."
+            anchor = VisualAnchor(
+                type="formula",
+                title="Inverse Fourier Reconstruction",
+                latex=r"f(t) = \int_{-\infty}^{\infty} \hat{f}(\xi) e^{2\pi i t \xi} d\xi",
+                visible_elements=["hat{f}(xi)", "f(t)", "integral"],
+                visual_purpose="Demonstrate the complete and lossless reconstruction from frequency space.",
+            )
             code = (
                 'title = Text("Inverse Fourier Reconstruction", font_size=36, color=GREEN).to_edge(UP)\n'
                 'formula = MathTex(r"f(t) = \\int_{-\\infty}^{\\infty} \\hat{f}(\\xi) e^{2\\pi i t \\xi} d\\xi", font_size=44, color=YELLOW)\n'
                 'box = SurroundingRectangle(formula, color=GREEN, buff=0.35)\n'
                 'self.play(Write(title))\n'
-                'self.play(Create(box), Write(formula))\n'
-                'self.wait(1)\n'
+                'self.play(Write(formula))\n'
+                'self.play(Create(box))\n'
+                'self.wait(1.0)\n'
+            )
+            narration = (
+                "Crucially, this frequency transformation is entirely reversible through the Inverse Fourier Transform. "
+                "No information is destroyed in the process. By integrating each frequency component scaled by its corresponding amplitude and phase, "
+                "we reassemble the original continuous signal with absolute mathematical precision. "
+                "It represents a flawless duality: time and frequency are merely two complementary languages describing the exact same physical reality."
             )
     else:
-        narration = f"In slide {slide_num}, we explore the key mathematical and conceptual properties of {prompt}."
+        anchor = VisualAnchor(
+            type="concept",
+            title=f"Core Insight: {prompt[:30]}",
+            latex="",
+            visible_elements=[f"Principle {slide_num}", "Foundations"],
+            visual_purpose=f"Introduce pedagogical stage {slide_num} of {prompt}.",
+        )
         code = (
             f'title = Text("Slide {slide_num}: {prompt[:30]}", font_size=38, color=YELLOW).to_edge(UP)\n'
             'box = SurroundingRectangle(title, color=BLUE, buff=0.3)\n'
             f'content = Text("Key Principle {slide_num}", font_size=30, color=WHITE).shift(DOWN*0.5)\n'
             'self.play(Create(box), Write(title))\n'
             'self.play(FadeIn(content))\n'
-            'self.wait(1)\n'
+            'self.wait(1.0)\n'
         )
-    return narration, code
+        narration = (
+            f"In this segment, we examine the foundational mechanisms of {prompt}. "
+            f"Rather than merely memorizing definitions, we want to cultivate true conceptual intuition. "
+            "When we break this concept down into its constituent elements, we discover how each component interacts dynamically "
+            "to produce the overarching behavior. Observe the relationships displayed before you; "
+            "understanding this visual anchor is the key to mastering the broader framework."
+        )
+
+    return TeachingSegment(
+        slide_num=slide_num,
+        concept=f"{prompt} - Part {slide_num}",
+        learning_objective=anchor.visual_purpose,
+        visual_anchor=anchor,
+        manim_code=code,
+        narration=narration,
+    )
 
 
-def generate_keyframe_stream(
+def plan_teaching_segment(
     prompt: str,
-    slide_queue: queue.Queue,
-    *,
-    base_url: str | None = None,
-    api_key: str | None = None,
-    model: str | None = None,
-    total_slides: int = 3,
-    on_progress: Callable[[str, str], None] | None = None,
-) -> None:
-    """Producer thread generating slide outlines, narrations, and Manim code."""
-    def _notify(stage: str, msg: str = ""):
-        if on_progress:
-            try:
-                on_progress(stage, msg)
-            except Exception:
-                pass
-        print(f"-> {stage} {msg}".strip(), file=sys.stderr, flush=True)
-
-    _notify("ClassifyNode", f"Classifying subject for: {prompt}")
-    _notify("PlanLectureNode", f"Structuring {total_slides}-slide outline")
-
-    client, effective_model = get_llm_client(base_url=base_url, api_key=api_key, model=model)
-
+    slide_num: int,
+    total_slides: int,
+    outline: str,
+    client: OpenAI,
+    model: str,
+) -> TeachingSegment:
+    """Generates a TeachingSegment: first the visual anchor, then in-depth narration."""
+    # Step 1: Generate Visual Anchor
+    visual_user_prompt = (
+        f"Topic: {prompt}\n"
+        f"Lecture Outline:\n{outline}\n\n"
+        f"Create the visual anchor for Slide {slide_num} of {total_slides}.\n"
+        f"Provide the <visual_anchor> JSON and concise, elegant Manim code."
+    )
     try:
-        outline_response = client.chat.completions.create(
-            model=effective_model,
+        vis_resp = client.chat.completions.create(
+            model=model,
             messages=[
-                {
-                    "role": "user",
-                    "content": f"Create a concise {total_slides}-slide outline for a visual Manim animation explaining: {prompt}. Return numbered points.",
-                }
+                {"role": "system", "content": VISUAL_PLANNER_PROMPT},
+                {"role": "user", "content": visual_user_prompt},
             ],
             temperature=0.3,
         )
-        outline = outline_response.choices[0].message.content or f"1. Introduction to {prompt}\n2. Core formulation\n3. Visual conclusion"
+        vis_text = vis_resp.choices[0].message.content or ""
+        anchor, code = _parse_visual_output(vis_text)
     except Exception:
-        outline = f"1. Core concept of {prompt}\n2. Mathematical mechanics\n3. Visual synthesis"
+        fallback = _build_curated_fallback_segment(prompt, slide_num, total_slides)
+        anchor, code = fallback.visual_anchor, fallback.manim_code
 
-    for i in range(1, total_slides + 1):
-        _notify("PlanTeachingScriptNode", f"Writing narration script for Slide {i}")
-        slide_prompt = (
-            f"Topic: {prompt}\n"
-            f"Lecture Outline:\n{outline}\n\n"
-            f"Write Slide {i} of {total_slides}.\n"
-            f"Provide detailed university-style pedagogical narration with <bookmark mark=\"v1\"/> and clean Manim visual code."
+    if not code.strip():
+        fallback = _build_curated_fallback_segment(prompt, slide_num, total_slides)
+        anchor, code = fallback.visual_anchor, fallback.manim_code
+
+    # Step 2: Generate In-Depth Narration based on the Visual Anchor
+    narration_user_prompt = (
+        f"Topic: {prompt}\n"
+        f"Slide Number: {slide_num} of {total_slides}\n"
+        f"Visual Anchor Title: {anchor.title}\n"
+        f"Displayed Formula: {anchor.latex}\n"
+        f"Visible Elements: {anchor.visible_elements}\n"
+        f"Visual Purpose: {anchor.visual_purpose}\n\n"
+        f"Write a deep, pedagogical, university-level teaching explanation.\n"
+        f"Explain what the student is seeing, define the symbols, explain intuition and applications.\n"
+        f"Remember: Do NOT merely read the slide aloud!"
+    )
+    try:
+        narr_resp = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": NARRATION_PLANNER_PROMPT},
+                {"role": "user", "content": narration_user_prompt},
+            ],
+            temperature=0.4,
         )
+        narr_text = narr_resp.choices[0].message.content or ""
+        narration = _parse_narration_output(narr_text)
+    except Exception:
+        fallback = _build_curated_fallback_segment(prompt, slide_num, total_slides)
+        narration = fallback.narration
 
-        try:
-            response = client.chat.completions.create(
-                model=effective_model,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": slide_prompt},
-                ],
-                temperature=0.4,
-            )
-            markdown_output = response.choices[0].message.content or ""
-            narration, code = _parse_markdown(markdown_output)
-        except Exception:
-            narration, code = _build_curated_fallback_slide(prompt, i, total_slides)
+    if not narration.strip() or len(narration.split()) < 20:
+        fallback = _build_curated_fallback_segment(prompt, slide_num, total_slides)
+        narration = fallback.narration
 
-        if not narration or not code:
-            fb_narr, fb_code = _build_curated_fallback_slide(prompt, i, total_slides)
-            if not narration:
-                narration = fb_narr
-            if not code:
-                code = fb_code
-
-        _notify("CodeAgent", f"Manim code and voiceover ready for Slide {i}")
-
-        is_final = (i == total_slides)
-        slide_queue.put(
-            SlideData(
-                slide_num=i,
-                narration=narration,
-                python_code=code,
-                is_final_slide=is_final,
-            )
-        )
+    return TeachingSegment(
+        slide_num=slide_num,
+        concept=anchor.title or f"{prompt} - Slide {slide_num}",
+        learning_objective=anchor.visual_purpose,
+        visual_anchor=anchor,
+        manim_code=code,
+        narration=narration,
+    )
 
 
-def render_single_keyframe(
-    slide_data: SlideData,
+def render_visual_anchor(
+    segment: TeachingSegment,
     output_dir: Path,
     quality: str = "low_quality",
 ) -> Path | None:
-    """Renders one SlideData chunk with Manim and Pocket TTS."""
-    output_stem = f"slide_{slide_data.slide_num}"
+    """Renders the pure visual animation for a TeachingSegment using Manim.
+
+    Fast, self-contained, and completely independent of speech synthesis.
+    """
+    output_stem = f"slide_{segment.slide_num}_visual"
     config.media_dir = str(output_dir)
     config.quality = quality
     config.output_file = output_stem
 
-    class DynamicSlideScene(VoiceoverScene):
-        def construct(self):
-            speech_service = get_speech_service()
-            if speech_service is not None:
-                try:
-                    self.set_speech_service(speech_service)
-                except Exception as exc:
-                    print(f"[Keyframe Voiceover] Error: {exc}", file=sys.stderr)
-                    speech_service = None
+    class VisualAnchorScene(Scene):
+        def wait_until_bookmark(self, mark: str, **kwargs):
+            self.wait(0.2)
 
+        def construct(self):
             safe_globals: Dict[str, Any] = {
                 "np": np,
                 "MathTex": MathTex,
@@ -401,35 +557,24 @@ def render_single_keyframe(
             }
             safe_locals: Dict[str, Any] = {"self": self}
 
-            narration_text = slide_data.narration or f"Presenting slide {slide_data.slide_num}."
-
             try:
-                if speech_service is not None:
-                    with self.voiceover(text=narration_text) as tracker:
-                        safe_locals["tracker"] = tracker
-                        if slide_data.python_code.strip():
-                            exec(slide_data.python_code, safe_globals, safe_locals)
-                        else:
-                            placeholder = Text(f"Slide {slide_data.slide_num}").scale(1.2)
-                            self.play(FadeIn(placeholder), run_time=1.0)
+                if segment.manim_code.strip():
+                    exec(segment.manim_code, safe_globals, safe_locals)
                 else:
-                    if slide_data.python_code.strip():
-                        exec(slide_data.python_code, safe_globals, safe_locals)
-                    else:
-                        placeholder = Text(f"Slide {slide_data.slide_num}").scale(1.2)
-                        self.play(FadeIn(placeholder), run_time=1.0)
-                    self.wait(2.0)
+                    t = Text(f"Slide {segment.slide_num}").scale(1.2)
+                    self.play(FadeIn(t), run_time=1.0)
+                self.wait(0.5)
             except Exception as exc:
-                print(f"[Keyframe Render Warning] Slide {slide_data.slide_num}: {exc}", file=sys.stderr)
+                print(f"[Visual Render Warning] Slide {segment.slide_num}: {exc}", file=sys.stderr)
                 try:
-                    fallback_title = Text(f"Slide {slide_data.slide_num}", font_size=40, color=YELLOW).to_edge(UP)
+                    fallback_title = Text(f"Slide {segment.slide_num}", font_size=40, color=YELLOW).to_edge(UP)
                     fallback_box = SurroundingRectangle(fallback_title, color=BLUE, buff=0.3)
                     self.play(Create(fallback_box), Write(fallback_title), run_time=1.0)
-                    self.wait(1.5)
+                    self.wait(1.0)
                 except Exception:
-                    self.wait(1.5)
+                    self.wait(1.0)
 
-    scene = DynamicSlideScene()
+    scene = VisualAnchorScene()
     scene.render()
 
     expected_mp4: Path | None = None
@@ -450,45 +595,68 @@ def render_single_keyframe(
     return None
 
 
-def assemble_slide_chunks(chunk_paths: List[Path], output_path: Path) -> Path:
-    """Concatenates individual slide MP4s with audio into a single seamless MP4."""
-    if not chunk_paths:
-        raise ValueError("No video chunks provided to assemble")
+def synthesize_teaching_audio(
+    narration_text: str,
+    output_wav: Path,
+) -> float:
+    """Synthesizes pedagogical narration into WAV audio using Pocket TTS.
 
-    valid_chunks = [p for p in chunk_paths if p.is_file() and p.stat().st_size > 0]
-    if not valid_chunks:
-        raise ValueError("No valid video chunks found on disk")
+    Returns the authoritative measured duration in seconds.
+    """
+    clean_text = re.sub(r"<bookmark.*?>", "", narration_text).strip()
+    try:
+        from tools.aos_speech_service import _get_narrator
+        narrator = _get_narrator("alba", "english")
+        narrator.synthesize(clean_text, output_wav)
+    except Exception:
+        # Fallback using scipy write of synthetic speech-timed tone or silence
+        try:
+            import scipy.io.wavfile
+            sr = 24000
+            words = len(clean_text.split())
+            sec = max(3.0, words * 0.45)
+            silence = np.zeros(int(sr * sec), dtype=np.float32)
+            scipy.io.wavfile.write(output_wav, sr, silence)
+        except Exception:
+            pass
 
-    if len(valid_chunks) == 1:
-        shutil.copy2(valid_chunks[0], output_path)
-        return output_path
+    return get_media_duration(output_wav)
 
-    concat_file = output_path.parent / "chunks_concat.txt"
-    with open(concat_file, "w", encoding="utf-8") as f:
-        for p in valid_chunks:
-            escaped = str(p.resolve()).replace("\\", "/")
-            f.write(f"file '{escaped}'\n")
 
-    cmd = [
-        "ffmpeg",
-        "-y",
-        "-f", "concat",
-        "-safe", "0",
-        "-i", str(concat_file),
-        "-c:v", "libx264",
-        "-pix_fmt", "yuv420p",
-        "-c:a", "aac",
-        "-b:a", "192k",
-        "-movflags", "+faststart",
-        str(output_path.resolve()),
-    ]
+def assemble_teaching_segment(
+    segment: TeachingSegment,
+    output_dir: Path,
+) -> Path | None:
+    """Combines visual animation, static visual hold, and authoritative narration audio."""
+    if not segment.visual_path or not Path(segment.visual_path).is_file():
+        return None
 
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    if result.returncode != 0 or not output_path.is_file():
-        # Fallback copy first chunk if concatenation failed
-        shutil.copy2(valid_chunks[0], output_path)
+    in_video = Path(segment.visual_path)
+    in_audio = Path(segment.audio_path) if segment.audio_path else None
+    out_chunk = output_dir / f"slide_{segment.slide_num}.mp4"
 
-    return output_path
+    # Authoritative durations
+    segment.visual_duration = get_media_duration(in_video)
+    if in_audio and in_audio.is_file():
+        segment.narration_duration = get_media_duration(in_audio)
+    else:
+        segment.narration_duration = segment.visual_duration
+
+    # Visual hold duration
+    hold_dur = segment.hold_duration
+
+    # Extend visual using final state
+    res = hold_final_state(
+        video_path=in_video,
+        hold_duration=hold_dur,
+        audio_path=in_audio,
+        output_path=out_chunk,
+    )
+    if res.is_file() and res.stat().st_size > 0:
+        segment.chunk_path = str(res)
+        return res
+
+    return None
 
 
 def run_producer_consumer(
@@ -502,7 +670,7 @@ def run_producer_consumer(
     quality: str = "low_quality",
     on_progress: Callable[[str, str], None] | None = None,
 ) -> dict[str, Any]:
-    """Coordinates producer slide synthesis and consumer Manim/TTS rendering in one go."""
+    """Coordinates decoupled visual anchor rendering and deep pedagogical narration in one go."""
     if output_dir:
         run_dir = Path(output_dir).resolve()
     else:
@@ -520,77 +688,85 @@ def run_producer_consumer(
                 pass
         print(f"-> {stage} {msg}".strip(), file=sys.stderr, flush=True)
 
-    slide_queue: queue.Queue = queue.Queue()
+    _notify("ClassifyNode", f"Classifying subject for: {prompt}")
+    _notify("PlanLectureNode", f"Structuring {total_slides} TeachingSegments")
 
-    producer_thread = threading.Thread(
-        target=generate_keyframe_stream,
-        args=(prompt, slide_queue),
-        kwargs={
-            "base_url": base_url,
-            "api_key": api_key,
-            "model": model,
-            "total_slides": total_slides,
-            "on_progress": on_progress,
-        },
-        daemon=True,
-    )
-    producer_thread.start()
+    client, effective_model = get_llm_client(base_url=base_url, api_key=api_key, model=model)
 
-    rendered_chunks: list[Path] = []
-    slide_records: list[dict[str, Any]] = []
-    combined_code_parts: list[str] = [
-        "# Auto-generated by AOS Native Keyframe Producer-Consumer Engine",
+    try:
+        outline_resp = client.chat.completions.create(
+            model=effective_model,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Create a concise {total_slides}-part pedagogical outline explaining: {prompt}. Return numbered points.",
+                }
+            ],
+            temperature=0.3,
+        )
+        outline = outline_resp.choices[0].message.content or f"1. Introduction to {prompt}\n2. Mechanics\n3. Implications"
+    except Exception:
+        outline = f"1. Foundations of {prompt}\n2. Core formulation\n3. Intuition & synthesis"
+
+    segments: List[TeachingSegment] = []
+    rendered_chunks: List[Path] = []
+    combined_code_parts: List[str] = [
+        "# Auto-generated by AOS Decoupled Teaching Segment Engine",
         "from manim import *",
-        "from manim_voiceover import VoiceoverScene",
-        "from tools.aos_speech_service import AOSSpeechService\n",
+        "import numpy as np\n",
     ]
 
-    while True:
-        try:
-            slide_data: SlideData = slide_queue.get(timeout=1.0)
-        except queue.Empty:
-            if not producer_thread.is_alive():
-                break
-            continue
-
-        _notify("VALIDATING_CODE", f"Validating code for Slide {slide_data.slide_num}")
-        _notify("RENDERING", f"Rendering Slide {slide_data.slide_num} with voice narration")
-
-        chunk_path: Path | None = None
-        try:
-            chunk_path = render_single_keyframe(slide_data, run_dir, quality=quality)
-            if chunk_path and chunk_path.is_file():
-                rendered_chunks.append(chunk_path)
-                slide_data.chunk_path = str(chunk_path)
-        except Exception as exc:
-            print(f"[Consumer Warning] Slide {slide_data.slide_num} render failed: {exc}", file=sys.stderr)
-
-        combined_code_parts.append(
-            f"# --- Slide {slide_data.slide_num} ---\n"
-            f"# Narration: {slide_data.narration}\n"
-            f"{slide_data.python_code}\n"
+    for i in range(1, total_slides + 1):
+        _notify("PlanTeachingScriptNode", f"Planning TeachingSegment {i} (Visual Anchor & Pedagogy)")
+        segment = plan_teaching_segment(
+            prompt=prompt,
+            slide_num=i,
+            total_slides=total_slides,
+            outline=outline,
+            client=client,
+            model=effective_model,
         )
-        slide_records.append({
-            "slide_num": slide_data.slide_num,
-            "narration": slide_data.narration,
-            "code": slide_data.python_code,
-            "chunk_path": str(chunk_path) if chunk_path and chunk_path.is_file() else None,
-        })
 
-        if slide_data.is_final_slide:
-            break
+        _notify("CodeAgent", f"Visual anchor Manim code ready for Slide {i}")
+        _notify("VALIDATING_CODE", f"Validating code for Slide {i}")
+        _notify("RENDERING", f"Rendering visual anchor for Slide {i}")
 
-    producer_thread.join(timeout=30)
+        # Step 1: Render Visual Anchor
+        visual_path = render_visual_anchor(segment, run_dir, quality=quality)
+        if visual_path and visual_path.is_file():
+            segment.visual_path = str(visual_path)
+            segment.visual_duration = get_media_duration(visual_path)
+
+        # Step 2: Synthesize Authoritative Pedagogical Narration
+        audio_path = run_dir / f"slide_{i}_audio.wav"
+        narr_dur = synthesize_teaching_audio(segment.narration, audio_path)
+        segment.audio_path = str(audio_path)
+        segment.narration_duration = narr_dur
+
+        # Step 3: Decoupled Visual Hold & Segment Assembly
+        _notify("TIMELINE_HOLD", f"Extending Slide {i} final frame: visual {segment.visual_duration:.1f}s, narration {segment.narration_duration:.1f}s")
+        chunk_path = assemble_teaching_segment(segment, run_dir)
+        if chunk_path and chunk_path.is_file():
+            rendered_chunks.append(chunk_path)
+
+        segments.append(segment)
+        combined_code_parts.append(
+            f"# --- Segment {segment.slide_num}: {segment.concept} ---\n"
+            f"# Objective: {segment.learning_objective}\n"
+            f"# Narration: {segment.narration}\n"
+            f"{segment.manim_code}\n"
+        )
 
     final_video = run_dir / "final.mp4"
     if rendered_chunks:
-        _notify("assemble", "Assembling final video with synchronized narration")
-        assemble_slide_chunks(rendered_chunks, final_video)
-        _notify("VALIDATING_VIDEO", "Validating output animation video")
+        _notify("assemble", "Assembling final lesson with synchronized audio-visual segments")
+        assemble_segments(rendered_chunks, final_video)
+        _notify("VALIDATING_VIDEO", "Validating output lesson video")
 
     scene_file = run_dir / "scene.py"
     scene_file.write_text("\n".join(combined_code_parts), encoding="utf-8")
 
+    segment_dicts = [s.model_dump() for s in segments]
     manifest = {
         "ok": final_video.is_file() and final_video.stat().st_size > 0,
         "mode": "animate",
@@ -598,13 +774,25 @@ def run_producer_consumer(
         "run_dir": str(run_dir),
         "video_path": str(final_video) if final_video.is_file() else None,
         "scene_file": str(scene_file),
-        "total_slides": len(slide_records),
-        "slides": slide_records,
+        "total_slides": len(segments),
+        "slides": [
+            {
+                "slide_num": s.slide_num,
+                "narration": s.narration,
+                "code": s.manim_code,
+                "visual_duration": s.visual_duration,
+                "narration_duration": s.narration_duration,
+                "total_duration": s.total_duration,
+                "hold_duration": s.hold_duration,
+                "chunk_path": s.chunk_path,
+            }
+            for s in segments
+        ],
+        "teaching_segments": segment_dicts,
         "has_audio": True,
     }
     manifest_path = run_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
-    _notify("upload", "Animation and narration ready")
-
+    _notify("upload", "Lesson video and comprehensive narration ready")
     return manifest

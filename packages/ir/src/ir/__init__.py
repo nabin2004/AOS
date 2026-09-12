@@ -593,3 +593,7 @@ class LectureIR(BaseModel):
     @property
     def duration_seconds(self) -> float:
         return round(sum(s.duration_seconds for s in self.scenes), 1)
+
+
+# Decoupled Teaching Segment exports
+from .teaching_segment import SemanticEvent, TeachingSegment, VisualAnchor
