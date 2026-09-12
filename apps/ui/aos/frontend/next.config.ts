@@ -23,7 +23,8 @@ const ContentSecurityPolicy = `
   style-src 'self' 'unsafe-inline';
   img-src 'self' blob: data: https:;
   font-src 'self' data:;
-  connect-src 'self' ws: wss: http://localhost:* https://localhost:*;
+  connect-src 'self' ws: wss: http://localhost:* https://localhost:* https://*.modal.run wss://*.modal.run https://*.r2.cloudflarestorage.com https://*.r2.dev;
+  media-src 'self' blob: data: https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.modal.run;
   ${_frameAncestors}
   base-uri 'self';
   form-action 'self';
