@@ -502,67 +502,67 @@
       }
     },
     "about": {
-      "eyebrow": "About",
-      "title": "We build {appName} so other founders don't have to.",
-      "description": "The fastest way to ship a real AI SaaS — auth, billing, RAG, agents, the whole boring stack — without rewiring the same plumbing every time.",
-      "whyTitle": "Why this exists",
-      "why1": "Every AI side-project starts the same way: a beautiful idea, then four weeks of YAML, three decisions about session storage, and one regretful hand-rolled webhook handler.",
-      "why2": "We open-sourced the plumbing — and kept iterating on it across real production apps — so the next person shipping an AI product can start the day on the actual product.",
+      "eyebrow": "About AOS",
+      "title": "Democratizing 3Blue1Brown-quality STEM education.",
+      "description": "AOS automates the arduous process of writing Manim code, aligning voiceovers, and rendering mathematical animations through a multi-agent cognitive architecture.",
+      "whyTitle": "Why AOS exists",
+      "why1": "Creating a single 10-minute 3Blue1Brown-style video traditionally takes weeks of manual Python scripting, coordinate tuning, audio keyframing, and re-rendering.",
+      "why2": "We built AOS to decompose complex STEM topics into structured pedagogical outlines, visual animation beats, and self-repairing Manim code — bringing dynamic mathematical intuition to every learner.",
       "byTheNumbers": "By the numbers",
-      "stat_apps": "Production apps shipped",
-      "stat_deploy": "Avg time to first deploy",
-      "stat_frameworks": "AI frameworks supported",
-      "stat_license": "License",
-      "valuesEyebrow": "What we believe",
-      "valuesTitle": "Principles, not tasteful platitudes.",
+      "stat_apps": "Animations rendered",
+      "stat_deploy": "Average pipeline run",
+      "stat_frameworks": "AI & Manim engines",
+      "stat_license": "Core License",
+      "valuesEyebrow": "Our Core Values",
+      "valuesTitle": "Pedagogical rigor meets generative engineering.",
       "values": [
         {
           "key": "shipBoring",
-          "title": "Ship the boring parts",
-          "description": "Auth, billing, observability — wired and tested so you can focus on what makes your product different."
+          "title": "Intuition first, rigor always",
+          "description": "Visualizations scaffold conceptual understanding from geometric intuition to rigorous symbolic proofs."
         },
         {
           "key": "defaults",
-          "title": "Defaults that age well",
-          "description": "We pick conventions that hold up at scale: typed APIs, repository-service split, async everywhere."
+          "title": "Deterministic compilation",
+          "description": "Every scene compiles to clean, executable Manim Community Python code with strict Pydantic IR schemas."
         },
         {
           "key": "openOpinionated",
-          "title": "Open, but opinionated",
-          "description": "MIT-licensed source you can fork freely. Strong defaults so the path of least resistance is also the right one."
+          "title": "Open source & transparent",
+          "description": "Zero black boxes: inspect, tweak, and fork the generated code, scene objects, and beat timing metadata freely."
         },
         {
           "key": "aiTool",
-          "title": "AI as a tool, not a goal",
-          "description": "RAG, agents, streaming — first-class but optional. Build calm products that happen to use AI well."
+          "title": "Millisecond-accurate audio sync",
+          "description": "Kyutai DSM delayed stream modeling locks every visual transformation directly to spoken words."
         }
       ],
-      "teamLabel": "Team",
-      "teamTitle": "Small team. Big surface area.",
+      "teamLabel": "Community",
+      "teamTitle": "Engineers, educators, and mathematicians.",
       "team": [
         {
-          "initials": "F",
-          "role": "Founders",
-          "line": "Engineering · Product"
+          "initials": "AO",
+          "role": "Core Maintainers",
+          "line": "AI Research · Systems Engineering"
         },
         {
           "initials": "OS",
-          "role": "Open source",
-          "line": "Community contributions"
+          "role": "Open Source",
+          "line": "Manim Community & AI Contributors"
         },
         {
-          "initials": "B",
-          "role": "Beta testers",
-          "line": "Early-access customers"
+          "initials": "ED",
+          "role": "Educators",
+          "line": "STEM Professors & Science Creators"
         }
       ],
-      "quoteLine1": "Build the product.",
-      "quoteLine2": "We'll handle",
-      "quoteLine3": "the boring part.",
-      "quoteByline": "manifesto",
-      "seePricing": "See pricing",
-      "ctaEyebrow": "Ready?",
-      "ctaTitle": "Try it — no card needed.",
+      "quoteLine1": "Transform mathematics.",
+      "quoteLine2": "From static equations",
+      "quoteLine3": "into living intuition.",
+      "quoteByline": "AOS Manifesto",
+      "seePricing": "Explore compute",
+      "ctaEyebrow": "Start creating",
+      "ctaTitle": "Generate your first animation today.",
       "ctaPrimary": "Get started",
       "ctaSecondary": "Talk to us"
     },
@@ -624,46 +624,46 @@
       }
     },
     "help": {
-      "eyebrow": "Help",
-      "title": "How can we help?",
-      "description": "Browse topics or jump straight to a question. Still stuck? Email support — we reply fast.",
-      "browseLabel": "Browse",
+      "eyebrow": "Documentation & Guides",
+      "title": "How can we help you create?",
+      "description": "Browse guides on multi-agent pipelines, Manim rendering, Kyutai audio sync, and EduClaw knowledge bases.",
+      "browseLabel": "Browse Guides",
       "topics": [
         {
           "id": "getting-started",
           "iconKey": "key",
           "title": "Getting started",
-          "description": "Sign up, first chat, connect your data."
+          "description": "Prompting, pipeline CLI, first video generation."
         },
         {
           "id": "chat",
           "iconKey": "message",
-          "title": "Chat & agents",
-          "description": "Streaming, tool calls, switching models."
+          "title": "Agent Graph & Pipeline",
+          "description": "Pydantic AI graph, validation loop, AST repair."
         },
         {
           "id": "kb",
           "iconKey": "book",
-          "title": "Knowledge bases",
-          "description": "Collections, sync sources, search."
+          "title": "EduClaw Knowledge Bases",
+          "description": "Textbook ingestion, syllabus RAG, formula extraction."
         },
         {
           "id": "billing",
           "iconKey": "credit",
-          "title": "Billing",
-          "description": "Plans, credits, invoices, seats."
+          "title": "Rendering & Compute",
+          "description": "Docker render containers, GPU acceleration, export formats."
         },
         {
           "id": "workspace",
           "iconKey": "settings",
-          "title": "Workspace",
-          "description": "Members, invitations, API keys."
+          "title": "Narration & Voiceover",
+          "description": "Kyutai DSM, Pocket TTS, beat alignment."
         },
         {
           "id": "security",
           "iconKey": "shield",
-          "title": "Security",
-          "description": "Auth, data retention, encryption."
+          "title": "Security & Sandboxing",
+          "description": "Container isolation, data privacy, API tokens."
         }
       ],
       "faqGroups": [
@@ -672,149 +672,149 @@
           "title": "Getting started",
           "items": [
             {
-              "q": "How do I create my first conversation?",
-              "a": "Sign in, click 'New chat' from the dashboard, then type a prompt. The agent will stream the response, including any tool calls it makes along the way."
+              "q": "How do I generate my first animation?",
+              "a": "Navigate to the Studio or Chat, enter a mathematical or scientific prompt (e.g. 'Explain the Fourier Transform with epicycles'), and click Generate. The agent pipeline will storyboard, synthesize Manim code, and render the scene."
             },
             {
-              "q": "Can I import data from Google Drive?",
-              "a": "Yes — under Knowledge bases, add a sync source for Google Drive. You'll authenticate via OAuth and pick a folder. Files re-sync on a schedule you choose."
+              "q": "Can I run AOS completely offline with local models?",
+              "a": "Yes. AOS supports local Ollama models (such as Qwen 2.5 Coder and Llama 3.3) paired with Pocket TTS and local Docker Manim rendering for zero-cloud usage."
             },
             {
-              "q": "Which AI model is used by default?",
-              "a": "We default to a sensible cost/quality balance per provider. You can switch models per-conversation from the model picker in the chat input."
+              "q": "What video resolutions and framerates are supported?",
+              "a": "AOS exports crisp 60 FPS vector animations in 1080p Full HD and 4K Ultra HD, as well as interactive HTML Manim Slides decks."
             }
           ]
         },
         {
           "id": "chat",
-          "title": "Chat & agents",
+          "title": "Agent Graph & Pipeline",
           "items": [
             {
-              "q": "Why does the assistant pause to ask for approval?",
-              "a": "Some tools (write actions, sending messages, web fetches) can be configured to require human approval. You'll see a confirmation panel inline — approve or reject and the agent resumes."
+              "q": "Why does the pipeline run a self-repair validation loop?",
+              "a": "Generated Manim code passes through schema and AST validation before rendering. If syntax or runtime errors occur, the repair agent inspects traceback errors and recompiles automatically."
             },
             {
-              "q": "Can I regenerate a response?",
-              "a": "Hover the most recent assistant message and click the regenerate icon. The agent re-runs the last prompt with the same model and tools."
+              "q": "Can I inspect and edit the generated Manim code?",
+              "a": "Yes. The complete lecture.py script and LectureIR JSON metadata are exposed in the UI and downloadable for custom fine-tuning or direct Manim CLI rendering."
             }
           ]
         },
         {
           "id": "kb",
-          "title": "Knowledge bases",
+          "title": "EduClaw Knowledge Bases",
           "items": [
             {
-              "q": "What file formats are supported?",
-              "a": "PDF, DOCX, MD, TXT out of the box. With LlamaParse enabled, 130+ formats including PPT, XLSX, images and more."
+              "q": "What document formats are supported for syllabus ingestion?",
+              "a": "PDF textbooks, Markdown lecture notes, Word documents (.docx), and LaTeX papers. EduClaw extracts core theorems, formulas, and structural headings."
             },
             {
-              "q": "How is search ranked?",
-              "a": "Cosine similarity over embeddings. Score thresholds and re-ranking can be configured per collection."
+              "q": "How does EduClaw map textbook formulas to animations?",
+              "a": "EduClaw vectorizes mathematical entities and maps definitions directly into SceneObject and Beat parameters so animations match authoritative textbook proofs."
             }
           ]
         },
         {
           "id": "billing",
-          "title": "Billing",
+          "title": "Rendering & Compute",
           "items": [
             {
-              "q": "Do unused credits roll over?",
-              "a": "Monthly subscription credits expire at the end of each billing cycle. Pay-as-you-go top-ups never expire."
+              "q": "How does Docker container rendering work?",
+              "a": "Rendering occurs inside isolated manimcommunity/manim containers. Persistent container pools eliminate cold starts for fast scene compilation."
             },
             {
-              "q": "How do seats work?",
-              "a": "Each plan includes a base seat count. Add seats from the billing portal — pro-rated and charged immediately."
+              "q": "What is the difference between local and cloud GPU rendering?",
+              "a": "Local rendering relies on your CPU or local GPU. Cloud GPU rendering provides high-throughput parallel rendering for long 4K lectures and multi-scene sequences."
             }
           ]
         },
         {
           "id": "workspace",
-          "title": "Workspace",
+          "title": "Narration & Voiceover",
           "items": [
             {
-              "q": "How do I invite teammates?",
-              "a": "From the dashboard, click 'Invite team'. Enter emails — they'll get a magic link to join your workspace."
+              "q": "How does Kyutai DSM synchronize narration with animation beats?",
+              "a": "Delayed Streams Modeling (DSM) produces millisecond-accurate word-level timestamps that lock narration pauses and emphasis directly to visual animation cues."
             },
             {
-              "q": "Where do I generate an API key?",
-              "a": "Settings → API keys. Keys are revealed once on creation; store yours in a secret manager. Revoke anytime."
+              "q": "What happens if audio synthesis is unavailable?",
+              "a": "Narration synthesis is non-blocking. If audio service is disabled or fails, AOS automatically renders the full video without audio so rendering never stalls."
             }
           ]
         },
         {
           "id": "security",
-          "title": "Security",
+          "title": "Security & Sandboxing",
           "items": [
             {
-              "q": "How is my data encrypted?",
-              "a": "TLS in transit, AES-256 at rest. Database backups encrypted with KMS-managed keys. See the Security page for details."
+              "q": "Is code execution sandboxed safely?",
+              "a": "Yes. All Manim code execution runs inside isolated Docker containers without host filesystem access or network privileges."
             },
             {
-              "q": "Do you train on my data?",
-              "a": "No. Your prompts and uploaded documents are never used to train any model — ours or third-party."
+              "q": "Are prompts and uploaded textbooks used to train models?",
+              "a": "Never. Prompts, documents, and generated video artifacts are strictly private and never used for public model training."
             }
           ]
         }
       ],
-      "stillStuckEyebrow": "Still stuck?",
-      "stillStuckTitle": "Talk to a real person.",
-      "stillStuckBody": "Email is the fastest way to get unstuck. We reply within 24 hours on weekdays.",
+      "stillStuckEyebrow": "Still have questions?",
+      "stillStuckTitle": "Connect with the AOS team.",
+      "stillStuckBody": "Reach out on GitHub or join our community Discord for real-time discussion with math educators and animators.",
       "stillStuckCta": "Contact support"
     },
     "changelog": {
       "eyebrow": "Changelog",
-      "title": "What's new",
-      "description": "Releases, improvements, and fixes shipping in {appName}."
+      "title": "Engine Releases & Updates",
+      "description": "Continuous improvements to the AOS agent graph, Manim CE/GL compiler, and Kyutai narration pipeline."
     },
     "community": {
       "eyebrow": "Community",
-      "title": "Builders ship faster together.",
-      "description": "A small, opinionated community of devs and founders shipping AI products on top of the template. Async, technical, low-noise.",
+      "title": "STEM educators and visual AI builders.",
+      "description": "Join researchers, mathematicians, and creators building the future of generative educational animation with AOS and Manim.",
       "channels": [
         {
           "key": "discord",
           "title": "Discord",
-          "description": "Real-time async chat with other builders. Share what you're shipping, get unstuck.",
+          "description": "Real-time async discussion with educators, mathematicians, and Manim developers.",
           "cta": "Join the server",
           "eyebrow": "Most active"
         },
         {
           "key": "github",
           "title": "GitHub",
-          "description": "Source code, issues, discussions. Star to bookmark, file an issue if you hit a bug.",
+          "description": "Source code, LectureIR schemas, model checkpoints, and issues. Star to follow along.",
           "cta": "View repository"
         },
         {
           "key": "twitter",
           "title": "Twitter / X",
-          "description": "Build-in-public updates, release notes, and the occasional technical thread.",
+          "description": "Showcase of newly generated STEM animations, benchmark updates, and research releases.",
           "cta": "Follow"
         },
         {
           "key": "youtube",
-          "title": "Office hours",
-          "description": "Weekly office-hours stream — we walk through real builds and answer questions.",
+          "title": "Video Showcase",
+          "description": "Watch full 60fps generated lectures, breakdowns of Pydantic AI graphs, and Manim deep-dives.",
           "cta": "Watch on YouTube"
         }
       ],
-      "guidelinesTitle": "Guidelines",
-      "guidelinesIntro": "We keep the bar high but the rules short. Treat each other well, post in the right place, don't spam.",
+      "guidelinesTitle": "Community Guidelines",
+      "guidelinesIntro": "We foster an open environment for mathematical clarity, pedagogical excellence, and AI safety.",
       "guidelines": [
         {
-          "title": "Be helpful",
-          "description": "Answer questions when you can. Even pointing someone to the right doc page is meaningful."
+          "title": "Promote pedagogical clarity",
+          "description": "Focus on intuitive visual explanations and mathematical accuracy."
         },
         {
-          "title": "Be specific",
-          "description": "Sharing what you tried beats sharing what you want. Logs, code, screenshots — concrete beats abstract."
+          "title": "Share reproducible Manim code",
+          "description": "Include LectureIR snippets, prompts, or Python scripts when discussing animations."
         },
         {
-          "title": "Share wins",
-          "description": "Shipped something? Tell us. We boost cool launches in newsletter and on social."
+          "title": "Respect open collaboration",
+          "description": "Be constructive, support new learners, and cite educational source materials."
         },
         {
-          "title": "No selling",
-          "description": "Don't DM-spam to pitch. Don't post your unrelated startup in the help channels. We mute, we don't ban — usually."
+          "title": "No spam or unrelated promotion",
+          "description": "Keep discussions centered on STEM education, Manim animations, and AI orchestration."
         }
       ]
     },
@@ -971,47 +971,131 @@
       }
     },
     "pricing": {
-      "eyebrow": "Pricing",
-      "title": "Simple, transparent pricing",
-      "description": "Start free. Upgrade when you're ready — every plan includes a 14-day trial.",
+      "eyebrow": "Compute & Pricing",
+      "title": "Transparent compute, built for scale.",
+      "description": "Run locally for free with Ollama, or scale cloud GPU rendering with millisecond-accurate Kyutai DSM speech.",
       "monthly": "Monthly",
       "annual": "Annual",
       "savePill": "−20%",
       "startTrial": "Start free trial",
       "mostPopular": "Most popular",
-      "demoBanner": "Showing template plans — connect Stripe to see your real catalog.",
-      "loved": "Loved by builders",
-      "lovedTitle": "Teams shipping with us",
-      "faqTitle": "Pricing questions, answered",
+      "demoBanner": "Showing AOS compute tiers — Local Ollama, Creator Pro, and Campus GPU cluster.",
+      "loved": "Loved by educators",
+      "lovedTitle": "Universities & Creators generating with AOS",
+      "faqTitle": "Pricing & deployment questions, answered",
       "perMonth": "/ month",
       "perYear": "/ year",
       "trialBadge": "{days}-day free trial",
       "faqs": [
         {
-          "q": "Can I change plans later?",
-          "a": "Yes — upgrade, downgrade, or cancel at any time from your billing portal. Changes pro-rate automatically."
+          "q": "Can I run AOS completely offline for free?",
+          "a": "Yes! AOS is open source. You can run local Ollama models (such as Qwen 2.5 Coder or Llama 3.3), local Pocket TTS, and local Docker Manim rendering completely free on your own machine."
         },
         {
-          "q": "Do unused credits roll over?",
-          "a": "Unused monthly credits expire at the end of each billing cycle. Top-up credit packs you purchase separately never expire."
+          "q": "What is included with Creator Pro?",
+          "a": "Creator Pro includes dedicated cloud GPU nodes for rapid 1080p and 4K Manim rendering, Kyutai DSM streaming audio alignment, and EduClaw textbook ingestion."
         },
         {
-          "q": "What payment methods do you accept?",
-          "a": "All major credit and debit cards via Stripe, plus ACH and SEPA on annual plans. Enterprise can pay via invoice."
+          "q": "What export formats does AOS produce?",
+          "a": "Every generation outputs standard 60 FPS MP4 video files, raw compilable Manim Community Python code (lecture.py), LectureIR structured schemas, and interactive Manim Slides decks."
         },
         {
-          "q": "Is there a free trial?",
-          "a": "Yes. Every paid plan comes with a 14-day free trial — no credit card required to start."
+          "q": "How does Kyutai speech synchronization work?",
+          "a": "Delayed Streams Modeling (DSM) produces millisecond-accurate word-level timestamps that align visual beats and LaTeX formulas seamlessly with voiceover."
         },
         {
-          "q": "Can I self-host?",
-          "a": "Yes. The template is open-source. Self-host on your own infra, or pay us to manage it."
+          "q": "Can universities self-host on campus GPU clusters?",
+          "a": "Yes. AOS is fully containerized and modular. You can deploy it using Docker Compose or Kubernetes on your on-premise compute infrastructure."
         },
         {
-          "q": "Do you offer discounts for annual billing?",
-          "a": "Annual plans get 2 months free (~17% saving). Toggle the billing switch above to see annual pricing."
+          "q": "Do you offer academic or student discounts?",
+          "a": "Yes, we offer special academic lab and campus-wide licensing with custom vector knowledge stores and priority GPU queues."
         }
       ]
+    },
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "blog": "Blog",
+      "platform": "Platform",
+      "solutions": "Solutions",
+      "customers": "Educators",
+      "resources": "Resources",
+      "changelog": "Changelog",
+      "about": "About",
+      "contact": "Contact",
+      "security": "Security",
+      "community": "Community"
+    },
+    "menu": {
+      "product": "Platform",
+      "seePricing": "View compute plans",
+      "solutions": "Solutions",
+      "talkToSales": "Contact team",
+      "resources": "Resources",
+      "items": {
+        "overview": {
+          "label": "Overview",
+          "desc": "Multi-agent Manim generation pipeline"
+        },
+        "howItWorks": {
+          "label": "How It Works",
+          "desc": "From prompt to 60fps vector video"
+        },
+        "insights": {
+          "label": "Agent Architecture",
+          "desc": "Pydantic AI graph with self-repairing AST"
+        },
+        "changelog": {
+          "label": "Changelog",
+          "desc": "Latest engine releases and features"
+        },
+        "support": {
+          "label": "STEM Educators",
+          "desc": "University lectures & visual courseware"
+        },
+        "sales": {
+          "label": "Technical Creators",
+          "desc": "3Blue1Brown-quality explainer animations"
+        },
+        "knowledge": {
+          "label": "EduClaw RAG",
+          "desc": "Textbook and syllabus knowledge extraction"
+        },
+        "research": {
+          "label": "Research & Labs",
+          "desc": "Academic deployments & custom pipelines"
+        },
+        "help": {
+          "desc": "Guides, setup instructions, and FAQs"
+        },
+        "api": {
+          "desc": "Interactive REST API and schema docs"
+        },
+        "security": {
+          "desc": "Data privacy, encryption, and sandboxing"
+        },
+        "community": {
+          "desc": "Join our community of math animators"
+        },
+        "blog": {
+          "desc": "Deep dives into math visualization and AI"
+        }
+      }
+    },
+    "footer": {
+      "product": "Platform",
+      "company": "Project",
+      "resources": "Resources",
+      "helpCenter": "Documentation",
+      "apiDocs": "API Reference",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "cookies": "Cookies",
+      "operational": "All rendering systems operational",
+      "tagline": "Multi-agent cognitive architecture for 3Blue1Brown-quality Manim animations and synchronized voiceover."
     }
   }
 }

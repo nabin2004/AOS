@@ -42,22 +42,22 @@ interface PlanRead {
 
 const TESTIMONIALS = [
   {
-    quote: "We replaced four separate SaaS tools and shipped our first AI feature in two weeks.",
-    name: "Maya Chen",
-    title: "CTO",
-    company: "Lumen Labs",
+    quote: "AOS generates in 2 minutes what used to take our teaching assistants 40 hours of manual Manim coding.",
+    name: "Dr. Elena Rostova",
+    title: "Associate Professor of Mathematics",
+    company: "State University",
   },
   {
-    quote: "The pricing was the easy part. The pre-built billing flow saved us a sprint.",
-    name: "Jonas Berg",
-    title: "Founder",
-    company: "Stash AI",
+    quote: "The Kyutai DSM speech alignment is phenomenal. Mathematical formulas appear on screen at the exact syllable they're spoken.",
+    name: "Marcus Chen",
+    title: "STEM Creator & Animator",
+    company: "VisualMath Studio",
   },
   {
-    quote: "Onboarded our entire ops team in an afternoon. The defaults are sensible.",
-    name: "Priya Nair",
-    title: "Head of Operations",
-    company: "Northwind",
+    quote: "Being able to run entirely offline on local Ollama Qwen models inside Docker makes this indispensable for our campus lab.",
+    name: "Dr. Julian Vance",
+    title: "Director of Digital Pedagogy",
+    company: "Cambridge STEM Lab",
   },
 ];
 

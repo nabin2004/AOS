@@ -30,9 +30,9 @@ export default function PricingLayout({ children }: { children: React.ReactNode 
           description: SITE.description,
           url: `${SITE.url}/pricing`,
           offers: [
-            { price: "0", priceCurrency: "USD", name: "Starter" },
-            { price: "29", priceCurrency: "USD", name: "Pro" },
-            { price: "99", priceCurrency: "USD", name: "Business" },
+            { price: "0", priceCurrency: "USD", name: "Open Source / Local" },
+            { price: "19", priceCurrency: "USD", name: "Creator Pro" },
+            { price: "99", priceCurrency: "USD", name: "Academic & Campus" },
           ],
         })}
       />

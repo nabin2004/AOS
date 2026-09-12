@@ -20,7 +20,7 @@ export const CONTACT_INFO = {
   /** Social handles. Used as `https://{platform}.com/{handle}` or absolute URLs. */
   socials: {
     twitter: "https://twitter.com",
-    github: "https://github.com",
+    github: "https://github.com/nabin2004/AOS",
     discord: "https://discord.gg",
     youtube: "https://youtube.com",
     linkedin: "https://linkedin.com",

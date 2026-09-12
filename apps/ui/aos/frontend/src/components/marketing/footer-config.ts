@@ -216,7 +216,7 @@ export interface SocialLink {
 
 export const SOCIAL_LINKS: SocialLink[] = [
   { label: "X (Twitter)", href: "https://x.com", icon: "x" },
-  { label: "GitHub", href: "https://github.com", icon: "github" },
+  { label: "GitHub", href: "https://github.com/nabin2004/AOS", icon: "github" },
   { label: "LinkedIn", href: "https://linkedin.com", icon: "linkedin" },
 ];
 
@@ -234,22 +234,48 @@ const enFallback: T = (key) => {
     "nav.blog": "Blog",
     "nav.platform": "Platform",
     "nav.solutions": "Solutions",
-    "nav.customers": "Customers",
+    "nav.customers": "Educators",
     "nav.resources": "Resources",
     "nav.changelog": "Changelog",
     "nav.about": "About",
     "nav.contact": "Contact",
     "nav.security": "Security",
     "nav.community": "Community",
-    "footer.product": "Product",
-    "footer.company": "Company",
+    "menu.product": "Platform",
+    "menu.seePricing": "View compute plans",
+    "menu.solutions": "Solutions",
+    "menu.talkToSales": "Contact team",
+    "menu.resources": "Resources",
+    "menu.items.overview.label": "Overview",
+    "menu.items.overview.desc": "Multi-agent Manim generation pipeline",
+    "menu.items.howItWorks.label": "How It Works",
+    "menu.items.howItWorks.desc": "From prompt to 60fps vector video",
+    "menu.items.insights.label": "Agent Architecture",
+    "menu.items.insights.desc": "Pydantic AI graph with self-repairing AST",
+    "menu.items.changelog.label": "Changelog",
+    "menu.items.changelog.desc": "Latest engine releases and features",
+    "menu.items.support.label": "STEM Educators",
+    "menu.items.support.desc": "University lectures & visual courseware",
+    "menu.items.sales.label": "Technical Creators",
+    "menu.items.sales.desc": "3Blue1Brown-quality explainer animations",
+    "menu.items.knowledge.label": "EduClaw RAG",
+    "menu.items.knowledge.desc": "Textbook and syllabus knowledge extraction",
+    "menu.items.research.label": "Research & Labs",
+    "menu.items.research.desc": "Academic deployments & custom pipelines",
+    "menu.items.help.desc": "Guides, setup instructions, and FAQs",
+    "menu.items.api.desc": "Interactive REST API and schema docs",
+    "menu.items.security.desc": "Data privacy, encryption, and sandboxing",
+    "menu.items.community.desc": "Join our community of math animators",
+    "menu.items.blog.desc": "Deep dives into math visualization and AI",
+    "footer.product": "Platform",
+    "footer.company": "Project",
     "footer.resources": "Resources",
-    "footer.helpCenter": "Help center",
-    "footer.apiDocs": "API docs",
+    "footer.helpCenter": "Documentation",
+    "footer.apiDocs": "API Reference",
     "footer.terms": "Terms",
     "footer.privacy": "Privacy",
     "footer.cookies": "Cookies",
-    "footer.tagline": "The AI assistant that knows your work.",
+    "footer.tagline": "Multi-agent cognitive architecture for 3Blue1Brown-quality Manim animations and synchronized voiceover.",
   };
   return en[key] ?? key;
 };
@@ -258,3 +284,5 @@ export const MARKETING_NAV_LINKS = buildMarketingNavLinks(enFallback);
 export const FOOTER_COLUMNS = buildFooterColumns(enFallback);
 export const FOOTER_LEGAL = buildFooterLegal(enFallback);
 export const FOOTER_TAGLINE = enFallback("footer.tagline");
+
+
