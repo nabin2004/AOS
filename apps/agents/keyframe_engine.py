@@ -93,13 +93,19 @@ def get_llm_client(
         effective_base = "https://openrouter.ai/api/v1"
         effective_key = openrouter_key
     elif openai_base:
-        effective_base = openai_base
+        if openai_base.rstrip("/").endswith("/v1"):
+            effective_base = openai_base.rstrip("/")
+        else:
+            effective_base = f"{openai_base.rstrip('/')}/v1"
         effective_key = openai_key or "local"
     elif openai_key:
         effective_base = "https://api.openai.com/v1"
         effective_key = openai_key
     elif ollama_base:
-        effective_base = f"{ollama_base.rstrip('/')}/v1"
+        if ollama_base.rstrip("/").endswith("/v1"):
+            effective_base = ollama_base.rstrip("/")
+        else:
+            effective_base = f"{ollama_base.rstrip('/')}/v1"
         effective_key = "ollama"
     else:
         effective_base = "https://openrouter.ai/api/v1"
@@ -544,6 +550,34 @@ def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: i
     )
 
 
+def _get_domain_knowledge(prompt: str) -> str:
+    """Provides high-density domain context for small/local LLMs on key STEM concepts."""
+    p = prompt.lower()
+    if "euler" in p:
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Euler's Formula & Identity):\n"
+            "- Core Formula: e^{iθ} = cos(θ) + i sin(θ). Evaluated at θ = π yields e^{iπ} + 1 = 0.\n"
+            "- Five Fundamental Constants: e ≈ 2.718 (continuous compound growth, calculus base), "
+            "i = √(-1) (orthogonal rotation by 90° in complex plane), π ≈ 3.14159 (circle geometry, radians), "
+            "1 (multiplicative unity), 0 (additive identity / ground state).\n"
+            "- Unit Circle Geometry: |e^{iθ}| = 1 always. Moving θ rotates a vector of length 1 around the origin. "
+            "Horizontal projection x = cos(θ), vertical projection y = sin(θ). Forms right triangle satisfying cos²(θ) + sin²(θ) = 1.\n"
+            "- Power Series Derivation: e^{ix} = 1 + ix - x²/2! - ix³/3! + x⁴/4! + ... "
+            "= (1 - x²/2! + ...) + i(x - x³/3! + ...) = cos(x) + i sin(x).\n"
+            "- Practical Impact: Signal processing, AC electrical circuits (phasors), wave optics, Fourier analysis, and quantum mechanics."
+        )
+    if "fourier" in p:
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Fourier Transform):\n"
+            "- Forward Transform: f̂(ξ) = ∫_{-∞}^{∞} f(t) e^{-2π i t ξ} dt.\n"
+            "- Inverse Transform: f(t) = ∫_{-∞}^{∞} f̂(ξ) e^{2π i t ξ} dξ.\n"
+            "- Rotational Winding Intuition: e^{-2π i t ξ} wraps the time signal around the origin at frequency ξ. "
+            "The integral measures the center-of-mass balance point; when ξ matches a signal harmonic, it spikes.\n"
+            "- Time-Frequency Duality: Continuous signal amplitude across time ↔ discrete spectral frequency peaks."
+        )
+    return ""
+
+
 def plan_teaching_segment(
     prompt: str,
     slide_num: int,
@@ -553,9 +587,13 @@ def plan_teaching_segment(
     model: str,
 ) -> TeachingSegment:
     """Generates a TeachingSegment: first the rich visual anchor, then in-depth narration."""
+    domain_ctx = _get_domain_knowledge(prompt)
+    ctx_block = f"\nAdditional Domain Grounding:\n{domain_ctx}\n" if domain_ctx else ""
+
     # Step 1: Generate Visual Anchor
     visual_user_prompt = (
         f"Topic: {prompt}\n"
+        f"{ctx_block}"
         f"Lecture Outline:\n{outline}\n\n"
         f"Create the visual anchor for Slide {slide_num} of {total_slides}.\n"
         f"Remember: Do NOT make a sparse slide with only title + formula! Include symbol breakdowns ('Where:'), "
@@ -584,6 +622,7 @@ def plan_teaching_segment(
     # Step 2: Generate In-Depth Narration based on the Visual Anchor
     narration_user_prompt = (
         f"Topic: {prompt}\n"
+        f"{ctx_block}"
         f"Slide Number: {slide_num} of {total_slides}\n"
         f"Visual Anchor Title: {anchor.title}\n"
         f"Displayed Formula: {anchor.latex}\n"
@@ -717,22 +756,81 @@ def render_visual_anchor(
             }
             safe_locals: Dict[str, Any] = {"self": self}
 
-            try:
-                if segment.manim_code.strip():
-                    exec(segment.manim_code, safe_globals, safe_locals)
-                else:
-                    t = Text(f"Slide {segment.slide_num}").scale(1.2)
-                    self.play(FadeIn(t), run_time=1.0)
-                self.wait(0.5)
-            except Exception as exc:
-                print(f"[Visual Render Warning] Slide {segment.slide_num}: {exc}", file=sys.stderr)
+            executed = False
+            if segment.manim_code.strip():
                 try:
-                    fallback_title = Text(f"Slide {segment.slide_num}", font_size=40, color=YELLOW).to_edge(UP)
-                    fallback_box = SurroundingRectangle(fallback_title, color=BLUE, buff=0.3)
-                    self.play(Create(fallback_box), Write(fallback_title), run_time=1.0)
+                    exec(segment.manim_code, safe_globals, safe_locals)
+                    executed = True
+                except Exception as exc:
+                    print(f"[Visual Render Warning] Slide {segment.slide_num} primary exec error: {exc}", file=sys.stderr)
+                    # Attempt transpilation of MathTex to Text if LaTeX or font rendering failed
+                    try:
+                        self.clear()
+                        alt_code = re.sub(r"MathTex\(\s*r?([\"'])(.*?)\1", r"Text(\1\2\1", segment.manim_code)
+                        alt_code = (
+                            alt_code.replace("\\bullet\\", "•")
+                            .replace("\\bullet", "•")
+                            .replace(r"\approx", "≈")
+                            .replace(r"\sqrt{-1}", "√(-1)")
+                            .replace(r"\sqrt", "√")
+                            .replace(r"\theta", "θ")
+                            .replace(r"\pi", "π")
+                            .replace(r"\cos", "cos")
+                            .replace(r"\sin", "sin")
+                            .replace(r"\xi", "ξ")
+                            .replace(r"\text{", "")
+                            .replace(r"\hat{f}", "f̂")
+                            .replace(r"\int_{-\infty}^{\infty}", "∫")
+                        )
+                        exec(alt_code, safe_globals, safe_locals)
+                        executed = True
+                        print(f"[Visual Render Info] Slide {segment.slide_num} successfully rendered via Text transpilation!", file=sys.stderr)
+                    except Exception as exc2:
+                        print(f"[Visual Render Warning] Slide {segment.slide_num} transpilation failed: {exc2}", file=sys.stderr)
+
+            if not executed:
+                # Robust educational fallback with full definitions and equation, NEVER dummy slide box
+                try:
+                    self.clear()
+                    title_text = segment.visual_anchor.title or segment.concept
+                    f_title = Text(title_text, font_size=32, color=YELLOW).to_edge(UP, buff=0.4)
+                    elements = [f_title]
+                    prev_mob = f_title
+
+                    latex_str = segment.visual_anchor.latex
+                    if latex_str:
+                        clean_eq = (
+                            latex_str.replace(r"\approx", "≈")
+                            .replace(r"\theta", "θ")
+                            .replace(r"\pi", "π")
+                            .replace(r"\cos", "cos")
+                            .replace(r"\sin", "sin")
+                            .replace(r"\text{", "")
+                            .replace("}", "")
+                        )
+                        f_math = Text(clean_eq, font_size=36, color=BLUE).next_to(f_title, DOWN, buff=0.35)
+                        f_box = SurroundingRectangle(f_math, color=GOLD, buff=0.25)
+                        elements.extend([f_math, f_box])
+                        prev_mob = f_box
+
+                    if segment.visual_anchor.key_definitions:
+                        where_lbl = Text("Key Concept Breakdown:", font_size=20, color=GOLD, weight=BOLD).next_to(prev_mob, DOWN, buff=0.35).to_edge(LEFT, buff=1.0)
+                        elements.append(where_lbl)
+                        bullet_mobs = []
+                        for d in segment.visual_anchor.key_definitions[:5]:
+                            clean_d = d.replace("\\bullet\\", "•").replace("\\bullet", "•").replace(r"\approx", "≈").replace(r"\theta", "θ").replace(r"\pi", "π")
+                            bullet_mobs.append(Text(f"• {clean_d}", font_size=18, color=WHITE))
+                        if bullet_mobs:
+                            b_group = VGroup(*bullet_mobs).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)
+                            elements.append(b_group)
+
+                    self.play(*[FadeIn(el) for el in elements], run_time=1.5)
+                    self.wait(1.5)
+                except Exception as exc3:
+                    print(f"[Visual Render Emergency Fallback] Slide {segment.slide_num}: {exc3}", file=sys.stderr)
                     self.wait(1.0)
-                except Exception:
-                    self.wait(1.0)
+            else:
+                self.wait(0.5)
 
     scene = VisualAnchorScene()
     scene.render()

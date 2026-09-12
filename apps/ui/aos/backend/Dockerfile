@@ -41,6 +41,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates gnupg git ffmpeg libcairo2 libpango-1.0-0 libpangocairo-1.0-0 \
     build-essential pkg-config libcairo2-dev libpango1.0-dev \
+    texlive-latex-base texlive-fonts-recommended texlive-latex-extra dvisvgm \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && npm install -g @llamaindex/liteparse \
