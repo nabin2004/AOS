@@ -543,32 +543,13 @@ class AgentSession:
                 },
             )
 
-            # Fail fast if no Celery workers are connected to the broker.
-            if not await asyncio.to_thread(self._celery_workers_available):
-                err = (
-                    "No Celery worker is connected. From apps/ui/aos/backend run: "
-                    "`uv run aos celery worker`"
+            # Check if Celery workers are connected to the broker.
+            has_celery = await asyncio.to_thread(self._celery_workers_available)
+            if not has_celery:
+                logger.info(
+                    "No Celery worker is connected; using direct in-process background task for %s",
+                    generation_id,
                 )
-                async with get_db_context() as db:
-                    await VideoGenerationService(db).mark_failed(
-                        generation_uuid, error_message=err
-                    )
-                await self._emit_video_terminal(
-                    generation_id=generation_id,
-                    tool_call_id=tool_call_id,
-                    prompt=user_message,
-                    status="failed",
-                    mode=video_mode,
-                    error=err,
-                    message=err,
-                )
-                await send_event(self.websocket, "final_result", {"output": ""})
-                await send_event(
-                    self.websocket,
-                    "complete",
-                    {"conversation_id": self.current_conversation_id},
-                )
-                return
 
             # 2) Subscribe to Redis BEFORE enqueue so early "running" pubs are not lost.
             subscribed = asyncio.Event()
@@ -592,25 +573,52 @@ class AgentSession:
             task_id = None
             if not is_duplicate:
                 try:
-                    async with get_db_context() as db:
-                        svc = VideoGenerationService(db)
-                        task_id = svc.enqueue(
-                            generation_uuid,
-                            llm_base_url=llm_base_url,
-                            llm_api_key=llm_api_key,
-                            model_name=model_name,
+                    if has_celery:
+                        async with get_db_context() as db:
+                            svc = VideoGenerationService(db)
+                            task_id = svc.enqueue(
+                                generation_uuid,
+                                llm_base_url=llm_base_url,
+                                llm_api_key=llm_api_key,
+                                model_name=model_name,
+                            )
+                            await svc.set_celery_task(generation_uuid, task_id)
+                            enqueued_msg = "Queued — waiting for an available generation worker…"
+                            await svc.set_progress(
+                                generation_uuid,
+                                stage="enqueued",
+                                message=enqueued_msg,
+                            )
+                    else:
+                        task_id = f"direct_{generation_id[:8]}"
+                        logger.info(
+                            "Running video generation directly in background task %s",
+                            task_id,
                         )
-                        await svc.set_celery_task(generation_uuid, task_id)
-                        enqueued_msg = "Queued — waiting for an available generation worker…"
-                        await svc.set_progress(
-                            generation_uuid,
-                            stage="enqueued",
-                            message=enqueued_msg,
+                        async with get_db_context() as db:
+                            svc = VideoGenerationService(db)
+                            await svc.set_celery_task(generation_uuid, task_id)
+                            enqueued_msg = "Starting video generation…"
+                            await svc.set_progress(
+                                generation_uuid,
+                                stage="starting",
+                                message=enqueued_msg,
+                                status="running",
+                            )
+                        from app.worker.tasks.video_tasks import _run_generate_video
+
+                        asyncio.create_task(
+                            _run_generate_video(
+                                generation_id,
+                                llm_base_url=llm_base_url,
+                                llm_api_key=llm_api_key,
+                                model_name=model_name,
+                            )
                         )
                 except Exception as e:
-                    logger.exception("Failed to enqueue video generation")
+                    logger.exception("Failed to dispatch video generation")
                     watch_task.cancel()
-                    err = f"Failed to enqueue video job: {e}"
+                    err = f"Failed to dispatch video job: {e}"
                     async with get_db_context() as db:
                         await VideoGenerationService(db).mark_failed(
                             generation_uuid, error_message=err

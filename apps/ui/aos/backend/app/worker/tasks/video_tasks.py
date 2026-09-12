@@ -669,40 +669,11 @@ async def _run_generate_video(
                 generation_id,
             )
     except Exception as exc:
-        error = f"minio_upload_failed: {exc}"
-        logger.exception("MinIO upload failed for %s", generation_id)
-        assistant_id = await _persist_assistant_result(
-            conversation_id=conversation_id,
-            generation_id=gid,
-            mode=mode,
-            prompt=prompt,
-            ok=False,
-            minio_key=None,
-            error=error,
-            existing_assistant_message_id=existing_assistant_message_id,
+        logger.warning(
+            "MinIO upload failed for %s (will fall back to local disk streaming): %s",
+            generation_id,
+            exc,
         )
-        async with get_worker_db_context() as db:
-            await VideoGenerationService(db).mark_failed(
-                gid,
-                error_message=error,
-                run_dir=run_dir,
-                assistant_message_id=assistant_id,
-            )
-        await _notify_video_status(
-            {
-                "type": "video_status",
-                "video_generation_id": generation_id,
-                "conversation_id": str(conversation_id),
-                "user_id": str(user_id),
-                "status": "failed",
-                "stage": "upload",
-                "message": f"Upload failed: {error}",
-                "mode": mode,
-                "prompt": prompt,
-                "error": error,
-            }
-        )
-        return {"status": "failed", "error": error}
 
     assistant_id = await _persist_assistant_result(
         conversation_id=conversation_id,

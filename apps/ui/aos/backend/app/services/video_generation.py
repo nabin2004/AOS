@@ -238,13 +238,29 @@ class VideoGenerationService:
         )
 
     def open_stream_for(self, row: VideoGeneration) -> BinaryIO:
-        if not row.minio_key or row.status != "completed":
+        from pathlib import Path
+
+        if row.status != "completed":
             raise NotFoundError(
                 message="Video not ready",
                 details={"id": str(row.id), "status": row.status},
             )
-        storage = get_video_storage()
-        return storage.open_stream(row.minio_key)
+        if row.minio_key:
+            try:
+                storage = get_video_storage()
+                return storage.open_stream(row.minio_key)
+            except Exception as exc:
+                logger.warning("MinIO open_stream failed (%s); falling back to local run_dir", exc)
+        if row.run_dir:
+            run_path = Path(row.run_dir)
+            for candidate_name in ("final.mp4", "lecture.mp4"):
+                candidate = run_path / candidate_name
+                if candidate.is_file():
+                    return open(candidate, "rb")
+        raise NotFoundError(
+            message="Video file not found",
+            details={"id": str(row.id)},
+        )
 
     def open_code_stream_for(self, row: VideoGeneration) -> BinaryIO:
         import io

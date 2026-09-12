@@ -99,6 +99,8 @@ services:
       - ./apps/educlaw:/app/apps/educlaw:ro
       - ./apps/agents:/app/apps/agents:ro
       - ./packages:/app/packages:ro
+      - ./pyproject.toml:/app/pyproject.toml:ro
+      - ./uv.lock:/app/uv.lock:ro
       - media_data:/app/media
     environment:
       - DEBUG=${DEBUG:-true}
@@ -165,6 +167,8 @@ services:
       - ./apps/agents:/app/apps/agents:rw
       - ./apps/slidestemp:/app/apps/slidestemp:ro
       - ./packages:/app/packages:ro
+      - ./pyproject.toml:/app/pyproject.toml:ro
+      - ./uv.lock:/app/uv.lock:ro
       - media_data:/app/media
     environment:
       - DEBUG=${DEBUG:-true}
