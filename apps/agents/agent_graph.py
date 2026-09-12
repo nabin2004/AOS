@@ -750,9 +750,33 @@ async def run_pipeline(
     cinematic: bool = False,
     prompt_index: int | None = None,
     mode: str = "keyframe",
+    output_dir: str | Path | None = None,
 ) -> dict:
     if dbos_enabled():
         ensure_dbos_launched()
+
+    # Integrated Keyframe Producer-Consumer Engine for UI Animate Mode
+    if mode == "keyframe":
+        from keyframe_engine import run_producer_consumer
+
+        total_slides = 3
+        if length in ("5m", "medium", "5"):
+            total_slides = 3
+        elif length in ("10m", "long", "10"):
+            total_slides = 4
+        elif length in ("short", "1m", "1"):
+            total_slides = 2
+
+        res = await asyncio.to_thread(
+            run_producer_consumer,
+            user_query,
+            output_dir=output_dir,
+            total_slides=total_slides,
+        )
+        if res.get("scene_file") and not res.get("scene_path"):
+            res["scene_path"] = res["scene_file"]
+        return res
+
     from cinematic_director import is_cinematic_mode
     cinematic_active = is_cinematic_mode(user_query, flag=cinematic)
     state = AnimationState(

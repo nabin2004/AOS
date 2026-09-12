@@ -235,56 +235,45 @@ async def run_animate(
     import asyncio
     from pathlib import Path
     from openai_compatible import format_custom_endpoint_error
-
-    # Ensure repository root is on sys.path for apps.educlaw imports
-    curr = Path(__file__).resolve()
-    for parent in [curr, *curr.parents]:
-        if (parent / "pyproject.toml").is_file() and (parent / "apps").is_dir():
-            if str(parent) not in sys.path:
-                sys.path.insert(0, str(parent))
-            break
-
-    # 1. Preferred Animate Engine: Asynchronous Producer-Consumer Keyframe Engine with Voiceover
-    if mode == "keyframe":
-        try:
-            from apps.educlaw.streaming_engine.runner import run_producer_consumer
-
-            total_slides = 3
-            if length in ("5m", "medium", "5"):
-                total_slides = 3
-            elif length in ("10m", "long", "10"):
-                total_slides = 4
-            elif length in ("short", "1m", "1"):
-                total_slides = 2
-
-            res = await asyncio.to_thread(
-                run_producer_consumer,
-                prompt,
-                output_dir=output_dir,
-                total_slides=total_slides,
-            )
-            if res.get("ok") and res.get("video_path"):
-                final_video = res["video_path"]
-                scene_file = res.get("scene_file")
-                return VideoArtifact(
-                    ok=True,
-                    mode="animate",
-                    video_path=final_video,
-                    scene_path=scene_file,
-                    run_dir=res.get("run_dir"),
-                    scene_file=scene_file,
-                    has_audio=True,
-                    detail=res,
-                )
-        except Exception as exc:
-            print(
-                f"[Producer-Consumer warning] {exc}, falling back to legacy pipeline",
-                file=sys.stderr,
-                flush=True,
-            )
-
-    # 2. Legacy fallback to agent_graph
     from agent_graph import run_pipeline
+
+    try:
+        result = await run_pipeline(
+            prompt,
+            length=length,
+            cinematic=cinematic,
+            mode=mode,
+            output_dir=output_dir,
+        )
+    except Exception as exc:
+        return VideoArtifact(
+            ok=False,
+            mode="animate",
+            error=format_custom_endpoint_error(exc),
+        )
+
+    # Native Keyframe Producer-Consumer Engine in agent_graph
+    if mode == "keyframe" or result.get("slides") or (result.get("ok") and result.get("video_path")):
+        if result.get("ok") and result.get("video_path"):
+            final_video = result["video_path"]
+            scene_file = result.get("scene_file") or result.get("scene_path")
+            return VideoArtifact(
+                ok=True,
+                mode="animate",
+                video_path=final_video,
+                scene_path=scene_file,
+                run_dir=result.get("run_dir"),
+                scene_file=scene_file,
+                has_audio=result.get("has_audio", True),
+                detail=result,
+            )
+        return VideoArtifact(
+            ok=False,
+            mode="animate",
+            error=result.get("error") or result.get("message") or "keyframe_generation_failed",
+            run_dir=result.get("run_dir"),
+            detail=result,
+        )
 
     try:
         result = await run_pipeline(prompt, length=length, cinematic=cinematic, mode=mode)
