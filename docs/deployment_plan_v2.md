@@ -9,9 +9,10 @@
 1. [Service Tier Overview](#1-service-tier-overview)
 2. [Infrastructure Architecture](#2-infrastructure-architecture)
 3. [Layer 1 — API & Agent Orchestration](#3-layer-1--api--agent-orchestration)
-4. [Layer 2 — LLM Inference](#4-layer-2--llm-inference)
-5. [Layer 3 — GRPO / SFT Training Jobs](#5-layer-3--grpo--sft-training-jobs)
-6. [Layer 4 — Manim Rendering (Parallel)](#6-layer-4--manim-rendering-parallel)
+4. [Layer 1.5 — Database & State Management](#4-layer-15--database--state-management)
+5. [Layer 2 — LLM Inference](#5-layer-2--llm-inference)
+6. [Layer 3 — GRPO / SFT Training Jobs](#6-layer-3--grpo--sft-training-jobs)
+7. [Layer 4 — Manim Rendering (Parallel)](#7-layer-4--manim-rendering-parallel)
 7. [Layer 5 — Audio Synthesis](#7-layer-5--audio-synthesis)
 8. [Layer 6 — Storage & Artifact Management](#8-layer-6--storage--artifact-management)
 9. [Layer 7 — Web UI & Frontend](#9-layer-7--web-ui--frontend)
@@ -41,6 +42,9 @@
 | GRPO / SFT Training | **Kaggle Notebooks** (Dual T4) | Google Colab Pro | Unlimited (30h/week) | Yes |
 | Manim Rendering | **Modal** (ephemeral Docker containers) | GitHub Actions runners | $30 included above | Yes |
 | Audio / TTS | **Modal** CPU function (Pocket TTS) | Replicate (free tier) | Included in Modal | Yes |
+| Database (SQL) | **Neon** (Serverless Postgres) | Supabase | 0.5 GB storage, scales to zero | Free (no CC) |
+| Caching / Redis | **Upstash** (Serverless Redis) | Redis Cloud | 10,000 reqs/day | Free (no CC) |
+| Vector DB | **Zilliz Cloud** (Serverless Milvus) | Pinecone | 2 collections free | Free (no CC) |
 | Artifact Storage | **Cloudflare R2** | Backblaze B2 | 10 GB free, 0 egress fees | Yes |
 | Model Storage | **Hugging Face Hub** (private repo) | Cloudflare R2 | 1 LFS GB free | Free (no CC) |
 | Web UI | **Vercel** (Next.js) | Cloudflare Pages | 100 GB bandwidth/month | Yes |
@@ -207,7 +211,39 @@ gcloud run deploy aos-api \
 
 ---
 
-## 4. Layer 2 — LLM Inference
+## 4. Layer 1.5 — Database & State Management
+
+Just like Vercel is for frontend and R2 is for storage, there are purpose-built "serverless" databases that provide generous free tiers and scale to zero (so you never pay for idle time). 
+
+### Primary Relational DB: Neon (Serverless Postgres)
+
+**Why Neon:** Neon separates compute from storage, meaning it can instantly wake up when a request comes in and scale to zero when unused. It is the exact technology that powers Vercel Postgres behind the scenes.
+- **Free Tier:** 0.5 GB storage, unlimited databases, scales to 0. (No CC required).
+
+**Setup Steps:**
+1. Sign up at [neon.tech](https://neon.tech).
+2. Create a new Postgres project.
+3. Copy the connection string.
+4. Add to `aos-secrets` as `DATABASE_URL="postgresql://user:pass@ep-cool-db.neon.tech/aos?sslmode=require"`.
+
+### Primary Caching / Task Queue: Upstash (Serverless Redis)
+
+**Why Upstash:** If you need Redis for rate limiting, caching, or Celery/Modal job queues, Upstash offers a completely serverless Redis instance. You only pay per request.
+- **Free Tier:** 10,000 requests per day, 256 MB storage. (No CC required).
+
+**Setup Steps:**
+1. Sign up at [upstash.com](https://upstash.com).
+2. Create a Redis database.
+3. Copy the URL and add to `aos-secrets` as `REDIS_URL="rediss://default:pass@eu1-cool-redis.upstash.io:30000"`.
+
+### Primary Vector DB: Zilliz Cloud (Serverless Milvus)
+
+**Why Zilliz / Milvus:** If AOS needs RAG retrieval for educational knowledge (EduClaw), Zilliz provides a fully managed Serverless Milvus with a great free tier.
+- **Free Tier:** 2 collections, 1 million vectors. (No CC required).
+
+---
+
+## 5. Layer 2 — LLM Inference
 
 ### Primary: Together AI (Recommended)
 

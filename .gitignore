@@ -61,3 +61,5 @@ apps/qwenCoder/qwen3-8b-*/
 apps/qwenCoder/*-merged/
 apps/qwenCoder/*-gguf/
 
+.neon
+node_modules/
