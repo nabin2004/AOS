@@ -1,10 +1,10 @@
 """Native Keyframe & Teaching Segment Engine for AOS Animation Pipeline.
 
 Decouples visual animation duration from detailed pedagogical narration:
-1. Renders the visual anchor animation once using Manim (clean, fast, ~5-10s).
+1. Renders rich, high-information-density visual slides using Manim (clean, fast, 5-15s).
 2. Generates an in-depth pedagogical teaching narration informed by the visual anchor
    (explains symbols, intuition, geometric meaning, analogies, avoiding redundancy).
-3. Synthesizes authoritative Pocket TTS audio and measures its exact duration (e.g. 60-90s).
+3. Synthesizes authoritative Pocket TTS audio and measures its exact duration (e.g. 50-90s).
 4. Freezes the final visual frame using FFmpeg (`tpad=stop_mode=clone`) for the
    remaining duration without re-running Manim.
 5. Assembles all TeachingSegments into a cohesive, high-production lesson video.
@@ -125,55 +125,76 @@ def get_llm_client(
     return client, effective_model
 
 
-VISUAL_PLANNER_PROMPT = """You are an expert mathematical animator creating concise visual slides in Manim Community Edition.
-Your job is ONLY to build a clean, elegant visual anchor (equations, diagrams, titles).
-Do NOT write narration here. Keep the animation short, focused, and elegant (5-10 seconds total).
+VISUAL_PLANNER_PROMPT = """You are an expert mathematical animator creating rich, highly informative, and elegant visual slides in Manim Community Edition.
+
+CORE PHILOSOPHY:
+"If a student paused this video and looked only at this frame, would they actually learn something?"
+Do NOT generate sparse slides with only a title and one equation! A great educational slide contains clear formulas, symbol breakdowns, definitions, relationships, and meaningful geometric or conceptual diagrams.
+
+VISUAL LAYOUT PATTERNS (Choose the most appropriate for the concept):
+1. ANNOTATED FORMULA & BREAKDOWN:
+   - Top: Clean title and primary equation highlighted inside a SurroundingRectangle.
+   - Bottom/Side: "Where:" section with structured bullets (using MathTex or Text) defining what every single symbol means (e.g. e -> base of growth, i -> imaginary unit, theta -> angle, cos -> horizontal component, sin -> vertical component).
+2. DYNAMIC GEOMETRIC PROJECTION (When motion provides learning value):
+   - Coordinate plane or axes + unit circle / curve.
+   - Vector or point moving dynamically along the path.
+   - Explicit angle arc (theta) and dashed projection lines to axes showing horizontal (cos) and vertical (sin) components with a right triangle.
+   - Side card summarizing key geometric relationships.
+3. CONSTANTS & THEOREMS SYNTHESIS:
+   - Theorem statement in a highlighted frame.
+   - Structured breakdown card grouping foundational constants or concepts and their domains.
+   - Visual vector or transition diagram illustrating the theorem.
+
+RULES:
+1. Coordinate bounds: x in [-6, 6], y in [-3.5, 3.5].
+2. Use VGroup with .arrange(DOWN, aligned_edge=LEFT) for clean, readable text/bullet layouts.
+3. Palette: BLUE, YELLOW, TEAL, GREEN, GOLD, RED, WHITE, GRAY.
+4. Output concise JSON in <visual_anchor> and executable Manim snippet in ```python ... ``` without Scene class.
 
 Output format:
 <visual_anchor>
 {
-  "type": "formula" | "diagram" | "geometry" | "concept",
-  "title": "Short Descriptive Title",
-  "latex": "Primary equation if applicable or empty string",
-  "visible_elements": ["list", "of", "symbols", "and", "labels"],
-  "visual_purpose": "Pedagogical role of this visual anchor"
+  "type": "annotated_formula" | "geometric_projection" | "constants_breakdown" | "concept_card",
+  "title": "Descriptive Slide Title",
+  "latex": "Primary formula if applicable",
+  "visible_elements": ["List", "of", "all", "visible", "symbols"],
+  "key_definitions": ["e: base of growth", "i: imaginary unit", "theta: angle"],
+  "visual_states": ["Formula intro", "Symbol definitions", "Static summary"],
+  "visual_purpose": "Clear pedagogical purpose"
 }
 </visual_anchor>
 
 ```python
 # Self-contained Manim code for Scene.construct(self).
 # Use self.play(...) and self.wait(...) directly.
-# Coordinate bounds: x in [-6, 6], y in [-3.5, 3.5].
-# Palette: BLUE, YELLOW, TEAL, GREEN, GOLD, RED, WHITE.
 ```
 """
 
-NARRATION_PLANNER_PROMPT = """You are a master university professor and educator.
-The student is currently looking at a visual slide on screen.
-Your job is to provide an IN-DEPTH, DETAILED teaching lecture explaining the concept thoroughly.
+NARRATION_PLANNER_PROMPT = """You are a master university professor and educator teaching with an intelligent animated whiteboard.
+The student is looking at the rich visual slide on screen (which displays the formula, symbol breakdown, and diagrams).
 
-CRITICAL ANTI-REDUNDANCY RULE:
-- Do NOT simply read or transcribe the equation or labels already visible on screen!
-- (BAD: "Here we see e to the i theta equals cosine theta plus i sine theta.")
-- (GOOD: Explain what each symbol means, why the relationship exists, provide physical and geometric intuition, real-world relevance, analogies, and connections.)
+Your job is to provide an IN-DEPTH, ENGAGING teaching lecture.
 
-PEDAGOGICAL STRUCTURE TO FOLLOW:
-1. INTRODUCE: What fundamental insight are we examining, and why is it important?
-2. OBSERVE: Guide the student's eye to key components.
-3. DEFINE: Deep dive into the meaning of each symbol (e.g. what e, i, theta, cos, sin actually do).
-4. BREAK DOWN & EXPLAIN: Why does this equality hold? How do algebra and geometry unify here?
-5. INTUITION: What is the geometric picture or physical analogy (e.g. circular motion, rotation)?
-6. EXAMPLE & CONNECTION: A notable case (e.g. Euler's identity), application, or historical context.
-7. RECAP: The core conceptual takeaway.
+CRITICAL PEDAGOGICAL RULES:
+1. SEAMLESS AUDIO-VISUAL COHESION:
+   - Reference the visual slide naturally: "Notice on the slide...", "As shown in the breakdown below the formula...", "Look at the dashed projection to the real axis..."
+2. TEACH, DO NOT MERELY READ:
+   - The slide provides the visible definitions and symbols; you provide the intuition, the "why", the physical and geometric meaning, real-world relevance, analogies, and unexpected connections.
+3. PEDAGOGICAL ARC:
+   - INTRODUCE the core insight.
+   - OBSERVE & BREAK DOWN the symbols and relationships.
+   - EXPLAIN the intuition (e.g. why multiplying by i rotates by 90 degrees, why continuous compound growth wraps into a circle).
+   - GIVE a concrete case or analogy.
+   - RECAP the central takeaway.
 
-Length: Write a comprehensive, conversational explanation (around 120-200 words, ~45-90 seconds of speech).
+Length: Around 140-220 words (~50-90 seconds of speech).
 Wrap your output in <narration> ... </narration> tags.
 """
 
 
 def _parse_visual_output(text: str) -> Tuple[VisualAnchor, str]:
     """Extracts VisualAnchor metadata and Python code from LLM output."""
-    anchor = VisualAnchor(type="formula", visual_purpose="Core concept visualization")
+    anchor = VisualAnchor(type="annotated_formula", visual_purpose="Core concept visualization")
     anchor_match = re.search(r"<visual_anchor>(.*?)</visual_anchor>", text, re.DOTALL | re.IGNORECASE)
     if anchor_match:
         try:
@@ -201,190 +222,321 @@ def _parse_narration_output(text: str) -> str:
 
 
 def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: int) -> TeachingSegment:
-    """Curated, high-fidelity STEM TeachingSegments with rich visual anchors and detailed ~60-90s pedagogy."""
+    """Curated, high-fidelity STEM TeachingSegments with rich visual anchors, symbol breakdowns, and ~60-90s pedagogy."""
     p_lower = prompt.lower()
     if "euler" in p_lower:
         if slide_num == 1:
             anchor = VisualAnchor(
-                type="formula",
+                type="annotated_formula",
                 title="Euler's Formula",
                 latex=r"e^{i\theta} = \cos(\theta) + i\sin(\theta)",
                 visible_elements=["e", "i", "theta", "cos(theta)", "sin(theta)"],
-                visual_purpose="Introduce the fundamental bridge between exponential growth and circular trigonometry.",
+                key_definitions=[
+                    "e ≈ 2.718 (base of continuous exponential growth)",
+                    "i = √(-1) (imaginary unit / 90° orthogonal rotation)",
+                    "θ (angle of rotation in radians)",
+                    "cos(θ) (horizontal coordinate / real component)",
+                    "sin(θ) (vertical coordinate / imaginary component)",
+                ],
+                visual_states=["Title and Formula", "Symbol Breakdown Cards", "Static Educational Hold"],
+                visual_purpose="Introduce the bridge between exponential growth and circular trigonometry with full symbol breakdown.",
             )
             code = (
-                'title = Text("Euler\'s Formula", font_size=40, color=YELLOW).to_edge(UP)\n'
-                'formula = MathTex(r"e^{i\\theta} = \\cos(\\theta) + i\\sin(\\theta)", font_size=48, color=BLUE)\n'
-                'box = SurroundingRectangle(formula, color=GOLD, buff=0.35)\n'
-                'self.play(Write(title))\n'
-                'self.play(Write(formula))\n'
-                'self.play(Create(box))\n'
-                'self.wait(1.0)\n'
+                'title = Text("Euler\'s Formula", font_size=36, color=YELLOW).to_edge(UP, buff=0.4)\n'
+                'formula = MathTex(r"e^{i\\theta} = \\cos(\\theta) + i\\sin(\\theta)", font_size=44, color=BLUE).next_to(title, DOWN, buff=0.35)\n'
+                'box = SurroundingRectangle(formula, color=GOLD, buff=0.25)\n'
+                'where_lbl = Text("Where:", font_size=22, color=GOLD, weight=BOLD).next_to(box, DOWN, buff=0.35).to_edge(LEFT, buff=1.2)\n'
+                'b1 = MathTex(r"\\bullet\\ e \\approx 2.718 \\text{ (base of continuous exponential growth)}", font_size=20, color=WHITE)\n'
+                'b2 = MathTex(r"\\bullet\\ i = \\sqrt{-1} \\text{ (imaginary unit / } 90^\\circ \\text{ orthogonal rotation)}", font_size=20, color=TEAL)\n'
+                'b3 = MathTex(r"\\bullet\\ \\theta \\text{ (angle of rotation measured in radians)}", font_size=20, color=GREEN)\n'
+                'b4 = MathTex(r"\\bullet\\ \\cos(\\theta) \\text{ (horizontal coordinate / real component)}", font_size=20, color=BLUE)\n'
+                'b5 = MathTex(r"\\bullet\\ \\sin(\\theta) \\text{ (vertical coordinate / imaginary component)}", font_size=20, color=RED)\n'
+                'bullets = VGroup(b1, b2, b3, b4, b5).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)\n'
+                'self.play(Write(title), run_time=0.8)\n'
+                'self.play(Write(formula), Create(box), run_time=1.2)\n'
+                'self.play(FadeIn(where_lbl), run_time=0.5)\n'
+                'self.play(LaggedStart(*[FadeIn(b, shift=RIGHT*0.2) for b in bullets], lag_ratio=0.2), run_time=2.0)\n'
+                'self.wait(1.5)\n'
             )
             narration = (
                 "Euler's formula stands as one of the most profound bridges in all of mathematics, "
                 "establishing an astonishing equality between exponential growth and circular trigonometry. "
-                "To truly understand what this equation tells us, let us look beyond the symbols. "
-                "The constant e is the natural base of growth, usually associated with continuous compounding in one dimension. "
-                "The imaginary unit i, on the other hand, represents orthogonal rotation by ninety degrees in the complex plane. "
-                "When we place i in the exponent multiplied by the angle theta, growth ceases to be exponential expansion along a line, "
-                "and instead transforms into continuous rotation around a circle. "
-                "The real part gives us the horizontal projection, cosine of theta, while the imaginary part gives the vertical component, sine of theta. "
-                "In a single stroke, this unified two completely separate branches of mathematics that mathematicians had studied for centuries."
+                "Look closely at the formula and the breakdown displayed on your screen. "
+                "The constant e is Euler's number, approximately 2.718, which is the natural base of continuous compound growth. "
+                "Next, we have the imaginary unit i, defined by the property that i squared equals negative one. "
+                "In the complex plane, multiplying by i corresponds to an orthogonal ninety-degree counterclockwise rotation. "
+                "When we place i in the exponent multiplied by the angle theta, growth ceases to expand along a straight line, "
+                "and instead wraps into continuous uniform rotation around the unit circle. "
+                "As detailed below the formula, the real part gives the horizontal coordinate, cosine of theta, "
+                "while the imaginary part gives the vertical coordinate, sine of theta. "
+                "This single line unites two branches of mathematics that had been studied separately for over two thousand years."
             )
         elif slide_num == 2:
             anchor = VisualAnchor(
-                type="geometry",
-                title="Geometric Interpretation in the Complex Plane",
-                latex=r"e^{i\theta}",
-                visible_elements=["ComplexPlane", "Circle", "e^{i\\theta}", "cos(\\theta)", "sin(\\theta)"],
-                visual_purpose="Visualize uniform rotation on the unit circle as theta varies.",
+                type="geometric_projection",
+                title="Geometric Interpretation: Unit Circle & Projections",
+                latex=r"e^{i\theta} = (\cos\theta, \sin\theta)",
+                visible_elements=["ComplexPlane", "UnitCircle", "Vector", "ThetaArc", "CosProjection", "SinProjection"],
+                key_definitions=[
+                    "|e^{iθ}| = 1 (constant unit radius from origin)",
+                    "Real projection: x = cos(θ)",
+                    "Imaginary projection: y = sin(θ)",
+                    "Pythagorean identity: cos²(θ) + sin²(θ) = 1",
+                ],
+                visual_states=["Coordinate Plane & Circle", "Rotating Vector to angle θ", "Dashed Projections to Axes", "Geometric Summary Card"],
+                visual_purpose="Demonstrate why cosine and sine appear by projecting rotating complex vector onto axes.",
             )
             code = (
-                'title = Text("Geometric Interpretation", font_size=36, color=TEAL).to_edge(UP)\n'
-                'plane = ComplexPlane(x_range=[-2, 2, 1], y_range=[-2, 2, 1]).scale(0.75).shift(DOWN*0.3)\n'
-                'circle = Circle(radius=1.5, color=TEAL).move_to(plane.n2p(0))\n'
-                'dot = Dot(circle.point_at_angle(PI/4), color=RED)\n'
-                'label = MathTex(r"e^{i\\theta}", color=RED).next_to(dot, UR, buff=0.15)\n'
-                'line = Line(plane.n2p(0), dot.get_center(), color=YELLOW)\n'
-                'self.play(Write(title))\n'
-                'self.play(Create(plane), Create(circle))\n'
-                'self.play(Create(line), FadeIn(dot), Write(label))\n'
-                'self.wait(1.0)\n'
+                'title = Text("Geometric Interpretation: The Unit Circle", font_size=32, color=TEAL).to_edge(UP, buff=0.35)\n'
+                'plane = ComplexPlane(x_range=[-1.6, 1.6, 1], y_range=[-1.4, 1.4, 1], x_length=4.6, y_length=4.0).shift(LEFT*2.2 + DOWN*0.3)\n'
+                'circle = Circle(radius=1.8, color=TEAL).move_to(plane.n2p(0))\n'
+                'theta_val = PI / 4\n'
+                'pt = plane.n2p(np.exp(1j * theta_val))\n'
+                'origin = plane.n2p(0)\n'
+                'pt_x = plane.n2p(np.cos(theta_val))\n'
+                'pt_y = plane.n2p(1j * np.sin(theta_val))\n'
+                'vector = Arrow(origin, pt, buff=0, color=YELLOW, stroke_width=4, max_tip_length_to_length_ratio=0.12)\n'
+                'dot = Dot(pt, color=RED, radius=0.08)\n'
+                'dot_label = MathTex(r"e^{i\\theta}", font_size=24, color=RED).next_to(dot, UR, buff=0.1)\n'
+                'proj_x = DashedLine(pt, pt_x, color=BLUE, stroke_width=2.5)\n'
+                'proj_y = DashedLine(pt, pt_y, color=RED, stroke_width=2.5)\n'
+                'lbl_cos = MathTex(r"\\cos(\\theta)", font_size=20, color=BLUE).next_to(pt_x, DOWN, buff=0.15)\n'
+                'lbl_sin = MathTex(r"\\sin(\\theta)", font_size=20, color=RED).next_to(pt_y, LEFT, buff=0.15)\n'
+                'arc = Arc(radius=0.5, start_angle=0, angle=theta_val, arc_center=origin, color=GOLD)\n'
+                'arc_lbl = MathTex(r"\\theta", font_size=18, color=GOLD).next_to(arc, RIGHT, buff=0.05).shift(UP*0.08)\n'
+                'card_title = Text("Key Geometric Insights", font_size=22, color=GOLD, weight=BOLD)\n'
+                't1 = MathTex(r"\\bullet\\ \\text{Radius: } |e^{i\\theta}| = 1", font_size=19, color=WHITE)\n'
+                't2 = MathTex(r"\\bullet\\ \\text{Real projection: } x = \\cos(\\theta)", font_size=19, color=BLUE)\n'
+                't3 = MathTex(r"\\bullet\\ \\text{Imaginary projection: } y = \\sin(\\theta)", font_size=19, color=RED)\n'
+                't4 = MathTex(r"\\bullet\\ \\text{Coordinates: } (\\cos\\theta, \\sin\\theta)", font_size=19, color=YELLOW)\n'
+                't5 = MathTex(r"\\bullet\\ \\cos^2\\theta + \\sin^2\\theta = 1", font_size=19, color=GREEN)\n'
+                'info_card = VGroup(card_title, t1, t2, t3, t4, t5).arrange(DOWN, aligned_edge=LEFT, buff=0.18).shift(RIGHT*2.8 + DOWN*0.3)\n'
+                'card_box = SurroundingRectangle(info_card, color=GRAY, buff=0.2, stroke_width=1.5)\n'
+                'self.play(Write(title), run_time=0.8)\n'
+                'self.play(Create(plane), Create(circle), run_time=1.2)\n'
+                'self.play(GrowArrow(vector), FadeIn(dot), Write(dot_label), run_time=1.0)\n'
+                'self.play(Create(arc), Write(arc_lbl), run_time=0.8)\n'
+                'self.play(Create(proj_x), Write(lbl_cos), Create(proj_y), Write(lbl_sin), run_time=1.2)\n'
+                'self.play(Create(card_box), FadeIn(info_card), run_time=1.2)\n'
+                'self.wait(1.5)\n'
             )
             narration = (
-                "Now, let us examine the geometric picture of Euler's formula in the complex plane. "
-                "As the parameter theta increases continuously, the expression e to the i theta traces out a path "
-                "with constant distance equal to one from the origin. In other words, it is tracing the unit circle. "
-                "If you track the shadow of this moving point along the horizontal real axis, it oscillates precisely according to the cosine function. "
-                "Meanwhile, its shadow along the vertical imaginary axis oscillates according to the sine function. "
-                "This means that complex exponentiation is simply uniform circular motion in disguise. "
-                "Engineers and physicists rely on this exact insight every day to model alternating currents, quantum wavefunctions, and acoustic vibrations, "
-                "turning complicated trigonometric differential equations into simple algebraic multiplications."
+                "Now let us examine the geometric reason why cosine and sine must appear in this equation. "
+                "On the left, notice the coordinate axes representing the complex plane: real numbers horizontally, and imaginary numbers vertically. "
+                "Because the absolute magnitude of e to the i theta is always strictly equal to one, "
+                "varying theta moves the yellow vector around the unit circle without ever changing its length. "
+                "Observe the blue and red dashed projection lines dropping from the tip of the vector. "
+                "The horizontal projection onto the real axis has length cosine of theta. "
+                "The vertical projection onto the imaginary axis has length sine of theta. "
+                "Together, they form a right triangle inside the circle where the hypotenuse is the unit radius. "
+                "This explains why cosine and sine are not arbitrary additions: they are the unavoidable Cartesian coordinates of circular rotation. "
+                "Engineers and physicists exploit this duality every day to transform difficult wave mechanics and differential equations into simple algebra."
             )
         else:
             anchor = VisualAnchor(
-                type="formula",
-                title="Euler's Identity",
+                type="constants_breakdown",
+                title="Euler's Identity: Mathematical Unity",
                 latex=r"e^{i\pi} + 1 = 0",
                 visible_elements=["e", "i", "pi", "1", "0"],
-                visual_purpose="Present the most famous special case uniting five fundamental mathematical constants.",
+                key_definitions=[
+                    "e ≈ 2.718 : Base of natural logarithms, growth, and calculus",
+                    "i = √(-1) : Imaginary unit, orthogonal rotation, and algebra",
+                    "π ≈ 3.14159 : Ratio of circle circumference to diameter, geometry",
+                    "1 : Multiplicative identity and basis of counting",
+                    "0 : Additive identity, origin, and ground state",
+                ],
+                visual_states=["Identity Formula Box", "Five Constants Breakdown", "Geometric Rotation Note"],
+                visual_purpose="Present the most famous special case uniting five fundamental mathematical constants with full descriptions.",
             )
             code = (
-                'identity = MathTex(r"e^{i\\pi} + 1 = 0", font_size=56, color=YELLOW)\n'
-                'box = SurroundingRectangle(identity, color=GREEN, buff=0.4)\n'
-                'caption = Text("The Most Beautiful Theorem in Mathematics", font_size=26, color=WHITE).next_to(box, DOWN, buff=0.5)\n'
-                'self.play(Write(identity))\n'
-                'self.play(Create(box))\n'
-                'self.play(FadeIn(caption))\n'
-                'self.wait(1.0)\n'
+                'title = Text("Euler\'s Identity: Mathematical Unity", font_size=34, color=GOLD).to_edge(UP, buff=0.4)\n'
+                'identity = MathTex(r"e^{i\\pi} + 1 = 0", font_size=48, color=YELLOW).next_to(title, DOWN, buff=0.35)\n'
+                'box = SurroundingRectangle(identity, color=GREEN, buff=0.3, stroke_width=2)\n'
+                'lbl_constants = Text("The Five Fundamental Constants of Mathematics:", font_size=20, color=WHITE, weight=BOLD).next_to(box, DOWN, buff=0.35).to_edge(LEFT, buff=1.0)\n'
+                'c1 = MathTex(r"\\bullet\\ e \\approx 2.718 : \\text{The base of natural logarithms, growth, and calculus}", font_size=19, color=WHITE)\n'
+                'c2 = MathTex(r"\\bullet\\ i = \\sqrt{-1} : \\text{The imaginary unit, orthogonal rotation, and algebra}", font_size=19, color=TEAL)\n'
+                'c3 = MathTex(r"\\bullet\\ \\pi \\approx 3.14159 : \\text{The ratio of circle circumference, geometry, and waves}", font_size=19, color=GREEN)\n'
+                'c4 = MathTex(r"\\bullet\\ 1 : \\text{The multiplicative identity and basis of counting}", font_size=19, color=BLUE)\n'
+                'c5 = MathTex(r"\\bullet\\ 0 : \\text{The additive identity, origin, and concept of nothingness}", font_size=19, color=GOLD)\n'
+                'constants_group = VGroup(c1, c2, c3, c4, c5).arrange(DOWN, aligned_edge=LEFT, buff=0.16).next_to(lbl_constants, DOWN, buff=0.18).align_to(lbl_constants, LEFT)\n'
+                'geo_note = Text("Rotation by π radians (180°) maps +1 directly to -1, so -1 + 1 = 0", font_size=18, color=GRAY_A).next_to(constants_group, DOWN, buff=0.25).align_to(lbl_constants, LEFT)\n'
+                'self.play(Write(title), run_time=0.8)\n'
+                'self.play(Write(identity), Create(box), run_time=1.2)\n'
+                'self.play(FadeIn(lbl_constants), run_time=0.5)\n'
+                'self.play(LaggedStart(*[FadeIn(c, shift=RIGHT*0.2) for c in constants_group], lag_ratio=0.15), run_time=1.8)\n'
+                'self.play(FadeIn(geo_note), run_time=0.8)\n'
+                'self.wait(1.5)\n'
             )
             narration = (
                 "When we evaluate Euler's formula at the specific angle theta equals pi radians, we arrive at Euler's identity. "
-                "Richard Feynman called this the most remarkable formula in mathematics, and it is easy to see why. "
-                "It brings together the five most fundamental constants of our universe: "
-                "e, the foundation of calculus and growth; i, the seed of imaginary numbers; pi, the ratio of circular geometry; "
-                "1, the multiplicative identity; and 0, the additive identity. "
-                "Geometrically, an angle of pi radians is a half-circle rotation, which points directly in the negative real direction, landing on negative one. "
-                "Adding one returns us perfectly to zero. It is a stunning testimony to the hidden harmony and coherence of mathematics."
+                "Notice the five fundamental constants listed on your screen: "
+                "e, the bedrock of calculus and growth; i, the heart of algebra and complex numbers; "
+                "pi, the ancient constant of circular geometry; 1, the foundation of arithmetic; and 0, the additive origin of all mathematics. "
+                "Before Euler, each of these five constants belonged to an entirely distinct domain of thought. "
+                "Yet here, connected by a single equation, they combine to produce zero. "
+                "As the note at the bottom of the slide illustrates, rotating by pi radians is a half-turn rotation of one hundred eighty degrees, "
+                "which carries the positive unit value plus one directly across the origin to negative one. "
+                "Adding one returns the system flawlessly to zero. It is widely celebrated as the most beautiful theorem in mathematics."
             )
     elif "fourier" in p_lower:
         if slide_num == 1:
             anchor = VisualAnchor(
-                type="formula",
-                title="The Fourier Transform",
+                type="annotated_formula",
+                title="The Continuous Fourier Transform",
                 latex=r"\hat{f}(\xi) = \int_{-\infty}^{\infty} f(t) e^{-2\pi i t \xi} dt",
                 visible_elements=["f(t)", "hat{f}(xi)", "integral", "e^{-2pi i t xi}"],
-                visual_purpose="Formulate the frequency decomposition of a continuous time-domain signal.",
+                key_definitions=[
+                    "f(t) : Time-domain continuous signal or audio wave",
+                    "hat{f}(xi) : Frequency-domain spectral density at frequency xi",
+                    "e^(-2πitξ) : Complex exponential winding function of frequency xi",
+                    "∫ dt : Continuous accumulation / center-of-mass calculation",
+                ],
+                visual_purpose="Formulate the frequency decomposition with complete mathematical breakdown.",
             )
             code = (
-                'title = Text("The Fourier Transform", font_size=40, color=YELLOW).to_edge(UP)\n'
-                'formula = MathTex(r"\\hat{f}(\\xi) = \\int_{-\\infty}^{\\infty} f(t) e^{-2\\pi i t \\xi} dt", font_size=44, color=BLUE)\n'
-                'box = SurroundingRectangle(formula, color=GOLD, buff=0.35)\n'
-                'self.play(Write(title))\n'
-                'self.play(Write(formula))\n'
-                'self.play(Create(box))\n'
-                'self.wait(1.0)\n'
+                'title = Text("The Continuous Fourier Transform", font_size=34, color=YELLOW).to_edge(UP, buff=0.4)\n'
+                'formula = MathTex(r"\\hat{f}(\\xi) = \\int_{-\\infty}^{\\infty} f(t) e^{-2\\pi i t \\xi} dt", font_size=42, color=BLUE).next_to(title, DOWN, buff=0.35)\n'
+                'box = SurroundingRectangle(formula, color=GOLD, buff=0.25)\n'
+                'where_lbl = Text("Mathematical Anatomy:", font_size=22, color=GOLD, weight=BOLD).next_to(box, DOWN, buff=0.35).to_edge(LEFT, buff=1.2)\n'
+                'b1 = MathTex(r"\\bullet\\ f(t) : \\text{Original time-domain signal (e.g. audio waveform or voltage)}", font_size=20, color=WHITE)\n'
+                'b2 = MathTex(r"\\bullet\\ \\hat{f}(\\xi) : \\text{Frequency spectrum representation (amplitude and phase at } \\xi)", font_size=20, color=TEAL)\n'
+                'b3 = MathTex(r"\\bullet\\ e^{-2\\pi i t \\xi} : \\text{Rotational winding engine of frequency } \\xi \\text{ around complex origin}", font_size=20, color=GREEN)\n'
+                'b4 = MathTex(r"\\bullet\\ \\int_{-\\infty}^{\\infty} dt : \\text{Continuous integration computing the center of mass of winding}", font_size=20, color=YELLOW)\n'
+                'bullets = VGroup(b1, b2, b3, b4).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)\n'
+                'self.play(Write(title), run_time=0.8)\n'
+                'self.play(Write(formula), Create(box), run_time=1.2)\n'
+                'self.play(FadeIn(where_lbl), run_time=0.5)\n'
+                'self.play(LaggedStart(*[FadeIn(b, shift=RIGHT*0.2) for b in bullets], lag_ratio=0.2), run_time=1.8)\n'
+                'self.wait(1.5)\n'
             )
             narration = (
-                "The Fourier Transform is one of the most transformative mathematical tools ever conceived, allowing us to decompose any complex signal into a spectrum of pure frequencies. "
-                "Rather than viewing a sound, an image, or a physical vibration merely as an amplitude unfolding across time, the Fourier Transform asks a deeper question: "
-                "which pure sinusoidal tones must be combined together to create this exact signal? "
-                "The term e to the minus two pi i t xi acts as a winding mechanism that wraps the signal around the complex plane at frequency xi. "
-                "By integrating over all time, we calculate the center of mass of this winding, which spikes dramatically only when the frequency matches an inherent component of the signal."
+                "The Fourier Transform is one of the most transformative mathematical concepts ever discovered, "
+                "allowing us to decompose any complex signal into a spectrum of pure sinusoidal frequencies. "
+                "Look at the mathematical anatomy detailed on your screen. "
+                "The function f of t represents the signal in the time domain, such as a recording of musical instruments or atmospheric pressure. "
+                "The complex exponential e to the minus two pi i t xi acts as a winding mechanism. "
+                "It takes the time-domain wave and wraps it around the complex plane at frequency xi. "
+                "By integrating over all time, the formula calculates the center of mass of this winding. "
+                "When the winding frequency xi matches a natural frequency of the signal, the winding aligns in phase and spikes outward, "
+                "revealing the exact composition of the original wave."
             )
         elif slide_num == 2:
             anchor = VisualAnchor(
-                type="diagram",
-                title="Time Domain vs Frequency Spectrum",
+                type="geometric_projection",
+                title="Duality: Time Domain vs Frequency Spectrum",
                 latex="",
-                visible_elements=["Time Signal", "Frequency Peaks"],
-                visual_purpose="Illustrate the dual perspectives of time and frequency.",
+                visible_elements=["Time Signal", "Frequency Peaks", "Harmonics"],
+                key_definitions=[
+                    "Time Domain: Signal amplitude unfolding sequentially across time",
+                    "Frequency Domain: Discrete spectral peaks showing constituent frequencies",
+                    "Applications: MP3 compression, MRI imaging, telecom, quantum mechanics",
+                ],
+                visual_purpose="Illustrate dual perspectives of signal representation.",
             )
             code = (
-                'axes = Axes(x_range=[0, 4, 1], y_range=[-1.5, 1.5, 1], x_length=7, y_length=3).shift(UP*0.5)\n'
-                'sine = axes.plot(lambda x: np.sin(2 * PI * x), color=TEAL)\n'
-                'label = Text("Time Domain Signal", font_size=24, color=TEAL).next_to(axes, DOWN, buff=0.3)\n'
-                'self.play(Create(axes), Create(sine))\n'
-                'self.play(Write(label))\n'
-                'self.wait(1.0)\n'
+                'title = Text("Duality: Time vs Frequency Domain", font_size=32, color=TEAL).to_edge(UP, buff=0.35)\n'
+                'axes1 = Axes(x_range=[0, 4, 1], y_range=[-1.2, 1.2, 1], x_length=5.0, y_length=1.8).shift(LEFT*2.5 + UP*0.8)\n'
+                'sine1 = axes1.plot(lambda x: np.sin(2 * PI * x) + 0.5 * np.sin(4 * PI * x), color=TEAL)\n'
+                'lbl1 = Text("Time Domain: Combined Waveform", font_size=18, color=TEAL).next_to(axes1, UP, buff=0.15)\n'
+                'axes2 = Axes(x_range=[0, 5, 1], y_range=[0, 2, 1], x_length=5.0, y_length=1.8).shift(LEFT*2.5 + DOWN*1.5)\n'
+                'peak1 = Line(axes2.c2p(1, 0), axes2.c2p(1, 1.5), color=YELLOW, stroke_width=4)\n'
+                'peak2 = Line(axes2.c2p(2, 0), axes2.c2p(2, 0.75), color=YELLOW, stroke_width=4)\n'
+                'lbl2 = Text("Frequency Domain: Pure Spectral Peaks", font_size=18, color=YELLOW).next_to(axes2, UP, buff=0.15)\n'
+                'card_title = Text("Dual Perspectives", font_size=20, color=GOLD, weight=BOLD)\n'
+                'p1 = MathTex(r"\\bullet\\ \\text{Time: When events happen}", font_size=18, color=WHITE)\n'
+                'p2 = MathTex(r"\\bullet\\ \\text{Frequency: Which tones exist}", font_size=18, color=WHITE)\n'
+                'p3 = MathTex(r"\\bullet\\ \\text{MP3/JPEG Compression}", font_size=18, color=BLUE)\n'
+                'p4 = MathTex(r"\\bullet\\ \\text{Medical MRI Scanners}", font_size=18, color=GREEN)\n'
+                'card = VGroup(card_title, p1, p2, p3, p4).arrange(DOWN, aligned_edge=LEFT, buff=0.16).shift(RIGHT*3.0 + DOWN*0.3)\n'
+                'box = SurroundingRectangle(card, color=GRAY, buff=0.2, stroke_width=1.5)\n'
+                'self.play(Write(title), run_time=0.8)\n'
+                'self.play(Create(axes1), Create(sine1), Write(lbl1), run_time=1.2)\n'
+                'self.play(Create(axes2), Create(peak1), Create(peak2), Write(lbl2), run_time=1.2)\n'
+                'self.play(Create(box), FadeIn(card), run_time=1.0)\n'
+                'self.wait(1.5)\n'
             )
             narration = (
-                "Consider the difference between a musical chord played on a piano and its sheet music. "
-                "In the time domain, you perceive a complex, oscillating wave of air pressure that is difficult to untangle with the naked eye. "
-                "In the frequency domain, that very same sound separates neatly into individual notes: the fundamental root, the third, and the fifth. "
-                "This dual perspective is the bedrock of modern signal processing, digital audio compression like MP3, medical imaging in MRI scanners, and telecommunications."
+                "To intuitively grasp the Fourier Transform, consider the dual views presented before you. "
+                "On the top left, the time-domain signal shows a complicated composite wave whose individual ingredients are tangled together. "
+                "On the bottom left, the Fourier Transform isolates each ingredient into sharp, unambiguous frequency spikes. "
+                "Think of the time domain as listening to a musical chord, while the frequency domain is reading the sheet music that lists each note. "
+                "Modern digital technologies rely entirely on this duality: audio compression discards frequencies the human ear cannot hear, "
+                "while MRI machines measure frequency resonances to reconstruct high-resolution images of the human brain."
             )
         else:
             anchor = VisualAnchor(
-                type="formula",
-                title="Inverse Fourier Reconstruction",
+                type="annotated_formula",
+                title="Inverse Fourier Transform: Perfect Reconstruction",
                 latex=r"f(t) = \int_{-\infty}^{\infty} \hat{f}(\xi) e^{2\pi i t \xi} d\xi",
-                visible_elements=["hat{f}(xi)", "f(t)", "integral"],
-                visual_purpose="Demonstrate the complete and lossless reconstruction from frequency space.",
+                visible_elements=["f(t)", "hat{f}(xi)", "integral", "reconstruction"],
+                key_definitions=[
+                    "Lossless Duality: Information is 100% preserved between domains",
+                    "Synthesis: Integrating pure sinusoids restores continuous time signal",
+                    "Orthogonality: Complex exponentials form an orthogonal basis",
+                ],
+                visual_purpose="Demonstrate complete and reversible reconstruction from frequency space.",
             )
             code = (
-                'title = Text("Inverse Fourier Reconstruction", font_size=36, color=GREEN).to_edge(UP)\n'
-                'formula = MathTex(r"f(t) = \\int_{-\\infty}^{\\infty} \\hat{f}(\\xi) e^{2\\pi i t \\xi} d\\xi", font_size=44, color=YELLOW)\n'
-                'box = SurroundingRectangle(formula, color=GREEN, buff=0.35)\n'
-                'self.play(Write(title))\n'
-                'self.play(Write(formula))\n'
-                'self.play(Create(box))\n'
-                'self.wait(1.0)\n'
+                'title = Text("Inverse Fourier Reconstruction", font_size=34, color=GREEN).to_edge(UP, buff=0.4)\n'
+                'formula = MathTex(r"f(t) = \\int_{-\\infty}^{\\infty} \\hat{f}(\\xi) e^{2\\pi i t \\xi} d\\xi", font_size=42, color=YELLOW).next_to(title, DOWN, buff=0.35)\n'
+                'box = SurroundingRectangle(formula, color=GREEN, buff=0.25)\n'
+                'where_lbl = Text("Synthesis Properties:", font_size=22, color=GREEN, weight=BOLD).next_to(box, DOWN, buff=0.35).to_edge(LEFT, buff=1.2)\n'
+                'b1 = MathTex(r"\\bullet\\ \\text{Lossless Reconstruction: No information is lost during transformation}", font_size=20, color=WHITE)\n'
+                'b2 = MathTex(r"\\bullet\\ e^{2\\pi i t \\xi} : \\text{Positive unwinding restores continuous time phase}", font_size=20, color=TEAL)\n'
+                'b3 = MathTex(r"\\bullet\\ \\text{Orthogonality: Frequency modes form a complete Hilbert space basis}", font_size=20, color=YELLOW)\n'
+                'bullets = VGroup(b1, b2, b3).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)\n'
+                'self.play(Write(title), run_time=0.8)\n'
+                'self.play(Write(formula), Create(box), run_time=1.2)\n'
+                'self.play(FadeIn(where_lbl), run_time=0.5)\n'
+                'self.play(LaggedStart(*[FadeIn(b, shift=RIGHT*0.2) for b in bullets], lag_ratio=0.2), run_time=1.5)\n'
+                'self.wait(1.5)\n'
             )
             narration = (
-                "Crucially, this frequency transformation is entirely reversible through the Inverse Fourier Transform. "
-                "No information is destroyed in the process. By integrating each frequency component scaled by its corresponding amplitude and phase, "
-                "we reassemble the original continuous signal with absolute mathematical precision. "
-                "It represents a flawless duality: time and frequency are merely two complementary languages describing the exact same physical reality."
+                "Crucially, the Fourier Transform is completely reversible through the Inverse Fourier Transform shown on your screen. "
+                "No information is degraded or lost. By taking each frequency component, scaling it by its amplitude and phase, "
+                "and unwinding it continuously back into time, we reassemble the exact original function. "
+                "This lossless symmetry guarantees that time and frequency are not competing descriptions, "
+                "but two complementary representations of the exact same physical reality."
             )
     else:
         anchor = VisualAnchor(
-            type="concept",
-            title=f"Core Insight: {prompt[:30]}",
-            latex="",
-            visible_elements=[f"Principle {slide_num}", "Foundations"],
-            visual_purpose=f"Introduce pedagogical stage {slide_num} of {prompt}.",
+            type="annotated_formula",
+            title=f"{prompt[:28]} : Key Foundations",
+            latex=r"\text{Principle } " + str(slide_num),
+            visible_elements=[f"Principle {slide_num}", "Core Insight", "Applications"],
+            key_definitions=[
+                f"Core Mechanism: Primary operational principle of {prompt[:20]}",
+                "Conceptual Basis: Foundational mathematical and physical relationships",
+                "Applications: Real-world engineering and computational significance",
+            ],
+            visual_purpose=f"Provide structured breakdown of {prompt} stage {slide_num}.",
         )
         code = (
-            f'title = Text("Slide {slide_num}: {prompt[:30]}", font_size=38, color=YELLOW).to_edge(UP)\n'
-            'box = SurroundingRectangle(title, color=BLUE, buff=0.3)\n'
-            f'content = Text("Key Principle {slide_num}", font_size=30, color=WHITE).shift(DOWN*0.5)\n'
-            'self.play(Create(box), Write(title))\n'
-            'self.play(FadeIn(content))\n'
-            'self.wait(1.0)\n'
+            f'title = Text("{prompt[:28]} : Key Principles", font_size=34, color=YELLOW).to_edge(UP, buff=0.4)\n'
+            f'box_lbl = Text("Core Concept {slide_num}", font_size=36, color=BLUE).next_to(title, DOWN, buff=0.35)\n'
+            'box = SurroundingRectangle(box_lbl, color=GOLD, buff=0.25)\n'
+            'where_lbl = Text("Key Insights:", font_size=22, color=GOLD, weight=BOLD).next_to(box, DOWN, buff=0.35).to_edge(LEFT, buff=1.2)\n'
+            f'b1 = MathTex(r"\\bullet\\ \\text{{Foundations: Essential framework underlying this concept}}", font_size=20, color=WHITE)\n'
+            f'b2 = MathTex(r"\\bullet\\ \\text{{Mechanics: Dynamic interaction of variables and parameters}}", font_size=20, color=TEAL)\n'
+            f'b3 = MathTex(r"\\bullet\\ \\text{{Implications: Broad mathematical and practical applications}}", font_size=20, color=GREEN)\n'
+            'bullets = VGroup(b1, b2, b3).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)\n'
+            'self.play(Write(title), run_time=0.8)\n'
+            'self.play(Write(box_lbl), Create(box), run_time=1.2)\n'
+            'self.play(FadeIn(where_lbl), run_time=0.5)\n'
+            'self.play(LaggedStart(*[FadeIn(b, shift=RIGHT*0.2) for b in bullets], lag_ratio=0.2), run_time=1.5)\n'
+            'self.wait(1.5)\n'
         )
         narration = (
             f"In this segment, we examine the foundational mechanisms of {prompt}. "
-            f"Rather than merely memorizing definitions, we want to cultivate true conceptual intuition. "
-            "When we break this concept down into its constituent elements, we discover how each component interacts dynamically "
-            "to produce the overarching behavior. Observe the relationships displayed before you; "
-            "understanding this visual anchor is the key to mastering the broader framework."
+            "Notice the structured breakdown displayed before you. Rather than treating this as abstract notation, "
+            "we want to cultivate genuine conceptual understanding of how these elements interact. "
+            "When we break down the core components, their mutual dependencies become apparent, "
+            "allowing us to apply these principles reliably to more advanced problems."
         )
 
     return TeachingSegment(
         slide_num=slide_num,
-        concept=f"{prompt} - Part {slide_num}",
+        concept=anchor.title or f"{prompt} - Slide {slide_num}",
         learning_objective=anchor.visual_purpose,
         visual_anchor=anchor,
         manim_code=code,
@@ -400,13 +552,15 @@ def plan_teaching_segment(
     client: OpenAI,
     model: str,
 ) -> TeachingSegment:
-    """Generates a TeachingSegment: first the visual anchor, then in-depth narration."""
+    """Generates a TeachingSegment: first the rich visual anchor, then in-depth narration."""
     # Step 1: Generate Visual Anchor
     visual_user_prompt = (
         f"Topic: {prompt}\n"
         f"Lecture Outline:\n{outline}\n\n"
         f"Create the visual anchor for Slide {slide_num} of {total_slides}.\n"
-        f"Provide the <visual_anchor> JSON and concise, elegant Manim code."
+        f"Remember: Do NOT make a sparse slide with only title + formula! Include symbol breakdowns ('Where:'), "
+        f"dynamic geometric projections with dashed lines, or concept cards so students learn even on pause.\n"
+        f"Provide the <visual_anchor> JSON and clean, executable Manim code."
     )
     try:
         vis_resp = client.chat.completions.create(
@@ -434,10 +588,11 @@ def plan_teaching_segment(
         f"Visual Anchor Title: {anchor.title}\n"
         f"Displayed Formula: {anchor.latex}\n"
         f"Visible Elements: {anchor.visible_elements}\n"
+        f"Key Definitions Visible on Slide: {anchor.key_definitions}\n"
         f"Visual Purpose: {anchor.visual_purpose}\n\n"
-        f"Write a deep, pedagogical, university-level teaching explanation.\n"
-        f"Explain what the student is seeing, define the symbols, explain intuition and applications.\n"
-        f"Remember: Do NOT merely read the slide aloud!"
+        f"Write an in-depth, university-level teaching explanation.\n"
+        f"Reference the slide breakdown naturally, explain the intuition, define the symbols, and explain applications.\n"
+        f"Remember: Do NOT merely recite the slide aloud!"
     )
     try:
         narr_resp = client.chat.completions.create(
@@ -500,6 +655,7 @@ def render_visual_anchor(
                 "FadeIn": FadeIn,
                 "FadeOut": FadeOut,
                 "GrowFromCenter": GrowFromCenter,
+                "GrowArrow": GrowArrow,
                 "Indicate": Indicate,
                 "Circumscribe": Circumscribe,
                 "Wiggle": Wiggle,
@@ -531,6 +687,8 @@ def render_visual_anchor(
                 "LaggedStart": LaggedStart,
                 "always_redraw": always_redraw,
                 "ValueTracker": ValueTracker,
+                "Angle": Angle,
+                "RightAngle": RightAngle,
                 "UP": UP,
                 "DOWN": DOWN,
                 "LEFT": LEFT,
@@ -552,6 +710,8 @@ def render_visual_anchor(
                 "PURPLE": PURPLE,
                 "GOLD": GOLD,
                 "TEAL": TEAL,
+                "BOLD": BOLD,
+                "GRAY_A": GRAY_A,
                 "PI": PI,
                 "TAU": TAU,
             }
@@ -717,7 +877,7 @@ def run_producer_consumer(
     ]
 
     for i in range(1, total_slides + 1):
-        _notify("PlanTeachingScriptNode", f"Planning TeachingSegment {i} (Visual Anchor & Pedagogy)")
+        _notify("PlanTeachingScriptNode", f"Planning TeachingSegment {i} (Rich Visual Anchor & Pedagogy)")
         segment = plan_teaching_segment(
             prompt=prompt,
             slide_num=i,
@@ -753,6 +913,7 @@ def run_producer_consumer(
         combined_code_parts.append(
             f"# --- Segment {segment.slide_num}: {segment.concept} ---\n"
             f"# Objective: {segment.learning_objective}\n"
+            f"# Definitions: {segment.visual_anchor.key_definitions}\n"
             f"# Narration: {segment.narration}\n"
             f"{segment.manim_code}\n"
         )
@@ -785,6 +946,8 @@ def run_producer_consumer(
                 "total_duration": s.total_duration,
                 "hold_duration": s.hold_duration,
                 "chunk_path": s.chunk_path,
+                "key_definitions": s.visual_anchor.key_definitions,
+                "layout_type": s.visual_anchor.layout_type,
             }
             for s in segments
         ],

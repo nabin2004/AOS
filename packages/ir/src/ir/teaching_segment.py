@@ -33,6 +33,18 @@ class VisualAnchor(BaseModel):
         default_factory=list,
         description="List of individual symbols or labels visible on screen (e.g. ['e', 'i', 'theta', 'cos', 'sin']).",
     )
+    key_definitions: List[str] = Field(
+        default_factory=list,
+        description="Key definitions and symbol explanations visible on the slide (e.g. ['e: Euler number ≈ 2.718', 'i: imaginary unit (i² = -1)']).",
+    )
+    layout_type: str = Field(
+        default="annotated_formula",
+        description="Layout structure: annotated_formula, geometric_projection, constants_breakdown, split_screen, or concept_card.",
+    )
+    visual_states: List[str] = Field(
+        default_factory=list,
+        description="Ordered sequence of visual states from introduction to static hold.",
+    )
     visual_purpose: str = Field(
         default="",
         description="The pedagogical purpose of this visual anchor.",
