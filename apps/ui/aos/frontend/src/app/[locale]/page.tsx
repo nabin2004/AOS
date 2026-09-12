@@ -1,19 +1,13 @@
 import type { Metadata } from "next";
 import {
-  CheckCircle2,
-  Cpu,
   Download,
-  Film,
-  Layers,
   Lock,
   Quote,
   RefreshCw,
   Search,
   Smartphone,
-  Sparkles,
   ThumbsUp,
   Users,
-  Video,
   Workflow,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";

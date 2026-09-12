@@ -1,4 +1,4 @@
-import { Bot, CheckCircle2, Code2, Cpu, FileText, Search, Sparkles, User, Video } from "lucide-react";
+import { CheckCircle2, Code2, Cpu, FileText, Search, Sparkles, User, Video } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
