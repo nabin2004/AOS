@@ -307,7 +307,7 @@ services:
   # MinIO (S3 Video & Asset Storage)
   # ----------------------------------------------------------------------------
   minio:
-    image: minio/minio:RELEASE.2025-02-18T16-25-55Z
+    image: quay.io/minio/minio:RELEASE.2025-02-18T16-25-55Z
     container_name: aos_minio
     ports:
       - "${MINIO_API_PORT:-9010}:9000"
@@ -331,7 +331,7 @@ services:
   # MinIO Bucket Auto-Provisioner (One-shot)
   # ----------------------------------------------------------------------------
   create_buckets:
-    image: minio/mc:latest
+    image: quay.io/minio/mc:latest
     container_name: aos_minio_init
     depends_on:
       minio:
