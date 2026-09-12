@@ -6,11 +6,11 @@ import { useEffect, useRef, useState } from "react";
 import { BrandIcon } from "./brand-icon";
 
 const SOURCES = [
-  { brand: "gdrive" as const, label: "Google Drive" },
-  { brand: "slack" as const, label: "Slack" },
-  { brand: "notion" as const, label: "Notion" },
-  { brand: "github" as const, label: "GitHub" },
-  { brand: "dropbox" as const, label: "Dropbox" },
+  { brand: "gdrive" as const, label: "STEM Prompt & Concept" },
+  { brand: "notion" as const, label: "Course Syllabus / Outline" },
+  { brand: "github" as const, label: "LaTeX Formulas & Math" },
+  { brand: "s3" as const, label: "Textbook PDF (EduClaw)" },
+  { brand: "loom" as const, label: "Voiceover Script" },
 ];
 
 interface Endpoints {
@@ -201,14 +201,14 @@ export function DataFlowDiagram() {
             <div className="bg-card border-foreground/10 absolute inset-6 rounded-full border shadow-inner" />
 
             <div className="relative z-10 text-center">
-              <p className="eyebrow text-foreground/55 mb-1.5">Knowledge base</p>
-              <AnimatedCount target={1240000} suffix="" />
+              <p className="eyebrow text-foreground/55 mb-1.5">AOS Agent Graph</p>
+              <AnimatedCount target={9} suffix=" agents" />
               <p className="text-foreground/55 mt-0.5 font-mono text-[10px] tracking-wider uppercase">
-                vectors indexed
+                Pydantic AI pipeline
               </p>
               <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[color-mix(in_oklab,var(--color-brand)_18%,transparent)] px-2 py-0.5">
                 <span className="bg-brand h-1.5 w-1.5 animate-pulse rounded-full" />
-                <span className="text-foreground font-mono text-[10px] font-medium">syncing</span>
+                <span className="text-foreground font-mono text-[10px] font-medium">orchestrating</span>
               </div>
             </div>
 
@@ -235,11 +235,11 @@ export function DataFlowDiagram() {
             className="border-foreground/15 bg-background ml-auto max-w-[90%] rounded-2xl rounded-tr-sm border px-4 py-3 shadow-sm"
           >
             <p className="text-foreground text-sm leading-snug">
-              What did the team ship last quarter?
+              Synthesize 60fps Fourier Transform animation
             </p>
           </div>
 
-          <p className="eyebrow text-foreground/55">Assistant</p>
+          <p className="eyebrow text-foreground/55">Artifacts</p>
 
           <div
             ref={assistantRef}
@@ -256,15 +256,15 @@ export function DataFlowDiagram() {
             <div className="relative">
               <div className="text-foreground/55 mb-2 flex items-center gap-1.5">
                 <Sparkles className="text-brand h-3.5 w-3.5" />
-                <span className="font-mono text-[10px] tracking-wider uppercase">Answer</span>
+                <span className="font-mono text-[10px] tracking-wider uppercase">Generated Video</span>
               </div>
               <p className="text-foreground text-sm leading-relaxed">
-                Three major features: real-time sync, audit logs, SSO. Cited from 4 sources.
+                4 scenes compiled in Docker Manim. 16 beats synchronized with Kyutai DSM speech.
               </p>
               <div className="border-foreground/10 mt-3 flex flex-wrap gap-1.5 border-t pt-3">
-                <Cite>onboarding-q1.pdf</Cite>
-                <Cite>release-notes.md</Cite>
-                <Cite>+2 more</Cite>
+                <Cite>lecture.py</Cite>
+                <Cite>lecture_ir.json</Cite>
+                <Cite>1080p60.mp4</Cite>
               </div>
             </div>
           </div>

@@ -8,15 +8,15 @@ import { cn } from "@/lib/utils";
 const SCRIPT = [
   {
     role: "user" as const,
-    text: "Teach me about Euler's formula.",
+    text: "Explain Euler's formula e^(iπ) + 1 = 0 with rotating unit vectors on the complex plane.",
   },
   {
     role: "tool" as const,
-    text: "manim.write · Compiling... · 12 chunks",
+    text: "aos.graph · Classify → Storyboard → ManimCE → BeatAlign (4 scenes, 16 beats)",
   },
   {
     role: "agent" as const,
-    text: "Euler's formula is a mathematical equation that relates the exponential function to trigonometric functions. It states that e^(ix) = cos(x) + i*sin(x), where i is the imaginary unit.",
+    text: "Synthesized 4 scenes: Complex Plane Setup, Unit Circle Rotation, Taylor Expansion Duality, and Identity Collapse. Aligned 16 narration beats with Kyutai DSM word timestamps. Rendering 1080p60 in Docker...",
   },
 ];
 
@@ -43,7 +43,7 @@ export function HeroDemo() {
           <span className="bg-foreground/20 h-2.5 w-2.5 rounded-full" />
           <span className="bg-foreground/20 h-2.5 w-2.5 rounded-full" />
         </div>
-        <div className="text-foreground/50 ml-3 font-mono text-xs">app.example.com / chat</div>
+        <div className="text-foreground/50 ml-3 font-mono text-xs">aos.studio / pipeline</div>
       </div>
 
       <div className="space-y-4 p-5 md:p-8">
@@ -92,7 +92,7 @@ export function HeroDemo() {
 
       <div className="border-foreground/10 bg-background flex items-center gap-3 border-t px-5 py-4">
         <Sparkles className="text-foreground/40 h-4 w-4" />
-        <span className="text-foreground/40 flex-1 text-sm">Ask anything…</span>
+        <span className="text-foreground/40 flex-1 text-sm">Enter a STEM topic, theorem, or notes to animate…</span>
         <kbd className="border-foreground/15 text-foreground/50 inline-flex items-center gap-1 rounded border px-2 py-1 font-mono text-xs">
           ⌘ ↵
         </kbd>

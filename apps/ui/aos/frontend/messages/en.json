@@ -569,7 +569,7 @@
     "contact": {
       "eyebrow": "Contact",
       "title": "Talk to us.",
-      "description": "Sales, support, partnerships, or just to say hi — pick the channel that fits, we'll get back to you.",
+      "description": "Sales, support, partnerships, or just to say hi, pick the channel that fits, we'll get back to you.",
       "channels": "Channels",
       "sendMessage": "Send us a message",
       "office": "Office",
@@ -879,55 +879,55 @@
       "endOfPost": "end of post"
     },
     "landing": {
-      "metaDescription": "Turn ideas, notes, or prompts into beautiful Manim-powered educational videos. Generate animations, voiceovers, and presentations with AI—no animation experience required.",
+      "metaDescription": "Turn complex math, science, and technical concepts into 3Blue1Brown-quality Manim animations. Multi-agent Pydantic AI orchestration, beat-synchronized voiceover, and instant 60fps rendering.",
       "hero": {
-        "eyebrow": "Meet your AI Manimator",
-        "titlePre": "Create",
-        "titleHighlight": "Videos",
-        "titleEm": "using AI.",
-      "description": "Transform prompts into professional STEM animations powered by Manim. Generate visuals, narration, and videos in minutes.",
-        "ctaPrimary": "Start creating",
-        "ctaSecondary": "Watch demo",
-        "stat_teams": "Videos created",
-        "stat_speed": "Faster production",
-        "stat_uptime": "Cloud rendering",
-        "ratingLabel": "rated 4.9/5 by 10 users",
-        "trustNote": "No credit card required · Cancel anytime"
+        "eyebrow": "Next-Gen Educational Video Orchestration",
+        "titlePre": "Synthesize",
+        "titleHighlight": "3Blue1Brown",
+        "titleEm": "Animations with AI.",
+        "description": "Transform STEM prompts, LaTeX formulas, or lecture outlines into professional Manim animations with millisecond-accurate narration in minutes.",
+        "ctaPrimary": "Start Generating",
+        "ctaSecondary": "Watch Demo",
+        "stat_teams": "60 FPS Visuals",
+        "stat_speed": "< 3 Min Pipeline",
+        "stat_uptime": "99.8% Speech Sync",
+        "ratingLabel": "trusted by STEM educators & creators",
+        "trustNote": "Open-source core · Self-hosted or Cloud"
       },
       "social": {
-        "title": "Trusted by educators, creators, and AI enthusiasts"
+        "title": "Orchestrated for universities, technical educators, and visual storytellers"
       },
       "how": {
         "eyebrow": "How it works",
-        "title": "Three steps from idea to animation"
+        "title": "Three steps from prompt to cinematic animation"
       },
       "features": {
-        "eyebrow": "Features",
-        "title": "Everything you need to create educational videos",
-      "subtitle": "From AI-powered scripting to Manim rendering, voice generation, and export—all in one platform."
+        "eyebrow": "Architecture",
+        "title": "End-to-end multi-agent educational pipeline",
+        "subtitle": "From pedagogical classification and visual storyboarding to Manim compilation, audio alignment, and Docker rendering."
       },
       "data": {
         "eyebrow": "AI generation pipeline",
-        "title": "Prompt → Script → Manim → Video"
+        "title": "Prompt → Storyboard → ManimCE → 60fps Video"
       },
       "testimonials": {
-        "eyebrow": "Loved by creators",
+        "eyebrow": "Loved by educators",
         "titlePre": "Teach visually",
-        "titleEm": "with us."
+        "titleEm": "at 60 frames per second."
       },
       "pricing": {
         "eyebrow": "Pricing",
-        "titlePre": "Pay only for what",
-        "titleEm": "your team needs.",
-        "subtitle": "Drag the slider — your plan, your price, in real time.",
+        "titlePre": "Transparent compute",
+        "titleEm": "built for scale.",
+        "subtitle": "Run locally for free with Ollama, or scale cloud GPU rendering on demand.",
         "teaser": {
           "seats": "Team size",
-          "seatsUnit": "users",
+          "seatsUnit": "creators",
           "perMonth": "/mo",
           "seeFull": "See full comparison →",
           "custom": "Let's talk",
           "billedMonthly": "billed monthly · cancel anytime",
-          "perSeatUnit": "/ user / month"
+          "perSeatUnit": "/ creator / month"
         }
       },
       "faq": {
@@ -935,39 +935,39 @@
         "title": "Frequently asked.",
         "items": [
           {
-            "q": "What does {appName} actually do?",
-            "a": "It's an AI assistant that lives on top of your team's documents, conversations, and tools. Ask it questions in natural language; get answers grounded in your own data, with sources cited."
+            "q": "What is {appName}?",
+            "a": "AOS (Agentic Orchestration System) is an autonomous multi-agent platform that turns STEM concepts, mathematical formulas, and course notes into professional educational videos using Manim, Pydantic AI, and Kyutai Pocket TTS / DSM."
           },
           {
-            "q": "Where does my data live?",
-            "a": "Your data stays in your workspace. We never train on your content, and we encrypt everything at rest and in transit. Bring your own keys if you need extra control."
+            "q": "How does the generation pipeline work?",
+            "a": "AOS runs an orchestrated Pydantic AI graph: Classify (audience & scope) → Plan (pedagogical outline) → Storyboard (scene breakdown) → Create Scenes (visual elements & LaTeX MathTex) → Add Beats (granular timings) → Add Narration → Validate & Repair (schema verification) → Synthesize Voice (Kyutai DSM) → Docker Render (60fps Manim compilation)."
           },
           {
-            "q": "Which tools can I connect?",
-            "a": "Out of the box: Google Drive, Notion, Slack, GitHub, Confluence, and any S3-compatible bucket. More integrations ship every month, and you can always pipe data in via the public API."
+            "q": "Can I run AOS locally with open-source models?",
+            "a": "Yes! AOS natively supports local Ollama models (such as fine-tuned Qwen 2.5 Coder), offline resident Pocket TTS for narration, and local Docker Manim rendering without requiring external cloud APIs or paid tokens."
           },
           {
-            "q": "Can I cancel anytime?",
-            "a": "Yes — every paid plan is month-to-month and you can cancel from the billing dashboard. Your account stays active until the end of the period you've already paid for."
+            "q": "How does narration sync with animations?",
+            "a": "Instead of blunt static pauses, AOS breaks each scene into visual beats and uses Kyutai Delayed Streams Modeling (DSM) to achieve millisecond-accurate word-level timestamps that align narration transitions exactly with visual elements."
           },
           {
-            "q": "Do you offer SSO and audit logs?",
-            "a": "SSO (Google, Okta, Microsoft Entra) and audit logs come with the Business plan. SCIM provisioning and DLP controls are available on Enterprise — get in touch."
+            "q": "What export formats are supported?",
+            "a": "You get 1080p and 4K MP4 videos, raw compilable Manim Community Python code (lecture.py), structured LectureIR JSON, and interactive presentation decks compatible with Manim Slides."
           },
           {
-            "q": "Is there an API?",
-            "a": "Yes. Every feature in the dashboard is also available over a JSON API. Stream chat responses, ingest documents, manage users, subscribe to events — see the developer docs."
+            "q": "Can I edit and customize the generated animations?",
+            "a": "Yes. Every visual object and beat is completely transparent. You can tweak parameters, edit the generated Python code, adjust timing beats, or re-render individual scenes directly in the web UI or CLI."
           }
         ]
       },
       "finalCta": {
-        "statValue": "12,840",
-        "statLabel": "Questions answered this week",
-        "titlePre": "Your team's next answer is",
-        "titleEm": "one ask away.",
-        "description": "Free 14-day trial. No credit card. Cancel anytime.",
-        "primary": "Start free",
-        "secondary": "See pricing"
+        "statValue": "60 FPS",
+        "statLabel": "Hardware-accelerated rendering",
+        "titlePre": "Bring your mathematical ideas to life",
+        "titleEm": "in minutes.",
+        "description": "Generate your first Manim video today. Open-source friendly, no credit card required.",
+        "primary": "Start Generating",
+        "secondary": "Explore Docs"
       }
     },
     "pricing": {

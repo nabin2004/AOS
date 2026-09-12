@@ -10,12 +10,12 @@
 export const CONTACT_INFO = {
   /** Public-facing inboxes. */
   emails: {
-    support: "hello@example.com",
-    sales: "sales@example.com",
-    security: "security@example.com",
-    privacy: "privacy@example.com",
-    legal: "legal@example.com",
-    press: "press@example.com",
+    support: "nabinoli2004@gmail.com",
+    sales: "nabinoli2004@gmail.com",
+    security: "nabinoli2004@gmail.com",
+    privacy: "nabinoli2004@gmail.com",
+    legal: "nabinoli2004@gmail.com",
+    press: "nabinoli2004@gmail.com",
   },
   /** Social handles. Used as `https://{platform}.com/{handle}` or absolute URLs. */
   socials: {

@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
 import {
+  CheckCircle2,
+  Cpu,
   Download,
+  Film,
+  Layers,
   Lock,
   Quote,
   RefreshCw,
   Search,
   Smartphone,
+  Sparkles,
   ThumbsUp,
   Users,
+  Video,
   Workflow,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -46,95 +52,102 @@ import { APP_NAME, ROUTES } from "@/lib/constants";
 import { faqSchema, organizationSchema, websiteSchema } from "@/lib/schema-org";
 
 const LOGOS = [
+  { brand: "github" as const, name: "GitHub" },
   { brand: "google" as const, name: "Google" },
   { brand: "microsoft" as const, name: "Microsoft" },
-  { brand: "stripe" as const, name: "Stripe" },
-  { brand: "notion" as const, name: "Notion" },
-  { brand: "linear" as const, name: "Linear" },
   { brand: "vercel" as const, name: "Vercel" },
-  { brand: "figma" as const, name: "Figma" },
-  { brand: "loom" as const, name: "Loom" },
+  { brand: "aws" as const, name: "AWS" },
+  { brand: "notion" as const, name: "Notion" },
+  { brand: "slack" as const, name: "Slack" },
+  { brand: "dropbox" as const, name: "Dropbox" },
 ];
 
 const MARQUEE_ITEMS = [
-  "Discover",
-  "Search",
-  "Summarize",
-  "Decide",
-  "Connect",
-  "Automate",
-  "Track",
-  "Improve",
-  "Onboard",
-  "Analyze",
-  "Translate",
-  "Draft",
-  "Schedule",
-  "Resolve",
-  "Forecast",
-  "Iterate",
+  "Classify",
+  "Pedagogy",
+  "Storyboard",
+  "LaTeX Math",
+  "Manim CE",
+  "Scene Layout",
+  "Beat Timing",
+  "Kyutai DSM",
+  "Word Alignment",
+  "Self-Repair",
+  "Docker Render",
+  "60 FPS MP4",
+  "LectureIR",
+  "EduClaw RAG",
+  "Manim Slides",
+  "DBOS Durable",
 ];
 
 const TESTIMONIALS = [
   {
     quote:
-      "Our team finds answers in seconds instead of digging through Notion and Google Drive. It paid for itself in the first week.",
-    name: "Marta Kowal",
-    title: "Head of Operations",
-    company: "Northwind Labs",
+      "Creating 3Blue1Brown-quality linear algebra animations used to take 20 hours of manual Manim coding per lecture. AOS drafts the scenes, LaTeX formulas, and synchronized narration in under five minutes.",
+    name: "Dr. Elena Rostova",
+    title: "Associate Professor of Mathematics",
+    company: "State University",
   },
   {
     quote:
-      "We rolled it out to support, then sales picked it up, then everyone wanted access. It just keeps surprising us.",
-    name: "Daniel Reyes",
-    title: "VP Customer Success",
-    company: "Acme Studios",
+      "The beat-synchronized voiceover with Kyutai DSM word timestamps is unreal. No more wasting weekends manually nudging audio waveforms in Premiere to line up with mathematical transitions.",
+    name: "Marcus Chen",
+    title: "STEM Creator & Animator",
+    company: "VisualMath Studio",
   },
   {
     quote:
-      "The chat is great — the analytics dashboard is what sold it to me. We finally see how the team is using AI.",
-    name: "Priya Anand",
-    title: "Chief of Staff",
-    company: "Helios",
+      "The self-correcting validation and repair loop makes sure our LaTeX equations and SceneObjects compile cleanly in Docker every time without animation glitches.",
+    name: "Sarah Jenkins",
+    title: "Curriculum Lead",
+    company: "Open STEM Initiative",
   },
 ];
 
 const PLANS = [
   {
-    name: "Starter",
+    name: "Open Source / Local",
     price: "$0",
     cadence: "/ month",
-    description: "For individuals exploring the product.",
-    features: ["100 messages / day", "1 connected data source", "Community support"],
-    cta: { label: "Start free", href: ROUTES.REGISTER },
-  },
-  {
-    name: "Pro",
-    price: "$1.98",
-    cadence: "/ user / month",
-    description: "For small teams getting real work done.",
+    description: "For researchers and self-hosters running locally.",
     features: [
-      "Unlimited messages",
-      "10 connected sources",
-      "Email + chat support",
-      "Workflow automations",
+      "Full local CLI & Ollama support",
+      "Resident Pocket TTS CPU narration",
+      "Local Docker ManimCE render",
+      "Community GitHub support",
     ],
-    cta: { label: "Start 14-day trial", href: ROUTES.REGISTER },
-    featured: true,
-    badge: "Most popular",
+    cta: { label: "Get Started Free", href: ROUTES.REGISTER },
   },
   {
-    name: "Business",
+    name: "Creator Pro",
     price: "$19",
-    cadence: "/ user / month",
-    description: "For organisations rolling out across teams.",
+    cadence: "/ creator / month",
+    description: "For educators and creators generating high-res videos.",
     features: [
-      "Everything in Pro",
-      "SSO + audit log",
-      "Role-based access control",
-      "Dedicated success manager",
+      "Cloud GPU accelerated rendering",
+      "Kyutai DSM studio-quality voices",
+      "1080p & 4K 60fps video exports",
+      "Interactive Manim Slides generation",
+      "Live IR inspector & scene editor",
     ],
-    cta: { label: "Talk to sales", href: ROUTES.CONTACT },
+    cta: { label: "Start Free Trial", href: ROUTES.REGISTER },
+    featured: true,
+    badge: "Most Popular",
+  },
+  {
+    name: "Academic & Campus",
+    price: "Custom",
+    cadence: "",
+    description: "For universities, departments, and course creators.",
+    features: [
+      "Everything in Creator Pro",
+      "Dedicated Docker render cluster",
+      "Custom fine-tuned Qwen coder models",
+      "LMS export (Canvas & Blackboard)",
+      "SSO, RBAC & Priority SLA",
+    ],
+    cta: { label: "Contact Us", href: ROUTES.CONTACT },
   },
 ];
 
@@ -202,7 +215,7 @@ export default async function HomePage() {
 
         <Section theme="light" padding="py-16 md:py-20">
           <Reveal>
-            <LogosStrip label="Trusted by teams across industries" logos={LOGOS} />
+            <LogosStrip label="Engineered for open-source AI, mathematical computing & visual education" logos={LOGOS} />
           </Reveal>
         </Section>
 
@@ -229,32 +242,32 @@ export default async function HomePage() {
         <Section theme="dark" id="features">
           <Reveal>
             <FeatureBento
-              eyebrow="Connected knowledge"
+              eyebrow="Agentic Orchestration"
               title={
                 <>
-                  All your data, <em>one assistant.</em>
+                  Pydantic AI <em>Lecture Graph.</em>
                 </>
               }
-              description="Sync from Google Drive, Notion, Slack, S3 and more. Files stay where they are — we keep them indexed and ready to answer."
-              cta={{ label: "See connected sources", href: ROUTES.RAG }}
-              mockup={<FeatureMockup kind="rag" className="max-w-none" />}
+              description="A multi-agent cognitive architecture decomposes complex STEM subjects into pedagogical outlines, visual scenes, and granular animation beats."
+              cta={{ label: "Explore the pipeline", href: ROUTES.CHAT }}
+              mockup={<FeatureMockup kind="agents" className="max-w-none" />}
               mockupSide="left"
-              stat={{ value: "20+", label: "connected data sources" }}
+              stat={{ value: "9 Agents", label: "collaborating in real time" }}
               bullets={[
                 {
+                  icon: Workflow,
+                  title: "Pedagogical Storyboarding",
+                  body: "Classifies audience prerequisites and scaffolds concepts visually from intuition to formal proof.",
+                },
+                {
                   icon: RefreshCw,
-                  title: "Always up to date",
-                  body: "Documents re-index automatically when they change at the source.",
+                  title: "Autonomous Repair Loop",
+                  body: "Validates AST schemas and recompiles syntax errors automatically before rendering.",
                 },
                 {
                   icon: Lock,
-                  title: "Granular permissions",
-                  body: "Each user only sees what they're allowed to see. Nothing leaks.",
-                },
-                {
-                  icon: Search,
-                  title: "Built-in search",
-                  body: "Find anything across every connected source from one box.",
+                  title: "Durable DBOS Workflows",
+                  body: "Step-level checkpointing guarantees pipeline resumption if a process or render gets interrupted.",
                 },
               ]}
             />
@@ -264,32 +277,32 @@ export default async function HomePage() {
         <Section theme="light">
           <Reveal>
             <FeatureBento
-              eyebrow="AI Chat"
+              eyebrow="Pedagogical RAG"
               title={
                 <>
-                  Answers grounded in <em>your own work.</em>
+                  EduClaw <em>Knowledge Ingestion.</em>
                 </>
               }
-              description="Ask questions in plain English and get answers with citations. Your assistant remembers context and adapts as your work evolves."
-              cta={{ label: "Try the chat", href: ROUTES.CHAT }}
-              mockup={<FeatureMockup kind="agents" className="max-w-none" />}
+              description="Ingest textbooks, research papers, and course syllabi. EduClaw extracts mathematical theorems and maps core concepts directly to visual animation cues."
+              cta={{ label: "View knowledge base", href: ROUTES.RAG }}
+              mockup={<FeatureMockup kind="rag" className="max-w-none" />}
               mockupSide="right"
-              stat={{ value: "100%", label: "answers cite their sources" }}
+              stat={{ value: "100%", label: "LaTeX formula fidelity" }}
               bullets={[
                 {
                   icon: Quote,
-                  title: "Cites sources, every time",
-                  body: "Every answer links back to the document or ticket it came from.",
+                  title: "LaTeX MathTex Native",
+                  body: "Flawless rendering of complex equations, matrices, integrals, and coordinate systems.",
                 },
                 {
-                  icon: Workflow,
-                  title: "Multi-step reasoning",
-                  body: "Breaks complex requests into steps and acts on each.",
+                  icon: Search,
+                  title: "Concept-to-Scene Mapping",
+                  body: "Automatically queries syllabus definitions to ground every visual beat in textbook clarity.",
                 },
                 {
                   icon: Smartphone,
-                  title: "Works on web and mobile",
-                  body: "Identical across devices, plus Slack and Teams integrations.",
+                  title: "Multimodal Video & Slides",
+                  body: "Outputs standard MP4 videos or interactive Manim Slides for web and live presentations.",
                 },
               ]}
             />
@@ -299,32 +312,32 @@ export default async function HomePage() {
         <Section theme="dark">
           <Reveal>
             <FeatureBento
-              eyebrow="Insights"
+              eyebrow="Studio Engine"
               title={
                 <>
-                  Know what your team <em>is asking.</em>
+                  60 FPS <em>Docker Rendering.</em>
                 </>
               }
-              description="A live dashboard of every question asked, answer rated, and workflow run. Spot gaps, find power users, and prove the ROI."
-              cta={{ label: "Explore the dashboard", href: ROUTES.DASHBOARD }}
+              description="High-speed containerized Manim rendering paired with Kyutai DSM speech synthesis. Millisecond-accurate word timestamps keep audio locked to visual animations."
+              cta={{ label: "Inspect render studio", href: ROUTES.DASHBOARD }}
               mockup={<FeatureMockup kind="billing" className="max-w-none" />}
               mockupSide="left"
-              stat={{ value: "+18%", label: "avg. monthly engagement" }}
+              stat={{ value: "60 FPS", label: "smooth vector animations" }}
               bullets={[
                 {
                   icon: Users,
-                  title: "Usage by team or person",
-                  body: "Drill down to see who's getting value and where questions concentrate.",
+                  title: "Kyutai DSM Audio Alignment",
+                  body: "Delayed Streams Modeling produces studio-grade narration with native word-level timestamps.",
                 },
                 {
                   icon: ThumbsUp,
-                  title: "Quality feedback loop",
-                  body: "Users rate answers; you see what's working and what to improve.",
+                  title: "Persistent Docker Containers",
+                  body: "Pre-warmed render environments eliminate cold start latency for rapid scene compilation.",
                 },
                 {
                   icon: Download,
-                  title: "Export to your warehouse",
-                  body: "Stream events to BigQuery, Snowflake or your tools via the API.",
+                  title: "Direct Code & Video Export",
+                  body: "Download raw compilable Manim Python scripts, LectureIR JSON, or 1080p/4K video assets.",
                 },
               ]}
             />
@@ -335,14 +348,13 @@ export default async function HomePage() {
           <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 -z-10" />
           <div className="mb-14 max-w-2xl">
             <div className="mb-5">
-              <span className="eyebrow-badge">How it connects</span>
+              <span className="eyebrow-badge">The AOS Pipeline</span>
             </div>
             <h2 className="text-display-lg text-foreground [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
-              Your data flows in. <em>Answers come back.</em>
+              From raw concept. <em>To cinematic animation.</em>
             </h2>
             <p className="text-foreground/70 mt-5 max-w-xl text-lg leading-relaxed">
-              Source documents, conversations, and cloud files are continuously indexed. Every
-              answer is grounded in your own work — with citations back to the source.
+              Every lecture travels through our structured Pydantic AI graph. Agents architect visual scenes, write verified Manim code, align Kyutai speech timestamps, and Docker renders the final video.
             </p>
           </div>
           <Reveal>
@@ -352,7 +364,7 @@ export default async function HomePage() {
 
         <Section theme="dark" id="security">
           <Reveal>
-            <EnterpriseSecurity cta={{ label: "Read our security overview", href: ROUTES.SECURITY }} />
+            <EnterpriseSecurity cta={{ label: "Read our architecture overview", href: ROUTES.SECURITY }} />
           </Reveal>
         </Section>
 
@@ -365,14 +377,14 @@ export default async function HomePage() {
         <Section theme="dark">
           <Reveal>
             <CaseStudy
-              quote="We replaced three internal tools and cut answer time from hours to seconds. Onboarding a new hire used to take a month — now it's a week."
-              name="Marta Kowal"
-              role="COO"
-              company="Northwind Labs"
+              quote="AOS transformed how we create university-level physics and calculus animations. Visualizing complex differential equations used to take our animator weeks — now we produce verified, synchronized videos before each class."
+              name="Dr. Julian Vance"
+              role="Director of Digital Pedagogy"
+              company="Cambridge STEM Lab"
               metrics={[
-                { value: "−68%", label: "time to first answer" },
-                { value: "3×", label: "faster onboarding" },
-                { value: "12 hrs", label: "saved per person / week" },
+                { value: "−92%", label: "production turnaround time" },
+                { value: "60 FPS", label: "native render quality" },
+                { value: "100%", label: "LaTeX formula accuracy" },
               ]}
             />
           </Reveal>
@@ -394,18 +406,16 @@ export default async function HomePage() {
           <Reveal>
             <ComparisonTable
               brand={APP_NAME}
-              alternatives={["Generic AI chat", "DIY / in-house"]}
+              alternatives={["Manual Manim Scripting", "Slide Decks / Screencasts"]}
               rows={[
-                { feature: "Grounded in your own data", cells: ["yes", "no", "partial"] },
-                { feature: "Citations on every answer", cells: ["yes", "no", "partial"] },
-                { feature: "Connects to your tools", cells: ["yes", "partial", "partial"] },
-                {
-                  feature: "Enterprise security (SSO, audit)",
-                  cells: ["yes", "partial", "partial"],
-                },
-                { feature: "Usage analytics & ROI", cells: ["yes", "no", "partial"] },
-                { feature: "Live in minutes", cells: ["yes", "yes", "no"] },
-                { feature: "Dedicated support", cells: ["yes", "no", "partial"] },
+                { feature: "AI Pedagogical Planning & Outlines", cells: ["yes", "no", "no"] },
+                { feature: "Automated Manim Scene Synthesis", cells: ["yes", "no", "no"] },
+                { feature: "Word-Aligned Voiceover (Kyutai DSM)", cells: ["yes", "no", "no"] },
+                { feature: "3Blue1Brown-Grade Vector Visuals", cells: ["yes", "yes", "no"] },
+                { feature: "Autonomous Schema Repair & Linting", cells: ["yes", "no", "no"] },
+                { feature: "Fast Dockerized Container Rendering", cells: ["yes", "partial", "yes"] },
+                { feature: "Interactive Manim Slides Export", cells: ["yes", "partial", "partial"] },
+                { feature: "Self-Hosted & Local Model Support", cells: ["yes", "yes", "partial"] },
               ]}
             />
           </Reveal>

@@ -1,20 +1,20 @@
-import { ChevronRight, MessageSquare, UploadCloud, UserPlus } from "lucide-react";
+import { ChevronRight, FileCode2, Layers, Video } from "lucide-react";
 
 const STEPS = [
   {
-    icon: UserPlus,
-    title: "Sign up in seconds",
-    body: "Create your account, invite your team, and pick the plan that fits. No credit card required for the trial.",
+    icon: FileCode2,
+    title: "Define Topic or Ingest Notes",
+    body: "Enter a STEM theorem, prompt, or upload course notes and PDFs. AOS extracts pedagogical objectives and structural concepts.",
   },
   {
-    icon: UploadCloud,
-    title: "Connect your data",
-    body: "Upload documents or sync from Google Drive, S3, or Notion. Your assistant learns from everything you bring.",
+    icon: Layers,
+    title: "Agentic Storyboard & Synthesis",
+    body: "Pydantic AI agents architect scene layouts, generate precise Manim code, structure beat timings, and run self-correcting validation loops.",
   },
   {
-    icon: MessageSquare,
-    title: "Start working with AI",
-    body: "Ask questions, run workflows, and let the agent take action — across web, mobile, and your favourite chat tools.",
+    icon: Video,
+    title: "Docker Render & 60fps Export",
+    body: "Isolated Manim containers render high-definition vector animations with synchronized Kyutai DSM speech and exportable presentation slides.",
   },
 ];
 

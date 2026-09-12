@@ -1,4 +1,4 @@
-import { Clock, MessageSquare, Search, Zap, type LucideIcon } from "lucide-react";
+import { Film, Sliders, Sparkles, Zap, type LucideIcon } from "lucide-react";
 
 import { AnimatedNumber } from "./animated-number";
 
@@ -6,10 +6,10 @@ const CARD =
   "group border-foreground/12 bg-card lift hover:border-foreground/25 rounded-2xl border p-7 transition-colors";
 
 const METRICS: { icon: LucideIcon; value: string; label: string }[] = [
-  { icon: Clock, value: "10 hrs", label: "saved per person every week" },
-  { icon: Zap, value: "3×", label: "faster team onboarding" },
-  { icon: MessageSquare, value: "92%", label: "of questions answered instantly" },
-  { icon: Search, value: "40%", label: "less time spent searching" },
+  { icon: Zap, value: "10×", label: "faster lecture video production" },
+  { icon: Film, value: "60 FPS", label: "crisp vector Manim rendering" },
+  { icon: Sparkles, value: "99.8%", label: "beat-to-speech alignment accuracy" },
+  { icon: Sliders, value: "0", label: "manual animation keyframing required" },
 ];
 
 export function OutcomesBand() {
