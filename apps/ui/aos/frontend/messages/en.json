@@ -378,86 +378,86 @@
       "pricing": "Pricing",
       "faq": "FAQ",
       "blog": "Blog",
+      "platform": "Platform",
+      "solutions": "Solutions",
+      "customers": "Educators",
+      "resources": "Resources",
       "changelog": "Changelog",
       "about": "About",
       "contact": "Contact",
       "help": "Help",
       "community": "Community",
       "security": "Security",
-      "getStarted": "Get started",
-      "signIn": "Sign in",
-      "platform": "Platform",
-      "solutions": "Solutions",
-      "customers": "Customers",
-      "resources": "Resources"
+      "getStarted": "Get Started",
+      "signIn": "Sign In"
     },
     "menu": {
-      "product": "Product",
+      "product": "Platform",
+      "seePricing": "View compute plans",
       "solutions": "Solutions",
+      "talkToSales": "Contact team",
       "resources": "Resources",
-      "seePricing": "See pricing",
-      "talkToSales": "Talk to sales",
       "items": {
         "overview": {
           "label": "Overview",
-          "desc": "The whole platform at a glance"
+          "desc": "Multi-agent Manim generation pipeline"
         },
         "howItWorks": {
-          "label": "How it works",
-          "desc": "From sign-up to first answer in minutes"
+          "label": "How It Works",
+          "desc": "From prompt to 60fps vector video"
         },
         "insights": {
-          "label": "Insights",
-          "desc": "Track usage, answer quality and ROI"
+          "label": "Agent Architecture",
+          "desc": "Pydantic AI graph with self-repairing AST"
         },
         "changelog": {
           "label": "Changelog",
-          "desc": "New features, shipped every week"
+          "desc": "Latest engine releases and features"
         },
         "support": {
-          "label": "Customer support",
-          "desc": "Resolve tickets faster with grounded answers"
+          "label": "STEM Educators",
+          "desc": "University lectures & visual courseware"
         },
         "sales": {
-          "label": "Sales teams",
-          "desc": "Surface the right deck, doc and number instantly"
+          "label": "Technical Creators",
+          "desc": "3Blue1Brown-quality explainer animations"
         },
         "knowledge": {
-          "label": "Internal knowledge",
-          "desc": "One place to ask across every tool"
+          "label": "EduClaw RAG",
+          "desc": "Textbook and syllabus knowledge extraction"
         },
         "research": {
-          "label": "Research & analysis",
-          "desc": "Summarize, compare and decide with citations"
+          "label": "Research & Labs",
+          "desc": "Academic deployments & custom pipelines"
         },
         "help": {
-          "desc": "Guides, tutorials and answers"
+          "desc": "Guides, setup instructions, and FAQs"
         },
         "api": {
-          "desc": "Build on our REST API"
+          "desc": "Interactive REST API and schema docs"
         },
         "security": {
-          "desc": "How we keep your data safe"
+          "desc": "Data privacy, encryption, and sandboxing"
         },
         "community": {
-          "desc": "Join the conversation"
+          "desc": "Join our community of math animators"
         },
         "blog": {
-          "desc": "Product news and playbooks"
+          "desc": "Deep dives into math visualization and AI"
         }
       }
     },
     "footer": {
-      "tagline": "The AI assistant that knows your work.",
-      "product": "Product",
-      "company": "Company",
+      "product": "Platform",
+      "company": "Project",
       "resources": "Resources",
-      "helpCenter": "Help center",
-      "apiDocs": "API docs",
+      "helpCenter": "Documentation",
+      "apiDocs": "API Reference",
       "terms": "Terms",
       "privacy": "Privacy",
       "cookies": "Cookies",
-      "operational": "All systems operational"
+      "operational": "All rendering systems operational",
+      "tagline": "Multi-agent cognitive architecture for 3Blue1Brown-quality Manim animations and synchronized voiceover."
     },
     "cookies": {
       "title": "We use cookies",
@@ -1012,90 +1012,6 @@
           "a": "Yes, we offer special academic lab and campus-wide licensing with custom vector knowledge stores and priority GPU queues."
         }
       ]
-    },
-    "nav": {
-      "features": "Features",
-      "howItWorks": "How it works",
-      "pricing": "Pricing",
-      "faq": "FAQ",
-      "blog": "Blog",
-      "platform": "Platform",
-      "solutions": "Solutions",
-      "customers": "Educators",
-      "resources": "Resources",
-      "changelog": "Changelog",
-      "about": "About",
-      "contact": "Contact",
-      "security": "Security",
-      "community": "Community"
-    },
-    "menu": {
-      "product": "Platform",
-      "seePricing": "View compute plans",
-      "solutions": "Solutions",
-      "talkToSales": "Contact team",
-      "resources": "Resources",
-      "items": {
-        "overview": {
-          "label": "Overview",
-          "desc": "Multi-agent Manim generation pipeline"
-        },
-        "howItWorks": {
-          "label": "How It Works",
-          "desc": "From prompt to 60fps vector video"
-        },
-        "insights": {
-          "label": "Agent Architecture",
-          "desc": "Pydantic AI graph with self-repairing AST"
-        },
-        "changelog": {
-          "label": "Changelog",
-          "desc": "Latest engine releases and features"
-        },
-        "support": {
-          "label": "STEM Educators",
-          "desc": "University lectures & visual courseware"
-        },
-        "sales": {
-          "label": "Technical Creators",
-          "desc": "3Blue1Brown-quality explainer animations"
-        },
-        "knowledge": {
-          "label": "EduClaw RAG",
-          "desc": "Textbook and syllabus knowledge extraction"
-        },
-        "research": {
-          "label": "Research & Labs",
-          "desc": "Academic deployments & custom pipelines"
-        },
-        "help": {
-          "desc": "Guides, setup instructions, and FAQs"
-        },
-        "api": {
-          "desc": "Interactive REST API and schema docs"
-        },
-        "security": {
-          "desc": "Data privacy, encryption, and sandboxing"
-        },
-        "community": {
-          "desc": "Join our community of math animators"
-        },
-        "blog": {
-          "desc": "Deep dives into math visualization and AI"
-        }
-      }
-    },
-    "footer": {
-      "product": "Platform",
-      "company": "Project",
-      "resources": "Resources",
-      "helpCenter": "Documentation",
-      "apiDocs": "API Reference",
-      "terms": "Terms",
-      "privacy": "Privacy",
-      "cookies": "Cookies",
-      "operational": "All rendering systems operational",
-      "tagline": "Multi-agent cognitive architecture for 3Blue1Brown-quality Manim animations and synchronized voiceover."
     }
   }
-}
+}
