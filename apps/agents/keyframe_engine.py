@@ -36,6 +36,11 @@ from tools.timeline_assembler import (
     get_media_duration,
     hold_final_state,
 )
+from tools.visual_critic import (
+    VisualContext,
+    VisualCriticVerdict,
+    get_visual_critic,
+)
 
 
 @dataclass
@@ -973,6 +978,50 @@ def assemble_teaching_segment(
     return None
 
 
+def repair_visual_anchor_code(
+    original_code: str,
+    segment: TeachingSegment,
+    verdict: VisualCriticVerdict,
+    client: OpenAI,
+    model: str,
+) -> str:
+    """Repairs Manim animation code based on concrete visual feedback from the Visual Critic."""
+    repair_prompt = (
+        f"Topic: {segment.concept}\n"
+        f"Displayed Formula: {segment.visual_anchor.latex or ''}\n"
+        f"Visible Elements: {segment.visual_anchor.visible_elements}\n"
+        f"Key Definitions: {segment.visual_anchor.key_definitions}\n\n"
+        f"{verdict.feedback_for_code_repair}\n\n"
+        f"Previous Manim Code:\n```python\n{original_code}\n```\n\n"
+        "Please provide the repaired, fully working Manim code snippet.\n"
+        "CRITICAL REQUIREMENTS:\n"
+        "1. Fix all reported visual defects (e.g. scale formulas with scale_to_fit_width to fit [-6, 6], add vertical buffers to prevent collisions, ensure bright contrast colors).\n"
+        "2. Output ONLY clean executable Python code inside ```python ... ``` without Scene class or construct definition.\n"
+        "3. Start directly with mobjects and self.play(...)."
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert mathematical animator repairing Manim code based on Visual Critic inspection. Output strictly executable code inside ```python ... ``` without Scene class.",
+                },
+                {"role": "user", "content": repair_prompt},
+            ],
+            temperature=0.2,
+        )
+        content = resp.choices[0].message.content or ""
+        _, repaired_code = _parse_visual_output(content)
+        if repaired_code and repaired_code.strip():
+            return repaired_code
+    except Exception as exc:
+        print(f"[Visual Critic Repair Warning] Slide {segment.slide_num} repair LLM failed: {exc}", file=sys.stderr)
+
+    return original_code
+
+
 def run_producer_consumer(
     prompt: str,
     *,
@@ -1045,11 +1094,58 @@ def run_producer_consumer(
         _notify("VALIDATING_CODE", f"Validating code for Slide {i}")
         _notify("RENDERING", f"Rendering visual anchor for Slide {i}")
 
-        # Step 1: Render Visual Anchor
-        visual_path = render_visual_anchor(segment, run_dir, quality=quality)
-        if visual_path and visual_path.is_file():
+        # Step 1: Render Visual Anchor with Visual Critic Feedback & Retry Loop
+        visual_critic = get_visual_critic()
+        max_visual_retries = int(os.getenv("AOS_VISUAL_CRITIC_MAX_RETRIES", "2"))
+
+        visual_path = None
+        for attempt in range(max_visual_retries + 1):
+            att_label = f" (attempt {attempt + 1}/{max_visual_retries + 1})" if attempt > 0 else ""
+            _notify("RENDERING", f"Rendering visual anchor for Slide {i}{att_label}")
+            visual_path = render_visual_anchor(segment, run_dir, quality=quality)
+            if not visual_path or not visual_path.is_file():
+                continue
+
             segment.visual_path = str(visual_path)
             segment.visual_duration = get_media_duration(visual_path)
+
+            # Extract keyframe snapshot for inspection
+            keyframe_path = run_dir / f"slide_{i}_keyframe_att{attempt + 1}.png"
+            extracted_frame = visual_critic.extract_keyframe(visual_path, keyframe_path)
+
+            v_context = VisualContext(
+                slide_num=i,
+                concept=segment.concept,
+                learning_objective=segment.learning_objective,
+                latex_formula=segment.visual_anchor.latex or "",
+                visible_elements=segment.visual_anchor.visible_elements,
+                key_definitions=segment.visual_anchor.key_definitions,
+                manim_code=segment.manim_code,
+            )
+
+            _notify("VISUAL_CRITIC", f"Inspecting Slide {i} with Visual Critic ({visual_critic.name})")
+            verdict = visual_critic.critique_frame(extracted_frame, v_context)
+            segment.visual_verdict = verdict.model_dump()
+
+            if verdict.passed:
+                _notify("VISUAL_CRITIC_PASS", f"Slide {i} passed visual critic inspection (Score: {verdict.score:.2f})")
+                break
+            else:
+                issues_summary = ", ".join(verdict.detected_issues[:3]) if verdict.detected_issues else "Layout defect"
+                _notify("VISUAL_CRITIC_DEFECTS", f"Slide {i} defects: {issues_summary}")
+                if attempt < max_visual_retries:
+                    _notify("VISUAL_CRITIC_REPAIR", f"Repairing Slide {i} Manim code using critic feedback ({attempt + 1}/{max_visual_retries})...")
+                    repaired_code = repair_visual_anchor_code(
+                        original_code=segment.manim_code,
+                        segment=segment,
+                        verdict=verdict,
+                        client=client,
+                        model=effective_model,
+                    )
+                    if repaired_code and repaired_code.strip():
+                        segment.manim_code = repaired_code
+                else:
+                    _notify("VISUAL_CRITIC_EXHAUSTED", f"Slide {i} max visual retries reached. Retaining best render.")
 
         # Step 2: Synthesize Authoritative Pedagogical Narration
         audio_path = run_dir / f"slide_{i}_audio.wav"
@@ -1102,6 +1198,7 @@ def run_producer_consumer(
                 "chunk_path": s.chunk_path,
                 "key_definitions": s.visual_anchor.key_definitions,
                 "layout_type": s.visual_anchor.layout_type,
+                "visual_verdict": s.visual_verdict,
             }
             for s in segments
         ],

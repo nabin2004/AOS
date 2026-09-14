@@ -71,20 +71,40 @@ def extract_keyframes(
 
 def get_vision_model() -> str:
     """Retrieve the configured multimodal vision model identifier."""
-    return os.getenv("EDUCLAW_VISION_MODEL", "openrouter:openai/gpt-4o-mini")
+    return (
+        os.getenv("AOS_VISUAL_CRITIC_MODEL")
+        or os.getenv("EDUCLAW_VISION_MODEL")
+        or "openrouter:google/gemini-2.5-flash"
+    )
 
 
 def inspect_keyframe_mock(frame_path: Path, timestamp: float) -> FrameInspection:
     """Heuristic / stub inspector when running in offline or test mode."""
-    return FrameInspection(
-        timestamp_sec=timestamp,
-        frame_path=str(frame_path),
-        has_overlaps=False,
-        has_clipping=False,
-        contrast_issue=False,
-        description="Frame passes visual boundaries and text clearance checks.",
-        suggested_fix="",
-    )
+    try:
+        from tools.visual_critic import HeuristicVisionCritic
+        critic = HeuristicVisionCritic()
+        v = critic.critique_frame(frame_path)
+        has_clipping = any(c.question_id == "equation_cutoff" and not c.passed for c in v.checks)
+        has_overlaps = any(c.question_id == "objects_overlapping" and not c.passed for c in v.checks)
+        return FrameInspection(
+            timestamp_sec=timestamp,
+            frame_path=str(frame_path),
+            has_overlaps=has_overlaps,
+            has_clipping=has_clipping,
+            contrast_issue=not v.passed,
+            description="; ".join(v.detected_issues) if v.detected_issues else "Frame passed visual safety checks.",
+            suggested_fix="; ".join(v.suggested_fixes),
+        )
+    except Exception:
+        return FrameInspection(
+            timestamp_sec=timestamp,
+            frame_path=str(frame_path),
+            has_overlaps=False,
+            has_clipping=False,
+            contrast_issue=False,
+            description="Frame passes visual boundaries and text clearance checks.",
+            suggested_fix="",
+        )
 
 
 async def inspect_video_frames(

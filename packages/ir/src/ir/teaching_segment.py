@@ -8,7 +8,7 @@ whose authoritative TTS duration drives the final segment duration via visual-st
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Any, List, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -122,6 +122,10 @@ class TeachingSegment(BaseModel):
     chunk_path: Optional[str] = Field(
         default=None,
         description="Filesystem path to the combined segment MP4 (animation + hold + audio).",
+    )
+    visual_verdict: Optional[dict[str, Any]] = Field(
+        default=None,
+        description="Visual Critic QC verdict, scores, and defect inspection.",
     )
 
     @property
