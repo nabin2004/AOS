@@ -41,11 +41,13 @@ class MoondreamCritic(BaseVisualCritic):
         pass_threshold: float = 0.70,
         use_ollama: bool = False,
         ollama_base_url: Optional[str] = None,
+        timeout: float = 20.0,
     ) -> None:
         super().__init__(model_name=model_name, backend_name="moondream", pass_threshold=pass_threshold)
         self.device = device
         self.use_ollama = use_ollama
         self.ollama_base_url = ollama_base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+        self.timeout = float(os.getenv("AOS_VISUAL_CRITIC_RETRY_TIMEOUT", str(timeout)))
         self._fallback_critic = HeuristicVisionCritic()
 
     def _ensure_local_model(self):
@@ -112,7 +114,7 @@ class MoondreamCritic(BaseVisualCritic):
         }
 
         url = f"{self.ollama_base_url.rstrip('/')}/api/generate"
-        resp = httpx.post(url, json=payload, timeout=30.0)
+        resp = httpx.post(url, json=payload, timeout=self.timeout)
         resp.raise_for_status()
         data = resp.json()
         return data.get("response", "").strip()

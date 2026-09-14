@@ -1254,6 +1254,7 @@ def repair_visual_anchor_code(
     verdict: VisualCriticVerdict,
     client: OpenAI,
     model: str,
+    timeout: float = 20.0,
 ) -> str:
     """Repairs Manim animation code based on concrete visual feedback from the Visual Critic."""
     repair_prompt = (
@@ -1281,6 +1282,7 @@ def repair_visual_anchor_code(
                 {"role": "user", "content": repair_prompt},
             ],
             temperature=0.2,
+            timeout=timeout,
         )
         content = resp.choices[0].message.content or ""
         _, repaired_code = _parse_visual_output(content)
@@ -1318,13 +1320,14 @@ def _process_single_slide(
     _notify("VALIDATING_CODE", f"Validating code for Slide {i}")
     _notify("RENDERING", f"Rendering visual anchor for Slide {i}")
 
-    # Step 1: Render Visual Anchor with Visual Critic Feedback & Retry Loop
-    visual_critic = get_visual_critic()
-    max_visual_retries = int(os.getenv("AOS_VISUAL_CRITIC_MAX_RETRIES", "2"))
+    # Step 1: Render Visual Anchor with Moondream Critic Feedback & 3-Try Retry Timeout Loop
+    visual_critic = get_visual_critic(backend=os.getenv("AOS_VISUAL_CRITIC_BACKEND", "moondream"))
+    max_visual_tries = int(os.getenv("AOS_VISUAL_CRITIC_MAX_RETRIES", "3"))
+    retry_timeout_sec = float(os.getenv("AOS_VISUAL_CRITIC_RETRY_TIMEOUT", "20.0"))
 
     visual_path = None
-    for attempt in range(max_visual_retries + 1):
-        att_label = f" (attempt {attempt + 1}/{max_visual_retries + 1})" if attempt > 0 else ""
+    for attempt in range(1, max_visual_tries + 1):
+        att_label = f" (try {attempt}/{max_visual_tries})"
         _notify("RENDERING", f"Rendering visual anchor for Slide {i}{att_label}")
         visual_path = render_visual_anchor(segment, run_dir, quality=quality)
         if not visual_path or not visual_path.is_file():
@@ -1334,7 +1337,7 @@ def _process_single_slide(
         segment.visual_duration = get_media_duration(visual_path)
 
         # Extract keyframe snapshot for inspection
-        keyframe_path = run_dir / f"slide_{i}_keyframe_att{attempt + 1}.png"
+        keyframe_path = run_dir / f"slide_{i}_keyframe_att{attempt}.png"
         extracted_frame = visual_critic.extract_keyframe(visual_path, keyframe_path)
 
         v_context = VisualContext(
@@ -1347,29 +1350,39 @@ def _process_single_slide(
             manim_code=segment.manim_code,
         )
 
-        _notify("VISUAL_CRITIC", f"Inspecting Slide {i} with Visual Critic ({visual_critic.name})")
-        verdict = visual_critic.critique_frame(extracted_frame, v_context)
+        _notify("VISUAL_CRITIC", f"Inspecting Slide {i} with Moondream Critic ({visual_critic.name}) [try {attempt}/{max_visual_tries}]")
+        try:
+            verdict = visual_critic.critique_frame(extracted_frame, v_context)
+        except Exception as vc_err:
+            print(f"[Visual Critic Warning] Slide {i} inspection error: {vc_err}", file=sys.stderr)
+            verdict = visual_critic._fallback_critic.critique_frame(extracted_frame, v_context) if hasattr(visual_critic, "_fallback_critic") else None
+            if not verdict:
+                break
         segment.visual_verdict = verdict.model_dump()
 
         if verdict.passed:
-            _notify("VISUAL_CRITIC_PASS", f"Slide {i} passed visual critic inspection (Score: {verdict.score:.2f})")
+            _notify("VISUAL_CRITIC_PASS", f"Slide {i} passed visual inspection (Score: {verdict.score:.2f}) on try {attempt}")
             break
         else:
             issues_summary = ", ".join(verdict.detected_issues[:3]) if verdict.detected_issues else "Layout defect"
-            _notify("VISUAL_CRITIC_DEFECTS", f"Slide {i} defects: {issues_summary}")
-            if attempt < max_visual_retries:
-                _notify("VISUAL_CRITIC_REPAIR", f"Repairing Slide {i} Manim code using critic feedback ({attempt + 1}/{max_visual_retries})...")
-                repaired_code = repair_visual_anchor_code(
-                    original_code=segment.manim_code,
-                    segment=segment,
-                    verdict=verdict,
-                    client=client,
-                    model=model,
-                )
-                if repaired_code and repaired_code.strip():
-                    segment.manim_code = repaired_code
+            _notify("VISUAL_CRITIC_DEFECTS", f"Slide {i} defects (try {attempt}/{max_visual_tries}): {issues_summary}")
+            if attempt < max_visual_tries:
+                _notify("VISUAL_CRITIC_REPAIR", f"Repairing Slide {i} Manim code using Moondream feedback (try {attempt}/{max_visual_tries}, timeout: {retry_timeout_sec}s)...")
+                try:
+                    repaired_code = repair_visual_anchor_code(
+                        original_code=segment.manim_code,
+                        segment=segment,
+                        verdict=verdict,
+                        client=client,
+                        model=model,
+                        timeout=retry_timeout_sec,
+                    )
+                    if repaired_code and repaired_code.strip():
+                        segment.manim_code = repaired_code
+                except Exception as r_err:
+                    _notify("VISUAL_CRITIC_TIMEOUT", f"Slide {i} repair timed out after {retry_timeout_sec}s on try {attempt}: {r_err}")
             else:
-                _notify("VISUAL_CRITIC_EXHAUSTED", f"Slide {i} max visual retries reached. Retaining best render.")
+                _notify("VISUAL_CRITIC_EXHAUSTED", f"Slide {i} reached max {max_visual_tries} tries. Retaining best visual render.")
 
     # Step 2: Synthesize Authoritative Pedagogical Narration
     audio_path = run_dir / f"slide_{i}_audio.wav"

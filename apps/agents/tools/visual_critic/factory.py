@@ -31,7 +31,7 @@ def get_visual_critic(
     effective_backend = (
         backend
         or os.getenv("AOS_VISUAL_CRITIC_BACKEND")
-        or "auto"
+        or "moondream"
     ).lower().strip()
 
     threshold = float(
@@ -71,9 +71,10 @@ def get_visual_critic(
             effective_backend = "moondream"
 
     # Backend: Moondream (0.5B default, easily replaced with 2B or custom checkpoint)
-    if effective_backend in ("moondream", "moondream_local", "moondream_0.5b"):
-        m_name = raw_model or "vikhyatk/moondream-0_5b"
-        return MoondreamCritic(model_name=m_name, device=dev, pass_threshold=threshold)
+    if effective_backend in ("moondream", "moondream_local", "moondream_0.5b", "moondream-0.5b", "moondream2"):
+        m_name = raw_model or os.getenv("AOS_VISUAL_CRITIC_MODEL") or "vikhyatk/moondream-0_5b"
+        use_ollama = bool(os.getenv("AOS_MOONDREAM_USE_OLLAMA", "0") == "1")
+        return MoondreamCritic(model_name=m_name, device=dev, pass_threshold=threshold, use_ollama=use_ollama)
 
     # Backend: Hybrid (Moondream front-line filter + Gemini Flash escalation)
     if effective_backend == "hybrid":

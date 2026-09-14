@@ -124,7 +124,9 @@ AOS_TTS_VOICE=en-US-ChristopherNeural
 # Concurrency: Number of parallel slide workers (default: 3)
 AOS_MAX_SLIDE_WORKERS=3
 
-# Visual Critic: auto | moondream | heuristic | hybrid | openrouter
-AOS_VISUAL_CRITIC_BACKEND=auto
-AOS_VISUAL_CRITIC_MAX_RETRIES=2
+# Visual Critic: moondream | openrouter | hybrid | heuristic | ollama
+AOS_VISUAL_CRITIC_BACKEND=moondream
+AOS_VISUAL_CRITIC_MODEL=vikhyatk/moondream-0_5b
+AOS_VISUAL_CRITIC_MAX_RETRIES=3
+AOS_VISUAL_CRITIC_RETRY_TIMEOUT=20.0
 ```

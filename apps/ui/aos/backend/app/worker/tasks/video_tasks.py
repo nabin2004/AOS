@@ -64,6 +64,12 @@ _STAGE_MESSAGES: dict[str, str] = {
     "VALIDATING_VIDEO": "Validating output animation video…",
     "VIDEO_VALIDATION_FAILED": "Validating video output…",
     "TIMELINE_HOLD": "Synchronizing visual anchor with in-depth narration…",
+    "VISUAL_CRITIC": "Inspecting slide layout with Moondream visual critic…",
+    "VISUAL_CRITIC_PASS": "Slide passed Moondream visual inspection…",
+    "VISUAL_CRITIC_DEFECTS": "Detected visual defects, initiating repair…",
+    "VISUAL_CRITIC_REPAIR": "Repairing slide Manim code with Moondream feedback…",
+    "VISUAL_CRITIC_TIMEOUT": "Visual critic repair timed out, proceeding safely…",
+    "VISUAL_CRITIC_EXHAUSTED": "Visual critic retries reached limit…",
 }
 
 _REPEATABLE_STAGES: set[str] = {
@@ -79,6 +85,12 @@ _REPEATABLE_STAGES: set[str] = {
     "TIMELINE_HOLD",
     "PlanTeachingScriptNode",
     "CodeAgent",
+    "VISUAL_CRITIC",
+    "VISUAL_CRITIC_PASS",
+    "VISUAL_CRITIC_DEFECTS",
+    "VISUAL_CRITIC_REPAIR",
+    "VISUAL_CRITIC_TIMEOUT",
+    "VISUAL_CRITIC_EXHAUSTED",
 }
 
 

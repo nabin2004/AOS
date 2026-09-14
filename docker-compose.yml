@@ -137,6 +137,9 @@ services:
       - API_KEY=${API_KEY:-change-me-in-production}
       - AGENTS_DIR=/app/apps/agents
       - AGENTS_UV_CMD=${AGENTS_UV_CMD:-uv}
+      - AOS_VISUAL_CRITIC_BACKEND=${AOS_VISUAL_CRITIC_BACKEND:-moondream}
+      - AOS_VISUAL_CRITIC_MAX_RETRIES=${AOS_VISUAL_CRITIC_MAX_RETRIES:-3}
+      - AOS_VISUAL_CRITIC_RETRY_TIMEOUT=${AOS_VISUAL_CRITIC_RETRY_TIMEOUT:-20.0}
       - PYTHONPATH=/app:/app/apps/agents:/app/packages/ir/src:/app/packages/store/src
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -206,6 +209,9 @@ services:
       - SECRET_KEY=${SECRET_KEY:-change-me-in-production-use-openssl-rand-hex-32}
       - AGENTS_DIR=/app/apps/agents
       - AGENTS_UV_CMD=${AGENTS_UV_CMD:-uv}
+      - AOS_VISUAL_CRITIC_BACKEND=${AOS_VISUAL_CRITIC_BACKEND:-moondream}
+      - AOS_VISUAL_CRITIC_MAX_RETRIES=${AOS_VISUAL_CRITIC_MAX_RETRIES:-3}
+      - AOS_VISUAL_CRITIC_RETRY_TIMEOUT=${AOS_VISUAL_CRITIC_RETRY_TIMEOUT:-20.0}
       - PYTHONPATH=/app:/app/apps/agents:/app/packages/ir/src:/app/packages/store/src
     extra_hosts:
       - "host.docker.internal:host-gateway"
