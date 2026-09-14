@@ -121,6 +121,30 @@ class VideoStorage:
         response = client.get_object(Bucket=self.bucket, Key=key)
         return response["Body"]
 
+    def open_stream_range(
+        self,
+        key: str,
+        range_header: str | None = None,
+    ) -> tuple[Any, int, dict[str, str]]:
+        """Return a streaming body and HTTP headers with byte-range support."""
+        self.ensure_bucket()
+        client = self._get_client()
+        kwargs: dict[str, Any] = {"Bucket": self.bucket, "Key": key}
+        if range_header:
+            kwargs["Range"] = range_header
+        response = client.get_object(**kwargs)
+        status_code = 206 if range_header and "ContentRange" in response else 200
+        headers: dict[str, str] = {
+            "Content-Type": response.get("ContentType", "video/mp4"),
+            "Accept-Ranges": "bytes",
+            "Cache-Control": "private, max-age=3600",
+        }
+        if "ContentLength" in response:
+            headers["Content-Length"] = str(response["ContentLength"])
+        if "ContentRange" in response:
+            headers["Content-Range"] = str(response["ContentRange"])
+        return response["Body"], status_code, headers
+
     def object_exists(self, key: str) -> bool:
         try:
             self.ensure_bucket()

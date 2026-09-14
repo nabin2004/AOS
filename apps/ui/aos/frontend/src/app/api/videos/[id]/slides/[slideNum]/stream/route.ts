@@ -4,10 +4,10 @@ const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string; slideNum: string }> },
 ) {
   try {
-    const { id } = await params;
+    const { id, slideNum } = await params;
     const accessToken =
       request.cookies.get("access_token")?.value ||
       request.nextUrl.searchParams.get("token") ||
@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
     }
 
-    const url = `${BACKEND_URL}/api/v1/videos/${id}/stream`;
+    const url = `${BACKEND_URL}/api/v1/videos/${id}/slides/${slideNum}/stream`;
     const forwardHeaders: Record<string, string> = {
       Authorization: `Bearer ${accessToken}`,
     };
@@ -32,13 +32,13 @@ export async function GET(
     });
 
     if (!response.ok) {
-      return NextResponse.json({ detail: "Video not found" }, { status: response.status });
+      return NextResponse.json({ detail: "Slide video not found" }, { status: response.status });
     }
 
     const responseHeaders: Record<string, string> = {
       "Content-Type": response.headers.get("content-type") || "video/mp4",
       "Content-Disposition":
-        response.headers.get("content-disposition") || `inline; filename="${id}.mp4"`,
+        response.headers.get("content-disposition") || `inline; filename="${id}_slide_${slideNum}.mp4"`,
       "Cache-Control": "private, max-age=3600",
       "Accept-Ranges": "bytes",
     };
@@ -53,7 +53,6 @@ export async function GET(
       responseHeaders["Content-Range"] = contentRange;
     }
 
-    // Stream through with original status (206 Partial Content or 200 OK)
     return new NextResponse(response.body, {
       status: response.status,
       headers: responseHeaders,

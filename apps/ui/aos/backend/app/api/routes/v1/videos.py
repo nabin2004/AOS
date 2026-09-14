@@ -3,7 +3,7 @@
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
 
 from app.api.deps import CurrentUser, VideoGenerationSvc
@@ -43,48 +43,40 @@ async def get_video(
 @router.get("/{video_id}/stream", response_model=None)
 async def stream_video(
     video_id: UUID,
+    request: Request,
     service: VideoGenerationSvc,
     user: CurrentUser,
 ) -> Any:
-    """Auth-gated proxy stream from MinIO (inline for Video.js)."""
+    """Auth-gated proxy stream from MinIO with full byte-range support."""
     try:
         row = await service.get_for_user(video_id, user.id)
-        body = service.open_stream_for(row)
+        range_header = request.headers.get("range")
+        body, status_code, headers = service.open_stream_for(row, range_header=range_header)
     except NotFoundError:
-        from fastapi import HTTPException
-
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video not found") from None
 
-    headers = {
-        "Content-Disposition": f'inline; filename="{video_id}.mp4"',
-        "Accept-Ranges": "bytes",
-        "Cache-Control": "private, max-age=3600",
-    }
-    return StreamingResponse(body, media_type="video/mp4", headers=headers)
+    headers["Content-Disposition"] = f'inline; filename="{video_id}.mp4"'
+    return StreamingResponse(body, status_code=status_code, media_type="video/mp4", headers=headers)
 
 
 @router.get("/{video_id}/slides/{slide_num}/stream", response_model=None)
 async def stream_slide_video(
     video_id: UUID,
     slide_num: int,
+    request: Request,
     service: VideoGenerationSvc,
     user: CurrentUser,
 ) -> Any:
-    """Auth-gated proxy stream for an individual slide/teaching segment MP4."""
+    """Auth-gated proxy stream for an individual slide/teaching segment MP4 with byte-range support."""
     try:
         row = await service.get_for_user(video_id, user.id)
-        body = service.open_slide_stream_for(row, slide_num)
+        range_header = request.headers.get("range")
+        body, status_code, headers = service.open_slide_stream_for(row, slide_num, range_header=range_header)
     except NotFoundError:
-        from fastapi import HTTPException
-
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Slide {slide_num} not found") from None
 
-    headers = {
-        "Content-Disposition": f'inline; filename="{video_id}_slide_{slide_num}.mp4"',
-        "Accept-Ranges": "bytes",
-        "Cache-Control": "private, max-age=3600",
-    }
-    return StreamingResponse(body, media_type="video/mp4", headers=headers)
+    headers["Content-Disposition"] = f'inline; filename="{video_id}_slide_{slide_num}.mp4"'
+    return StreamingResponse(body, status_code=status_code, media_type="video/mp4", headers=headers)
 
 
 @router.get("/{video_id}/code", response_model=None)

@@ -114,7 +114,7 @@ export function GenerationTimeline({
       durationMs =
         executed.duration_ms ??
         (status === "running" ? Math.max(100, now - executed.timestamp) : undefined);
-    } else if (idx < highestCanonicalIndex) {
+    } else if (idx < highestCanonicalIndex || currentStatus === "completed") {
       status = "completed";
     }
 

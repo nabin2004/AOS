@@ -237,7 +237,54 @@ class VideoGenerationService:
             generation_id=row.id,
         )
 
-    def open_stream_for(self, row: VideoGeneration) -> BinaryIO:
+    def _open_local_file_range(
+        self,
+        path: Path,
+        range_header: str | None = None,
+    ) -> tuple[Any, int, dict[str, str]]:
+        total_size = path.stat().st_size
+        headers: dict[str, str] = {
+            "Content-Type": "video/mp4",
+            "Accept-Ranges": "bytes",
+            "Cache-Control": "private, max-age=3600",
+        }
+        if range_header:
+            units, _, spec = range_header.strip().partition("=")
+            if units.strip().lower() == "bytes":
+                s_str, _, e_str = spec.strip().partition("-")
+                start = int(s_str.strip()) if s_str.strip() else 0
+                end = int(e_str.strip()) if e_str.strip() else total_size - 1
+                end = min(end, total_size - 1)
+                length = max(0, end - start + 1)
+
+                def iter_slice():
+                    with open(path, "rb") as f:
+                        f.seek(start)
+                        rem = length
+                        while rem > 0:
+                            chunk = f.read(min(rem, 64 * 1024))
+                            if not chunk:
+                                break
+                            rem -= len(chunk)
+                            yield chunk
+
+                headers["Content-Range"] = f"bytes {start}-{end}/{total_size}"
+                headers["Content-Length"] = str(length)
+                return iter_slice(), 206, headers
+
+        def iter_full():
+            with open(path, "rb") as f:
+                while chunk := f.read(64 * 1024):
+                    yield chunk
+
+        headers["Content-Length"] = str(total_size)
+        return iter_full(), 200, headers
+
+    def open_stream_for(
+        self,
+        row: VideoGeneration,
+        range_header: str | None = None,
+    ) -> tuple[Any, int, dict[str, str]]:
         from pathlib import Path
 
         if row.status != "completed":
@@ -248,15 +295,15 @@ class VideoGenerationService:
         if row.minio_key:
             try:
                 storage = get_video_storage()
-                return storage.open_stream(row.minio_key)
+                return storage.open_stream_range(row.minio_key, range_header=range_header)
             except Exception as exc:
-                logger.warning("MinIO open_stream failed (%s); falling back to local run_dir", exc)
+                logger.warning("MinIO open_stream_range failed (%s); falling back to local run_dir", exc)
         if row.run_dir:
             run_path = Path(row.run_dir)
             for candidate_name in ("final.mp4", "lecture.mp4"):
                 candidate = run_path / candidate_name
                 if candidate.is_file():
-                    return open(candidate, "rb")
+                    return self._open_local_file_range(candidate, range_header=range_header)
         raise NotFoundError(
             message="Video file not found",
             details={"id": str(row.id)},
@@ -285,7 +332,12 @@ class VideoGenerationService:
             details={"id": str(row.id)},
         )
 
-    def open_slide_stream_for(self, row: VideoGeneration, slide_num: int) -> BinaryIO:
+    def open_slide_stream_for(
+        self,
+        row: VideoGeneration,
+        slide_num: int,
+        range_header: str | None = None,
+    ) -> tuple[Any, int, dict[str, str]]:
         """Stream an individual slide segment MP4 from MinIO or fallback run_dir."""
         from pathlib import Path
 
@@ -297,14 +349,14 @@ class VideoGenerationService:
         )
         try:
             storage = get_video_storage()
-            return storage.open_stream(slide_key)
+            return storage.open_stream_range(slide_key, range_header=range_header)
         except Exception as exc:
             logger.debug("MinIO open_slide_stream failed for %s (%s); checking run_dir", slide_key, exc)
 
         if row.run_dir:
             candidate = Path(row.run_dir) / f"slide_{slide_num}.mp4"
             if candidate.is_file():
-                return open(candidate, "rb")
+                return self._open_local_file_range(candidate, range_header=range_header)
 
         raise NotFoundError(
             message=f"Slide {slide_num} video not found",
