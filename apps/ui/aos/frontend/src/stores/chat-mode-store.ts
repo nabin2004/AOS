@@ -35,7 +35,7 @@ export const useChatModeStore = create<ChatModeState>()(
       deepResearch: false,
       setDeepResearch: (on) => set({ deepResearch: on }),
       toggleDeepResearch: () => set((s) => ({ deepResearch: !s.deepResearch })),
-      videoMode: "animate",
+      videoMode: "off",
       setVideoMode: (mode) => set({ videoMode: mode }),
       harnessMode: "off",
       setHarnessMode: (mode) => set({ harnessMode: mode }),
@@ -46,13 +46,13 @@ export const useChatModeStore = create<ChatModeState>()(
     }),
     {
       name: "chat-mode",
-      version: 4,
+      version: 5,
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Partial<ChatModeState>;
-        if (version < 4) {
+        if (version < 5) {
           return {
             deepResearch: Boolean(state.deepResearch),
-            videoMode: (state.videoMode === "lecture" ? "lecture" : "animate") as VideoMode,
+            videoMode: "off" as VideoMode,
             harnessMode: (state.harnessMode || "off") as HarnessMode,
             headless: state.headless ?? true,
             autoApprove: state.autoApprove ?? true,

@@ -332,8 +332,12 @@ export function ChatInput({
           onKeyDown={handleKeyDown}
           placeholder={
             videoMode === "animate"
-              ? "Describe what you want to animate (e.g. Teach me about Euler's formula)..."
-              : "Type a message..."
+              ? "Describe what you want to animate (1-shot animation)..."
+              : videoMode === "teaching"
+                ? "Enter topic for 1-shot visual anchor lecture..."
+                : videoMode === "lecture"
+                  ? "Enter topic for 1-shot full lecture..."
+                  : "Type a message (click Animate to generate video)..."
           }
           disabled={disabled}
           rows={1}

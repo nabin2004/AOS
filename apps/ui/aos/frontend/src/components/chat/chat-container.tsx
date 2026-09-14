@@ -455,14 +455,19 @@ function ChatUI({
                   )}
                   title={
                     videoMode === "animate"
-                      ? "Animate Mode is ON: Generates Manim animations + synchronized voiceover. Click to switch to normal chat."
-                      : "Click to enable Animate Mode (generates Manim animations + voice narration)"
+                      ? "Animate mode active for this prompt. Automatically returns to simple conversation mode after sending."
+                      : "Click to animate your next message (1-shot; reverts to conversation mode after sending)"
                   }
                 >
                   <Film className="h-3.5 w-3.5" />
                   <span>Animate</span>
-                  {videoMode === "animate" && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  {videoMode === "animate" ? (
+                    <>
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-[9px] font-semibold opacity-90 uppercase">1-shot</span>
+                    </>
+                  ) : (
+                    <span className="text-[9px] opacity-40 uppercase">off</span>
                   )}
                 </button>
               </div>

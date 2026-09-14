@@ -511,10 +511,10 @@ function SettingsPanel({
         <div className="grid grid-cols-4 gap-1">
           {(
             [
-              { value: "off", label: "Off", hint: "Normal chat" },
-              { value: "animate", label: "Animate", hint: "Fast Manim scene" },
-              { value: "teaching", label: "Teaching", hint: "Visual anchor + extended narration" },
-              { value: "lecture", label: "Lecture", hint: "Full IR + assemble" },
+              { value: "off", label: "Off", hint: "Simple conversation mode" },
+              { value: "animate", label: "Animate", hint: "Animate next message (1-shot)" },
+              { value: "teaching", label: "Teaching", hint: "Visual anchor + extended narration (1-shot)" },
+              { value: "lecture", label: "Lecture", hint: "Full IR + assemble (1-shot)" },
             ] as const
           ).map((opt) => (
             <button
@@ -535,12 +535,12 @@ function SettingsPanel({
         </div>
         <p className="text-foreground/55 text-[11px] leading-relaxed">
           {videoMode === "off"
-            ? "Chat replies normally without compiling a video."
+            ? "Simple conversation mode: chat replies normally without compiling a video."
             : videoMode === "animate"
-              ? "Your next prompt runs the animate pipeline (classify → plan → Manim compile)."
+              ? "1-Shot Animate: Your next prompt generates an animation with voiceover, then automatically returns to conversation mode."
               : videoMode === "teaching"
-                ? "Visual Anchor mode: Informative Manim visual anchor + decoupled in-depth teaching narration."
-                : "Your next prompt runs the full lecture pipeline (IR → render → ffmpeg assemble)."}
+                ? "1-Shot Visual Anchor: Informative Manim visual anchor + decoupled in-depth teaching narration, then returns to conversation mode."
+                : "1-Shot Lecture: Full IR pipeline + video assembly, then returns to conversation mode."}
         </p>
       </div>
 

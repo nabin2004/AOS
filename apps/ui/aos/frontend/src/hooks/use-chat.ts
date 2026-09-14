@@ -663,6 +663,8 @@ export function useChat(options: UseChatOptions = {}) {
       const videoMode = useChatModeStore.getState().videoMode;
       if (videoMode === "animate" || videoMode === "teaching" || videoMode === "lecture") {
         payload.video_mode = videoMode;
+        // One-shot Animate: The animate button only applies to this chat turn, then reverts to simple conversation mode
+        useChatModeStore.getState().setVideoMode("off");
       }
       const harnessMode = useChatModeStore.getState().harnessMode;
       if (harnessMode === "educlaw") {
