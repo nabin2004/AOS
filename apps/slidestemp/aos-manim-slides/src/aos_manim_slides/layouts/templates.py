@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional, Union
 
-from manim import VGroup
+from manim import VGroup, VMobject, Mobject
 
 from aos_manim_core import ThemeConfig
 
@@ -70,7 +70,8 @@ class ContentSlide(Slide):
     def __init__(
         self,
         title: str,
-        bullets: List[str],
+        bullets: Optional[List[str]] = None,
+        content: Optional[Any] = None,
         callout: Optional[tuple[str, str]] = None,
         subtitle: Optional[str] = None,
         theme: Optional[ThemeConfig] = None,
@@ -78,7 +79,28 @@ class ContentSlide(Slide):
         total_this_slide_bookmark: str = "",
         **kwargs,
     ) -> None:
-        blocks: list = [ListBlock(items=list(bullets))]
+        blocks: list = []
+        if bullets:
+            blocks.append(ListBlock(items=list(bullets)))
+        elif content:
+            if isinstance(content, (list, tuple)):
+                str_items = []
+                for item in content:
+                    if isinstance(item, str):
+                        str_items.append(item)
+                    elif isinstance(item, VMobject):
+                        blocks.append(RawMobject(mobject=item))
+                    else:
+                        str_items.append(str(item))
+                if str_items:
+                    blocks.append(ListBlock(items=str_items))
+            elif isinstance(content, VMobject):
+                blocks.append(RawMobject(mobject=content))
+            else:
+                blocks.append(ListBlock(items=[str(content)]))
+        else:
+            blocks.append(ListBlock(items=[]))
+
         if callout:
             blocks.append(Callout(title=callout[0], body=callout[1], role="decoration"))
         spec = SlideSpec(
@@ -97,9 +119,11 @@ class TwoColumnSlide(Slide):
 
     def __init__(
         self,
-        title: str,
-        left_content: VGroup,
-        right_content: VGroup,
+        title: Optional[str] = None,
+        left_content: Any = None,
+        right_content: Any = None,
+        left_title: Optional[str] = None,
+        right_title: Optional[str] = None,
         col_width: float = 5.2,
         subtitle: Optional[str] = None,
         theme: Optional[ThemeConfig] = None,
@@ -107,17 +131,33 @@ class TwoColumnSlide(Slide):
         total_this_slide_bookmark: str = "",
         **kwargs,
     ) -> None:
+        effective_title = title or left_title or "Comparison"
+
+        if isinstance(left_content, (list, tuple)):
+            left_grp = VGroup(*left_content)
+        elif left_content is not None and isinstance(left_content, VMobject):
+            left_grp = left_content
+        else:
+            left_grp = VGroup()
+
+        if isinstance(right_content, (list, tuple)):
+            right_grp = VGroup(*right_content)
+        elif right_content is not None and isinstance(right_content, VMobject):
+            right_grp = right_content
+        else:
+            right_grp = VGroup()
+
         spec = SlideSpec(
-            title=title,
+            title=effective_title,
             subtitle=subtitle,
             layout="two-column",
-            left=[RawMobject(mobject=left_content)],
-            right=[RawMobject(mobject=right_content)],
+            left=[RawMobject(mobject=left_grp)],
+            right=[RawMobject(mobject=right_grp)],
             ratios=[0.5, 0.5],
             total_bookmark_for_this_slide=total_bookmark_for_this_slide,
             total_this_slide_bookmark=total_this_slide_bookmark,
         )
-        super().__init__(title=title, subtitle=subtitle, theme=theme, spec=spec, total_bookmark_for_this_slide=total_bookmark_for_this_slide, total_this_slide_bookmark=total_this_slide_bookmark, **kwargs)
+        super().__init__(title=effective_title, subtitle=subtitle, theme=theme, spec=spec, total_bookmark_for_this_slide=total_bookmark_for_this_slide, total_this_slide_bookmark=total_this_slide_bookmark, **kwargs)
 
 
 class QuizSlide(Slide):

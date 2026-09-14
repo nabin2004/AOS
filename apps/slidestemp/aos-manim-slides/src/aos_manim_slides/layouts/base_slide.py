@@ -42,7 +42,14 @@ class Slide(VGroup):
         total_this_slide_bookmark: str = "",
         **kwargs,
     ) -> None:
-        super().__init__(**kwargs)
+        # Only pass valid VMobject / Mobject styling kwargs to super().__init__
+        valid_mobject_keys = {
+            "color", "opacity", "stroke_color", "stroke_width",
+            "stroke_opacity", "fill_color", "fill_opacity", "name", "z_index", "sheen_factor"
+        }
+        mobject_kwargs = {k: v for k, v in kwargs.items() if k in valid_mobject_keys}
+        super().__init__(**mobject_kwargs)
+        self.extra_kwargs = kwargs
         self.theme = theme or get_theme()
         self.title_text = title
         self.subtitle_text = subtitle

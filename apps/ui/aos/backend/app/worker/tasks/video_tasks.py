@@ -296,12 +296,22 @@ def _run_agents_cli(
     env["PYTHONUNBUFFERED"] = "1"
     # Host Celery often inherits backend VIRTUAL_ENV; agents `uv run` must use apps/agents.
     env.pop("VIRTUAL_ENV", None)
-    custom_base = (llm_base_url or "").strip()
-    custom_key = (llm_api_key or "").strip()
-    custom_model = (model_name or "").strip()
+    custom_base = (
+        (llm_base_url or "").strip()
+        or os.getenv("AOS_OPENAI_BASE_URL", "").strip()
+        or getattr(settings, "AOS_OPENAI_BASE_URL", "").strip()
+    )
+    custom_key = (
+        (llm_api_key or "").strip()
+        or os.getenv("AOS_OPENAI_API_KEY", "local").strip()
+    )
+    custom_model = (
+        (model_name or "").strip()
+        or os.getenv("AOS_OPENAI_MODEL", "nabin2004/AOS-qwen3-8b-grpo").strip()
+    )
 
     if custom_base:
-        # Pre-flight check: ensure the custom base URL is actually responsive
+        # Pre-flight check: ensure the custom base URL is responsive (or is a Modal endpoint)
         endpoint_alive = True
         try:
             import urllib.request
@@ -310,20 +320,23 @@ def _run_agents_cli(
             req = urllib.request.Request(test_url, headers={"User-Agent": "AOS-HealthCheck/1.0"})
             if custom_key and custom_key != "local":
                 req.add_header("Authorization", f"Bearer {custom_key}")
-            with urllib.request.urlopen(req, timeout=2.0) as resp:
-                if resp.status >= 500:
+            with urllib.request.urlopen(req, timeout=3.0) as resp:
+                if resp.status >= 500 and not ("modal" in custom_base and resp.status == 503):
                     endpoint_alive = False
+        except urllib.error.HTTPError as he:
+            # Modal returns 503 while spinning up GPU containers from zero (handled by warmup loop)
+            if he.code == 503 and "modal" in custom_base:
+                endpoint_alive = True
+            elif he.code in {401, 403, 404}:
+                endpoint_alive = True
+            else:
+                endpoint_alive = "modal" in custom_base
         except Exception:
-            try:
-                with urllib.request.urlopen(custom_base, timeout=1.5) as resp:
-                    if resp.status >= 500:
-                        endpoint_alive = False
-            except Exception:
-                endpoint_alive = False
+            endpoint_alive = "modal" in custom_base
 
         if not endpoint_alive:
             logger.warning(
-                "Custom LLM endpoint '%s' is unreachable or returned 5xx. Gracefully falling back to cloud profile.",
+                "Custom LLM endpoint '%s' is unreachable. Gracefully falling back to cloud profile.",
                 custom_base,
             )
             custom_base = ""

@@ -33,18 +33,22 @@ interface LlmProviderState extends LlmProviderConfig {
   toRequestPayload: () => LlmProviderRequestPayload;
 }
 
+export const DEFAULT_MODAL_BASE_URL =
+  "https://nabinoli2004--aosqwen-server.us-east.modal.direct/v1";
+export const DEFAULT_MODAL_MODEL_ID = "nabin2004/AOS-qwen3-8b-grpo";
+
 const EMPTY: LlmProviderConfig = {
-  baseUrl: "",
-  apiKey: "",
-  modelId: "",
+  baseUrl: DEFAULT_MODAL_BASE_URL,
+  apiKey: "local",
+  modelId: DEFAULT_MODAL_MODEL_ID,
 };
 
 export function llmProviderToRequestPayload(
   config: LlmProviderConfig,
 ): LlmProviderRequestPayload {
-  const baseUrl = config.baseUrl.trim();
-  const apiKey = config.apiKey.trim();
-  const modelId = config.modelId.trim();
+  const baseUrl = (config.baseUrl || DEFAULT_MODAL_BASE_URL).trim();
+  const apiKey = (config.apiKey || "local").trim();
+  const modelId = (config.modelId || DEFAULT_MODAL_MODEL_ID).trim();
   const payload: LlmProviderRequestPayload = {};
   if (baseUrl) payload.llm_base_url = baseUrl;
   if (apiKey) payload.llm_api_key = apiKey;

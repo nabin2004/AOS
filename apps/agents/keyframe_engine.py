@@ -898,9 +898,7 @@ def render_visual_anchor(
     Fast, self-contained, and completely independent of speech synthesis.
     """
     output_stem = f"slide_{segment.slide_num}_visual"
-    config.media_dir = str(output_dir)
-    config.quality = quality
-    config.output_file = output_stem
+    output_stem = f"slide_{segment.slide_num}_visual"
 
     class VisualAnchorScene(Scene):
         def wait_until_bookmark(self, mark: str, **kwargs):
@@ -1123,6 +1121,9 @@ def render_visual_anchor(
                 self.wait(1.0)
 
     with _manim_render_lock:
+        config.media_dir = str(output_dir)
+        config.quality = quality
+        config.output_file = output_stem
         scene = VisualAnchorScene()
         scene.render()
 

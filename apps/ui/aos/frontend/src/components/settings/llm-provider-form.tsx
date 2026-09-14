@@ -32,7 +32,7 @@ export function LlmProviderForm({ compact = false }: { compact?: boolean }) {
       >
         <Input
           type="url"
-          placeholder="http://localhost:11434/v1"
+          placeholder="https://nabinoli2004--aosqwen-server.us-east.modal.direct/v1"
           value={baseUrl}
           onChange={(e) => setBaseUrl(e.target.value)}
           className={inputClass}
@@ -70,7 +70,7 @@ export function LlmProviderForm({ compact = false }: { compact?: boolean }) {
       >
         <Input
           type="text"
-          placeholder="model-id"
+          placeholder="nabin2004/AOS-qwen3-8b-grpo"
           value={modelId}
           onChange={(e) => setModelId(e.target.value)}
           className={inputClass}

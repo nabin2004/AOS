@@ -7,6 +7,11 @@ import sys
 from pathlib import Path
 from typing import Literal
 
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent / ".env")
+load_dotenv()
+
 from pydantic_ai.settings import ModelSettings
 
 from ollama_model import ollama_extra_body, ollama_thinking_enabled, resolve_model
