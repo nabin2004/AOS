@@ -12,6 +12,7 @@ Decouples visual animation duration from detailed pedagogical narration:
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 import json
 import os
 import queue
@@ -155,7 +156,10 @@ RULES:
 1. Coordinate bounds: x in [-6, 6], y in [-3.5, 3.5].
 2. Use VGroup with .arrange(DOWN, aligned_edge=LEFT) for clean, readable text/bullet layouts.
 3. Palette: BLUE, YELLOW, TEAL, GREEN, GOLD, RED, WHITE, GRAY.
-4. Output concise JSON in <visual_anchor> and executable Manim snippet in ```python ... ``` without Scene class.
+4. Output concise JSON in <visual_anchor> and executable Manim snippet in ```python ... ``` WITHOUT defining any class or def construct(self).
+   Start directly with mobjects and self.play(...).
+   Do NOT use `with self.play(...)`. Use normal `self.play(...)`.
+   Do NOT use `MathTex.animate.set_value`.
 
 Output format:
 <visual_anchor>
@@ -171,8 +175,13 @@ Output format:
 </visual_anchor>
 
 ```python
-# Self-contained Manim code for Scene.construct(self).
-# Use self.play(...) and self.wait(...) directly.
+# Start directly with mobjects and self.play(...)
+title = Text("Slide Title", font_size=32, color=YELLOW).to_edge(UP, buff=0.4)
+formula = MathTex(r"...", font_size=36, color=BLUE).next_to(title, DOWN, buff=0.35)
+box = SurroundingRectangle(formula, color=GOLD, buff=0.2)
+self.play(Write(title))
+self.play(Write(formula), Create(box))
+self.wait(1.5)
 ```
 """
 
@@ -680,11 +689,17 @@ def render_visual_anchor(
         def wait_until_bookmark(self, mark: str, **kwargs):
             self.wait(0.2)
 
+        @contextmanager
+        def voiceover(self, *args, **kwargs):
+            yield None
+
         def construct(self):
             safe_globals: Dict[str, Any] = {
                 "np": np,
                 "MathTex": MathTex,
                 "Text": Text,
+                "Title": Title,
+                "Scene": Scene,
                 "VGroup": VGroup,
                 "Group": Group,
                 "Create": Create,
@@ -754,15 +769,48 @@ def render_visual_anchor(
                 "PI": PI,
                 "TAU": TAU,
             }
-            safe_locals: Dict[str, Any] = {"self": self}
+            try:
+                from manim_voiceover import VoiceoverScene
+                safe_globals["VoiceoverScene"] = VoiceoverScene
+            except Exception:
+                safe_globals["VoiceoverScene"] = Scene
+
+            def _clean_manim_code(code_str: str) -> str:
+                # Clean hallucinated `with self.play(...):`
+                code_str = re.sub(
+                    r"with\s+self\.play\((.*?)\)(?:\s*as\s+\w+)?:",
+                    r"self.play(\1)",
+                    code_str,
+                )
+                return code_str
+
+            def _execute_code(code_str: str) -> bool:
+                cleaned = _clean_manim_code(code_str)
+                locs: Dict[str, Any] = {"self": self}
+                exec(cleaned, safe_globals, locs)
+
+                # Check if a Scene subclass was defined in locs
+                scene_cls = None
+                for v in list(locs.values()):
+                    if isinstance(v, type) and issubclass(v, Scene) and v is not Scene and v is not VisualAnchorScene:
+                        scene_cls = v
+                        break
+
+                if scene_cls:
+                    scene_cls.construct(self)
+
+                # Return True only if actual mobjects were added to the canvas
+                return len(self.mobjects) > 0
 
             executed = False
             if segment.manim_code.strip():
                 try:
-                    exec(segment.manim_code, safe_globals, safe_locals)
-                    executed = True
+                    executed = _execute_code(segment.manim_code)
                 except Exception as exc:
                     print(f"[Visual Render Warning] Slide {segment.slide_num} primary exec error: {exc}", file=sys.stderr)
+                    self.clear()
+
+                if not executed:
                     # Attempt transpilation of MathTex to Text if LaTeX or font rendering failed
                     try:
                         self.clear()
@@ -782,18 +830,21 @@ def render_visual_anchor(
                             .replace(r"\hat{f}", "f̂")
                             .replace(r"\int_{-\infty}^{\infty}", "∫")
                         )
-                        exec(alt_code, safe_globals, safe_locals)
-                        executed = True
-                        print(f"[Visual Render Info] Slide {segment.slide_num} successfully rendered via Text transpilation!", file=sys.stderr)
+                        executed = _execute_code(alt_code)
+                        if executed:
+                            print(f"[Visual Render Info] Slide {segment.slide_num} successfully rendered via Text transpilation!", file=sys.stderr)
                     except Exception as exc2:
                         print(f"[Visual Render Warning] Slide {segment.slide_num} transpilation failed: {exc2}", file=sys.stderr)
+                        self.clear()
 
-            if not executed:
+            if not executed or len(self.mobjects) == 0:
                 # Robust educational fallback with full definitions and equation, NEVER dummy slide box
                 try:
                     self.clear()
                     title_text = segment.visual_anchor.title or segment.concept
                     f_title = Text(title_text, font_size=32, color=YELLOW).to_edge(UP, buff=0.4)
+                    if f_title.width > 12.0:
+                        f_title.scale_to_fit_width(12.0)
                     elements = [f_title]
                     prev_mob = f_title
 
@@ -809,6 +860,8 @@ def render_visual_anchor(
                             .replace("}", "")
                         )
                         f_math = Text(clean_eq, font_size=36, color=BLUE).next_to(f_title, DOWN, buff=0.35)
+                        if f_math.width > 12.0:
+                            f_math.scale_to_fit_width(12.0)
                         f_box = SurroundingRectangle(f_math, color=GOLD, buff=0.25)
                         elements.extend([f_math, f_box])
                         prev_mob = f_box
@@ -819,7 +872,10 @@ def render_visual_anchor(
                         bullet_mobs = []
                         for d in segment.visual_anchor.key_definitions[:5]:
                             clean_d = d.replace("\\bullet\\", "•").replace("\\bullet", "•").replace(r"\approx", "≈").replace(r"\theta", "θ").replace(r"\pi", "π")
-                            bullet_mobs.append(Text(f"• {clean_d}", font_size=18, color=WHITE))
+                            b_mob = Text(f"• {clean_d}", font_size=18, color=WHITE)
+                            if b_mob.width > 11.5:
+                                b_mob.scale_to_fit_width(11.5)
+                            bullet_mobs.append(b_mob)
                         if bullet_mobs:
                             b_group = VGroup(*bullet_mobs).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)
                             elements.append(b_group)
@@ -830,7 +886,7 @@ def render_visual_anchor(
                     print(f"[Visual Render Emergency Fallback] Slide {segment.slide_num}: {exc3}", file=sys.stderr)
                     self.wait(1.0)
             else:
-                self.wait(0.5)
+                self.wait(1.0)
 
     scene = VisualAnchorScene()
     scene.render()
