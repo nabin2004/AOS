@@ -86,7 +86,12 @@ class OpenRouterVisionCritic(BaseVisualCritic):
 
     def _get_client(self) -> OpenAI:
         if self._client is None:
-            self._client = OpenAI(base_url=self.base_url, api_key=self.api_key)
+            self._client = OpenAI(
+                base_url=self.base_url,
+                api_key=self.api_key,
+                timeout=12.0,
+                max_retries=1,
+            )
         return self._client
 
     def critique_frame(

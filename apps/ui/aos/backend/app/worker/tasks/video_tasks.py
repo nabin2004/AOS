@@ -235,17 +235,30 @@ def _run_agents_cli(
     """
     agents_dir = _resolve_agents_dir()
     command = "animate" if mode in ("animate", "teaching") else "generate"
-    cmd = [
-        settings.AGENTS_UV_CMD,
-        "run",
-        "--frozen",
-        "python",
-        "cli.py",
-        command,
-        prompt,
-        "--json",
-        "--no-banner",
-    ]
+    
+    # In Docker, invoke the container virtualenv Python directly to avoid uv workspace locking overhead (saves 3-5m)
+    venv_python = Path("/app/.venv/bin/python")
+    if venv_python.is_file():
+        cmd = [
+            str(venv_python),
+            "cli.py",
+            command,
+            prompt,
+            "--json",
+            "--no-banner",
+        ]
+    else:
+        cmd = [
+            settings.AGENTS_UV_CMD,
+            "run",
+            "--frozen",
+            "python",
+            "cli.py",
+            command,
+            prompt,
+            "--json",
+            "--no-banner",
+        ]
     if mode in ("animate", "teaching"):
         cmd.append("--fast")
         cmd.extend(["--mode", "keyframe"])
@@ -259,6 +272,34 @@ def _run_agents_cli(
     custom_base = (llm_base_url or "").strip()
     custom_key = (llm_api_key or "").strip()
     custom_model = (model_name or "").strip()
+
+    if custom_base:
+        # Pre-flight check: ensure the custom base URL is actually responsive
+        endpoint_alive = True
+        try:
+            import urllib.request
+            req_url = custom_base.rstrip("/")
+            test_url = f"{req_url}/models" if not req_url.endswith("/models") else req_url
+            req = urllib.request.Request(test_url, headers={"User-Agent": "AOS-HealthCheck/1.0"})
+            if custom_key and custom_key != "local":
+                req.add_header("Authorization", f"Bearer {custom_key}")
+            with urllib.request.urlopen(req, timeout=2.0) as resp:
+                if resp.status >= 500:
+                    endpoint_alive = False
+        except Exception:
+            try:
+                with urllib.request.urlopen(custom_base, timeout=1.5) as resp:
+                    if resp.status >= 500:
+                        endpoint_alive = False
+            except Exception:
+                endpoint_alive = False
+
+        if not endpoint_alive:
+            logger.warning(
+                "Custom LLM endpoint '%s' is unreachable or returned 5xx. Gracefully falling back to cloud profile.",
+                custom_base,
+            )
+            custom_base = ""
 
     if custom_base:
         # Frontend BYOK / OpenAI-compatible URL applies to every graph role.

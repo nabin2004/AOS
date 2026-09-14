@@ -135,7 +135,13 @@ def get_llm_client(
             or "qwen2.5-coder"
         ).strip()
 
-    client = OpenAI(base_url=effective_base, api_key=effective_key)
+    timeout_val = float(os.getenv("AOS_LLM_TIMEOUT_SECONDS", "15.0"))
+    client = OpenAI(
+        base_url=effective_base,
+        api_key=effective_key,
+        timeout=timeout_val,
+        max_retries=1,
+    )
     return client, effective_model
 
 
@@ -543,6 +549,127 @@ def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: i
                 "This lossless symmetry guarantees that time and frequency are not competing descriptions, "
                 "but two complementary representations of the exact same physical reality."
             )
+    elif any(k in p_lower for k in ("bodmas", "pemdas", "order of operations", "bidmas", "bedmas")):
+        if slide_num == 1:
+            anchor = VisualAnchor(
+                type="annotated_formula",
+                title="The BODMAS / PEMDAS Hierarchy",
+                latex=r"\text{B} \rightarrow \text{O} \rightarrow \text{D} / \text{M} \rightarrow \text{A} / \text{S}",
+                visible_elements=["B: Brackets", "O: Orders / Exponents", "D/M: Division & Multiplication", "A/S: Addition & Subtraction"],
+                key_definitions=[
+                    "B / P : Brackets & Parentheses (evaluate innermost sub-expressions first)",
+                    "O / E : Orders & Exponents (indices, powers, square roots)",
+                    "D & M : Division & Multiplication (equal precedence, evaluated Left-to-Right)",
+                    "A & S : Addition & Subtraction (equal precedence, evaluated Left-to-Right)",
+                ],
+                visual_purpose="Establish the standard order of operations precedence hierarchy.",
+            )
+            code = (
+                'title = Text("The BODMAS / PEMDAS Hierarchy", font_size=34, color=YELLOW).to_edge(UP, buff=0.4)\n'
+                'rule_box = MathTex(r"\\mathbf{B} \\rightarrow \\mathbf{O} \\rightarrow \\mathbf{D} / \\mathbf{M} \\rightarrow \\mathbf{A} / \\mathbf{S}", font_size=42, color=BLUE).next_to(title, DOWN, buff=0.35)\n'
+                'box = SurroundingRectangle(rule_box, color=GOLD, buff=0.25)\n'
+                'where_lbl = Text("Precedence Rules:", font_size=22, color=GOLD, weight=BOLD).next_to(box, DOWN, buff=0.35).to_edge(LEFT, buff=1.2)\n'
+                'b1 = MathTex(r"\\bullet\\ \\mathbf{B / P} : \\text{Brackets / Parentheses (evaluate innermost first)}", font_size=20, color=WHITE)\n'
+                'b2 = MathTex(r"\\bullet\\ \\mathbf{O / E} : \\text{Orders / Exponents (indices, powers, and roots)}", font_size=20, color=TEAL)\n'
+                'b3 = MathTex(r"\\bullet\\ \\mathbf{D \\& M} : \\text{Division \\& Multiplication (equal rank, Left-to-Right)}", font_size=20, color=GREEN)\n'
+                'b4 = MathTex(r"\\bullet\\ \\mathbf{A \\& S} : \\text{Addition \\& Subtraction (equal rank, Left-to-Right)}", font_size=20, color=YELLOW)\n'
+                'bullets = VGroup(b1, b2, b3, b4).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)\n'
+                'self.play(Write(title), run_time=0.8)\n'
+                'self.play(Write(rule_box), Create(box), run_time=1.2)\n'
+                'self.play(FadeIn(where_lbl), run_time=0.5)\n'
+                'self.play(LaggedStart(*[FadeIn(b, shift=RIGHT*0.2) for b in bullets], lag_ratio=0.2), run_time=1.8)\n'
+                'self.wait(1.5)\n'
+            )
+            narration = (
+                "The order of operations is the universal grammatical convention of mathematics, "
+                "ensuring that every mathematical expression has exactly one unambiguous value. "
+                "Depending on where you studied, you might know this rule as BODMAS, PEMDAS, or BIDMAS. "
+                "As outlined on your screen, operations are resolved in four strict hierarchical stages: "
+                "First, evaluate all expressions enclosed within brackets or parentheses from the inside out. "
+                "Second, calculate orders, which include exponents, square roots, and indices. "
+                "Next come division and multiplication. A critical rule to remember is that division and multiplication "
+                "have equal precedence and must be evaluated from left to right as they appear. "
+                "Finally, addition and subtraction are computed, which also share equal rank from left to right. "
+                "Following this consistent hierarchy prevents ambiguity in both manual calculations and computer software."
+            )
+        elif slide_num == 2:
+            anchor = VisualAnchor(
+                type="annotated_formula",
+                title="Equal Precedence & Left-to-Right Rule",
+                latex=r"12 \div 3 \times 2 = 4 \times 2 = 8",
+                visible_elements=["12 / 3 * 2", "Step 1: 12 / 3 = 4", "Step 2: 4 * 2 = 8", "Left-to-Right Precedence"],
+                key_definitions=[
+                    "Common Trap: Multiplications do NOT come before divisions automatically",
+                    "Left-to-Right: Division and multiplication share identical priority tier",
+                    "Step 1: 12 ÷ 3 = 4 (leftmost operator first)",
+                    "Step 2: 4 × 2 = 8 (final correct evaluation)",
+                ],
+                visual_purpose="Dispel the common trap where multiplication is incorrectly prioritized over division.",
+            )
+            code = (
+                'title = Text("Equal Precedence & The Left-to-Right Rule", font_size=32, color=YELLOW).to_edge(UP, buff=0.4)\n'
+                'expr = MathTex(r"12 \\div 3 \\times 2 = ?", font_size=44, color=BLUE).next_to(title, DOWN, buff=0.35)\n'
+                'box = SurroundingRectangle(expr, color=GOLD, buff=0.25)\n'
+                'step1 = MathTex(r"\\text{Step 1: } 12 \\div 3 = 4 \\quad \\rightarrow \\quad 4 \\times 2", font_size=24, color=GREEN)\n'
+                'step2 = MathTex(r"\\text{Step 2: } 4 \\times 2 = \\mathbf{8} \\quad \\checkmark \\text{ (Correct: Left-to-Right)}", font_size=24, color=GOLD)\n'
+                'trap = Text("Pitfall: 12 ÷ (3 × 2) = 12 ÷ 6 = 2 ✗ (Violates left-to-right rule)", font_size=20, color=RED)\n'
+                'steps = VGroup(step1, step2, trap).arrange(DOWN, aligned_edge=LEFT, buff=0.25).next_to(box, DOWN, buff=0.4)\n'
+                'self.play(Write(title), run_time=0.8)\n'
+                'self.play(Write(expr), Create(box), run_time=1.0)\n'
+                'self.play(FadeIn(step1, shift=UP*0.2), run_time=0.8)\n'
+                'self.play(FadeIn(step2, shift=UP*0.2), run_time=0.8)\n'
+                'self.play(FadeIn(trap, shift=UP*0.2), run_time=0.8)\n'
+                'self.wait(1.5)\n'
+            )
+            narration = (
+                "One of the most frequent misconceptions in algebra is believing multiplication must always precede division "
+                "simply because M precedes D in the word PEMDAS, or that division must precede multiplication because D comes before M in BODMAS. "
+                "In reality, division and multiplication are inverses of each other and belong to the exact same priority tier. "
+                "Look at the example on the board: twelve divided by three times two. "
+                "Because division and multiplication share equal precedence, we resolve them strictly from left to right. "
+                "The leftmost operator is division: twelve divided by three gives four. "
+                "Then we take four times two to arrive at the correct answer of eight. "
+                "If someone incorrectly performed the multiplication first, three times two, they would get twelve divided by six equals two, "
+                "which violates standard mathematical precedence and produces an error in every modern scientific calculator."
+            )
+        else:
+            anchor = VisualAnchor(
+                type="annotated_formula",
+                title="Worked Multi-Tier Example",
+                latex=r"3 + 2 \times (4^2 - 6) \div 5",
+                visible_elements=["Original Expression", "Step 1: Exponent in Brackets", "Step 2: Bracket Evaluation", "Step 3: Multiplication & Division", "Final Addition"],
+                key_definitions=[
+                    "1. Brackets: (4^2 - 6) -> 4^2 = 16 -> (16 - 6) = 10",
+                    "2. Substitute: Expression becomes 3 + 2 × 10 ÷ 5",
+                    "3. Multiply & Divide: 2 × 10 = 20 -> 20 ÷ 5 = 4",
+                    "4. Final Addition: 3 + 4 = 7",
+                ],
+                visual_purpose="Demonstrate end-to-end multi-tier calculation using BODMAS.",
+            )
+            code = (
+                'title = Text("Worked Multi-Tier Example", font_size=34, color=GOLD).to_edge(UP, buff=0.4)\n'
+                'full_eq = MathTex(r"3 + 2 \\times (4^2 - 6) \\div 5 = \\mathbf{7}", font_size=40, color=YELLOW).next_to(title, DOWN, buff=0.35)\n'
+                'box = SurroundingRectangle(full_eq, color=GREEN, buff=0.25)\n'
+                's1 = MathTex(r"\\mathbf{1.\\ Brackets \\& Orders:} \\quad (4^2 - 6) = (16 - 6) = \\mathbf{10}", font_size=21, color=WHITE)\n'
+                's2 = MathTex(r"\\mathbf{2.\\ New\\ Form:} \\quad 3 + 2 \\times 10 \\div 5", font_size=21, color=TEAL)\n'
+                's3 = MathTex(r"\\mathbf{3.\\ Left\\ to\\ Right:} \\quad 2 \\times 10 = 20 \\quad \\rightarrow \\quad 20 \\div 5 = \\mathbf{4}", font_size=21, color=GREEN)\n'
+                's4 = MathTex(r"\\mathbf{4.\\ Final\\ Addition:} \\quad 3 + 4 = \\mathbf{7}", font_size=22, color=GOLD)\n'
+                'steps = VGroup(s1, s2, s3, s4).arrange(DOWN, aligned_edge=LEFT, buff=0.22).next_to(box, DOWN, buff=0.35)\n'
+                'self.play(Write(title), run_time=0.8)\n'
+                'self.play(Write(full_eq), Create(box), run_time=1.0)\n'
+                'self.play(LaggedStart(*[FadeIn(s, shift=RIGHT*0.2) for s in steps], lag_ratio=0.25), run_time=2.2)\n'
+                'self.wait(1.5)\n'
+            )
+            narration = (
+                "Let us put all the principles together in a full multi-tier expression: three plus two times open parenthesis four squared minus six close parenthesis divided by five. "
+                "Step one: We examine inside the brackets first. Inside the brackets, we see an exponent, four squared, which equals sixteen. "
+                "Continuing inside the brackets, sixteen minus six leaves us with ten. "
+                "Step two: Substitute ten back into the main expression, yielding three plus two times ten divided by five. "
+                "Step three: We now have addition, multiplication, and division. Multiplication and division take priority over addition, "
+                "and by our left-to-right rule, we multiply two times ten to get twenty, followed by twenty divided by five, which simplifies to four. "
+                "Step four: Finally, we perform the addition: three plus four equals seven. "
+                "By systematically applying the BODMAS precedence rules at each step, even complex nested formulas resolve cleanly and without ambiguity."
+            )
     else:
         anchor = VisualAnchor(
             type="annotated_formula",
@@ -615,6 +742,14 @@ def _get_domain_knowledge(prompt: str) -> str:
             "- Rotational Winding Intuition: e^{-2π i t ξ} wraps the time signal around the origin at frequency ξ. "
             "The integral measures the center-of-mass balance point; when ξ matches a signal harmonic, it spikes.\n"
             "- Time-Frequency Duality: Continuous signal amplitude across time ↔ discrete spectral frequency peaks."
+        )
+    if any(k in p for k in ("bodmas", "pemdas", "order of operations", "bidmas", "bedmas")):
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (BODMAS / PEMDAS / Order of Operations):\n"
+            "- Acronym Mappings: BODMAS (Brackets, Orders, Division, Multiplication, Addition, Subtraction) vs PEMDAS (Parentheses, Exponents, Multiplication, Division, Addition, Subtraction).\n"
+            "- Crucial Precedence Equality: Division and Multiplication have EQUAL rank (resolved Left-to-Right). Addition and Subtraction have EQUAL rank (resolved Left-to-Right).\n"
+            "- Common Pitfalls: Erroneously doing multiplication before division in expressions like 8 ÷ 2(4) or 12 ÷ 3 × 2.\n"
+            "- Structure: Inner groupings first → Exponents/powers/roots next → Multiplicative operations L-to-R → Additive operations L-to-R."
         )
     return ""
 
@@ -809,6 +944,20 @@ def render_visual_anchor(
             except Exception:
                 safe_globals["VoiceoverScene"] = Scene
 
+            try:
+                from manim import Paragraph
+                safe_globals["Paragraph"] = Paragraph
+            except Exception:
+                safe_globals["Paragraph"] = Text
+
+            try:
+                from manim import Tex, MarkupText
+                safe_globals["Tex"] = Tex
+                safe_globals["MarkupText"] = MarkupText
+            except Exception:
+                safe_globals["Tex"] = MathTex
+                safe_globals["MarkupText"] = Text
+
             def _clean_manim_code(code_str: str) -> str:
                 # Clean hallucinated `with self.play(...):`
                 code_str = re.sub(
@@ -848,7 +997,7 @@ def render_visual_anchor(
                     # Attempt transpilation of MathTex to Text if LaTeX or font rendering failed
                     try:
                         self.clear()
-                        alt_code = re.sub(r"MathTex\(\s*r?([\"'])(.*?)\1", r"Text(\1\2\1", segment.manim_code)
+                        alt_code = re.sub(r"(?:MathTex|Tex|Paragraph)\(\s*r?([\"'])(.*?)\1", r"Text(\1\2\1", segment.manim_code)
                         alt_code = (
                             alt_code.replace("\\bullet\\", "•")
                             .replace("\\bullet", "•")
@@ -918,7 +1067,10 @@ def render_visual_anchor(
                     self.wait(1.5)
                 except Exception as exc3:
                     print(f"[Visual Render Emergency Fallback] Slide {segment.slide_num}: {exc3}", file=sys.stderr)
-                    self.wait(1.0)
+                    self.clear()
+                    safe_title = Text(f"Slide {segment.slide_num}: {segment.concept[:30]}", font_size=28, color=YELLOW)
+                    self.add(safe_title)
+                    self.wait(1.5)
             else:
                 self.wait(1.0)
 
@@ -940,6 +1092,23 @@ def render_visual_anchor(
             except Exception:
                 pass
         return dest.resolve()
+
+    if not dest.is_file() or dest.stat().st_size == 0:
+        # Guarantee an MP4 exists using ffmpeg color generator so timeline assembly never drops slides
+        try:
+            cmd = [
+                "ffmpeg", "-y",
+                "-f", "lavfi",
+                "-i", "color=c=0x111827:s=854x480:d=3.0:r=30",
+                "-c:v", "libx264",
+                "-pix_fmt", "yuv420p",
+                str(dest),
+            ]
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            if dest.is_file() and dest.stat().st_size > 0:
+                return dest.resolve()
+        except Exception:
+            pass
 
     return None
 
