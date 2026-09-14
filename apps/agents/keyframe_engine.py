@@ -212,6 +212,27 @@ Wrap your output in <narration> ... </narration> tags.
 """
 
 
+def _extract_topic_title(prompt: str) -> str:
+    """Extracts a clean, short topic title from potentially massive or multi-paragraph user prompts."""
+    lines = [l.strip() for l in prompt.strip().splitlines() if l.strip()]
+    if not lines:
+        return "Key Mathematical Principles"
+    first_line = lines[0]
+    # Remove common conversational prefixes
+    first_line = re.sub(
+        r"^(teach me about (the)?|explain (the)?|what is (the)?|help me understand (the)?|introduce (the)?)\s*",
+        "",
+        first_line,
+        flags=re.IGNORECASE,
+    ).strip()
+    # Strip after common Wikipedia or navigation headers
+    first_line = re.split(r":\s*Order of operations|\s*Article\s+Talk|\s*-\s*Wikipedia", first_line, flags=re.IGNORECASE)[0].strip()
+    first_line = first_line.rstrip(":,.-")
+    if len(first_line) > 60:
+        first_line = first_line[:57] + "..."
+    return first_line or "Key Mathematical Concept"
+
+
 def _parse_visual_output(text: str) -> Tuple[VisualAnchor, str]:
     """Extracts VisualAnchor metadata and Python code from LLM output."""
     anchor = VisualAnchor(type="annotated_formula", visual_purpose="Core concept visualization")
@@ -233,11 +254,13 @@ def _parse_visual_output(text: str) -> Tuple[VisualAnchor, str]:
 
 
 def _parse_narration_output(text: str) -> str:
-    """Extracts pedagogical narration from LLM output."""
-    narr_match = re.search(r"<narration>(.*?)</narration>", text, re.DOTALL | re.IGNORECASE)
+    """Extracts pedagogical narration from LLM output, stripping reasoning traces."""
+    clean = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+    clean = re.sub(r"(?:^|\n)\s*Assistant:?\s*", "\n", clean, flags=re.IGNORECASE)
+    narr_match = re.search(r"<narration>(.*?)</narration>", clean, re.DOTALL | re.IGNORECASE)
     if narr_match:
         return narr_match.group(1).strip()
-    clean = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+    clean = re.sub(r"```.*?```", "", clean, flags=re.DOTALL)
     return clean.strip()
 
 
@@ -546,17 +569,19 @@ def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: i
             'self.play(LaggedStart(*[FadeIn(b, shift=RIGHT*0.2) for b in bullets], lag_ratio=0.2), run_time=1.5)\n'
             'self.wait(1.5)\n'
         )
+        clean_topic = _extract_topic_title(prompt)
         narration = (
-            f"In this segment, we examine the foundational mechanisms of {prompt}. "
+            f"In this segment, we examine the foundational mechanisms of {clean_topic}. "
             "Notice the structured breakdown displayed before you. Rather than treating this as abstract notation, "
             "we want to cultivate genuine conceptual understanding of how these elements interact. "
             "When we break down the core components, their mutual dependencies become apparent, "
             "allowing us to apply these principles reliably to more advanced problems."
         )
 
+    clean_topic = _extract_topic_title(prompt)
     return TeachingSegment(
         slide_num=slide_num,
-        concept=anchor.title or f"{prompt} - Slide {slide_num}",
+        concept=anchor.title or f"{clean_topic} - Slide {slide_num}",
         learning_objective=anchor.visual_purpose,
         visual_anchor=anchor,
         manim_code=code,
@@ -601,12 +626,14 @@ def plan_teaching_segment(
     model: str,
 ) -> TeachingSegment:
     """Generates a TeachingSegment: first the rich visual anchor, then in-depth narration."""
+    clean_topic = _extract_topic_title(prompt)
+    condensed_prompt = clean_topic if len(prompt) < 400 else f"{clean_topic}\n\nKey Concepts Context:\n{prompt[:400]}..."
     domain_ctx = _get_domain_knowledge(prompt)
     ctx_block = f"\nAdditional Domain Grounding:\n{domain_ctx}\n" if domain_ctx else ""
 
     # Step 1: Generate Visual Anchor
     visual_user_prompt = (
-        f"Topic: {prompt}\n"
+        f"Topic: {condensed_prompt}\n"
         f"{ctx_block}"
         f"Lecture Outline:\n{outline}\n\n"
         f"Create the visual anchor for Slide {slide_num} of {total_slides}.\n"
@@ -635,7 +662,7 @@ def plan_teaching_segment(
 
     # Step 2: Generate In-Depth Narration based on the Visual Anchor
     narration_user_prompt = (
-        f"Topic: {prompt}\n"
+        f"Topic: {clean_topic}\n"
         f"{ctx_block}"
         f"Slide Number: {slide_num} of {total_slides}\n"
         f"Visual Anchor Title: {anchor.title}\n"
@@ -917,12 +944,26 @@ def render_visual_anchor(
 def synthesize_teaching_audio(
     narration_text: str,
     output_wav: Path,
+    max_words: int = 220,
 ) -> float:
     """Synthesizes pedagogical narration into WAV audio using Pocket TTS.
 
+    Guarantees strict word budget (max 220 words ~75s) to prevent runaway TTS latency.
     Returns the authoritative measured duration in seconds.
     """
-    clean_text = re.sub(r"<bookmark.*?>", "", narration_text).strip()
+    clean_text = re.sub(r"<think>.*?</think>", "", narration_text, flags=re.DOTALL)
+    clean_text = re.sub(r"<bookmark.*?>", "", clean_text).strip()
+
+    # Enforce hard upper bound on narration words
+    words = clean_text.split()
+    if len(words) > max_words:
+        truncated = " ".join(words[:max_words])
+        last_period = max(truncated.rfind("."), truncated.rfind("!"), truncated.rfind("?"))
+        if last_period > len(truncated) // 2:
+            clean_text = truncated[: last_period + 1]
+        else:
+            clean_text = truncated + "."
+
     try:
         from tools.aos_speech_service import _get_narrator
         narrator = _get_narrator("alba", "english")
