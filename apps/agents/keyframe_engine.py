@@ -42,6 +42,8 @@ from tools.visual_critic import (
     get_visual_critic,
 )
 
+_manim_render_lock = threading.Lock()
+
 
 @dataclass
 class SlideData:
@@ -920,8 +922,9 @@ def render_visual_anchor(
             else:
                 self.wait(1.0)
 
-    scene = VisualAnchorScene()
-    scene.render()
+    with _manim_render_lock:
+        scene = VisualAnchorScene()
+        scene.render()
 
     expected_mp4: Path | None = None
     for mp4 in output_dir.rglob(f"*{output_stem}*.mp4"):
@@ -941,12 +944,56 @@ def render_visual_anchor(
     return None
 
 
+def _synthesize_edge_tts(
+    clean_text: str,
+    output_wav: Path,
+    voice: str = "en-US-ChristopherNeural",
+) -> bool:
+    """Fast neural speech synthesis using Edge-TTS with transcode to standard 24kHz WAV."""
+    try:
+        import asyncio
+        import edge_tts
+
+        temp_mp3 = output_wav.with_suffix(".temp.mp3")
+
+        async def _run():
+            comm = edge_tts.Communicate(clean_text, voice)
+            await comm.save(str(temp_mp3))
+
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop is not None and loop.is_running():
+            import concurrent.futures
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                pool.submit(lambda: asyncio.run(_run())).result(timeout=25)
+        else:
+            asyncio.run(_run())
+
+        if temp_mp3.is_file() and temp_mp3.stat().st_size > 0:
+            subprocess.run(
+                ["ffmpeg", "-y", "-i", str(temp_mp3), "-ar", "24000", "-ac", "1", str(output_wav)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True,
+            )
+            temp_mp3.unlink(missing_ok=True)
+            return True
+    except Exception as exc:
+        print(f"[Edge-TTS Info] Fast speech note: {exc}; using fallback narrator", file=sys.stderr)
+    return False
+
+
 def synthesize_teaching_audio(
     narration_text: str,
     output_wav: Path,
     max_words: int = 220,
+    voice: str | None = None,
 ) -> float:
-    """Synthesizes pedagogical narration into WAV audio using Pocket TTS.
+    """Synthesizes pedagogical narration into WAV audio using Edge-TTS or Pocket TTS.
 
     Guarantees strict word budget (max 220 words ~75s) to prevent runaway TTS latency.
     Returns the authoritative measured duration in seconds.
@@ -964,14 +1011,27 @@ def synthesize_teaching_audio(
         else:
             clean_text = truncated + "."
 
+    tts_backend = os.getenv("AOS_TTS_BACKEND", "auto").lower()
+    edge_voice = voice or os.getenv("AOS_TTS_VOICE", "en-US-ChristopherNeural")
+
+    # Fast Path: Edge-TTS (sub-2 second neural synthesis)
+    if tts_backend in ("auto", "edge", "edge-tts"):
+        if _synthesize_edge_tts(clean_text, output_wav, voice=edge_voice):
+            dur = get_media_duration(output_wav)
+            if dur > 0.5:
+                return dur
+
+    # Offline Fallback: Resident Kyutai Pocket TTS (100M CPU model)
     try:
         from tools.aos_speech_service import _get_narrator
+
         narrator = _get_narrator("alba", "english")
         narrator.synthesize(clean_text, output_wav)
     except Exception:
         # Fallback using scipy write of synthetic speech-timed tone or silence
         try:
             import scipy.io.wavfile
+
             sr = 24000
             words = len(clean_text.split())
             sec = max(3.0, words * 0.45)
@@ -1063,6 +1123,106 @@ def repair_visual_anchor_code(
     return original_code
 
 
+def _process_single_slide(
+    i: int,
+    total_slides: int,
+    prompt: str,
+    outline: str,
+    client: OpenAI,
+    model: str,
+    run_dir: Path,
+    quality: str,
+    _notify: Callable[[str, str], None],
+) -> tuple[int, TeachingSegment, Path | None, str]:
+    """Generates visual anchor, performs visual critic check, synthesizes speech, and produces video chunk."""
+    _notify("PlanTeachingScriptNode", f"Planning TeachingSegment {i} (Rich Visual Anchor & Pedagogy)")
+    segment = plan_teaching_segment(
+        prompt=prompt,
+        slide_num=i,
+        total_slides=total_slides,
+        outline=outline,
+        client=client,
+        model=model,
+    )
+
+    _notify("CodeAgent", f"Visual anchor Manim code ready for Slide {i}")
+    _notify("VALIDATING_CODE", f"Validating code for Slide {i}")
+    _notify("RENDERING", f"Rendering visual anchor for Slide {i}")
+
+    # Step 1: Render Visual Anchor with Visual Critic Feedback & Retry Loop
+    visual_critic = get_visual_critic()
+    max_visual_retries = int(os.getenv("AOS_VISUAL_CRITIC_MAX_RETRIES", "2"))
+
+    visual_path = None
+    for attempt in range(max_visual_retries + 1):
+        att_label = f" (attempt {attempt + 1}/{max_visual_retries + 1})" if attempt > 0 else ""
+        _notify("RENDERING", f"Rendering visual anchor for Slide {i}{att_label}")
+        visual_path = render_visual_anchor(segment, run_dir, quality=quality)
+        if not visual_path or not visual_path.is_file():
+            continue
+
+        segment.visual_path = str(visual_path)
+        segment.visual_duration = get_media_duration(visual_path)
+
+        # Extract keyframe snapshot for inspection
+        keyframe_path = run_dir / f"slide_{i}_keyframe_att{attempt + 1}.png"
+        extracted_frame = visual_critic.extract_keyframe(visual_path, keyframe_path)
+
+        v_context = VisualContext(
+            slide_num=i,
+            concept=segment.concept,
+            learning_objective=segment.learning_objective,
+            latex_formula=segment.visual_anchor.latex or "",
+            visible_elements=segment.visual_anchor.visible_elements,
+            key_definitions=segment.visual_anchor.key_definitions,
+            manim_code=segment.manim_code,
+        )
+
+        _notify("VISUAL_CRITIC", f"Inspecting Slide {i} with Visual Critic ({visual_critic.name})")
+        verdict = visual_critic.critique_frame(extracted_frame, v_context)
+        segment.visual_verdict = verdict.model_dump()
+
+        if verdict.passed:
+            _notify("VISUAL_CRITIC_PASS", f"Slide {i} passed visual critic inspection (Score: {verdict.score:.2f})")
+            break
+        else:
+            issues_summary = ", ".join(verdict.detected_issues[:3]) if verdict.detected_issues else "Layout defect"
+            _notify("VISUAL_CRITIC_DEFECTS", f"Slide {i} defects: {issues_summary}")
+            if attempt < max_visual_retries:
+                _notify("VISUAL_CRITIC_REPAIR", f"Repairing Slide {i} Manim code using critic feedback ({attempt + 1}/{max_visual_retries})...")
+                repaired_code = repair_visual_anchor_code(
+                    original_code=segment.manim_code,
+                    segment=segment,
+                    verdict=verdict,
+                    client=client,
+                    model=model,
+                )
+                if repaired_code and repaired_code.strip():
+                    segment.manim_code = repaired_code
+            else:
+                _notify("VISUAL_CRITIC_EXHAUSTED", f"Slide {i} max visual retries reached. Retaining best render.")
+
+    # Step 2: Synthesize Authoritative Pedagogical Narration
+    audio_path = run_dir / f"slide_{i}_audio.wav"
+    narr_dur = synthesize_teaching_audio(segment.narration, audio_path)
+    segment.audio_path = str(audio_path)
+    segment.narration_duration = narr_dur
+
+    # Step 3: Decoupled Visual Hold & Segment Assembly
+    _notify("TIMELINE_HOLD", f"Extending Slide {i} final frame: visual {segment.visual_duration:.1f}s, narration {segment.narration_duration:.1f}s")
+    chunk_path = assemble_teaching_segment(segment, run_dir)
+
+    code_part = (
+        f"# --- Segment {segment.slide_num}: {segment.concept} ---\n"
+        f"# Objective: {segment.learning_objective}\n"
+        f"# Definitions: {segment.visual_anchor.key_definitions}\n"
+        f"# Narration: {segment.narration}\n"
+        f"{segment.manim_code}\n"
+    )
+
+    return i, segment, chunk_path, code_part
+
+
 def run_producer_consumer(
     prompt: str,
     *,
@@ -1112,102 +1272,60 @@ def run_producer_consumer(
     except Exception:
         outline = f"1. Foundations of {prompt}\n2. Core formulation\n3. Intuition & synthesis"
 
-    segments: List[TeachingSegment] = []
-    rendered_chunks: List[Path] = []
     combined_code_parts: List[str] = [
         "# Auto-generated by AOS Decoupled Teaching Segment Engine",
         "from manim import *",
         "import numpy as np\n",
     ]
 
-    for i in range(1, total_slides + 1):
-        _notify("PlanTeachingScriptNode", f"Planning TeachingSegment {i} (Rich Visual Anchor & Pedagogy)")
-        segment = plan_teaching_segment(
-            prompt=prompt,
-            slide_num=i,
-            total_slides=total_slides,
-            outline=outline,
-            client=client,
-            model=effective_model,
-        )
+    # Concurrent slide generation pipeline
+    import concurrent.futures
 
-        _notify("CodeAgent", f"Visual anchor Manim code ready for Slide {i}")
-        _notify("VALIDATING_CODE", f"Validating code for Slide {i}")
-        _notify("RENDERING", f"Rendering visual anchor for Slide {i}")
+    max_workers = min(total_slides, int(os.getenv("AOS_MAX_SLIDE_WORKERS", "3")))
+    results: list[tuple[int, TeachingSegment, Path | None, str]] = []
 
-        # Step 1: Render Visual Anchor with Visual Critic Feedback & Retry Loop
-        visual_critic = get_visual_critic()
-        max_visual_retries = int(os.getenv("AOS_VISUAL_CRITIC_MAX_RETRIES", "2"))
-
-        visual_path = None
-        for attempt in range(max_visual_retries + 1):
-            att_label = f" (attempt {attempt + 1}/{max_visual_retries + 1})" if attempt > 0 else ""
-            _notify("RENDERING", f"Rendering visual anchor for Slide {i}{att_label}")
-            visual_path = render_visual_anchor(segment, run_dir, quality=quality)
-            if not visual_path or not visual_path.is_file():
-                continue
-
-            segment.visual_path = str(visual_path)
-            segment.visual_duration = get_media_duration(visual_path)
-
-            # Extract keyframe snapshot for inspection
-            keyframe_path = run_dir / f"slide_{i}_keyframe_att{attempt + 1}.png"
-            extracted_frame = visual_critic.extract_keyframe(visual_path, keyframe_path)
-
-            v_context = VisualContext(
-                slide_num=i,
-                concept=segment.concept,
-                learning_objective=segment.learning_objective,
-                latex_formula=segment.visual_anchor.latex or "",
-                visible_elements=segment.visual_anchor.visible_elements,
-                key_definitions=segment.visual_anchor.key_definitions,
-                manim_code=segment.manim_code,
+    if max_workers > 1:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
+            futures = [
+                pool.submit(
+                    _process_single_slide,
+                    i=i,
+                    total_slides=total_slides,
+                    prompt=prompt,
+                    outline=outline,
+                    client=client,
+                    model=effective_model,
+                    run_dir=run_dir,
+                    quality=quality,
+                    _notify=_notify,
+                )
+                for i in range(1, total_slides + 1)
+            ]
+            for fut in concurrent.futures.as_completed(futures):
+                results.append(fut.result())
+    else:
+        for i in range(1, total_slides + 1):
+            results.append(
+                _process_single_slide(
+                    i=i,
+                    total_slides=total_slides,
+                    prompt=prompt,
+                    outline=outline,
+                    client=client,
+                    model=effective_model,
+                    run_dir=run_dir,
+                    quality=quality,
+                    _notify=_notify,
+                )
             )
 
-            _notify("VISUAL_CRITIC", f"Inspecting Slide {i} with Visual Critic ({visual_critic.name})")
-            verdict = visual_critic.critique_frame(extracted_frame, v_context)
-            segment.visual_verdict = verdict.model_dump()
+    # Sort results deterministically by slide_num
+    results.sort(key=lambda r: r[0])
 
-            if verdict.passed:
-                _notify("VISUAL_CRITIC_PASS", f"Slide {i} passed visual critic inspection (Score: {verdict.score:.2f})")
-                break
-            else:
-                issues_summary = ", ".join(verdict.detected_issues[:3]) if verdict.detected_issues else "Layout defect"
-                _notify("VISUAL_CRITIC_DEFECTS", f"Slide {i} defects: {issues_summary}")
-                if attempt < max_visual_retries:
-                    _notify("VISUAL_CRITIC_REPAIR", f"Repairing Slide {i} Manim code using critic feedback ({attempt + 1}/{max_visual_retries})...")
-                    repaired_code = repair_visual_anchor_code(
-                        original_code=segment.manim_code,
-                        segment=segment,
-                        verdict=verdict,
-                        client=client,
-                        model=effective_model,
-                    )
-                    if repaired_code and repaired_code.strip():
-                        segment.manim_code = repaired_code
-                else:
-                    _notify("VISUAL_CRITIC_EXHAUSTED", f"Slide {i} max visual retries reached. Retaining best render.")
-
-        # Step 2: Synthesize Authoritative Pedagogical Narration
-        audio_path = run_dir / f"slide_{i}_audio.wav"
-        narr_dur = synthesize_teaching_audio(segment.narration, audio_path)
-        segment.audio_path = str(audio_path)
-        segment.narration_duration = narr_dur
-
-        # Step 3: Decoupled Visual Hold & Segment Assembly
-        _notify("TIMELINE_HOLD", f"Extending Slide {i} final frame: visual {segment.visual_duration:.1f}s, narration {segment.narration_duration:.1f}s")
-        chunk_path = assemble_teaching_segment(segment, run_dir)
-        if chunk_path and chunk_path.is_file():
-            rendered_chunks.append(chunk_path)
-
-        segments.append(segment)
-        combined_code_parts.append(
-            f"# --- Segment {segment.slide_num}: {segment.concept} ---\n"
-            f"# Objective: {segment.learning_objective}\n"
-            f"# Definitions: {segment.visual_anchor.key_definitions}\n"
-            f"# Narration: {segment.narration}\n"
-            f"{segment.manim_code}\n"
-        )
+    segments: List[TeachingSegment] = [r[1] for r in results]
+    rendered_chunks: List[Path] = [r[2] for r in results if r[2] and r[2].is_file()]
+    for r in results:
+        combined_code_parts.append(r[3])
 
     final_video = run_dir / "final.mp4"
     if rendered_chunks:

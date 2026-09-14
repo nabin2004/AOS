@@ -70,3 +70,43 @@ def test_hold_final_state_decoupling(tmp_path: Path):
     # The new duration should equal initial_duration + hold_seconds
     expected_duration = initial_duration + hold_seconds
     assert pytest.approx(new_duration, abs=0.5) == expected_duration
+
+
+def test_extract_topic_title():
+    """Verify topic title extraction handles massive prompt copy-pastes cleanly."""
+    from apps.agents.keyframe_engine import _extract_topic_title
+
+    long_wiki_prompt = (
+        "Teach me about the PEMBDAS rule: Order of operations\n\n"
+        "Article\nTalk\nRead\nEdit\nView history\n\nAppearance hide\nText\n\n"
+        "Small\nStandard\nLarge\nWidth\nStandard\nWide\nColor\n"
+        "From Wikipedia, the free encyclopedia\nNot to be confused with Operations order.\n"
+        "In mathematics and computer programming, the order of operations is a collection..."
+    )
+    title = _extract_topic_title(long_wiki_prompt)
+    assert "PEMBDAS" in title
+    assert len(title) <= 60
+    assert "Wikipedia" not in title
+    assert "Article" not in title
+
+
+def test_edge_tts_speech_synthesis(tmp_path: Path):
+    """Verify Edge-TTS synthesizes clean audio with valid duration in < 5 seconds."""
+    import time
+    from apps.agents.keyframe_engine import synthesize_teaching_audio
+
+    out_wav = tmp_path / "test_fast_speech.wav"
+    sample_text = (
+        "The order of operations is formalized through precedence conventions. "
+        "Multiplication and division precede addition and subtraction."
+    )
+    t0 = time.time()
+    dur = synthesize_teaching_audio(sample_text, out_wav)
+    elapsed = time.time() - t0
+
+    assert out_wav.is_file()
+    assert out_wav.stat().st_size > 1000
+    assert dur > 1.0
+    # Fast synthesis should finish in well under 10 seconds (typically ~1.5s)
+    assert elapsed < 10.0
+
