@@ -230,6 +230,22 @@ def _parse_progress_stage(line: str) -> tuple[str, str | None] | None:
     return stage, custom_msg
 
 
+def _venv_has_agents_deps(python_path: Path) -> bool:
+    """Verify that a candidate Python interpreter has agents workspace packages installed."""
+    if not python_path.is_file():
+        return False
+    try:
+        res = subprocess.run(
+            [str(python_path), "-c", "import typer, pydantic_ai; print('OK')"],
+            capture_output=True,
+            text=True,
+            timeout=5.0,
+        )
+        return res.returncode == 0 and "OK" in res.stdout
+    except Exception:
+        return False
+
+
 def _run_agents_cli(
     mode: str,
     prompt: str,
@@ -248,9 +264,9 @@ def _run_agents_cli(
     agents_dir = _resolve_agents_dir()
     command = "animate" if mode in ("animate", "teaching") else "generate"
     
-    # In Docker, invoke the container virtualenv Python directly to avoid uv workspace locking overhead (saves 3-5m)
+    # In Docker, check if container virtualenv Python has agents packages ready
     venv_python = Path("/app/.venv/bin/python")
-    if venv_python.is_file():
+    if _venv_has_agents_deps(venv_python):
         cmd = [
             str(venv_python),
             "cli.py",
@@ -263,7 +279,6 @@ def _run_agents_cli(
         cmd = [
             settings.AGENTS_UV_CMD,
             "run",
-            "--frozen",
             "python",
             "cli.py",
             command,

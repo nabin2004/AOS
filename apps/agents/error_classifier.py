@@ -35,7 +35,7 @@ class ClassifiedError:
 
 
 # Regex patterns for error matching
-_RE_503 = re.compile(r"\b(503|502|504|service unavailable|bad gateway|gateway timeout)\b", re.I)
+_RE_503 = re.compile(r"\b(503|502|504|service unavailable|bad gateway|gateway timeout|unavailable|no capacity available|capacity exhausted|overloaded)\b", re.I)
 _RE_COLD_START = re.compile(r"(cold start|scaling up|waking up|serverless container|booting)", re.I)
 _RE_RATE_LIMIT = re.compile(r"\b(429|rate limit|quota exceeded|too many requests|tokens per minute)\b", re.I)
 _RE_AUTH = re.compile(r"\b(401|403|unauthorized|forbidden|invalid[ _]?api[ _]?key|expired token|authentication failed)\b", re.I)
@@ -101,11 +101,15 @@ def classify_error(error: Exception | str | None) -> ClassifiedError:
 
     # 3. Transient LLM cold-start / 503 / 502 / 504
     if _RE_503.search(lowered) or _RE_COLD_START.search(lowered):
+        if "capacity" in lowered or "unavailable" in lowered:
+            user_msg = "The AI model was temporarily out of capacity (503 UNAVAILABLE). Automatic recovery or model failover was attempted — click Try Again to regenerate."
+        else:
+            user_msg = "Starting the AI model… The service is waking up from idle and will start automatically."
         return ClassifiedError(
             category=ErrorCategory.TRANSIENT_LLM_ERROR,
             is_retryable=True,
             is_repairable=False,
-            user_message="Starting the AI model… The service is waking up from idle and will start automatically.",
+            user_message=user_msg,
             developer_details=raw_error,
             raw_error=raw_error,
         )

@@ -145,6 +145,52 @@ def get_llm_client(
     return client, effective_model
 
 
+def execute_completion_with_fallback(
+    client: OpenAI,
+    primary_model: str,
+    messages: list[dict],
+    temperature: float = 0.3,
+    timeout: float | None = None,
+) -> Any:
+    """Executes a chat completion with transparent multi-model failover on 503 / 429 / capacity exhaustion."""
+    candidates = [primary_model]
+
+    # Add robust backup models when using OpenRouter or cloud
+    base_url = str(client.base_url)
+    if "openrouter.ai" in base_url:
+        for backup in ("openai/gpt-4o-mini", "google/gemini-2.5-flash", "anthropic/claude-3.5-haiku"):
+            if backup not in candidates:
+                candidates.append(backup)
+
+    last_error = None
+    for cand in candidates:
+        try:
+            return client.chat.completions.create(
+                model=cand,
+                messages=messages,
+                temperature=temperature,
+                timeout=timeout,
+            )
+        except Exception as exc:
+            last_error = exc
+            err_str = str(exc).lower()
+            is_transient = any(
+                k in err_str
+                for k in ("503", "502", "504", "429", "capacity", "unavailable", "rate limit", "overloaded", "timeout")
+            )
+            if is_transient and cand != candidates[-1]:
+                next_cand = candidates[candidates.index(cand) + 1]
+                print(
+                    f"[Model Failover] Model '{cand}' unavailable ({exc}); failing over to '{next_cand}'...",
+                    file=sys.stderr,
+                )
+                continue
+            raise exc
+
+    if last_error:
+        raise last_error
+
+
 VISUAL_PLANNER_PROMPT = """You are an expert mathematical animator creating rich, highly informative, and elegant visual slides in Manim Community Edition.
 
 CORE PHILOSOPHY:
@@ -779,8 +825,9 @@ def plan_teaching_segment(
         f"Provide the <visual_anchor> JSON and clean, executable Manim code."
     )
     try:
-        vis_resp = client.chat.completions.create(
-            model=model,
+        vis_resp = execute_completion_with_fallback(
+            client=client,
+            primary_model=model,
             messages=[
                 {"role": "system", "content": VISUAL_PLANNER_PROMPT},
                 {"role": "user", "content": visual_user_prompt},
@@ -812,8 +859,9 @@ def plan_teaching_segment(
         f"Remember: Do NOT merely recite the slide aloud!"
     )
     try:
-        narr_resp = client.chat.completions.create(
-            model=model,
+        narr_resp = execute_completion_with_fallback(
+            client=client,
+            primary_model=model,
             messages=[
                 {"role": "system", "content": NARRATION_PLANNER_PROMPT},
                 {"role": "user", "content": narration_user_prompt},
@@ -1272,8 +1320,9 @@ def repair_visual_anchor_code(
     )
 
     try:
-        resp = client.chat.completions.create(
-            model=model,
+        resp = execute_completion_with_fallback(
+            client=client,
+            primary_model=model,
             messages=[
                 {
                     "role": "system",
@@ -1440,8 +1489,9 @@ def run_producer_consumer(
     client, effective_model = get_llm_client(base_url=base_url, api_key=api_key, model=model)
 
     try:
-        outline_resp = client.chat.completions.create(
-            model=effective_model,
+        outline_resp = execute_completion_with_fallback(
+            client=client,
+            primary_model=effective_model,
             messages=[
                 {
                     "role": "user",

@@ -36,19 +36,21 @@ class MoondreamCritic(BaseVisualCritic):
 
     def __init__(
         self,
-        model_name: str = "vikhyatk/moondream-0_5b",
+        model_name: str = "vikhyatk/moondream2",
         device: str = "auto",
         pass_threshold: float = 0.70,
         use_ollama: bool = False,
         ollama_base_url: Optional[str] = None,
         timeout: float = 20.0,
     ) -> None:
-        super().__init__(model_name=model_name, backend_name="moondream", pass_threshold=pass_threshold)
+        effective_model = os.getenv("AOS_VISUAL_CRITIC_MODEL", model_name).strip()
+        super().__init__(model_name=effective_model, backend_name="moondream", pass_threshold=pass_threshold)
         self.device = device
         self.use_ollama = use_ollama
         self.ollama_base_url = ollama_base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         self.timeout = float(os.getenv("AOS_VISUAL_CRITIC_RETRY_TIMEOUT", str(timeout)))
         self._fallback_critic = HeuristicVisionCritic()
+        self._model_load_failed = False
 
     def _ensure_local_model(self):
         """Lazy-loads and caches the Moondream model and tokenizer."""
@@ -138,6 +140,9 @@ class MoondreamCritic(BaseVisualCritic):
         if not img_p.is_file():
             return self._fallback_critic.critique_frame(image_path, context)
 
+        if self._model_load_failed:
+            return self._fallback_critic.critique_frame(img_p, context)
+
         # Quick heuristic pre-flight: catch pitch black screen immediately
         h_verdict = self._fallback_critic.critique_frame(img_p, context)
         if not h_verdict.passed:
@@ -154,6 +159,14 @@ class MoondreamCritic(BaseVisualCritic):
         try:
             with Image.open(img_p) as raw_img:
                 pil_img = raw_img.convert("RGB")
+
+            # Quick probe to ensure model weights and inference are operational
+            try:
+                self._ask_question(img_p, pil_img, "Is this image visible? Answer strictly with 'Yes' or 'No'.")
+            except Exception as probe_err:
+                self._model_load_failed = True
+                print(f"[MoondreamCritic] Model load/inference unavailable ({probe_err}); seamlessly using HeuristicVisionCritic.", file=sys.stderr)
+                return self._fallback_critic.critique_frame(img_p, context)
 
             checks: List[VisualCheckItem] = []
             raw_answers: Dict[str, str] = {}
