@@ -12,19 +12,21 @@ Decouples visual animation duration from detailed pedagogical narration:
 
 from __future__ import annotations
 
+import asyncio
+import concurrent.futures
 from contextlib import contextmanager
 import json
 import os
-import queue
 import re
 import shutil
 import subprocess
 import sys
 import threading
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable
+from uuid import uuid4
 
 import numpy as np
 from manim import *
@@ -37,6 +39,7 @@ from tools.timeline_assembler import (
     hold_final_state,
 )
 from tools.visual_critic import (
+    HeuristicVisionCritic,
     VisualContext,
     VisualCriticVerdict,
     get_visual_critic,
@@ -54,6 +57,35 @@ class SlideData:
     is_final_slide: bool = False
     chunk_path: str | None = None
     teaching_segment: TeachingSegment | None = None
+    visual_duration: float = 0.0
+    narration_duration: float = 0.0
+
+    @property
+    def total_duration(self) -> float:
+        if self.teaching_segment:
+            return self.teaching_segment.total_duration
+        return max(self.visual_duration, self.narration_duration)
+
+    @property
+    def hold_duration(self) -> float:
+        if self.teaching_segment:
+            return self.teaching_segment.hold_duration
+        return max(0.0, self.narration_duration - self.visual_duration)
+
+
+@dataclass
+class SlideProcessResult:
+    """Result of processing a single slide in the keyframe pipeline."""
+    slide_num: int
+    segment: TeachingSegment
+    chunk_path: Path | None
+    code_part: str
+
+    def __iter__(self):
+        return iter((self.slide_num, self.segment, self.chunk_path, self.code_part))
+
+    def __getitem__(self, idx: int) -> Any:
+        return (self.slide_num, self.segment, self.chunk_path, self.code_part)[idx]
 
 
 def get_speech_service():
@@ -70,7 +102,7 @@ def get_llm_client(
     base_url: str | None = None,
     api_key: str | None = None,
     model: str | None = None,
-) -> Tuple[OpenAI, str]:
+) -> tuple[OpenAI, str]:
     """Dynamically resolves LLM client and model for keyframe script generation."""
     openrouter_key = (
         api_key
@@ -116,8 +148,9 @@ def get_llm_client(
             effective_base = f"{ollama_base.rstrip('/')}/v1"
         effective_key = "ollama"
     else:
+        # No credentials or local base provided; use unconfigured local placeholder
         effective_base = "https://openrouter.ai/api/v1"
-        effective_key = "local"
+        effective_key = "unconfigured_local"
 
     if model and model.strip():
         effective_model = model.strip()
@@ -153,10 +186,18 @@ def execute_completion_with_fallback(
     timeout: float | None = None,
 ) -> Any:
     """Executes a chat completion with transparent multi-model failover on 503 / 429 / capacity exhaustion."""
+    base_url = str(client.base_url)
+    api_key = str(client.api_key or "")
+
+    # Short-circuit if OpenRouter is targeted with dummy/unconfigured key
+    if "openrouter.ai" in base_url and api_key in ("local", "unconfigured_local", ""):
+        raise ValueError(
+            "No OpenRouter API key configured; short-circuiting external LLM call to fallback."
+        )
+
     candidates = [primary_model]
 
     # Add robust backup models when using OpenRouter or cloud
-    base_url = str(client.base_url)
     if "openrouter.ai" in base_url:
         for backup in ("openai/gpt-4o-mini", "google/gemini-2.5-flash", "anthropic/claude-3.5-haiku"):
             if backup not in candidates:
@@ -272,22 +313,39 @@ def _extract_topic_title(prompt: str) -> str:
     if not lines:
         return "Key Mathematical Principles"
     first_line = lines[0]
-    # Remove common conversational prefixes
+
+    # Remove conversational prefixes
     first_line = re.sub(
-        r"^(teach me about (the)?|explain (the)?|what is (the)?|help me understand (the)?|introduce (the)?)\s*",
+        r"^(?:teach\s+me\s+about\s+(?:the\s+)?|explain\s+(?:the\s+)?|what\s+is\s+(?:the\s+)?|"
+        r"help\s+me\s+understand\s+(?:the\s+)?|introduce\s+(?:the\s+)?|visualize\s+(?:the\s+)?|"
+        r"show\s+me\s+(?:how\s+)?|lecture\s+on\s+(?:the\s+)?|deep\s+dive\s+into\s+(?:the\s+)?|"
+        r"how\s+(?:to\s+|a\s+|an\s+|the\s+)?)\s*",
         "",
         first_line,
         flags=re.IGNORECASE,
     ).strip()
-    # Strip after common Wikipedia or navigation headers
-    first_line = re.split(r":\s*Order of operations|\s*Article\s+Talk|\s*-\s*Wikipedia", first_line, flags=re.IGNORECASE)[0].strip()
+
+    # Strip general Wikipedia / web-scraping navigation artifacts and secondary subtitles
+    first_line = re.split(
+        r":\s*Order of operations|(?:\s*[-–—|]\s*)?(?:from\s+)?wikipedia(?:\s+the\s+free\s+encyclopedia)?|"
+        r"\s*article\s+talk|\s*jump\s+to\s+content|\s*main\s+page",
+        first_line,
+        flags=re.IGNORECASE,
+    )[0].strip()
+
     first_line = first_line.rstrip(":,.-")
     if len(first_line) > 60:
-        first_line = first_line[:57] + "..."
+        truncated = first_line[:57]
+        last_space = truncated.rfind(" ")
+        if last_space > 20:
+            first_line = truncated[:last_space] + "..."
+        else:
+            first_line = truncated + "..."
+
     return first_line or "Key Mathematical Concept"
 
 
-def _parse_visual_output(text: str) -> Tuple[VisualAnchor, str]:
+def _parse_visual_output(text: str) -> tuple[VisualAnchor, str]:
     """Extracts VisualAnchor metadata and Python code from LLM output."""
     anchor = VisualAnchor(type="annotated_formula", visual_purpose="Core concept visualization")
     anchor_match = re.search(r"<visual_anchor>(.*?)</visual_anchor>", text, re.DOTALL | re.IGNORECASE)
@@ -296,15 +354,23 @@ def _parse_visual_output(text: str) -> Tuple[VisualAnchor, str]:
             raw_json = anchor_match.group(1).strip()
             data = json.loads(raw_json)
             anchor = VisualAnchor(**data)
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"[Keyframe Engine] Failed to parse <visual_anchor> JSON: {exc}", file=sys.stderr)
 
-    code = ""
+    code = _parse_code_only(text)
+    return anchor, code
+
+
+def _parse_code_only(text: str) -> str:
+    """Extracts executable Python code from LLM output, ignoring XML/anchor metadata."""
     code_match = re.search(r"```(?:python)?(.*?)```", text, re.DOTALL)
     if code_match:
-        code = code_match.group(1).strip()
-
-    return anchor, code
+        return code_match.group(1).strip()
+    clean = re.sub(r"<visual_anchor>.*?</visual_anchor>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    clean = re.sub(r"<think>.*?</think>", "", clean, flags=re.DOTALL | re.IGNORECASE)
+    if "self.play" in clean:
+        return clean.strip()
+    return ""
 
 
 def _parse_narration_output(text: str) -> str:
@@ -318,9 +384,734 @@ def _parse_narration_output(text: str) -> str:
     return clean.strip()
 
 
+def _clean_manim_code(code_str: str) -> str:
+    """Cleans generated code: unwraps Scene classes and replaces `with self.play(...):` with balanced parens."""
+    # 1. Handle hallucinated Scene class definitions
+    if re.search(r"class\s+\w+\s*\(\s*(?:Scene|VoiceoverScene)\s*\)\s*:", code_str):
+        lines = code_str.splitlines()
+        extracted_lines = []
+        inside_construct = False
+        base_indent = None
+        for line in lines:
+            if re.match(r"^\s*def\s+construct\s*\(\s*self\s*\)\s*:", line):
+                inside_construct = True
+                continue
+            if inside_construct:
+                if not line.strip():
+                    extracted_lines.append("")
+                    continue
+                indent = len(line) - len(line.lstrip())
+                if base_indent is None:
+                    base_indent = indent
+                if indent >= base_indent:
+                    extracted_lines.append(line[base_indent:])
+                else:
+                    break
+        if extracted_lines:
+            code_str = "\n".join(extracted_lines)
+
+    # 2. Clean hallucinated `with self.play(...):` blocks with balanced parens and fix indentation
+    lines = code_str.splitlines()
+    out_lines = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        match = re.match(r"^(\s*)with\s+self\.play\(", line)
+        if match:
+            indent_str = match.group(1)
+            indent_len = len(indent_str)
+
+            curr_str = line
+            start_paren = match.end() - 1
+            depth = 1
+            idx = start_paren + 1
+
+            while depth > 0 and idx <= len(curr_str):
+                if idx == len(curr_str):
+                    if i + 1 < len(lines):
+                        i += 1
+                        curr_str += "\n" + lines[i]
+                    else:
+                        break
+                ch = curr_str[idx]
+                if ch == "(":
+                    depth += 1
+                elif ch == ")":
+                    depth -= 1
+                elif ch in ('"', "'"):
+                    quote = ch
+                    idx += 1
+                    while idx < len(curr_str) and curr_str[idx] != quote:
+                        if curr_str[idx] == "\\":
+                            idx += 1
+                        idx += 1
+                idx += 1
+
+            if depth == 0:
+                args = curr_str[start_paren + 1 : idx - 1]
+                play_line = f"{indent_str}self.play({args})"
+                out_lines.append(play_line)
+
+                i += 1
+                while i < len(lines):
+                    next_line = lines[i]
+                    if not next_line.strip():
+                        out_lines.append(next_line)
+                        i += 1
+                        continue
+                    next_indent = len(next_line) - len(next_line.lstrip())
+                    if next_indent > indent_len:
+                        stripped_stmt = next_line.strip()
+                        if stripped_stmt != "pass":
+                            unindented = indent_str + next_line[next_indent:]
+                            out_lines.append(unindented)
+                        i += 1
+                    else:
+                        break
+                continue
+            else:
+                out_lines.append(line)
+        else:
+            out_lines.append(line)
+        i += 1
+
+    return "\n".join(out_lines)
+
+
+class VisualAnchorScene(Scene):
+    """Self-contained Manim scene that constructs a TeachingSegment visual anchor."""
+
+    def __init__(self, segment: TeachingSegment | None = None, **kwargs):
+        super().__init__(**kwargs)
+        self.segment = segment
+
+    def wait_until_bookmark(self, mark: str, **kwargs):
+        self.wait(0.2)
+
+    @contextmanager
+    def voiceover(self, *args, **kwargs):
+        yield None
+
+    def construct(self):
+        if not self.segment:
+            return
+
+        safe_globals: dict[str, Any] = {
+            "np": np,
+            "MathTex": MathTex,
+            "Text": Text,
+            "Title": Title,
+            "Scene": Scene,
+            "VGroup": VGroup,
+            "Group": Group,
+            "Create": Create,
+            "Write": Write,
+            "Transform": Transform,
+            "ReplacementTransform": ReplacementTransform,
+            "FadeIn": FadeIn,
+            "FadeOut": FadeOut,
+            "GrowFromCenter": GrowFromCenter,
+            "GrowArrow": GrowArrow,
+            "Indicate": Indicate,
+            "Circumscribe": Circumscribe,
+            "Wiggle": Wiggle,
+            "Line": Line,
+            "DashedLine": DashedLine,
+            "Arrow": Arrow,
+            "DoubleArrow": DoubleArrow,
+            "Vector": Vector,
+            "Circle": Circle,
+            "Square": Square,
+            "Rectangle": Rectangle,
+            "RoundedRectangle": RoundedRectangle,
+            "SurroundingRectangle": SurroundingRectangle,
+            "Polygon": Polygon,
+            "Triangle": Triangle,
+            "Dot": Dot,
+            "Axes": Axes,
+            "NumberPlane": NumberPlane,
+            "ComplexPlane": ComplexPlane,
+            "PolarPlane": PolarPlane,
+            "FunctionGraph": FunctionGraph,
+            "ParametricFunction": ParametricFunction,
+            "Arc": Arc,
+            "ArcBetweenPoints": ArcBetweenPoints,
+            "CurvedArrow": CurvedArrow,
+            "DashedVMobject": DashedVMobject,
+            "Brace": Brace,
+            "DecimalNumber": DecimalNumber,
+            "LaggedStart": LaggedStart,
+            "always_redraw": always_redraw,
+            "ValueTracker": ValueTracker,
+            "Angle": Angle,
+            "RightAngle": RightAngle,
+            "UP": UP,
+            "DOWN": DOWN,
+            "LEFT": LEFT,
+            "RIGHT": RIGHT,
+            "ORIGIN": ORIGIN,
+            "UL": UL,
+            "UR": UR,
+            "DL": DL,
+            "DR": DR,
+            "BLUE": BLUE,
+            "RED": RED,
+            "YELLOW": YELLOW,
+            "GREEN": GREEN,
+            "WHITE": WHITE,
+            "GRAY": GRAY,
+            "GREY": GREY,
+            "BLACK": BLACK,
+            "ORANGE": ORANGE,
+            "PURPLE": PURPLE,
+            "GOLD": GOLD,
+            "TEAL": TEAL,
+            "BOLD": BOLD,
+            "GRAY_A": GRAY_A,
+            "PI": PI,
+            "TAU": TAU,
+        }
+        try:
+            from manim_voiceover import VoiceoverScene
+            safe_globals["VoiceoverScene"] = VoiceoverScene
+        except Exception:
+            safe_globals["VoiceoverScene"] = Scene
+
+        try:
+            from manim import Paragraph
+            safe_globals["Paragraph"] = Paragraph
+        except Exception:
+            safe_globals["Paragraph"] = Text
+
+        try:
+            from manim import MarkupText, Tex
+            safe_globals["Tex"] = Tex
+            safe_globals["MarkupText"] = MarkupText
+        except Exception:
+            safe_globals["Tex"] = MathTex
+            safe_globals["MarkupText"] = Text
+
+        def _execute_code(code_str: str) -> bool:
+            cleaned = _clean_manim_code(code_str)
+            locs: dict[str, Any] = {"self": self}
+            exec(cleaned, safe_globals, locs)
+            return len(self.mobjects) > 0
+
+        executed = False
+        if self.segment.manim_code.strip():
+            try:
+                executed = _execute_code(self.segment.manim_code)
+            except Exception as exc:
+                print(f"[Visual Render Warning] Slide {self.segment.slide_num} primary exec error: {exc}", file=sys.stderr)
+                self.clear()
+
+            if not executed:
+                try:
+                    self.clear()
+                    alt_code = re.sub(r"(?:MathTex|Tex|Paragraph)\(\s*r?([\"'])(.*?)\1", r"Text(\1\2\1", self.segment.manim_code)
+                    alt_code = (
+                        alt_code.replace("\\bullet\\", "•")
+                        .replace("\\bullet", "•")
+                        .replace(r"\approx", "≈")
+                        .replace(r"\sqrt{-1}", "√(-1)")
+                        .replace(r"\sqrt", "√")
+                        .replace(r"\theta", "θ")
+                        .replace(r"\pi", "π")
+                        .replace(r"\cos", "cos")
+                        .replace(r"\sin", "sin")
+                        .replace(r"\xi", "ξ")
+                        .replace(r"\text{", "")
+                        .replace(r"\hat{f}", "f̂")
+                        .replace(r"\int_{-\infty}^{\infty}", "∫")
+                    )
+                    executed = _execute_code(alt_code)
+                    if executed:
+                        print(f"[Visual Render Info] Slide {self.segment.slide_num} successfully rendered via Text transpilation!", file=sys.stderr)
+                except Exception as exc2:
+                    print(f"[Visual Render Warning] Slide {self.segment.slide_num} transpilation failed: {exc2}", file=sys.stderr)
+                    self.clear()
+
+        if not executed or len(self.mobjects) == 0:
+            try:
+                self.clear()
+                title_text = self.segment.visual_anchor.title or self.segment.concept
+                f_title = Text(title_text, font_size=32, color=YELLOW).to_edge(UP, buff=0.4)
+                if f_title.width > 12.0:
+                    f_title.scale_to_fit_width(12.0)
+                elements = [f_title]
+                prev_mob = f_title
+
+                latex_str = self.segment.visual_anchor.latex
+                if latex_str:
+                    clean_eq = (
+                        latex_str.replace(r"\approx", "≈")
+                        .replace(r"\theta", "θ")
+                        .replace(r"\pi", "π")
+                        .replace(r"\cos", "cos")
+                        .replace(r"\sin", "sin")
+                        .replace(r"\text{", "")
+                        .replace("}", "")
+                    )
+                    f_math = Text(clean_eq, font_size=36, color=BLUE).next_to(f_title, DOWN, buff=0.35)
+                    if f_math.width > 12.0:
+                        f_math.scale_to_fit_width(12.0)
+                    f_box = SurroundingRectangle(f_math, color=GOLD, buff=0.25)
+                    elements.extend([f_math, f_box])
+                    prev_mob = f_box
+
+                if self.segment.visual_anchor.key_definitions:
+                    where_lbl = Text("Key Concept Breakdown:", font_size=20, color=GOLD, weight=BOLD).next_to(prev_mob, DOWN, buff=0.35).to_edge(LEFT, buff=1.0)
+                    elements.append(where_lbl)
+                    bullet_mobs = []
+                    for d in self.segment.visual_anchor.key_definitions[:5]:
+                        clean_d = d.replace("\\bullet\\", "•").replace("\\bullet", "•").replace(r"\approx", "≈").replace(r"\theta", "θ").replace(r"\pi", "π")
+                        b_mob = Text(f"• {clean_d}", font_size=18, color=WHITE)
+                        if b_mob.width > 11.5:
+                            b_mob.scale_to_fit_width(11.5)
+                        bullet_mobs.append(b_mob)
+                    if bullet_mobs:
+                        b_group = VGroup(*bullet_mobs).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)
+                        elements.append(b_group)
+
+                self.play(*[FadeIn(el) for el in elements], run_time=1.5)
+                self.wait(1.5)
+            except Exception as exc3:
+                print(f"[Visual Render Emergency Fallback] Slide {self.segment.slide_num}: {exc3}", file=sys.stderr)
+                self.clear()
+                safe_title = Text(f"Slide {self.segment.slide_num}: {self.segment.concept[:30]}", font_size=28, color=YELLOW)
+                self.add(safe_title)
+                self.wait(1.5)
+        else:
+            self.wait(1.0)
+
+
+def _render_visual_anchor_subprocess(
+    segment: TeachingSegment,
+    output_dir: Path,
+    output_stem: str,
+    quality: str = "low_quality",
+    timeout: float = 120.0,
+) -> Path | None:
+    """Renders a Manim scene in an isolated subprocess, preventing global config contention across threads."""
+    spec_path = output_dir / f"_slide_{segment.slide_num}_spec.json"
+    runner_path = output_dir / f"_slide_{segment.slide_num}_runner.py"
+
+    try:
+        spec_path.write_text(segment.model_dump_json(), encoding="utf-8")
+        repo_root = Path(__file__).resolve().parents[2]
+        runner_code = f"""import sys
+from pathlib import Path
+
+repo_root = Path(r"{repo_root}")
+for p in (repo_root, repo_root / "packages" / "ir" / "src", repo_root / "apps" / "agents"):
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
+
+from ir import TeachingSegment
+from keyframe_engine import VisualAnchorScene
+from manim import config
+
+if __name__ == "__main__":
+    spec_file = Path(sys.argv[1])
+    output_dir = Path(sys.argv[2])
+    output_stem = sys.argv[3]
+    quality = sys.argv[4]
+
+    segment = TeachingSegment.model_validate_json(spec_file.read_text(encoding="utf-8"))
+    config.media_dir = str(output_dir)
+    config.quality = quality
+    config.output_file = output_stem
+    config.verbosity = "WARNING"
+
+    scene = VisualAnchorScene(segment=segment)
+    scene.render()
+"""
+        runner_path.write_text(runner_code, encoding="utf-8")
+
+        proc = subprocess.run(
+            [sys.executable, str(runner_path), str(spec_path), str(output_dir), output_stem, quality],
+            cwd=str(output_dir),
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        if proc.returncode != 0:
+            print(
+                f"[Visual Subprocess Warning] Slide {segment.slide_num} render error (rc={proc.returncode}): {proc.stderr[:400]}",
+                file=sys.stderr,
+            )
+
+        # Locate rendered MP4
+        dest = output_dir / f"{output_stem}.mp4"
+        for mp4 in output_dir.rglob(f"*{output_stem}*.mp4"):
+            if mp4.is_file() and "partial_movie_files" not in mp4.parts:
+                if mp4.resolve() != dest.resolve():
+                    try:
+                        shutil.copy2(mp4, dest)
+                    except Exception:
+                        pass
+                break
+
+        if dest.is_file() and dest.stat().st_size > 0:
+            return dest.resolve()
+
+    except Exception as exc:
+        print(f"[Visual Subprocess Exception] Slide {segment.slide_num}: {exc}", file=sys.stderr)
+    finally:
+        spec_path.unlink(missing_ok=True)
+        runner_path.unlink(missing_ok=True)
+
+    return None
+
+
+def render_visual_anchor(
+    segment: TeachingSegment,
+    output_dir: Path,
+    quality: str = "low_quality",
+) -> Path | None:
+    """Renders the pure visual animation for a TeachingSegment using Manim.
+
+    Renders via isolated subprocess for true concurrency without global lock contention.
+    Falls back gracefully to in-process tempconfig and ffmpeg color generator.
+    """
+    output_stem = f"slide_{segment.slide_num}_visual"
+
+    # Primary: Run via isolated subprocess for thread-safety and true parallelism
+    sub_path = _render_visual_anchor_subprocess(segment, output_dir, output_stem, quality=quality)
+    if sub_path and sub_path.is_file() and sub_path.stat().st_size > 0:
+        return sub_path
+
+    # Secondary: In-process fallback with tempconfig under safety lock
+    try:
+        from manim import tempconfig
+        with _manim_render_lock:
+            with tempconfig({"media_dir": str(output_dir), "quality": quality, "output_file": output_stem, "verbosity": "WARNING"}):
+                scene = VisualAnchorScene(segment=segment)
+                scene.render()
+
+        dest = output_dir / f"{output_stem}.mp4"
+        for mp4 in output_dir.rglob(f"*{output_stem}*.mp4"):
+            if mp4.is_file() and "partial_movie_files" not in mp4.parts:
+                if mp4.resolve() != dest.resolve():
+                    try:
+                        shutil.copy2(mp4, dest)
+                    except Exception:
+                        pass
+                return dest.resolve()
+    except Exception as exc:
+        print(f"[Visual In-Process Fallback Warning] Slide {segment.slide_num}: {exc}", file=sys.stderr)
+
+    dest = output_dir / f"{output_stem}.mp4"
+    if dest.is_file() and dest.stat().st_size > 0:
+        return dest.resolve()
+
+    # Tertiary safety net: ffmpeg color generator so timeline assembly never drops slides
+    try:
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi",
+            "-i", "color=c=0x111827:s=854x480:d=3.0:r=30",
+            "-c:v", "libx264",
+            "-pix_fmt", "yuv420p",
+            str(dest),
+        ]
+        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        if dest.is_file() and dest.stat().st_size > 0:
+            return dest.resolve()
+    except Exception as ff_err:
+        print(f"[Visual Render Emergency Warning] ffmpeg fallback failed for Slide {segment.slide_num}: {ff_err}", file=sys.stderr)
+
+    return None
+
+
+def _synthesize_edge_tts(
+    clean_text: str,
+    output_wav: Path,
+    voice: str = "en-US-ChristopherNeural",
+) -> bool:
+    """Fast neural speech synthesis using Edge-TTS with transcode to standard 24kHz WAV."""
+    temp_mp3 = output_wav.with_suffix(f".{uuid4().hex[:6]}.temp.mp3")
+    try:
+        import edge_tts
+
+        async def _run():
+            comm = edge_tts.Communicate(clean_text, voice)
+            await asyncio.wait_for(comm.save(str(temp_mp3)), timeout=20.0)
+
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop is not None and loop.is_running():
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                pool.submit(lambda: asyncio.run(_run())).result(timeout=25)
+        else:
+            asyncio.run(_run())
+
+        if temp_mp3.is_file() and temp_mp3.stat().st_size > 0:
+            subprocess.run(
+                ["ffmpeg", "-y", "-i", str(temp_mp3), "-ar", "24000", "-ac", "1", str(output_wav)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True,
+            )
+            return True
+    except Exception as exc:
+        print(f"[Edge-TTS Info] Fast speech note: {exc}; using fallback narrator", file=sys.stderr)
+    finally:
+        temp_mp3.unlink(missing_ok=True)
+
+    return False
+
+
+def synthesize_teaching_audio(
+    narration_text: str,
+    output_wav: Path,
+    max_words: int = 220,
+    voice: str | None = None,
+    return_status: bool = False,
+) -> float | tuple[float, bool]:
+    """Synthesizes pedagogical narration into WAV audio using Edge-TTS or Pocket TTS.
+
+    Guarantees strict word budget with clean sentence-boundary truncation.
+    Returns duration (or (duration, is_real_audio) if return_status=True).
+    """
+    clean_text = re.sub(r"<think>.*?</think>", "", narration_text, flags=re.DOTALL)
+    clean_text = re.sub(r"<bookmark.*?>", "", clean_text).strip()
+
+    # Enforce hard upper bound on narration words, truncating strictly at sentence boundaries
+    words = clean_text.split()
+    if len(words) > max_words:
+        truncated = " ".join(words[:max_words])
+        last_punct = max(truncated.rfind("."), truncated.rfind("!"), truncated.rfind("?"))
+        if last_punct > 0:
+            clean_text = truncated[: last_punct + 1]
+        else:
+            clean_text = truncated + "..."
+
+    tts_backend = os.getenv("AOS_TTS_BACKEND", "auto").lower()
+    edge_voice = voice or os.getenv("AOS_TTS_VOICE", "en-US-ChristopherNeural")
+
+    # Fast Path: Edge-TTS
+    if tts_backend in ("auto", "edge", "edge-tts"):
+        if _synthesize_edge_tts(clean_text, output_wav, voice=edge_voice):
+            dur = get_media_duration(output_wav)
+            if dur > 0.5:
+                return (dur, True) if return_status else dur
+
+    # Offline Fallback: Resident Kyutai Pocket TTS (100M CPU model)
+    try:
+        from tools.aos_speech_service import _get_narrator
+
+        narrator = _get_narrator("alba", "english")
+        narrator.synthesize(clean_text, output_wav)
+        dur = get_media_duration(output_wav)
+        if dur > 0.5:
+            return (dur, True) if return_status else dur
+    except Exception as p_err:
+        print(f"[Keyframe Audio Warning] Pocket TTS failed for '{output_wav.name}': {p_err}", file=sys.stderr)
+
+    # Silent fallback with explicit warning
+    print(
+        f"[Keyframe Audio Warning] Both Edge-TTS and Pocket TTS failed for '{output_wav.name}'. Created silent fallback.",
+        file=sys.stderr,
+    )
+    try:
+        import scipy.io.wavfile
+
+        sr = 24000
+        words_count = len(clean_text.split())
+        sec = max(3.0, words_count * 0.45)
+        silence = np.zeros(int(sr * sec), dtype=np.float32)
+        scipy.io.wavfile.write(output_wav, sr, silence)
+    except Exception as sc_err:
+        print(f"[Keyframe Audio Warning] Scipy silent WAV generation failed: {sc_err}", file=sys.stderr)
+
+    dur = get_media_duration(output_wav)
+    return (dur, False) if return_status else dur
+
+
+def assemble_teaching_segment(
+    segment: TeachingSegment,
+    output_dir: Path,
+) -> Path | None:
+    """Combines visual animation, static visual hold, and authoritative narration audio."""
+    if not segment.visual_path or not Path(segment.visual_path).is_file():
+        return None
+
+    in_video = Path(segment.visual_path)
+    in_audio = Path(segment.audio_path) if segment.audio_path and Path(segment.audio_path).is_file() else None
+    out_chunk = output_dir / f"slide_{segment.slide_num}.mp4"
+
+    segment.visual_duration = get_media_duration(in_video)
+    if in_audio:
+        segment.narration_duration = get_media_duration(in_audio)
+    else:
+        print(
+            f"[Assembly Warning] Slide {segment.slide_num} missing narration audio file at {segment.audio_path}; visual hold set to 0.0.",
+            file=sys.stderr,
+        )
+        segment.narration_duration = 0.0
+        segment.audio_path = None
+
+    hold_dur = segment.hold_duration
+
+    res = hold_final_state(
+        video_path=in_video,
+        hold_duration=hold_dur,
+        audio_path=in_audio,
+        output_path=out_chunk,
+    )
+    if res.is_file() and res.stat().st_size > 0:
+        segment.chunk_path = str(res)
+        return res
+
+    return None
+
+
+def repair_visual_anchor_code(
+    original_code: str,
+    segment: TeachingSegment,
+    verdict: VisualCriticVerdict,
+    client: OpenAI,
+    model: str,
+    timeout: float = 20.0,
+) -> str:
+    """Repairs Manim animation code based on concrete visual feedback from the Visual Critic."""
+    repair_prompt = (
+        f"Topic: {segment.concept}\n"
+        f"Displayed Formula: {segment.visual_anchor.latex or ''}\n"
+        f"Visible Elements: {segment.visual_anchor.visible_elements}\n"
+        f"Key Definitions: {segment.visual_anchor.key_definitions}\n\n"
+        f"{verdict.feedback_for_code_repair}\n\n"
+        f"Previous Manim Code:\n```python\n{original_code}\n```\n\n"
+        "Please provide the repaired, fully working Manim code snippet.\n"
+        "CRITICAL REQUIREMENTS:\n"
+        "1. Fix all reported visual defects (e.g. scale formulas with scale_to_fit_width to fit [-6, 6], add vertical buffers to prevent collisions, ensure bright contrast colors).\n"
+        "2. Output ONLY clean executable Python code inside ```python ... ``` without Scene class or construct definition.\n"
+        "3. Start directly with mobjects and self.play(...)."
+    )
+
+    try:
+        resp = execute_completion_with_fallback(
+            client=client,
+            primary_model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert mathematical animator repairing Manim code based on Visual Critic inspection. Output strictly executable code inside ```python ... ``` without Scene class.",
+                },
+                {"role": "user", "content": repair_prompt},
+            ],
+            temperature=0.2,
+            timeout=timeout,
+        )
+        content = resp.choices[0].message.content or ""
+        repaired_code = _parse_code_only(content)
+        if repaired_code and repaired_code.strip():
+            return repaired_code
+    except Exception as exc:
+        print(f"[Visual Critic Repair Warning] Slide {segment.slide_num} repair LLM failed: {exc}", file=sys.stderr)
+
+    return original_code
+
+
+def _get_domain_knowledge(prompt: str) -> str:
+    """Provides high-density domain context for small/local LLMs on key STEM concepts."""
+    p = prompt.lower()
+    if "euler" in p:
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Euler's Formula & Identity):\n"
+            "- Core Formula: e^{iθ} = cos(θ) + i sin(θ). Evaluated at θ = π yields e^{iπ} + 1 = 0.\n"
+            "- Five Fundamental Constants: e ≈ 2.718 (continuous compound growth, calculus base), "
+            "i = √(-1) (orthogonal rotation by 90° in complex plane), π ≈ 3.14159 (circle geometry, radians), "
+            "1 (multiplicative unity), 0 (additive identity / ground state).\n"
+            "- Unit Circle Geometry: |e^{iθ}| = 1 always. Moving θ rotates a vector of length 1 around the origin. "
+            "Horizontal projection x = cos(θ), vertical projection y = sin(θ). Forms right triangle satisfying cos²(θ) + sin²(θ) = 1.\n"
+            "- Power Series Derivation: e^{ix} = 1 + ix - x²/2! - ix³/3! + x⁴/4! + ... "
+            "= (1 - x²/2! + ...) + i(x - x³/3! + ...) = cos(x) + i sin(x).\n"
+            "- Practical Impact: Signal processing, AC electrical circuits (phasors), wave optics, Fourier analysis, and quantum mechanics."
+        )
+    if "fourier" in p:
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Fourier Transform):\n"
+            "- Forward Transform: f̂(ξ) = ∫_{-∞}^{∞} f(t) e^{-2π i t ξ} dt.\n"
+            "- Inverse Transform: f(t) = ∫_{-∞}^{∞} f̂(ξ) e^{2π i t ξ} dξ.\n"
+            "- Rotational Winding Intuition: e^{-2π i t ξ} wraps the time signal around the origin at frequency ξ. "
+            "The integral measures the center-of-mass balance point; when ξ matches a signal harmonic, it spikes.\n"
+            "- Time-Frequency Duality: Continuous signal amplitude across time ↔ discrete spectral frequency peaks."
+        )
+    if any(k in p for k in ("bodmas", "pemdas", "order of operations", "bidmas", "bedmas")):
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (BODMAS / PEMDAS / Order of Operations):\n"
+            "- Acronym Mappings: BODMAS (Brackets, Orders, Division, Multiplication, Addition, Subtraction) vs PEMDAS (Parentheses, Exponents, Multiplication, Division, Addition, Subtraction).\n"
+            "- Crucial Precedence Equality: Division and Multiplication have EQUAL rank (resolved Left-to-Right). Addition and Subtraction have EQUAL rank (resolved Left-to-Right).\n"
+            "- Common Pitfalls: Erroneously doing multiplication before division in expressions like 8 ÷ 2(4) or 12 ÷ 3 × 2.\n"
+            "- Structure: Inner groupings first → Exponents/powers/roots next → Multiplicative operations L-to-R → Additive operations L-to-R."
+        )
+    if any(k in p for k in ("pythagor", "right triangle", "hypotenuse")):
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Pythagorean Theorem):\n"
+            "- Core Formula: a² + b² = c² in Euclidean right-angled geometry.\n"
+            "- Geometric Proof: Dissecting squares of side (a+b) to show four right triangles surround c².\n"
+            "- Metric Foundations: Distance formula in R²: d = √((x₂ - x₁)² + (y₂ - y₁)²); Hilbert space inner product norms."
+        )
+    if any(k in p for k in ("newton's second law", "f = ma", "second law of motion", "f=ma")):
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Newton's Second Law of Motion):\n"
+            "- Fundamental Equation: F_net = m * a, or more generally F = dp/dt (rate of change of momentum).\n"
+            "- Physical Units: Force in Newtons (kg·m/s²), mass in kg, acceleration in m/s².\n"
+            "- Vector Nature: Net force vector aligns in the exact direction of acceleration."
+        )
+    if any(k in p for k in ("binary search", "bsearch", "divide and conquer")):
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Binary Search Algorithm):\n"
+            "- Precondition: Array must be sorted in monotonic order.\n"
+            "- Complexity: O(log n) time complexity vs O(n) linear search, O(1) auxiliary space.\n"
+            "- Pointer Mechanics: Maintain low and high pointers, compute mid = low + (high - low)//2, halve search space."
+        )
+    if any(k in p for k in ("bayes", "conditional probability", "prior probability", "posterior")):
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Bayes' Theorem):\n"
+            "- Formula: P(A|B) = [P(B|A) * P(A)] / P(B).\n"
+            "- Components: P(A|B) is posterior, P(B|A) is likelihood, P(A) is prior belief, P(B) is total evidence.\n"
+            "- Applications: Medical diagnostic testing, machine learning classification, Bayesian inference."
+        )
+    if any(k in p for k in ("gravitation", "gravity", "orbital", "kepler")):
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Newton's Law of Universal Gravitation):\n"
+            "- Equation: F = G * (m₁ * m₂) / r².\n"
+            "- Inverse-Square Law: Doubling distance reduces gravitational attraction by factor of 4.\n"
+            "- Orbital Mechanics: Gravitational pull supplies centripetal acceleration: v = √(GM/r)."
+        )
+    if any(k in p for k in ("neural network", "forward pass", "activation function")):
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Neural Network Forward Pass):\n"
+            "- Linear Combination: z = W · x + b (matrix weight multiplication plus bias vector).\n"
+            "- Non-linear Activation: a = σ(z) (e.g. ReLU, Sigmoid, GeLU) introducing non-linearity.\n"
+            "- Layered Composition: Output of layer l feeds as input to layer l+1."
+        )
+    if any(k in p for k in ("matrix multiplication", "linear transformation", "basis vector")):
+        return (
+            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Matrix Multiplication as Linear Transformation):\n"
+            "- Geometric Intuition: Columns of 2x2 matrix indicate where basis vectors i_hat and j_hat land.\n"
+            "- Transformation: [x', y']^T = [[a, b], [c, d]] [x, y]^T = x * [a, c]^T + y * [b, d]^T.\n"
+            "- Determinant: det(A) measures scaling factor of area, negative determinant indicates space inversion."
+        )
+    clean_topic = _extract_topic_title(prompt)
+    return (
+        f"DOMAIN CONTEXT & PEDAGOGICAL GROUNDING ({clean_topic}):\n"
+        "- Structure the concept into clear visual primitives: main equation, symbol breakdown, and intuition.\n"
+        "- Ensure symbols are defined explicitly with visual cards or labeled groups."
+    )
+
+
 def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: int) -> TeachingSegment:
     """Curated, high-fidelity STEM TeachingSegments with rich visual anchors, symbol breakdowns, and ~60-90s pedagogy."""
     p_lower = prompt.lower()
+    clean_topic = _extract_topic_title(prompt)
+
     if "euler" in p_lower:
         if slide_num == 1:
             anchor = VisualAnchor(
@@ -716,27 +1507,98 @@ def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: i
                 "Step four: Finally, we perform the addition: three plus four equals seven. "
                 "By systematically applying the BODMAS precedence rules at each step, even complex nested formulas resolve cleanly and without ambiguity."
             )
+    elif any(k in p_lower for k in ("pythagor", "right triangle")):
+        anchor = VisualAnchor(
+            type="annotated_formula",
+            title="The Pythagorean Theorem" if slide_num == 1 else f"Pythagorean Theorem: Geometric Proof {slide_num}",
+            latex=r"a^2 + b^2 = c^2",
+            visible_elements=["Leg a", "Leg b", "Hypotenuse c", "Right Angle"],
+            key_definitions=[
+                "a, b : Orthogonal legs forming the 90-degree right angle",
+                "c : Hypotenuse, opposite the right angle (longest side)",
+                "a² + b² = c² : Area of squares on legs equals area on hypotenuse",
+            ],
+            visual_purpose="Establish the foundational metric relationship in Euclidean geometry.",
+        )
+        code = (
+            'title = Text("The Pythagorean Theorem", font_size=34, color=YELLOW).to_edge(UP, buff=0.4)\n'
+            'formula = MathTex(r"a^2 + b^2 = c^2", font_size=44, color=BLUE).next_to(title, DOWN, buff=0.35)\n'
+            'box = SurroundingRectangle(formula, color=GOLD, buff=0.25)\n'
+            'where_lbl = Text("Geometric Properties:", font_size=22, color=GOLD, weight=BOLD).next_to(box, DOWN, buff=0.35).to_edge(LEFT, buff=1.2)\n'
+            'b1 = MathTex(r"\\bullet\\ a, b : \\text{Perpendicular side lengths (legs)}", font_size=20, color=WHITE)\n'
+            'b2 = MathTex(r"\\bullet\\ c : \\text{Hypotenuse opposite the } 90^\\circ \\text{ angle}", font_size=20, color=TEAL)\n'
+            'b3 = MathTex(r"\\bullet\\ c = \\sqrt{a^2 + b^2} : \\text{Euclidean distance in } \\mathbb{R}^2", font_size=20, color=GREEN)\n'
+            'bullets = VGroup(b1, b2, b3).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)\n'
+            'self.play(Write(title), run_time=0.8)\n'
+            'self.play(Write(formula), Create(box), run_time=1.2)\n'
+            'self.play(FadeIn(where_lbl), run_time=0.5)\n'
+            'self.play(LaggedStart(*[FadeIn(b, shift=RIGHT*0.2) for b in bullets], lag_ratio=0.2), run_time=1.5)\n'
+            'self.wait(1.5)\n'
+        )
+        narration = (
+            "The Pythagorean Theorem is the cornerstone of Euclidean geometry and coordinate geometry. "
+            "In every right-angled triangle, the sum of the squares of the two perpendicular legs equals the square of the hypotenuse. "
+            "Notice how this simple algebraic relationship, a squared plus b squared equals c squared, "
+            "directly defines our concept of physical distance in two-dimensional space. "
+            "Whether calculating orbital trajectories or GPS coordinates, distance is computed by taking the square root of the sum of squared displacements."
+        )
+    elif any(k in p_lower for k in ("newton", "f = ma", "second law")):
+        anchor = VisualAnchor(
+            type="annotated_formula",
+            title="Newton's Second Law of Motion",
+            latex=r"\mathbf{F}_{\text{net}} = m \mathbf{a}",
+            visible_elements=["F_net: Net Force", "m: Mass", "a: Acceleration"],
+            key_definitions=[
+                "F_net : Vector sum of all external forces acting on object (Newtons)",
+                "m : Inertial mass resisting changes in motion (kilograms)",
+                "a : Resulting vector acceleration in direction of net force (m/s²)",
+            ],
+            visual_purpose="Formulate the dynamical relationship governing classical mechanics.",
+        )
+        code = (
+            'title = Text("Newton\'s Second Law of Motion", font_size=34, color=YELLOW).to_edge(UP, buff=0.4)\n'
+            'formula = MathTex(r"\\mathbf{F}_{\\text{net}} = m \\mathbf{a}", font_size=46, color=BLUE).next_to(title, DOWN, buff=0.35)\n'
+            'box = SurroundingRectangle(formula, color=GOLD, buff=0.25)\n'
+            'where_lbl = Text("Physical Quantities:", font_size=22, color=GOLD, weight=BOLD).next_to(box, DOWN, buff=0.35).to_edge(LEFT, buff=1.2)\n'
+            'b1 = MathTex(r"\\bullet\\ \\mathbf{F} : \\text{Net external force vector (measured in Newtons, } \\text{kg}\\cdot\\text{m/s}^2)", font_size=20, color=WHITE)\n'
+            'b2 = MathTex(r"\\bullet\\ m : \\text{Inertial mass (resistance to acceleration, kg)}", font_size=20, color=TEAL)\n'
+            'b3 = MathTex(r"\\bullet\\ \\mathbf{a} : \\text{Vector acceleration (rate of change of velocity, } \\text{m/s}^2)", font_size=20, color=GREEN)\n'
+            'bullets = VGroup(b1, b2, b3).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)\n'
+            'self.play(Write(title), run_time=0.8)\n'
+            'self.play(Write(formula), Create(box), run_time=1.2)\n'
+            'self.play(FadeIn(where_lbl), run_time=0.5)\n'
+            'self.play(LaggedStart(*[FadeIn(b, shift=RIGHT*0.2) for b in bullets], lag_ratio=0.2), run_time=1.5)\n'
+            'self.wait(1.5)\n'
+        )
+        narration = (
+            "Newton's Second Law of Motion provides the quantitative backbone of classical mechanics. "
+            "It states that the acceleration of an object is directly proportional to the net force acting upon it, "
+            "and inversely proportional to its inertial mass. As shown in the vector equation before you, "
+            "applying a force produces an acceleration along that exact direction. "
+            "A heavier mass requires proportionally greater force to achieve the same rate of acceleration, "
+            "governing everything from rocket propulsion to structural civil engineering."
+        )
     else:
         anchor = VisualAnchor(
             type="annotated_formula",
-            title=f"{prompt[:28]} : Key Foundations",
-            latex=r"\text{Principle } " + str(slide_num),
-            visible_elements=[f"Principle {slide_num}", "Core Insight", "Applications"],
+            title=f"{clean_topic} : Foundations" if slide_num == 1 else f"{clean_topic} : Mechanics {slide_num}",
+            latex=r"\text{Concept } " + str(slide_num),
+            visible_elements=[f"{clean_topic} Principle", "Primary Mechanisms", "Real-World Impact"],
             key_definitions=[
-                f"Core Mechanism: Primary operational principle of {prompt[:20]}",
+                f"Core Mechanism: Primary operational principle of {clean_topic}",
                 "Conceptual Basis: Foundational mathematical and physical relationships",
                 "Applications: Real-world engineering and computational significance",
             ],
-            visual_purpose=f"Provide structured breakdown of {prompt} stage {slide_num}.",
+            visual_purpose=f"Provide structured breakdown of {clean_topic} stage {slide_num}.",
         )
         code = (
-            f'title = Text("{prompt[:28]} : Key Principles", font_size=34, color=YELLOW).to_edge(UP, buff=0.4)\n'
-            f'box_lbl = Text("Core Concept {slide_num}", font_size=36, color=BLUE).next_to(title, DOWN, buff=0.35)\n'
+            f'title = Text("{clean_topic[:28]} : Key Principles", font_size=34, color=YELLOW).to_edge(UP, buff=0.4)\n'
+            f'box_lbl = Text("Core Formulation {slide_num}", font_size=36, color=BLUE).next_to(title, DOWN, buff=0.35)\n'
             'box = SurroundingRectangle(box_lbl, color=GOLD, buff=0.25)\n'
             'where_lbl = Text("Key Insights:", font_size=22, color=GOLD, weight=BOLD).next_to(box, DOWN, buff=0.35).to_edge(LEFT, buff=1.2)\n'
-            f'b1 = MathTex(r"\\bullet\\ \\text{{Foundations: Essential framework underlying this concept}}", font_size=20, color=WHITE)\n'
-            f'b2 = MathTex(r"\\bullet\\ \\text{{Mechanics: Dynamic interaction of variables and parameters}}", font_size=20, color=TEAL)\n'
-            f'b3 = MathTex(r"\\bullet\\ \\text{{Implications: Broad mathematical and practical applications}}", font_size=20, color=GREEN)\n'
+            f'b1 = MathTex(r"\\bullet\\ \\text{{Foundations: Essential framework underlying {clean_topic[:20]}}}", font_size=20, color=WHITE)\n'
+            'b2 = MathTex(r"\\bullet\\ \\text{Mechanics: Dynamic interaction of core variables and parameters}", font_size=20, color=TEAL)\n'
+            'b3 = MathTex(r"\\bullet\\ \\text{Implications: Broad mathematical and practical applications}", font_size=20, color=GREEN)\n'
             'bullets = VGroup(b1, b2, b3).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)\n'
             'self.play(Write(title), run_time=0.8)\n'
             'self.play(Write(box_lbl), Create(box), run_time=1.2)\n'
@@ -744,7 +1606,6 @@ def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: i
             'self.play(LaggedStart(*[FadeIn(b, shift=RIGHT*0.2) for b in bullets], lag_ratio=0.2), run_time=1.5)\n'
             'self.wait(1.5)\n'
         )
-        clean_topic = _extract_topic_title(prompt)
         narration = (
             f"In this segment, we examine the foundational mechanisms of {clean_topic}. "
             "Notice the structured breakdown displayed before you. Rather than treating this as abstract notation, "
@@ -753,7 +1614,6 @@ def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: i
             "allowing us to apply these principles reliably to more advanced problems."
         )
 
-    clean_topic = _extract_topic_title(prompt)
     return TeachingSegment(
         slide_num=slide_num,
         concept=anchor.title or f"{clean_topic} - Slide {slide_num}",
@@ -762,42 +1622,6 @@ def _build_curated_fallback_segment(prompt: str, slide_num: int, total_slides: i
         manim_code=code,
         narration=narration,
     )
-
-
-def _get_domain_knowledge(prompt: str) -> str:
-    """Provides high-density domain context for small/local LLMs on key STEM concepts."""
-    p = prompt.lower()
-    if "euler" in p:
-        return (
-            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Euler's Formula & Identity):\n"
-            "- Core Formula: e^{iθ} = cos(θ) + i sin(θ). Evaluated at θ = π yields e^{iπ} + 1 = 0.\n"
-            "- Five Fundamental Constants: e ≈ 2.718 (continuous compound growth, calculus base), "
-            "i = √(-1) (orthogonal rotation by 90° in complex plane), π ≈ 3.14159 (circle geometry, radians), "
-            "1 (multiplicative unity), 0 (additive identity / ground state).\n"
-            "- Unit Circle Geometry: |e^{iθ}| = 1 always. Moving θ rotates a vector of length 1 around the origin. "
-            "Horizontal projection x = cos(θ), vertical projection y = sin(θ). Forms right triangle satisfying cos²(θ) + sin²(θ) = 1.\n"
-            "- Power Series Derivation: e^{ix} = 1 + ix - x²/2! - ix³/3! + x⁴/4! + ... "
-            "= (1 - x²/2! + ...) + i(x - x³/3! + ...) = cos(x) + i sin(x).\n"
-            "- Practical Impact: Signal processing, AC electrical circuits (phasors), wave optics, Fourier analysis, and quantum mechanics."
-        )
-    if "fourier" in p:
-        return (
-            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (Fourier Transform):\n"
-            "- Forward Transform: f̂(ξ) = ∫_{-∞}^{∞} f(t) e^{-2π i t ξ} dt.\n"
-            "- Inverse Transform: f(t) = ∫_{-∞}^{∞} f̂(ξ) e^{2π i t ξ} dξ.\n"
-            "- Rotational Winding Intuition: e^{-2π i t ξ} wraps the time signal around the origin at frequency ξ. "
-            "The integral measures the center-of-mass balance point; when ξ matches a signal harmonic, it spikes.\n"
-            "- Time-Frequency Duality: Continuous signal amplitude across time ↔ discrete spectral frequency peaks."
-        )
-    if any(k in p for k in ("bodmas", "pemdas", "order of operations", "bidmas", "bedmas")):
-        return (
-            "DOMAIN CONTEXT & PEDAGOGICAL GROUNDING (BODMAS / PEMDAS / Order of Operations):\n"
-            "- Acronym Mappings: BODMAS (Brackets, Orders, Division, Multiplication, Addition, Subtraction) vs PEMDAS (Parentheses, Exponents, Multiplication, Division, Addition, Subtraction).\n"
-            "- Crucial Precedence Equality: Division and Multiplication have EQUAL rank (resolved Left-to-Right). Addition and Subtraction have EQUAL rank (resolved Left-to-Right).\n"
-            "- Common Pitfalls: Erroneously doing multiplication before division in expressions like 8 ÷ 2(4) or 12 ÷ 3 × 2.\n"
-            "- Structure: Inner groupings first → Exponents/powers/roots next → Multiplicative operations L-to-R → Additive operations L-to-R."
-        )
-    return ""
 
 
 def plan_teaching_segment(
@@ -813,6 +1637,17 @@ def plan_teaching_segment(
     condensed_prompt = clean_topic if len(prompt) < 400 else f"{clean_topic}\n\nKey Concepts Context:\n{prompt[:400]}..."
     domain_ctx = _get_domain_knowledge(prompt)
     ctx_block = f"\nAdditional Domain Grounding:\n{domain_ctx}\n" if domain_ctx else ""
+
+    fallback_segment: TeachingSegment | None = None
+
+    def get_fallback() -> TeachingSegment:
+        nonlocal fallback_segment
+        if fallback_segment is None:
+            fallback_segment = _build_curated_fallback_segment(prompt, slide_num, total_slides)
+        return fallback_segment
+
+    anchor: VisualAnchor | None = None
+    code: str = ""
 
     # Step 1: Generate Visual Anchor
     visual_user_prompt = (
@@ -836,13 +1671,17 @@ def plan_teaching_segment(
         )
         vis_text = vis_resp.choices[0].message.content or ""
         anchor, code = _parse_visual_output(vis_text)
-    except Exception:
-        fallback = _build_curated_fallback_segment(prompt, slide_num, total_slides)
-        anchor, code = fallback.visual_anchor, fallback.manim_code
+    except Exception as exc:
+        print(f"[Keyframe Engine Warning] Slide {slide_num} visual anchor generation failed: {exc}", file=sys.stderr)
+        fb = get_fallback()
+        anchor, code = fb.visual_anchor, fb.manim_code
 
     if not code.strip():
-        fallback = _build_curated_fallback_segment(prompt, slide_num, total_slides)
-        anchor, code = fallback.visual_anchor, fallback.manim_code
+        print(f"[Keyframe Engine Warning] Slide {slide_num} generated empty code; using curated fallback visual.", file=sys.stderr)
+        fb = get_fallback()
+        if anchor is None or not anchor.title:
+            anchor = fb.visual_anchor
+        code = fb.manim_code
 
     # Step 2: Generate In-Depth Narration based on the Visual Anchor
     narration_user_prompt = (
@@ -858,6 +1697,7 @@ def plan_teaching_segment(
         f"Reference the slide breakdown naturally, explain the intuition, define the symbols, and explain applications.\n"
         f"Remember: Do NOT merely recite the slide aloud!"
     )
+    narration = ""
     try:
         narr_resp = execute_completion_with_fallback(
             client=client,
@@ -870,478 +1710,24 @@ def plan_teaching_segment(
         )
         narr_text = narr_resp.choices[0].message.content or ""
         narration = _parse_narration_output(narr_text)
-    except Exception:
-        fallback = _build_curated_fallback_segment(prompt, slide_num, total_slides)
-        narration = fallback.narration
+    except Exception as exc:
+        print(f"[Keyframe Engine Warning] Slide {slide_num} narration generation failed: {exc}", file=sys.stderr)
+        fb = get_fallback()
+        narration = fb.narration
 
     if not narration.strip() or len(narration.split()) < 20:
-        fallback = _build_curated_fallback_segment(prompt, slide_num, total_slides)
-        narration = fallback.narration
+        print(f"[Keyframe Engine Warning] Slide {slide_num} narration insufficient; using curated fallback narration.", file=sys.stderr)
+        fb = get_fallback()
+        narration = fb.narration
 
     return TeachingSegment(
         slide_num=slide_num,
-        concept=anchor.title or f"{prompt} - Slide {slide_num}",
+        concept=anchor.title or f"{clean_topic} - Slide {slide_num}",
         learning_objective=anchor.visual_purpose,
         visual_anchor=anchor,
         manim_code=code,
         narration=narration,
     )
-
-
-def render_visual_anchor(
-    segment: TeachingSegment,
-    output_dir: Path,
-    quality: str = "low_quality",
-) -> Path | None:
-    """Renders the pure visual animation for a TeachingSegment using Manim.
-
-    Fast, self-contained, and completely independent of speech synthesis.
-    """
-    output_stem = f"slide_{segment.slide_num}_visual"
-    output_stem = f"slide_{segment.slide_num}_visual"
-
-    class VisualAnchorScene(Scene):
-        def wait_until_bookmark(self, mark: str, **kwargs):
-            self.wait(0.2)
-
-        @contextmanager
-        def voiceover(self, *args, **kwargs):
-            yield None
-
-        def construct(self):
-            safe_globals: Dict[str, Any] = {
-                "np": np,
-                "MathTex": MathTex,
-                "Text": Text,
-                "Title": Title,
-                "Scene": Scene,
-                "VGroup": VGroup,
-                "Group": Group,
-                "Create": Create,
-                "Write": Write,
-                "Transform": Transform,
-                "ReplacementTransform": ReplacementTransform,
-                "FadeIn": FadeIn,
-                "FadeOut": FadeOut,
-                "GrowFromCenter": GrowFromCenter,
-                "GrowArrow": GrowArrow,
-                "Indicate": Indicate,
-                "Circumscribe": Circumscribe,
-                "Wiggle": Wiggle,
-                "Line": Line,
-                "DashedLine": DashedLine,
-                "Arrow": Arrow,
-                "DoubleArrow": DoubleArrow,
-                "Vector": Vector,
-                "Circle": Circle,
-                "Square": Square,
-                "Rectangle": Rectangle,
-                "RoundedRectangle": RoundedRectangle,
-                "SurroundingRectangle": SurroundingRectangle,
-                "Polygon": Polygon,
-                "Triangle": Triangle,
-                "Dot": Dot,
-                "Axes": Axes,
-                "NumberPlane": NumberPlane,
-                "ComplexPlane": ComplexPlane,
-                "PolarPlane": PolarPlane,
-                "FunctionGraph": FunctionGraph,
-                "ParametricFunction": ParametricFunction,
-                "Arc": Arc,
-                "ArcBetweenPoints": ArcBetweenPoints,
-                "CurvedArrow": CurvedArrow,
-                "DashedVMobject": DashedVMobject,
-                "Brace": Brace,
-                "DecimalNumber": DecimalNumber,
-                "LaggedStart": LaggedStart,
-                "always_redraw": always_redraw,
-                "ValueTracker": ValueTracker,
-                "Angle": Angle,
-                "RightAngle": RightAngle,
-                "UP": UP,
-                "DOWN": DOWN,
-                "LEFT": LEFT,
-                "RIGHT": RIGHT,
-                "ORIGIN": ORIGIN,
-                "UL": UL,
-                "UR": UR,
-                "DL": DL,
-                "DR": DR,
-                "BLUE": BLUE,
-                "RED": RED,
-                "YELLOW": YELLOW,
-                "GREEN": GREEN,
-                "WHITE": WHITE,
-                "GRAY": GRAY,
-                "GREY": GREY,
-                "BLACK": BLACK,
-                "ORANGE": ORANGE,
-                "PURPLE": PURPLE,
-                "GOLD": GOLD,
-                "TEAL": TEAL,
-                "BOLD": BOLD,
-                "GRAY_A": GRAY_A,
-                "PI": PI,
-                "TAU": TAU,
-            }
-            try:
-                from manim_voiceover import VoiceoverScene
-                safe_globals["VoiceoverScene"] = VoiceoverScene
-            except Exception:
-                safe_globals["VoiceoverScene"] = Scene
-
-            try:
-                from manim import Paragraph
-                safe_globals["Paragraph"] = Paragraph
-            except Exception:
-                safe_globals["Paragraph"] = Text
-
-            try:
-                from manim import Tex, MarkupText
-                safe_globals["Tex"] = Tex
-                safe_globals["MarkupText"] = MarkupText
-            except Exception:
-                safe_globals["Tex"] = MathTex
-                safe_globals["MarkupText"] = Text
-
-            def _clean_manim_code(code_str: str) -> str:
-                # Clean hallucinated `with self.play(...):`
-                code_str = re.sub(
-                    r"with\s+self\.play\((.*?)\)(?:\s*as\s+\w+)?:",
-                    r"self.play(\1)",
-                    code_str,
-                )
-                return code_str
-
-            def _execute_code(code_str: str) -> bool:
-                cleaned = _clean_manim_code(code_str)
-                locs: Dict[str, Any] = {"self": self}
-                exec(cleaned, safe_globals, locs)
-
-                # Check if a Scene subclass was defined in locs
-                scene_cls = None
-                for v in list(locs.values()):
-                    if isinstance(v, type) and issubclass(v, Scene) and v is not Scene and v is not VisualAnchorScene:
-                        scene_cls = v
-                        break
-
-                if scene_cls:
-                    scene_cls.construct(self)
-
-                # Return True only if actual mobjects were added to the canvas
-                return len(self.mobjects) > 0
-
-            executed = False
-            if segment.manim_code.strip():
-                try:
-                    executed = _execute_code(segment.manim_code)
-                except Exception as exc:
-                    print(f"[Visual Render Warning] Slide {segment.slide_num} primary exec error: {exc}", file=sys.stderr)
-                    self.clear()
-
-                if not executed:
-                    # Attempt transpilation of MathTex to Text if LaTeX or font rendering failed
-                    try:
-                        self.clear()
-                        alt_code = re.sub(r"(?:MathTex|Tex|Paragraph)\(\s*r?([\"'])(.*?)\1", r"Text(\1\2\1", segment.manim_code)
-                        alt_code = (
-                            alt_code.replace("\\bullet\\", "•")
-                            .replace("\\bullet", "•")
-                            .replace(r"\approx", "≈")
-                            .replace(r"\sqrt{-1}", "√(-1)")
-                            .replace(r"\sqrt", "√")
-                            .replace(r"\theta", "θ")
-                            .replace(r"\pi", "π")
-                            .replace(r"\cos", "cos")
-                            .replace(r"\sin", "sin")
-                            .replace(r"\xi", "ξ")
-                            .replace(r"\text{", "")
-                            .replace(r"\hat{f}", "f̂")
-                            .replace(r"\int_{-\infty}^{\infty}", "∫")
-                        )
-                        executed = _execute_code(alt_code)
-                        if executed:
-                            print(f"[Visual Render Info] Slide {segment.slide_num} successfully rendered via Text transpilation!", file=sys.stderr)
-                    except Exception as exc2:
-                        print(f"[Visual Render Warning] Slide {segment.slide_num} transpilation failed: {exc2}", file=sys.stderr)
-                        self.clear()
-
-            if not executed or len(self.mobjects) == 0:
-                # Robust educational fallback with full definitions and equation, NEVER dummy slide box
-                try:
-                    self.clear()
-                    title_text = segment.visual_anchor.title or segment.concept
-                    f_title = Text(title_text, font_size=32, color=YELLOW).to_edge(UP, buff=0.4)
-                    if f_title.width > 12.0:
-                        f_title.scale_to_fit_width(12.0)
-                    elements = [f_title]
-                    prev_mob = f_title
-
-                    latex_str = segment.visual_anchor.latex
-                    if latex_str:
-                        clean_eq = (
-                            latex_str.replace(r"\approx", "≈")
-                            .replace(r"\theta", "θ")
-                            .replace(r"\pi", "π")
-                            .replace(r"\cos", "cos")
-                            .replace(r"\sin", "sin")
-                            .replace(r"\text{", "")
-                            .replace("}", "")
-                        )
-                        f_math = Text(clean_eq, font_size=36, color=BLUE).next_to(f_title, DOWN, buff=0.35)
-                        if f_math.width > 12.0:
-                            f_math.scale_to_fit_width(12.0)
-                        f_box = SurroundingRectangle(f_math, color=GOLD, buff=0.25)
-                        elements.extend([f_math, f_box])
-                        prev_mob = f_box
-
-                    if segment.visual_anchor.key_definitions:
-                        where_lbl = Text("Key Concept Breakdown:", font_size=20, color=GOLD, weight=BOLD).next_to(prev_mob, DOWN, buff=0.35).to_edge(LEFT, buff=1.0)
-                        elements.append(where_lbl)
-                        bullet_mobs = []
-                        for d in segment.visual_anchor.key_definitions[:5]:
-                            clean_d = d.replace("\\bullet\\", "•").replace("\\bullet", "•").replace(r"\approx", "≈").replace(r"\theta", "θ").replace(r"\pi", "π")
-                            b_mob = Text(f"• {clean_d}", font_size=18, color=WHITE)
-                            if b_mob.width > 11.5:
-                                b_mob.scale_to_fit_width(11.5)
-                            bullet_mobs.append(b_mob)
-                        if bullet_mobs:
-                            b_group = VGroup(*bullet_mobs).arrange(DOWN, aligned_edge=LEFT, buff=0.18).next_to(where_lbl, DOWN, buff=0.2).align_to(where_lbl, LEFT)
-                            elements.append(b_group)
-
-                    self.play(*[FadeIn(el) for el in elements], run_time=1.5)
-                    self.wait(1.5)
-                except Exception as exc3:
-                    print(f"[Visual Render Emergency Fallback] Slide {segment.slide_num}: {exc3}", file=sys.stderr)
-                    self.clear()
-                    safe_title = Text(f"Slide {segment.slide_num}: {segment.concept[:30]}", font_size=28, color=YELLOW)
-                    self.add(safe_title)
-                    self.wait(1.5)
-            else:
-                self.wait(1.0)
-
-    with _manim_render_lock:
-        config.media_dir = str(output_dir)
-        config.quality = quality
-        config.output_file = output_stem
-        scene = VisualAnchorScene()
-        scene.render()
-
-    expected_mp4: Path | None = None
-    for mp4 in output_dir.rglob(f"*{output_stem}*.mp4"):
-        if mp4.is_file() and "partial_movie_files" not in mp4.parts:
-            expected_mp4 = mp4
-            break
-
-    dest = output_dir / f"{output_stem}.mp4"
-    if expected_mp4 and expected_mp4.is_file():
-        if expected_mp4.resolve() != dest.resolve():
-            try:
-                shutil.copy2(expected_mp4, dest)
-            except Exception:
-                pass
-        return dest.resolve()
-
-    if not dest.is_file() or dest.stat().st_size == 0:
-        # Guarantee an MP4 exists using ffmpeg color generator so timeline assembly never drops slides
-        try:
-            cmd = [
-                "ffmpeg", "-y",
-                "-f", "lavfi",
-                "-i", "color=c=0x111827:s=854x480:d=3.0:r=30",
-                "-c:v", "libx264",
-                "-pix_fmt", "yuv420p",
-                str(dest),
-            ]
-            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-            if dest.is_file() and dest.stat().st_size > 0:
-                return dest.resolve()
-        except Exception:
-            pass
-
-    return None
-
-
-def _synthesize_edge_tts(
-    clean_text: str,
-    output_wav: Path,
-    voice: str = "en-US-ChristopherNeural",
-) -> bool:
-    """Fast neural speech synthesis using Edge-TTS with transcode to standard 24kHz WAV."""
-    try:
-        import asyncio
-        import edge_tts
-
-        temp_mp3 = output_wav.with_suffix(".temp.mp3")
-
-        async def _run():
-            comm = edge_tts.Communicate(clean_text, voice)
-            await comm.save(str(temp_mp3))
-
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
-
-        if loop is not None and loop.is_running():
-            import concurrent.futures
-
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-                pool.submit(lambda: asyncio.run(_run())).result(timeout=25)
-        else:
-            asyncio.run(_run())
-
-        if temp_mp3.is_file() and temp_mp3.stat().st_size > 0:
-            subprocess.run(
-                ["ffmpeg", "-y", "-i", str(temp_mp3), "-ar", "24000", "-ac", "1", str(output_wav)],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                check=True,
-            )
-            temp_mp3.unlink(missing_ok=True)
-            return True
-    except Exception as exc:
-        print(f"[Edge-TTS Info] Fast speech note: {exc}; using fallback narrator", file=sys.stderr)
-    return False
-
-
-def synthesize_teaching_audio(
-    narration_text: str,
-    output_wav: Path,
-    max_words: int = 220,
-    voice: str | None = None,
-) -> float:
-    """Synthesizes pedagogical narration into WAV audio using Edge-TTS or Pocket TTS.
-
-    Guarantees strict word budget (max 220 words ~75s) to prevent runaway TTS latency.
-    Returns the authoritative measured duration in seconds.
-    """
-    clean_text = re.sub(r"<think>.*?</think>", "", narration_text, flags=re.DOTALL)
-    clean_text = re.sub(r"<bookmark.*?>", "", clean_text).strip()
-
-    # Enforce hard upper bound on narration words
-    words = clean_text.split()
-    if len(words) > max_words:
-        truncated = " ".join(words[:max_words])
-        last_period = max(truncated.rfind("."), truncated.rfind("!"), truncated.rfind("?"))
-        if last_period > len(truncated) // 2:
-            clean_text = truncated[: last_period + 1]
-        else:
-            clean_text = truncated + "."
-
-    tts_backend = os.getenv("AOS_TTS_BACKEND", "auto").lower()
-    edge_voice = voice or os.getenv("AOS_TTS_VOICE", "en-US-ChristopherNeural")
-
-    # Fast Path: Edge-TTS (sub-2 second neural synthesis)
-    if tts_backend in ("auto", "edge", "edge-tts"):
-        if _synthesize_edge_tts(clean_text, output_wav, voice=edge_voice):
-            dur = get_media_duration(output_wav)
-            if dur > 0.5:
-                return dur
-
-    # Offline Fallback: Resident Kyutai Pocket TTS (100M CPU model)
-    try:
-        from tools.aos_speech_service import _get_narrator
-
-        narrator = _get_narrator("alba", "english")
-        narrator.synthesize(clean_text, output_wav)
-    except Exception:
-        # Fallback using scipy write of synthetic speech-timed tone or silence
-        try:
-            import scipy.io.wavfile
-
-            sr = 24000
-            words = len(clean_text.split())
-            sec = max(3.0, words * 0.45)
-            silence = np.zeros(int(sr * sec), dtype=np.float32)
-            scipy.io.wavfile.write(output_wav, sr, silence)
-        except Exception:
-            pass
-
-    return get_media_duration(output_wav)
-
-
-def assemble_teaching_segment(
-    segment: TeachingSegment,
-    output_dir: Path,
-) -> Path | None:
-    """Combines visual animation, static visual hold, and authoritative narration audio."""
-    if not segment.visual_path or not Path(segment.visual_path).is_file():
-        return None
-
-    in_video = Path(segment.visual_path)
-    in_audio = Path(segment.audio_path) if segment.audio_path else None
-    out_chunk = output_dir / f"slide_{segment.slide_num}.mp4"
-
-    # Authoritative durations
-    segment.visual_duration = get_media_duration(in_video)
-    if in_audio and in_audio.is_file():
-        segment.narration_duration = get_media_duration(in_audio)
-    else:
-        segment.narration_duration = segment.visual_duration
-
-    # Visual hold duration
-    hold_dur = segment.hold_duration
-
-    # Extend visual using final state
-    res = hold_final_state(
-        video_path=in_video,
-        hold_duration=hold_dur,
-        audio_path=in_audio,
-        output_path=out_chunk,
-    )
-    if res.is_file() and res.stat().st_size > 0:
-        segment.chunk_path = str(res)
-        return res
-
-    return None
-
-
-def repair_visual_anchor_code(
-    original_code: str,
-    segment: TeachingSegment,
-    verdict: VisualCriticVerdict,
-    client: OpenAI,
-    model: str,
-    timeout: float = 20.0,
-) -> str:
-    """Repairs Manim animation code based on concrete visual feedback from the Visual Critic."""
-    repair_prompt = (
-        f"Topic: {segment.concept}\n"
-        f"Displayed Formula: {segment.visual_anchor.latex or ''}\n"
-        f"Visible Elements: {segment.visual_anchor.visible_elements}\n"
-        f"Key Definitions: {segment.visual_anchor.key_definitions}\n\n"
-        f"{verdict.feedback_for_code_repair}\n\n"
-        f"Previous Manim Code:\n```python\n{original_code}\n```\n\n"
-        "Please provide the repaired, fully working Manim code snippet.\n"
-        "CRITICAL REQUIREMENTS:\n"
-        "1. Fix all reported visual defects (e.g. scale formulas with scale_to_fit_width to fit [-6, 6], add vertical buffers to prevent collisions, ensure bright contrast colors).\n"
-        "2. Output ONLY clean executable Python code inside ```python ... ``` without Scene class or construct definition.\n"
-        "3. Start directly with mobjects and self.play(...)."
-    )
-
-    try:
-        resp = execute_completion_with_fallback(
-            client=client,
-            primary_model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are an expert mathematical animator repairing Manim code based on Visual Critic inspection. Output strictly executable code inside ```python ... ``` without Scene class.",
-                },
-                {"role": "user", "content": repair_prompt},
-            ],
-            temperature=0.2,
-            timeout=timeout,
-        )
-        content = resp.choices[0].message.content or ""
-        _, repaired_code = _parse_visual_output(content)
-        if repaired_code and repaired_code.strip():
-            return repaired_code
-    except Exception as exc:
-        print(f"[Visual Critic Repair Warning] Slide {segment.slide_num} repair LLM failed: {exc}", file=sys.stderr)
-
-    return original_code
 
 
 def _process_single_slide(
@@ -1354,7 +1740,7 @@ def _process_single_slide(
     run_dir: Path,
     quality: str,
     _notify: Callable[[str, str], None],
-) -> tuple[int, TeachingSegment, Path | None, str]:
+) -> SlideProcessResult:
     """Generates visual anchor, performs visual critic check, synthesizes speech, and produces video chunk."""
     _notify("PlanTeachingScriptNode", f"Planning TeachingSegment {i} (Rich Visual Anchor & Pedagogy)")
     segment = plan_teaching_segment(
@@ -1370,7 +1756,7 @@ def _process_single_slide(
     _notify("VALIDATING_CODE", f"Validating code for Slide {i}")
     _notify("RENDERING", f"Rendering visual anchor for Slide {i}")
 
-    # Step 1: Render Visual Anchor with Moondream Critic Feedback & 3-Try Retry Timeout Loop
+    # Step 1: Render Visual Anchor with Critic Feedback & 3-Try Retry Timeout Loop
     visual_critic = get_visual_critic(backend=os.getenv("AOS_VISUAL_CRITIC_BACKEND", "moondream"))
     max_visual_tries = int(os.getenv("AOS_VISUAL_CRITIC_MAX_RETRIES", "3"))
     retry_timeout_sec = float(os.getenv("AOS_VISUAL_CRITIC_RETRY_TIMEOUT", "20.0"))
@@ -1390,6 +1776,16 @@ def _process_single_slide(
         keyframe_path = run_dir / f"slide_{i}_keyframe_att{attempt}.png"
         extracted_frame = visual_critic.extract_keyframe(visual_path, keyframe_path)
 
+        if extracted_frame is None or not Path(extracted_frame).is_file():
+            _notify("VISUAL_CRITIC_SKIP", f"Slide {i} keyframe extraction failed; skipping visual critic inspection")
+            segment.visual_verdict = {
+                "passed": True,
+                "score": 0.5,
+                "detected_issues": ["Keyframe extraction skipped"],
+                "skipped": True,
+            }
+            break
+
         v_context = VisualContext(
             slide_num=i,
             concept=segment.concept,
@@ -1400,14 +1796,29 @@ def _process_single_slide(
             manim_code=segment.manim_code,
         )
 
-        _notify("VISUAL_CRITIC", f"Inspecting Slide {i} with Moondream Critic ({visual_critic.name}) [try {attempt}/{max_visual_tries}]")
+        _notify("VISUAL_CRITIC", f"Inspecting Slide {i} with Critic ({visual_critic.name}) [try {attempt}/{max_visual_tries}]")
         try:
             verdict = visual_critic.critique_frame(extracted_frame, v_context)
         except Exception as vc_err:
-            print(f"[Visual Critic Warning] Slide {i} inspection error: {vc_err}", file=sys.stderr)
-            verdict = visual_critic._fallback_critic.critique_frame(extracted_frame, v_context) if hasattr(visual_critic, "_fallback_critic") else None
-            if not verdict:
+            print(f"[Visual Critic Warning] Slide {i} inspection error: {vc_err}; falling back to heuristic critic", file=sys.stderr)
+            try:
+                heuristic = HeuristicVisionCritic()
+                verdict = heuristic.critique_frame(extracted_frame, v_context)
+            except Exception as h_err:
+                print(f"[Visual Critic Error] Heuristic fallback failed: {h_err}", file=sys.stderr)
+                verdict = VisualCriticVerdict(
+                    passed=True,
+                    score=0.5,
+                    critic_model="fallback-bypass",
+                    backend="fallback",
+                    detected_issues=[],
+                    suggested_fixes=[],
+                    feedback_for_code_repair="",
+                )
+                segment.visual_verdict = verdict.model_dump()
+                segment.visual_verdict["skipped"] = True
                 break
+
         segment.visual_verdict = verdict.model_dump()
 
         if verdict.passed:
@@ -1417,7 +1828,7 @@ def _process_single_slide(
             issues_summary = ", ".join(verdict.detected_issues[:3]) if verdict.detected_issues else "Layout defect"
             _notify("VISUAL_CRITIC_DEFECTS", f"Slide {i} defects (try {attempt}/{max_visual_tries}): {issues_summary}")
             if attempt < max_visual_tries:
-                _notify("VISUAL_CRITIC_REPAIR", f"Repairing Slide {i} Manim code using Moondream feedback (try {attempt}/{max_visual_tries}, timeout: {retry_timeout_sec}s)...")
+                _notify("VISUAL_CRITIC_REPAIR", f"Repairing Slide {i} Manim code using critic feedback (try {attempt}/{max_visual_tries}, timeout: {retry_timeout_sec}s)...")
                 try:
                     repaired_code = repair_visual_anchor_code(
                         original_code=segment.manim_code,
@@ -1436,9 +1847,13 @@ def _process_single_slide(
 
     # Step 2: Synthesize Authoritative Pedagogical Narration
     audio_path = run_dir / f"slide_{i}_audio.wav"
-    narr_dur = synthesize_teaching_audio(segment.narration, audio_path)
+    narr_dur, is_real_audio = synthesize_teaching_audio(segment.narration, audio_path, return_status=True)
     segment.audio_path = str(audio_path)
     segment.narration_duration = narr_dur
+    if not is_real_audio:
+        if segment.visual_verdict is None:
+            segment.visual_verdict = {}
+        segment.visual_verdict["tts_ok"] = False
 
     # Step 3: Decoupled Visual Hold & Segment Assembly
     _notify("TIMELINE_HOLD", f"Extending Slide {i} final frame: visual {segment.visual_duration:.1f}s, narration {segment.narration_duration:.1f}s")
@@ -1452,7 +1867,12 @@ def _process_single_slide(
         f"{segment.manim_code}\n"
     )
 
-    return i, segment, chunk_path, code_part
+    return SlideProcessResult(
+        slide_num=i,
+        segment=segment,
+        chunk_path=chunk_path,
+        code_part=code_part,
+    )
 
 
 def run_producer_consumer(
@@ -1502,20 +1922,18 @@ def run_producer_consumer(
             temperature=0.3,
         )
         outline = outline_resp.choices[0].message.content or f"1. Introduction to {prompt}\n2. Mechanics\n3. Implications"
-    except Exception:
+    except Exception as exc:
+        print(f"[Keyframe Engine] Outline generation fallback ({exc})", file=sys.stderr)
         outline = f"1. Foundations of {prompt}\n2. Core formulation\n3. Intuition & synthesis"
 
-    combined_code_parts: List[str] = [
+    combined_code_parts: list[str] = [
         "# Auto-generated by AOS Decoupled Teaching Segment Engine",
         "from manim import *",
         "import numpy as np\n",
     ]
 
-    # Concurrent slide generation pipeline
-    import concurrent.futures
-
     max_workers = min(total_slides, int(os.getenv("AOS_MAX_SLIDE_WORKERS", "3")))
-    results: list[tuple[int, TeachingSegment, Path | None, str]] = []
+    results: list[SlideProcessResult] = []
 
     if max_workers > 1:
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
@@ -1553,12 +1971,12 @@ def run_producer_consumer(
             )
 
     # Sort results deterministically by slide_num
-    results.sort(key=lambda r: r[0])
+    results.sort(key=lambda r: r.slide_num)
 
-    segments: List[TeachingSegment] = [r[1] for r in results]
-    rendered_chunks: List[Path] = [r[2] for r in results if r[2] and r[2].is_file()]
+    segments: list[TeachingSegment] = [r.segment for r in results]
+    rendered_chunks: list[Path] = [r.chunk_path for r in results if r.chunk_path and r.chunk_path.is_file()]
     for r in results:
-        combined_code_parts.append(r[3])
+        combined_code_parts.append(r.code_part)
 
     final_video = run_dir / "final.mp4"
     if rendered_chunks:
@@ -1570,14 +1988,22 @@ def run_producer_consumer(
     scene_file.write_text("\n".join(combined_code_parts), encoding="utf-8")
 
     segment_dicts = [s.model_dump() for s in segments]
+    video_ok = final_video.is_file() and final_video.stat().st_size > 0
+    all_chunks_valid = len(rendered_chunks) == len(segments) and len(rendered_chunks) > 0
+    has_real_audio = any(
+        s.audio_path and Path(s.audio_path).is_file() and s.narration_duration > 0.5 and getattr(s, "visual_verdict", {}).get("tts_ok", True)
+        for s in segments
+    )
+
     manifest = {
-        "ok": final_video.is_file() and final_video.stat().st_size > 0,
+        "ok": bool(video_ok and all_chunks_valid),
         "mode": "animate",
         "prompt": prompt,
         "run_dir": str(run_dir),
-        "video_path": str(final_video) if final_video.is_file() else None,
+        "video_path": str(final_video) if video_ok else None,
         "scene_file": str(scene_file),
         "total_slides": len(segments),
+        "rendered_chunks_count": len(rendered_chunks),
         "slides": [
             {
                 "slide_num": s.slide_num,
@@ -1585,8 +2011,8 @@ def run_producer_consumer(
                 "code": s.manim_code,
                 "visual_duration": s.visual_duration,
                 "narration_duration": s.narration_duration,
-                "total_duration": s.total_duration,
-                "hold_duration": s.hold_duration,
+                "total_duration": getattr(s, "total_duration", max(s.visual_duration, s.narration_duration)),
+                "hold_duration": getattr(s, "hold_duration", max(0.0, s.narration_duration - s.visual_duration)),
                 "chunk_path": s.chunk_path,
                 "key_definitions": s.visual_anchor.key_definitions,
                 "layout_type": s.visual_anchor.layout_type,
@@ -1595,7 +2021,7 @@ def run_producer_consumer(
             for s in segments
         ],
         "teaching_segments": segment_dicts,
-        "has_audio": True,
+        "has_audio": bool(has_real_audio and video_ok),
     }
     manifest_path = run_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
