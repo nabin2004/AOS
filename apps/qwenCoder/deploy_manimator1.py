@@ -241,7 +241,22 @@ def write_modelfile(gguf_dir: Path, ollama_tag: str, primary_quant: str) -> Path
     return path
 
 
+def setup_kaggle_secrets() -> None:
+    """Retrieve HF_TOKEN from Kaggle UserSecretsClient if not set."""
+    if "HF_TOKEN" not in os.environ:
+        try:
+            from kaggle_secrets import UserSecretsClient  # type: ignore
+
+            val = UserSecretsClient().get_secret("HF_TOKEN")
+            if val:
+                os.environ["HF_TOKEN"] = val
+                print("✔ Retrieved HF_TOKEN from Kaggle UserSecrets.")
+        except Exception:
+            pass
+
+
 def main() -> int:
+    setup_kaggle_secrets()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-repo", default=BASE_REPO)
     parser.add_argument("--adapter-repo", default=ADAPTER_REPO)
