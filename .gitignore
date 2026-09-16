@@ -36,6 +36,7 @@ apps/sft/dataset_narrated/*
 !apps/sft/dataset_narrated/README.md
 apps/qwenCoder/data_narrated_sft/
 apps/qwenCoder/data_narrated_dpo/
+apps/new_dataset/data/
 # Local caches and media
 .aos/
 .cache/
