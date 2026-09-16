@@ -86,6 +86,7 @@ class TrainingConfig:
     eval_manibench: bool = False
     manibench_render: bool = False
     manibench_timeout: int = 20
+    warmup_ratio: float | None = None  # When set, overrides warmup_steps in SFTConfig
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -122,6 +123,13 @@ class TrainingConfig:
             eval_args["eval_strategy"] = "steps" if self.save_strategy == "steps" else "epoch"
             eval_args["eval_steps"] = self.save_steps
 
+        # Use warmup_ratio when set, otherwise fall back to warmup_steps=10
+        warmup_args: dict[str, Any] = {}
+        if self.warmup_ratio is not None:
+            warmup_args["warmup_ratio"] = self.warmup_ratio
+        else:
+            warmup_args["warmup_steps"] = 10
+
         return SFTConfig(
             output_dir=str(self.output_dir),
             num_train_epochs=self.epochs,
@@ -131,7 +139,7 @@ class TrainingConfig:
             gradient_checkpointing_kwargs={"use_reentrant": False},
             learning_rate=self.learning_rate,
             lr_scheduler_type="cosine",
-            warmup_steps=10,
+            **warmup_args,
             optim=self.optim,
             bf16=bool(use_bf16),
             fp16=bool(not use_bf16),
@@ -154,6 +162,8 @@ class TrainingConfig:
         config = cls().resolve_paths()
         if getattr(args, "rtx3060", False):
             config = apply_rtx3060_preset(config)
+        if getattr(args, "t4x2", False):
+            config = apply_t4x2_preset(config)
         if args.kaggle or os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
             config = apply_kaggle_preset(config)
         if args.data_path is not None:
@@ -376,6 +386,48 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
     )
 
 
+def apply_t4x2_preset(config: TrainingConfig) -> TrainingConfig:
+    """Kaggle T4×2 QLoRA preset: 4-bit NF4, LoRA r=16, seq_len=4500, warmup_ratio=0.05, fp16.
+
+    T4 is Turing (sm_75) — no native bf16. Uses fp16 + paged_adamw_8bit.
+    Two T4 GPUs give 2×16 GB VRAM. Effective batch = 1 * 8 * 2 = 16.
+    """
+    print(
+        "NOTE: --t4x2 T4×2 QLoRA preset: fp16, 4-bit NF4, lora_r=16, seq_len=4500, "
+        "warmup_ratio=0.05, paged_adamw_8bit, packing=off, save_strategy=epoch.",
+        file=sys.stderr,
+    )
+    report_to = config.report_to
+    if report_to == "wandb" and not os.environ.get("WANDB_API_KEY", "").strip():
+        report_to = "none"
+    save_steps = config.save_steps
+    env_steps = os.environ.get("SAVE_STEPS", "").strip()
+    if env_steps:
+        save_steps = int(env_steps)
+    return replace(
+        config,
+        batch_size=1,
+        grad_accum=8,
+        seq_len=4500,
+        epochs=3,
+        num_proc=2,
+        packing=False,
+        lora_r=16,
+        lora_alpha=32,
+        learning_rate=1e-4,
+        use_4bit=True,
+        use_bf16=False,  # T4 = sm_75, no bf16
+        optim="paged_adamw_8bit",
+        save_strategy="epoch",
+        save_steps=save_steps,
+        save_total_limit=3,
+        warmup_ratio=0.05,
+        report_to=report_to,
+        output_dir=default_kaggle_output_dir(),
+        sync_trainer_checkpoint=True,
+    )
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Qwen2.5-Coder-7B staged SFT (manim-sft / educlaw / traces)"
@@ -468,6 +520,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--kaggle",
         action="store_true",
         help="P100/T4 QLoRA: 4-bit, r=16, full dataset, packing off, seq 2048",
+    )
+    parser.add_argument(
+        "--t4x2",
+        action="store_true",
+        help="Kaggle T4×2 QLoRA: 4-bit NF4, fp16, r=16, seq 4500, warmup_ratio=0.05, epoch save",
     )
     parser.add_argument("--report-to", default=None)
     parser.add_argument("--run-name", default=None)

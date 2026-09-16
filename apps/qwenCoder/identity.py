@@ -73,6 +73,26 @@ STAGE_TAGS: dict[str, tuple[str, ...]] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# qwen-Manimator-1 series (Qwen3-8B SFT on new_data/train.jsonl)
+# ---------------------------------------------------------------------------
+
+MANIMATOR1_SFT_OUTPUT_DIR_NAME = "qwen-manimator-1-sft"
+MANIMATOR1_MERGED_OUTPUT_DIR_NAME = "qwen-manimator-1-merged"
+MANIMATOR1_GGUF_OUTPUT_DIR_NAME = "qwen-manimator-1-gguf"
+
+HUB_MANIMATOR1_SFT_REPO = "nabin2004/qwen-Manimator-1-sft"
+HUB_MANIMATOR1_MERGED_REPO = "nabin2004/qwen-Manimator-1-merged"
+HUB_MANIMATOR1_GGUF_REPO = "nabin2004/qwen-Manimator-1-gguf"
+HUB_MANIMATOR1_DATASET_REPO = "nabin2004/qwen-Manimator-1-sft-data"
+
+OLLAMA_MANIMATOR1_TAG = "qwen-manimator-1"
+
+WANDB_MANIMATOR1_RUN_NAME = "qwen-Manimator-1-sft"
+WANDB_MANIMATOR1_GROUP = "qwen-Manimator-1"
+WANDB_MANIMATOR1_TAGS = ("qwen3-8b", "manimator", "sft", "aos")
+
+
 def stage_run_name(stage: str | None) -> str:
     if not stage:
         return WANDB_SFT_RUN_NAME
