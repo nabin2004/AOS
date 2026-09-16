@@ -43,6 +43,7 @@ try:
 except Exception:
     pass
 
+import trl_compat  # noqa: F401
 from trl import SFTConfig, SFTTrainer
 
 try:

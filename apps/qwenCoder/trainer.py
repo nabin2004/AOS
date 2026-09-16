@@ -1,11 +1,38 @@
 from __future__ import annotations
 
+import functools
+import types
 from pathlib import Path
 
 import torch
 from datasets import Dataset
 from transformers import PreTrainedTokenizerBase, TrainerCallback
+import trl.trainer.sft_trainer as _sft_module
 from trl import SFTTrainer
+
+# Fix TRL issue #6483: SFTTrainer's _patch_chunked_ce_lm_head assumes original_forward has .__func__,
+# which crashes with AttributeError when model.forward is a functools.partial (e.g. from
+# accelerate device_map or bitsandbytes prepare_model_for_kbit_training).
+if hasattr(_sft_module, "_patch_chunked_ce_lm_head"):
+    _orig_patch_chunked_ce_lm_head = _sft_module._patch_chunked_ce_lm_head
+
+    def _safe_patch_chunked_ce_lm_head(target, *args, **kwargs):
+        fwd = getattr(target, "forward", None)
+        if isinstance(fwd, functools.partial) and not hasattr(fwd, "__func__"):
+            inner = fwd.func
+            while isinstance(inner, functools.partial):
+                inner = inner.func
+            try:
+                fwd.__func__ = getattr(inner, "__func__", inner)
+            except Exception:
+                pass
+        try:
+            return _orig_patch_chunked_ce_lm_head(target, *args, **kwargs)
+        except Exception as exc:
+            print(f"trainer: bypassed _patch_chunked_ce_lm_head ({exc}); falling back to standard forward.")
+            return None
+
+    _sft_module._patch_chunked_ce_lm_head = _safe_patch_chunked_ce_lm_head
 
 from checkpoints import last_checkpoint_in, push_trainer_checkpoint
 from config import TrainingConfig, effective_bf16
@@ -50,49 +77,6 @@ def _assert_qlora(model) -> None:
         )
 
 
-def _unwrap_lm_head_partial(model) -> None:
-    """Unwrap functools.partial on lm_head.forward before SFTTrainer.__init__.
-
-    bitsandbytes' prepare_model_for_kbit_training may wrap lm_head.forward as a
-    functools.partial (e.g. to inject enable_input_require_grads hooks). TRL's
-    _patch_chunked_ce_lm_head then calls `inspect.signature(forward.__func__)`,
-    which AttributeErrors on functools.partial objects. Restoring the real bound
-    method (or clearing the partial) avoids the crash with zero training impact.
-    """
-    import functools
-    import types
-
-    # Candidates: direct lm_head, peft base_model lm_head, peft base_model.model lm_head
-    candidates = [model]
-    if hasattr(model, "base_model"):
-        candidates.append(model.base_model)
-    if hasattr(model, "base_model") and hasattr(model.base_model, "model"):
-        candidates.append(model.base_model.model)
-
-    for obj in candidates:
-        lm_head = getattr(obj, "lm_head", None)
-        if lm_head is None:
-            continue
-        fwd = getattr(lm_head, "forward", None)
-        if fwd is None or not isinstance(fwd, functools.partial):
-            continue
-        # Unwrap nested partials until we reach the real callable.
-        inner = fwd.func
-        while isinstance(inner, functools.partial):
-            inner = inner.func
-        if isinstance(inner, types.MethodType):
-            lm_head.forward = inner
-            print("trainer: unwrapped functools.partial on lm_head.forward (TRL compat fix).")
-        else:
-            # Cannot restore to a MethodType; delete the attribute so Python
-            # falls back to the class-level __call__, which TRL can inspect.
-            try:
-                del lm_head.forward
-                print("trainer: deleted partial lm_head.forward override (TRL compat fix).")
-            except AttributeError:
-                pass
-
-
 def build_trainer(
     model,
     tokenizer: PreTrainedTokenizerBase,
@@ -103,9 +87,6 @@ def build_trainer(
     # When continuing an existing LoRA, the model is already a PeftModel —
     # do not pass a fresh peft_config (that would create a second adapter).
     peft_config = None if config.init_adapter is not None else config.lora_config()
-    # Unwrap any functools.partial on lm_head.forward before TRL's
-    # _patch_chunked_ce_lm_head tries to call inspect.signature(__func__).
-    _unwrap_lm_head_partial(model)
     trainer = SFTTrainer(
         model=model,
         args=config.sft_config(),

@@ -127,6 +127,10 @@ class TrainingConfig:
 
         warmup_steps = self.warmup_steps_override if self.warmup_steps_override is not None else 10
 
+        extra_args: dict[str, Any] = {}
+        if hasattr(SFTConfig, "loss_type"):
+            extra_args["loss_type"] = "nll"
+
         return SFTConfig(
             output_dir=str(self.output_dir),
             num_train_epochs=self.epochs,
@@ -150,6 +154,7 @@ class TrainingConfig:
             dataset_kwargs={"add_specialtokens": False} if False else {"add_special_tokens": False},
             report_to=self.report_to,
             run_name=self.run_name,
+            **extra_args,
             **eval_args,
         )
 

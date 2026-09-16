@@ -17,6 +17,7 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 import torch 
+import trl_compat  # noqa: F401 - apply TRL compatibility shims early
 from config import TrainingConfig, build_arg_parser, effective_bf16
 from checkpoints import resolve_resume_checkpoint
 from data import load_training_and_eval_datasets, native_sft_chat_repo
