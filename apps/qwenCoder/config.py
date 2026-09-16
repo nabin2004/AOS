@@ -86,7 +86,9 @@ class TrainingConfig:
     eval_manibench: bool = False
     manibench_render: bool = False
     manibench_timeout: int = 20
-    warmup_ratio: float | None = None  # When set, overrides warmup_steps in SFTConfig
+    # warmup_steps: TRL >= 5.0 dropped warmup_ratio from SFTConfig.
+    # Store as warmup_steps only. T4x2 preset uses 10 (ratio=0.05 at ~115 total steps).
+    warmup_steps_override: int | None = None  # When set, overrides the default warmup_steps=10
 
     def resolve_paths(self) -> TrainingConfig:
         data_path = self.data_path
@@ -123,12 +125,7 @@ class TrainingConfig:
             eval_args["eval_strategy"] = "steps" if self.save_strategy == "steps" else "epoch"
             eval_args["eval_steps"] = self.save_steps
 
-        # Use warmup_ratio when set, otherwise fall back to warmup_steps=10
-        warmup_args: dict[str, Any] = {}
-        if self.warmup_ratio is not None:
-            warmup_args["warmup_ratio"] = self.warmup_ratio
-        else:
-            warmup_args["warmup_steps"] = 10
+        warmup_steps = self.warmup_steps_override if self.warmup_steps_override is not None else 10
 
         return SFTConfig(
             output_dir=str(self.output_dir),
@@ -139,7 +136,7 @@ class TrainingConfig:
             gradient_checkpointing_kwargs={"use_reentrant": False},
             learning_rate=self.learning_rate,
             lr_scheduler_type="cosine",
-            **warmup_args,
+            warmup_steps=warmup_steps,
             optim=self.optim,
             bf16=bool(use_bf16),
             fp16=bool(not use_bf16),
@@ -421,7 +418,7 @@ def apply_t4x2_preset(config: TrainingConfig) -> TrainingConfig:
         save_strategy="epoch",
         save_steps=save_steps,
         save_total_limit=3,
-        warmup_ratio=0.05,
+        warmup_steps_override=10,  # ~5% of 115 total steps; warmup_ratio removed in TRL v5.2
         report_to=report_to,
         output_dir=default_kaggle_output_dir(),
         sync_trainer_checkpoint=True,
