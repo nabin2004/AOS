@@ -391,7 +391,7 @@ def apply_t4x2_preset(config: TrainingConfig) -> TrainingConfig:
     """
     print(
         "NOTE: --t4x2 T4×2 QLoRA preset: fp16, 4-bit NF4, lora_r=16, seq_len=4500, "
-        "warmup_ratio=0.05, paged_adamw_8bit, packing=off, save_strategy=epoch.",
+        "warmup_steps=10, paged_adamw_8bit, packing=off, save_strategy=epoch.",
         file=sys.stderr,
     )
     report_to = config.report_to
