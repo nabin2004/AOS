@@ -1,6 +1,6 @@
 from pydantic_ai import Agent, Tool
 from dotenv import load_dotenv
-from codemode_retry import install_codemode_retry_patch
+
 from llm_config import is_ollama, model_for, model_for_agent, settings_for
 from pydantic_ai_harness import CodeMode
 from tools import compile_manim_code, manim_write
@@ -15,7 +15,7 @@ from observability import configure_logfire
 configure_logfire()
 
 load_dotenv()
-install_codemode_retry_patch()
+
 
 # Compact prompt for Ollama/GGUF E2B — same shape as diagnosis-passing Infer probe.
 # Keep this short; do not paste full Manim scenes (E2B copies bare imports into run_code).
@@ -213,7 +213,7 @@ coder_agent = Agent(
     system_prompt=coder_system_prompt(),
     model_settings=settings_for("coder"),
     retries=5,
-    capabilities=[CodeMode(max_retries=8)],
+    capabilities=[CodeMode(max_retries=8, dynamic_catalog=True)],
     tools=[
         Tool(compile_manim_code),
         Tool(manim_read),
