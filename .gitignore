@@ -64,3 +64,5 @@ apps/qwenCoder/*-gguf/
 
 .neon
 node_modules/
+.claude/
+agent/

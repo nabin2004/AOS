@@ -39,6 +39,20 @@ The following skills from [`adithya-s-k/manim_skill`](https://github.com/adithya
 | **`run-lecture-pipeline`** | [`.agents/skills/run-lecture-pipeline/SKILL.md`](.agents/skills/run-lecture-pipeline/SKILL.md) | Execution guide for the end-to-end multi-agent lecture generation pipeline. |
 | **`sft-trace-collection`** | [`.agents/skills/sft-trace-collection/SKILL.md`](.agents/skills/sft-trace-collection/SKILL.md) | Synthetic prompt generation, trajectory collection, and SFT/DPO dataset builds. |
 
+### Pydantic AI & Logfire Skills (`pydantic/skills`)
+
+| Skill Name | Path | Purpose |
+|------------|------|---------|
+| **`building-pydantic-ai-agents`** | [`.agents/skills/building-pydantic-ai-agents/SKILL.md`](.agents/skills/building-pydantic-ai-agents/SKILL.md) | Building AI agents with Pydantic AI — tools, capabilities, structured outputs, streaming, testing. |
+| **`pydantic-ai-harness`** | [`.agents/skills/pydantic-ai-harness/SKILL.md`](.agents/skills/pydantic-ai-harness/SKILL.md) | Code Mode sandboxing, filesystem, subagents, planning, and context compaction. |
+| **`pydantic`** | [`.agents/skills/pydantic/SKILL.md`](.agents/skills/pydantic/SKILL.md) | Advanced data modeling, validation, and schema constraints. |
+| **`logfire-setup`** | [`.agents/skills/logfire-setup/SKILL.md`](.agents/skills/logfire-setup/SKILL.md) | Entry point for Logfire observability and monitoring. |
+| **`logfire-instrumentation`** | [`.agents/skills/logfire-instrumentation/SKILL.md`](.agents/skills/logfire-instrumentation/SKILL.md) | Adding traces, spans, and telemetry to application code. |
+| **`logfire-evals`** | [`.agents/skills/logfire-evals/SKILL.md`](.agents/skills/logfire-evals/SKILL.md) | Offline evaluations, test datasets, and LLM judges. |
+| **`logfire-query`** | [`.agents/skills/logfire-query/SKILL.md`](.agents/skills/logfire-query/SKILL.md) | Querying and analyzing telemetry data and SQL traces. |
+| **`logfire-ui`** | [`.agents/skills/logfire-ui/SKILL.md`](.agents/skills/logfire-ui/SKILL.md) | Navigating and linking to Logfire UI dashboards and traces. |
+| **`logfire-infrastructure`** | [`.agents/skills/logfire-infrastructure/SKILL.md`](.agents/skills/logfire-infrastructure/SKILL.md) | Monitoring hosts, Docker containers, databases, and cluster metrics. |
+
 ---
 
 ## 3. How to Install Skills in the Harness
