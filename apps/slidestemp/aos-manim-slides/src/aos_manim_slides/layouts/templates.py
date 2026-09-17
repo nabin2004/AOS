@@ -1,11 +1,7 @@
 from __future__ import annotations
-
 from typing import List, Optional, Union
-
 from manim import VGroup, VMobject, Mobject
-
 from aos_manim_core import ThemeConfig
-
 from ..document.model import Callout, ListBlock, RawMobject, SlideSpec
 from .base_slide import Slide
 

@@ -93,17 +93,34 @@ tags:
   - aos
   - code-generation
   - math
+  - gguf
+  - ollama
 ---
 
-# qwen-Manimator-1 (Merged bf16 Safetensors)
+# qwen-Manimator-1 (Merged bf16 Safetensors & GGUF)
 
-Full-weight merged release of **qwen-Manimator-1**, a Qwen/Qwen3-8B model fine-tuned
+Full-weight merged release and GGUF quantizations of **qwen-Manimator-1**, a Qwen/Qwen3-8B model fine-tuned
 to generate pedagogically rich **ManimCE + Manim Voiceover** animations.
 
 - **Base Model**: `Qwen/Qwen3-8B`
 - **LoRA Adapter**: [`{adapter_repo}`](https://huggingface.co/{adapter_repo})
 - **Merged Model**: [`{merged_repo}`](https://huggingface.co/{merged_repo})
 - **Quantized GGUF**: [`{gguf_repo}`](https://huggingface.co/{gguf_repo})
+
+---
+
+## Quickstart with Ollama (1-Click)
+
+You can run this merged model directly in Ollama:
+
+```bash
+ollama run hf.co/{merged_repo}
+```
+
+Or run the dedicated GGUF repository:
+```bash
+ollama run hf.co/{gguf_repo}
+```
 
 ---
 
@@ -116,7 +133,7 @@ to generate pedagogically rich **ManimCE + Manim Voiceover** animations.
 
 ---
 
-## Quickstart
+## Quickstart (Transformers)
 
 ```python
 import torch
@@ -426,7 +443,7 @@ def main() -> int:
     if shutil.which("ollama"):
         print(f"\nRegistering with local Ollama: {args.ollama_tag}...")
         try:
-            subprocess.run(["ollama", "create", args.ollama_tag, "-f", str(modelfile_path)], check=True)
+            subprocess.run(["ollama", "create", args.ollama_tag, "-f", str(modelfile_path)], cwd=str(gguf_dir), check=True)
             print(f"✔ Registered ollama model: {args.ollama_tag}")
         except Exception as e:
             print(f"Notice: Ollama registration: {e}")
@@ -463,7 +480,14 @@ def main() -> int:
             repo_type="model",
             token=token,
         )
-        print(f"✔ GGUF artifacts injected into merged repo.")
+        api.upload_file(
+            path_or_fileobj=str(merged_dir / "README.md"),
+            path_in_repo="README.md",
+            repo_id=args.merged_repo,
+            repo_type="model",
+            token=token,
+        )
+        print(f"✔ GGUF artifacts & model card injected into merged repo.")
 
     print("\n=================================================================")
     print("🎉 qwen-Manimator-1 Merge & GGUF Deployment Complete!")
