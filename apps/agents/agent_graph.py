@@ -49,29 +49,7 @@ from ir.manim_ir import Subject, Classification
 
 
 
-@dataclass
-class PipelineDeps:
-    topic: str | None = None
-    subject: str | None = None
-    lecture_plan: dict | None = None
-    teaching_script: dict | None = None
 
-
-# pai web (and other callers) often run the agent without deps=PipelineDeps().
-# Keep pipeline state in a module store reset at classify_topic.
-_pipeline_state = PipelineDeps()
-
-
-def _reset_pipeline_state() -> PipelineDeps:
-    global _pipeline_state
-    _pipeline_state = PipelineDeps()
-    return _pipeline_state
-
-
-def _pipeline_state_for(ctx: RunContext[PipelineDeps]) -> PipelineDeps:
-    if ctx.deps is not None:
-        return ctx.deps
-    return _pipeline_state
 
 
 @dataclass
@@ -95,73 +73,7 @@ def _subject_str(subject: str | Subject) -> str:
     return str(subject)
 
 
-def _assistant_text_from_messages(messages: list | None) -> str:
-    if not messages:
-        return ""
-    chunks: list[str] = []
-    for msg in messages:
-        if getattr(msg, "kind", None) not in (None, "response"):
-            continue
-        for part in getattr(msg, "parts", None) or []:
-            content = getattr(part, "content", None)
-            if not isinstance(content, str) or not content.strip():
-                continue
-            part_kind = getattr(part, "part_kind", None)
-            if part_kind in (None, "text"):
-                chunks.append(content)
-    return "\n".join(chunks)
 
-
-def _salvage_codemode_text_dump(
-    run_dir,
-    *,
-    summary: str,
-    messages: list | None,
-) -> None:
-    """If the model dumped run_code as chat text or wrote a scene without compiling, compile."""
-    from tools.compile import compile_manim_code
-    from tools.manim_write import manim_write
-
-    manifest = load_manifest(run_dir)
-    if manifest.get("scene_file") and not (manifest.get("last_compile") or {}).get("ok"):
-        scene_file = Path(run_dir) / manifest["scene_file"]
-        if scene_file.exists():
-            code = scene_file.read_text(encoding="utf-8")
-            scene_name = manifest.get("scene_name") or (manifest.get("last_write") or {}).get("scene_name") or "Scene"
-            compile_manim_code(
-                code=code,
-                scene_name=scene_name,
-                output_dir=str(run_dir),
-            )
-            return
-
-    if manifest.get("scene_file") or (manifest.get("last_write") or {}).get("ok"):
-        return
-
-    blob = summary or ""
-    extracted = extract_codemode_dump(blob)
-    if extracted is None:
-        extracted = extract_codemode_dump(_assistant_text_from_messages(messages))
-    if extracted is None:
-        for cand in Path(run_dir).glob("*.py"):
-            if cand.name not in ("__init__.py",):
-                cand_code = cand.read_text(encoding="utf-8")
-                extracted = extract_codemode_dump(cand_code)
-                if extracted:
-                    break
-    if extracted is None:
-        return
-
-    manim_write(
-        code=extracted.code,
-        scene_name=extracted.scene_name,
-        output_dir=str(run_dir),
-    )
-    compile_manim_code(
-        code=extracted.code,
-        scene_name=extracted.scene_name,
-        output_dir=str(run_dir),
-    )
 
 
 async def run_coder_step(
@@ -241,8 +153,6 @@ async def run_coder_step(
     except Exception as exc:
         stopped_reason = format_custom_endpoint_error(exc)
         summary = stopped_reason
-
-    _salvage_codemode_text_dump(run_dir, summary=summary, messages=messages)
 
     manifest = load_manifest(run_dir)
     if (manifest.get("last_compile") or {}).get("ok"):
@@ -519,153 +429,46 @@ async def run_pipeline(
     }
 
 
+from pydantic import BaseModel
+
+class PipelineResult(BaseModel):
+    result: str
+    stopped_reason: str
+    compile_ok: bool
+    scene_name: str | None
+    run_dir: str | None
+    audio: int | None
+    error: str | None
+    message: str | None
+
 animation_agent = Agent(
     model_for_agent("animation"),
-    deps_type=PipelineDeps,
     name="Manim Animation Pipeline",
-    description="Runs classify → lecture plan → Manim code/compile for a learning topic.",
+    description="Runs the full educational animation graph pipeline.",
     model_settings=settings_for("animation"),
     system_prompt=(
-        "You run the Manim animation pipeline for educational topics.\n"
-        "Act immediately — do not write long reasoning or preambles.\n"
-        "Call tools in this exact order:\n"
-        "1. classify_topic with the user's exact message\n"
-        "2. plan_lecture with the returned topic and subject "
-        "(skip if subject is unknown / unsupported — tell the user and stop)\n"
-        "3. write_manim_animation with topic and subject only "
-        "(the lecture plan and teaching script are stored automatically — "
-        "do not pass plan text)\n"
-        "4. If the user provides feedback on an already generated animation (e.g. 'make the circle blue', 'fix the error'), call "
-        "revise_manim_animation with their feedback and the run_dir from the previous step.\n"
-        "Between tools, at most one short status line "
-        "(e.g. 'Classifying…', 'Planning…', 'Writing Manim…', 'Revising…').\n"
-        "After write_manim_animation or revise_manim_animation, summarize only from the tool result: "
-        "stopped_reason, compile_ok, scene_name, run_dir, audio count. "
-        "Do not invent paths or invent success if the tool reported failure."
+        "You are the interactive frontend for the Manim animation pipeline.\n"
+        "Call `generate_educational_animation` with the user's exact query to start the generation.\n"
+        "Do not write long reasoning or preambles, just call the tool."
     ),
 )
 
 
 @animation_agent.tool
-async def classify_topic(ctx: RunContext[PipelineDeps], user_query: str) -> dict:
-    """Classify the user request into a subject domain and lecture topic."""
-    _reset_pipeline_state()
-    result = await classifier_agent.run(user_query, usage=ctx.usage)
-    classification = result.output
-    if classification is None:
-        return {
-            "ok": False,
-            "supported": False,
-            "subject": "unknown",
-            "topic": None,
-            "message": "Classification failed.",
-        }
-    supported = classification.subject != Subject.UNKNOWN
-    payload = classification.model_dump(mode="json")
-    payload["ok"] = True
-    payload["supported"] = supported
-    if not supported:
-        payload["message"] = "Domain not supported (outside Math/CS/AI)."
-    return payload
-
-
-@animation_agent.tool
-async def plan_lecture(ctx: RunContext[PipelineDeps], topic: str, subject: str) -> dict:
-    """Generate a lecture plan and teaching script for the classified topic."""
-    result = await lecture_planner_agent.run(
-        f"Topic: {topic}\nSubject: {subject}",
-        usage=ctx.usage,
+async def generate_educational_animation(ctx: RunContext, user_query: str) -> PipelineResult:
+    """Execute the full animation pipeline (classify, plan, script, code, compile) for the user's query."""
+    result = await run_pipeline(user_query)
+    
+    return PipelineResult(
+        result=result.get("result", result.get("summary", "")),
+        stopped_reason=result.get("stopped_reason", "unknown"),
+        compile_ok=result.get("compile_ok", False),
+        scene_name=result.get("scene_name"),
+        run_dir=result.get("run_dir"),
+        audio=len(result.get("audio_paths", [])),
+        error=result.get("error"),
+        message=result.get("message"),
     )
-    plan = result.output
-    if plan is None:
-        return {"ok": False, "message": "Lecture planning failed."}
-    if hasattr(plan, "model_dump"):
-        plan_payload = plan.model_dump(mode="json")
-    else:
-        plan_payload = {"raw": str(plan)}
-    state = _pipeline_state_for(ctx)
-    state.topic = topic
-    state.subject = subject
-    state.lecture_plan = plan_payload
-    script_payload = None
-    try:
-        script_result = await teaching_script_agent.run(
-            teaching_script_user_prompt(topic, subject, plan_payload),
-            usage=ctx.usage,
-        )
-        script_payload = teaching_script_to_payload(script_result.output)
-        state.teaching_script = script_payload
-    except Exception as exc:
-        print(
-            f"teaching script error: {format_custom_endpoint_error(str(exc))}",
-            file=sys.stderr,
-            flush=True,
-        )
-        state.teaching_script = None
-    return {"ok": True, "plan": plan_payload, "teaching_script": script_payload}
-
-
-@animation_agent.tool
-async def write_manim_animation(
-    ctx: RunContext[PipelineDeps],
-    topic: str,
-    subject: str,
-) -> dict:
-    """Write, compile, and optionally narrate Manim code from the stored lecture plan."""
-    state = _pipeline_state_for(ctx)
-    if state.lecture_plan is None:
-        return {
-            "ok": False,
-            "stopped_reason": "no_plan",
-            "message": "No lecture plan stored — call plan_lecture first.",
-        }
-    if state.teaching_script is None:
-        try:
-            script_result = await teaching_script_agent.run(
-                teaching_script_user_prompt(topic, subject, state.lecture_plan),
-                usage=ctx.usage,
-            )
-            state.teaching_script = teaching_script_to_payload(script_result.output)
-        except Exception as exc:
-            print(
-                f"teaching script error: {format_custom_endpoint_error(str(exc))}",
-                file=sys.stderr,
-                flush=True,
-            )
-    coder_result = await run_coder_step(
-        topic,
-        subject,
-        state.lecture_plan,
-        teaching_script=state.teaching_script,
-        usage=ctx.usage,
-    )
-    return coder_result.model_dump(mode="json")
-
-
-@animation_agent.tool
-async def revise_manim_animation(
-    ctx: RunContext[PipelineDeps],
-    feedback: str,
-    run_dir: str,
-) -> dict:
-    """Revise an existing Manim animation based on user feedback."""
-    state = _pipeline_state_for(ctx)
-    if not state.topic or not state.subject or not state.lecture_plan:
-        return {
-            "ok": False,
-            "message": "Cannot revise: no lecture plan in current state. Please generate an animation first.",
-        }
-
-    coder_result = await run_coder_step(
-        state.topic,
-        state.subject,
-        state.lecture_plan,
-        teaching_script=state.teaching_script,
-        usage=ctx.usage,
-        existing_run_dir=run_dir,
-        feedback=feedback,
-    )
-    return coder_result.model_dump(mode="json")
 
 
 if __name__ == "__main__":
