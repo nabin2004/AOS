@@ -42,41 +42,11 @@ from teaching_script import (
     teaching_script_user_prompt,
 )
 from ir.manim_ir import Subject, Classification
-from dbos_setup import dbos_enabled, ensure_dbos_launched
 
 
 
 
-def _run_classifier():
-    if dbos_enabled():
-        from durable_agents import durable_classifier
 
-        return durable_classifier
-    return classifier_agent
-
-
-def _run_planner():
-    if dbos_enabled():
-        from durable_agents import durable_lecture_planner
-
-        return durable_lecture_planner
-    return lecture_planner_agent
-
-
-def _run_teaching_script():
-    if dbos_enabled():
-        from durable_agents import durable_teaching_script
-
-        return durable_teaching_script
-    return teaching_script_agent
-
-
-def _run_coder():
-    if dbos_enabled():
-        from durable_agents import durable_coder
-
-        return durable_coder
-    return coder_agent
 
 
 @dataclass
@@ -210,8 +180,6 @@ async def run_coder_step(
     animation_mode: str = "keyframe",
 ) -> CoderRunResult:
     """Write/compile Manim for a topic; shared by the graph node and web tools."""
-    if dbos_enabled():
-        ensure_dbos_launched()
 
     run_dir = Path(existing_run_dir) if existing_run_dir else new_coder_run_dir(topic)
 
@@ -261,7 +229,7 @@ async def run_coder_step(
 
     try:
         async def _call_coder():
-            return await _run_coder().run(prompt, usage=usage, usage_limits=coder_limits)
+            return await coder_agent.run(prompt, usage=usage, usage_limits=coder_limits)
 
         result = await execute_with_llm_retry(_call_coder, operation_name="Coder Agent")
         messages = result.all_messages()
@@ -298,12 +266,10 @@ class ClassifyNode(BaseNode[AnimationState, None, str]):
     async def run(
         self, ctx: GraphRunContext[AnimationState]
     ) -> "PlanLectureNode | End[str]":
-        if dbos_enabled():
-            ensure_dbos_launched()
         classify_error: str | None = None
         try:
             async def _call_classify():
-                return await _run_classifier().run(ctx.state.user_query)
+                return await classifier_agent.run(ctx.state.user_query)
 
             result = await execute_with_llm_retry(_call_classify, operation_name="Classifier Agent")
             ctx.state.classification = result.output
@@ -327,15 +293,13 @@ class ClassifyNode(BaseNode[AnimationState, None, str]):
 @dataclass
 class PlanLectureNode(BaseNode[AnimationState, None, str]):
     async def run(self, ctx: GraphRunContext[AnimationState]) -> "PlanTeachingScriptNode | End[str]":
-        if dbos_enabled():
-            ensure_dbos_launched()
         plan_error: str | None = None
         classification = ctx.state.classification
         topic = classification.topic if classification else "Math Topic"
         subject = classification.subject if classification else Subject.MATH
         try:
             async def _call_planner():
-                return await _run_planner().run(
+                return await lecture_planner_agent.run(
                     f"Topic: {topic}\n"
                     f"Subject: {subject}"
                 )
@@ -359,15 +323,13 @@ class PlanLectureNode(BaseNode[AnimationState, None, str]):
 @dataclass
 class PlanTeachingScriptNode(BaseNode[AnimationState, None, str]):
     async def run(self, ctx: GraphRunContext[AnimationState]) -> "CodeAgent":
-        if dbos_enabled():
-            ensure_dbos_launched()
         classification = ctx.state.classification
         plan = ctx.state.plan
         if classification is None or plan is None:
             return CodeAgent()
         try:
             async def _call_teaching_script():
-                return await _run_teaching_script().run(
+                return await teaching_script_agent.run(
                     teaching_script_user_prompt(
                         classification.topic,
                         _subject_str(classification.subject),
@@ -473,8 +435,6 @@ async def run_pipeline(
     mode: str = "keyframe",
     output_dir: str | Path | None = None,
 ) -> dict:
-    if dbos_enabled():
-        ensure_dbos_launched()
 
     # Integrated Keyframe Producer-Consumer Engine for UI Animate Mode
     if mode == "keyframe":
