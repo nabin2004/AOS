@@ -165,6 +165,7 @@ export function ChatControls({
 
   const triggerSummary = useMemo(() => {
     const parts: string[] = [];
+    if (videoMode === "keyframe") parts.push("Keyframe");
     if (videoMode === "animate") parts.push("Animate");
     if (videoMode === "teaching") parts.push("Teaching");
     if (videoMode === "lecture") parts.push("Lecture");
@@ -508,11 +509,12 @@ function SettingsPanel({
             Video generation
           </span>
         </div>
-        <div className="grid grid-cols-4 gap-1">
+        <div className="grid grid-cols-5 gap-1">
           {(
             [
               { value: "off", label: "Off", hint: "Simple conversation mode" },
-              { value: "animate", label: "Animate", hint: "Animate next message (1-shot)" },
+              { value: "keyframe", label: "Keyframe", hint: "Keyframe Producer-Consumer engine (1-shot)" },
+              { value: "animate", label: "Animate", hint: "agent_graph.py multi-agent pipeline (1-shot)" },
               { value: "teaching", label: "Teaching", hint: "Visual anchor + extended narration (1-shot)" },
               { value: "lecture", label: "Lecture", hint: "Full IR + assemble (1-shot)" },
             ] as const
@@ -523,7 +525,7 @@ function SettingsPanel({
               title={opt.hint}
               onClick={() => setVideoMode(opt.value)}
               className={cn(
-                "rounded-md px-2 py-1.5 text-xs font-medium transition-colors",
+                "rounded-md px-2 py-1.5 text-xs font-medium transition-colors text-center",
                 videoMode === opt.value
                   ? "bg-primary text-primary-foreground"
                   : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10",
@@ -536,11 +538,13 @@ function SettingsPanel({
         <p className="text-foreground/55 text-[11px] leading-relaxed">
           {videoMode === "off"
             ? "Simple conversation mode: chat replies normally without compiling a video."
-            : videoMode === "animate"
-              ? "1-Shot Animate: Your next prompt generates an animation with voiceover, then automatically returns to conversation mode."
-              : videoMode === "teaching"
-                ? "1-Shot Visual Anchor: Informative Manim visual anchor + decoupled in-depth teaching narration, then returns to conversation mode."
-                : "1-Shot Lecture: Full IR pipeline + video assembly, then returns to conversation mode."}
+            : videoMode === "keyframe"
+              ? "1-Shot Keyframe: Discrete pedagogical slides + synchronized Pocket TTS narration and frame freezing via Keyframe Engine."
+              : videoMode === "animate"
+                ? "1-Shot Animate: Pure Pydantic AI agent graph (agent_graph.py: Classify → Plan → TeachingScript → Coder) compiling continuous Manim code."
+                : videoMode === "teaching"
+                  ? "1-Shot Visual Anchor: Informative Manim visual anchor + decoupled in-depth teaching narration, then returns to conversation mode."
+                  : "1-Shot Lecture: Full IR pipeline + video assembly, then returns to conversation mode."}
         </p>
       </div>
 

@@ -262,7 +262,7 @@ def _run_agents_cli(
     Streams ``-> {node}`` progress lines to Redis while the process runs.
     """
     agents_dir = _resolve_agents_dir()
-    command = "animate" if mode in ("animate", "teaching") else "generate"
+    command = "animate" if mode in ("animate", "keyframe", "teaching") else "generate"
     
     # In Docker, check if container virtualenv Python has agents packages ready
     venv_python = Path("/app/.venv/bin/python")
@@ -286,9 +286,12 @@ def _run_agents_cli(
             "--json",
             "--no-banner",
         ]
-    if mode in ("animate", "teaching"):
+    if mode in ("keyframe", "teaching"):
         cmd.append("--fast")
         cmd.extend(["--mode", "keyframe"])
+    elif mode == "animate":
+        cmd.append("--fast")
+        cmd.extend(["--mode", "continuous"])
 
     logger.info("Running agents CLI in %s: %s …", agents_dir, command)
     env = os.environ.copy()

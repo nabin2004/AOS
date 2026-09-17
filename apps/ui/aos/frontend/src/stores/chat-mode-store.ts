@@ -3,13 +3,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type VideoMode = "off" | "animate" | "teaching" | "lecture";
+export type VideoMode = "off" | "animate" | "keyframe" | "teaching" | "lecture";
 export type HarnessMode = "off" | "educlaw";
 
 /**
  * Per-client chat-mode toggles:
  * - deepResearch: planner + parallel subagents
- * - videoMode: Manim video pipeline (off | animate | lecture)
+ * - videoMode: Manim video pipeline (off | animate | keyframe | lecture)
  * - harnessMode: EduClaw sandboxed coding harness (off | educlaw)
  * - headless / autoApprove: automation options for tool executions
  *

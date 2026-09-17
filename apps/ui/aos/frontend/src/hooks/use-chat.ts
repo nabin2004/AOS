@@ -661,9 +661,9 @@ export function useChat(options: UseChatOptions = {}) {
       if (activeKBIds.length) payload.active_knowledge_base_ids = activeKBIds;
       payload.deep_research = useChatModeStore.getState().deepResearch;
       const videoMode = useChatModeStore.getState().videoMode;
-      if (videoMode === "animate" || videoMode === "teaching" || videoMode === "lecture") {
+      if (videoMode === "animate" || videoMode === "keyframe" || videoMode === "teaching" || videoMode === "lecture") {
         payload.video_mode = videoMode;
-        // One-shot Animate: The animate button only applies to this chat turn, then reverts to simple conversation mode
+        // One-shot video generation: Reverts to simple conversation mode after sending
         useChatModeStore.getState().setVideoMode("off");
       }
       const harnessMode = useChatModeStore.getState().harnessMode;

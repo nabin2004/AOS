@@ -253,7 +253,7 @@ async def run_animate(
         )
 
     # Native Keyframe Producer-Consumer Engine in agent_graph
-    if mode == "keyframe" or result.get("slides") or (result.get("ok") and result.get("video_path")):
+    if mode == "keyframe" or result.get("slides"):
         if result.get("ok") and result.get("video_path"):
             final_video = result["video_path"]
             scene_file = result.get("scene_file") or result.get("scene_path")
@@ -273,15 +273,6 @@ async def run_animate(
             error=result.get("error") or result.get("message") or "keyframe_generation_failed",
             run_dir=result.get("run_dir"),
             detail=result,
-        )
-
-    try:
-        result = await run_pipeline(prompt, length=length, cinematic=cinematic, mode=mode)
-    except Exception as exc:
-        return VideoArtifact(
-            ok=False,
-            mode="animate",
-            error=format_custom_endpoint_error(exc),
         )
 
     run_dir = result.get("run_dir")

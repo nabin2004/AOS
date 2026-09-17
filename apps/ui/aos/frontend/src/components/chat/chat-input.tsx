@@ -331,13 +331,15 @@ export function ChatInput({
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={
-            videoMode === "animate"
-              ? "Describe what you want to animate (1-shot animation)..."
-              : videoMode === "teaching"
-                ? "Enter topic for 1-shot visual anchor lecture..."
-                : videoMode === "lecture"
-                  ? "Enter topic for 1-shot full lecture..."
-                  : "Type a message (click Animate to generate video)..."
+            videoMode === "keyframe"
+              ? "Describe topic for Keyframe slide animation (1-shot)..."
+              : videoMode === "animate"
+                ? "Describe what you want to animate with agent_graph.py (1-shot)..."
+                : videoMode === "teaching"
+                  ? "Enter topic for 1-shot visual anchor lecture..."
+                  : videoMode === "lecture"
+                    ? "Enter topic for 1-shot full lecture..."
+                    : "Type a message (click Keyframe or Animate to generate video)..."
           }
           disabled={disabled}
           rows={1}

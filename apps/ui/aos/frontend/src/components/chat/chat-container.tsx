@@ -15,7 +15,7 @@ import { SubagentFeed } from "./subagent-feed";
 import { SubagentPanel } from "./subagent-panel";
 import { ToolApprovalDialog } from "./tool-approval-dialog";
 import { QuestionPrompt } from "@/components/ui";
-import { Film } from "lucide-react";
+import { Film, Layers } from "lucide-react";
 import type { PendingApproval, AskUserQuestion, AskUserAnswer, Decision } from "@/types";
 import { useConversationStore, useChatStore, useChatModeStore } from "@/stores";
 import { useResearchStore } from "@/stores";
@@ -446,6 +446,33 @@ function ChatUI({
 
                 <button
                   type="button"
+                  onClick={() => setVideoMode(videoMode === "keyframe" ? "off" : "keyframe")}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[11px] font-medium tracking-wider transition-all",
+                    videoMode === "keyframe"
+                      ? "bg-amber-500 text-white shadow-sm shadow-amber-500/25 ring-1 ring-amber-500/30 dark:bg-amber-600"
+                      : "bg-foreground/5 text-foreground/60 hover:bg-foreground/10 hover:text-foreground",
+                  )}
+                  title={
+                    videoMode === "keyframe"
+                      ? "Keyframe engine active (discrete pedagogical slides + voiceover). Automatically returns to simple conversation mode after sending."
+                      : "Click to generate keyframe slides with narration (1-shot; reverts to conversation mode after sending)"
+                  }
+                >
+                  <Layers className="h-3.5 w-3.5" />
+                  <span>Keyframe</span>
+                  {videoMode === "keyframe" ? (
+                    <>
+                      <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                      <span className="text-[9px] font-semibold opacity-90 uppercase">1-shot</span>
+                    </>
+                  ) : (
+                    <span className="text-[9px] opacity-40 uppercase">off</span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setVideoMode(videoMode === "animate" ? "off" : "animate")}
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[11px] font-medium tracking-wider transition-all",
@@ -455,8 +482,8 @@ function ChatUI({
                   )}
                   title={
                     videoMode === "animate"
-                      ? "Animate mode active for this prompt. Automatically returns to simple conversation mode after sending."
-                      : "Click to animate your next message (1-shot; reverts to conversation mode after sending)"
+                      ? "Animate agent graph active (agent_graph.py multi-agent pipeline). Automatically returns to simple conversation mode after sending."
+                      : "Click to run Manim animation agent graph (1-shot; reverts to conversation mode after sending)"
                   }
                 >
                   <Film className="h-3.5 w-3.5" />

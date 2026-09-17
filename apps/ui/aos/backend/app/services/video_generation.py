@@ -17,7 +17,7 @@ from app.services.video_storage import code_object_key, get_video_storage, slide
 
 logger = logging.getLogger(__name__)
 
-VALID_MODES = frozenset({"animate", "lecture", "teaching"})
+VALID_MODES = frozenset({"animate", "keyframe", "lecture", "teaching"})
 
 
 class VideoGenerationService:
