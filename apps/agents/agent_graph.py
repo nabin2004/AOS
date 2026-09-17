@@ -45,264 +45,6 @@ from ir.manim_ir import Subject, Classification
 from dbos_setup import dbos_enabled, ensure_dbos_launched
 
 
-def _heuristic_classification(user_query: str) -> Classification | None:
-    """In-domain fallback when the classifier model cannot emit structured output."""
-    q = user_query.lower()
-    math_hints = (
-        "bodmas",
-        "pemdas",
-        "bidmas",
-        "order of operations",
-        "algebra",
-        "calculus",
-        "geometry",
-        "trigonometry",
-        "fraction",
-        "equation",
-        "matrix",
-        "derivative",
-        "integral",
-        "probability",
-        "statistics",
-        "pythagoras",
-        "quadratic",
-        "arithmetic",
-        "math",
-        "euler",
-        "e^{i",
-        "complex number",
-        "complex numbers",
-        "cis",
-        "unit circle",
-        "formula",
-        "theorem",
-        "identity",
-        "fourier",
-        "de moivre",
-        "lorenz",
-        "attractor",
-        "chaos",
-        "differential",
-        "dynamical",
-        "physics",
-        "gravity",
-        "system",
-    )
-    cs_hints = (
-        "algorithm",
-        "data structure",
-        "binary tree",
-        "linked list",
-        "complexity",
-        "sorting",
-        "recursion",
-        "programming",
-    )
-    ai_hints = (
-        "neural network",
-        "machine learning",
-        "gradient descent",
-        "backpropagation",
-        "transformer",
-        "llm",
-    )
-    extracted_topic = re.sub(
-        r"^(teach\s+me\s+about|explain|animate|visualize|what\s+is|show\s+me|create\s+a\s+video\s+about|lecture\s+on)\s+",
-        "",
-        user_query.strip(),
-        flags=re.IGNORECASE,
-    ).strip() or user_query.strip()
-
-    if any(h in q for h in cs_hints):
-        return Classification(subject=Subject.CS, topic=extracted_topic.title() or "Computer Science Topic")
-    if any(h in q for h in ai_hints):
-        return Classification(subject=Subject.AI, topic=extracted_topic.title() or "AI Topic")
-
-    topic = extracted_topic.title() if extracted_topic else "Math Topic"
-    if "bodmas" in q:
-        topic = "BODMAS"
-    elif "pemdas" in q:
-        topic = "PEMDAS"
-    elif "euler" in q:
-        topic = "Eulers Formula"
-    elif "lorenz" in q:
-        topic = "Lorenz Attractor"
-
-    return Classification(subject=Subject.MATH, topic=topic)
-
-
-
-def _heuristic_lecture_plan(topic: str, subject: Subject | str) -> Lecture:
-    """Generate a clean, valid default Lecture plan if the planner LLM fails."""
-    subj = (
-        Subject(subject)
-        if isinstance(subject, str) and subject in Subject._value2member_map_
-        else (subject if isinstance(subject, Subject) else Subject.MATH)
-    )
-    clean_topic = re.sub(r"[^A-Za-z0-9]", "", topic.title()) or "Main"
-    scene_name = f"{clean_topic}Scene"
-    return Lecture(
-        topic=topic,
-        subject=subj,
-        greeting=f"In this lesson, you will explore {topic}.",
-        needed_formulas=[],
-        class_names=[scene_name],
-        does_it_needs_3d=any(k in topic.lower() for k in ("3d", "lorenz", "space", "sphere")),
-        assumptions=[],
-        list_of_external_library_needed=[],
-        animation_needed=["Write", "FadeIn", "Create", "Transform"],
-        animation_updaters_needed=[],
-        camera_needed=[],
-        Mobjects_needed=["Title", "Text", "MathTex", "VGroup"],
-        objectives=[f"Understand the core intuition behind {topic}"],
-        opener=f"You will see the fundamental principles of {topic} visualized step by step.",
-        learning_outcomes=[f"Explain the key intuition behind {topic}"],
-    )
-
-
-def _heuristic_teaching_script(
-    topic: str, subject: Subject | str, plan: Any = None
-) -> TeachingScript:
-    """Generate a clean, structured default TeachingScript if the teaching script agent fails."""
-    clean_topic = re.sub(r"[^A-Za-z0-9 ]", "", topic).strip() or "Mathematical Principles"
-    clean_title = topic.replace("'", "").title()
-    scene_name = f"{re.sub(r'[^A-Za-z0-9]', '', clean_title) or 'Main'}Scene"
-
-    topic_lower = topic.lower()
-    if "euler" in topic_lower:
-        beats = [
-            TeachingBeat(
-                id="intro",
-                takeaway="Euler's formula unites exponential growth and circular trigonometry.",
-                visual="Title displaying Euler's Formula and master equation e^{i theta} = cos(theta) + i sin(theta)",
-                narration="Euler's formula reveals a profound bridge connecting exponential growth directly to trigonometry in the complex plane.",
-            ),
-            TeachingBeat(
-                id="complex_plane",
-                takeaway="In the complex plane, multiplying by i rotates by 90 degrees.",
-                visual="Draw complex coordinate axes with Real horizontal axis and Imaginary vertical axis.",
-                narration="In the complex plane, the horizontal axis represents real numbers and the vertical axis represents imaginary numbers. Multiplying by i corresponds to a 90-degree rotation.",
-            ),
-            TeachingBeat(
-                id="unit_circle",
-                takeaway="Points on the unit circle are parameterized by (cos theta, sin theta).",
-                visual="Unit circle with radius 1, angle theta arc, and coordinates (cos theta, sin theta)",
-                narration="On the unit circle, every point at an angle theta has coordinates cosine theta along the real axis, and sine theta along the imaginary axis.",
-            ),
-            TeachingBeat(
-                id="continuous_rotation",
-                takeaway="Imaginary velocity is perpendicular to position, creating uniform circular motion.",
-                visual="Rotating vector along the unit circle showing perpendicular velocity vector",
-                narration="Because multiplying by i turns velocity perpendicular to position, e to the i theta drives continuous circular motion at unit speed.",
-            ),
-            TeachingBeat(
-                id="formula_synthesis",
-                takeaway="Euler's formula connects exponential growth and circular coordinates.",
-                visual="Formula highlighted: e^{i theta} = cos(theta) + i sin(theta)",
-                narration="Euler's formula synthesizes these insights: e to the i theta equals cosine theta plus i sine theta.",
-            ),
-            TeachingBeat(
-                id="identity_takeaway",
-                takeaway="Setting theta = pi yields Euler's identity uniting 5 fundamental constants.",
-                visual="Highlight theta = pi rotating to -1, revealing e^{i pi} + 1 = 0",
-                narration="Setting theta equal to pi rotates halfway around the circle to minus one, giving Euler's identity: e to the i pi plus one equals zero.",
-            ),
-        ]
-    elif "lorenz" in topic_lower or "attractor" in topic_lower or "chaos" in topic_lower:
-        beats = [
-            TeachingBeat(
-                id="intro",
-                takeaway="The Lorenz attractor reveals deterministic chaos arising from simple fluid convection equations.",
-                visual="Title card: The Lorenz Attractor, with subtitle: Order, Chaos, and the Butterfly Effect.",
-                narration="In 1963, meteorologist Edward Lorenz was studying a simplified mathematical model of atmospheric thermal convection. He simplified fluid dynamics into three coupled nonlinear differential equations. What he discovered revolutionized science: completely deterministic equations could produce behavior so unpredictable that it birthed modern chaos theory.",
-            ),
-            TeachingBeat(
-                id="equations",
-                takeaway="The Lorenz system consists of three coupled ordinary differential equations with parameters sigma, rho, and beta.",
-                visual="Display the three equations: dx/dt = sigma(y - x), dy/dt = x(rho - z) - y, dz/dt = xy - beta z with parameters sigma=10, rho=28, beta=8/3.",
-                narration="Here are the three governing equations. The variable x represents convective circulation speed, y measures horizontal temperature variation, and z represents vertical temperature distortion. The constants sigma, rho, and beta define physical fluid properties. Notice the nonlinear products, x times z and x times y; these two terms are the mathematical engine generating chaos.",
-            ),
-            TeachingBeat(
-                id="phase_space",
-                takeaway="In three-dimensional phase space, every point uniquely represents an instantaneous fluid state.",
-                visual="Fade out equations and set up 3D coordinate frame with X, Y, and Z axes.",
-                narration="To understand this dynamic system, we step into three-dimensional phase space. Here, each axis represents one of our three variables. Every single point in this space corresponds to a complete instantaneous state of the fluid. At every location, our equations assign a velocity vector dictating where the system travels next.",
-            ),
-            TeachingBeat(
-                id="numerical_trajectory",
-                takeaway="A trajectory spirals outward around one unstable focus until crossing over to the other.",
-                visual="Trace a trajectory spiraling outward around the left focus, then crossing over to the right focus.",
-                narration="Let us trace the path of a fluid state starting near the origin. The point spirals outward around one focal point as circulation intensifies. Once its amplitude grows large enough, it flings across to the second focus, beginning another outward spiral. The trajectory endlessly loops between the two sides, never settling into equilibrium and never repeating.",
-            ),
-            TeachingBeat(
-                id="butterfly_geometry",
-                takeaway="The full Lorenz attractor forms a double-lobed strange attractor resembling the wings of a butterfly.",
-                visual="Display the full iconic butterfly attractor with dense orbital ribbons in yellow and cyan.",
-                narration="When we trace thousands of steps, the iconic butterfly silhouette emerges. Mathematicians call this a strange attractor. It is an attractor because trajectories across phase space are pulled toward it; and it is strange because its geometric structure is a fractal, possessing infinite detail within a strictly bounded volume.",
-            ),
-            TeachingBeat(
-                id="butterfly_effect",
-                takeaway="The Butterfly Effect: trajectories starting exponentially close diverge into completely different states.",
-                visual="Animate two trajectories starting 0.001 apart in contrasting colors, tracing together and then diverging to opposite wings.",
-                narration="Now observe the defining hallmark of chaos: sensitive dependence on initial conditions, commonly called the Butterfly Effect. We release two trajectories differing by just one thousandth of a unit. At first, they trace identical paths side by side. But exponential divergence soon takes over; within moments, one trajectory turns left while the other turns right, ending on completely opposite wings.",
-            ),
-            TeachingBeat(
-                id="bounded_fractal",
-                takeaway="Because trajectories never intersect, the attractor has a fractional dimension between 2 and 3.",
-                visual="Gently rotate view around the attractor, showing that sheets of trajectories never cross.",
-                narration="A remarkable consequence of determinism is that the trajectory can never intersect itself, because that would mean two identical states having different futures. Since it loops forever within finite space without intersecting or repeating, the attractor cannot be a simple two-dimensional surface. It is a fractal manifold with a dimension of approximately 2.06.",
-            ),
-            TeachingBeat(
-                id="conclusion",
-                takeaway="Deterministic chaos reveals fundamental predictability horizons in nature.",
-                visual="Final summary card: Determinism Does Not Imply Predictability.",
-                narration="The Lorenz attractor taught humanity a profound truth: determinism does not guarantee predictability. Even with flawless mathematical laws, tiny measurement uncertainties inevitably blind our forecasts over time. In this balance of order and chaos, mathematics reveals its deepest elegance.",
-            ),
-        ]
-    else:
-        beats = [
-            TeachingBeat(
-                id="intro",
-                takeaway=f"Introduction to {clean_topic}",
-                visual=f"Title card displaying {clean_topic} and educational objective",
-                narration=f"In this lesson, we explore the core intuition and geometric beauty of {clean_topic}.",
-            ),
-            TeachingBeat(
-                id="setup",
-                takeaway="Foundational components",
-                visual="Coordinate frame and essential mathematical components",
-                narration=f"To understand {clean_topic}, we first establish the foundational coordinate framework.",
-            ),
-            TeachingBeat(
-                id="formula",
-                takeaway="The central relationship",
-                visual="Key mathematical formula written and highlighted",
-                narration="Notice how this fundamental relationship connects distinct branches of mathematics together.",
-            ),
-            TeachingBeat(
-                id="intuition",
-                takeaway="Visual intuition",
-                visual="Transformation illustrating the behavior of the expression",
-                narration="When we trace this operation visually, the underlying geometric harmony becomes clear.",
-            ),
-            TeachingBeat(
-                id="synthesis",
-                takeaway="Synthesis of concepts",
-                visual="Combined visualization showing the complete structure",
-                narration="This perspective bridges algebraic calculation directly with geometric insight.",
-            ),
-            TeachingBeat(
-                id="conclusion",
-                takeaway="Summary and key takeaway",
-                visual="Final summary card with highlighted conclusion",
-                narration=f"In conclusion, {clean_topic} reveals how elegant relationships unify mathematical thinking.",
-            ),
-        ]
-    return TeachingScript(
-        scene_class_name=scene_name,
-        throughline=f"A step-by-step visual exploration of {clean_topic}.",
-        beats=beats,
-    )
 
 
 def _run_classifier():
@@ -574,26 +316,17 @@ class ClassifyNode(BaseNode[AnimationState, None, str]):
             ctx.state.classification is None
             or ctx.state.classification.subject == Subject.UNKNOWN
         ):
-            fallback = _heuristic_classification(ctx.state.user_query)
-            if fallback is not None:
-                print(
-                    f"-> ClassifyFallback {fallback.subject} {fallback.topic}",
-                    file=sys.stderr,
-                    flush=True,
-                )
-                ctx.state.classification = fallback
-            else:
-                detail = "Domain not supported or classification failed."
-                if classify_error:
-                    detail = f"{detail} ({classify_error[:400]})"
-                return End(detail)
+            detail = "Domain not supported or classification failed."
+            if classify_error:
+                detail = f"{detail} ({classify_error[:400]})"
+            return End(detail)
 
         return PlanLectureNode()
 
 
 @dataclass
 class PlanLectureNode(BaseNode[AnimationState, None, str]):
-    async def run(self, ctx: GraphRunContext[AnimationState]) -> "PlanTeachingScriptNode":
+    async def run(self, ctx: GraphRunContext[AnimationState]) -> "PlanTeachingScriptNode | End[str]":
         if dbos_enabled():
             ensure_dbos_launched()
         plan_error: str | None = None
@@ -615,12 +348,10 @@ class PlanLectureNode(BaseNode[AnimationState, None, str]):
             ctx.state.plan = None
 
         if ctx.state.plan is None:
-            print(
-                f"-> PlanFallback {subject} {topic}",
-                file=sys.stderr,
-                flush=True,
-            )
-            ctx.state.plan = _heuristic_lecture_plan(topic, subject)
+            detail = "Lecture planning failed."
+            if plan_error:
+                detail = f"{detail} ({plan_error[:400]})"
+            return End(detail)
 
         return PlanTeachingScriptNode()
 
@@ -655,16 +386,6 @@ class PlanTeachingScriptNode(BaseNode[AnimationState, None, str]):
                 flush=True,
             )
             ctx.state.teaching_script = None
-
-        if ctx.state.teaching_script is None:
-            print(
-                f"-> TeachingScriptFallback {classification.subject} {classification.topic}",
-                file=sys.stderr,
-                flush=True,
-            )
-            ctx.state.teaching_script = _heuristic_teaching_script(
-                classification.topic, classification.subject, plan
-            )
 
         return CodeAgent()
 
