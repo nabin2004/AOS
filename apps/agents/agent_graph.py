@@ -73,9 +73,6 @@ def _subject_str(subject: str | Subject) -> str:
     return str(subject)
 
 
-
-
-
 async def run_coder_step(
     topic: str,
     subject: str | Subject,

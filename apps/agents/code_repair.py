@@ -216,7 +216,8 @@ async def run_manim_repair_loop(
 
             # 2. Re-compile
             print(f"-> RENDERING Rendering repaired scene (attempt {attempt})…", file=sys.stderr, flush=True)
-            compile_raw = compile_manim_code(
+            compile_raw = await compile_manim_code(
+                ctx=None,
                 code=current_code,
                 scene_name=scene_name,
                 output_dir=str(attempt_dir),

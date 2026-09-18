@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dbos_setup import DBOS
-
+from pydantic_ai import RunContext
+from tools.ag_ui import ToolProgressEvent
 from tools.coder_workspace import (
     OutputDirError,
     load_manifest,
@@ -52,8 +52,8 @@ async def write_lecture_py_for_ir(lecture_ir: LectureIR, deps: ToolDeps) -> str:
     return str(scene_path)
 
 
-@DBOS.step()
-def manim_write(
+async def manim_write(
+    ctx: RunContext,
     code: str,
     scene_name: str = "scene",
     output_dir: str | None = None,
@@ -82,6 +82,8 @@ def manim_write(
         scene_path = scene_file_path(workspace, scene_name)
         code = prepare_manim_source(code)
         scene_path.write_text(code, encoding="utf-8")
+        if ctx and hasattr(ctx, "emit"):
+            await ctx.emit(ToolProgressEvent(message=f"Wrote Manim code for {scene_name}..."))
 
         manifest = load_manifest(workspace)
         manifest["output_dir"] = str(workspace)

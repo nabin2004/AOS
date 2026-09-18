@@ -3,7 +3,7 @@
     "parts": [
       {
         "content": "internal prompt",
-        "timestamp": "2026-09-06T05:24:17.569102Z",
+        "timestamp": "2026-09-17T13:49:10.718603Z",
         "part_kind": "user-prompt"
       }
     ],
@@ -38,10 +38,11 @@
       "input_audio_tokens": 0,
       "cache_audio_read_tokens": 0,
       "output_audio_tokens": 0,
-      "details": {}
+      "details": {},
+      "cost": null
     },
     "model_name": null,
-    "timestamp": "2026-09-06T05:24:17.569102Z",
+    "timestamp": "2026-09-17T13:49:10.718603Z",
     "kind": "response",
     "provider_name": null,
     "provider_url": null,
@@ -61,7 +62,7 @@
         "tool_call_id": "call_1",
         "tool_kind": null,
         "metadata": null,
-        "timestamp": "2026-09-06T05:24:17.569677Z",
+        "timestamp": "2026-09-17T13:49:10.718603Z",
         "outcome": "success",
         "part_kind": "tool-return"
       }

@@ -2,6 +2,8 @@ from pydantic_ai import Agent, Tool
 from dotenv import load_dotenv
 
 from llm_config import is_ollama, model_for, model_for_agent, settings_for
+from pathlib import Path
+from pydantic_ai_skills import SkillsCapability
 from pydantic_ai_harness import CodeMode
 from tools import compile_manim_code, manim_write
 from tools.manim_read import manim_read
@@ -213,7 +215,16 @@ coder_agent = Agent(
     system_prompt=coder_system_prompt(),
     model_settings=settings_for("coder"),
     retries=5,
-    capabilities=[CodeMode(max_retries=8, dynamic_catalog=True)],
+    capabilities=[
+        CodeMode(max_retries=8, dynamic_catalog=True),
+        SkillsCapability(
+            id='manim_skills',
+            directories=[str(Path(__file__).parents[2] / '.agents' / 'skills')],
+            include=['manimce-best-practices', 'manimgl-best-practices', 'manim-composer'],
+            defer_loading=True,
+            description="Manim best practices and educational video composer guidelines. Load this capability when writing or debugging Manim code to ensure you follow correct styles, layout rules, and API patterns."
+        )
+    ],
     tools=[
         Tool(compile_manim_code),
         Tool(manim_read),

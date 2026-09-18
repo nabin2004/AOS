@@ -8,6 +8,9 @@ import sys
 from pathlib import Path
 from dbos_setup import DBOS
 from error_feedback import summarize_diagnostic_output
+import asyncio
+from pydantic_ai import RunContext
+from tools.ag_ui import ToolProgressEvent
 
 from tools.coder_workspace import (
     OutputDirError,
@@ -298,8 +301,8 @@ def _manim_quality_flag() -> str:
     return "l"
 
 
-@DBOS.step()
-def compile_manim_code(
+async def compile_manim_code(
+    ctx: RunContext,
     code: str,
     scene_name: str = "scene",
     output_dir: str | None = None,
@@ -356,6 +359,8 @@ def compile_manim_code(
 
         # Static pre-validation before invoking subprocess
         print(f"-> VALIDATING_CODE Validating {scene_class} static syntax…", file=sys.stderr, flush=True)
+        if ctx and hasattr(ctx, "emit"):
+            await ctx.emit(ToolProgressEvent(message=f"Validating {scene_class} static syntax..."))
         valid_static, static_err = validate_manim_code_static(code, scene_name)
         if not valid_static and static_err == "missing_voiceover_calls":
 
@@ -394,6 +399,8 @@ def compile_manim_code(
                 _VOICEOVER_HINT if "voiceover" in static_err else f"Static code validation failed: {static_err}"
             )
             print(f"-> CODE_REPAIRING Static validation failed ({static_err}). Automatic repair requested…", file=sys.stderr, flush=True)
+            if ctx and hasattr(ctx, "emit"):
+                await ctx.emit(ToolProgressEvent(message=f"Static validation failed ({static_err}). Automatic repair requested..."))
             return result_json(
                 ok=False,
                 step="compile",
@@ -411,9 +418,12 @@ def compile_manim_code(
 
         timed_out = False
         print(f"-> RENDERING Rendering animation scene {scene_class}…", file=sys.stderr, flush=True)
+        if ctx and hasattr(ctx, "emit"):
+            await ctx.emit(ToolProgressEvent(message=f"Rendering animation scene {scene_class}..."))
         render_timeout = int(os.getenv("AOS_RENDER_TIMEOUT_SECONDS", str(RENDER_TIMEOUT_SECONDS)))
         try:
-            proc = subprocess.run(
+            proc = await asyncio.to_thread(
+                subprocess.run,
                 cmd,
                 capture_output=True,
                 text=True,
@@ -442,6 +452,8 @@ def compile_manim_code(
 
         if not ok:
             print(f"-> CODE_REPAIRING Manim rendering needs correction ({failure_marker or 'error'}). Retrying…", file=sys.stderr, flush=True)
+            if ctx and hasattr(ctx, "emit"):
+                await ctx.emit(ToolProgressEvent(message=f"Manim rendering needs correction ({failure_marker or 'error'}). Retrying..."))
 
         video_path: str | None = None
         has_audio: bool | None = None

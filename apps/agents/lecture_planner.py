@@ -2,6 +2,9 @@ from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import Lecture
 from llm_config import model_for_agent, settings_for
+from pathlib import Path
+from pydantic_ai_harness import Planning
+from pydantic_ai_skills import SkillsCapability
 
 load_dotenv()
 
@@ -26,4 +29,14 @@ lecture_planner_agent = Agent(
     output_type=Lecture,
     model_settings=settings_for("planner"),
     retries=3,
+    capabilities=[
+        Planning(),
+        SkillsCapability(
+            id='manim_skills',
+            directories=[str(Path(__file__).parents[2] / '.agents' / 'skills')],
+            include=['manim-composer', 'manimce-best-practices', 'manimgl-best-practices'],
+            defer_loading=True,
+            description="Manim best practices and educational video composer guidelines. Load this before making the final plan to understand scene pacing, layout rules, and standard teaching patterns in Manim."
+        )
+    ],
 )

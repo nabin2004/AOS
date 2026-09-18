@@ -1,0 +1,38 @@
+# Use the official vLLM OpenAI-compatible image as the base
+FROM vllm/vllm-openai:latest
+
+# We need huggingface_hub to download the models during build so they are baked in
+RUN pip install -U "huggingface_hub[cli]"
+
+# Define the models to bake in
+# Update BASE_MODEL to the exact Qwen3-8B HF repo name if different!
+ARG BASE_MODEL="Qwen/Qwen2.5-7B-Instruct"
+ARG LORA_REPO="nabin2004/qwen-Manimator-1-sft"
+ARG HF_TOKEN
+
+# Create directories
+RUN mkdir -p /models/base /models/lora
+
+# Download the base model (Baking it in makes cold starts much faster on RunPod)
+RUN if [ -n "$HF_TOKEN" ]; then \
+        huggingface-cli login --token $HF_TOKEN; \
+    fi && \
+    huggingface-cli download ${BASE_MODEL} --local-dir /models/base
+
+# Download the LoRA adapter
+RUN huggingface-cli download ${LORA_REPO} --local-dir /models/lora
+
+# Set up the vLLM server to use the baked-in models and enable LoRA
+# - port 8000 is required by RunPod serverless for custom HTTP endpoints
+ENV PORT=8000
+
+# We use the standard vLLM entrypoint, explicitly pointing to our local model and lora
+ENTRYPOINT ["python3", "-m", "vllm.entrypoints.openai.api_server", \
+            "--model", "/models/base", \
+            "--served-model-name", "qwen3-8b", \
+            "--enable-lora", \
+            "--lora-modules", "manimator=/models/lora", \
+            "--host", "0.0.0.0", \
+            "--port", "8000", \
+            "--max-model-len", "8192", \
+            "--tool-call-parser", "hermes"]
