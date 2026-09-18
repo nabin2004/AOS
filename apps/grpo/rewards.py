@@ -62,8 +62,9 @@ _CODE_FENCE = re.compile(r"```(?:python)?\s*([\s\S]*?)```", re.IGNORECASE)
 
 HEURISTIC_EXEC_PARTIAL = 0.3
 REWARD_WEIGHTS = {
-    "exec": 0.45,
-    "narration": 0.15,
+    "exec": 0.40,
+    "narration": 0.10,
+    "narr_sync": 0.10,
     "align": 0.20,
     "vcer": 0.10,
     "cover": 0.10,
@@ -318,6 +319,29 @@ def narration_reward(completions: list[object], **kwargs) -> list[float]:
     return rewards
 
 
+def narration_sync_reward(completions: list[object], **kwargs) -> list[float]:
+    """Rewards proper synchronization between voiceover bookmarks and wait_until_bookmark calls."""
+    texts = _normalize_completions(completions)
+    rewards = []
+    
+    bookmark_tag_pattern = re.compile(r"<bookmark\s+mark=[\'\"]([^\'\"]+)[\'\"]\s*/>")
+    wait_until_pattern = re.compile(r"\.wait_until_bookmark\(\s*[\'\"]([^\'\"]+)[\'\"]\s*\)")
+    
+    for code in texts:
+        tags = set(bookmark_tag_pattern.findall(code))
+        waits = set(wait_until_pattern.findall(code))
+        
+        union_len = len(tags.union(waits))
+        if union_len == 0:
+            # No bookmarks needed, no penalty
+            rewards.append(1.0)
+        else:
+            intersection_len = len(tags.intersection(waits))
+            rewards.append(intersection_len / union_len)
+            
+    return rewards
+
+
 def lexical_alignment_reward(completions: list[object], **kwargs) -> list[float]:
     """First-stage fast lexical presence check for ManiBench required_visual_events."""
     texts = _normalize_completions(completions)
@@ -497,6 +521,7 @@ def combined_reward(completions: list[object], **kwargs) -> list[float]:
 
         exec_r = executability_reward(completions, rendered_videos=rendered_videos, **kwargs)
         narr_r = narration_reward(completions, **kwargs)
+        narr_sync_r = narration_sync_reward(completions, **kwargs)
         vcer_r = vcer_reward(completions, **kwargs)
         align_r = alignment_reward(completions, rendered_videos=rendered_videos, **kwargs)
         cover_r = coverage_reward(completions, **kwargs)
@@ -505,8 +530,8 @@ def combined_reward(completions: list[object], **kwargs) -> list[float]:
         n = len(completions)
         penalties = _length_penalty(kwargs.get("completion_ids"), n)
         combined = []
-        for e, nr, v, a, c, pen in zip(exec_r, narr_r, vcer_r, align_r, cover_r, penalties):
-            score = w["exec"] * e + w["narration"] * nr + w["align"] * a + w["vcer"] * v + w["cover"] * c - pen
+        for e, nr, nsr, v, a, c, pen in zip(exec_r, narr_r, narr_sync_r, vcer_r, align_r, cover_r, penalties):
+            score = w["exec"] * e + w["narration"] * nr + w["narr_sync"] * nsr + w["align"] * a + w["vcer"] * v + w["cover"] * c - pen
             # Soft penalty instead of hard collapse to 0.0:
             # If code completely lacks basic structure (e < 0.10), dampen score by 75%
             if e < 0.10:
@@ -519,6 +544,7 @@ def combined_reward(completions: list[object], **kwargs) -> list[float]:
                 f"mean={sum(combined) / len(combined):.3f} "
                 f"exec={sum(exec_r) / len(exec_r):.3f} "
                 f"narr={sum(narr_r) / len(narr_r):.3f} "
+                f"sync={sum(narr_sync_r) / len(narr_sync_r):.3f} "
                 f"align={sum(align_r) / len(align_r):.3f} "
                 f"vcer={sum(vcer_r) / len(vcer_r):.3f} "
                 f"cover={sum(cover_r) / len(cover_r):.3f}",
