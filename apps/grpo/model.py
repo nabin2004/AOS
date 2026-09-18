@@ -162,8 +162,8 @@ def _load_qwen(config: TrainingConfig):
         model.add_adapter(GRPO_ADAPTER, grpo_config)
         model.set_adapter(GRPO_ADAPTER)
     else:
-        # Continual mode (default): load DPO adapter directly as trainable policy adapter
-        print(f"Loading initial policy adapter from DPO checkpoint: {config.sft_lora_path} (is_trainable=True)")
+        # Continual mode (default): load adapter directly as trainable policy adapter
+        print(f"Loading initial policy adapter: {config.sft_lora_path} (is_trainable=True)")
         model = PeftModel.from_pretrained(
             model,
             str(config.sft_lora_path),

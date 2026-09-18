@@ -28,7 +28,7 @@ class KaggleTimeLimitCallback(TrainerCallback):
     def on_step_end(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
         elapsed_hours = (time.time() - self.start_time) / 3600.0
         if elapsed_hours >= self.max_hours:
-            print(f"\n⚠️ Reached time limit ({elapsed_hours:.2f} hrs >= {self.max_hours:.2f} hrs). Forcing save and graceful exit...")
+            print(f"\n[Time Limit] Reached time limit ({elapsed_hours:.2f} hrs >= {self.max_hours:.2f} hrs). Forcing save and graceful exit...")
             control.should_save = True
             control.should_training_stop = True
 

@@ -151,18 +151,20 @@ def _heuristic_exec_score(code: str) -> float:
     # Baseline formatting rewards so truncated candidates don't flatline to 0.0
     if "```python" in code.lower() or "```" in code:
         score += 0.10
+    if "from manim" in code or "import manim" in code:
+        score += 0.10
     if "class " in code and any(s in code for s in ("Scene", "VoiceoverScene", "ThreeDScene", "MovingCameraScene")):
-        score += 0.10
+        score += 0.15
     if "def construct" in code:
-        score += 0.10
+        score += 0.15
     if "self.play(" in code or "self.add(" in code:
-        score += 0.10
+        score += 0.20
 
     has_scene = _has_manim_scene(source)
     if _syntax_ok(source):
-        score += 0.10
+        score += 0.30
         if has_scene:
-            score = max(score, HEURISTIC_EXEC_PARTIAL + 0.10)
+            score = max(score, 0.70)
     else:
         if has_scene:
             score = max(score, HEURISTIC_EXEC_PARTIAL)

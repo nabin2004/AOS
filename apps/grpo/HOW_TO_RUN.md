@@ -23,19 +23,27 @@ Kaggle provides free access to **Dual NVIDIA T4 GPUs (2x 16 GB = 32 GB VRAM)**, 
 ### Step 3: Run the Training Cell
 Paste and execute the following in a single notebook cell:
 
-```python
 # 1. Clone the repository and pull the latest code
 !git clone https://github.com/nabin2004/AOS.git
 %cd AOS
 !git pull origin master
 
-# 2. Run End-to-End GRPO Stacking on top of the DPO Adapter
+# Option A: Run GRPO on top of the NEW Manimator Adapter (Recommended)
 !python3 apps/grpo/run_kaggle_grpo.py \
     --base-model Qwen/Qwen3-8B \
-    --sft-lora nabin2004/AOS-qwen3-8b-narrated-dpo \
+    --sft-lora nabin2004/qwen-Manimator-1-sft \
     --dataset-repo nabin2004/Manim-grpo-dataset-200 \
-    --hub-repo nabin2004/AOS-qwen3-8b-grpo \
+    --hub-repo nabin2004/qwen-Manimator-1-grpo \
+    --run-name qwen-manimator-1-grpo \
     --push-to-hub
+
+# Option B: Run GRPO on top of the Narrated DPO Adapter
+# !python3 apps/grpo/run_kaggle_grpo.py \
+#     --base-model Qwen/Qwen3-8B \
+#     --sft-lora nabin2004/AOS-qwen3-8b-narrated-dpo \
+#     --dataset-repo nabin2004/Manim-grpo-dataset-200 \
+#     --hub-repo nabin2004/AOS-qwen3-8b-grpo \
+#     --push-to-hub
 ```
 
 ---

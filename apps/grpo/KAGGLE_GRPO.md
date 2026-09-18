@@ -52,6 +52,18 @@ This guide details how to run the end-to-end Group Relative Policy Optimization 
 ```
 
 ### Cell 3: Full End-to-End GRPO Training & Hugging Face Upload
+#### Option A: Run on NEW Manimator Adapter (Recommended)
+```python
+!python3 apps/grpo/run_kaggle_grpo.py \
+    --base-model Qwen/Qwen3-8B \
+    --sft-lora nabin2004/qwen-Manimator-1-sft \
+    --dataset-repo nabin2004/Manim-grpo-dataset-200 \
+    --hub-repo nabin2004/qwen-Manimator-1-grpo \
+    --run-name qwen-manimator-1-grpo \
+    --push-to-hub
+```
+
+#### Option B: Run on Narrated DPO Adapter
 ```python
 !python3 apps/grpo/run_kaggle_grpo.py \
     --base-model Qwen/Qwen3-8B \

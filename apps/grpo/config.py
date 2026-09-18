@@ -132,32 +132,36 @@ class TrainingConfig:
                 raise SystemExit(f"Unsupported --base {args.base!r}; use gemma|qwen")
             config = replace(config, base_family=family)
             if family == "qwen":
-                qwen_sft = GRPO_ROOT / ".." / "qwenCoder" / "qwen2.5-coder-7b-manim-ft"
-                qwen_dpo_local = GRPO_ROOT / ".." / "dpo" / "qwen2.5-coder-7b-manim-dpo"
+                qwen_manimator_local = GRPO_ROOT / ".." / "qwenCoder" / "qwen-manimator-1-sft"
                 qwen3_dpo_local = GRPO_ROOT / ".." / "dpo" / "qwen3-8b-narrated-dpo"
+                qwen_dpo_local = GRPO_ROOT / ".." / "dpo" / "qwen2.5-coder-7b-manim-dpo"
+                qwen_sft = GRPO_ROOT / ".." / "qwenCoder" / "qwen2.5-coder-7b-manim-ft"
+                qwen_manimator_hub = "nabin2004/qwen-Manimator-1-sft"
                 qwen3_dpo_hub = "nabin2004/AOS-qwen3-8b-narrated-dpo"
                 
-                # Priority: local Qwen3 narrated DPO -> remote Qwen3 DPO hub -> local DPO -> local SFT
-                if qwen3_dpo_local.is_dir():
+                # Priority: local Manimator -> local Qwen3 narrated DPO -> local DPO -> local SFT -> remote Manimator hub
+                if qwen_manimator_local.is_dir():
+                    qwen_default = qwen_manimator_local
+                elif qwen3_dpo_local.is_dir():
                     qwen_default = qwen3_dpo_local
                 elif qwen_dpo_local.is_dir():
                     qwen_default = qwen_dpo_local
                 elif qwen_sft.is_dir():
                     qwen_default = qwen_sft
                 else:
-                    qwen_default = qwen3_dpo_hub
+                    qwen_default = qwen_manimator_hub
+
+                chosen_sft = str(args.sft_lora if args.sft_lora is not None else qwen_default)
+                is_manimator = "manimator" in chosen_sft.lower()
 
                 updates: dict = {
-                    "run_name": "qwen3-8b-manim-dpo-grpo",
+                    "run_name": "qwen-manimator-1-grpo" if is_manimator else "qwen3-8b-manim-dpo-grpo",
                     "wandb_project": "aos-grpo",
-                    "wandb_group": "qwen3-8b-manim-dpo",
+                    "wandb_group": "qwen-manimator-1" if is_manimator else "qwen3-8b-manim-dpo",
                     "wandb_tags": (
-                        "qwen3-8b",
-                        "dpo-stacked",
-                        "manim",
-                        "aos",
-                        "grpo",
-                        "manibench",
+                        ("qwen3-8b", "manimator", "manim", "aos", "grpo", "manibench")
+                        if is_manimator
+                        else ("qwen3-8b", "dpo-stacked", "manim", "aos", "grpo", "manibench")
                     ),
                 }
                 if args.base_model is None:
@@ -165,8 +169,9 @@ class TrainingConfig:
                 if args.sft_lora is None:
                     updates["sft_lora_path"] = _resolve_path(qwen_default)
                 if args.output_dir is None:
+                    output_name = "grpo_qwen_manimator" if is_manimator else "grpo_qwen_manim"
                     updates["output_dir"] = _resolve_path(
-                        GRPO_ROOT / "grpo_qwen_manim"
+                        GRPO_ROOT / output_name
                     )
                 config = replace(config, **updates)
         if args.base_model is not None:
