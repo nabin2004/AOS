@@ -195,6 +195,12 @@ class TrainingConfig:
         if args.max_completion_length is not None:
             config = replace(config, max_completion_length=args.max_completion_length)
         if args.num_generations is not None:
+            if args.num_generations > 8:
+                print(
+                    f"Notice: num_generations={args.num_generations} is very large. "
+                    f"On Kaggle T4/P100 (16GB), recommended is 4 (or 2) to avoid slow rollouts and CUDA OOM.",
+                    file=sys.stderr,
+                )
             config = replace(config, num_generations=args.num_generations)
         if args.max_steps is not None:
             config = replace(config, max_steps=args.max_steps)
