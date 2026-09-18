@@ -408,6 +408,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--run-name", default="qwen3-8b-manim-grpo-kaggle", help="Run name for W&B logging")
     parser.add_argument("--max-runtime-hours", type=float, default=8.0, help="Maximum Kaggle hours before forcing a clean checkpoint save (default: 8.0)")
     parser.add_argument("--num-generations", type=int, default=None, help="GRPO samples per prompt (defaults to 4 on Kaggle T4)")
+    parser.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="Start GRPO training from step 0, skipping any checkpoints on the Hub or local disk",
+    )
     return parser
 
 
@@ -442,7 +447,11 @@ def main() -> int:
 
             print(f"Downloading base adapter from Hugging Face Hub: {sft_lora}...")
             token = os.environ.get("HF_TOKEN")
-            downloaded_dir = snapshot_download(repo_id=sft_lora, token=token)
+            downloaded_dir = snapshot_download(
+                repo_id=sft_lora,
+                token=token,
+                ignore_patterns=["last-trainer-checkpoint/*", "checkpoint-*/*"],
+            )
             sft_lora = downloaded_dir
             print(f"✔ Downloaded adapter to: {sft_lora}")
         except Exception as e:
@@ -451,11 +460,13 @@ def main() -> int:
     # 6. Execute GRPO Training with Safety Backup
     output_path = Path(args.output_dir)
     
-    # Check for auto-resume if pushing to hub is enabled
+    # Check for auto-resume if pushing to hub is enabled (unless --no-resume is explicitly passed)
     resume_flag = None
-    if args.push_to_hub and args.hub_repo:
+    if not args.no_resume and args.push_to_hub and args.hub_repo:
         if download_latest_checkpoint_from_hub(args.hub_repo, output_path):
             resume_flag = "True"
+    elif args.no_resume:
+        print("\n⚡ --no-resume flag active: Starting fresh GRPO run from step 0.")
 
     try:
         run_grpo_training(
