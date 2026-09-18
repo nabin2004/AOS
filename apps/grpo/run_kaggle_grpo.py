@@ -238,7 +238,7 @@ def run_grpo_training(
     vlm_threshold: float = 0.15,
     push_to_hub: bool = False,
     hub_repo: str | None = None,
-    max_runtime_hours: float | None = 11.0,
+    max_runtime_hours: float | None = 8.0,
     resume_from_checkpoint: str | None = None,
     num_generations: int | None = None,
 ) -> None:
@@ -358,7 +358,17 @@ def download_latest_checkpoint_from_hub(repo_id: str, output_dir: Path) -> bool:
             local_dir=str(output_dir),
             token=token,
         )
+        ckpt_path = output_dir / latest_ckpt
+        has_weights = (ckpt_path / "adapter_model.safetensors").is_file() or (ckpt_path / "adapter_model.bin").is_file()
+        has_opt = (ckpt_path / "optimizer.pt").is_file() or (ckpt_path / "optimizer.bin").is_file()
+        has_sched = (ckpt_path / "scheduler.pt").is_file()
+        has_state = (ckpt_path / "trainer_state.json").is_file()
+
         print(f"✔ Successfully downloaded {latest_ckpt} to {output_dir}")
+        print(f"   • Weights: {'FOUND' if has_weights else 'MISSING'}")
+        print(f"   • Optimizer (AdamW momentum): {'FOUND' if has_opt else 'NOT PRESENT (will restart momentum)'}")
+        print(f"   • Scheduler (LR curve): {'FOUND' if has_sched else 'NOT PRESENT (will restart LR)'}")
+        print(f"   • Trainer State (step/epoch): {'FOUND' if has_state else 'NOT PRESENT'}")
         return True
     except Exception as e:
         print(f"Notice: Failed to auto-resume from hub: {e}")
@@ -396,7 +406,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--report-to", default="wandb", help="Logging backend ('wandb' or 'none')")
     parser.add_argument("--run-name", default="qwen3-8b-manim-grpo-kaggle", help="Run name for W&B logging")
-    parser.add_argument("--max-runtime-hours", type=float, default=11.0, help="Maximum Kaggle hours before forcing a clean checkpoint save (default: 11.0)")
+    parser.add_argument("--max-runtime-hours", type=float, default=8.0, help="Maximum Kaggle hours before forcing a clean checkpoint save (default: 8.0)")
     parser.add_argument("--num-generations", type=int, default=None, help="GRPO samples per prompt (defaults to 4 on Kaggle T4)")
     return parser
 

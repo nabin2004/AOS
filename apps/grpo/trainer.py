@@ -16,7 +16,9 @@ import torch
 from config import DEFAULT_BETA, DEFAULT_LEARNING_RATE, GRPO_ADAPTER, TrainingConfig
 from rewards import combined_reward
 
+import os
 import time
+from pathlib import Path
 from transformers import TrainerCallback, TrainerControl, TrainerState, TrainingArguments
 
 class KaggleTimeLimitCallback(TrainerCallback):
@@ -31,6 +33,43 @@ class KaggleTimeLimitCallback(TrainerCallback):
             print(f"\n[Time Limit] Reached time limit ({elapsed_hours:.2f} hrs >= {self.max_hours:.2f} hrs). Forcing save and graceful exit...")
             control.should_save = True
             control.should_training_stop = True
+
+
+class HubCheckpointCallback(TrainerCallback):
+    """Uploads complete checkpoint folders (weights, optimizer, scheduler, trainer_state, rng)
+    to Hugging Face Hub whenever a checkpoint is saved, ensuring intermediate checkpoints on HF
+    are 100% resumable with full optimizer momentum and continuous learning rates.
+    """
+    def __init__(self, hub_repo: str | None, token: str | None = None):
+        self.hub_repo = hub_repo
+        self.token = token or os.environ.get("HF_TOKEN")
+
+    def on_save(self, args: TrainingArguments, state: TrainerState, control: TrainerControl, **kwargs):
+        if not self.hub_repo or not self.token:
+            return
+        output_dir = Path(args.output_dir)
+        checkpoint_dirs = sorted(
+            [d for d in output_dir.glob("checkpoint-*") if d.is_dir()],
+            key=lambda d: int(d.name.split("-")[1]) if "-" in d.name and d.name.split("-")[1].isdigit() else 0,
+        )
+        if not checkpoint_dirs:
+            return
+        latest_ckpt_dir = checkpoint_dirs[-1]
+        try:
+            from huggingface_hub import HfApi
+            api = HfApi(token=self.token)
+            api.create_repo(repo_id=self.hub_repo, repo_type="model", exist_ok=True, token=self.token)
+            print(f"\n[Hub Sync] Uploading full checkpoint state ({latest_ckpt_dir.name}: weights + optimizer + scheduler + state)...", flush=True)
+            api.upload_folder(
+                folder_path=str(latest_ckpt_dir),
+                path_in_repo=latest_ckpt_dir.name,
+                repo_id=self.hub_repo,
+                repo_type="model",
+                token=self.token,
+            )
+            print(f"[Hub Sync] Completed upload for {latest_ckpt_dir.name}.", flush=True)
+        except Exception as e:
+            print(f"[Hub Sync Warning] Failed to upload checkpoint to Hub: {e}", file=sys.stderr)
 
 
 def _prompt_token_len(tokenizer, prompt: list) -> int:
@@ -199,6 +238,10 @@ def build_trainer(model, tokenizer, dataset, config: TrainingConfig, training_ar
     # Add the Kaggle Time Limit Callback
     if config.max_runtime_hours is not None and config.max_runtime_hours > 0:
         trainer.add_callback(KaggleTimeLimitCallback(max_hours=config.max_runtime_hours))
+
+    # Add Hub Checkpoint Sync Callback (saves weights + optimizer + scheduler + state to Hub)
+    if config.push_to_hub and config.hub_repo:
+        trainer.add_callback(HubCheckpointCallback(hub_repo=config.hub_repo))
 
     return trainer
 

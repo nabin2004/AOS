@@ -364,4 +364,5 @@ def build_dataset(config: TrainingConfig) -> Dataset:
 
     if not rows:
         raise ValueError("No problem rows loaded for GRPO dataset.")
-    return Dataset.from_list(rows)
+    # Deterministic shuffle ensures uniformly distributed problem exposure instead of 50-sample blocks
+    return Dataset.from_list(rows).shuffle(seed=42)

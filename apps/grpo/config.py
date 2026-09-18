@@ -64,7 +64,7 @@ class TrainingConfig:
     resume_from_checkpoint: str | None = None
     push_to_hub: bool = False
     hub_repo: str | None = None
-    max_runtime_hours: float = 11.0
+    max_runtime_hours: float = 8.0
 
     def resolve_paths(self) -> TrainingConfig:
         dataset_path = self.dataset_path
@@ -495,6 +495,6 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--max-runtime-hours",
         type=float,
         default=None,
-        help="Maximum hours before forcing a clean checkpoint save and exit (default: 11.0)",
+        help="Maximum hours before forcing a clean checkpoint save and exit (default: 8.0)",
     )
     return parser
