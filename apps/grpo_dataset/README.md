@@ -196,14 +196,18 @@ Combine this with `alignment.py`'s keyword-based score (e.g. `0.5 * keyword_alig
 
 ---
 
-## Narration Reward (`reward_model/narration.py`)
+## Narration Rewards (`apps/grpo/rewards.py`)
 
-For multi-modal tasks using **Manim Voiceover**, code generations are also scored for proper voiceover and synchronization structure:
-- **`VoiceoverScene` Inheritance (0.25)**: Ensures the class derives from `VoiceoverScene`.
-- **Speech Service Setup (0.20)**: Checks for `self.set_speech_service(...)`.
-- **Voiceover Blocks (0.25)**: Evaluates use of `with self.voiceover(...)` blocks.
-- **SSML Bookmarks (0.15)**: Checks for precise narration timestamps via `<bookmark mark="..." />`.
-- **Bookmark Synchronization (0.15)**: Evaluates synchronization with `self.wait_until_bookmark(...)`.
+For multi-modal tasks using **Manim Voiceover**, code generations are scored using two distinct reward functions in the combined reward:
+
+1. **`narration_reward` (Weight: 0.10)**:
+   - **`VoiceoverScene` Inheritance**: Rewards derivation from `VoiceoverScene` (up to 0.35).
+   - **Speech Service Setup**: Rewards initialization of services like `AOSSpeechService` or `RecorderService` (up to 0.25).
+   - **Voiceover Blocks**: Rewards correct use of `with self.voiceover(...)` context managers (up to 0.40).
+
+2. **`narration_sync_reward` (Weight: 0.10)**:
+   - **Bookmark Synchronization**: Extracts SSML bookmarks (`<bookmark mark='...'/>`) from voiceover strings and cross-references them with `wait_until_bookmark(...)` method calls in the animation logic.
+   - Computes an Intersection over Union (IoU) of defined bookmarks versus awaited bookmarks, ensuring every defined bookmark is waited on, and every waited bookmark was actually defined. Returns `1.0` if no bookmarks are present to avoid unfairly penalizing standard scenes.
 
 Run validation:
 ```bash
