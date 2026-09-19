@@ -72,6 +72,27 @@ class HubCheckpointCallback(TrainerCallback):
             print(f"[Hub Sync Warning] Failed to upload checkpoint to Hub: {e}", file=sys.stderr)
 
 
+class RewardLoggingCallback(TrainerCallback):
+    """Injects individual reward breakdown metrics into Trainer logs and W&B."""
+
+    def on_log(
+        self,
+        args: TrainingArguments,
+        state: TrainerState,
+        control: TrainerControl,
+        logs: dict | None = None,
+        **kwargs,
+    ):
+        if logs is not None:
+            try:
+                from rewards import get_latest_reward_metrics
+                metrics = get_latest_reward_metrics(pop=True)
+                if metrics:
+                    logs.update(metrics)
+            except Exception:
+                pass
+
+
 def _prompt_token_len(tokenizer, prompt: list) -> int:
     ids = tokenizer.apply_chat_template(
         prompt,
@@ -177,7 +198,7 @@ def make_training_args(
         **common,
         num_train_epochs=3,
         learning_rate=config.learning_rate or DEFAULT_LEARNING_RATE,
-        logging_steps=10,
+        logging_steps=2,
         save_strategy="steps",
         save_steps=50,
         save_total_limit=2,
@@ -242,6 +263,9 @@ def build_trainer(model, tokenizer, dataset, config: TrainingConfig, training_ar
     # Add Hub Checkpoint Sync Callback (saves weights + optimizer + scheduler + state to Hub)
     if config.push_to_hub and config.hub_repo:
         trainer.add_callback(HubCheckpointCallback(hub_repo=config.hub_repo))
+
+    # Add Reward Breakdown Logging Callback (synchronizes individual reward terms into Trainer & W&B)
+    trainer.add_callback(RewardLoggingCallback())
 
     return trainer
 

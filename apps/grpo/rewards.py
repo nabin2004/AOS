@@ -509,6 +509,58 @@ def coverage_reward(completions: list[object], **kwargs) -> list[float]:
     return rewards
 
 
+_REWARD_METRICS_BUFFER: dict[str, list[float]] = {
+    "reward/exec": [],
+    "reward/narration": [],
+    "reward/narration_sync": [],
+    "reward/alignment": [],
+    "reward/vcer": [],
+    "reward/coverage": [],
+    "reward/combined": [],
+}
+
+
+def record_reward_metrics(
+    exec_r: list[float],
+    narr_r: list[float],
+    sync_r: list[float],
+    align_r: list[float],
+    vcer_r: list[float],
+    cover_r: list[float],
+    combined_r: list[float],
+) -> dict[str, float]:
+    """Records individual reward component averages for logging."""
+    def _mean(lst: list[float]) -> float:
+        return float(sum(lst) / len(lst)) if lst else 0.0
+
+    metrics = {
+        "reward/exec": _mean(exec_r),
+        "reward/narration": _mean(narr_r),
+        "reward/narration_sync": _mean(sync_r),
+        "reward/alignment": _mean(align_r),
+        "reward/vcer": _mean(vcer_r),
+        "reward/coverage": _mean(cover_r),
+        "reward/combined": _mean(combined_r),
+    }
+    for k, v in metrics.items():
+        _REWARD_METRICS_BUFFER[k].append(v)
+    return metrics
+
+
+def get_latest_reward_metrics(pop: bool = True) -> dict[str, float]:
+    """Returns the average of reward metrics accumulated since last log call.
+    
+    If pop=True, the internal buffer is cleared for the next logging interval.
+    """
+    out = {}
+    for k, vals in _REWARD_METRICS_BUFFER.items():
+        if vals:
+            out[k] = round(float(sum(vals) / len(vals)), 4)
+            if pop:
+                vals.clear()
+    return out
+
+
 def combined_reward(completions: list[object], **kwargs) -> list[float]:
     batch_token = uuid.uuid4().hex[:8]
     batch_dir = _ensure_render_dir() / f"batch_{batch_token}"
@@ -538,20 +590,40 @@ def combined_reward(completions: list[object], **kwargs) -> list[float]:
                 score *= 0.25
             combined.append(max(0.0, min(1.0, score)))
 
-        if _reward_debug_enabled() and combined:
+        # Track and compute per-batch component metrics
+        curr_metrics = record_reward_metrics(
+            exec_r=exec_r,
+            narr_r=narr_r,
+            sync_r=narr_sync_r,
+            align_r=align_r,
+            vcer_r=vcer_r,
+            cover_r=cover_r,
+            combined_r=combined,
+        )
+
+        # 1. Console logging: Always print individual component breakdown cleanly
+        if combined:
             print(
-                f"[reward] min={min(combined):.3f} max={max(combined):.3f} "
-                f"mean={sum(combined) / len(combined):.3f} "
-                f"exec={sum(exec_r) / len(exec_r):.3f} "
-                f"narr={sum(narr_r) / len(narr_r):.3f} "
-                f"sync={sum(narr_sync_r) / len(narr_sync_r):.3f} "
-                f"align={sum(align_r) / len(align_r):.3f} "
-                f"vcer={sum(vcer_r) / len(vcer_r):.3f} "
-                f"cover={sum(cover_r) / len(cover_r):.3f}",
-                file=sys.stderr,
+                f"[reward] combined={curr_metrics['reward/combined']:.3f} | "
+                f"exec={curr_metrics['reward/exec']:.3f} | "
+                f"narr={curr_metrics['reward/narration']:.3f} | "
+                f"sync={curr_metrics['reward/narration_sync']:.3f} | "
+                f"align={curr_metrics['reward/alignment']:.3f} | "
+                f"vcer={curr_metrics['reward/vcer']:.3f} | "
+                f"cover={curr_metrics['reward/coverage']:.3f}",
                 flush=True,
             )
+
+        # 2. W&B logging: Staging metrics directly into active W&B run
+        try:
+            import wandb
+            if wandb.run is not None:
+                wandb.log(curr_metrics, commit=False)
+        except Exception:
+            pass
+
         return combined
     finally:
         if batch_dir.exists():
             shutil.rmtree(batch_dir, ignore_errors=True)
+

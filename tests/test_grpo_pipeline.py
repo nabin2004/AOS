@@ -312,5 +312,42 @@ class TestKaggleTimeLimit(unittest.TestCase):
         self.assertTrue(control.should_training_stop)
 
 
+class TestRewardLoggingCallback(unittest.TestCase):
+    """Test individual reward component logging into Trainer logs."""
+
+    def test_reward_callback_injects_metrics(self):
+        from unittest.mock import MagicMock
+        from trainer import RewardLoggingCallback
+        from rewards import get_latest_reward_metrics, record_reward_metrics
+
+        # Clear any prior buffer
+        get_latest_reward_metrics(pop=True)
+
+        # Simulate recording metrics from a rollout
+        record_reward_metrics(
+            exec_r=[0.9],
+            narr_r=[0.8],
+            sync_r=[1.0],
+            align_r=[0.7],
+            vcer_r=[1.0],
+            cover_r=[0.6],
+            combined_r=[0.82],
+        )
+
+        cb = RewardLoggingCallback()
+        logs = {"loss": 0.123}
+        cb.on_log(MagicMock(), MagicMock(), MagicMock(), logs=logs)
+
+        self.assertIn("reward/exec", logs)
+        self.assertIn("reward/narration", logs)
+        self.assertIn("reward/narration_sync", logs)
+        self.assertIn("reward/alignment", logs)
+        self.assertIn("reward/vcer", logs)
+        self.assertIn("reward/coverage", logs)
+        self.assertIn("reward/combined", logs)
+        self.assertEqual(logs["reward/narration_sync"], 1.0)
+        self.assertEqual(logs["reward/exec"], 0.9)
+
+
 if __name__ == "__main__":
     unittest.main()
