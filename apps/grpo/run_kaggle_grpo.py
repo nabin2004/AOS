@@ -241,6 +241,8 @@ def run_grpo_training(
     max_runtime_hours: float | None = 8.0,
     resume_from_checkpoint: str | None = None,
     num_generations: int | None = None,
+    max_completion_length: int | None = None,
+    repeat_factor: int | None = None,
 ) -> None:
     """Execute GRPO training via subprocess or direct module invocation."""
     python_exe = sys.executable
@@ -269,6 +271,8 @@ def run_grpo_training(
         str(vlm_threshold),
     ]
 
+    if dataset_repo:
+        cmd.extend(["--dataset-repo", dataset_repo])
     if push_to_hub:
         cmd.append("--push-to-hub")
     if hub_repo:
@@ -279,6 +283,10 @@ def run_grpo_training(
         cmd.extend(["--resume-from-checkpoint", resume_from_checkpoint])
     if num_generations is not None:
         cmd.extend(["--num-generations", str(num_generations)])
+    if max_completion_length is not None:
+        cmd.extend(["--max-completion-length", str(max_completion_length)])
+    if repeat_factor is not None:
+        cmd.extend(["--repeat-factor", str(repeat_factor)])
 
 
     if stack_lora:
@@ -408,6 +416,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--run-name", default="qwen3-8b-manim-grpo-kaggle", help="Run name for W&B logging")
     parser.add_argument("--max-runtime-hours", type=float, default=8.0, help="Maximum Kaggle hours before forcing a clean checkpoint save (default: 8.0)")
     parser.add_argument("--num-generations", type=int, default=None, help="GRPO samples per prompt (defaults to 4 on Kaggle T4)")
+    parser.add_argument("--max-completion-length", type=int, default=None, help="Cap completion tokens (e.g. 512, default: 256)")
+    parser.add_argument("--repeat-factor", type=int, default=None, help="Problem repeat factor in dataset (default: 50)")
     parser.add_argument(
         "--no-resume",
         action="store_true",
@@ -489,6 +499,8 @@ def main() -> int:
             max_runtime_hours=args.max_runtime_hours,
             resume_from_checkpoint=resume_flag,
             num_generations=args.num_generations,
+            max_completion_length=args.max_completion_length,
+            repeat_factor=args.repeat_factor,
         )
 
     except KeyboardInterrupt:

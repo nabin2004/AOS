@@ -209,6 +209,8 @@ def make_training_args(
     if config.max_steps is not None:
         kwargs["max_steps"] = config.max_steps
         kwargs.pop("num_train_epochs", None)
+        if config.max_steps <= 100:
+            kwargs["save_steps"] = max(10, min(25, config.max_steps // 4))
 
     grpo_config = GRPOConfig(**kwargs)
 

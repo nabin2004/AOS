@@ -176,6 +176,8 @@ class TrainingConfig:
                 config = replace(config, **updates)
         if args.base_model is not None:
             config = replace(config, base_model=args.base_model)
+        if getattr(args, "dataset_repo", None) is not None:
+            config = replace(config, dataset_repo=args.dataset_repo)
         if args.dataset_path is not None:
             config = replace(
                 config, dataset_path=_resolve_path(Path(args.dataset_path))
@@ -357,6 +359,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--base-model",
         default=None,
         help="Override base model (default: read from SFT adapter_config.json)",
+    )
+    parser.add_argument(
+        "--dataset-repo",
+        default=None,
+        help="HF Hub repository containing ManiBench problem bundles",
     )
     parser.add_argument(
         "--dataset-path",
