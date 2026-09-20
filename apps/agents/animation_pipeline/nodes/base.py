@@ -11,7 +11,14 @@ from openai_compatible import format_custom_endpoint_error
 
 
 class BaseAnimationNode:
-    """Abstract mixin encapsulating retry execution and error normalization."""
+    """Abstract mixin encapsulating retry execution, subject normalization, and error normalization."""
+
+    @staticmethod
+    def subject_str(subject: Any) -> str:
+        """Normalize subject enum or string representation."""
+        if hasattr(subject, "value"):
+            return str(subject.value)
+        return str(subject)
 
     async def execute_agent_call(
         self,

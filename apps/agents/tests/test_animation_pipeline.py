@@ -76,3 +76,12 @@ def test_facade_backward_compatibility():
     assert agent_graph.run_pipeline is not None
     assert agent_graph.ClassifyNode is ClassifyNode
     assert agent_graph.CodeAgent is CodeAgentNode
+
+
+def test_code_agent_encapsulation():
+    """Verify CodeAgentNode directly encapsulates synthesis without coder_step."""
+    node = CodeAgentNode()
+    assert hasattr(node, "synthesize")
+    assert hasattr(node, "run")
+    assert hasattr(node, "subject_str")
+    assert callable(node.synthesize)

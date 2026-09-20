@@ -9,7 +9,6 @@ from pydantic_graph import BaseNode, GraphRunContext
 from animation_pipeline.nodes.base import BaseAnimationNode
 from animation_pipeline.nodes.code_agent import CodeAgentNode
 from animation_pipeline.state import AnimationState
-from coder_step import subject_str
 from teaching_script import (
     teaching_script_agent,
     teaching_script_user_prompt,
@@ -33,7 +32,7 @@ class PlanTeachingScriptNode(BaseNode[AnimationState, None, str], BaseAnimationN
                 return await teaching_script_agent.run(
                     teaching_script_user_prompt(
                         classification.topic,
-                        subject_str(classification.subject),
+                        self.subject_str(classification.subject),
                         plan,
                         length=ctx.state.target_length,
                         cinematic=ctx.state.cinematic,

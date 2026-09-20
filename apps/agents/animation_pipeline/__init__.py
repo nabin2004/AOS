@@ -17,7 +17,9 @@ from animation_pipeline.nodes import (
 from animation_pipeline.runner import AnimationPipelineRunner
 from animation_pipeline.state import AnimationState
 from animation_pipeline.storage import PipelineArtifactManager
-from coder_step import run_coder_step, subject_str
+from animation_pipeline.nodes.code_agent import run_coder_step
+
+subject_str = BaseAnimationNode.subject_str
 
 # Resident instances for immediate usage
 _default_builder = AnimationGraphBuilder()

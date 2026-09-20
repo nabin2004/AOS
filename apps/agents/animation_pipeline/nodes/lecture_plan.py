@@ -9,7 +9,6 @@ from pydantic_graph import BaseNode, End, GraphRunContext
 from animation_pipeline.nodes.base import BaseAnimationNode
 from animation_pipeline.nodes.teaching_script import PlanTeachingScriptNode
 from animation_pipeline.state import AnimationState
-from coder_step import subject_str
 from ir.manim_ir import Subject
 from lecture_planner import lecture_planner_agent
 
@@ -30,7 +29,7 @@ class PlanLectureNode(BaseNode[AnimationState, None, str], BaseAnimationNode):
             async def _call_planner():
                 planner_prompt = (
                     f"Topic: {topic}\n"
-                    f"Subject: {subject_str(subject)}\n"
+                    f"Subject: {self.subject_str(subject)}\n"
                     f"Target Length: {ctx.state.target_length}\n"
                     f"Cinematic: {ctx.state.cinematic}\n\n"
                     "Consult `manim-composer` to craft a clear pedagogical narrative arc, hook, pacing, and aha moment. "
