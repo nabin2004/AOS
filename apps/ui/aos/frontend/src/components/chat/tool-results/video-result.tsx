@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 import {
   AlertCircle,
   CheckCircle2,
@@ -23,6 +24,11 @@ import {
 } from "@/components/chat/generation";
 import { accumulateGenerationEvent } from "@/lib/generation-events";
 import { TeachingSegmentsExplorer } from "./teaching-segments-explorer";
+import { RevisionHistoryBar } from "@/components/video/revision-history-bar";
+import { RevisionCompareModal } from "@/components/video/revision-compare-modal";
+import { CritiqueDeck } from "@/components/video/critique-deck";
+import { useCritiqueStore } from "@/stores";
+
 
 export type { VideoToolResult };
 
@@ -60,7 +66,21 @@ interface VideoResultProps {
 export function VideoResult({ data, onRetry }: VideoResultProps) {
   const [selectedStage, setSelectedStage] = useState<GenerationStageEvent | null>(null);
 
+  const fetchRevisions = useCritiqueStore((s) => s.fetchRevisions);
+  const activeRevision = useCritiqueStore((s) => s.activeRevision[data.video_generation_id] || 1);
+  const revisions = useCritiqueStore((s) => s.revisions[data.video_generation_id] || []);
+
+  useEffect(() => {
+    if (data.video_generation_id) {
+      fetchRevisions(data.video_generation_id);
+    }
+  }, [data.video_generation_id, fetchRevisions]);
+
+  const activeRevObj = revisions.find((r) => r.revision === activeRevision);
+  const videoSrc = activeRevObj?.stream_url || getVideoStreamUrl(data.video_generation_id);
+
   // Compute accumulated events from data.events or construct initial events
+
   const events: GenerationStageEvent[] =
     data.events && data.events.length > 0
       ? data.events
@@ -317,13 +337,31 @@ export function VideoResult({ data, onRetry }: VideoResultProps) {
       {/* Preserved Prompt */}
       <PromptViewer prompt={data.prompt} defaultExpanded={false} />
 
+      {/* Revision History & Version Navigation */}
+      <RevisionHistoryBar videoGenerationId={data.video_generation_id} />
+
+      {/* Revision Side-by-Side Comparison Mode */}
+      <RevisionCompareModal videoGenerationId={data.video_generation_id} />
+
       {/* Video Player */}
       <div className="overflow-hidden rounded-xl border border-border/60 shadow-sm bg-black/90">
         <AppVideoPlayer
-          src={getVideoStreamUrl(data.video_generation_id)}
+          src={videoSrc}
           className="overflow-hidden rounded-lg w-full aspect-video"
         />
       </div>
+
+      {/* Human-in-the-Loop Visual & Scientific Critique Deck */}
+      <CritiqueDeck
+        videoGenerationId={data.video_generation_id}
+        code={activeRevObj?.code || data.code}
+        onRepairRequested={(category, feedback) => {
+          if (onRetry) {
+            onRetry(`[REPAIR: ${category.toUpperCase()}] ${feedback}`);
+          }
+        }}
+      />
+
 
       {/* Teaching Segments & Visual Anchors Explorer */}
       {data.slides && data.slides.length > 0 && (

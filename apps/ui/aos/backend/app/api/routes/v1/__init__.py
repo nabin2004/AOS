@@ -30,8 +30,11 @@ from app.api.routes.v1 import admin_stats
 from app.api.routes.v1 import org_integrations
 from app.api.routes.v1 import educlaw
 from app.api.routes.v1 import system_logs
+from app.api.routes.v1 import critique
 
 v1_router = APIRouter()
+
+
 
 v1_router.include_router(health.router, tags=["health"])
 
@@ -53,6 +56,8 @@ v1_router.include_router(rag.router, prefix="/rag", tags=["rag"])
 
 v1_router.include_router(files.router, tags=["files"])
 v1_router.include_router(videos.router, tags=["videos"])
+v1_router.include_router(critique.router)
+
 
 v1_router.include_router(
     admin_conversations.router, prefix="/admin/conversations", tags=["admin-conversations"]
