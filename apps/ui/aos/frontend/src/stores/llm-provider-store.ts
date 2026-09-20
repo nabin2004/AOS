@@ -28,30 +28,38 @@ interface LlmProviderState extends LlmProviderConfig {
   setApiKey: (apiKey: string) => void;
   setModelId: (modelId: string) => void;
   setConfig: (partial: Partial<LlmProviderConfig>) => void;
+  setOllama: (modelId?: string) => void;
   reset: () => void;
   /** Fields to merge into the chat WebSocket send payload. */
   toRequestPayload: () => LlmProviderRequestPayload;
 }
+
+export const OLLAMA_DEFAULT_BASE_URL = "http://localhost:11434/v1";
+export const OLLAMA_DEFAULT_MODEL_ID = "hf.co/Qwen/Qwen3-8B-GGUF:latest";
 
 export const DEFAULT_MODAL_BASE_URL =
   "https://nabinoli2004--aosqwen-server.us-east.modal.direct/v1";
 export const DEFAULT_MODAL_MODEL_ID = "nabin2004/AOS-qwen3-8b-grpo";
 
 const EMPTY: LlmProviderConfig = {
-  baseUrl: DEFAULT_MODAL_BASE_URL,
-  apiKey: "local",
-  modelId: DEFAULT_MODAL_MODEL_ID,
+  baseUrl: "",
+  apiKey: "",
+  modelId: "",
 };
 
 export function llmProviderToRequestPayload(
   config: LlmProviderConfig,
 ): LlmProviderRequestPayload {
-  const baseUrl = (config.baseUrl || DEFAULT_MODAL_BASE_URL).trim();
-  const apiKey = (config.apiKey || "local").trim();
-  const modelId = (config.modelId || DEFAULT_MODAL_MODEL_ID).trim();
+  const baseUrl = (config.baseUrl || "").trim();
+  const apiKey = (config.apiKey || "").trim();
+  const modelId = (config.modelId || "").trim();
   const payload: LlmProviderRequestPayload = {};
-  if (baseUrl) payload.llm_base_url = baseUrl;
-  if (apiKey) payload.llm_api_key = apiKey;
+  if (baseUrl) {
+    payload.llm_base_url = baseUrl;
+    payload.llm_api_key = apiKey || "local";
+  } else if (apiKey) {
+    payload.llm_api_key = apiKey;
+  }
   if (modelId) payload.model = modelId;
   return payload;
 }
@@ -64,6 +72,12 @@ export const useLlmProviderStore = create<LlmProviderState>()(
       setApiKey: (apiKey) => set({ apiKey }),
       setModelId: (modelId) => set({ modelId }),
       setConfig: (partial) => set(partial),
+      setOllama: (modelId) =>
+        set({
+          baseUrl: OLLAMA_DEFAULT_BASE_URL,
+          apiKey: "local",
+          modelId: modelId || OLLAMA_DEFAULT_MODEL_ID,
+        }),
       reset: () => set({ ...EMPTY }),
       toRequestPayload: () => {
         const { baseUrl, apiKey, modelId } = get();
@@ -80,3 +94,4 @@ export const useLlmProviderStore = create<LlmProviderState>()(
     },
   ),
 );
+

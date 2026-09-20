@@ -60,6 +60,10 @@ class ErrorResponse(BaseModel):
 class AgentModelsResponse(BaseModel):
     default: str
     models: list[str]
+    ollama_running: bool = False
+    ollama_models: list[str] = []
+    ollama_base_url: str | None = None
+
 
 
 class HealthResponse(BaseModel):

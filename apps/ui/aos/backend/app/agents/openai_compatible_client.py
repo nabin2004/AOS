@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
+import re
+from typing import Any
 
 import httpx
 from openai import AsyncOpenAI
@@ -12,15 +15,55 @@ from pydantic_ai.providers.openai import OpenAIProvider
 logger = logging.getLogger(__name__)
 
 LOCAL_API_KEY_PLACEHOLDER = "local"
-HTTP_TIMEOUT = httpx.Timeout(180.0, connect=30.0)
+HTTP_TIMEOUT = httpx.Timeout(300.0, connect=30.0)
 OPENAI_MAX_RETRIES = 6
 WARMUP_MAX_WAIT_S = 150.0
 _warmup_attempted: set[str] = set()
 _warmed_bases: set[str] = set()
 
 
+def normalize_endpoint_url(base_url: str | None) -> str:
+    """Normalize custom LLM base URL and auto-resolve docker localhost mappings.
+
+    When running inside a Docker container (e.g. aos_backend), localhost/127.0.0.1
+    refers to the container itself. If the user points to Ollama or a local server
+    on their host machine (e.g. http://localhost:11434/v1), we auto-resolve it to
+    http://host.docker.internal:11434/v1 so connections succeed reliably.
+    """
+    if not base_url:
+        return ""
+    url = str(base_url).strip()
+    if not url:
+        return ""
+
+    if not url.startswith(("http://", "https://")):
+        url = f"http://{url}"
+
+    url = url.rstrip("/")
+
+    # If it's an Ollama endpoint without /v1, append /v1 for OpenAI compatibility
+    if ":11434" in url and not url.endswith("/v1"):
+        url = f"{url}/v1"
+
+    # Check if running inside container
+    in_container = (
+        os.path.exists("/.dockerenv")
+        or bool(os.getenv("DOCKER_CONTAINER"))
+        or bool(os.getenv("RUNNING_IN_DOCKER"))
+    )
+    if in_container:
+        url = re.sub(
+            r"^(https?://)(localhost|127\.0\.0\.1)(:\d+)?",
+            r"\1host.docker.internal\3",
+            url,
+            flags=re.IGNORECASE,
+        )
+
+    return url
+
+
 def models_url(base_url: str) -> str:
-    base = base_url.rstrip("/")
+    base = normalize_endpoint_url(base_url).rstrip("/")
     if base.endswith("/v1"):
         return f"{base}/models"
     return f"{base}/v1/models"
@@ -28,11 +71,12 @@ def models_url(base_url: str) -> str:
 
 def health_urls(base_url: str) -> list[str]:
     """Candidates for waking up and checking custom LLM endpoint readiness."""
-    base = base_url.rstrip("/")
+    base = normalize_endpoint_url(base_url).rstrip("/")
     root = base[:-3] if base.endswith("/v1") else base
     urls = [
+        models_url(base),
+        f"{root}/api/tags",
         f"{root}/health",
-        models_url(base_url),
     ]
     if base != root:
         urls.insert(1, f"{base}/health")
@@ -139,11 +183,11 @@ async def warmup_openai_compatible_endpoint_async(
     *,
     max_wait_s: float = WARMUP_MAX_WAIT_S,
 ) -> bool:
-    key = (base_url or "").rstrip("/")
+    key = normalize_endpoint_url(base_url)
     if not key or key in _warmed_bases:
         return True
 
-    urls = health_urls(base_url)
+    urls = health_urls(key)
     headers: dict[str, str] = {}
     if api_key and api_key != LOCAL_API_KEY_PLACEHOLDER:
         headers["Authorization"] = f"Bearer {api_key}"
@@ -202,11 +246,13 @@ def warmup_openai_compatible_endpoint(base_url: str, api_key: str) -> None:
 
 
 def build_openai_provider(base_url: str, api_key: str) -> OpenAIProvider:
-    """Provider with ~180s timeout and SDK retries (covers HTTP 503)."""
+    """Provider with ~300s timeout and SDK retries (covers HTTP 503 and local CPU models)."""
+    resolved_base = normalize_endpoint_url(base_url)
+    resolved_key = (api_key or "").strip() or LOCAL_API_KEY_PLACEHOLDER
     client = AsyncOpenAI(
-        base_url=base_url,
-        api_key=api_key,
-        timeout=180.0,
+        base_url=resolved_base,
+        api_key=resolved_key,
+        timeout=300.0,
         max_retries=OPENAI_MAX_RETRIES,
     )
     try:
@@ -214,7 +260,8 @@ def build_openai_provider(base_url: str, api_key: str) -> OpenAIProvider:
     except TypeError:
         http_client = httpx.AsyncClient(timeout=HTTP_TIMEOUT)
         return OpenAIProvider(
-            base_url=base_url,
-            api_key=api_key,
+            base_url=resolved_base,
+            api_key=resolved_key,
             http_client=http_client,
         )
+
