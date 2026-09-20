@@ -8,6 +8,7 @@ from typing import Any
 from uuid import UUID
 
 from fastapi import WebSocket, WebSocketDisconnect
+import logfire
 from pydantic_ai import (
     Agent,
     FinalResultEvent,
@@ -27,7 +28,10 @@ from pydantic_ai.messages import (
 )
 
 from app.agents.assistant import Deps, get_agent
-from app.agents.openai_compatible_client import format_custom_endpoint_error
+from app.agents.openai_compatible_client import (
+    diagnose_endpoint_error,
+    format_custom_endpoint_error,
+)
 from app.api.deps import get_conversation_service
 from app.core.config import settings
 from app.db.models.user import User
@@ -317,14 +321,32 @@ class AgentSession:
         except WebSocketDisconnect:
             raise
         except Exception as e:
-            logger.exception("Error processing agent request")
+            model_target = data.get("model") or settings.AI_MODEL
+            diag = diagnose_endpoint_error(
+                e, base_url=llm_base_url, model=model_target
+            )
+            logfire.exception(
+                "Agent turn failed: {error_msg} (model={model_name}, endpoint={endpoint})",
+                error_msg=str(e),
+                model_name=model_target,
+                endpoint=llm_base_url or "default",
+                conversation_id=self.current_conversation_id,
+                diagnostic_type=diag.get("error_type"),
+                diagnostic_hint=diag.get("hint"),
+            )
+            logger.error(
+                "Error processing agent request: %s (model=%s, base_url=%s)",
+                e,
+                model_target,
+                llm_base_url,
+                exc_info=True,
+            )
             await send_event(
                 self.websocket,
                 "error",
                 {
-                    "message": format_custom_endpoint_error(
-                        str(e), base_url=llm_base_url
-                    )
+                    "message": diag["message"],
+                    "details": diag,
                 },
             )
 

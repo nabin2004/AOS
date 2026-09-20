@@ -25,3 +25,8 @@ def configure_logfire() -> None:
     if logfire_enabled():
         logfire.configure(send_to_logfire="if-token-present")
         logfire.instrument_pydantic_ai()
+        try:
+            logfire.instrument_httpx(capture_all=True)
+        except Exception:
+            pass
+

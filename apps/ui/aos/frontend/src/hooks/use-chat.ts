@@ -17,7 +17,7 @@ import type {
 import { WS_URL } from "@/lib/constants";
 import { setUrlParam } from "@/lib/utils";
 import { useConversationStore } from "@/stores";
-import { useResearchStore, useChatModeStore, useLlmProviderStore } from "@/stores";
+import { useResearchStore, useChatModeStore, useLlmProviderStore, useDebugPanelStore } from "@/stores";
 import { llmProviderToRequestPayload } from "@/stores/llm-provider-store";
 import { apiClient } from "@/lib/api-client";
 import {
@@ -146,6 +146,7 @@ export function useChat(options: UseChatOptions = {}) {
   const handleWebSocketMessage = useCallback(
     (event: MessageEvent) => {
       const wsEvent: WSEvent = JSON.parse(event.data);
+      useDebugPanelStore.getState().addEvent(wsEvent.type, "in", wsEvent.data);
 
       const createNewMessage = (content: string): string => {
         if (currentMessageIdRef.current) {
@@ -440,8 +441,21 @@ export function useChat(options: UseChatOptions = {}) {
         case "error": {
           // Handle error — always surface a bubble (early failures may arrive
           // before model_request_start creates an assistant message).
-          const { message } = wsEvent.data as { message: string };
-          const errBody = `❌ Error: ${message || "Unknown error"}`;
+          const errData = wsEvent.data as {
+            message?: string;
+            details?: import("@/stores/debug-panel-store").EndpointDiagnostic;
+          };
+          const message = errData?.message || "Unknown error";
+          if (errData?.details) {
+            useDebugPanelStore.getState().setLastDiagnostic(errData.details);
+          } else {
+            useDebugPanelStore.getState().setLastDiagnostic({
+              error_type: "ConnectionError",
+              message,
+              hint: "Check that your custom LLM endpoint or backend is accessible.",
+            });
+          }
+          const errBody = `❌ Error: ${message}`;
           if (currentMessageIdRef.current) {
             const id = currentMessageIdRef.current;
             const errText = `\n\n${errBody}`;
@@ -672,6 +686,11 @@ export function useChat(options: UseChatOptions = {}) {
         payload.headless = useChatModeStore.getState().headless;
         payload.auto_approve = useChatModeStore.getState().autoApprove;
       }
+      useDebugPanelStore.getState().addEvent("send_message", "out", payload);
+      useDebugPanelStore.getState().setTargetInfo(
+        (payload.llm_base_url as string) || null,
+        (payload.model as string) || null,
+      );
       sendMessage(payload);
     },
     [addMessage, sendMessage, conversationId],

@@ -67,8 +67,19 @@ class PiiRedactionFilter(logging.Filter):
 
 
 def setup_logging() -> None:
-    """Configure root logger with PII redaction filter."""
+    """Configure root logger with PII redaction filter and in-memory ring buffer."""
+    from app.core.log_buffer import RingBufferLoggingHandler
+
     root_logger = logging.getLogger()
+    pii_filter = PiiRedactionFilter()
+
     # Avoid adding duplicate filters
     if not any(isinstance(f, PiiRedactionFilter) for f in root_logger.filters):
-        root_logger.addFilter(PiiRedactionFilter())
+        root_logger.addFilter(pii_filter)
+
+    # Attach ring buffer handler if not already present
+    if not any(isinstance(h, RingBufferLoggingHandler) for h in root_logger.handlers):
+        handler = RingBufferLoggingHandler()
+        handler.addFilter(pii_filter)
+        root_logger.addHandler(handler)
+

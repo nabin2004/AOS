@@ -30,3 +30,12 @@ def instrument_asyncpg() -> None:
 def instrument_pydantic_ai() -> None:
     """Instrument PydanticAI for AI agent observability."""
     logfire.instrument_pydantic_ai()
+
+
+def instrument_httpx() -> None:
+    """Instrument HTTPX client to trace all outbound LLM and API requests."""
+    try:
+        logfire.instrument_httpx(capture_all=True)
+    except Exception:
+        pass
+

@@ -15,10 +15,11 @@ import { SubagentFeed } from "./subagent-feed";
 import { SubagentPanel } from "./subagent-panel";
 import { ToolApprovalDialog } from "./tool-approval-dialog";
 import { QuestionPrompt } from "@/components/ui";
-import { Film, Layers } from "lucide-react";
+import { Bug, Film, Layers } from "lucide-react";
 import type { PendingApproval, AskUserQuestion, AskUserAnswer, Decision } from "@/types";
-import { useConversationStore, useChatStore, useChatModeStore } from "@/stores";
+import { useConversationStore, useChatStore, useChatModeStore, useDebugPanelStore } from "@/stores";
 import { useResearchStore } from "@/stores";
+import { DebugDrawer } from "./debug/debug-drawer";
 import { useConversations } from "@/hooks";
 import { useSlashCommands } from "@/hooks";
 import { apiClient } from "@/lib/api-client";
@@ -498,7 +499,16 @@ function ChatUI({
                   )}
                 </button>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => useDebugPanelStore.getState().toggleOpen()}
+                  className="bg-foreground/5 hover:bg-foreground/10 text-foreground/60 hover:text-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-mono text-[11px] font-medium tracking-wider transition-all"
+                  title="Open Live Telemetry & Dev Logs HUD"
+                >
+                  <Bug className="h-3.5 w-3.5" />
+                  <span>Logs</span>
+                </button>
                 <ChatControls
                   onModelChange={onModelChange}
                   onTemperatureChange={onTemperatureChange}
@@ -515,6 +525,7 @@ function ChatUI({
       <FilePreviewPanel />
       <SourcesPanel />
       <SubagentPanel />
+      <DebugDrawer />
     </div>
   );
 }

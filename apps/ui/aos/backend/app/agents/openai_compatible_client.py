@@ -59,23 +59,78 @@ def format_custom_endpoint_error(
     if "Custom LLM endpoint is unavailable" in text or "LLM authentication failed" in text:
         return text
     lowered = text.lower()
-    if "401" in lowered or "invalid_token" in lowered or "api key expired" in lowered or "unauthorized" in lowered:
+    if any(k in lowered for k in ("401", "invalid_token", "api key expired", "unauthorized")):
         return (
             "LLM authentication failed (HTTP 401: API key expired or invalid). "
             "Please configure a valid OPENROUTER_API_KEY in apps/ui/aos/backend/.env "
             "or set your custom LLM provider in Settings."
         )
-    if any(k in lowered for k in ("503", "502", "504", "service unavailable", "connecterror", "connection refused", "timeout")):
+    if any(k in lowered for k in (
+        "connection error",
+        "connecterror",
+        "connection refused",
+        "failed to connect",
+        "cannot connect",
+        "apiconnectionerror",
+        "network unreachable",
+        "name resolution",
+        "dns",
+        "getaddrinfo failed",
+        "all connection attempts failed",
+    )):
         host = (base_url or "the custom LLM endpoint").rstrip("/")
         return (
-            f"Custom LLM endpoint is unavailable (HTTP 503) or waking up ({host}). "
-            "Serverless containers (Modal) can take 1–2 minutes to scale up from zero and load weights into GPU memory. "
-            "The Modal app may be scaled to zero or still loading — wait and retry, "
-            "or redeploy nabinoli2004--aos-qwen-coder-server and confirm the UI base URL "
-            "ends with /v1. "
+            f"Cannot connect to LLM endpoint ({host}). "
+            "Please verify that your custom LLM provider (Ollama, HuggingFace endpoint, Modal, or local server) "
+            f"is running and accessible, and verify the Base URL in Chat Settings ({host}) ends with /v1 if required. "
+            f"[Raw error: {text[:200]}]"
+        )
+    if any(k in lowered for k in ("503", "502", "504", "service unavailable", "timeout", "timed out")):
+        host = (base_url or "the custom LLM endpoint").rstrip("/")
+        return (
+            f"Custom LLM endpoint is unavailable (HTTP 503) or timed out ({host}). "
+            "Serverless containers (Modal / HuggingFace Spaces) can take 1–2 minutes to scale up from zero and load weights into GPU memory. "
+            "Please wait and retry in a moment. "
             f"Original: {text[:400]}"
         )
     return text or "custom_llm_failed"
+
+
+def diagnose_endpoint_error(
+    error: str | Exception,
+    *,
+    base_url: str | None = None,
+    model: str | None = None,
+) -> dict[str, Any]:
+    """Generate structured diagnostic metadata for frontend and telemetry."""
+    err_text = str(error).strip() if error else "Unknown error"
+    lowered = err_text.lower()
+    host = (base_url or "").rstrip("/")
+
+    err_type = "APIConnectionError" if any(k in lowered for k in ("connection", "connect", "dns", "getaddrinfo")) else type(error).__name__
+    if "401" in lowered or "unauthorized" in lowered:
+        category = "auth"
+        hint = "Check your API key in Settings or backend .env."
+    elif any(k in lowered for k in ("connection error", "connecterror", "connection refused", "getaddrinfo", "dns")):
+        category = "connection_refused"
+        hint = f"Cannot reach endpoint '{host}'. Confirm the service is running and accessible."
+    elif any(k in lowered for k in ("503", "502", "504", "timeout", "timed out")):
+        category = "service_unavailable"
+        hint = f"Server at '{host}' is overloaded, waking up, or timed out."
+    else:
+        category = "general_error"
+        hint = "Review backend logs for complete traceback."
+
+    return {
+        "error_type": err_type,
+        "category": category,
+        "message": format_custom_endpoint_error(error, base_url=base_url),
+        "raw_error": err_text,
+        "endpoint": host or "default_openrouter",
+        "model": model or "unknown",
+        "hint": hint,
+    }
+
 
 
 async def warmup_openai_compatible_endpoint_async(

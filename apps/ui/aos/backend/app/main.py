@@ -15,9 +15,13 @@ from app.api.exception_handlers import register_exception_handlers
 from app.api.router import api_router
 from app.core.config import settings
 from app.db.session import close_db, get_db_context
-from app.core.logfire_setup import instrument_app, setup_logfire
-from app.core.logfire_setup import instrument_asyncpg
-from app.core.logfire_setup import instrument_pydantic_ai
+from app.core.logfire_setup import (
+    instrument_app,
+    instrument_asyncpg,
+    instrument_httpx,
+    instrument_pydantic_ai,
+    setup_logfire,
+)
 from app.core.logging import setup_logging
 from app.core.middleware import RequestIDMiddleware
 from app.db.todo_pool import close_todo_pool, init_todo_pool
@@ -67,6 +71,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[LifespanState, None]:
     setup_logfire()
     instrument_asyncpg()
     instrument_pydantic_ai()
+    instrument_httpx()
     redis_client = RedisClient()
     await redis_client.connect()
     state["redis"] = redis_client

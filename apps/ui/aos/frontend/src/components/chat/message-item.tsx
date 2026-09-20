@@ -6,9 +6,9 @@ import { ToolCallCard } from "./tool-call-card";
 import { MarkdownContent } from "./markdown-content";
 import { CopyButton } from "./copy-button";
 import { RatingButtons } from "./rating-buttons";
-import { useChatStore, useFilePreviewStore } from "@/stores";
+import { useChatStore, useFilePreviewStore, useDebugPanelStore } from "@/stores";
 import { useSourcesPanelStore } from "@/stores/sources-panel-store";
-import { Bot, FileText, Globe, Paperclip, RefreshCw, User } from "lucide-react";
+import { Bot, Bug, FileText, Globe, Paperclip, RefreshCw, User } from "lucide-react";
 import Image from "next/image";
 import { useAuthStore } from "@/stores";
 import { getFileUrl } from "@/lib/file-api";
@@ -358,6 +358,20 @@ export function MessageItem({ message, groupPosition, onRegenerate }: MessageIte
                 isUser ? "bg-secondary hover:bg-secondary/80" : "bg-muted hover:bg-muted/80",
               )}
             />
+            {!isUser && message.content.includes("❌ Error:") && (
+              <button
+                type="button"
+                onClick={() => {
+                  useDebugPanelStore.getState().setActiveTab("diagnostics");
+                  useDebugPanelStore.getState().setOpen(true);
+                }}
+                className="inline-flex items-center gap-1 rounded-md border border-red-500/30 bg-red-500/10 px-2 py-0.5 font-mono text-[10px] font-medium text-red-400 hover:bg-red-500/20 transition-colors shadow-sm"
+                title="Open Live Dev HUD & Diagnostics"
+              >
+                <Bug className="h-3 w-3" />
+                <span>Inspect Diagnostics & Logs</span>
+              </button>
+            )}
             {!isUser && onRegenerate && (
               <button
                 type="button"
