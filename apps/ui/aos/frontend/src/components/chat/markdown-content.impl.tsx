@@ -2,7 +2,10 @@
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import rehypeHighlight from "rehype-highlight";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { ExternalLink } from "lucide-react";
 
 import { CopyButton } from "./copy-button";
@@ -19,21 +22,38 @@ function languageLabel(className: string | undefined): string | null {
  * Pre-process markdown to turn bare citation markers [N] into markdown links
  * with a special `#cite-N` href. The `a` component override below detects this
  * and renders an interactive CitationBadge instead of a regular link.
- *
- * Only replaces [N] that is NOT followed by `(` (already a link) or `:` (link
- * reference definition). Code spans/blocks are left as-is because the regex
- * doesn't enter them — in practice agent responses never cite inside code.
  */
 function preprocessCitations(content: string): string {
   return content.replace(/\[(\d{1,3})\](?![\(:])/g, (_, n) => `[[${n}]](#cite-${n})`);
 }
 
+/**
+ * Pre-process LaTeX math delimiters to ensure remark-math and KaTeX parse them reliably.
+ * Cleans up spaced inline math like "$ f(x) $" -> "$f(x)$" and normalizes block equations.
+ */
+function preprocessMath(content: string): string {
+  if (!content) return "";
+  // 1. Normalize inline math with padded spaces: "$ f(x) $" -> "$f(x)$"
+  let res = content.replace(/\$\s+([^$\n]+?)\s+\$/g, (match, inner) => {
+    if (/[a-zA-Z\\_{}\^=+\-*/]/.test(inner)) {
+      return `$${inner.trim()}$`;
+    }
+    return match;
+  });
+
+  // 2. Normalize display math with irregular spacing around delimiters
+  res = res.replace(/\$\$\s*([\s\S]+?)\s*\$\$/g, (_, inner) => `\n$$\n${inner.trim()}\n$$\n`);
+
+  return res;
+}
+
 export function MarkdownContent({ content, onCiteClick }: MarkdownContentProps) {
-  const processed = onCiteClick ? preprocessCitations(content) : content;
+  let processed = onCiteClick ? preprocessCitations(content) : content;
+  processed = preprocessMath(processed);
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      rehypePlugins={[rehypeHighlight]}
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[rehypeHighlight, rehypeKatex]}
       components={{
         pre({ children, ...props }) {
           const codeElement = children as React.ReactElement<{

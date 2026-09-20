@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { ChatMessage, ChatMessageFile } from "@/types";
 import { ToolCallCard } from "./tool-call-card";
@@ -8,7 +9,7 @@ import { CopyButton } from "./copy-button";
 import { RatingButtons } from "./rating-buttons";
 import { useChatStore, useFilePreviewStore, useDebugPanelStore } from "@/stores";
 import { useSourcesPanelStore } from "@/stores/sources-panel-store";
-import { Bot, Bug, FileText, Globe, Paperclip, RefreshCw, User } from "lucide-react";
+import { Bot, Bug, Clapperboard, Edit3, FileText, Globe, Paperclip, RefreshCw, User } from "lucide-react";
 import Image from "next/image";
 import { useAuthStore } from "@/stores";
 import { getFileUrl } from "@/lib/file-api";
@@ -16,6 +17,15 @@ import { extractSources } from "@/lib/chat-sources";
 import type { SourceItem } from "@/lib/chat-sources";
 import type { MessagePart } from "@/types";
 import { RESEARCH_TOOL_NAMES } from "./research-panel";
+import { ManimStudioModal } from "./manim-studio-modal";
+
+function isContentAnimatable(text: string): boolean {
+  if (!text) return false;
+  const lower = text.toLowerCase();
+  const hasMathSymbol = /\$\$|\$|\\frac|\\sum|\\int|\\begin\{|f\(x\)|f'\(|f''\(|e\^|\\partial/.test(text);
+  const hasKeyConcepts = /taylor|maclaurin|fourier|euler|calculus|derivative|integral|matrix|eigen|neural network|algorithm|sorting|binary search|vector/.test(lower);
+  return hasMathSymbol || hasKeyConcepts;
+}
 
 function ThinkingBlock({ text, open, isStreaming }: { text: string; open: boolean; isStreaming: boolean }) {
   return (
@@ -119,6 +129,16 @@ export function MessageItem({ message, groupPosition, onRegenerate }: MessageIte
   const openSources = useSourcesPanelStore((s) => s.open);
   const { user: authUser, avatarVersion } = useAuthStore();
   const isGrouped = groupPosition && groupPosition !== "single";
+
+  const [isStudioOpen, setIsStudioOpen] = useState(false);
+  const [isEditingKnowledge, setIsEditingKnowledge] = useState(false);
+  const [editedKnowledge, setEditedKnowledge] = useState(message.content || "");
+
+  const canAnimate =
+    !isUser &&
+    !message.isStreaming &&
+    Boolean(message.content) &&
+    isContentAnimatable(message.content);
 
   const sources = !isUser ? extractSources(message) : [];
   const hasSources = sources.length > 0 && !message.isStreaming;
@@ -401,6 +421,80 @@ export function MessageItem({ message, groupPosition, onRegenerate }: MessageIte
             )}
           </div>
         )}
+
+        {/* Human-In-The-Loop Knowledge Editor */}
+        {isEditingKnowledge && (
+          <div className="mt-2 w-full rounded-xl border border-primary/30 bg-muted/30 p-3 shadow-inner space-y-2">
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+              <span className="font-semibold text-foreground flex items-center gap-1.5">
+                <Edit3 className="h-3.5 w-3.5 text-primary" />
+                Edit Knowledge & Formulas
+              </span>
+              <span>LaTeX math syntax supported</span>
+            </div>
+            <textarea
+              value={editedKnowledge}
+              onChange={(e) => setEditedKnowledge(e.target.value)}
+              rows={7}
+              className="w-full rounded-lg border border-input bg-background p-3 font-mono text-xs focus:ring-1 focus:ring-primary shadow-sm"
+              placeholder="Edit the explanation or formulas..."
+            />
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  updateMessage(message.id, (msg) => ({ ...msg, content: editedKnowledge }));
+                  setIsEditingKnowledge(false);
+                }}
+                className="px-3 py-1 rounded-md bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors shadow-sm"
+              >
+                Save Changes
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditedKnowledge(message.content || "");
+                  setIsEditingKnowledge(false);
+                }}
+                className="px-2.5 py-1 rounded-md bg-muted text-muted-foreground hover:text-foreground text-xs transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Human-In-The-Loop Animate Action Bar */}
+        {canAnimate && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-2 pt-2 border-t border-border/40">
+            <button
+              type="button"
+              onClick={() => setIsStudioOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/30 px-3.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition-all shadow-sm hover:shadow"
+              title="Open interactive Manim Studio to plan, synthesize code, and render video"
+            >
+              <Clapperboard className="h-3.5 w-3.5" />
+              <span>Animate with Manim</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditingKnowledge(!isEditingKnowledge)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-muted/60 border border-border/50 px-2.5 py-1.5 text-xs font-medium text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+              title="Refine the text or formulas before animating"
+            >
+              <Edit3 className="h-3.5 w-3.5" />
+              <span>{isEditingKnowledge ? "Preview Knowledge" : "Edit Knowledge"}</span>
+            </button>
+          </div>
+        )}
+
+        {/* Manim Studio Modal */}
+        <ManimStudioModal
+          isOpen={isStudioOpen}
+          onClose={() => setIsStudioOpen(false)}
+          initialKnowledge={editedKnowledge || message.content || ""}
+          conversationId={message.conversationId}
+        />
       </div>
     </div>
   );

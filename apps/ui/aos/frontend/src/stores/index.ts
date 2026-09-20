@@ -9,7 +9,7 @@ export { useOrgStore } from "./org-store";
 export { useKBSelectionStore } from "./kb-selection-store";
 export { useResearchStore } from "./research-store";
 export { useChatModeStore } from "./chat-mode-store";
-export { useLlmProviderStore } from "./llm-provider-store";
+export { useLlmProviderStore, OLLAMA_DEFAULT_BASE_URL } from "./llm-provider-store";
 export { useSourcesPanelStore } from "./sources-panel-store";
 export { useDebugPanelStore } from "./debug-panel-store";
 export { useCritiqueStore } from "./critique-store";

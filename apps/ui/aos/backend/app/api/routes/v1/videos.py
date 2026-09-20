@@ -101,3 +101,91 @@ async def get_video_code(
     }
     return StreamingResponse(body, media_type="text/plain; charset=utf-8", headers=headers)
 
+
+@router.post("/classify", response_model=None)
+async def classify_text(
+    payload: dict[str, Any],
+) -> Any:
+    """Classify educational text for Manim visual animatability."""
+    from app.services.manim_studio import classify_text_for_manim
+    text = payload.get("text", "")
+    return classify_text_for_manim(text)
+
+
+@router.post("/plan", response_model=None)
+async def compose_plan(
+    payload: dict[str, Any],
+    user: CurrentUser,
+) -> Any:
+    """Generate a structured scenes.md visual plan using manim-composer skills."""
+    from app.services.manim_studio import compose_plan_service
+    text = payload.get("text", "")
+    hints = payload.get("hints")
+    model_name = payload.get("model_name")
+    base_url = payload.get("base_url")
+    api_key = payload.get("api_key")
+    return await compose_plan_service(
+        text,
+        hints=hints,
+        model_name=model_name,
+        base_url=base_url,
+        api_key=api_key,
+    )
+
+
+@router.post("/code", response_model=None)
+async def synthesize_code(
+    payload: dict[str, Any],
+    user: CurrentUser,
+) -> Any:
+    """Synthesize Manim Community code using manimce-best-practices skills."""
+    from app.services.manim_studio import synthesize_code_service
+    plan = payload.get("plan", "")
+    knowledge_text = payload.get("knowledge_text")
+    scene_name = payload.get("scene_name")
+    model_name = payload.get("model_name")
+    base_url = payload.get("base_url")
+    api_key = payload.get("api_key")
+    return await synthesize_code_service(
+        plan,
+        knowledge_text=knowledge_text,
+        scene_name=scene_name,
+        model_name=model_name,
+        base_url=base_url,
+        api_key=api_key,
+    )
+
+
+@router.post("/render-custom", response_model=None)
+async def render_custom_scene(
+    payload: dict[str, Any],
+    user: CurrentUser,
+    request: Request,
+) -> Any:
+    """Compile and render custom Manim scene code with quality options."""
+    from app.db.session import get_db_context
+    from app.services.manim_studio import render_custom_code_service
+    code = payload.get("code", "")
+    scene_name = payload.get("scene_name")
+    quality = payload.get("quality", "l")
+    prompt = payload.get("prompt")
+    conversation_id_raw = payload.get("conversation_id")
+    conv_id = UUID(conversation_id_raw) if conversation_id_raw else None
+
+    async with get_db_context() as db:
+        try:
+            return await render_custom_code_service(
+                code=code,
+                scene_name=scene_name,
+                quality=quality,
+                user_id=user.id,
+                db=db,
+                conversation_id=conv_id,
+                prompt=prompt,
+            )
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Render execution failed: {exc}",
+            ) from exc
+

@@ -1000,4 +1000,16 @@
     color: #ffdcd7;
     background-color: #67060c;
   }
+
+  /* KaTeX mathematical formula rendering */
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5rem 0;
+    margin: 0.75rem 0;
+  }
+  .katex {
+    font-size: 1.08em;
+    text-rendering: auto;
+  }
 }
