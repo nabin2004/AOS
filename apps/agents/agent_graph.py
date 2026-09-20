@@ -206,10 +206,15 @@ class PlanLectureNode(BaseNode[AnimationState, None, str]):
         subject = classification.subject if classification else Subject.MATH
         try:
             async def _call_planner():
-                return await lecture_planner_agent.run(
+                planner_prompt = (
                     f"Topic: {topic}\n"
-                    f"Subject: {subject}"
+                    f"Subject: {_subject_str(subject)}\n"
+                    f"Target Length: {ctx.state.target_length}\n"
+                    f"Cinematic: {ctx.state.cinematic}\n\n"
+                    "Consult `manim-composer` to craft a clear pedagogical narrative arc, hook, pacing, and aha moment. "
+                    "Consult `manimce-best-practices` to ensure equations, diagrams, and layouts adhere to Manim CE frame-safe standards."
                 )
+                return await lecture_planner_agent.run(planner_prompt)
 
             result = await execute_with_llm_retry(_call_planner, operation_name="Lecture Planner Agent")
             ctx.state.plan = result.output

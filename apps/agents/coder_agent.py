@@ -208,6 +208,8 @@ def coder_prompt_variant() -> str:
     return "local" if is_ollama(model_for("coder")) else "full"
 
 
+SKILLS_DIR = (Path(__file__).resolve().parents[2] / ".agents" / "skills").resolve()
+
 coder_agent = Agent(
     model_for_agent("coder"),
     name="Code Agent",
@@ -218,12 +220,11 @@ coder_agent = Agent(
     capabilities=[
         CodeMode(max_retries=8, dynamic_catalog=True),
         SkillsCapability(
-            id='manim_skills',
-            directories=[str(Path(__file__).parents[2] / '.agents' / 'skills')],
-            include=['manimce-best-practices', 'manimgl-best-practices', 'manim-composer'],
-            defer_loading=True,
-            description="Manim best practices and educational video composer guidelines. Load this capability when writing or debugging Manim code to ensure you follow correct styles, layout rules, and API patterns."
-        )
+            directories=[SKILLS_DIR],
+            include=["manimce-best-practices", "manim-composer"],
+            defer_loading=False,
+            description="Manim Community Edition best practices and educational video composer guidelines. Provides rules, layout constraints, and 3b1b pedagogical pacing.",
+        ),
     ],
     tools=[
         Tool(compile_manim_code),

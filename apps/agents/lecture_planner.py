@@ -8,7 +8,13 @@ from pydantic_ai_skills import SkillsCapability
 
 load_dotenv()
 
+SKILLS_DIR = (Path(__file__).resolve().parents[2] / ".agents" / "skills").resolve()
+
 LECTURE_PROMPT = """You design educational Manim lectures for AOS. Given a topic and subject, produce a Lecture that answers: WHAT are we teaching? Tone: direct, energetic, second-person ("you will see…"). No passive voice. Manim is a programmatic animation engine.
+
+You have access to specialized skills:
+- `manim-composer`: Consult this skill (via load_skill or read_skill_resource) to structure the video narrative arc, narrative hook, key "aha moment", audience prerequisites, and pedagogical flow (in 3Blue1Brown style).
+- `manimce-best-practices`: Consult this skill to ensure visual layout, positioning, equations, mobjects, and 2D/3D camera rules adhere to Manim Community Edition standards.
 
 Default to a flat 2D teaching board: titles, equations, diagrams, and bullet columns that stay frame-safe. Most lectures should stay 2D — do NOT demand camera orbits or slanted 3D views for board/list/equation content.
 
@@ -24,7 +30,7 @@ For the Lorenz attractor, use scipy solve_ivp for the trajectory, plot it in 3D,
 lecture_planner_agent = Agent(
     model_for_agent("planner"),
     name="Lecture Planner Agent",
-    description="Generates a lecture plan for an AOS educational animation.",
+    description="Generates a lecture plan for an AOS educational animation using manim-composer and manimce-best-practices.",
     system_prompt=LECTURE_PROMPT,
     output_type=Lecture,
     model_settings=settings_for("planner"),
@@ -32,11 +38,11 @@ lecture_planner_agent = Agent(
     capabilities=[
         Planning(),
         SkillsCapability(
-            id='manim_skills',
-            directories=[str(Path(__file__).parents[2] / '.agents' / 'skills')],
-            include=['manim-composer', 'manimce-best-practices', 'manimgl-best-practices'],
-            defer_loading=True,
-            description="Manim best practices and educational video composer guidelines. Load this before making the final plan to understand scene pacing, layout rules, and standard teaching patterns in Manim."
-        )
+            directories=[SKILLS_DIR],
+            include=["manim-composer", "manimce-best-practices"],
+            defer_loading=False,
+            description="Manim composer and Manim CE best practices for educational lecture planning.",
+        ),
     ],
 )
+

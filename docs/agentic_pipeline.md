@@ -202,12 +202,13 @@ class AnimationState:
 
 #### 2. Nodes in the Graph
 - **`ClassifyNode`**: Invokes `classifier_agent` to extract the specific topic and validate domain feasibility (`Subject.MATH`, `Subject.PHYSICS`, `Subject.CS`, `Subject.BIOLOGY`). Rejects unsupported domains early to save token spend.
-- **`PlanLectureNode`**: Invokes `lecture_planner_agent` to construct a pedagogical roadmap with prerequisites, cognitive anchors, and logical progression.
+- **`PlanLectureNode`**: Invokes `lecture_planner_agent` with Pydantic AI's `SkillsCapability` (`manim-composer` and `manimce-best-practices`). It consults `manim-composer` for 3Blue1Brown pedagogical narrative arcs, hooks, and "aha moments", and `manimce-best-practices` to construct frame-safe, mathematically sound lecture plans.
 - **`PlanTeachingScriptNode`**: Invokes `teaching_script_agent` to draft time-synchronized narration text, visual beats, and explicit screen-clearing boundaries.
-- **`CodeAgent`**: Invokes `run_coder_step()` which launches `coder_agent` with tool sandboxing (`pydantic_ai_harness.CodeMode`).
+- **`CodeAgent`**: Invokes `run_coder_step()` which launches `coder_agent` equipped with `SkillsCapability` (`manimce-best-practices` and `manim-composer`) and tool sandboxing (`pydantic_ai_harness.CodeMode`).
 
 #### 3. Coder Agent & Code Mode Tooling (`coder_agent.py`)
-Rather than relying on brittle raw text generation, the `coder_agent` uses **Code Mode**. It writes a small Python driver script that executes workspace tools asynchronously:
+Rather than relying on brittle raw text generation, the `coder_agent` uses **Code Mode** and native **Agent Skills**. It writes a small Python driver script that executes workspace tools asynchronously while adhering to the guidelines in `manimce-best-practices` and `manim-composer`:
+- `load_skill(skill_name)` / `read_skill_resource(...)`: Inspects Manim Community Edition rules, mobject styling, camera timing, and LaTeX guidelines dynamically.
 - `manim_write(code, scene_name, output_dir)`: Persists scene code to `scene.py` and registers it in `manifest.json`.
 - `compile_manim_code(code, scene_name, output_dir)`: Invokes the Manim compiler (locally or within persistent Docker container `aos-manim-<hash>`), logging stdout/stderr to `logs/compile.log`.
 - `manim_read(output_dir)`: Reads the existing scene to iteratively refine code upon compilation errors.
@@ -350,6 +351,7 @@ The following matrix documents the core tools, helper libraries, and infrastruct
 | **`upload_to_minio`** | `apps/agents/tools/minio_storage.py` | `agent_graph.py` & Celery tasks | Uploads generated MP4 videos and scene Python files to S3/MinIO buckets; returns presigned access URLs. |
 | **`validate_video_file`** | `apps/agents/video_validator.py` | `video_entry.py` & Celery | Uses `ffprobe` to verify that output video has non-zero duration, valid keyframes, and playable audio streams. |
 | **`execute_with_llm_retry`** | `apps/agents/llm_retry.py` | All Pydantic AI Graph Nodes | Wraps model invocations with exponential backoff and jitter to survive transient HTTP 503/429/cold starts. |
+| **`SkillsCapability`** | `pydantic_ai_skills` | `lecture_planner_agent` & `coder_agent` | Integrates `manim-composer` and `manimce-best-practices` agent skills with `load_skill`, `read_skill_resource`, and progressive disclosure. |
 | **`CodeMode`** | `pydantic_ai_harness` | `coder_agent.py` | Sandboxed Python runner enabling the agent to execute multi-tool orchestration in a single model turn. |
 
 ---
