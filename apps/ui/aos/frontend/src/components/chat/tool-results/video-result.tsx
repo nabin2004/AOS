@@ -27,6 +27,7 @@ import { TeachingSegmentsExplorer } from "./teaching-segments-explorer";
 import { RevisionHistoryBar } from "@/components/video/revision-history-bar";
 import { RevisionCompareModal } from "@/components/video/revision-compare-modal";
 import { CritiqueDeck } from "@/components/video/critique-deck";
+import { CritiqueOverlay } from "@/components/video/critique-overlay";
 import { useCritiqueStore } from "@/stores";
 
 
@@ -343,12 +344,13 @@ export function VideoResult({ data, onRetry }: VideoResultProps) {
       {/* Revision Side-by-Side Comparison Mode */}
       <RevisionCompareModal videoGenerationId={data.video_generation_id} />
 
-      {/* Video Player */}
-      <div className="overflow-hidden rounded-xl border border-border/60 shadow-sm bg-black/90">
+      {/* Video Player with Interactive Visual Critique Overlay */}
+      <div className="relative overflow-hidden rounded-xl border border-border/60 shadow-sm bg-black/90">
         <AppVideoPlayer
           src={videoSrc}
           className="overflow-hidden rounded-lg w-full aspect-video"
         />
+        <CritiqueOverlay videoGenerationId={data.video_generation_id} />
       </div>
 
       {/* Human-in-the-Loop Visual & Scientific Critique Deck */}

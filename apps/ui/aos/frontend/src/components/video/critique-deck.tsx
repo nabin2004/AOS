@@ -19,6 +19,8 @@ import {
   AlertTriangle,
   Sparkles,
   Send,
+  Clapperboard,
+  Crosshair,
 } from "lucide-react";
 import { Button, Input, Textarea, Badge } from "@/components/ui";
 
@@ -57,6 +59,13 @@ const FAILURE_OPTIONS: FailureOption[] = [
     label: "Improve Visibility",
     description: "Formulas or curves too small, thin strokes, or poor contrast",
     icon: Eye,
+    dimension: "visual",
+  },
+  {
+    id: "animation",
+    label: "Fix Animation",
+    description: "Motion dynamics, easing function, or transform transition is awkward",
+    icon: Clapperboard,
     dimension: "visual",
   },
   {
@@ -115,6 +124,11 @@ export function CritiqueDeck({
   const acceptedRevisions = useCritiqueStore(
     (s) => s.acceptedRevisions[videoGenerationId] || false,
   );
+  const isCritiqueMode = useCritiqueStore(
+    (s) => s.critiqueModeActive[videoGenerationId] || false,
+  );
+  const toggleCritiqueMode = useCritiqueStore((s) => s.toggleCritiqueMode);
+  const spatialCorrection = useCritiqueStore((s) => s.spatialCorrection);
 
   const [activeTab, setActiveTab] = useState<"visual" | "scientific">("visual");
 
@@ -179,6 +193,20 @@ export function CritiqueDeck({
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant={isCritiqueMode ? "default" : "outline"}
+            onClick={() => toggleCritiqueMode(videoGenerationId)}
+            className={`h-8 gap-1.5 text-xs font-medium ${
+              isCritiqueMode
+                ? "bg-amber-500 text-black hover:bg-amber-400 font-semibold"
+                : "border-amber-500/40 text-amber-500 hover:bg-amber-500/10"
+            }`}
+          >
+            <Crosshair className="h-3.5 w-3.5" />
+            <span>{isCritiqueMode ? "Critique Mode On" : "Critique Mode"}</span>
+          </Button>
+
           {acceptedRevisions ? (
             <div className="flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
               <CheckCircle2 className="h-4 w-4" />
@@ -197,6 +225,25 @@ export function CritiqueDeck({
           )}
         </div>
       </div>
+
+      {/* Active On-Canvas Spatial Correction Indicator */}
+      {spatialCorrection && (
+        <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/30 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-sky-400">Target Element:</span>
+            <span className="font-mono text-foreground">{spatialCorrection.target_object}</span>
+            <span className="text-muted-foreground">•</span>
+            <span className="text-sky-300 font-medium">Action: {spatialCorrection.action}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => useCritiqueStore.getState().setSpatialCorrection(null)}
+            className="text-[11px] text-muted-foreground hover:text-foreground font-mono"
+          >
+            Clear
+          </button>
+        </div>
+      )}
 
       {/* Semantic Failure Categories Tabs */}
       <div className="space-y-2.5">

@@ -36,6 +36,17 @@ REPAIR_STRATEGIES: dict[CritiqueCategory, dict[str, str]] = {
             "5. Ensure high-contrast colors (e.g. `YELLOW`, `TEAL`, `BLUE_C`, `RED_C`) against dark background."
         ),
     },
+    CritiqueCategory.ANIMATION: {
+        "focus": "Motion dynamics, easing functions, awkward transitions, and transform artifacts",
+        "guidance": (
+            "CRITICAL ANIMATION & TRANSITION DIRECTIVES:\n"
+            "1. The visual movement or transition between states is jarring, unnatural, or awkward.\n"
+            "2. Use smoother rate functions: replace jerky transitions with `rate_func=smooth` or `rate_func=there_and_back`.\n"
+            "3. When transforming complex formulas or geometric shapes, prefer `ReplacementTransform` or `FadeTransform` over abrupt `Transform` to prevent tangled visual artifacts.\n"
+            "4. Add natural rotation and entry motion (`Create`, `Write`, `GrowFromCenter`, `DrawBorderThenFill`) rather than sudden appearance.\n"
+            "5. Ensure continuous camera panning is gentle (`self.camera.frame.animate.set(...)`)."
+        ),
+    },
     CritiqueCategory.TIMING: {
         "focus": "Animation beat durations, run_time, and pacing synchronization",
         "guidance": (
@@ -98,6 +109,21 @@ def build_repair_prompt(request: CritiqueSubmissionRequest) -> str:
         f"- Failure Category: {request.category.value.upper()}",
         f"- Specific Observation{ts_str}{target_str}: {request.feedback}",
         f"- Severity: {request.severity.value.upper()}",
+    ]
+
+    if request.spatial_correction:
+        sc = request.spatial_correction
+        sc_lines = [
+            f"- Spatial Correction Action: {sc.action.upper()}",
+            f"- Target Mobject: {sc.target_object}",
+        ]
+        if sc.old_position and sc.new_position:
+            sc_lines.append(f"  * Position adjustment: old={sc.old_position} -> new={sc.new_position}")
+        if sc.old_scale and sc.new_scale:
+            sc_lines.append(f"  * Scale adjustment: old={sc.old_scale} -> new={sc.new_scale}")
+        parts.extend(sc_lines)
+
+    parts.extend([
         "",
         "TARGETED REPAIR STRATEGY:",
         strategy["guidance"],
@@ -106,6 +132,6 @@ def build_repair_prompt(request: CritiqueSubmissionRequest) -> str:
         "1. Modify the Manim source code to fix this specific issue without breaking unaffected scenes.",
         "2. Ensure all mobjects remain within frame boundaries and render cleanly in 1080p.",
         "3. Output the complete, corrected, executable Manim script.",
-    ]
+    ])
 
     return "\n".join(parts)

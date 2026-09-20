@@ -17,6 +17,9 @@ from app.schemas.critique import (
 )
 from app.services.repair_dispatcher import build_repair_prompt
 
+logger = logging.getLogger(__name__)
+
+
 def _find_repo_root() -> Path:
     current = Path(__file__).resolve()
     for parent in current.parents:
@@ -63,6 +66,7 @@ class CritiqueRecorder:
             severity=request.severity,
             session_id=request.session_id,
             created_at=datetime.now(timezone.utc),
+            spatial_correction=request.spatial_correction,
             repair_prompt=repair_prompt,
             status="pending",
         )

@@ -6,6 +6,7 @@ export type CritiqueCategory =
   | "positioning"
   | "visual_drift"
   | "visibility"
+  | "animation"
   | "timing"
   | "scientific_accuracy"
   | "explanation"
@@ -13,6 +14,24 @@ export type CritiqueCategory =
   | "general";
 
 export type SeverityLevel = "low" | "medium" | "high" | "critical";
+
+export interface SpatialCorrection {
+  action: "move" | "scale" | "reposition" | "hide" | "make_larger" | "fix_overlap";
+  target_object: string;
+  old_position?: [number, number];
+  new_position?: [number, number];
+  old_scale?: number;
+  new_scale?: number;
+}
+
+export interface DetectedIssue {
+  id: string;
+  type: CritiqueCategory;
+  label: string;
+  timestamp?: number;
+  target?: string;
+  suggestedAction?: string;
+}
 
 export interface VideoRevisionItem {
   revision: number;
@@ -30,6 +49,7 @@ interface CritiqueStoreState {
   activeRevision: Record<string, number>;
   compareRevision: Record<string, number | null>;
   isComparing: Record<string, boolean>;
+  critiqueModeActive: Record<string, boolean>;
 
   // Active critique draft
   currentTimestamp: number;
@@ -37,6 +57,7 @@ interface CritiqueStoreState {
   feedbackText: string;
   targetObject: string;
   severity: SeverityLevel;
+  spatialCorrection: SpatialCorrection | null;
   isSubmitting: boolean;
   submissionMessage: string | null;
   acceptedRevisions: Record<string, boolean>;
@@ -46,11 +67,13 @@ interface CritiqueStoreState {
   setActiveRevision: (videoGenId: string, revision: number) => void;
   setCompareRevision: (videoGenId: string, revision: number | null) => void;
   toggleCompare: (videoGenId: string) => void;
+  toggleCritiqueMode: (videoGenId: string) => void;
   setCurrentTimestamp: (ts: number) => void;
   setSelectedCategory: (cat: CritiqueCategory | null) => void;
   setFeedbackText: (text: string) => void;
   setTargetObject: (obj: string) => void;
   setSeverity: (sev: SeverityLevel) => void;
+  setSpatialCorrection: (correction: SpatialCorrection | null) => void;
   submitCritique: (videoGenId: string, currentRev: number, manimCode?: string) => Promise<boolean>;
   acceptRevision: (videoGenId: string, revision: number) => Promise<boolean>;
   resetDraft: () => void;
@@ -61,12 +84,14 @@ export const useCritiqueStore = create<CritiqueStoreState>((set, get) => ({
   activeRevision: {},
   compareRevision: {},
   isComparing: {},
+  critiqueModeActive: {},
 
   currentTimestamp: 0,
   selectedCategory: null,
   feedbackText: "",
   targetObject: "",
   severity: "medium",
+  spatialCorrection: null,
   isSubmitting: false,
   submissionMessage: null,
   acceptedRevisions: {},
@@ -104,20 +129,24 @@ export const useCritiqueStore = create<CritiqueStoreState>((set, get) => ({
   },
 
   toggleCompare: (videoGenId) => {
-    set((state) => {
-      const current = Boolean(state.isComparing[videoGenId]);
-      const revs = state.revisions[videoGenId] || [];
-      const active = state.activeRevision[videoGenId] || 1;
-      // Default compare target is the previous revision if available
-      const compareTarget = active > 1 ? active - 1 : revs.length > 1 ? 1 : null;
-      return {
-        isComparing: { ...state.isComparing, [videoGenId]: !current },
-        compareRevision: { ...state.compareRevision, [videoGenId]: compareTarget },
-      };
-    });
+    set((state) => ({
+      isComparing: {
+        ...state.isComparing,
+        [videoGenId]: !state.isComparing[videoGenId],
+      },
+    }));
   },
 
-  setCurrentTimestamp: (ts) => set({ currentTimestamp: Math.max(0, ts) }),
+  toggleCritiqueMode: (videoGenId) => {
+    set((state) => ({
+      critiqueModeActive: {
+        ...state.critiqueModeActive,
+        [videoGenId]: !state.critiqueModeActive[videoGenId],
+      },
+    }));
+  },
+
+  setCurrentTimestamp: (ts) => set({ currentTimestamp: ts }),
 
   setSelectedCategory: (cat) => set({ selectedCategory: cat }),
 
@@ -127,21 +156,24 @@ export const useCritiqueStore = create<CritiqueStoreState>((set, get) => ({
 
   setSeverity: (sev) => set({ severity: sev }),
 
+  setSpatialCorrection: (correction) => set({ spatialCorrection: correction }),
+
   submitCritique: async (videoGenId, currentRev, manimCode) => {
-    const { selectedCategory, feedbackText, currentTimestamp, targetObject, severity } = get();
-    if (!selectedCategory && !feedbackText.trim()) return false;
+    const { selectedCategory, feedbackText, currentTimestamp, targetObject, severity, spatialCorrection } = get();
+    if (!selectedCategory && !feedbackText.trim() && !spatialCorrection) return false;
 
     set({ isSubmitting: true, submissionMessage: null });
     try {
       const payload = {
         video_generation_id: videoGenId,
         revision: currentRev,
-        category: selectedCategory || "general",
-        feedback: feedbackText.trim() || `Human reviewer requested ${selectedCategory?.replace("_", " ")} fix.`,
+        category: selectedCategory || (spatialCorrection ? "positioning" : "general"),
+        feedback: feedbackText.trim() || (spatialCorrection ? `Adjusted ${spatialCorrection.target_object} via on-screen critique: ${spatialCorrection.action}` : `Human reviewer requested ${selectedCategory?.replace("_", " ")} fix.`),
         timestamp_seconds: currentTimestamp > 0 ? currentTimestamp : null,
-        target_object: targetObject.trim() || null,
+        target_object: targetObject.trim() || spatialCorrection?.target_object || null,
         severity,
         manim_code: manimCode || null,
+        spatial_correction: spatialCorrection || null,
       };
 
       const res = await fetch(`/api/videos/${videoGenId}/critique`, {

@@ -13,6 +13,7 @@ class CritiqueCategory(str, Enum):
     POSITIONING = "positioning"
     VISUAL_DRIFT = "visual_drift"
     VISIBILITY = "visibility"
+    ANIMATION = "animation"
     TIMING = "timing"
     SCIENTIFIC_ACCURACY = "scientific_accuracy"
     EXPLANATION = "explanation"
@@ -27,6 +28,15 @@ class SeverityLevel(str, Enum):
     CRITICAL = "critical"
 
 
+class SpatialCorrection(BaseModel):
+    action: str = Field(..., description="Action: move, scale, reposition, hide, make_larger, fix_overlap")
+    target_object: str = Field(..., description="Name of the targeted mobject")
+    old_position: tuple[float, float] | None = None
+    new_position: tuple[float, float] | None = None
+    old_scale: float | None = None
+    new_scale: float | None = None
+
+
 class CritiqueSubmissionRequest(BaseModel):
     video_generation_id: str = Field(..., description="ID of the video being critiqued")
     revision: int = Field(1, ge=1, description="Current revision number being reviewed")
@@ -37,6 +47,7 @@ class CritiqueSubmissionRequest(BaseModel):
     severity: SeverityLevel = Field(SeverityLevel.MEDIUM, description="Critique urgency / severity")
     session_id: str | None = Field(None, description="Active chat conversation or session ID")
     manim_code: str | None = Field(None, description="Manim code of the revision being critiqued")
+    spatial_correction: SpatialCorrection | None = Field(None, description="Structured spatial/bounding box adjustment")
 
 
 class CritiqueRecord(BaseModel):
@@ -50,6 +61,7 @@ class CritiqueRecord(BaseModel):
     severity: SeverityLevel = SeverityLevel.MEDIUM
     session_id: str | None = None
     created_at: datetime
+    spatial_correction: SpatialCorrection | None = None
     repair_prompt: str | None = None
     status: Literal["pending", "repairing", "completed", "rejected"] = "pending"
     repaired_video_id: str | None = None
