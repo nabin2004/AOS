@@ -1,59 +1,54 @@
+"""Animus Agent Graph — Declarative Pydantic Graph Pipeline for Educational Animations.
+
+Architecture:
+    ClassifyNode -> PlanLectureNode -> PlanTeachingScriptNode -> CodeAgentNode
+"""
+
+from __future__ import annotations
+
+import asyncio
 from dataclasses import dataclass
+import json
 import os
 from pathlib import Path
-import re
 import sys
 from typing import Any
+import uuid
+
 from dotenv import load_dotenv
-
-load_dotenv()
-
-from pydantic_graph import BaseNode, End, EndMarker, GraphBuilder, GraphRunContext
+from pydantic import BaseModel
 from pydantic_ai import Agent, RunContext
-from pydantic_ai.exceptions import UsageLimitExceeded
-from pydantic_ai.usage import RunUsage, UsageLimits
+from pydantic_graph import BaseNode, End, EndMarker, GraphBuilder, GraphRunContext
 
-from observability import configure_logfire, sft_batch_enabled
-from llm_config import is_ollama, model_for, model_for_agent, settings_for, model_for_agent, settings_for
-from openai_compatible import format_custom_endpoint_error
-from llm_retry import execute_with_llm_retry
-from coder_prompt import (
-    build_coder_user_prompt,
-    plan_to_payload,
-)
-
-configure_logfire()
-
-from coder_agent import SFT_BATCH_ADDENDUM, coder_agent
-from coder_run import (
-    CoderRunResult,
-    arrange_coder_artifacts,
-    new_coder_run_dir,
-)
-from tools.coder_workspace import load_manifest
-from tools.manim_source import extract_codemode_dump
 from classifier_agent import classifier_agent
-from lecture_planner import lecture_planner_agent, Lecture
+from cinematic_director import is_cinematic_mode
+from coder_run import CoderRunResult
+from coder_step import run_coder_step, subject_str
+from ir.manim_ir import Classification, Lecture, Subject
+from lecture_planner import lecture_planner_agent
+from llm_config import model_for_agent, settings_for
+from llm_retry import execute_with_llm_retry
+from observability import configure_logfire
+from openai_compatible import format_custom_endpoint_error
 from teaching_script import (
-    TeachingBeat,
     TeachingScript,
     teaching_script_agent,
-    teaching_script_to_payload,
     teaching_script_user_prompt,
 )
-from ir.manim_ir import Subject, Classification
+
+load_dotenv()
+configure_logfire()
 
 
-
-
-
-
-
-
+# ==============================================================================
+# Pipeline State Definition
+# ==============================================================================
 
 
 @dataclass
 class AnimationState:
+    """Shared state passed through the Pydantic Graph execution lifecycle."""
+
     user_query: str
     target_length: str = "medium"
     cinematic: bool = False
@@ -67,118 +62,26 @@ class AnimationState:
     animation_mode: str = "keyframe"
 
 
-def _subject_str(subject: str | Subject) -> str:
-    if isinstance(subject, Subject):
-        return subject.value
-    return str(subject)
-
-
-async def run_coder_step(
-    topic: str,
-    subject: str | Subject,
-    plan: Lecture | str | dict,
-    *,
-    teaching_script: TeachingScript | dict | None = None,
-    usage: RunUsage | None = None,
-    user_prompt: str | None = None,
-    prompt_index: int | None = None,
-    existing_run_dir: str | None = None,
-    feedback: str | None = None,
-    length: str = "medium",
-    cinematic: bool = False,
-    animation_mode: str = "keyframe",
-) -> CoderRunResult:
-    """Write/compile Manim for a topic; shared by the graph node and web tools."""
-
-    run_dir = Path(existing_run_dir) if existing_run_dir else new_coder_run_dir(topic)
-
-    payload = plan_to_payload(plan)
-    script_payload = teaching_script_to_payload(teaching_script)
-    if script_payload:
-        payload["teaching_script"] = script_payload
-        try:
-            (run_dir / "teaching_script.json").write_text(
-                json.dumps(script_payload, indent=2), encoding="utf-8"
-            )
-            manifest = load_manifest(run_dir)
-            manifest["teaching_script"] = script_payload
-            manifest["topic"] = topic
-            save_manifest(run_dir, manifest)
-        except Exception:
-            pass
-    local_coder = is_ollama(model_for("coder"))
-    prompt = build_coder_user_prompt(
-        topic=topic,
-        subject=_subject_str(subject),
-        output_dir=run_dir,
-        plan_payload=payload,
-        compact=local_coder,
-        include_codemode_hint=local_coder,
-        length=length,
-        cinematic=cinematic,
-        mode=animation_mode,
-    )
-    if feedback and existing_run_dir:
-        from pathlib import Path
-        code_file = Path(existing_run_dir) / "lecture.py"
-        if not code_file.exists():
-            code_file = Path(existing_run_dir) / "scene.py"
-        current_code = code_file.read_text(encoding="utf-8") if code_file.exists() else ""
-        prompt += f"\n\nExisting Code:\n```python\n{current_code}\n```\n\nUser Feedback for Revision:\n{feedback}\nRevise the code to address this feedback."
-
-    if sft_batch_enabled():
-        prompt += SFT_BATCH_ADDENDUM
-
-    messages = None
-    run_usage = usage
-    summary = ""
-    stopped_reason = "completed"
-    request_limit = int(os.getenv("AOS_CODER_MAX_REQUESTS", "6"))
-    coder_limits = UsageLimits(request_limit=request_limit)
-
-    try:
-        async def _call_coder():
-            return await coder_agent.run(prompt, usage=usage, usage_limits=coder_limits)
-
-        result = await execute_with_llm_retry(_call_coder, operation_name="Coder Agent")
-        messages = result.all_messages()
-        run_usage = result.usage
-        summary = str(result.output) if result.output is not None else ""
-    except UsageLimitExceeded as exc:
-        stopped_reason = f"usage_limit: {exc}"
-        summary = stopped_reason
-    except Exception as exc:
-        stopped_reason = format_custom_endpoint_error(exc)
-        summary = stopped_reason
-
-    manifest = load_manifest(run_dir)
-    if (manifest.get("last_compile") or {}).get("ok"):
-        stopped_reason = "completed"
-
-    return arrange_coder_artifacts(
-        run_dir,
-        messages=messages,
-        usage=run_usage,
-        summary=summary,
-        stopped_reason=stopped_reason,
-        request_limit=request_limit,
-        tool_calls_limit=None,
-        user_prompt=user_prompt or topic,
-        prompt_index=prompt_index,
-    )
+# ==============================================================================
+# Graph Node Definitions
+# ==============================================================================
 
 
 @dataclass
 class ClassifyNode(BaseNode[AnimationState, None, str]):
+    """Classifies user request into domain subject and verified topic."""
+
     async def run(
         self, ctx: GraphRunContext[AnimationState]
-    ) -> "PlanLectureNode | End[str]":
+    ) -> PlanLectureNode | End[str]:
         classify_error: str | None = None
         try:
             async def _call_classify():
                 return await classifier_agent.run(ctx.state.user_query)
 
-            result = await execute_with_llm_retry(_call_classify, operation_name="Classifier Agent")
+            result = await execute_with_llm_retry(
+                _call_classify, operation_name="Classifier Agent"
+            )
             ctx.state.classification = result.output
         except Exception as exc:
             classify_error = format_custom_endpoint_error(exc)
@@ -199,16 +102,21 @@ class ClassifyNode(BaseNode[AnimationState, None, str]):
 
 @dataclass
 class PlanLectureNode(BaseNode[AnimationState, None, str]):
-    async def run(self, ctx: GraphRunContext[AnimationState]) -> "PlanTeachingScriptNode | End[str]":
+    """Produces the high-level pedagogical outline using manim-composer and manimce-best-practices."""
+
+    async def run(
+        self, ctx: GraphRunContext[AnimationState]
+    ) -> PlanTeachingScriptNode | End[str]:
         plan_error: str | None = None
         classification = ctx.state.classification
         topic = classification.topic if classification else "Math Topic"
         subject = classification.subject if classification else Subject.MATH
+
         try:
             async def _call_planner():
                 planner_prompt = (
                     f"Topic: {topic}\n"
-                    f"Subject: {_subject_str(subject)}\n"
+                    f"Subject: {subject_str(subject)}\n"
                     f"Target Length: {ctx.state.target_length}\n"
                     f"Cinematic: {ctx.state.cinematic}\n\n"
                     "Consult `manim-composer` to craft a clear pedagogical narrative arc, hook, pacing, and aha moment. "
@@ -216,7 +124,9 @@ class PlanLectureNode(BaseNode[AnimationState, None, str]):
                 )
                 return await lecture_planner_agent.run(planner_prompt)
 
-            result = await execute_with_llm_retry(_call_planner, operation_name="Lecture Planner Agent")
+            result = await execute_with_llm_retry(
+                _call_planner, operation_name="Lecture Planner Agent"
+            )
             ctx.state.plan = result.output
         except Exception as exc:
             plan_error = format_custom_endpoint_error(exc)
@@ -234,24 +144,31 @@ class PlanLectureNode(BaseNode[AnimationState, None, str]):
 
 @dataclass
 class PlanTeachingScriptNode(BaseNode[AnimationState, None, str]):
-    async def run(self, ctx: GraphRunContext[AnimationState]) -> "CodeAgent":
+    """Generates sequential narration beats aligned with visual actions."""
+
+    async def run(
+        self, ctx: GraphRunContext[AnimationState]
+    ) -> CodeAgentNode:
         classification = ctx.state.classification
         plan = ctx.state.plan
         if classification is None or plan is None:
-            return CodeAgent()
+            return CodeAgentNode()
+
         try:
             async def _call_teaching_script():
                 return await teaching_script_agent.run(
                     teaching_script_user_prompt(
                         classification.topic,
-                        _subject_str(classification.subject),
+                        subject_str(classification.subject),
                         plan,
                         length=ctx.state.target_length,
                         cinematic=ctx.state.cinematic,
                     )
                 )
 
-            result = await execute_with_llm_retry(_call_teaching_script, operation_name="Teaching Script Agent")
+            result = await execute_with_llm_retry(
+                _call_teaching_script, operation_name="Teaching Script Agent"
+            )
             ctx.state.teaching_script = result.output
         except Exception as exc:
             print(
@@ -261,12 +178,15 @@ class PlanTeachingScriptNode(BaseNode[AnimationState, None, str]):
             )
             ctx.state.teaching_script = None
 
-        return CodeAgent()
+        return CodeAgentNode()
 
 
 @dataclass
-class CodeAgent(BaseNode[AnimationState, None, str]):
+class CodeAgentNode(BaseNode[AnimationState, None, str]):
+    """Synthesizes, compiles, and verifies the final Manim scene code."""
+
     async def run(self, ctx: GraphRunContext[AnimationState]) -> End[str]:
+        assert ctx.state.classification is not None, "Classification required for code agent"
         coder_result = await run_coder_step(
             ctx.state.classification.topic,
             ctx.state.classification.subject,
@@ -292,39 +212,51 @@ class CodeAgent(BaseNode[AnimationState, None, str]):
         return End(end_summary)
 
 
-g = GraphBuilder(
+# Backward compatibility alias
+CodeAgent = CodeAgentNode
+
+
+# ==============================================================================
+# Graph Builder & Assembly
+# ==============================================================================
+
+_builder = GraphBuilder(
     state_type=AnimationState, output_type=str, name="Manim Animation Graph"
 )
 
 
-@g.step
-async def start(state: AnimationState) -> ClassifyNode:
+@_builder.step
+async def _start(state: AnimationState) -> ClassifyNode:
     return ClassifyNode()
 
 
-g.add(
-    g.node(ClassifyNode),
-    g.node(PlanLectureNode),
-    g.node(PlanTeachingScriptNode),
-    g.node(CodeAgent),
-    g.edge_from(g.start_node).to(start),
+_builder.add(
+    _builder.node(ClassifyNode),
+    _builder.node(PlanLectureNode),
+    _builder.node(PlanTeachingScriptNode),
+    _builder.node(CodeAgentNode),
+    _builder.edge_from(_builder.start_node).to(_start),
 )
 
-animation_graph = g.build()
+animation_graph = _builder.build()
 
-import asyncio
+
+# ==============================================================================
+# Storage & Execution Helpers
+# ==============================================================================
 
 
 def _find_compiled_video(run_dir: str | None) -> Path | None:
+    """Locate the compiled MP4 in the run directory, inspecting manifest.json first."""
     if not run_dir:
         return None
     root = Path(run_dir)
     if not root.is_dir():
         return None
+
     manifest_path = root / "manifest.json"
     if manifest_path.is_file():
         try:
-            import json
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             last = manifest.get("last_compile") or {}
             candidate = last.get("video_path") or manifest.get("video_path")
@@ -332,10 +264,56 @@ def _find_compiled_video(run_dir: str | None) -> Path | None:
                 return Path(candidate)
         except Exception:
             pass
+
     for path in root.rglob("*.mp4"):
         if path.is_file() and "partial_movie_files" not in path.parts:
             return path
     return None
+
+
+def _upload_pipeline_artifacts(
+    result: dict[str, Any], coder_result: CoderRunResult
+) -> None:
+    """Upload video and Python scene files to MinIO/S3 if configured."""
+    if not os.getenv("S3_VIDEO_ENDPOINT"):
+        return
+
+    try:
+        from tools.minio_storage import upload_to_minio
+
+        video_path = _find_compiled_video(coder_result.run_dir)
+        if video_path and video_path.is_file():
+            gen_id = uuid.uuid4()
+            video_key = f"videos/pipeline/{gen_id}.mp4"
+            code_key = f"videos/pipeline/{gen_id}.py"
+
+            video_url = upload_to_minio(
+                video_path, object_key=video_key, content_type="video/mp4"
+            )
+            result["minio_url"] = video_url
+            result["minio_key"] = video_key
+            print(f"[minio] Uploaded video to {video_url}", file=sys.stderr, flush=True)
+
+            if coder_result.scene_file:
+                scene_path = Path(coder_result.run_dir) / coder_result.scene_file
+                if scene_path.is_file():
+                    code_url = upload_to_minio(
+                        scene_path, object_key=code_key, content_type="text/x-python"
+                    )
+                    result["code_minio_url"] = code_url
+                    result["code_minio_key"] = code_key
+                    print(
+                        f"[minio] Uploaded scene code to {code_url}",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+    except Exception as exc:
+        print(f"[minio] Upload failed: {exc}", file=sys.stderr, flush=True)
+
+
+# ==============================================================================
+# Pipeline Entry Point
+# ==============================================================================
 
 
 async def run_pipeline(
@@ -346,9 +324,8 @@ async def run_pipeline(
     prompt_index: int | None = None,
     mode: str = "keyframe",
     output_dir: str | Path | None = None,
-) -> dict:
-
-    # Integrated Keyframe Producer-Consumer Engine for UI Animate Mode
+) -> dict[str, Any]:
+    """Execute the animation pipeline, routing between keyframe engine and graph."""
     if mode == "keyframe":
         from keyframe_engine import run_producer_consumer
 
@@ -370,7 +347,6 @@ async def run_pipeline(
             res["scene_path"] = res["scene_file"]
         return res
 
-    from cinematic_director import is_cinematic_mode
     cinematic_active = is_cinematic_mode(user_query, flag=cinematic)
     state = AnimationState(
         user_query=user_query,
@@ -379,7 +355,7 @@ async def run_pipeline(
         prompt_index=prompt_index,
         animation_mode=mode,
     )
-    # Prefer iter so UI/Celery can stream ``-> {node_id}`` on stderr.
+
     summary = ""
     try:
         async with animation_graph.iter(state=state) as run:
@@ -391,38 +367,14 @@ async def run_pipeline(
                     print(f"-> {task.node_id}", file=sys.stderr, flush=True)
     except Exception as exc:
         raise RuntimeError(format_custom_endpoint_error(exc)) from exc
+
     if state.coder_result is not None:
         result = state.coder_result.model_dump(mode="json")
         if prompt_index is not None:
             result["prompt_index"] = prompt_index
-
-        import os
-        if os.getenv("S3_VIDEO_ENDPOINT"):
-            try:
-                import uuid
-                from tools.minio_storage import upload_to_minio
-                video_path = _find_compiled_video(state.coder_result.run_dir)
-                if video_path and video_path.is_file():
-                    gen_id = uuid.uuid4()
-                    video_key = f"videos/pipeline/{gen_id}.mp4"
-                    code_key = f"videos/pipeline/{gen_id}.py"
-
-                    video_url = upload_to_minio(video_path, object_key=video_key, content_type="video/mp4")
-                    result["minio_url"] = video_url
-                    result["minio_key"] = video_key
-                    print(f"[minio] Uploaded video to {video_url}", file=sys.stderr, flush=True)
-
-                    if state.coder_result.scene_file:
-                        scene_path = Path(state.coder_result.run_dir) / state.coder_result.scene_file
-                        if scene_path.is_file():
-                            code_url = upload_to_minio(scene_path, object_key=code_key, content_type="text/x-python")
-                            result["code_minio_url"] = code_url
-                            result["code_minio_key"] = code_key
-                            print(f"[minio] Uploaded scene code to {code_url}", file=sys.stderr, flush=True)
-            except Exception as e:
-                print(f"[minio] Upload failed: {e}", file=sys.stderr, flush=True)
-
+        _upload_pipeline_artifacts(result, state.coder_result)
         return result
+
     return {
         "result": summary,
         "stopped_reason": "classification_failed_or_unsupported",
@@ -431,17 +383,21 @@ async def run_pipeline(
     }
 
 
-from pydantic import BaseModel
+# ==============================================================================
+# Interactive Pydantic AI Agent Interface
+# ==============================================================================
+
 
 class PipelineResult(BaseModel):
     result: str
     stopped_reason: str
     compile_ok: bool
-    scene_name: str | None
-    run_dir: str | None
-    audio: int | None
-    error: str | None
-    message: str | None
+    scene_name: str | None = None
+    run_dir: str | None = None
+    audio: int | None = None
+    error: str | None = None
+    message: str | None = None
+
 
 animation_agent = Agent(
     model_for_agent("animation"),
@@ -457,10 +413,12 @@ animation_agent = Agent(
 
 
 @animation_agent.tool
-async def generate_educational_animation(ctx: RunContext, user_query: str) -> PipelineResult:
+async def generate_educational_animation(
+    ctx: RunContext, user_query: str
+) -> PipelineResult:
     """Execute the full animation pipeline (classify, plan, script, code, compile) for the user's query."""
     result = await run_pipeline(user_query)
-    
+
     return PipelineResult(
         result=result.get("result", result.get("summary", "")),
         stopped_reason=result.get("stopped_reason", "unknown"),
