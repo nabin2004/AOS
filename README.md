@@ -24,6 +24,7 @@ docker compose up -d --build
 ```
 
 📖 **For full deployment details, architecture diagrams, and service management, see the comprehensive [DOCKER_GUIDE.md](DOCKER_GUIDE.md).**
+📖 **For deep architectural documentation on the Agentic Video Pipelines (UI Animate, Producer-Consumer, `agent_graph.py`), see [docs/agentic_pipeline.md](docs/agentic_pipeline.md).**
 
 ---
 

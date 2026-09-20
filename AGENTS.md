@@ -56,6 +56,9 @@ AOS/
 
 ## 3. Core Agent Pipeline Workflow
 
+> [!TIP]
+> For an exhaustive architectural breakdown with Mermaid diagrams covering the UI Animate button, Keyframe Producer-Consumer engine, `agent_graph.py`, and EduClaw streaming queue, refer to [docs/agentic_pipeline.md](docs/agentic_pipeline.md).
+
 ### Graph Structure (`apps/agents/graph.py`)
 The primary lecture generation flow follows a structured `pydantic_graph`:
 1. **Classify**: Determines subject area, difficulty, prerequisites, and target audience.
