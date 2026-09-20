@@ -1,0 +1,4 @@
+{"video_generation_id": "test_lifecycle_vid_99", "accepted_revision": 2, "rating": 5, "notes": "Looks perfect!", "total_revisions": 2, "accepted_at": "2026-09-20T19:00:25.523253+00:00", "final_code": "class Scene(Scene): ... # fixed", "prompt": "Explain Euler's identity"}
+{"video_generation_id": "api_test_vid_123", "accepted_revision": 1, "rating": 5, "notes": null, "total_revisions": 1, "accepted_at": "2026-09-20T19:00:25.557229+00:00", "final_code": null, "prompt": null}
+{"video_generation_id": "test_lifecycle_vid_99", "accepted_revision": 2, "rating": 5, "notes": "Looks perfect!", "total_revisions": 2, "accepted_at": "2026-09-20T19:23:09.187798+00:00", "final_code": "class Scene(Scene): ... # fixed", "prompt": "Explain Euler's identity"}
+{"video_generation_id": "api_test_vid_123", "accepted_revision": 1, "rating": 5, "notes": null, "total_revisions": 1, "accepted_at": "2026-09-20T19:23:09.222506+00:00", "final_code": null, "prompt": null}
