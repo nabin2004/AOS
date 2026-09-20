@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import type { ChatMessage, ChatMessageFile } from "@/types";
 import { ToolCallCard } from "./tool-call-card";
@@ -20,11 +20,15 @@ import { RESEARCH_TOOL_NAMES } from "./research-panel";
 import { ManimStudioModal } from "./manim-studio-modal";
 
 function isContentAnimatable(text: string): boolean {
-  if (!text) return false;
+  if (!text || text.trim().length < 15) return false;
   const lower = text.toLowerCase();
-  const hasMathSymbol = /\$\$|\$|\\frac|\\sum|\\int|\\begin\{|f\(x\)|f'\(|f''\(|e\^|\\partial/.test(text);
-  const hasKeyConcepts = /taylor|maclaurin|fourier|euler|calculus|derivative|integral|matrix|eigen|neural network|algorithm|sorting|binary search|vector/.test(lower);
-  return hasMathSymbol || hasKeyConcepts;
+  if (/^(hello|hi|hey|good morning|how can i assist)[\s!.,?]*$/i.test(text.trim())) {
+    return false;
+  }
+  const hasMath = /\$\$|\$|\\frac|\\partial|\\sigma|\\rho|\\beta|\\theta|\\alpha|\\sum|\\int|\\lim|\/dt|\/dx|d[xyz]\/dt|f\([a-z]\)|=|\b\d+\s*[\+\-\*\/]\s*\d+\b/i.test(text);
+  const hasConcepts = /lorenz|attractor|chaos|butterfly|differential|equation|formula|theorem|taylor|maclaurin|fourier|euler|calculus|derivative|integral|matrix|eigen|vector|coordinate|trajectory|dimension|algorithm|neural|graph|tree|sorting|search|physics|geometry|algebra|probability|statistics|quantum|mechanics|simulation|wave|solution|system/i.test(lower);
+  const isExplanation = text.trim().length > 40;
+  return hasMath || hasConcepts || isExplanation;
 }
 
 function ThinkingBlock({ text, open, isStreaming }: { text: string; open: boolean; isStreaming: boolean }) {
@@ -130,15 +134,29 @@ export function MessageItem({ message, groupPosition, onRegenerate }: MessageIte
   const { user: authUser, avatarVersion } = useAuthStore();
   const isGrouped = groupPosition && groupPosition !== "single";
 
+  const rawText =
+    message.content ||
+    message.parts
+      ?.filter((p) => p.type === "text" && p.content)
+      .map((p) => p.content)
+      .join("\n") ||
+    "";
+
   const [isStudioOpen, setIsStudioOpen] = useState(false);
   const [isEditingKnowledge, setIsEditingKnowledge] = useState(false);
-  const [editedKnowledge, setEditedKnowledge] = useState(message.content || "");
+  const [editedKnowledge, setEditedKnowledge] = useState(rawText);
+
+  useEffect(() => {
+    if (!isEditingKnowledge && rawText) {
+      setEditedKnowledge(rawText);
+    }
+  }, [rawText, isEditingKnowledge]);
 
   const canAnimate =
     !isUser &&
     !message.isStreaming &&
-    Boolean(message.content) &&
-    isContentAnimatable(message.content);
+    Boolean(rawText.trim()) &&
+    isContentAnimatable(rawText);
 
   const sources = !isUser ? extractSources(message) : [];
   const hasSources = sources.length > 0 && !message.isStreaming;
@@ -492,7 +510,7 @@ export function MessageItem({ message, groupPosition, onRegenerate }: MessageIte
         <ManimStudioModal
           isOpen={isStudioOpen}
           onClose={() => setIsStudioOpen(false)}
-          initialKnowledge={editedKnowledge || message.content || ""}
+          initialKnowledge={editedKnowledge || rawText || message.content || ""}
           conversationId={message.conversationId}
         />
       </div>
