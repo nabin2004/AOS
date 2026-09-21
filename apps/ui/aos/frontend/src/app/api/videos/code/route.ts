@@ -8,10 +8,11 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   try {
     const accessToken = request.cookies.get("access_token")?.value;
+    const authorization = request.headers.get("authorization");
     const body = await request.json();
     const data = await backendFetch("/api/v1/videos/code", {
       method: "POST",
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      headers: authorization ? { Authorization: authorization } : accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
       body: JSON.stringify(body),
     });
     return NextResponse.json(data);

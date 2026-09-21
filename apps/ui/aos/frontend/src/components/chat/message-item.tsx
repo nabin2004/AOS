@@ -7,7 +7,7 @@ import { ToolCallCard } from "./tool-call-card";
 import { MarkdownContent } from "./markdown-content";
 import { CopyButton } from "./copy-button";
 import { RatingButtons } from "./rating-buttons";
-import { useChatStore, useFilePreviewStore, useDebugPanelStore } from "@/stores";
+import { useAnimationSessionStore, useChatStore, useFilePreviewStore, useDebugPanelStore } from "@/stores";
 import { useSourcesPanelStore } from "@/stores/sources-panel-store";
 import { Bot, Bug, Clapperboard, Edit3, FileText, Globe, Paperclip, RefreshCw, User } from "lucide-react";
 import Image from "next/image";
@@ -129,6 +129,8 @@ interface MessageItemProps {
 export function MessageItem({ message, groupPosition, onRegenerate }: MessageItemProps) {
   const isUser = message.role === "user";
   const updateMessage = useChatStore((state) => state.updateMessage);
+  const messages = useChatStore((state) => state.messages);
+  const startAnimationSession = useAnimationSessionStore((state) => state.startSession);
   const openPreview = useFilePreviewStore((s) => s.open);
   const openSources = useSourcesPanelStore((s) => s.open);
   const { user: authUser, avatarVersion } = useAuthStore();
@@ -145,6 +147,13 @@ export function MessageItem({ message, groupPosition, onRegenerate }: MessageIte
   const [isStudioOpen, setIsStudioOpen] = useState(false);
   const [isEditingKnowledge, setIsEditingKnowledge] = useState(false);
   const [editedKnowledge, setEditedKnowledge] = useState(rawText);
+  const sourcePrompt = (() => {
+    const messageIndex = messages.findIndex((item) => item.id === message.id);
+    for (let index = messageIndex - 1; index >= 0; index -= 1) {
+      if (messages[index]?.role === "user") return messages[index]?.content;
+    }
+    return undefined;
+  })();
 
   useEffect(() => {
     if (!isEditingKnowledge && rawText) {
@@ -487,12 +496,20 @@ export function MessageItem({ message, groupPosition, onRegenerate }: MessageIte
           <div className="mt-2.5 flex flex-wrap items-center gap-2 pt-2 border-t border-border/40">
             <button
               type="button"
-              onClick={() => setIsStudioOpen(true)}
+              onClick={() => {
+                startAnimationSession({
+                  conversationId: message.conversationId,
+                  sourceMessageId: message.id,
+                  sourcePrompt,
+                  sourceText: editedKnowledge || rawText || message.content || "",
+                });
+                setIsStudioOpen(true);
+              }}
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/30 px-3.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition-all shadow-sm hover:shadow"
-              title="Open interactive Manim Studio to plan, synthesize code, and render video"
+              title="Turn this explanation into an animation"
             >
               <Clapperboard className="h-3.5 w-3.5" />
-              <span>Animate with Manim</span>
+              <span>Animate this explanation</span>
             </button>
             <button
               type="button"
@@ -512,6 +529,8 @@ export function MessageItem({ message, groupPosition, onRegenerate }: MessageIte
           onClose={() => setIsStudioOpen(false)}
           initialKnowledge={editedKnowledge || rawText || message.content || ""}
           conversationId={message.conversationId}
+          sourceMessageId={message.id}
+          sourcePrompt={sourcePrompt}
         />
       </div>
     </div>

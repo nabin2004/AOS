@@ -15,7 +15,7 @@ import { SubagentFeed } from "./subagent-feed";
 import { SubagentPanel } from "./subagent-panel";
 import { ToolApprovalDialog } from "./tool-approval-dialog";
 import { QuestionPrompt } from "@/components/ui";
-import { Bug, Film, Layers } from "lucide-react";
+import { Bug, Layers } from "lucide-react";
 import type { PendingApproval, AskUserQuestion, AskUserAnswer, Decision } from "@/types";
 import { useConversationStore, useChatStore, useChatModeStore, useDebugPanelStore } from "@/stores";
 import { useResearchStore } from "@/stores";
@@ -472,32 +472,6 @@ function ChatUI({
                   )}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setVideoMode(videoMode === "animate" ? "off" : "animate")}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[11px] font-medium tracking-wider transition-all",
-                    videoMode === "animate"
-                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25 ring-1 ring-primary/30"
-                      : "bg-foreground/5 text-foreground/60 hover:bg-foreground/10 hover:text-foreground",
-                  )}
-                  title={
-                    videoMode === "animate"
-                      ? "Animate agent graph active (agent_graph.py multi-agent pipeline). Automatically returns to simple conversation mode after sending."
-                      : "Click to run Manim animation agent graph (1-shot; reverts to conversation mode after sending)"
-                  }
-                >
-                  <Film className="h-3.5 w-3.5" />
-                  <span>Animate</span>
-                  {videoMode === "animate" ? (
-                    <>
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="text-[9px] font-semibold opacity-90 uppercase">1-shot</span>
-                    </>
-                  ) : (
-                    <span className="text-[9px] opacity-40 uppercase">off</span>
-                  )}
-                </button>
               </div>
               <div className="flex items-center gap-1.5">
                 <button

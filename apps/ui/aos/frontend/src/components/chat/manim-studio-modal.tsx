@@ -36,7 +36,9 @@ import { AppVideoPlayer } from "@/components/media/video-player";
 import { CritiqueDeck } from "@/components/video/critique-deck";
 import { CritiqueOverlay } from "@/components/video/critique-overlay";
 import { useCritiqueStore } from "@/stores";
+import { useAuthStore } from "@/stores";
 import { useLlmProviderStore } from "@/stores/llm-provider-store";
+import { useAnimationSessionStore, type AnimationEmphasis } from "@/stores/animation-session-store";
 
 interface PlannedMobject {
   type: string;
@@ -55,19 +57,19 @@ interface PlannedScene {
 
 function parseScenesPlan(markdown: string) {
   const titleMatch = markdown.match(/^#\s+(.+)$/m);
-  const title = titleMatch ? titleMatch[1].trim() : "Pedagogical Animation";
+  const title = titleMatch?.[1]?.trim() || "Pedagogical Animation";
 
   const hookMatch = markdown.match(/\*\*Hook\*\*:\s*([^\n]+)/i);
-  const hook = hookMatch ? hookMatch[1].trim() : "";
+  const hook = hookMatch?.[1]?.trim() || "";
 
   const insightMatch = markdown.match(/\*\*Key Insight\*\*:\s*([^\n]+)/i);
-  const keyInsight = insightMatch ? insightMatch[1].trim() : "";
+  const keyInsight = insightMatch?.[1]?.trim() || "";
 
   const sceneBlocks = markdown.split(/##\s+Scene\s+(\d+)[:\s]+([^\n]+)/i);
   const scenes: PlannedScene[] = [];
 
   for (let i = 1; i < sceneBlocks.length; i += 3) {
-    const num = parseInt(sceneBlocks[i], 10) || Math.floor(i / 3) + 1;
+    const num = parseInt(sceneBlocks[i] || "", 10) || Math.floor(i / 3) + 1;
     const sceneTitle = sceneBlocks[i + 1]?.trim() || `Scene ${num}`;
     const content = sceneBlocks[i + 2] || "";
 
@@ -77,7 +79,7 @@ function parseScenesPlan(markdown: string) {
     const visualElementsMatch = content.match(/###\s+Visual Elements([\s\S]+?)(?=###|$)/i);
     const mobjects: PlannedMobject[] = [];
     if (visualElementsMatch) {
-      const lines = visualElementsMatch[1].split("\n").filter((l) => l.trim().startsWith("-") || l.trim().startsWith("*"));
+      const lines = (visualElementsMatch[1] || "").split("\n").filter((l) => l.trim().startsWith("-") || l.trim().startsWith("*"));
       for (const line of lines) {
         const clean = line.replace(/^[-*]\s*/, "").trim();
         let type = "Mobject";
@@ -99,7 +101,7 @@ function parseScenesPlan(markdown: string) {
     const actionsMatch = content.match(/###\s+Content([\s\S]+?)(?=###|$)/i);
     const actions: string[] = [];
     if (actionsMatch) {
-      const lines = actionsMatch[1].split("\n").filter((l) => /^\d+\.|\-|\*/.test(l.trim()));
+      const lines = (actionsMatch[1] || "").split("\n").filter((l) => /^\d+\.|\-|\*/.test(l.trim()));
       for (const line of lines) {
         actions.push(line.replace(/^\d+\.\s*|[-*]\s*/, "").trim());
       }
@@ -108,8 +110,8 @@ function parseScenesPlan(markdown: string) {
     scenes.push({
       number: num,
       title: sceneTitle,
-      duration: durationMatch ? durationMatch[1].trim() : "~10s",
-      purpose: purposeMatch ? purposeMatch[1].trim() : "Conceptual demonstration",
+      duration: durationMatch?.[1]?.trim() || "~10s",
+      purpose: purposeMatch?.[1]?.trim() || "Conceptual demonstration",
       mobjects: mobjects.length > 0 ? mobjects : [
         { type: "Text", name: "Scene Title", detail: `Text("${sceneTitle}")` },
         { type: "MathTex", name: "Core Equation", detail: "MathTex(r'...')" },
@@ -133,6 +135,8 @@ interface ManimStudioModalProps {
   onClose: () => void;
   initialKnowledge: string;
   conversationId?: string;
+  sourceMessageId: string;
+  sourcePrompt?: string;
 }
 
 type StudioStage = "plan" | "code" | "render" | "review";
@@ -150,6 +154,8 @@ export function ManimStudioModal({
   onClose,
   initialKnowledge,
   conversationId,
+  sourceMessageId,
+  sourcePrompt,
 }: ManimStudioModalProps) {
   const [currentStage, setCurrentStage] = useState<StudioStage>("plan");
   
@@ -162,6 +168,11 @@ export function ManimStudioModal({
   const [isEditingPlan, setIsEditingPlan] = useState(false);
 
   const [planViewMode, setPlanViewMode] = useState<"visual" | "markdown">("visual");
+  const activeSession = useAnimationSessionStore((state) => state.activeSession);
+  const updateSession = useAnimationSessionStore((state) => state.updateSession);
+  const startSession = useAnimationSessionStore((state) => state.startSession);
+  const emphasis = activeSession?.emphasis ?? "ai";
+  const additionalInstructions = activeSession?.instructions ?? "";
 
   const parsedPlan = useMemo(() => {
     return parseScenesPlan(planMarkdown);
@@ -203,6 +214,7 @@ export function ManimStudioModal({
   const [videoStreamUrl, setVideoStreamUrl] = useState<string | null>(null);
 
   const { baseUrl, apiKey, modelId } = useLlmProviderStore();
+  const accessToken = useAuthStore((state) => state.accessToken);
   const critiqueModeActive = useCritiqueStore((s) => s.critiqueModeActive);
 
   // Track the last knowledge we generated a plan for so we can detect a new query
@@ -215,7 +227,11 @@ export function ManimStudioModal({
     try {
       const resp = await fetch("/api/videos/plan", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({
           text: sourceText,
           model_name: modelId,
@@ -226,6 +242,7 @@ export function ManimStudioModal({
       if (resp.ok) {
         const data = await resp.json();
         setPlanMarkdown(data.plan || "");
+        updateSession({ composerPlan: data.plan || "", stage: "composer" });
       } else {
         const errData = await resp.json().catch(() => null);
         const errMsg = errData?.detail || `Plan generation failed (HTTP ${resp.status})`;
@@ -237,7 +254,23 @@ export function ManimStudioModal({
     } finally {
       setIsGeneratingPlan(false);
     }
-  }, [modelId, baseUrl, apiKey]);
+  }, [modelId, baseUrl, apiKey, accessToken, updateSession]);
+
+  const handleCreatePlan = useCallback(() => {
+    const emphasisInstruction: Record<AnimationEmphasis, string> = {
+      concept: "Emphasize a clear conceptual explanation for a new learner.",
+      geometric: "Emphasize geometric or visual intuition wherever possible.",
+      derivation: "Emphasize the mathematical derivation and its steps.",
+      ai: "Choose the strongest pedagogical visual emphasis for this explanation.",
+    };
+    const composerContext = [
+      sourcePrompt ? `Original question: ${sourcePrompt}` : "",
+      `Assistant explanation:\n${knowledgeText}`,
+      `Animation direction: ${emphasisInstruction[emphasis]}`,
+      additionalInstructions ? `Additional instructions: ${additionalInstructions}` : "",
+    ].filter(Boolean).join("\n\n");
+    handleGeneratePlan(composerContext);
+  }, [additionalInstructions, emphasis, handleGeneratePlan, knowledgeText, sourcePrompt]);
 
   const handleSynthesizeCode = useCallback(async () => {
     setIsSynthesizingCode(true);
@@ -245,7 +278,11 @@ export function ManimStudioModal({
     try {
       const resp = await fetch("/api/videos/code", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({
           plan: planMarkdown,
           knowledge_text: knowledgeText,
@@ -257,6 +294,7 @@ export function ManimStudioModal({
       if (resp.ok) {
         const data = await resp.json();
         setSceneCode(data.code || "");
+        updateSession({ generatedCode: data.code || "", stage: "coding" });
         if (data.scene_name) setSceneName(data.scene_name);
         setCurrentStage("code");
       } else {
@@ -270,7 +308,7 @@ export function ManimStudioModal({
     } finally {
       setIsSynthesizingCode(false);
     }
-  }, [planMarkdown, knowledgeText, modelId, baseUrl, apiKey]);
+  }, [planMarkdown, knowledgeText, modelId, baseUrl, apiKey, accessToken, updateSession]);
 
   // Reset or initialize when opened, or when initialKnowledge changes
   useEffect(() => {
@@ -291,9 +329,16 @@ export function ManimStudioModal({
       setVideoStreamUrl(null);
       setIsEditingPlan(false);
       setIsEditingCode(false);
-      handleGeneratePlan(initialKnowledge);
+      if (!activeSession || activeSession.sourceMessageId !== sourceMessageId) {
+        startSession({
+          conversationId,
+          sourceMessageId,
+          sourcePrompt,
+          sourceText: initialKnowledge,
+        });
+      }
     }
-  }, [isOpen, initialKnowledge, handleGeneratePlan]);
+  }, [isOpen, initialKnowledge, activeSession, conversationId, sourceMessageId, sourcePrompt, startSession]);
 
   const handleRenderVideo = async () => {
     setIsRendering(true);
@@ -302,7 +347,11 @@ export function ManimStudioModal({
     try {
       const resp = await fetch("/api/videos/render-custom", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({
           code: sceneCode,
           scene_name: sceneName,
@@ -315,13 +364,15 @@ export function ManimStudioModal({
         const data = await resp.json();
         setVideoGenerationId(data.video_generation_id);
         setVideoStreamUrl(data.stream_url);
+        updateSession({ stage: "review", render: { jobId: data.video_generation_id, videoUrl: data.stream_url } });
         setCurrentStage("review");
       } else {
         const err = await resp.json().catch(() => ({ detail: "Unknown error" }));
         setRenderError(err.detail || "Rendering failed");
       }
-    } catch (e: any) {
-      setRenderError(`Failed to compile & render: ${e.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      setRenderError(`Failed to compile & render: ${message}`);
     } finally {
       setIsRendering(false);
     }
@@ -335,7 +386,11 @@ export function ManimStudioModal({
     try {
       const resp = await fetch("/api/videos/code", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({
           plan: `${planMarkdown}\n\n### REPAIR DIRECTIVE (${category.toUpperCase()}):\n${feedback}`,
           knowledge_text: knowledgeText,
@@ -349,8 +404,9 @@ export function ManimStudioModal({
         const data = await resp.json();
         setSceneCode(data.code || "");
       }
-    } catch (e: any) {
-      setRenderError(`Repair code generation failed: ${e.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      setRenderError(`Repair code generation failed: ${message}`);
     } finally {
       setIsSynthesizingCode(false);
     }
@@ -371,7 +427,7 @@ export function ManimStudioModal({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="font-semibold text-sm sm:text-base text-foreground">
-                  Interactive Manim Animation Studio
+                  Animation Composer
                 </h2>
                 <Badge variant="outline" className="text-[10px] uppercase font-mono tracking-wider border-primary/30 text-primary bg-primary/5">
                   Human-In-The-Loop
@@ -470,6 +526,41 @@ export function ManimStudioModal({
           {/* STAGE 1: PLAN (Composer) */}
           {currentStage === "plan" && (
             <div className="space-y-4 max-w-4xl mx-auto">
+              <section className="space-y-4 rounded-2xl border border-primary/25 bg-primary/5 p-4 sm:p-5">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">Source</p>
+                  {sourcePrompt && <p className="mt-1 text-sm font-medium text-foreground">{sourcePrompt}</p>}
+                  <p className="mt-2 max-h-24 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">{knowledgeText}</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-foreground">What should the animation communicate?</p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {([
+                      ["concept", "Explain the concept"],
+                      ["geometric", "Show geometric intuition"],
+                      ["derivation", "Show mathematical derivation"],
+                      ["ai", "Let AI decide"],
+                    ] as const).map(([value, label]) => (
+                      <button key={value} type="button" onClick={() => updateSession({ emphasis: value })}
+                        className={`rounded-lg border px-3 py-2 text-left text-xs font-medium transition-colors ${emphasis === value ? "border-primary bg-background text-primary ring-1 ring-primary/25" : "border-border/60 bg-background/60 text-foreground/75 hover:border-primary/40"}`}>
+                        {emphasis === value ? "●" : "○"} {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <label className="block space-y-1.5">
+                  <span className="text-xs font-medium text-foreground">Additional instructions <span className="font-normal text-muted-foreground">(optional)</span></span>
+                  <textarea value={additionalInstructions} onChange={(event) => updateSession({ instructions: event.target.value })} rows={3}
+                    className="w-full rounded-lg border border-input bg-background p-2.5 text-xs leading-relaxed focus:outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="For example: keep it under 30 seconds and use a graph." />
+                </label>
+                <div className="flex justify-end">
+                  <Button onClick={handleCreatePlan} disabled={isGeneratingPlan} className="gap-2">
+                    {isGeneratingPlan ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                    Create Animation Plan <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </section>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/40">
                 <div>
                   <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
@@ -477,7 +568,7 @@ export function ManimStudioModal({
                     Manim Composer Visual Plan
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Plan pedagogical scenes, mobjects (LaTeX formulas, shapes, text), and visual pacing.
+                    Plan pedagogical scenes, mobjects.
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -522,7 +613,7 @@ export function ManimStudioModal({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleGeneratePlan(knowledgeText)}
+                    onClick={handleCreatePlan}
                     disabled={isGeneratingPlan}
                     className="h-8 text-xs gap-1 text-muted-foreground hover:text-foreground"
                     title="Regenerate Plan with Composer"
@@ -1001,9 +1092,6 @@ export function ManimStudioModal({
                   <div className="relative aspect-video w-full">
                     <AppVideoPlayer
                       src={videoStreamUrl}
-                      poster={undefined}
-                      controls
-                      autoPlay={false}
                       className="h-full w-full"
                     />
                     {critiqueModeActive && videoGenerationId && (

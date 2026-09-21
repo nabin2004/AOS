@@ -509,12 +509,11 @@ function SettingsPanel({
             Video generation
           </span>
         </div>
-        <div className="grid grid-cols-5 gap-1">
+        <div className="grid grid-cols-4 gap-1">
           {(
             [
               { value: "off", label: "Off", hint: "Simple conversation mode" },
               { value: "keyframe", label: "Keyframe", hint: "Keyframe Producer-Consumer engine (1-shot)" },
-              { value: "animate", label: "Animate", hint: "agent_graph.py multi-agent pipeline (1-shot)" },
               { value: "teaching", label: "Teaching", hint: "Visual anchor + extended narration (1-shot)" },
               { value: "lecture", label: "Lecture", hint: "Full IR + assemble (1-shot)" },
             ] as const
