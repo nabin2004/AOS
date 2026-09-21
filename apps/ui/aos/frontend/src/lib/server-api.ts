@@ -45,14 +45,32 @@ export async function backendFetch<T>(endpoint: string, options: RequestOptions 
     headers["Content-Type"] = "application/json";
   }
 
-  const response = await fetch(url, {
-    ...fetchOptions,
-    headers: {
-      ...headers,
-      ...fetchOptions.headers,
-    },
-    body,
-  });
+  // Set a hard timeout slightly under the Next.js maxDuration (120 s) so we
+  // get a meaningful error message rather than a platform-level timeout kill.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 115_000);
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...fetchOptions,
+      headers: {
+        ...headers,
+        ...fetchOptions.headers,
+      },
+      body,
+      signal: controller.signal,
+    });
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new BackendApiError(504, "Gateway Timeout", {
+        detail: "The LLM generation request timed out after 115 seconds.",
+      });
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     let errorData;

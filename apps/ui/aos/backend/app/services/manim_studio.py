@@ -41,6 +41,20 @@ from app.services.video_storage import get_video_storage, video_object_key, code
 
 logger = logging.getLogger(__name__)
 
+# ── LLM generation limits ────────────────────────────────────────────────────
+# Max output tokens the LLM is allowed to produce. 8 k covers even complex
+# multi-scene Manim scripts with plenty of headroom.
+MANIM_MAX_OUTPUT_TOKENS: int = 8_000
+
+# Hard cap on the number of characters we forward as "knowledge_text" or
+# "plan" context.  4 000 chars ≈ ~1 000 tokens — keeps the combined prompt
+# well under the typical 128 k context window while leaving ~8 k for output.
+MANIM_MAX_CONTEXT_CHARS: int = 4_000
+
+# How many times to retry on transient HTTP errors (429 rate-limit, 503
+# overload) before giving up.  Each attempt waits 2^attempt seconds.
+LLM_MAX_RETRIES: int = 3
+
 # Heuristic patterns indicating mathematical or scientific content suitable for Manim
 MATH_PATTERNS = [
     r"\$\$[\s\S]+?\$\$",  # Display math
@@ -155,32 +169,58 @@ async def call_llm(
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.3,
-        "max_tokens": 6000,
+        "max_tokens": MANIM_MAX_OUTPUT_TOKENS,
     }
 
-    try:
-        async with httpx.AsyncClient(timeout=90.0) as client:
-            resp = await client.post(url, headers=headers, json=payload)
+    last_exc: Exception | None = None
+    for attempt in range(LLM_MAX_RETRIES):
+        try:
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                resp = await client.post(url, headers=headers, json=payload)
+
             if resp.status_code == 200:
                 data = resp.json()
-                content = data["choices"][0]["message"]["content"]
-                # Detect mid-generation truncation (finish_reason != "stop")
-                finish_reason = data.get("choices", [{}])[0].get("finish_reason", "stop")
-                if finish_reason not in ("stop", "end_turn", None) and finish_reason != "stop":
+                choices = data.get("choices") or []
+                if not choices:
+                    raise RuntimeError("LLM returned no choices in response")
+                content = choices[0]["message"]["content"]
+                # Warn if the model stopped early due to token budget exhaustion
+                finish_reason = choices[0].get("finish_reason", "stop")
+                if finish_reason == "length":
                     logger.warning(
-                        "LLM response was truncated (finish_reason=%s). Consider increasing max_tokens.",
-                        finish_reason,
+                        "LLM output was truncated (finish_reason=length). "
+                        "Response may be incomplete. Consider raising MANIM_MAX_OUTPUT_TOKENS."
                     )
                 return content.strip()
-            else:
-                error_body = resp.text[:500]
-                logger.warning("LLM call failed with HTTP %s: %s", resp.status_code, error_body)
-                raise RuntimeError(f"LLM HTTP {resp.status_code}: {error_body}")
-    except RuntimeError:
-        raise
-    except Exception as exc:
-        logger.warning("Error invoking LLM (%s): %s", url, exc)
-        raise RuntimeError(f"LLM network error: {exc}") from exc
+
+            # Retryable server-side errors
+            if resp.status_code in (429, 500, 502, 503, 504):
+                wait = 2 ** attempt
+                logger.warning(
+                    "LLM HTTP %s (attempt %d/%d); retrying in %ds — %s",
+                    resp.status_code, attempt + 1, LLM_MAX_RETRIES, wait,
+                    resp.text[:200],
+                )
+                await asyncio.sleep(wait)
+                continue
+
+            # Non-retryable client error (4xx except 429)
+            error_body = resp.text[:500]
+            logger.error("LLM call failed (non-retryable) HTTP %s: %s", resp.status_code, error_body)
+            raise RuntimeError(f"LLM HTTP {resp.status_code}: {error_body}")
+
+        except RuntimeError:
+            raise
+        except Exception as exc:
+            last_exc = exc
+            wait = 2 ** attempt
+            logger.warning(
+                "LLM network error (attempt %d/%d): %s; retrying in %ds",
+                attempt + 1, LLM_MAX_RETRIES, exc, wait,
+            )
+            await asyncio.sleep(wait)
+
+    raise RuntimeError(f"LLM call failed after {LLM_MAX_RETRIES} attempts: {last_exc}")
 
 
 COMPOSER_SYSTEM_PROMPT = """\
@@ -307,7 +347,16 @@ async def compose_plan_service(
     classification = classify_text_for_manim(text)
     topic = classification.topic or "Mathematical Concept"
 
-    user_prompt = f"Educational Content:\n{text}\n\n"
+    # Guard: truncate unbounded knowledge text so it doesn't overflow context window
+    capped_text = text[:MANIM_MAX_CONTEXT_CHARS]
+    if len(text) > MANIM_MAX_CONTEXT_CHARS:
+        capped_text += "\n\n[... content truncated for context window ...]"
+        logger.info(
+            "compose_plan: knowledge_text truncated from %d to %d chars",
+            len(text), MANIM_MAX_CONTEXT_CHARS,
+        )
+
+    user_prompt = f"Educational Content:\n{capped_text}\n\n"
     if hints:
         user_prompt += f"User specific visual preferences / hints:\n{hints}\n\n"
     user_prompt += f"Please construct a comprehensive scenes.md visual plan for Manim focusing on topic '{topic}'."
@@ -340,8 +389,8 @@ Your job is to synthesize complete, bug-free, beautifully styled Python code usi
 
 CRITICAL MANIM RULES:
 1. ONLY import from manim: `from manim import *`. Do not import nonexistent packages.
-2. Define a single main Scene class inheriting from `Scene`, e.g.:
-   `class TaylorFormulaScene(Scene):`
+2. Name your Scene class after the topic in the plan (e.g. `class ExponentialEScene(Scene):`).
+   NEVER name it TaylorFormulaScene unless the topic is literally Taylor's Formula.
 3. Layout & Positioning (Crucial to avoid visual collision):
    - Camera frame is 16:9: width=14.22, height=8.0 (X from -7 to +7, Y from -4 to +4).
    - Place titles at top: `title.to_edge(UP, buff=0.5)`
@@ -350,13 +399,14 @@ CRITICAL MANIM RULES:
    - Never let equations overlap each other! When transitioning to a new step, fade out earlier equations or use `ReplacementTransform`.
 4. LaTeX & Typography:
    - Use raw string syntax `r"..."` for all `MathTex`.
-   - Double backslash LaTeX symbols if needed: e.g. `MathTex(r"f(x) = f(a) + f'(a)(x-a) + \\frac{f''(a)}{2!}(x-a)^2")`.
+   - Double backslash LaTeX symbols: e.g. `MathTex(r"e = \\lim_{n \\to \\infty}\\left(1+\\frac{1}{n}\\right)^n")`.
    - Set readable font sizes: `font_size=36` or `font_size=40` for main equations, `font_size=28` for explanatory notes.
 5. Timing & Animations:
    - Use smooth animations: `Write(...)`, `Create(...)`, `FadeIn(...)`, `Transform(...)`.
    - Add sensible pacing pauses: `self.wait(1.5)` or `self.wait(2)`.
 6. Output Format:
    - Return ONLY the executable python code block, enclosed in ```python ... ```.
+   - The code must be self-contained and render with `manim -ql scene.py <ClassName>`.
 """
 
 
@@ -430,9 +480,26 @@ async def synthesize_code_service(
     api_key: str | None = None,
 ) -> VideoCodeResponse:
     """Generate Manim Community Edition code from the approved visual plan."""
-    user_prompt = f"Approved Visual Plan (scenes.md):\n{plan}\n\n"
+    # Guard: cap plan size — it can be huge if the composer returned a long markdown
+    capped_plan = plan[:MANIM_MAX_CONTEXT_CHARS]
+    if len(plan) > MANIM_MAX_CONTEXT_CHARS:
+        capped_plan += "\n\n[... plan truncated for context window ...]"
+        logger.info("synthesize_code: plan truncated from %d to %d chars", len(plan), MANIM_MAX_CONTEXT_CHARS)
+
+    # Guard: cap knowledge_text separately (combined budget = 2 × MANIM_MAX_CONTEXT_CHARS)
+    capped_knowledge: str | None = None
     if knowledge_text:
-        user_prompt += f"Original Knowledge & Mathematical Formulas:\n{knowledge_text}\n\n"
+        capped_knowledge = knowledge_text[:MANIM_MAX_CONTEXT_CHARS]
+        if len(knowledge_text) > MANIM_MAX_CONTEXT_CHARS:
+            capped_knowledge += "\n\n[... knowledge truncated for context window ...]"
+            logger.info(
+                "synthesize_code: knowledge_text truncated from %d to %d chars",
+                len(knowledge_text), MANIM_MAX_CONTEXT_CHARS,
+            )
+
+    user_prompt = f"Approved Visual Plan (scenes.md):\n{capped_plan}\n\n"
+    if capped_knowledge:
+        user_prompt += f"Original Knowledge & Mathematical Formulas:\n{capped_knowledge}\n\n"
     user_prompt += "Synthesize a complete, elegant Manim Community scene implementing this plan."
 
     llm_error: str | None = None
