@@ -18,7 +18,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, AsyncGenerator, Literal
 from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
@@ -186,6 +186,77 @@ def classify_text_for_manim(text: str) -> VideoClassifyResponse:
     )
 
 
+def _resolve_llm_config(
+    api_key: str | None = None,
+    base_url: str | None = None,
+    model_name: str | None = None,
+) -> tuple[str, str, str]:
+    """Resolve (api_key, endpoint_url, model) with extensive fallback mechanisms."""
+    key = (api_key or "").strip()
+    if not key:
+        key = (
+            getattr(settings, "OPENROUTER_API_KEY", "")
+            or os.getenv("OPENROUTER_API_KEY", "").strip()
+            or os.getenv("AOS_OPENAI_API_KEY", "").strip()
+        )
+    if not key:
+        # Search relative to current file or docker mount
+        for candidate in [
+            Path(__file__).resolve().parents[5] / "apps" / "agents" / ".env",
+            Path("/app/apps/agents/.env"),
+            Path(__file__).resolve().parents[3] / "agents" / ".env",
+            Path("../agents/.env"),
+        ]:
+            if candidate.exists():
+                try:
+                    for line in candidate.read_text(encoding="utf-8").splitlines():
+                        line_str = line.strip()
+                        if line_str.startswith("OPENROUTER_API_KEY="):
+                            key = line_str.split("=", 1)[1].strip().strip('"').strip("'")
+                            break
+                        elif line_str.startswith("AOS_OPENAI_API_KEY="):
+                            key = line_str.split("=", 1)[1].strip().strip('"').strip("'")
+                    if key:
+                        break
+                except Exception:
+                    pass
+
+    custom_base = normalize_endpoint_url(base_url)
+    if not custom_base:
+        env_base = getattr(settings, "AOS_OPENAI_BASE_URL", "") or os.getenv("AOS_OPENAI_BASE_URL", "")
+        if env_base and "modal.direct" not in env_base:
+            custom_base = normalize_endpoint_url(env_base)
+
+    model = (model_name or "").strip()
+    if not model:
+        model = (
+            getattr(settings, "AI_MODEL", "")
+            or os.getenv("AOS_OPENAI_MODEL", "")
+            or os.getenv("AI_MODEL", "")
+        )
+    # Default to free OpenRouter model if unset or modal offline model
+    if not model or model == "nabin2004/AOS-qwen3-8b-grpo":
+        model = "nex-agi/nex-n2.5-pro:free"
+
+    if custom_base:
+        if custom_base.endswith("/chat/completions"):
+            url = custom_base
+        else:
+            url = f"{custom_base.rstrip('/')}/chat/completions"
+    else:
+        url = "https://openrouter.ai/api/v1/chat/completions"
+
+    return key, url, model
+
+
+FALLBACK_MODELS = [
+    "nex-agi/nex-n2.5-pro:free",
+    "nex-agi/nex-n2.5-mini:free",
+    "liquid/lfm-2.5-2.6b:free",
+    "qwen/qwen3.8-27b:free",
+]
+
+
 async def call_llm(
     prompt: str,
     system_prompt: str,
@@ -197,86 +268,161 @@ async def call_llm(
     """Call LLM provider (OpenRouter or user custom BYOK endpoint)."""
     import httpx
 
-    custom_base = normalize_endpoint_url(base_url)
-    key = (api_key or "").strip() or settings.OPENROUTER_API_KEY
-    model = (model_name or "").strip() or settings.AI_MODEL or "openai/gpt-4o-mini"
+    key, url, primary_model = _resolve_llm_config(api_key=api_key, base_url=base_url, model_name=model_name)
 
-    # Build the completions URL, being careful not to double-append the path
-    # when custom_base already ends with /chat/completions.
-    if custom_base:
-        if custom_base.endswith("/chat/completions"):
-            url = custom_base
-        else:
-            url = f"{custom_base.rstrip('/')}/chat/completions"
-    else:
-        url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {key}",
         "Content-Type": "application/json",
     }
-    if not custom_base:
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    if "openrouter.ai" in url:
         headers["HTTP-Referer"] = "https://aos.local"
         headers["X-Title"] = "AOS Manim Studio"
 
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt},
-        ],
-        "temperature": 0.3,
-        "max_tokens": MANIM_MAX_OUTPUT_TOKENS,
-    }
+    candidate_models = [primary_model]
+    if "openrouter.ai" in url and primary_model in FALLBACK_MODELS:
+        for m in FALLBACK_MODELS:
+            if m not in candidate_models:
+                candidate_models.append(m)
 
     last_exc: Exception | None = None
-    for attempt in range(LLM_MAX_RETRIES):
-        try:
-            async with httpx.AsyncClient(timeout=120.0) as client:
-                resp = await client.post(url, headers=headers, json=payload)
+    for target_model in candidate_models:
+        payload = {
+            "model": target_model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0.3,
+            "max_tokens": MANIM_MAX_OUTPUT_TOKENS,
+        }
 
-            if resp.status_code == 200:
-                data = resp.json()
-                choices = data.get("choices") or []
-                if not choices:
-                    raise RuntimeError("LLM returned no choices in response")
-                content = choices[0]["message"]["content"]
-                # Warn if the model stopped early due to token budget exhaustion
-                finish_reason = choices[0].get("finish_reason", "stop")
-                if finish_reason == "length":
+        for attempt in range(LLM_MAX_RETRIES):
+            try:
+                async with httpx.AsyncClient(timeout=120.0) as client:
+                    resp = await client.post(url, headers=headers, json=payload)
+
+                if resp.status_code == 200:
+                    data = resp.json()
+                    choices = data.get("choices") or []
+                    if not choices:
+                        raise RuntimeError("LLM returned no choices in response")
+                    content = choices[0]["message"]["content"]
+                    finish_reason = choices[0].get("finish_reason", "stop")
+                    if finish_reason == "length":
+                        logger.warning(
+                            "LLM output was truncated (finish_reason=length). "
+                            "Response may be incomplete. Consider raising MANIM_MAX_OUTPUT_TOKENS."
+                        )
+                    return content.strip()
+
+                if resp.status_code in (429, 404, 500, 502, 503, 504):
                     logger.warning(
-                        "LLM output was truncated (finish_reason=length). "
-                        "Response may be incomplete. Consider raising MANIM_MAX_OUTPUT_TOKENS."
+                        "LLM HTTP %s on model %s (attempt %d/%d) — %s",
+                        resp.status_code, target_model, attempt + 1, LLM_MAX_RETRIES,
+                        resp.text[:150],
                     )
-                return content.strip()
+                    if resp.status_code in (429, 404):
+                        # Switch to next candidate model immediately if rate limited or not found
+                        break
+                    await asyncio.sleep(2 ** attempt)
+                    continue
 
-            # Retryable server-side errors
-            if resp.status_code in (429, 500, 502, 503, 504):
-                wait = 2 ** attempt
-                logger.warning(
-                    "LLM HTTP %s (attempt %d/%d); retrying in %ds — %s",
-                    resp.status_code, attempt + 1, LLM_MAX_RETRIES, wait,
-                    resp.text[:200],
-                )
-                await asyncio.sleep(wait)
-                continue
+                error_body = resp.text[:500]
+                logger.error("LLM call failed (non-retryable) HTTP %s: %s", resp.status_code, error_body)
+                raise RuntimeError(f"LLM HTTP {resp.status_code}: {error_body}")
 
-            # Non-retryable client error (4xx except 429)
-            error_body = resp.text[:500]
-            logger.error("LLM call failed (non-retryable) HTTP %s: %s", resp.status_code, error_body)
-            raise RuntimeError(f"LLM HTTP {resp.status_code}: {error_body}")
+            except RuntimeError:
+                raise
+            except Exception as exc:
+                last_exc = exc
+                await asyncio.sleep(1)
 
-        except RuntimeError:
-            raise
+    raise RuntimeError(f"LLM call failed across models {candidate_models}: {last_exc}")
+
+
+async def call_llm_stream(
+    prompt: str,
+    system_prompt: str,
+    *,
+    model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> AsyncGenerator[str, None]:
+    """Stream LLM completion tokens as an async generator."""
+    import json
+    import httpx
+
+    key, url, primary_model = _resolve_llm_config(api_key=api_key, base_url=base_url, model_name=model_name)
+
+    headers = {
+        "Content-Type": "application/json",
+    }
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
+    if "openrouter.ai" in url:
+        headers["HTTP-Referer"] = "https://aos.local"
+        headers["X-Title"] = "AOS Manim Studio"
+
+    candidate_models = [primary_model]
+    if "openrouter.ai" in url:
+        for m in FALLBACK_MODELS:
+            if m not in candidate_models:
+                candidate_models.append(m)
+
+    last_err: Exception | None = None
+    for target_model in candidate_models:
+        payload = {
+            "model": target_model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0.3,
+            "max_tokens": MANIM_MAX_OUTPUT_TOKENS,
+            "stream": True,
+        }
+
+        got_token = False
+        try:
+            # Local and serverless models can take longer than two minutes before
+            # their first token. The browser receives SSE immediately, so keep the
+            # upstream stream alive instead of failing the Composer prematurely.
+            async with httpx.AsyncClient(timeout=300.0) as client:
+                async with client.stream("POST", url, headers=headers, json=payload) as resp:
+                    if resp.status_code != 200:
+                        body = await resp.aread()
+                        err_text = body.decode("utf-8", errors="replace")[:400]
+                        logger.warning("LLM stream HTTP %s on %s: %s", resp.status_code, target_model, err_text)
+                        last_err = RuntimeError(f"HTTP {resp.status_code}: {err_text}")
+                        continue
+                    async for line in resp.aiter_lines():
+                        if not line:
+                            continue
+                        if line.startswith("data: "):
+                            data_str = line[6:].strip()
+                            if data_str == "[DONE]":
+                                break
+                            try:
+                                chunk = json.loads(data_str)
+                                choices = chunk.get("choices") or []
+                                if choices:
+                                    delta = choices[0].get("delta", {})
+                                    token = delta.get("content")
+                                    if token:
+                                        got_token = True
+                                        yield token
+                            except Exception:
+                                continue
+            if got_token:
+                return
         except Exception as exc:
-            last_exc = exc
-            wait = 2 ** attempt
-            logger.warning(
-                "LLM network error (attempt %d/%d): %s; retrying in %ds",
-                attempt + 1, LLM_MAX_RETRIES, exc, wait,
-            )
-            await asyncio.sleep(wait)
+            last_err = exc
+            logger.warning("LLM stream exception on model %s: %s", target_model, exc)
+            continue
 
-    raise RuntimeError(f"LLM call failed after {LLM_MAX_RETRIES} attempts: {last_exc}")
+    if last_err:
+        raise last_err
 
 
 COMPOSER_SYSTEM_PROMPT = """\
@@ -439,6 +585,65 @@ async def compose_plan_service(
     )
 
 
+async def compose_plan_stream_service(
+    text: str,
+    hints: str | None = None,
+    *,
+    model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> AsyncGenerator[str, None]:
+    """Stream scenes.md visual plan generation events via SSE.
+
+    Yields lines formatted as `data: {JSON}\n\n`.
+    """
+    import json
+
+    classification = classify_text_for_manim(text)
+    topic = classification.topic or "Mathematical Concept"
+
+    yield f"data: {json.dumps({'type': 'start', 'topic': topic, 'title': f'Visual Plan: {topic}'})}\n\n"
+
+    capped_text = text[:MANIM_MAX_CONTEXT_CHARS]
+    if len(text) > MANIM_MAX_CONTEXT_CHARS:
+        capped_text += "\n\n[... content truncated for context window ...]"
+
+    user_prompt = f"Educational Content:\n{capped_text}\n\n"
+    if hints:
+        user_prompt += f"User specific visual preferences / hints:\n{hints}\n\n"
+    user_prompt += f"Please construct a comprehensive scenes.md visual plan for Manim focusing on topic '{topic}'."
+
+    accumulated: list[str] = []
+    stream_failed = False
+    try:
+        async for token in call_llm_stream(
+            user_prompt,
+            COMPOSER_SYSTEM_PROMPT,
+            model_name=model_name,
+            base_url=base_url,
+            api_key=api_key,
+        ):
+            accumulated.append(token)
+            yield f"data: {json.dumps({'type': 'token', 'token': token})}\n\n"
+    except Exception as exc:
+        logger.warning("Streaming plan generation failed: %s", exc)
+        stream_failed = True
+
+    full_plan = "".join(accumulated).strip()
+    if stream_failed or len(full_plan) < 100:
+        fallback = _generate_fallback_plan(text, topic)
+        if not accumulated:
+            chunk_size = 64
+            for i in range(0, len(fallback), chunk_size):
+                chunk = fallback[i : i + chunk_size]
+                yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
+                await asyncio.sleep(0.01)
+            full_plan = fallback
+
+    yield f"data: {json.dumps({'type': 'done', 'plan': full_plan, 'topic': topic, 'title': f'Visual Plan: {topic}'})}\n\n"
+
+
+
 CODER_SYSTEM_PROMPT = """\
 You are an expert Manim Community Edition coding agent (strictly following the manimce-best-practices skill).
 Your job is to synthesize complete, bug-free, beautifully styled Python code using `from manim import *`.
@@ -598,6 +803,85 @@ async def synthesize_code_service(
         code, detected_scene = _generate_fallback_code(plan, knowledge_text)
 
     return VideoCodeResponse(code=code, scene_name=detected_scene)
+
+
+async def synthesize_code_stream_service(
+    plan: str,
+    knowledge_text: str | None = None,
+    scene_name: str | None = None,
+    *,
+    model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> AsyncGenerator[str, None]:
+    """Stream Manim Community Edition code synthesis via SSE.
+
+    Yields lines formatted as `data: {JSON}\n\n`.
+    """
+    import json
+
+    detected_scene = scene_name or "GeneratedScene"
+    yield f"data: {json.dumps({'type': 'start', 'scene_name': detected_scene})}\n\n"
+
+    capped_plan = plan[:MANIM_MAX_CONTEXT_CHARS]
+    if len(plan) > MANIM_MAX_CONTEXT_CHARS:
+        capped_plan += "\n\n[... plan truncated for context window ...]"
+
+    capped_knowledge: str | None = None
+    if knowledge_text:
+        capped_knowledge = knowledge_text[:MANIM_MAX_CONTEXT_CHARS]
+        if len(knowledge_text) > MANIM_MAX_CONTEXT_CHARS:
+            capped_knowledge += "\n\n[... knowledge truncated for context window ...]"
+
+    user_prompt = f"Approved Visual Plan (scenes.md):\n{capped_plan}\n\n"
+    if capped_knowledge:
+        user_prompt += f"Original Knowledge & Mathematical Formulas:\n{capped_knowledge}\n\n"
+    user_prompt += "Synthesize a complete, elegant Manim Community scene implementing this plan."
+
+    accumulated: list[str] = []
+    stream_failed = False
+    try:
+        async for token in call_llm_stream(
+            user_prompt,
+            CODER_SYSTEM_PROMPT,
+            model_name=model_name,
+            base_url=base_url,
+            api_key=api_key,
+        ):
+            accumulated.append(token)
+            yield f"data: {json.dumps({'type': 'token', 'token': token})}\n\n"
+    except Exception as exc:
+        logger.warning("Streaming code synthesis failed: %s", exc)
+        stream_failed = True
+
+    raw_response = "".join(accumulated).strip()
+    code = ""
+    if raw_response:
+        code_match = re.search(r"```python\s*([\s\S]+?)\s*```", raw_response)
+        if code_match:
+            code = code_match.group(1).strip()
+        elif "class " in raw_response and "Scene" in raw_response:
+            code = raw_response.strip()
+
+    if code:
+        class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\((?:ThreeDScene|Scene|MovingCameraScene)", code)
+        if class_match:
+            detected_scene = class_match.group(1)
+
+    if stream_failed or not code or "def construct" not in code:
+        fallback_code, detected_scene = _generate_fallback_code(plan, knowledge_text)
+        if not accumulated:
+            chunk_size = 64
+            for i in range(0, len(fallback_code), chunk_size):
+                chunk = fallback_code[i : i + chunk_size]
+                yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
+                await asyncio.sleep(0.01)
+            code = fallback_code
+        elif not code:
+            code = fallback_code
+
+    yield f"data: {json.dumps({'type': 'done', 'code': code, 'scene_name': detected_scene})}\n\n"
+
 
 
 def _execute_manim_render(
@@ -817,4 +1101,3 @@ async def render_custom_code_service(
         quality=quality,
         code=code,
     )
-

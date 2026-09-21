@@ -149,6 +149,31 @@ const QUALITY_OPTIONS: { id: RenderQuality; label: string; desc: string; res: st
   { id: "k", label: "4K Ultra (-qk)", desc: "Cinematic quality, 60fps", res: "2160p" },
 ];
 
+type StudioStreamEvent =
+  | { type: "start"; scene_name?: string }
+  | { type: "token"; token: string }
+  | { type: "done"; plan?: string; code?: string; scene_name?: string };
+
+async function consumeStudioStream(response: Response, onEvent: (event: StudioStreamEvent) => void) {
+  if (!response.body) throw new Error("The server did not return a streaming response.");
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+    const frames = buffer.split("\n\n");
+    buffer = frames.pop() || "";
+    for (const frame of frames) {
+      const data = frame.split("\n").find((line) => line.startsWith("data: "))?.slice(6);
+      if (!data) continue;
+      try { onEvent(JSON.parse(data) as StudioStreamEvent); } catch { /* ignore malformed SSE frame */ }
+    }
+    if (done) break;
+  }
+}
+
 export function ManimStudioModal({
   isOpen,
   onClose,
@@ -224,8 +249,9 @@ export function ManimStudioModal({
   const handleGeneratePlan = useCallback(async (sourceText: string) => {
     setIsGeneratingPlan(true);
     setRenderError(null);
+    setPlanMarkdown("");
     try {
-      const resp = await fetch("/api/videos/plan", {
+      const resp = await fetch("/api/videos/plan/stream", {
         method: "POST",
         credentials: "same-origin",
         headers: {
@@ -240,9 +266,15 @@ export function ManimStudioModal({
         }),
       });
       if (resp.ok) {
-        const data = await resp.json();
-        setPlanMarkdown(data.plan || "");
-        updateSession({ composerPlan: data.plan || "", stage: "composer" });
+        await consumeStudioStream(resp, (event) => {
+          if (event.type === "token") {
+            setPlanMarkdown((current) => current + event.token);
+          } else if (event.type === "done") {
+            const plan = event.plan || "";
+            setPlanMarkdown(plan);
+            updateSession({ composerPlan: plan, stage: "composer" });
+          }
+        });
       } else {
         const errData = await resp.json().catch(() => null);
         const errMsg = errData?.detail || `Plan generation failed (HTTP ${resp.status})`;
@@ -275,8 +307,10 @@ export function ManimStudioModal({
   const handleSynthesizeCode = useCallback(async () => {
     setIsSynthesizingCode(true);
     setRenderError(null);
+    setSceneCode("");
+    setCurrentStage("code");
     try {
-      const resp = await fetch("/api/videos/code", {
+      const resp = await fetch("/api/videos/code/stream", {
         method: "POST",
         credentials: "same-origin",
         headers: {
@@ -292,11 +326,18 @@ export function ManimStudioModal({
         }),
       });
       if (resp.ok) {
-        const data = await resp.json();
-        setSceneCode(data.code || "");
-        updateSession({ generatedCode: data.code || "", stage: "coding" });
-        if (data.scene_name) setSceneName(data.scene_name);
-        setCurrentStage("code");
+        await consumeStudioStream(resp, (event) => {
+          if (event.type === "start" && event.scene_name) {
+            setSceneName(event.scene_name);
+          } else if (event.type === "token") {
+            setSceneCode((current) => current + event.token);
+          } else if (event.type === "done") {
+            const code = event.code || "";
+            setSceneCode(code);
+            updateSession({ generatedCode: code, stage: "coding" });
+            if (event.scene_name) setSceneName(event.scene_name);
+          }
+        });
       } else {
         const errData = await resp.json().catch(() => null);
         const errMsg = errData?.detail || `Code synthesis failed (HTTP ${resp.status})`;
@@ -661,12 +702,14 @@ export function ManimStudioModal({
               </div>
 
               {isGeneratingPlan ? (
-                <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="text-sm font-medium">Invoking Manim Composer Agent…</p>
-                  <p className="text-xs text-muted-foreground/80">
-                    Drafting scenes.md according to pedagogical animation best practices.
-                  </p>
+                <div className="space-y-3 rounded-xl border border-primary/25 bg-muted/10 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Manim Composer is drafting scenes.md…
+                  </div>
+                  <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap font-mono text-xs leading-relaxed text-foreground/85">
+                    {planMarkdown || "Preparing the animation brief…"}
+                  </pre>
                 </div>
               ) : isEditingPlan ? (
                 <div className="space-y-2">
@@ -873,12 +916,14 @@ export function ManimStudioModal({
               </div>
 
               {isSynthesizingCode ? (
-                <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="text-sm font-medium">Coder Agent is generating Manim scene…</p>
-                  <p className="text-xs text-muted-foreground/80">
-                    Structuring construct() methods, MathTex LaTeX alignments, and animations.
-                  </p>
+                <div className="space-y-3 rounded-xl border border-primary/25 bg-zinc-950 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    ManimCE Coder is synthesizing scene.py…
+                  </div>
+                  <pre className="max-h-[480px] overflow-auto whitespace-pre-wrap font-mono text-xs leading-relaxed text-zinc-200">
+                    {sceneCode || "Preparing the implementation…"}
+                  </pre>
                 </div>
               ) : isEditingCode ? (
                 <div className="space-y-2">

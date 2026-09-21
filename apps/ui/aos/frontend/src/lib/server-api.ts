@@ -95,6 +95,29 @@ export async function backendFetch<T>(endpoint: string, options: RequestOptions 
   return JSON.parse(text);
 }
 
+/** Forward a streaming backend response without buffering its SSE body. */
+export async function backendFetchStream(endpoint: string, options: RequestOptions = {}): Promise<Response> {
+  const { params, body, raw: _raw, ...fetchOptions } = options;
+  let url = `${BACKEND_URL}${endpoint}`;
+  if (params) url += `?${new URLSearchParams(params).toString()}`;
+
+  const response = await fetch(url, {
+    ...fetchOptions,
+    headers: {
+      Accept: "text/event-stream",
+      ...(body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+      ...fetchOptions.headers,
+    },
+    body,
+  });
+  if (!response.ok) {
+    let data: unknown = null;
+    try { data = await response.json(); } catch { /* keep null */ }
+    throw new BackendApiError(response.status, response.statusText, data);
+  }
+  return response;
+}
+
 /**
  * Forward authorization header from the incoming request to the backend.
  */

@@ -133,6 +133,27 @@ async def compose_plan(
     )
 
 
+@router.post("/plan/stream", response_model=None)
+async def compose_plan_stream(
+    payload: dict[str, Any],
+    user: CurrentUser,
+) -> Any:
+    """Stream Manim Composer's `scenes.md` draft as SSE token deltas."""
+    from app.services.manim_studio import compose_plan_stream_service
+
+    return StreamingResponse(
+        compose_plan_stream_service(
+            payload.get("text", ""),
+            hints=payload.get("hints"),
+            model_name=payload.get("model_name"),
+            base_url=payload.get("base_url"),
+            api_key=payload.get("api_key"),
+        ),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
 @router.post("/code", response_model=None)
 async def synthesize_code(
     payload: dict[str, Any],
@@ -153,6 +174,28 @@ async def synthesize_code(
         model_name=model_name,
         base_url=base_url,
         api_key=api_key,
+    )
+
+
+@router.post("/code/stream", response_model=None)
+async def synthesize_code_stream(
+    payload: dict[str, Any],
+    user: CurrentUser,
+) -> Any:
+    """Stream ManimCE Coder output as SSE token deltas."""
+    from app.services.manim_studio import synthesize_code_stream_service
+
+    return StreamingResponse(
+        synthesize_code_stream_service(
+            payload.get("plan", ""),
+            knowledge_text=payload.get("knowledge_text"),
+            scene_name=payload.get("scene_name"),
+            model_name=payload.get("model_name"),
+            base_url=payload.get("base_url"),
+            api_key=payload.get("api_key"),
+        ),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
 
@@ -188,4 +231,3 @@ async def render_custom_scene(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Render execution failed: {exc}",
             ) from exc
-
