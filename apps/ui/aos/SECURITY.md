@@ -15,7 +15,7 @@ We aim to acknowledge within 48h and ship a fix within 7 days for high-severity 
 ## Security model
 
 ### Authentication
-- **JWT (`HS256`)** signed with `SECRET_KEY`. Access token TTL = `ACCESS_TOKEN_EXPIRE_MINUTES` (default 30 min). Refresh token TTL = `REFRESH_TOKEN_EXPIRE_MINUTES` (default 7 days).
+- **JWT (`HS256`)** signed with `SECRET_KEY`. Access token TTL = `ACCESS_TOKEN_EXPIRE_MINUTES` (default 7 days). Refresh token TTL = `REFRESH_TOKEN_EXPIRE_MINUTES` (default 7 days).
 - **Password hashing:** bcrypt via `passlib`. Plain passwords never persisted.
 - **OAuth 2.0 (Google)** — auth-code flow. Token validated server-side, internal user record looked up/created by email.
 - **Session management** — DB-backed sessions with revocation. Each refresh-token issuance creates a session row; `/sessions` endpoint lets users see + revoke devices.

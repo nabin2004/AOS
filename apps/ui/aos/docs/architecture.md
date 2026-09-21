@@ -111,7 +111,7 @@ The project supports two authentication methods, both always available:
 
 1. **JWT (JSON Web Tokens)** -- Used by the frontend and API clients.
    - Login via `POST /api/v1/auth/login` returns `access_token` + `refresh_token`.
-   - Access tokens expire after `ACCESS_TOKEN_EXPIRE_MINUTES` (default 30 min).
+   - Access tokens expire after `ACCESS_TOKEN_EXPIRE_MINUTES` (default 7 days).
    - Refresh tokens expire after `REFRESH_TOKEN_EXPIRE_MINUTES` (default 7 days).
    - The frontend stores tokens as HTTP-only cookies.
    - WebSocket auth passes the JWT as a query parameter (`?token=<jwt>`) or cookie.

@@ -46,7 +46,7 @@ openssl rand -hex 32
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `SECRET_KEY` | (insecure default) | JWT signing key. **Must** be changed in production. Generate with: `openssl rand -hex 32` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | `10080` | Access token lifetime (7 days) |
 | `REFRESH_TOKEN_EXPIRE_MINUTES` | `10080` | Refresh token lifetime (7 days) |
 | `ALGORITHM` | `HS256` | JWT signing algorithm |
 
