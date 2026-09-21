@@ -152,7 +152,8 @@ const QUALITY_OPTIONS: { id: RenderQuality; label: string; desc: string; res: st
 type StudioStreamEvent =
   | { type: "start"; scene_name?: string }
   | { type: "token"; token: string }
-  | { type: "done"; plan?: string; code?: string; scene_name?: string };
+  | { type: "done"; plan?: string; code?: string; scene_name?: string }
+  | { type: "error"; detail?: string };
 
 async function consumeStudioStream(response: Response, onEvent: (event: StudioStreamEvent) => void) {
   if (!response.body) throw new Error("The server did not return a streaming response.");
@@ -168,7 +169,16 @@ async function consumeStudioStream(response: Response, onEvent: (event: StudioSt
     for (const frame of frames) {
       const data = frame.split("\n").find((line) => line.startsWith("data: "))?.slice(6);
       if (!data) continue;
-      try { onEvent(JSON.parse(data) as StudioStreamEvent); } catch { /* ignore malformed SSE frame */ }
+      try {
+        const event = JSON.parse(data) as StudioStreamEvent;
+        if (event.type === "error") {
+          throw new Error(event.detail || "The streaming generation service returned an error.");
+        }
+        onEvent(event);
+      } catch (error) {
+        if (error instanceof Error) throw error;
+        // Ignore only malformed frames; do not mask an explicit server error.
+      }
     }
     if (done) break;
   }

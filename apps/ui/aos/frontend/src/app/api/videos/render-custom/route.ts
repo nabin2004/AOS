@@ -14,8 +14,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     if (error instanceof BackendApiError) {
+      const data = error.data as { detail?: unknown } | null;
+      const detail = typeof data?.detail === "string" && data.detail.trim()
+        ? data.detail
+        : error.message || "Failed to render custom scene";
       return NextResponse.json(
-        { detail: error.message || "Failed to render custom scene" },
+        // Preserve FastAPI's `detail`, including the Manim compiler stderr.
+        { detail },
         { status: error.status },
       );
     }

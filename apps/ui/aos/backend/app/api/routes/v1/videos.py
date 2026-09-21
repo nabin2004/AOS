@@ -1,5 +1,6 @@
 """Video generation list / get / stream endpoints."""
 
+import logging
 from typing import Any
 from uuid import UUID
 
@@ -11,6 +12,7 @@ from app.core.exceptions import NotFoundError
 from app.schemas.video_generation import VideoGenerationList, VideoGenerationRead
 
 router = APIRouter(prefix="/videos", tags=["videos"])
+logger = logging.getLogger(__name__)
 
 
 @router.get("", response_model=VideoGenerationList)
@@ -226,8 +228,14 @@ async def render_custom_scene(
                 conversation_id=conv_id,
                 prompt=prompt,
             )
+        except HTTPException:
+            # The renderer returns a 4xx exception containing the Manim stderr
+            # when compilation fails. Preserve it so the Studio can show the
+            # actionable compiler log rather than a generic server error.
+            raise
         except Exception as exc:
+            logger.exception("Unexpected custom Manim render failure")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Render execution failed: {exc}",
+                detail=f"Render execution failed: {exc!s}",
             ) from exc

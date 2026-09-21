@@ -1334,7 +1334,14 @@ class AgentSession:
         user_message: str,
         collected_tool_calls: list[dict[str, Any]],
     ) -> None:
-        """Drive the agent_run iterator, dispatching each node to its streaming helper."""
+        """Drive the agent run and retain a streaming fallback for buffered models.
+
+        Some OpenAI-compatible local servers return a complete response even
+        when asked for a stream.  Pydantic AI then reaches the end node with no
+        ``TextPartDelta`` events.  In that case, relay the final answer in
+        small WebSocket deltas so the chat remains progressively rendered.
+        """
+        emitted_text = False
         async for node in agent_run:
             if Agent.is_user_prompt_node(node):
                 prompt_text = (
@@ -1344,17 +1351,31 @@ class AgentSession:
             elif Agent.is_model_request_node(node):
                 await send_event(self.websocket, "model_request_start", {})
                 async with node.stream(agent_run.ctx) as request_stream:
-                    await self._stream_request_events(request_stream)
+                    emitted_text = await self._stream_request_events(request_stream) or emitted_text
             elif Agent.is_call_tools_node(node):
                 await send_event(self.websocket, "call_tools_start", {})
                 async with node.stream(agent_run.ctx) as handle_stream:
                     await self._stream_tool_events(handle_stream, collected_tool_calls)
             elif Agent.is_end_node(node) and agent_run.result is not None:
+                if not emitted_text and agent_run.result.output:
+                    await self._stream_buffered_output(agent_run.result.output)
                 await send_event(
                     self.websocket, "final_result", {"output": agent_run.result.output}
                 )
 
-    async def _stream_request_events(self, request_stream: Any) -> None:
+    async def _stream_buffered_output(self, output: str) -> None:
+        """Progressively relay a provider-buffered final answer to the browser."""
+        for offset in range(0, len(output), 64):
+            await send_event(
+                self.websocket,
+                "text_delta",
+                {"index": 0, "content": output[offset : offset + 64]},
+            )
+            # Yield to the websocket transport and React between chunks while
+            # keeping the fallback substantially faster than model generation.
+            await asyncio.sleep(0.015)
+
+    async def _stream_request_events(self, request_stream: Any) -> bool:
         """Forward model-request events (text/thinking/tool deltas + final-result start).
 
         During a deep research turn the model narrates every delegation step.
@@ -1367,14 +1388,17 @@ class AgentSession:
         deep_research = self._research is not None
         buffered_text: list[tuple[int, str]] = []
         tool_names: dict[int, str] = {}
+        emitted_text = False
 
         async def emit_text(index: int, content: str) -> None:
+            nonlocal emitted_text
             if not content:
                 return
             if deep_research:
                 buffered_text.append((index, content))
             else:
                 await send_event(self.websocket, "text_delta", {"index": index, "content": content})
+                emitted_text = True
 
         async for event in request_stream:
             if isinstance(event, PartStartEvent):
@@ -1425,6 +1449,9 @@ class AgentSession:
         if deep_research and buffered_text and not made_research_call:
             for index, content in buffered_text:
                 await send_event(self.websocket, "text_delta", {"index": index, "content": content})
+                emitted_text = True
+
+        return emitted_text
 
     async def _stream_tool_events(
         self,
