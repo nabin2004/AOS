@@ -42,13 +42,17 @@ from app.services.video_storage import get_video_storage, video_object_key, code
 logger = logging.getLogger(__name__)
 
 # ── LLM generation limits ────────────────────────────────────────────────────
-# Max output tokens the LLM is allowed to produce. 8 k covers even complex
-# multi-scene Manim scripts with plenty of headroom.
-MANIM_MAX_OUTPUT_TOKENS: int = 8_000
+# Max output tokens the LLM is allowed to produce.
+# NOTE: Small local models (e.g. Qwen3-8B via Ollama) have a total context
+# window of ~8k-32k tokens (input + output combined).  Requesting 8k output
+# on top of a 2k-3k prompt will cause the model to reject the request or
+# silently produce garbage.  Keep this ≤ 3000 for local model compatibility;
+# cloud models (OpenRouter) handle larger values fine.
+MANIM_MAX_OUTPUT_TOKENS: int = 3_000
 
 # Hard cap on the number of characters we forward as "knowledge_text" or
 # "plan" context.  4 000 chars ≈ ~1 000 tokens — keeps the combined prompt
-# well under the typical 128 k context window while leaving ~8 k for output.
+# well under the typical context window while leaving room for output.
 MANIM_MAX_CONTEXT_CHARS: int = 4_000
 
 # How many times to retry on transient HTTP errors (429 rate-limit, 503
@@ -78,29 +82,57 @@ MATH_PATTERNS = [
 ]
 
 KEYWORDS_ANIMATABLE = [
-    "taylor series", "taylor's formula", "maclaurin series", "fourier transform",
-    "fourier series", "euler's formula", "derivative", "integral", "calculus",
+    # Series & approximations
+    "taylor series", "taylor's formula", "taylor's series", "maclaurin series",
+    "fourier transform", "fourier series", "power series", "geometric series",
+    # Exponential & logarithm
+    "exponential", "euler's number", "number e", "natural logarithm", "logarithm",
+    "e^x", "e^{x", "compound interest", "continuous growth", "exponential growth",
+    "exponential decay", "half-life",
+    # Calculus
+    "derivative", "integral", "calculus", "differential", "antiderivative",
+    "riemann sum", "limit", "continuity", "chain rule", "product rule",
+    "integration by parts", "fundamental theorem",
+    # Algebra & linear algebra
+    "euler's formula", "complex number", "imaginary number", "pythagorean",
     "eigenvector", "eigenvalue", "matrix multiplication", "linear transformation",
+    "determinant", "dot product", "cross product", "vector",
+    # Probability & statistics
+    "probability", "normal distribution", "binomial distribution", "bayes",
+    "central limit theorem", "standard deviation", "variance", "markov chain",
+    "random variable", "expected value",
+    # Geometry & topology
+    "trigonometry", "coordinate system", "vector field", "complex plane",
+    "polar coordinates", "parametric", "surface area", "volume",
+    # CS & algorithms
     "gradient descent", "neural network", "backpropagation", "sorting algorithm",
-    "binary search", "dijkstra", "graph traversal", "pythagorean", "trigonometry",
-    "coordinate system", "vector field", "complex plane", "riemann sum",
-    "normal distribution", "binomial distribution", "markov chain"
+    "binary search", "dijkstra", "graph traversal", "big o", "time complexity",
+    "dynamic programming", "recursion",
 ]
 
 
 def classify_text_for_manim(text: str) -> VideoClassifyResponse:
-    """Classify if the given educational text can be animated with Manim."""
+    """Classify if the given educational text can be animated with Manim.
+
+    Falls back to extracting the topic from the first heading / first line
+    when no keyword matches, so the LLM always gets a meaningful topic.
+    """
     lower_text = text.lower()
-    
+
     # Check for exact keywords
     for kw in KEYWORDS_ANIMATABLE:
         if kw in lower_text:
             topic = kw.title()
+            is_math = any(m in kw for m in (
+                "series", "formula", "calculus", "derivative", "integral",
+                "matrix", "linear", "vector", "exponential", "logarithm",
+                "probability", "distribution", "euler", "fourier",
+            ))
             return VideoClassifyResponse(
                 animatable=True,
-                subject="math" if any(m in kw for m in ("series", "formula", "calculus", "derivative", "integral", "matrix", "linear", "vector")) else "cs",
+                subject="math" if is_math else "cs",
                 topic=topic,
-                reason=f"Identified core animatable concept '{topic}' suitable for visual geometric and algebraic exposition.",
+                reason=f"Identified core animatable concept '{topic}'.",
             )
 
     # Check for LaTeX / math patterns
@@ -109,15 +141,20 @@ def classify_text_for_manim(text: str) -> VideoClassifyResponse:
         if re.search(pattern, text):
             math_matches += 1
 
-    if math_matches >= 2 or (math_matches >= 1 and any(term in lower_text for term in ("formula", "equation", "function", "theorem", "approximation", "series"))):
+    if math_matches >= 2 or (math_matches >= 1 and any(
+        term in lower_text for term in (
+            "formula", "equation", "function", "theorem",
+            "approximation", "series", "number",
+        )
+    )):
         # Extract potential title from heading or first line
         lines = [line.strip("#* \t\r\n") for line in text.splitlines() if line.strip("#* \t\r\n")]
-        title = lines[0][:40] if lines else "Mathematical Derivation"
+        title = lines[0][:60] if lines else "Mathematical Derivation"
         return VideoClassifyResponse(
             animatable=True,
             subject="math",
             topic=title,
-            reason="Detected mathematical formulas and equations ideally suited for Manim Community step-by-step visualization.",
+            reason="Detected mathematical content suitable for Manim visualization.",
         )
 
     # Computer science / algorithms check
@@ -126,14 +163,26 @@ def classify_text_for_manim(text: str) -> VideoClassifyResponse:
             animatable=True,
             subject="cs",
             topic="Algorithmic Structure",
-            reason="Detected data structure / algorithm concepts well-suited for state transition animations.",
+            reason="Detected data structure / algorithm concepts.",
+        )
+
+    # Last resort: extract the first meaningful line as topic so we never
+    # return an empty topic and fall into a generic fallback.
+    lines = [line.strip("#* \t\r\n") for line in text.splitlines() if line.strip("#* \t\r\n")]
+    if lines:
+        title = lines[0][:60]
+        return VideoClassifyResponse(
+            animatable=True,
+            subject="math",
+            topic=title,
+            reason="Extracted topic from content — treating as animatable educational material.",
         )
 
     return VideoClassifyResponse(
         animatable=False,
         subject="unknown",
         topic="",
-        reason="Content does not appear to contain mathematical formulas or visual algorithmic structures suited for Manim.",
+        reason="Content does not appear to contain visual material suited for Manim.",
     )
 
 
@@ -152,8 +201,15 @@ async def call_llm(
     key = (api_key or "").strip() or settings.OPENROUTER_API_KEY
     model = (model_name or "").strip() or settings.AI_MODEL or "openai/gpt-4o-mini"
 
-    # Try custom endpoint or OpenRouter
-    url = f"{custom_base}/chat/completions" if custom_base else "https://openrouter.ai/api/v1/chat/completions"
+    # Build the completions URL, being careful not to double-append the path
+    # when custom_base already ends with /chat/completions.
+    if custom_base:
+        if custom_base.endswith("/chat/completions"):
+            url = custom_base
+        else:
+            url = f"{custom_base.rstrip('/')}/chat/completions"
+    else:
+        url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {key}",
         "Content-Type": "application/json",
@@ -638,11 +694,15 @@ async def render_custom_code_service(
     prompt: str | None = None,
 ) -> VideoRenderCustomResponse:
     """Compile and render user-approved Manim code, upload to MinIO/storage, and return playback info."""
-    effective_scene = scene_name or "TaylorFormulaScene"
-    if not scene_name:
-        class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\(", code)
-        if class_match:
-            effective_scene = class_match.group(1)
+    # Derive effective scene name from the code itself first, then the
+    # explicit parameter, falling back to a generic name.  Never hard-code
+    # TaylorFormulaScene as the default.
+    effective_scene = "GeneratedScene"
+    class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\(", code or "")
+    if class_match:
+        effective_scene = class_match.group(1)
+    elif scene_name:
+        effective_scene = scene_name
 
     gen_id = uuid4()
     # Create run dir in OS temp directory to avoid triggering Uvicorn WatchFiles reloader
