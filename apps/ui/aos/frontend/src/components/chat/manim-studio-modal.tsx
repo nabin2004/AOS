@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   Sparkles,
   Clapperboard,
@@ -188,7 +188,7 @@ export function ManimStudioModal({
 
   // Stage 2: Code
   const [sceneCode, setSceneCode] = useState("");
-  const [sceneName, setSceneName] = useState("TaylorFormulaScene");
+  const [sceneName, setSceneName] = useState("GeneratedScene");
   const [isSynthesizingCode, setIsSynthesizingCode] = useState(false);
   const [isEditingCode, setIsEditingCode] = useState(false);
 
@@ -207,6 +207,70 @@ export function ManimStudioModal({
 
   // Track the last knowledge we generated a plan for so we can detect a new query
   const lastKnowledgeRef = useRef<string>("");
+
+  // ── API handlers (defined before useEffect so they are stable references) ─
+  const handleGeneratePlan = useCallback(async (sourceText: string) => {
+    setIsGeneratingPlan(true);
+    setRenderError(null);
+    try {
+      const resp = await fetch("/api/videos/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: sourceText,
+          model_name: modelId,
+          base_url: baseUrl,
+          api_key: apiKey,
+        }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setPlanMarkdown(data.plan || "");
+      } else {
+        const errData = await resp.json().catch(() => null);
+        const errMsg = errData?.detail || `Plan generation failed (HTTP ${resp.status})`;
+        setRenderError(errMsg);
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setRenderError(`Network error while generating plan: ${msg}`);
+    } finally {
+      setIsGeneratingPlan(false);
+    }
+  }, [modelId, baseUrl, apiKey]);
+
+  const handleSynthesizeCode = useCallback(async () => {
+    setIsSynthesizingCode(true);
+    setRenderError(null);
+    try {
+      const resp = await fetch("/api/videos/code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: planMarkdown,
+          knowledge_text: knowledgeText,
+          model_name: modelId,
+          base_url: baseUrl,
+          api_key: apiKey,
+        }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setSceneCode(data.code || "");
+        if (data.scene_name) setSceneName(data.scene_name);
+        setCurrentStage("code");
+      } else {
+        const errData = await resp.json().catch(() => null);
+        const errMsg = errData?.detail || `Code synthesis failed (HTTP ${resp.status})`;
+        setRenderError(errMsg);
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setRenderError(`Network error while generating code: ${msg}`);
+    } finally {
+      setIsSynthesizingCode(false);
+    }
+  }, [planMarkdown, knowledgeText, modelId, baseUrl, apiKey]);
 
   // Reset or initialize when opened, or when initialKnowledge changes
   useEffect(() => {
@@ -229,66 +293,7 @@ export function ManimStudioModal({
       setIsEditingCode(false);
       handleGeneratePlan(initialKnowledge);
     }
-  }, [isOpen, initialKnowledge]);
-
-  const handleGeneratePlan = async (sourceText: string) => {
-    setIsGeneratingPlan(true);
-    setRenderError(null);
-    try {
-      const resp = await fetch("/api/videos/plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: sourceText,
-          model_name: modelId,
-          base_url: baseUrl,
-          api_key: apiKey,
-        }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        setPlanMarkdown(data.plan || "");
-      } else {
-        const err = await resp.text();
-        setRenderError(`Plan generation error: ${err}`);
-      }
-    } catch (e: any) {
-      setRenderError(`Network error while generating plan: ${e.message}`);
-    } finally {
-      setIsGeneratingPlan(false);
-    }
-  };
-
-  const handleSynthesizeCode = async () => {
-    setIsSynthesizingCode(true);
-    setRenderError(null);
-    try {
-      const resp = await fetch("/api/videos/code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          plan: planMarkdown,
-          knowledge_text: knowledgeText,
-          model_name: modelId,
-          base_url: baseUrl,
-          api_key: apiKey,
-        }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        setSceneCode(data.code || "");
-        if (data.scene_name) setSceneName(data.scene_name);
-        setCurrentStage("code");
-      } else {
-        const err = await resp.text();
-        setRenderError(`Code synthesis error: ${err}`);
-      }
-    } catch (e: any) {
-      setRenderError(`Network error while generating code: ${e.message}`);
-    } finally {
-      setIsSynthesizingCode(false);
-    }
-  };
+  }, [isOpen, initialKnowledge, handleGeneratePlan]);
 
   const handleRenderVideo = async () => {
     setIsRendering(true);
