@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Sparkles,
   Clapperboard,
@@ -205,13 +205,29 @@ export function ManimStudioModal({
   const { baseUrl, apiKey, modelId } = useLlmProviderStore();
   const critiqueModeActive = useCritiqueStore((s) => s.critiqueModeActive);
 
-  // Reset or initialize when opened
+  // Track the last knowledge we generated a plan for so we can detect a new query
+  const lastKnowledgeRef = useRef<string>("");
+
+  // Reset or initialize when opened, or when initialKnowledge changes
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+
+    const isNewKnowledge = initialKnowledge !== lastKnowledgeRef.current;
+
+    if (isNewKnowledge) {
+      // Reset the full pipeline state for the new query
+      lastKnowledgeRef.current = initialKnowledge;
       setKnowledgeText(initialKnowledge);
-      if (!planMarkdown) {
-        handleGeneratePlan(initialKnowledge);
-      }
+      setPlanMarkdown("");
+      setSceneCode("");
+      setSceneName("GeneratedScene");
+      setCurrentStage("plan");
+      setRenderError(null);
+      setVideoGenerationId(null);
+      setVideoStreamUrl(null);
+      setIsEditingPlan(false);
+      setIsEditingCode(false);
+      handleGeneratePlan(initialKnowledge);
     }
   }, [isOpen, initialKnowledge]);
 
