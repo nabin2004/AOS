@@ -155,22 +155,32 @@ async def call_llm(
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.3,
-        "max_tokens": 3000,
+        "max_tokens": 6000,
     }
 
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=90.0) as client:
             resp = await client.post(url, headers=headers, json=payload)
             if resp.status_code == 200:
                 data = resp.json()
                 content = data["choices"][0]["message"]["content"]
+                # Detect mid-generation truncation (finish_reason != "stop")
+                finish_reason = data.get("choices", [{}])[0].get("finish_reason", "stop")
+                if finish_reason not in ("stop", "end_turn", None) and finish_reason != "stop":
+                    logger.warning(
+                        "LLM response was truncated (finish_reason=%s). Consider increasing max_tokens.",
+                        finish_reason,
+                    )
                 return content.strip()
             else:
-                logger.warning("LLM call failed with HTTP %s: %s", resp.status_code, resp.text)
+                error_body = resp.text[:500]
+                logger.warning("LLM call failed with HTTP %s: %s", resp.status_code, error_body)
+                raise RuntimeError(f"LLM HTTP {resp.status_code}: {error_body}")
+    except RuntimeError:
+        raise
     except Exception as exc:
         logger.warning("Error invoking LLM (%s): %s", url, exc)
-
-    return ""
+        raise RuntimeError(f"LLM network error: {exc}") from exc
 
 
 COMPOSER_SYSTEM_PROMPT = """\
@@ -220,68 +230,68 @@ Keep the output directly as clean Markdown with clear headings and bullet points
 
 
 def _generate_fallback_plan(text: str, topic: str) -> str:
-    """Generate a high-quality pedagogical plan when LLM is unavailable."""
+    """Generate a topic-aware pedagogical plan when LLM is unavailable."""
     clean_topic = topic or "Mathematical Concept"
+    # Extract a short description hint from the first non-empty line of the source text
+    first_lines = [l.strip() for l in text.splitlines() if l.strip()][:3]
+    text_hint = " ".join(first_lines)[:200] if first_lines else clean_topic
     return f"""# Visualizing {clean_topic}
 
 ## Overview
 - **Topic**: {clean_topic}
-- **Hook**: How can an infinite sum of polynomial derivatives reconstruct any smooth curve?
-- **Target Audience**: Calculus and STEM learners
+- **Hook**: How does the core idea behind {clean_topic} connect to visual geometric intuition?
+- **Target Audience**: STEM learners
 - **Estimated Length**: ~30 seconds
-- **Key Insight**: Higher-order terms adjust the curvature and bend the approximation closer and closer to the true curve around the center point.
+- **Key Insight**: Understanding {clean_topic} through step-by-step visual construction.
 
 ## Narrative Arc
-We begin with the core definition of {clean_topic}, introduce the foundational formula in crisp LaTeX, and break down each derivative term visually to show how successive corrections increase approximation accuracy.
+We begin with the definition of {clean_topic}, introduce its key formula, and build visual intuition using annotated Manim animations.
 
 ---
 
-## Scene 1: Introduction & Formula Definition
+## Scene 1: Introduction & Core Definition
 **Duration**: ~12 seconds
-**Purpose**: State the core formula clearly and define center point $a$ and the polynomial summation.
+**Purpose**: Introduce {clean_topic} and present its primary definition.
 
 ### Visual Elements
 - Title: `Text("{clean_topic}", font_size=40).to_edge(UP)`
-- General Equation: `MathTex(r"f(x) = f(a) + f'(a)(x-a) + \\frac{{f''(a)}}{{2!}}(x-a)^2 + \\cdots")`
-- Variable annotation highlighting center point $a$ and factorial denominators $n!$.
+- Core definition or formula as `MathTex`.
+- Annotated labels explaining each symbol.
 
 ### Content
 1. Fade in the title with an accent underline.
-2. Write the general Taylor expansion equation at the screen center.
-3. Highlight the linear term $f'(a)(x-a)$ in YELLOW and quadratic term in TEAL.
+2. Write the core definition or equation at the screen centre.
+3. Highlight key symbols in YELLOW and TEAL.
 
 ### Technical Notes
 - Use `MathTex` with color-coded substrings.
-- Use `to_edge(UP)` for title and `next_to` for annotations to avoid overlapping.
+- Use `to_edge(UP)` for title and `next_to` for annotations.
 
 ---
 
-## Scene 2: Special Case & Approximation Growth
+## Scene 2: Key Properties & Visual Intuition
 **Duration**: ~18 seconds
-**Purpose**: Demonstrate the Maclaurin series ($a = 0$) and the intuitive role of factorials.
+**Purpose**: Demonstrate the most important properties or applications of {clean_topic}.
 
 ### Visual Elements
-- Maclaurin transformation formula: $f(x) = \\sum_{{n=0}}^\\infty \\frac{{f^{{(n)}}(0)}}{{n!}} x^n$.
-- Concrete example: $e^x = 1 + x + \\frac{{x^2}}{{2!}} + \\frac{{x^3}}{{3!}} + \\cdots$.
-- Grouped highlight box around terms.
+- Secondary formulas or visual diagrams.
+- Annotated arrows or highlight boxes.
 
 ### Content
-1. Transition formula from general center $a$ to origin $a=0$ via `ReplacementTransform`.
-2. Introduce the exponential series example $e^x$.
-3. Conclude with summary text emphasizing convergence.
+1. Present key properties one-by-one with `Write` and `FadeIn` animations.
+2. Use `SurroundingRectangle` to emphasise each key term.
+3. Conclude with a summary line.
 
 ---
 
 ## Color Palette
-- Primary: `BLUE_C` (Functions and curves)
-- Secondary: `YELLOW` (First derivative tangent / linear term)
-- Accent: `TEAL` (Second derivative curvature / quadratic term)
+- Primary: `BLUE_C`
+- Secondary: `YELLOW`
+- Accent: `TEAL`
 - Text: `WHITE` / `LIGHT_GREY`
 
 ## Mathematical Content
-- $f(x) = f(a) + f'(a)(x-a) + \\frac{{f''(a)}}{{2!}}(x-a)^2 + \\cdots + \\frac{{f^{{(n)}}(a)}}{{n!}}(x-a)^n$
-- Maclaurin case ($a = 0$): $f(x) = f(0) + f'(0)x + \\frac{{f''(0)}}{{2!}}x^2 + \\cdots$
-- Example ($e^x$): $e^x = 1 + x + \\frac{{x^2}}{{2!}} + \\frac{{x^3}}{{3!}} + \\cdots$
+Derived from source material: {text_hint}
 """
 
 
@@ -302,13 +312,17 @@ async def compose_plan_service(
         user_prompt += f"User specific visual preferences / hints:\n{hints}\n\n"
     user_prompt += f"Please construct a comprehensive scenes.md visual plan for Manim focusing on topic '{topic}'."
 
-    plan_markdown = await call_llm(
-        user_prompt,
-        COMPOSER_SYSTEM_PROMPT,
-        model_name=model_name,
-        base_url=base_url,
-        api_key=api_key,
-    )
+    try:
+        plan_markdown = await call_llm(
+            user_prompt,
+            COMPOSER_SYSTEM_PROMPT,
+            model_name=model_name,
+            base_url=base_url,
+            api_key=api_key,
+        )
+    except RuntimeError as exc:
+        logger.warning("Plan LLM call failed (%s); using topic-aware fallback plan.", exc)
+        plan_markdown = ""
 
     if not plan_markdown or len(plan_markdown.strip()) < 100:
         plan_markdown = _generate_fallback_plan(text, topic)
@@ -347,76 +361,60 @@ CRITICAL MANIM RULES:
 
 
 def _generate_fallback_code(plan: str, knowledge_text: str | None = None) -> tuple[str, str]:
-    """Generate robust, guaranteed-to-render Manim Community code for Taylor's formula / math."""
-    scene_name = "TaylorFormulaScene"
-    code = '''from manim import *
+    """Generate a topic-aware minimal Manim scene when LLM code generation fails."""
+    # Derive topic from the plan header or knowledge text
+    topic = "Mathematical Concept"
+    if plan:
+        header_match = re.search(r"^#\s+(.+)$", plan, re.MULTILINE)
+        if header_match:
+            topic = header_match.group(1).strip().replace("Visualizing ", "")
+    elif knowledge_text:
+        first = [l.strip() for l in knowledge_text.splitlines() if l.strip()]
+        if first:
+            topic = first[0][:60]
 
-class TaylorFormulaScene(Scene):
+    # Build a safe class name from the topic
+    safe_name = re.sub(r"[^A-Za-z0-9]", "", topic.title().replace(" ", ""))
+    if not safe_name or not safe_name[0].isalpha():
+        safe_name = "TopicScene"
+    scene_name = f"{safe_name}Scene"
+
+    # Escape the topic for use in Python string literals
+    topic_escaped = topic.replace("\\", "\\\\").replace('"', '\\"')
+
+    code = f'''from manim import *
+
+class {scene_name}(Scene):
     def construct(self):
-        # 1. Title Header
-        title = Text("Taylor's Formula & Series", font_size=40, color=BLUE_C)
+        # Title
+        title = Text("{topic_escaped}", font_size=40, color=BLUE_C)
         title.to_edge(UP, buff=0.5)
         underline = Line(LEFT * 5, RIGHT * 5, color=BLUE_E).next_to(title, DOWN, buff=0.15)
-        
         self.play(Write(title), GrowFromCenter(underline))
         self.wait(1)
 
-        # 2. General Formula Definition
-        def_text = Text("Approximating smooth functions near center point a:", font_size=24, color=GRAY_A)
-        def_text.next_to(underline, DOWN, buff=0.4)
-
-        formula = MathTex(
-            r"f(x) = f(a) + f'(a)(x-a) + \\frac{f''(a)}{2!}(x-a)^2 + \\cdots + \\frac{f^{(n)}(a)}{n!}(x-a)^n + \\cdots",
-            font_size=32
+        # Intro description
+        intro = Text(
+            "Exploring the core ideas of {topic_escaped}.",
+            font_size=26, color=GRAY_A
         )
-        formula.set_color_by_tex(r"f(a)", YELLOW)
-        formula.set_color_by_tex(r"f'(a)", TEAL)
-        formula.set_color_by_tex(r"\\frac{f''(a)}{2!}", GREEN)
-        formula.next_to(def_text, DOWN, buff=0.5)
-
-        self.play(FadeIn(def_text, shift=UP * 0.2))
-        self.play(Write(formula), run_time=2.5)
-        self.wait(2)
-
-        # 3. Highlight Key Components
-        box = SurroundingRectangle(formula, color=YELLOW, buff=0.2)
-        key_note = Text(
-            "Each n-th derivative term matches curvature, while n! factorials ensure convergence.",
-            font_size=20,
-            color=YELLOW_A
-        ).next_to(box, DOWN, buff=0.4)
-
-        self.play(Create(box), FadeIn(key_note, shift=UP * 0.2))
-        self.wait(2.5)
-
-        # 4. Transition to Maclaurin Series (Special Case a = 0)
-        self.play(FadeOut(def_text), FadeOut(box), FadeOut(key_note))
-        
-        maclaurin_header = Text("Special Case: Maclaurin Series (a = 0)", font_size=28, color=TEAL_A)
-        maclaurin_header.next_to(underline, DOWN, buff=0.4)
-
-        maclaurin_eq = MathTex(
-            r"f(x) = f(0) + f'(0)x + \\frac{f''(0)}{2!}x^2 + \\frac{f^{(3)}(0)}{3!}x^3 + \\cdots",
-            font_size=34
-        )
-        maclaurin_eq.next_to(maclaurin_header, DOWN, buff=0.4)
-
-        example_label = Text("Canonical Example for exponential growth:", font_size=22, color=GRAY_B)
-        example_label.next_to(maclaurin_eq, DOWN, buff=0.4)
-
-        example_eq = MathTex(
-            r"e^x = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\frac{x^4}{4!} + \\cdots",
-            font_size=36,
-            color=GOLD
-        )
-        example_eq.next_to(example_label, DOWN, buff=0.3)
-
-        self.play(ReplacementTransform(formula, maclaurin_eq), FadeIn(maclaurin_header))
+        intro.next_to(underline, DOWN, buff=0.5)
+        self.play(FadeIn(intro, shift=UP * 0.2))
         self.wait(1.5)
-        self.play(FadeIn(example_label), Write(example_eq), run_time=2.0)
-        self.wait(3)
 
-        # Fade out all elements cleanly
+        # Highlight box
+        box = SurroundingRectangle(intro, color=YELLOW, buff=0.25)
+        self.play(Create(box))
+        self.wait(1.5)
+
+        # Conclusion
+        self.play(FadeOut(box), FadeOut(intro))
+        conclusion = Text(
+            "Visual animation for {topic_escaped} is ready.",
+            font_size=28, color=TEAL
+        ).next_to(underline, DOWN, buff=0.5)
+        self.play(FadeIn(conclusion))
+        self.wait(2)
         self.play(FadeOut(Group(*self.mobjects)))
 '''
     return code, scene_name
@@ -437,13 +435,19 @@ async def synthesize_code_service(
         user_prompt += f"Original Knowledge & Mathematical Formulas:\n{knowledge_text}\n\n"
     user_prompt += "Synthesize a complete, elegant Manim Community scene implementing this plan."
 
-    raw_response = await call_llm(
-        user_prompt,
-        CODER_SYSTEM_PROMPT,
-        model_name=model_name,
-        base_url=base_url,
-        api_key=api_key,
-    )
+    llm_error: str | None = None
+    try:
+        raw_response = await call_llm(
+            user_prompt,
+            CODER_SYSTEM_PROMPT,
+            model_name=model_name,
+            base_url=base_url,
+            api_key=api_key,
+        )
+    except RuntimeError as exc:
+        llm_error = str(exc)
+        raw_response = ""
+        logger.warning("Code synthesis LLM call failed: %s", llm_error)
 
     code = ""
     detected_scene = scene_name or "GeneratedScene"
@@ -460,7 +464,14 @@ async def synthesize_code_service(
         if class_match:
             detected_scene = class_match.group(1)
 
-    if not code or len(code) < 100 or "def construct" not in code:
+    # Only fall back if we truly got no usable code (not just short responses)
+    if not code or "def construct" not in code:
+        if llm_error:
+            # Surface the real error to the frontend so the user knows what happened
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"Code generation failed: {llm_error}",
+            )
         code, detected_scene = _generate_fallback_code(plan, knowledge_text)
 
     return VideoCodeResponse(code=code, scene_name=detected_scene)
