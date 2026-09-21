@@ -6,6 +6,11 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 
+# Install build tools for native extensions (pycairo, manimpango)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential pkg-config libcairo2-dev libpango1.0-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 ENV UV_COMPILE_BYTECODE=1
@@ -48,17 +53,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
-# Copy virtual environment from builder
-COPY --from=builder /app/.venv /app/.venv
-COPY --from=builder /app /app
+# Create non-root user and writable directories
+RUN adduser --disabled-password --gecos "" appuser && \
+    mkdir -p /app/media /app/data /app/chroma_data /app/models_cache
+
+# Copy the complete application once.  ``--chown`` avoids a costly recursive
+# ownership walk over the large Manim/Python virtual environment at build time.
+COPY --from=builder --chown=appuser:appuser /app /app
 
 # Add venv to path
 ENV PATH="/app/.venv/bin:$PATH"
-
-# Create non-root user and writable directories
-RUN adduser --disabled-password --gecos "" appuser && \
-    mkdir -p /app/media /app/data /app/chroma_data /app/models_cache && \
-    chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8000

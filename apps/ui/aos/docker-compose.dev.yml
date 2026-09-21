@@ -8,6 +8,47 @@
 # Differs from docker-compose.yml: agents mount, S3_VIDEO_ENDPOINT on app, MinIO curl healthcheck.
 
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:8000
+        - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+        - NEXT_PUBLIC_SITE_URL=http://localhost:3000
+        - NEXT_PUBLIC_MAX_UPLOAD_SIZE_MB=50
+        - NEXT_PUBLIC_OAUTH_PROVIDERS=google
+        - NEXT_PUBLIC_RAG_ENABLED=true
+    image: aos_frontend:latest
+    container_name: aos_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - BACKEND_URL=http://app:8000
+      - BACKEND_WS_URL=ws://app:8000
+      - NEXT_PUBLIC_RAG_ENABLED=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - backend
+    depends_on:
+      app:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "fetch('http://localhost:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+
   app:
     build:
       context: ./backend

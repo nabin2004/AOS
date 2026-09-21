@@ -152,7 +152,7 @@ function Write-StackBanner {
     Write-Host "   Flower:        http://localhost:5555"
     Write-Host "   MinIO console: http://localhost:9011  (minioadmin / minioadmin)"
     Write-Host "   MinIO API:     http://localhost:9010"
-    Write-Host "   Frontend:      http://localhost:3000  (cd frontend; bun dev)"
+    Write-Host "   Frontend:      http://localhost:3000"
     Write-Host ""
     Write-Host ("Animate Celery = HOST (auto). PID: " + $CeleryPid) -ForegroundColor Yellow
     Write-Host ("  Log: " + $HostCeleryLog)
@@ -190,14 +190,14 @@ try {
     }
 
     if ($Rebuild) {
-        Write-Host "Building backend image..." -ForegroundColor Cyan
-        Invoke-Compose @("build", "app")
-        Write-Host "Recreating app + flower (no Docker Celery)..." -ForegroundColor Cyan
-        Invoke-Compose @("up", "-d", "--force-recreate", "app", "flower")
+        Write-Host "Building backend and frontend images..." -ForegroundColor Cyan
+        Invoke-Compose @("build", "app", "frontend")
+        Write-Host "Recreating frontend, app + flower (no Docker Celery)..." -ForegroundColor Cyan
+        Invoke-Compose @("up", "-d", "--force-recreate", "frontend", "app", "flower")
         Invoke-Compose @("up", "-d")
     }
     else {
-        Write-Host "Ensuring stack is up (infra + API + Flower; no Docker Celery)..." -ForegroundColor Cyan
+        Write-Host "Ensuring stack is up (infra + API + Frontend + Flower; no Docker Celery)..." -ForegroundColor Cyan
         Invoke-Compose @("up", "-d")
     }
 
