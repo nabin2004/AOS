@@ -348,8 +348,13 @@ async def call_llm_stream(
     model_name: str | None = None,
     base_url: str | None = None,
     api_key: str | None = None,
-) -> AsyncGenerator[str, None]:
-    """Stream LLM completion tokens as an async generator."""
+) -> AsyncGenerator[tuple[Literal["status", "thinking", "token"], str], None]:
+    """Stream provider activity, reasoning (when supplied), and completion tokens.
+
+    Reasoning is deliberately kept separate from the final response.  Providers
+    use different OpenAI-compatible field names, so accept the common variants
+    without asking a model to reveal reasoning it did not already stream.
+    """
     import json
     import httpx
 
@@ -372,6 +377,7 @@ async def call_llm_stream(
 
     last_err: Exception | None = None
     for target_model in candidate_models:
+        yield "status", f"Connecting to {target_model}…"
         payload = {
             "model": target_model,
             "messages": [
@@ -408,10 +414,17 @@ async def call_llm_stream(
                                 choices = chunk.get("choices") or []
                                 if choices:
                                     delta = choices[0].get("delta", {})
+                                    reasoning = (
+                                        delta.get("reasoning_content")
+                                        or delta.get("reasoning")
+                                        or delta.get("analysis")
+                                    )
+                                    if isinstance(reasoning, str) and reasoning:
+                                        yield "thinking", reasoning
                                     token = delta.get("content")
                                     if token:
                                         got_token = True
-                                        yield token
+                                        yield "token", token
                             except Exception:
                                 continue
             if got_token:
@@ -603,6 +616,7 @@ async def compose_plan_stream_service(
     topic = classification.topic or "Mathematical Concept"
 
     yield f"data: {json.dumps({'type': 'start', 'topic': topic, 'title': f'Visual Plan: {topic}'})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'message': 'Analyzing the lesson and preparing a visual brief…'})}\n\n"
 
     capped_text = text[:MANIM_MAX_CONTEXT_CHARS]
     if len(text) > MANIM_MAX_CONTEXT_CHARS:
@@ -616,21 +630,27 @@ async def compose_plan_stream_service(
     accumulated: list[str] = []
     stream_failed = False
     try:
-        async for token in call_llm_stream(
+        async for event_type, value in call_llm_stream(
             user_prompt,
             COMPOSER_SYSTEM_PROMPT,
             model_name=model_name,
             base_url=base_url,
             api_key=api_key,
         ):
-            accumulated.append(token)
-            yield f"data: {json.dumps({'type': 'token', 'token': token})}\n\n"
+            if event_type == "token":
+                accumulated.append(value)
+                yield f"data: {json.dumps({'type': 'token', 'token': value})}\n\n"
+            elif event_type == "thinking":
+                yield f"data: {json.dumps({'type': 'thinking', 'text': value})}\n\n"
+            else:
+                yield f"data: {json.dumps({'type': 'status', 'message': value})}\n\n"
     except Exception as exc:
         logger.warning("Streaming plan generation failed: %s", exc)
         stream_failed = True
 
     full_plan = "".join(accumulated).strip()
     if stream_failed or len(full_plan) < 100:
+        yield f"data: {json.dumps({'type': 'status', 'message': 'Completing the visual plan with the local fallback…'})}\n\n"
         fallback = _generate_fallback_plan(text, topic)
         if not accumulated:
             chunk_size = 64
@@ -640,6 +660,7 @@ async def compose_plan_stream_service(
                 await asyncio.sleep(0.01)
             full_plan = fallback
 
+    yield f"data: {json.dumps({'type': 'status', 'message': 'Visual plan complete.'})}\n\n"
     yield f"data: {json.dumps({'type': 'done', 'plan': full_plan, 'topic': topic, 'title': f'Visual Plan: {topic}'})}\n\n"
 
 
@@ -822,6 +843,7 @@ async def synthesize_code_stream_service(
 
     detected_scene = scene_name or "GeneratedScene"
     yield f"data: {json.dumps({'type': 'start', 'scene_name': detected_scene})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'message': 'Translating the visual plan into safe ManimCE code…'})}\n\n"
 
     capped_plan = plan[:MANIM_MAX_CONTEXT_CHARS]
     if len(plan) > MANIM_MAX_CONTEXT_CHARS:
@@ -841,15 +863,20 @@ async def synthesize_code_stream_service(
     accumulated: list[str] = []
     stream_failed = False
     try:
-        async for token in call_llm_stream(
+        async for event_type, value in call_llm_stream(
             user_prompt,
             CODER_SYSTEM_PROMPT,
             model_name=model_name,
             base_url=base_url,
             api_key=api_key,
         ):
-            accumulated.append(token)
-            yield f"data: {json.dumps({'type': 'token', 'token': token})}\n\n"
+            if event_type == "token":
+                accumulated.append(value)
+                yield f"data: {json.dumps({'type': 'token', 'token': value})}\n\n"
+            elif event_type == "thinking":
+                yield f"data: {json.dumps({'type': 'thinking', 'text': value})}\n\n"
+            else:
+                yield f"data: {json.dumps({'type': 'status', 'message': value})}\n\n"
     except Exception as exc:
         logger.warning("Streaming code synthesis failed: %s", exc)
         stream_failed = True
@@ -869,6 +896,7 @@ async def synthesize_code_stream_service(
             detected_scene = class_match.group(1)
 
     if stream_failed or not code or "def construct" not in code:
+        yield f"data: {json.dumps({'type': 'status', 'message': 'Checking the generated scene and preparing a fallback if needed…'})}\n\n"
         fallback_code, detected_scene = _generate_fallback_code(plan, knowledge_text)
         if not accumulated:
             chunk_size = 64
@@ -880,6 +908,7 @@ async def synthesize_code_stream_service(
         elif not code:
             code = fallback_code
 
+    yield f"data: {json.dumps({'type': 'status', 'message': 'Manim scene code complete.'})}\n\n"
     yield f"data: {json.dumps({'type': 'done', 'code': code, 'scene_name': detected_scene})}\n\n"
 
 

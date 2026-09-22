@@ -152,8 +152,15 @@ const QUALITY_OPTIONS: { id: RenderQuality; label: string; desc: string; res: st
 type StudioStreamEvent =
   | { type: "start"; scene_name?: string }
   | { type: "token"; token: string }
+  | { type: "thinking"; text: string }
+  | { type: "status"; message: string }
   | { type: "done"; plan?: string; code?: string; scene_name?: string }
   | { type: "error"; detail?: string };
+
+interface StreamActivity {
+  kind: "status" | "thinking";
+  text: string;
+}
 
 async function consumeStudioStream(response: Response, onEvent: (event: StudioStreamEvent) => void) {
   if (!response.body) throw new Error("The server did not return a streaming response.");
@@ -184,6 +191,31 @@ async function consumeStudioStream(response: Response, onEvent: (event: StudioSt
   }
 }
 
+function LiveActivityFeed({ activity }: { activity: StreamActivity[] }) {
+  const latestStatus = [...activity].reverse().find((event) => event.kind === "status");
+  const thinking = activity.filter((event) => event.kind === "thinking").map((event) => event.text).join("");
+
+  return (
+    <div className="space-y-2 rounded-lg border border-primary/15 bg-background/50 p-3">
+      <div className="flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
+        <Lightbulb className="h-3.5 w-3.5 text-primary" />
+        <span>Live pipeline activity</span>
+        {latestStatus ? <span className="truncate font-normal">— {latestStatus.text}</span> : null}
+      </div>
+      {thinking ? (
+        <details open className="group">
+          <summary className="cursor-pointer text-[11px] font-medium text-primary">Model reasoning supplied by provider</summary>
+          <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-foreground/80">
+            {thinking}
+          </pre>
+        </details>
+      ) : (
+        <p className="text-[11px] text-muted-foreground">Waiting for the model&apos;s first streamed update…</p>
+      )}
+    </div>
+  );
+}
+
 export function ManimStudioModal({
   isOpen,
   onClose,
@@ -201,6 +233,7 @@ export function ManimStudioModal({
   const [planMarkdown, setPlanMarkdown] = useState("");
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
   const [isEditingPlan, setIsEditingPlan] = useState(false);
+  const [planActivity, setPlanActivity] = useState<StreamActivity[]>([]);
 
   const [planViewMode, setPlanViewMode] = useState<"visual" | "markdown">("visual");
   const activeSession = useAnimationSessionStore((state) => state.activeSession);
@@ -237,6 +270,7 @@ export function ManimStudioModal({
   const [sceneName, setSceneName] = useState("GeneratedScene");
   const [isSynthesizingCode, setIsSynthesizingCode] = useState(false);
   const [isEditingCode, setIsEditingCode] = useState(false);
+  const [codeActivity, setCodeActivity] = useState<StreamActivity[]>([]);
 
   // Stage 3: Render
   const [quality, setQuality] = useState<RenderQuality>("l");
@@ -260,6 +294,7 @@ export function ManimStudioModal({
     setIsGeneratingPlan(true);
     setRenderError(null);
     setPlanMarkdown("");
+    setPlanActivity([]);
     try {
       const resp = await fetch("/api/videos/plan/stream", {
         method: "POST",
@@ -279,6 +314,11 @@ export function ManimStudioModal({
         await consumeStudioStream(resp, (event) => {
           if (event.type === "token") {
             setPlanMarkdown((current) => current + event.token);
+          } else if (event.type === "thinking" || event.type === "status") {
+            setPlanActivity((current) => [...current, {
+              kind: event.type,
+              text: event.type === "thinking" ? event.text : event.message,
+            }]);
           } else if (event.type === "done") {
             const plan = event.plan || "";
             setPlanMarkdown(plan);
@@ -318,6 +358,7 @@ export function ManimStudioModal({
     setIsSynthesizingCode(true);
     setRenderError(null);
     setSceneCode("");
+    setCodeActivity([]);
     setCurrentStage("code");
     try {
       const resp = await fetch("/api/videos/code/stream", {
@@ -341,6 +382,11 @@ export function ManimStudioModal({
             setSceneName(event.scene_name);
           } else if (event.type === "token") {
             setSceneCode((current) => current + event.token);
+          } else if (event.type === "thinking" || event.type === "status") {
+            setCodeActivity((current) => [...current, {
+              kind: event.type,
+              text: event.type === "thinking" ? event.text : event.message,
+            }]);
           } else if (event.type === "done") {
             const code = event.code || "";
             setSceneCode(code);
@@ -372,7 +418,9 @@ export function ManimStudioModal({
       lastKnowledgeRef.current = initialKnowledge;
       setKnowledgeText(initialKnowledge);
       setPlanMarkdown("");
+      setPlanActivity([]);
       setSceneCode("");
+      setCodeActivity([]);
       setSceneName("GeneratedScene");
       setCurrentStage("plan");
       setRenderError(null);
@@ -717,6 +765,7 @@ export function ManimStudioModal({
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Manim Composer is drafting scenes.md…
                   </div>
+                  <LiveActivityFeed activity={planActivity} />
                   <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap font-mono text-xs leading-relaxed text-foreground/85">
                     {planMarkdown || "Preparing the animation brief…"}
                   </pre>
@@ -931,6 +980,7 @@ export function ManimStudioModal({
                     <Loader2 className="h-4 w-4 animate-spin" />
                     ManimCE Coder is synthesizing scene.py…
                   </div>
+                  <LiveActivityFeed activity={codeActivity} />
                   <pre className="max-h-[480px] overflow-auto whitespace-pre-wrap font-mono text-xs leading-relaxed text-zinc-200">
                     {sceneCode || "Preparing the implementation…"}
                   </pre>

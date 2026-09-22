@@ -1,4 +1,7 @@
+import json
+
 import pytest
+from app.services import manim_studio
 from app.services.manim_studio import classify_text_for_manim, _generate_fallback_plan, _generate_fallback_code
 
 
@@ -39,3 +42,21 @@ def test_fallback_code_generation():
     assert "class TaylorFormulaScene(Scene):" in code
     assert "def construct(self):" in code
     assert scene_name == "TaylorFormulaScene"
+
+
+@pytest.mark.anyio
+async def test_plan_stream_forwards_provider_reasoning_and_status(monkeypatch):
+    async def fake_llm_stream(*args, **kwargs):
+        yield "status", "Connecting to test-model…"
+        yield "thinking", "I will introduce the equation first."
+        yield "token", "# A plan long enough to avoid fallback\n" + ("details\n" * 20)
+
+    monkeypatch.setattr(manim_studio, "call_llm_stream", fake_llm_stream)
+
+    frames = [
+        json.loads(frame.removeprefix("data: ").strip())
+        async for frame in manim_studio.compose_plan_stream_service("Explain a derivative")
+    ]
+
+    assert {frame["type"] for frame in frames} >= {"start", "status", "thinking", "token", "done"}
+    assert any(frame.get("text") == "I will introduce the equation first." for frame in frames)
