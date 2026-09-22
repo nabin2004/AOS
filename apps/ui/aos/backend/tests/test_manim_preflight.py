@@ -49,3 +49,20 @@ def test_repair_normalizes_raw_tex_and_bottom() -> None:
 
     assert 'MathTex(r"e \\approx 2.718")' in repaired.code
     assert "to_edge(DOWN)" in repaired.code
+
+
+def test_preflight_reports_mathtex_index_against_its_definition() -> None:
+    result = preflight_manim_code(
+        "from manim import *\n"
+        "class DemoScene(Scene):\n"
+        "    def construct(self):\n"
+        "        eq = MathTex(r\"x = y\")\n"
+        "        self.play(ReplacementTransform(eq[1], Text(\"?\")))\n"
+    )
+
+    finding = next(error for error in result.errors if error["type"] == "MobjectIndexOutOfRange")
+    assert result.valid is False
+    assert finding["name"] == "eq"
+    assert finding["index"] == 1
+    assert finding["definition_line"] == 4
+    assert "MathTex" in finding["definition"]

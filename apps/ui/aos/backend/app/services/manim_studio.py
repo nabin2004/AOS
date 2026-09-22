@@ -907,6 +907,9 @@ Rules:
 - Make the smallest targeted change that fixes the reported error.
 - Preserve all educational content, narration, VoiceoverScene, bookmarks, timing, and scene order.
 - For Mobject indexing, never assume question[5] exists; use get_part_by_tex safely or a stable VGroup.
+- For any MobjectIndexOutOfRange finding, inspect the supplied construction definition and repair both the
+  construction and use site. Split MathTex/Tex into explicit arguments, use isolate=[...], or transform the
+  whole mobject safely; do not just change the failing index without checking its intended visual meaning.
 - Fix every static finding in the bundle, including all non-raw MathTex/Tex literals, unsupported methods,
   undefined names, and brittle indexes that can be out of range.
 - Do not regenerate unrelated code or introduce new dependencies.

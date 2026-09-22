@@ -42,8 +42,10 @@ RULES:
    NEVER truncate code or use placeholders like "... remaining code unchanged ...".
 4. Ensure the scene subclasses `VoiceoverSlideScene` or `VoiceoverScene` and contains `self.set_speech_service(...)`.
 5. If LaTeX fails (e.g. LaTeX Error or standalone.cls), replace MathTex with simple Tex or Text to guarantee compilation.
-6. Check all coordinates: keep visuals inside |x| <= 6.5, |y| <= 3.5.
-7. Wrap your entire code in a ```python ... ``` markdown code block. Do NOT include commentary outside the code block.
+6. For Mobject index failures, inspect the supplied construction context. Never guess that `obj[1]` exists:
+   split MathTex/Tex into explicit string arguments, add isolate=[...], or use a safe whole-mobject transform.
+7. Check all coordinates: keep visuals inside |x| <= 6.5, |y| <= 3.5.
+8. Wrap your entire code in a ```python ... ``` markdown code block. Do NOT include commentary outside the code block.
 8. PRESERVE all cinematic patterns from the original code — camera orbits, updaters, traced paths,
    particle fields, equation morphs, split screens, etc. Do NOT remove them unless they are the
    direct cause of the error.
@@ -142,7 +144,9 @@ Do NOT call self.play(...) bare without a voiceover block! Every main beat must 
 1. Analyze the exact error above.
 2. Fix the broken imports, syntax errors, or invalid Manim API calls.
 3. If LaTeX/standalone.cls failed, replace complex formulas with Text objects.
-4. Output the complete, working Python file. Do not use placeholders or comments replacing code.
+4. For every MobjectIndexOutOfRange finding, repair the construction and use site together. The definition
+   context in the diagnostic bundle is authoritative; do not merely change the failing index in isolation.
+5. Output the complete, working Python file. Do not use placeholders or comments replacing code.
 """
 
 
@@ -163,6 +167,7 @@ def collect_diagnostic_bundle(code: str, runtime_error: str, attempt_dir: Path) 
                 findings.append({"type": "UnsupportedManimMethod", "name": "set_text", "line": node.lineno})
             elif isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant) and isinstance(node.slice.value, int):
                 findings.append({"type": "BrittleMobjectIndex", "index": node.slice.value, "line": node.lineno})
+        findings.extend(_collect_index_shape_findings(tree, code))
     except SyntaxError as exc:
         findings.append({"type": "SyntaxError", "message": exc.msg, "line": exc.lineno, "column": exc.offset})
 
@@ -190,6 +195,51 @@ def collect_diagnostic_bundle(code: str, runtime_error: str, attempt_dir: Path) 
         + "\n\n=== LATEX / COMPILER LOG TAILS ===\n"
         + ("\n\n".join(log_parts) if log_parts else "No .log file was found; use the runtime diagnostic above.")
     )
+
+
+def _collect_index_shape_findings(tree: ast.AST, code: str) -> list[dict[str, object]]:
+    """Add construction context for literal Mobject indexing failures."""
+    definitions: dict[str, tuple[int | None, str, int]] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
+            continue
+        if len(node.targets) != 1 or not isinstance(node.targets[0], ast.Name):
+            continue
+        callee = node.value.func.id if isinstance(node.value.func, ast.Name) else None
+        if callee not in {"MathTex", "Tex", "VGroup", "Group"}:
+            continue
+        has_isolate = any(keyword.arg == "isolate" for keyword in node.value.keywords)
+        definitions[node.targets[0].id] = (
+            None if has_isolate else len(node.value.args),
+            ast.get_source_segment(code, node.value) or callee,
+            node.lineno,
+        )
+
+    findings: list[dict[str, object]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Subscript) or not isinstance(node.value, ast.Name):
+            continue
+        if not isinstance(node.slice, ast.Constant) or not isinstance(node.slice.value, int):
+            continue
+        definition = definitions.get(node.value.id)
+        if definition is None:
+            continue
+        count, expression, definition_line = definition
+        findings.append({
+            "type": "MobjectIndexOutOfRange" if count is not None and node.slice.value >= count else "MobjectIndexShapeCheck",
+            "name": node.value.id,
+            "index": node.slice.value,
+            "definition_line": definition_line,
+            "definition": expression,
+            "line": node.lineno,
+            "message": (
+                f"{node.value.id}[{node.slice.value}] exceeds the {count} top-level part(s) inferred from its construction."
+                if count is not None and node.slice.value >= count
+                else f"Check {node.value.id}[{node.slice.value}] against its construction before indexing."
+            ),
+            "suggestion": "split MathTex/Tex into explicit arguments, use isolate, or transform the whole mobject safely",
+        })
+    return findings
 
 
 async def run_manim_repair_loop(

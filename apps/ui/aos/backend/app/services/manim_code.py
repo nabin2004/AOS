@@ -171,11 +171,70 @@ def preflight_manim_code(code: str) -> PreflightResult:
             })
 
     errors.extend(_find_nonraw_tex_strings(code))
+    errors.extend(_find_mobject_index_mismatches(tree, code))
 
     return PreflightResult(
         valid=not any(item.get("severity", "error") == "error" for item in errors),
         errors=tuple(errors),
     )
+
+
+def _find_mobject_index_mismatches(tree: ast.AST, code: str) -> list[dict[str, object]]:
+    """Compare literal Mobject indexes with their local construction shape.
+
+    This catches semantic failures such as ``eq = MathTex("x = y")`` followed
+    by ``eq[1]`` before Manim has to render. Unknown/dynamic definitions are
+    reported as warnings so valid code is not rejected merely because static
+    analysis cannot prove its shape.
+    """
+    definitions: dict[str, tuple[int | None, str, int]] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
+            continue
+        if len(node.targets) != 1 or not isinstance(node.targets[0], ast.Name):
+            continue
+        call = node.value
+        callee = call.func.id if isinstance(call.func, ast.Name) else None
+        if callee not in {"MathTex", "Tex", "VGroup", "Group"}:
+            continue
+        isolate = any(keyword.arg == "isolate" for keyword in call.keywords)
+        count = None if isolate else len(call.args)
+        definitions[node.targets[0].id] = (
+            count,
+            ast.get_source_segment(code, call) or callee,
+            node.lineno,
+        )
+
+    findings: list[dict[str, object]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Subscript) or not isinstance(node.value, ast.Name):
+            continue
+        if not isinstance(node.slice, ast.Constant) or not isinstance(node.slice.value, int):
+            continue
+        name = node.value.id
+        definition = definitions.get(name)
+        if definition is None:
+            continue
+        count, expression, definition_line = definition
+        finding: dict[str, object] = {
+            "type": "MobjectIndexOutOfRange" if count is not None and node.slice.value >= count else "MobjectIndexShapeCheck",
+            "name": name,
+            "index": node.slice.value,
+            "definition_line": definition_line,
+            "definition": expression,
+            "line": node.lineno,
+            "column": node.col_offset + 1,
+            "message": (
+                f"{name}[{node.slice.value}] is not valid for this statically known construction with {count} top-level part(s)."
+                if count is not None and node.slice.value >= count
+                else f"Check {name}[{node.slice.value}] against the construction before indexing."
+            ),
+            "suggestion": "split MathTex/Tex into explicit arguments, use isolate, or transform the whole mobject safely",
+        }
+        if count is None:
+            finding["severity"] = "warning"
+        findings.append(finding)
+    return findings
 
 
 def _find_nonraw_tex_strings(code: str) -> list[dict[str, object]]:
