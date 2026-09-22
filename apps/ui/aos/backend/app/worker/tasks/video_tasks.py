@@ -293,6 +293,10 @@ def _run_agents_cli(
         cmd.append("--fast")
         cmd.extend(["--mode", "continuous"])
 
+    # Do not rely on the CLI's medium/5-minute default for UI videos. Keep it
+    # configurable so deployments can trade duration against render cost.
+    cmd.extend(["--length", getattr(settings, "VIDEO_DEFAULT_LENGTH", "10m")])
+
     logger.info("Running agents CLI in %s: %s …", agents_dir, command)
     env = os.environ.copy()
     # Force unbuffered / line-buffered Python so progress appears promptly.
@@ -841,6 +845,8 @@ async def _run_generate_video(
         notify_payload["slides"] = slides
     if teaching_segments:
         notify_payload["teaching_segments"] = teaching_segments
+    if "has_audio" in artifact:
+        notify_payload["has_audio"] = bool(artifact["has_audio"])
 
     await _notify_video_status(notify_payload)
     return {

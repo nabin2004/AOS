@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import logging
 import os
 import re
@@ -38,6 +39,7 @@ from app.schemas.video_generation import (
     VideoRenderCustomResponse,
 )
 from app.services.video_storage import get_video_storage, video_object_key, code_object_key
+from app.services.manim_code import preflight_manim_code, repair_manim_code
 
 logger = logging.getLogger(__name__)
 
@@ -760,6 +762,7 @@ async def synthesize_code_service(
     model_name: str | None = None,
     base_url: str | None = None,
     api_key: str | None = None,
+    repair_error: str | None = None,
 ) -> VideoCodeResponse:
     """Generate Manim Community Edition code from the approved visual plan."""
     # Guard: cap plan size — it can be huge if the composer returned a long markdown
@@ -782,6 +785,26 @@ async def synthesize_code_service(
     user_prompt = f"Approved Visual Plan (scenes.md):\n{capped_plan}\n\n"
     if capped_knowledge:
         user_prompt += f"Original Knowledge & Mathematical Formulas:\n{capped_knowledge}\n\n"
+    if repair_error:
+        repair_docs = "No additional documentation was available."
+        try:
+            from app.agents.tools.rag_tool import search_knowledge_base
+
+            repair_docs = await search_knowledge_base(
+                query=f"ManimCE repair documentation for this compiler error: {repair_error[-2400:]}",
+                kb_collection_names=[settings.rag.collection_name],
+                top_k=5,
+            )
+        except Exception as exc:
+            logger.warning("Repair documentation retrieval failed: %s", exc)
+        user_prompt += (
+            "\nThis is a repair request. Preserve the scene's teaching content, narration, "
+            "VoiceoverScene, and timing. Fix the reported error with official ManimCE APIs. "
+            "Never chain methods from get_part_by_tex unless the result is checked for None; "
+            "for arrows, use a stable parent-mobject point or a known submobject reference.\n"
+            f"Manim compiler traceback:\n{repair_error[-6000:]}\n\n"
+            f"Retrieved Manim documentation:\n{repair_docs[:10000]}\n\n"
+        )
     user_prompt += "Synthesize a complete, elegant Manim Community scene implementing this plan."
 
     llm_error: str | None = None
@@ -824,6 +847,105 @@ async def synthesize_code_service(
         code, detected_scene = _generate_fallback_code(plan, knowledge_text)
 
     return VideoCodeResponse(code=code, scene_name=detected_scene)
+
+
+async def repair_code_service(
+    code: str,
+    error: str,
+    scene_name: str | None = None,
+    *,
+    model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> VideoCodeResponse:
+    """Repair the current scene in place using one focused model call.
+
+    Unlike normal synthesis, this never regenerates from the lecture plan.
+    Keeping the current source in the prompt prevents repair attempts from
+    discarding narration, timing, or already-correct scenes.
+    """
+    from app.services.manim_code import preflight_manim_code, repair_manim_code
+
+    original = repair_manim_code(code)
+    current_code = original.code
+    preflight = preflight_manim_code(current_code)
+    diagnostic_bundle = {
+        "stage": "repair",
+        "runtime_or_compiler": error[-9000:],
+        "static_findings": list(preflight.errors),
+        "deterministic_repairs_already_applied": list(original.changes),
+    }
+    docs = "No additional documentation was available."
+    try:
+        from app.agents.tools.rag_tool import search_knowledge_base
+
+        docs = await search_knowledge_base(
+            query=f"ManimCE API repair for this runtime error: {error[-2400:]}",
+            kb_collection_names=[settings.rag.collection_name],
+            top_k=4,
+        )
+    except Exception as exc:
+        logger.warning("Repair documentation retrieval failed: %s", exc)
+
+    prompt = f"""Repair this existing Manim Community Edition source in place.
+
+Diagnostic bundle (address every item in one pass; do not wait for the next render to discover obvious issues):
+```json
+{json.dumps(diagnostic_bundle, indent=2)[:18000]}
+```
+
+Relevant Manim documentation:
+{docs[:9000]}
+
+Current source:
+```python
+{current_code[:36000]}
+```
+
+Rules:
+- Return the complete corrected source in one python code block and nothing else.
+- Make the smallest targeted change that fixes the reported error.
+- Preserve all educational content, narration, VoiceoverScene, bookmarks, timing, and scene order.
+- For Mobject indexing, never assume question[5] exists; use get_part_by_tex safely or a stable VGroup.
+- Fix every static finding in the bundle, including all non-raw MathTex/Tex literals, unsupported methods,
+  undefined names, and brittle indexes that can be out of range.
+- Do not regenerate unrelated code or introduce new dependencies.
+"""
+    try:
+        raw = await asyncio.wait_for(
+            call_llm(
+                prompt,
+                "You are a senior ManimCE repair engineer. Fix the existing source, do not redesign it.",
+                model_name=model_name,
+                base_url=base_url,
+                api_key=api_key,
+            ),
+            timeout=90.0,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail=f"Manim repair agent timed out or failed: {exc}",
+        ) from exc
+
+    match = re.search(r"```(?:python|py)?\s*([\s\S]+?)\s*```", raw, re.I)
+    repaired_code = (match.group(1) if match else raw).strip()
+    if not repaired_code or "def construct" not in repaired_code:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Repair agent returned incomplete Python source")
+
+    repaired_code = repair_manim_code(repaired_code).code
+    preflight = preflight_manim_code(repaired_code)
+    if not preflight.valid:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={"stage": "repair_preflight", "status": "failed", "errors": list(preflight.errors)},
+        )
+
+    detected_scene = scene_name or "GeneratedScene"
+    class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\((?:ThreeDScene|Scene|MovingCameraScene)", repaired_code)
+    if class_match:
+        detected_scene = class_match.group(1)
+    return VideoCodeResponse(code=repaired_code, scene_name=detected_scene)
 
 
 async def synthesize_code_stream_service(
@@ -994,6 +1116,15 @@ def _execute_manim_render(
         # Sort newest first
         candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)
         return candidates[0], ""
+    # Rich LaTeX diagnostics are usually written beside the generated media,
+    # not to stderr. Include their tails in the returned error so the next UI
+    # repair request gets the actual TeX failure in the same cycle.
+    log_files = sorted(workspace_dir.rglob("*.log"), key=lambda p: p.stat().st_mtime)[-5:]
+    for log_file in log_files:
+        try:
+            error_log += f"\n--- {log_file.name} (tail) ---\n{log_file.read_text(encoding='utf-8', errors='replace')[-6000:]}"
+        except OSError:
+            continue
     return None, error_log or "Animation video file was not generated by Manim."
 
 
@@ -1007,11 +1138,31 @@ async def render_custom_code_service(
     prompt: str | None = None,
 ) -> VideoRenderCustomResponse:
     """Compile and render user-approved Manim code, upload to MinIO/storage, and return playback info."""
+    repair = repair_manim_code(code)
+    effective_code = repair.code
+    if repair.changes:
+        logger.info("Applied deterministic Manim compatibility repairs: %s", "; ".join(repair.changes))
+
+    preflight = preflight_manim_code(effective_code)
+    if not preflight.valid:
+        import json
+
+        diagnostic_bundle = {
+            "stage": "preflight",
+            "status": "failed",
+            "errors": list(preflight.errors),
+            "repair_changes": list(repair.changes),
+        }
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=json.dumps(diagnostic_bundle),
+        )
+
     # Derive effective scene name from the code itself first, then the
     # explicit parameter, falling back to a generic name.  Never hard-code
     # TaylorFormulaScene as the default.
     effective_scene = "GeneratedScene"
-    class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\(", code or "")
+    class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\(", effective_code or "")
     if class_match:
         effective_scene = class_match.group(1)
     elif scene_name:
@@ -1065,7 +1216,7 @@ async def render_custom_code_service(
     # Execute rendering in threadpool to keep async loop responsive
     rendered_mp4, compile_err = await asyncio.to_thread(
         _execute_manim_render,
-        code,
+        effective_code,
         effective_scene,
         quality,
         run_dir,
@@ -1128,5 +1279,5 @@ async def render_custom_code_service(
         stream_url=stream_url,
         scene_name=effective_scene,
         quality=quality,
-        code=code,
+        code=effective_code,
     )

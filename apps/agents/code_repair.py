@@ -8,12 +8,15 @@ builds a targeted repair prompt, and requests a minimal root-cause fix from the 
 from __future__ import annotations
 
 from dataclasses import dataclass
+import ast
 import json
 import logging
 from pathlib import Path
 import re
 import shutil
 import sys
+import tokenize
+from io import StringIO
 from typing import Any
 
 from pydantic_ai import Agent
@@ -22,7 +25,6 @@ from cinematic_hints import CINEMATIC_HINT_LEGEND
 from error_classifier import ErrorCategory, classify_error
 from llm_config import model_for_agent, settings_for
 from llm_retry import execute_with_llm_retry
-from reliability_config import CODE_REPAIR_MAX_ATTEMPTS
 from tools.compile import compile_manim_code, validate_manim_code_static
 from tools.manim_source import auto_wrap_missing_voiceovers, prepare_manim_source
 from video_validator import validate_video_file
@@ -94,6 +96,7 @@ def build_repair_prompt(
     attempt: int,
     max_attempts: int,
     scene_name: str | None = None,
+    diagnostic_bundle: str | None = None,
 ) -> str:
     """Build a comprehensive context for the repair model."""
     safe_traceback = str(traceback).strip()
@@ -128,6 +131,7 @@ Do NOT call self.play(...) bare without a voiceover block! Every main beat must 
 
 === COMPILER DIAGNOSTIC / TRACEBACK ===
 {safe_traceback}
+{diagnostic_bundle or '=== STATIC / LATEX DIAGNOSTICS ===\nNo additional diagnostics were collected.'}
 {voiceover_guidance}
 === BROKEN SOURCE CODE ===
 ```python
@@ -142,6 +146,52 @@ Do NOT call self.play(...) bare without a voiceover block! Every main beat must 
 """
 
 
+def collect_diagnostic_bundle(code: str, runtime_error: str, attempt_dir: Path) -> str:
+    """Collect all cheap diagnostics before asking the model to repair.
+
+    This deliberately does not stop at the first AST finding. It also includes
+    the actual LaTeX/compiler log, which is where malformed non-raw MathTex
+    strings are explained by TeX.
+    """
+    findings: list[dict[str, object]] = []
+    try:
+        tree = ast.parse(code)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Name) and node.id == "BOTTOM" and isinstance(node.ctx, ast.Load):
+                findings.append({"type": "UnsupportedManimName", "name": "BOTTOM", "suggestion": "DOWN", "line": node.lineno})
+            elif isinstance(node, ast.Attribute) and node.attr == "set_text":
+                findings.append({"type": "UnsupportedManimMethod", "name": "set_text", "line": node.lineno})
+            elif isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant) and isinstance(node.slice.value, int):
+                findings.append({"type": "BrittleMobjectIndex", "index": node.slice.value, "line": node.lineno})
+    except SyntaxError as exc:
+        findings.append({"type": "SyntaxError", "message": exc.msg, "line": exc.lineno, "column": exc.offset})
+
+    lines = code.splitlines()
+    try:
+        for token in tokenize.generate_tokens(StringIO(code).readline):
+            if token.type != tokenize.STRING or "r" in token.string[: token.string.find('"') if '"' in token.string else token.string.find("'")].lower():
+                continue
+            line = lines[token.start[0] - 1] if 0 < token.start[0] <= len(lines) else ""
+            if "\\" in token.string and re.search(r"\b(?:MathTex|Tex|SingleStringMathTex)\s*\(", line[: token.start[1]]):
+                findings.append({"type": "NonRawTexString", "line": token.start[0], "text": token.string})
+    except (tokenize.TokenError, IndentationError):
+        pass
+
+    log_parts: list[str] = []
+    for path in sorted(attempt_dir.rglob("*.log"))[-5:]:
+        try:
+            content = path.read_text(encoding="utf-8", errors="replace")
+            log_parts.append(f"--- {path.name} (tail) ---\n{content[-6000:]}")
+        except OSError:
+            continue
+    return (
+        "=== STATIC DIAGNOSTICS (ALL FINDINGS) ===\n"
+        + json.dumps(findings, indent=2)
+        + "\n\n=== LATEX / COMPILER LOG TAILS ===\n"
+        + ("\n\n".join(log_parts) if log_parts else "No .log file was found; use the runtime diagnostic above.")
+    )
+
+
 async def run_manim_repair_loop(
     *,
     original_prompt: str,
@@ -149,7 +199,7 @@ async def run_manim_repair_loop(
     error_summary: str,
     run_dir: str | Path,
     scene_name: str = "Scene",
-    max_attempts: int = CODE_REPAIR_MAX_ATTEMPTS,
+    max_attempts: int = 1,
 ) -> RepairResult:
     """Run an iterative self-healing repair loop up to max_attempts."""
     workspace = Path(run_dir)
@@ -180,6 +230,7 @@ async def run_manim_repair_loop(
             if valid_fast and "missing_voiceover_calls" in current_error:
                 pass
             else:
+                diagnostic_bundle = collect_diagnostic_bundle(current_code, current_error, attempt_dir)
                 repair_prompt = build_repair_prompt(
                     original_prompt=original_prompt,
                     broken_code=current_code,
@@ -187,6 +238,7 @@ async def run_manim_repair_loop(
                     attempt=attempt,
                     max_attempts=max_attempts,
                     scene_name=scene_name,
+                    diagnostic_bundle=diagnostic_bundle,
                 )
 
                 async def _call_repair() -> str:

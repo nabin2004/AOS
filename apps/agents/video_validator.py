@@ -65,6 +65,27 @@ def _inspect_mp4_atoms_fallback(path: Path) -> bool:
         return False
 
 
+def _decode_check(path: Path) -> tuple[bool, str | None]:
+    """Decode every present stream so metadata-only validation cannot pass corrupt MP4s."""
+    try:
+        proc = subprocess.run(
+            [
+                "ffmpeg", "-v", "error", "-xerror",
+                "-i", str(path),
+                "-map", "0:v:0", "-map", "0:a:0?",
+                "-f", "null", "-",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError) as exc:
+        return False, str(exc)
+    if proc.returncode != 0:
+        return False, (proc.stderr or "FFmpeg decode failed")[-1200:]
+    return True, None
+
+
 def validate_video_file(
     video_path: str | Path | None,
     *,
@@ -145,6 +166,21 @@ def validate_video_file(
         width = video_stream.get("width")
         height = video_stream.get("height")
         codec = video_stream.get("codec_name")
+
+        decodable, decode_error = _decode_check(p)
+        if not decodable:
+            return VideoValidationResult(
+                ok=False,
+                video_path=str(p),
+                file_size_bytes=size,
+                duration_seconds=duration,
+                width=width,
+                height=height,
+                codec=codec,
+                has_audio=audio_stream is not None,
+                error=f"FFmpeg could not decode the rendered video: {decode_error}",
+                detail=info,
+            )
 
         return VideoValidationResult(
             ok=True,

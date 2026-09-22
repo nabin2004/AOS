@@ -163,6 +163,7 @@ class AssistantAgent:
         # ``openai_*``-prefixed fields on TypedDict settings are silently
         # ignored by other providers, so this is safe to apply unconditionally.
         model_settings: ModelSettings = ModelSettings()
+        model_settings["max_tokens"] = settings.AI_MAX_OUTPUT_TOKENS
         if self.temperature is not None:
             model_settings["temperature"] = self.temperature
         if self.thinking_effort:

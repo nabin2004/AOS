@@ -1,29 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { defaultLocale } from "@/i18n";
 import { SITE } from "@/lib/seo";
-
-const display = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["700", "800"],
-  display: "swap",
-});
-
-const body = Inter({
-  subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-const mono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["400", "500"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -89,7 +67,6 @@ export default function RootLayout({
     <html
       lang={defaultLocale}
       suppressHydrationWarning
-      className={`${display.variable} ${body.variable} ${mono.variable}`}
     >
       <body className="font-body">{children}</body>
     </html>

@@ -163,7 +163,9 @@ def _ollama_num_ctx() -> int:
 
 def settings_for(role: AgentRole) -> ModelSettings | None:
     if custom_endpoint_for_role(role):
-        return None
+        # OpenAI-compatible local/BYOK servers still need an explicit output
+        # budget; they simply do not understand Ollama's ``num_ctx`` body.
+        return {"max_tokens": _max_tokens_for(role)}
     model = model_for(role)
     if not is_ollama(model):
         return None

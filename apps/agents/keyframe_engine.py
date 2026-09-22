@@ -196,6 +196,17 @@ def execute_completion_with_fallback(
         )
 
     candidates = [primary_model]
+    # The keyframe engine uses the OpenAI-compatible client directly rather
+    # than Pydantic AI, so its completion budget must be supplied here.
+    # Without this, local/BYOK servers often fall back to a short provider
+    # default and produce abbreviated narration.
+    try:
+        max_tokens = max(
+            2048,
+            int(os.getenv("AOS_KEYFRAME_MAX_TOKENS", os.getenv("AOS_MAX_TOKENS", "12288"))),
+        )
+    except ValueError:
+        max_tokens = 12288
 
     # Add robust backup models when using OpenRouter or cloud
     if "openrouter.ai" in base_url:
@@ -210,6 +221,7 @@ def execute_completion_with_fallback(
                 model=cand,
                 messages=messages,
                 temperature=temperature,
+                max_tokens=max_tokens,
                 timeout=timeout,
             )
         except Exception as exc:
@@ -302,7 +314,8 @@ CRITICAL PEDAGOGICAL RULES:
    - GIVE a concrete case or analogy.
    - RECAP the central takeaway.
 
-Length: Around 140-220 words (~50-90 seconds of speech).
+Length: Around 180-320 words (~70-130 seconds of speech). Do not stop after a
+short summary; fully explain the visible steps, intuition, and takeaway.
 Wrap your output in <narration> ... </narration> tags.
 """
 
@@ -868,7 +881,7 @@ def _synthesize_edge_tts(
 def synthesize_teaching_audio(
     narration_text: str,
     output_wav: Path,
-    max_words: int = 220,
+    max_words: int = 320,
     voice: str | None = None,
     return_status: bool = False,
 ) -> float | tuple[float, bool]:
@@ -968,6 +981,27 @@ def assemble_teaching_segment(
         return res
 
     return None
+
+
+def _mp4_has_audio_stream(video_path: Path) -> bool | None:
+    """Verify that the assembled MP4, not only its source WAV, has audio."""
+    if not video_path.is_file():
+        return False
+    try:
+        probe = subprocess.run(
+            [
+                "ffprobe", "-v", "error", "-select_streams", "a:0",
+                "-show_entries", "stream=codec_type", "-of", "csv=p=0",
+                str(video_path),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=15,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return probe.returncode == 0 and "audio" in probe.stdout.lower()
 
 
 def repair_visual_anchor_code(
@@ -1634,7 +1668,13 @@ def plan_teaching_segment(
 ) -> TeachingSegment:
     """Generates a TeachingSegment: first the rich visual anchor, then in-depth narration."""
     clean_topic = _extract_topic_title(prompt)
-    condensed_prompt = clean_topic if len(prompt) < 400 else f"{clean_topic}\n\nKey Concepts Context:\n{prompt[:400]}..."
+    try:
+        prompt_limit = max(2000, int(os.getenv("AOS_KEYFRAME_PROMPT_CHARS", "12000")))
+    except ValueError:
+        prompt_limit = 12000
+    # Preserve the user's examples, narration contract, and visual constraints.
+    # The old 400-character slice reduced detailed lessons to a topic title.
+    condensed_prompt = prompt[:prompt_limit] if len(prompt) > prompt_limit else prompt
     domain_ctx = _get_domain_knowledge(prompt)
     ctx_block = f"\nAdditional Domain Grounding:\n{domain_ctx}\n" if domain_ctx else ""
 
@@ -1994,6 +2034,8 @@ def run_producer_consumer(
         s.audio_path and Path(s.audio_path).is_file() and s.narration_duration > 0.5 and getattr(s, "visual_verdict", {}).get("tts_ok", True)
         for s in segments
     )
+    verified_audio = _mp4_has_audio_stream(final_video) if video_ok else False
+    has_audio = has_real_audio if verified_audio is None else bool(verified_audio)
 
     manifest = {
         "ok": bool(video_ok and all_chunks_valid),
@@ -2021,7 +2063,7 @@ def run_producer_consumer(
             for s in segments
         ],
         "teaching_segments": segment_dicts,
-        "has_audio": bool(has_real_audio and video_ok),
+        "has_audio": bool(has_audio and video_ok),
     }
     manifest_path = run_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")

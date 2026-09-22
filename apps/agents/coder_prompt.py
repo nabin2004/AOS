@@ -23,6 +23,7 @@ _LOCAL_PLAN_KEYS = (
 
 CODER_SCRIPT_HINT = (
     "VOICEOVER, PACING & PEDAGOGY CONTRACT (CRITICAL):\n"
+    "0. VOICEOVER IMPLEMENTATION (MANDATORY): import VoiceoverScene from manim_voiceover and AOSSpeechService from tools.aos_speech_service; initialize `self.set_speech_service(AOSSpeechService(voice=\"alba\", cache_dir=\"voiceover_cache\"))`.\n"
     "1. DUAL INHERITANCE (CRITICAL FOR 3D & CAMERA MOVEMENT):\n"
     "   - Whenever using 3D axes (ThreeDAxes), camera moves (move_camera), or rotations (begin_ambient_camera_rotation),\n"
     "     your scene MUST subclass both: `class MyScene(VoiceoverScene, ThreeDScene):`.\n"
@@ -30,6 +31,7 @@ CODER_SCRIPT_HINT = (
     "2. FLAWLESS AUDIO SYNCHRONIZATION:\n"
     "   - Every animation beat MUST be wrapped inside `with self.voiceover(text=\"...\") as tracker:` blocks.\n"
     "   - Tie visual animation durations directly to tracker.duration! E.g. `self.play(..., run_time=tracker.duration)`.\n"
+    "   - Use `<bookmark mark=\"name\"/>` tags and `self.wait_until_bookmark(\"name\")` for narration-led reveals when a visual must appear at a precise spoken moment.\n"
     "   - NEVER put hardcoded self.wait(...) inside a voiceover block. Let the voiceover tracker determine the beat length!\n"
     "3. SCREEN HYGIENE (NO SPATIAL OVERLAPS):\n"
     "   - When transitioning to a new coordinate plane, 3D axes, or visual section, explicitly clear the board:\n"
@@ -48,6 +50,8 @@ CODER_SCRIPT_HINT = (
     "     curve = VMobject(color=BLUE).set_points_smoothly(pts)\n"
     "   - For chaos/butterfly effect, trace a second nearby trajectory (e.g. x+0.0001 in RED) to show divergence!\n"
     "5. Implement Plan.teaching_script narration lines verbatim in sequential order.\n"
+    "   - Do not paraphrase, omit, reorder, or invent spoken content.\n"
+    "   - Before each new concept, FadeOut/Uncreate/Transform obsolete objects; explicitly clean temporary objects before the scene ends.\n"
     "6. Silent self.play(...) without a voiceover block will fail static validation.\n"
 )
 

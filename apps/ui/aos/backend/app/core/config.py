@@ -162,6 +162,9 @@ class Settings(BaseSettings):
     AI_TEMPERATURE: float = 0.7
     AI_THINKING_ENABLED: bool = False
     AI_THINKING_EFFORT: str = "medium"  # "low", "medium", "high"
+    # Leave enough completion room for detailed explanations and code.
+    AI_MAX_OUTPUT_TOKENS: int = 8192
+    VIDEO_DEFAULT_LENGTH: str = "10m"
     AI_AVAILABLE_MODELS: list[str] = [
         "anthropic/claude-opus-4-7",
         "anthropic/claude-sonnet-4-6",

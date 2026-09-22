@@ -22,8 +22,14 @@ export function RevisionCompareModal({ videoGenerationId }: RevisionCompareModal
     return null;
   }
 
-  const revA = revisions.find((r) => r.revision === compareRevision) || revisions[0];
-  const revB = revisions.find((r) => r.revision === activeRevision) || revisions[revisions.length - 1];
+  const firstRevision = revisions[0];
+  const lastRevision = revisions.at(-1);
+  if (!firstRevision || !lastRevision) {
+    return null;
+  }
+
+  const revA = revisions.find((r) => r.revision === compareRevision) || firstRevision;
+  const revB = revisions.find((r) => r.revision === activeRevision) || lastRevision;
 
   return (
     <div className="rounded-2xl border border-primary/40 bg-card/95 p-4 shadow-xl space-y-3">

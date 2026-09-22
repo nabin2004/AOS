@@ -4,6 +4,7 @@ from fastmcp import FastMCP
 
 from config import SEARCH_TOP_K
 from vector_index import SearchResult, get_or_build_index
+from repair import deterministic_repair, documentation_context, preflight_source
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -64,6 +65,38 @@ async def search_manim_signatures(query: str, top_k: int = SEARCH_TOP_K) -> str:
     """
     results = index.search(query, embedder, top_k=top_k, chunk_type="signature")
     return _format_results(results, "signatures")
+
+
+@server.tool()
+async def repair_manim_source(source: str, error: str, top_k: int = SEARCH_TOP_K) -> dict:
+    """Diagnose and safely repair generated Manim source.
+
+    The tool first searches the local Manim documentation index, then applies
+    only deterministic compatibility edits. It returns the evidence and the
+    full candidate source so a caller can review it before rendering.
+    """
+    result = deterministic_repair(source)
+    diagnostics = preflight_source(result.source)
+    docs = documentation_context(
+        error=error,
+        source=source,
+        search=lambda query, limit, chunk_type: index.search(
+            query, embedder, top_k=limit, chunk_type=chunk_type
+        ),
+        top_k=max(1, min(top_k, 8)),
+    )
+    return {
+        "ok": result.syntax_valid,
+        "source": result.source,
+        "changes": list(result.changes),
+        "syntax_valid": result.syntax_valid,
+        "syntax_error": result.syntax_error,
+        "preflight": {
+            "status": "failed" if diagnostics else "passed",
+            "errors": diagnostics,
+        },
+        "documentation": docs,
+    }
 
 
 if __name__ == "__main__":

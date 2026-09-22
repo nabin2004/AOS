@@ -208,8 +208,39 @@ def assemble_segments(segment_paths: List[Path], output_path: Path) -> Path:
     if not valid_chunks:
         raise ValueError("No valid video segment files found on disk")
 
+    def is_decodable(path: Path) -> bool:
+        try:
+            result = subprocess.run(
+                [
+                    "ffmpeg", "-v", "error", "-xerror",
+                    "-i", str(path),
+                    "-map", "0:v:0", "-map", "0:a:0?",
+                    "-f", "null", "-",
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=120,
+            )
+            return result.returncode == 0
+        except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+            return False
+
+    invalid_chunks = [p for p in valid_chunks if not is_decodable(p)]
+    if invalid_chunks:
+        raise RuntimeError(
+            "Cannot assemble: one or more video segments failed FFmpeg decode: "
+            + ", ".join(p.name for p in invalid_chunks)
+        )
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     if len(valid_chunks) == 1:
-        shutil.copy2(valid_chunks[0], output_path)
+        temp_output = output_path.with_name(output_path.stem + ".assembling.mp4")
+        shutil.copy2(valid_chunks[0], temp_output)
+        if not is_decodable(temp_output):
+            temp_output.unlink(missing_ok=True)
+            raise RuntimeError("Single video segment failed FFmpeg decode validation")
+        temp_output.replace(output_path)
         return output_path
 
     concat_file = output_path.parent / "segments_concat.txt"
@@ -218,6 +249,8 @@ def assemble_segments(segment_paths: List[Path], output_path: Path) -> Path:
             escaped = str(p.resolve()).replace("\\", "/")
             f.write(f"file '{escaped}'\n")
 
+    temp_output = output_path.with_name(output_path.stem + ".assembling.mp4")
+    temp_output.unlink(missing_ok=True)
     cmd = [
         "ffmpeg",
         "-y",
@@ -229,12 +262,17 @@ def assemble_segments(segment_paths: List[Path], output_path: Path) -> Path:
         "-c:a", "aac",
         "-b:a", "192k",
         "-movflags", "+faststart",
-        str(output_path.resolve()),
+        str(temp_output.resolve()),
     ]
 
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    if result.returncode != 0 or not output_path.is_file():
-        # Fallback: copy first chunk
-        shutil.copy2(valid_chunks[0], output_path)
+    if result.returncode != 0 or not temp_output.is_file() or not is_decodable(temp_output):
+        temp_output.unlink(missing_ok=True)
+        raise RuntimeError(
+            "FFmpeg produced an undecodable concatenated video: "
+            + (result.stderr[-1000:] if result.stderr else "unknown error")
+        )
+
+    temp_output.replace(output_path)
 
     return output_path

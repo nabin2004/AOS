@@ -169,6 +169,7 @@ async def synthesize_code(
     model_name = payload.get("model_name")
     base_url = payload.get("base_url")
     api_key = payload.get("api_key")
+    repair_error = payload.get("repair_error")
     return await synthesize_code_service(
         plan,
         knowledge_text=knowledge_text,
@@ -176,6 +177,25 @@ async def synthesize_code(
         model_name=model_name,
         base_url=base_url,
         api_key=api_key,
+        repair_error=repair_error,
+    )
+
+
+@router.post("/repair", response_model=None)
+async def repair_code(
+    payload: dict[str, Any],
+    user: CurrentUser,
+) -> Any:
+    """Repair the submitted Manim source against a concrete compiler traceback."""
+    from app.services.manim_studio import repair_code_service
+
+    return await repair_code_service(
+        code=payload.get("code", ""),
+        error=payload.get("error", ""),
+        scene_name=payload.get("scene_name"),
+        model_name=payload.get("model_name"),
+        base_url=payload.get("base_url"),
+        api_key=payload.get("api_key"),
     )
 
 

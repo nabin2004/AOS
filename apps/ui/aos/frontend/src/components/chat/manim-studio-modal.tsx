@@ -443,36 +443,104 @@ export function ManimStudioModal({
     setIsRendering(true);
     setRenderError(null);
     setRenderProgressMsg("Initiating Docker Manim compiler container...");
+    // One initial render plus one bundled repair pass. The repair endpoint
+    // receives static findings and compiler diagnostics together, so repeated
+    // blind render/repair cycles are unnecessary and make failures look hung.
+    const maxRepairAttempts = 2;
+    let candidateCode = sceneCode;
+    let lastError = "";
+    const attemptedCode = new Set<string>([candidateCode]);
     try {
-      const resp = await fetch("/api/videos/render-custom", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
-        body: JSON.stringify({
-          code: sceneCode,
-          scene_name: sceneName,
-          quality: quality,
-          conversation_id: conversationId,
-          prompt: `Manim Studio: ${sceneName}`,
-        }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        setVideoGenerationId(data.video_generation_id);
-        setVideoStreamUrl(data.stream_url);
-        updateSession({ stage: "review", render: { jobId: data.video_generation_id, videoUrl: data.stream_url } });
-        setCurrentStage("review");
-      } else {
+      for (let attempt = 0; attempt < maxRepairAttempts; attempt += 1) {
+        setRenderProgressMsg(
+          attempt === 0
+            ? "Compiling and rendering the Manim scene..."
+            : `Re-rendering repaired scene (attempt ${attempt + 1}/${maxRepairAttempts})...`,
+        );
+        const resp = await fetch("/api/videos/render-custom", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          body: JSON.stringify({
+            code: candidateCode,
+            scene_name: sceneName,
+            quality: quality,
+            conversation_id: conversationId,
+            prompt: `Manim Studio: ${sceneName}`,
+          }),
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (typeof data.code === "string" && data.code !== candidateCode) {
+            candidateCode = data.code;
+            setSceneCode(data.code);
+          }
+          setVideoGenerationId(data.video_generation_id);
+          setVideoStreamUrl(data.stream_url);
+          updateSession({ stage: "review", render: { jobId: data.video_generation_id, videoUrl: data.stream_url } });
+          setCurrentStage("review");
+          return;
+        }
+
         const err = await resp.json().catch(() => ({ detail: "Unknown error" }));
-        setRenderError(err.detail || "Rendering failed");
+        lastError = typeof err.detail === "string"
+          ? err.detail
+          : JSON.stringify(err.detail || { message: "Rendering failed" }, null, 2);
+        if (attempt === maxRepairAttempts - 1) {
+          setRenderError(`Automatic repair exhausted after ${maxRepairAttempts - 1} attempt(s).\n\n${lastError}`);
+          return;
+        }
+        // Automatic, visible repair stage. The user sees the Coder Agent
+        // working and the repaired source remains available for inspection.
+        setRenderError(lastError);
+        setCurrentStage("code");
+        setIsSynthesizingCode(true);
+        setRenderProgressMsg(
+          `Manim failed. Repair ${attempt + 1}/${maxRepairAttempts - 1}: retrieving documentation and repairing the code...`,
+        );
+        const repairResp = await fetch("/api/videos/repair", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
+          body: JSON.stringify({
+            code: candidateCode,
+            error: lastError,
+            scene_name: sceneName,
+            model_name: modelId,
+            base_url: baseUrl,
+            api_key: apiKey,
+            repair_error: lastError,
+          }),
+        });
+        if (!repairResp.ok) {
+          const repairError = await repairResp.json().catch(() => ({ detail: "Automatic repair failed" }));
+          throw new Error(repairError.detail || "Automatic repair failed");
+        }
+        const repaired = await repairResp.json();
+        if (typeof repaired.code !== "string" || !repaired.code.trim()) {
+          throw new Error("Automatic repair returned no executable code");
+        }
+        if (attemptedCode.has(repaired.code)) {
+          throw new Error("Automatic repair returned unchanged code; stopping repeated retries");
+        }
+        attemptedCode.add(repaired.code);
+        candidateCode = repaired.code;
+        setSceneCode(candidateCode);
+        setRenderError(null);
+        setIsSynthesizingCode(false);
+        setCurrentStage("render");
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
-      setRenderError(`Failed to compile & render: ${message}`);
+      setRenderError(lastError ? `${lastError}\n\nAutomatic repair failed: ${message}` : `Failed to compile & render: ${message}`);
     } finally {
+      setIsSynthesizingCode(false);
       setIsRendering(false);
     }
   };
@@ -497,11 +565,16 @@ export function ManimStudioModal({
           model_name: modelId,
           base_url: baseUrl,
           api_key: apiKey,
+          repair_error: category === "render" ? feedback : undefined,
         }),
       });
       if (resp.ok) {
         const data = await resp.json();
         setSceneCode(data.code || "");
+        setIsEditingCode(false);
+      } else {
+        const error = await resp.json().catch(() => ({ detail: "Repair failed" }));
+        throw new Error(error.detail || "Repair failed");
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
@@ -1091,13 +1164,13 @@ export function ManimStudioModal({
                     <Button
                       size="sm"
                       onClick={() => {
-                        setIsEditingCode(true);
-                        setCurrentStage("code");
+                        void handleRepairFromCritique("render", renderError);
                       }}
+                      disabled={isSynthesizingCode}
                       className="h-8 text-xs bg-red-600 hover:bg-red-700 text-white gap-1.5 font-medium shadow-sm"
                     >
                       <Edit3 className="h-3.5 w-3.5" />
-                      Fix Code in Coder Agent
+                      {isSynthesizingCode ? "Repairing with Manim Docsâ€¦" : "Fix Code in Coder Agent"}
                     </Button>
                   </div>
                 </div>
