@@ -13,7 +13,8 @@ param(
     [switch]$Rebuild,
     [switch]$AgentsOnly,
     [switch]$Logs,
-    [switch]$DockerCelery
+    [switch]$DockerCelery,
+    [switch]$NoFrontend
 )
 
 $ErrorActionPreference = "Stop"
@@ -144,7 +145,7 @@ function Stop-HostCelery {
 }
 
 function Write-StackBanner {
-    param([int]$CeleryPid)
+    param([int]$CeleryPid, [bool]$HostFrontend = $false)
     Write-Host ""
     Write-Host "Dev stack:" -ForegroundColor Green
     Write-Host "   API:           http://localhost:8000"
@@ -152,7 +153,11 @@ function Write-StackBanner {
     Write-Host "   Flower:        http://localhost:5555"
     Write-Host "   MinIO console: http://localhost:9011  (minioadmin / minioadmin)"
     Write-Host "   MinIO API:     http://localhost:9010"
-    Write-Host "   Frontend:      http://localhost:3000"
+    if ($HostFrontend) {
+        Write-Host "   Frontend:      HOST DEV (Run 'bun dev' in apps/ui/aos/frontend -> http://localhost:3000)" -ForegroundColor Cyan
+    } else {
+        Write-Host "   Frontend:      http://localhost:3000 (Docker)"
+    }
     Write-Host ""
     Write-Host ("Animate Celery = HOST (auto). PID: " + $CeleryPid) -ForegroundColor Yellow
     Write-Host ("  Log: " + $HostCeleryLog)
@@ -203,6 +208,14 @@ try {
 
     Stop-DockerCelery
 
+    if ($NoFrontend) {
+        Write-Host "Stopping Docker frontend (freeing port 3000 for host bun dev)..." -ForegroundColor Cyan
+        $prevEap = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        & docker compose @ComposeArgs stop frontend 2>&1 | Out-Null
+        $ErrorActionPreference = $prevEap
+    }
+
     if ($DockerCelery) {
         Write-Host "Starting Compose celery with profile docker-celery (Animate likely broken)..." -ForegroundColor Yellow
         & docker compose @ComposeArgs --profile docker-celery up -d celery_worker celery_beat
@@ -212,7 +225,7 @@ try {
 
     Write-Host "Service status:" -ForegroundColor Cyan
     Invoke-Compose @("ps")
-    Write-StackBanner -CeleryPid $celeryPid
+    Write-StackBanner -CeleryPid $celeryPid -HostFrontend $NoFrontend
 }
 finally {
     Pop-Location
