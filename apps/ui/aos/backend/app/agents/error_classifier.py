@@ -39,7 +39,7 @@ _RE_AUTH = re.compile(r"\b(401|403|unauthorized|forbidden|invalid[ _]?api[ _]?ke
 _RE_NETWORK = re.compile(r"(connecterror|connection refused|connect timeout|econnrefused|econnreset|connection reset)", re.I)
 _RE_TIMEOUT = re.compile(r"(render timeout|timeoutexpired|process timed out|timed out after)", re.I)
 _RE_VIDEO_VAL = re.compile(r"(video_validation_failed|0[ -]?byte|no video stream|duration is 0|corrupted video|no mp4 found)", re.I)
-_RE_SYNTAX = re.compile(r"(syntaxerror|indentationerror|parse error|invalid syntax|no_scene_class_found)", re.I)
+_RE_SYNTAX = re.compile(r"(syntaxerror|indentationerror|parse error|invalid syntax|no_scene_class_found|indexerror|attributeerror|nameerror|typeerror|keyerror|list index out of range)", re.I)
 _RE_MANIM = re.compile(r"(manim|latex error|standalone\.cls|mobject|compile_failed)", re.I)
 
 
@@ -139,3 +139,30 @@ def classify_error(error: Exception | str | None) -> ClassifiedError:
         developer_details=raw_error,
         raw_error=raw_error,
     )
+
+
+def get_repair_guidance(classified: ClassifiedError) -> str:
+    """Provide targeted repair advice based on the classified error."""
+    raw = classified.raw_error.lower()
+    if classified.category == ErrorCategory.MANIM_RENDER_ERROR:
+        if "latex" in raw or "standalone.cls" in raw or "xdv" in raw:
+            return (
+                "LaTeX compilation failure: Use raw string r'...' for MathTex, escape backslashes, "
+                "avoid unsupported LaTeX packages, and ensure all math delimiters match."
+            )
+        if "index" in raw or "out of range" in raw:
+            return (
+                "Mobject index out of range: Never assume subobject indices like mobj[5] exist. "
+                "Split MathTex/Tex into explicit arguments, use isolate=[...], or transform the whole mobject safely."
+            )
+        if "attributeerror" in raw:
+            return (
+                "Attribute error / unsupported method: Use official Manim Community Edition APIs only. "
+                "Do not use obsolete ManimCairo or ManimGL methods."
+            )
+        return "Manim rendering error: Check that all Mobjects and animation parameters are valid ManimCE constructs."
+    elif classified.category == ErrorCategory.CODE_VALIDATION_ERROR:
+        return "Static syntax validation failure: Fix undefined variables, illegal imports, or syntax errors."
+    elif classified.category == ErrorCategory.RENDER_TIMEOUT:
+        return "Render timeout: Simplify complex parametric curves, reduce scene animation run_time, or decrease mobject count."
+    return "Fix the reported error with minimal targeted edits while preserving existing visual structure and pacing."

@@ -168,18 +168,6 @@ def classify_text_for_manim(text: str) -> VideoClassifyResponse:
             reason="Detected data structure / algorithm concepts.",
         )
 
-    # Last resort: extract the first meaningful line as topic so we never
-    # return an empty topic and fall into a generic fallback.
-    lines = [line.strip("#* \t\r\n") for line in text.splitlines() if line.strip("#* \t\r\n")]
-    if lines:
-        title = lines[0][:60]
-        return VideoClassifyResponse(
-            animatable=True,
-            subject="math",
-            topic=title,
-            reason="Extracted topic from content — treating as animatable educational material.",
-        )
-
     return VideoClassifyResponse(
         animatable=False,
         subject="unknown",
@@ -249,195 +237,6 @@ def _resolve_llm_config(
         url = "https://openrouter.ai/api/v1/chat/completions"
 
     return key, url, model
-
-
-FALLBACK_MODELS = [
-    "nex-agi/nex-n2.5-pro:free",
-    "nex-agi/nex-n2.5-mini:free",
-    "liquid/lfm-2.5-2.6b:free",
-    "qwen/qwen3.8-27b:free",
-]
-
-
-async def call_llm(
-    prompt: str,
-    system_prompt: str,
-    *,
-    model_name: str | None = None,
-    base_url: str | None = None,
-    api_key: str | None = None,
-) -> str:
-    """Call LLM provider (OpenRouter or user custom BYOK endpoint)."""
-    import httpx
-
-    key, url, primary_model = _resolve_llm_config(api_key=api_key, base_url=base_url, model_name=model_name)
-
-    headers = {
-        "Content-Type": "application/json",
-    }
-    if key:
-        headers["Authorization"] = f"Bearer {key}"
-    if "openrouter.ai" in url:
-        headers["HTTP-Referer"] = "https://aos.local"
-        headers["X-Title"] = "AOS Manim Studio"
-
-    candidate_models = [primary_model]
-    if "openrouter.ai" in url and primary_model in FALLBACK_MODELS:
-        for m in FALLBACK_MODELS:
-            if m not in candidate_models:
-                candidate_models.append(m)
-
-    last_exc: Exception | None = None
-    for target_model in candidate_models:
-        payload = {
-            "model": target_model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt},
-            ],
-            "temperature": 0.3,
-            "max_tokens": MANIM_MAX_OUTPUT_TOKENS,
-        }
-
-        for attempt in range(LLM_MAX_RETRIES):
-            try:
-                async with httpx.AsyncClient(timeout=120.0) as client:
-                    resp = await client.post(url, headers=headers, json=payload)
-
-                if resp.status_code == 200:
-                    data = resp.json()
-                    choices = data.get("choices") or []
-                    if not choices:
-                        raise RuntimeError("LLM returned no choices in response")
-                    content = choices[0]["message"]["content"]
-                    finish_reason = choices[0].get("finish_reason", "stop")
-                    if finish_reason == "length":
-                        logger.warning(
-                            "LLM output was truncated (finish_reason=length). "
-                            "Response may be incomplete. Consider raising MANIM_MAX_OUTPUT_TOKENS."
-                        )
-                    return content.strip()
-
-                if resp.status_code in (429, 404, 500, 502, 503, 504):
-                    logger.warning(
-                        "LLM HTTP %s on model %s (attempt %d/%d) — %s",
-                        resp.status_code, target_model, attempt + 1, LLM_MAX_RETRIES,
-                        resp.text[:150],
-                    )
-                    if resp.status_code in (429, 404):
-                        # Switch to next candidate model immediately if rate limited or not found
-                        break
-                    await asyncio.sleep(2 ** attempt)
-                    continue
-
-                error_body = resp.text[:500]
-                logger.error("LLM call failed (non-retryable) HTTP %s: %s", resp.status_code, error_body)
-                raise RuntimeError(f"LLM HTTP {resp.status_code}: {error_body}")
-
-            except RuntimeError:
-                raise
-            except Exception as exc:
-                last_exc = exc
-                await asyncio.sleep(1)
-
-    raise RuntimeError(f"LLM call failed across models {candidate_models}: {last_exc}")
-
-
-async def call_llm_stream(
-    prompt: str,
-    system_prompt: str,
-    *,
-    model_name: str | None = None,
-    base_url: str | None = None,
-    api_key: str | None = None,
-) -> AsyncGenerator[tuple[Literal["status", "thinking", "token"], str], None]:
-    """Stream provider activity, reasoning (when supplied), and completion tokens.
-
-    Reasoning is deliberately kept separate from the final response.  Providers
-    use different OpenAI-compatible field names, so accept the common variants
-    without asking a model to reveal reasoning it did not already stream.
-    """
-    import json
-    import httpx
-
-    key, url, primary_model = _resolve_llm_config(api_key=api_key, base_url=base_url, model_name=model_name)
-
-    headers = {
-        "Content-Type": "application/json",
-    }
-    if key:
-        headers["Authorization"] = f"Bearer {key}"
-    if "openrouter.ai" in url:
-        headers["HTTP-Referer"] = "https://aos.local"
-        headers["X-Title"] = "AOS Manim Studio"
-
-    candidate_models = [primary_model]
-    if "openrouter.ai" in url:
-        for m in FALLBACK_MODELS:
-            if m not in candidate_models:
-                candidate_models.append(m)
-
-    last_err: Exception | None = None
-    for target_model in candidate_models:
-        yield "status", f"Connecting to {target_model}…"
-        payload = {
-            "model": target_model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt},
-            ],
-            "temperature": 0.3,
-            "max_tokens": MANIM_MAX_OUTPUT_TOKENS,
-            "stream": True,
-        }
-
-        got_token = False
-        try:
-            # Local and serverless models can take longer than two minutes before
-            # their first token. The browser receives SSE immediately, so keep the
-            # upstream stream alive instead of failing the Composer prematurely.
-            async with httpx.AsyncClient(timeout=300.0) as client:
-                async with client.stream("POST", url, headers=headers, json=payload) as resp:
-                    if resp.status_code != 200:
-                        body = await resp.aread()
-                        err_text = body.decode("utf-8", errors="replace")[:400]
-                        logger.warning("LLM stream HTTP %s on %s: %s", resp.status_code, target_model, err_text)
-                        last_err = RuntimeError(f"HTTP {resp.status_code}: {err_text}")
-                        continue
-                    async for line in resp.aiter_lines():
-                        if not line:
-                            continue
-                        if line.startswith("data: "):
-                            data_str = line[6:].strip()
-                            if data_str == "[DONE]":
-                                break
-                            try:
-                                chunk = json.loads(data_str)
-                                choices = chunk.get("choices") or []
-                                if choices:
-                                    delta = choices[0].get("delta", {})
-                                    reasoning = (
-                                        delta.get("reasoning_content")
-                                        or delta.get("reasoning")
-                                        or delta.get("analysis")
-                                    )
-                                    if isinstance(reasoning, str) and reasoning:
-                                        yield "thinking", reasoning
-                                    token = delta.get("content")
-                                    if token:
-                                        got_token = True
-                                        yield "token", token
-                            except Exception:
-                                continue
-            if got_token:
-                return
-        except Exception as exc:
-            last_err = exc
-            logger.warning("LLM stream exception on model %s: %s", target_model, exc)
-            continue
-
-    if last_err:
-        raise last_err
 
 
 COMPOSER_SYSTEM_PROMPT = """\
@@ -579,14 +378,12 @@ async def compose_plan_service(
     user_prompt += f"Please construct a comprehensive scenes.md visual plan for Manim focusing on topic '{topic}'."
 
     try:
-        plan_markdown = await call_llm(
-            user_prompt,
-            COMPOSER_SYSTEM_PROMPT,
-            model_name=model_name,
-            base_url=base_url,
-            api_key=api_key,
-        )
-    except RuntimeError as exc:
+        from app.agents.hitl_agents import get_composer_agent, HitlPlanDeps
+        agent = get_composer_agent(model_name, base_url, api_key)
+        deps = HitlPlanDeps(topic=topic, hints=hints, source_text=capped_text)
+        result = await agent.run(user_prompt, deps=deps)
+        plan_markdown = result.data
+    except Exception as exc:
         logger.warning("Plan LLM call failed (%s); using topic-aware fallback plan.", exc)
         plan_markdown = ""
 
@@ -632,20 +429,13 @@ async def compose_plan_stream_service(
     accumulated: list[str] = []
     stream_failed = False
     try:
-        async for event_type, value in call_llm_stream(
-            user_prompt,
-            COMPOSER_SYSTEM_PROMPT,
-            model_name=model_name,
-            base_url=base_url,
-            api_key=api_key,
-        ):
-            if event_type == "token":
-                accumulated.append(value)
-                yield f"data: {json.dumps({'type': 'token', 'token': value})}\n\n"
-            elif event_type == "thinking":
-                yield f"data: {json.dumps({'type': 'thinking', 'text': value})}\n\n"
-            else:
-                yield f"data: {json.dumps({'type': 'status', 'message': value})}\n\n"
+        from app.agents.hitl_agents import get_composer_agent, HitlPlanDeps
+        agent = get_composer_agent(model_name, base_url, api_key)
+        deps = HitlPlanDeps(topic=topic, hints=hints, source_text=capped_text)
+        async with agent.run_stream(user_prompt, deps=deps) as result:
+            async for chunk in result.stream_text(delta=True):
+                accumulated.append(chunk)
+                yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
     except Exception as exc:
         logger.warning("Streaming plan generation failed: %s", exc)
         stream_failed = True
@@ -702,13 +492,15 @@ def _generate_fallback_code(plan: str, knowledge_text: str | None = None) -> tup
         header_match = re.search(r"^#\s+(.+)$", plan, re.MULTILINE)
         if header_match:
             topic = header_match.group(1).strip().replace("Visualizing ", "")
-    elif knowledge_text:
+    if topic == "Mathematical Concept" and knowledge_text:
         first = [l.strip() for l in knowledge_text.splitlines() if l.strip()]
         if first:
             topic = first[0][:60]
 
     # Build a safe class name from the topic
-    safe_name = re.sub(r"[^A-Za-z0-9]", "", topic.title().replace(" ", ""))
+    clean_topic = re.sub(r"['’]s\b", "", topic, flags=re.IGNORECASE)
+    clean_topic = re.sub(r"[^A-Za-z0-9 ]+", " ", clean_topic)
+    safe_name = re.sub(r"[^A-Za-z0-9]", "", clean_topic.title())
     if not safe_name or not safe_name[0].isalpha():
         safe_name = "TopicScene"
     scene_name = f"{safe_name}Scene"
@@ -809,32 +601,18 @@ async def synthesize_code_service(
 
     llm_error: str | None = None
     try:
-        raw_response = await call_llm(
-            user_prompt,
-            CODER_SYSTEM_PROMPT,
-            model_name=model_name,
-            base_url=base_url,
-            api_key=api_key,
-        )
-    except RuntimeError as exc:
+        from app.agents.hitl_agents import get_coder_agent, HitlCoderDeps
+        agent = get_coder_agent(model_name, base_url, api_key)
+        deps = HitlCoderDeps(plan=capped_plan, knowledge_text=capped_knowledge, scene_name=scene_name)
+        result = await agent.run(user_prompt, deps=deps)
+        raw_response = result.data
+    except Exception as exc:
         llm_error = str(exc)
         raw_response = ""
-        logger.warning("Code synthesis LLM call failed: %s", llm_error)
+        logger.warning("Code synthesis agent failed: %s", llm_error)
 
-    code = ""
-    detected_scene = scene_name or "GeneratedScene"
-
-    if raw_response:
-        code_match = re.search(r"```python\s*([\s\S]+?)\s*```", raw_response)
-        if code_match:
-            code = code_match.group(1).strip()
-        elif "class " in raw_response and "Scene" in raw_response:
-            code = raw_response.strip()
-
-    if code:
-        class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\((?:ThreeDScene|Scene|MovingCameraScene)", code)
-        if class_match:
-            detected_scene = class_match.group(1)
+    from app.agents.hitl_agents import extract_manim_code
+    code, detected_scene = extract_manim_code(raw_response, default_scene=scene_name or "GeneratedScene")
 
     # Only fall back if we truly got no usable code (not just short responses)
     if not code or "def construct" not in code:
@@ -864,13 +642,29 @@ async def repair_code_service(
     Keeping the current source in the prompt prevents repair attempts from
     discarding narration, timing, or already-correct scenes.
     """
+    from app.agents.error_classifier import classify_error, get_repair_guidance
     from app.services.manim_code import preflight_manim_code, repair_manim_code
 
+    classified = classify_error(error)
+    if not classified.is_repairable:
+        logger.info(
+            "Repair aborted: classified error is not repairable code-wise (%s): %s",
+            classified.category,
+            classified.user_message,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"{classified.user_message} (Category: {classified.category.value})",
+        )
+
+    guidance = get_repair_guidance(classified)
     original = repair_manim_code(code)
     current_code = original.code
     preflight = preflight_manim_code(current_code)
     diagnostic_bundle = {
         "stage": "repair",
+        "category": classified.category.value,
+        "guidance": guidance,
         "runtime_or_compiler": error[-9000:],
         "static_findings": list(preflight.errors),
         "deterministic_repairs_already_applied": list(original.changes),
@@ -894,6 +688,9 @@ Diagnostic bundle (address every item in one pass; do not wait for the next rend
 {json.dumps(diagnostic_bundle, indent=2)[:18000]}
 ```
 
+Targeted repair guidance:
+{guidance}
+
 Relevant Manim documentation:
 {docs[:9000]}
 
@@ -914,15 +711,27 @@ Rules:
   undefined names, and brittle indexes that can be out of range.
 - Do not regenerate unrelated code or introduce new dependencies.
 """
+    from app.agents.hitl_agents import (
+        HitlRepairDeps,
+        get_repair_agent,
+        run_repair_with_self_correction,
+    )
+
+    deps = HitlRepairDeps(
+        error=error,
+        current_code=current_code,
+        scene_name=scene_name,
+        classified_error=classified,
+        diagnostic_bundle=diagnostic_bundle,
+    )
+
     try:
-        raw = await asyncio.wait_for(
-            call_llm(
-                prompt,
-                "You are a senior ManimCE repair engineer. Fix the existing source, do not redesign it.",
-                model_name=model_name,
-                base_url=base_url,
-                api_key=api_key,
-            ),
+        agent = get_repair_agent(model_name, base_url, api_key)
+        repaired_code, detected_scene = await run_repair_with_self_correction(
+            agent=agent,
+            prompt=prompt,
+            deps=deps,
+            max_attempts=2,
             timeout=90.0,
         )
     except Exception as exc:
@@ -931,8 +740,6 @@ Rules:
             detail=f"Manim repair agent timed out or failed: {exc}",
         ) from exc
 
-    match = re.search(r"```(?:python|py)?\s*([\s\S]+?)\s*```", raw, re.I)
-    repaired_code = (match.group(1) if match else raw).strip()
     if not repaired_code or "def construct" not in repaired_code:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Repair agent returned incomplete Python source")
 
@@ -944,10 +751,6 @@ Rules:
             detail={"stage": "repair_preflight", "status": "failed", "errors": list(preflight.errors)},
         )
 
-    detected_scene = scene_name or "GeneratedScene"
-    class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\((?:ThreeDScene|Scene|MovingCameraScene)", repaired_code)
-    if class_match:
-        detected_scene = class_match.group(1)
     return VideoCodeResponse(code=repaired_code, scene_name=detected_scene)
 
 
@@ -988,37 +791,20 @@ async def synthesize_code_stream_service(
     accumulated: list[str] = []
     stream_failed = False
     try:
-        async for event_type, value in call_llm_stream(
-            user_prompt,
-            CODER_SYSTEM_PROMPT,
-            model_name=model_name,
-            base_url=base_url,
-            api_key=api_key,
-        ):
-            if event_type == "token":
-                accumulated.append(value)
-                yield f"data: {json.dumps({'type': 'token', 'token': value})}\n\n"
-            elif event_type == "thinking":
-                yield f"data: {json.dumps({'type': 'thinking', 'text': value})}\n\n"
-            else:
-                yield f"data: {json.dumps({'type': 'status', 'message': value})}\n\n"
+        from app.agents.hitl_agents import get_coder_agent, HitlCoderDeps
+        agent = get_coder_agent(model_name, base_url, api_key)
+        deps = HitlCoderDeps(plan=capped_plan, knowledge_text=capped_knowledge, scene_name=detected_scene)
+        async with agent.run_stream(user_prompt, deps=deps) as result:
+            async for chunk in result.stream_text(delta=True):
+                accumulated.append(chunk)
+                yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
     except Exception as exc:
         logger.warning("Streaming code synthesis failed: %s", exc)
         stream_failed = True
 
     raw_response = "".join(accumulated).strip()
-    code = ""
-    if raw_response:
-        code_match = re.search(r"```python\s*([\s\S]+?)\s*```", raw_response)
-        if code_match:
-            code = code_match.group(1).strip()
-        elif "class " in raw_response and "Scene" in raw_response:
-            code = raw_response.strip()
-
-    if code:
-        class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\((?:ThreeDScene|Scene|MovingCameraScene)", code)
-        if class_match:
-            detected_scene = class_match.group(1)
+    from app.agents.hitl_agents import extract_manim_code
+    code, detected_scene = extract_manim_code(raw_response, default_scene=detected_scene)
 
     if stream_failed or not code or "def construct" not in code:
         yield f"data: {json.dumps({'type': 'status', 'message': 'Checking the generated scene and preparing a fallback if needed…'})}\n\n"
