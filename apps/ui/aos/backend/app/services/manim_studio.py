@@ -113,11 +113,10 @@ KEYWORDS_ANIMATABLE = [
 ]
 
 
-def classify_text_for_manim(text: str) -> VideoClassifyResponse:
-    """Classify if the given educational text can be animated with Manim.
+def classify_text_heuristic(text: str) -> VideoClassifyResponse:
+    """Classify educational text animatability using fast deterministic patterns.
 
-    Falls back to extracting the topic from the first heading / first line
-    when no keyword matches, so the LLM always gets a meaningful topic.
+    Serves as an instant offline/fallback classification pass when LLM is unavailable.
     """
     lower_text = text.lower()
 
@@ -173,6 +172,80 @@ def classify_text_for_manim(text: str) -> VideoClassifyResponse:
         subject="unknown",
         topic="",
         reason="Content does not appear to contain visual material suited for Manim.",
+    )
+
+
+async def classify_text_for_manim(
+    text: str,
+    *,
+    model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> VideoClassifyResponse:
+    """Classify if educational text can be animated with Manim using a Pydantic AI agent.
+
+    Uses an LLM agent with structured output (VideoClassifyResponse), falling back to
+    deterministic heuristic classification if the model call fails or in offline mode.
+    """
+    stripped = (text or "").strip()
+    if not stripped:
+        return VideoClassifyResponse(
+            animatable=False,
+            subject="unknown",
+            topic="",
+            reason="Empty text provided.",
+        )
+
+    try:
+        from app.agents.hitl_agents import get_classifier_agent, _resolve_llm_config
+
+        key, url, _ = _resolve_llm_config(
+            api_key=api_key, base_url=base_url, model_name=model_name
+        )
+        if (not key or key == "sk-local") and "openrouter.ai" in url:
+            return classify_text_heuristic(text)
+
+        agent = get_classifier_agent(
+            model_name=model_name, base_url=base_url, api_key=api_key
+        )
+        capped_text = text[:MANIM_MAX_CONTEXT_CHARS]
+        prompt = (
+            "Please classify the following educational content for Manim animatability:\n\n"
+            f"{capped_text}"
+        )
+        result = await asyncio.wait_for(agent.run(prompt), timeout=15.0)
+        output = getattr(result, "output", getattr(result, "data", None))
+        if isinstance(output, VideoClassifyResponse):
+            return output
+    except Exception as exc:
+        logger.warning(
+            "Pydantic AI classification agent failed or timed out (%s); falling back to heuristic.",
+            exc,
+        )
+
+    return classify_text_heuristic(text)
+
+
+def classify_text_for_manim_sync(
+    text: str,
+    *,
+    model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> VideoClassifyResponse:
+    """Synchronous wrapper for classify_text_for_manim."""
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    if loop and loop.is_running():
+        return classify_text_heuristic(text)
+
+    return asyncio.run(
+        classify_text_for_manim(
+            text, model_name=model_name, base_url=base_url, api_key=api_key
+        )
     )
 
 
@@ -360,7 +433,9 @@ async def compose_plan_service(
     api_key: str | None = None,
 ) -> VideoPlanResponse:
     """Generate a structured scenes.md visual plan using manim-composer skills."""
-    classification = classify_text_for_manim(text)
+    classification = await classify_text_for_manim(
+        text, model_name=model_name, base_url=base_url, api_key=api_key
+    )
     topic = classification.topic or "Mathematical Concept"
 
     # Guard: truncate unbounded knowledge text so it doesn't overflow context window
@@ -411,7 +486,9 @@ async def compose_plan_stream_service(
     """
     import json
 
-    classification = classify_text_for_manim(text)
+    classification = await classify_text_for_manim(
+        text, model_name=model_name, base_url=base_url, api_key=api_key
+    )
     topic = classification.topic or "Mathematical Concept"
 
     yield f"data: {json.dumps({'type': 'start', 'topic': topic, 'title': f'Visual Plan: {topic}'})}\n\n"

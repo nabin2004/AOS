@@ -2,7 +2,13 @@ import json
 
 import pytest
 from app.services import manim_studio
-from app.services.manim_studio import classify_text_for_manim, _generate_fallback_plan, _generate_fallback_code
+from app.services.manim_studio import (
+    classify_text_for_manim,
+    classify_text_for_manim_sync,
+    classify_text_heuristic,
+    _generate_fallback_plan,
+    _generate_fallback_code,
+)
 
 
 def test_classify_taylors_formula():
@@ -15,17 +21,79 @@ def test_classify_taylors_formula():
     When $ a = 0 $, the formula simplifies to:
     $$ f(x) = f(0) + f'(0)x + \\frac{f''(0)}{2!}x^2 + \\cdots $$
     """
-    res = classify_text_for_manim(sample_text)
+    res = classify_text_heuristic(sample_text)
     assert res.animatable is True
     assert res.subject == "math"
     assert "Taylor" in res.topic or "Series" in res.topic or "Formula" in res.topic
 
 
+def test_classify_for_manim_sync(monkeypatch):
+    import app.agents.hitl_agents as hitl_agents
+
+    class MockSuccessAgent:
+        async def run(self, *args, **kwargs):
+            class Res:
+                output = VideoClassifyResponse(
+                    animatable=True,
+                    subject="math",
+                    topic="Taylor Series",
+                    reason="Approximation polynomial formulas",
+                )
+            return Res()
+
+    monkeypatch.setattr(hitl_agents, "get_classifier_agent", lambda *a, **k: MockSuccessAgent())
+    sync_res = classify_text_for_manim_sync("Taylor series")
+    assert sync_res.animatable is True
+    assert sync_res.topic == "Taylor Series"
+
+
 def test_classify_general_non_animatable():
     sample_text = "The Roman Empire was the post-Republican period of ancient Rome. It included large territorial holdings around the Mediterranean Sea."
-    res = classify_text_for_manim(sample_text)
+    res = classify_text_heuristic(sample_text)
     assert res.animatable is False
     assert res.subject == "unknown"
+
+
+@pytest.mark.anyio
+async def test_classify_text_for_manim_agent_fallback(monkeypatch):
+    import app.agents.hitl_agents as hitl_agents
+
+    class FailingAgent:
+        async def run(self, *args, **kwargs):
+            raise RuntimeError("API timeout simulation")
+
+    monkeypatch.setattr(hitl_agents, "get_classifier_agent", lambda *a, **k: FailingAgent())
+    sample_text = "Taylor series expansion $$ f(x) = \\sum f^{(n)}(a)(x-a)^n/n! $$"
+    res = await classify_text_for_manim(sample_text)
+    assert res.animatable is True
+    assert res.subject == "math"
+
+
+@pytest.mark.anyio
+async def test_pydantic_ai_classifier_agent_structured_output():
+    from pydantic_ai import Agent
+    from pydantic_ai.models.test import TestModel
+    from app.agents.hitl_agents import CLASSIFIER_SYSTEM_PROMPT
+    from app.schemas.video_generation import VideoClassifyResponse
+
+    agent = Agent(
+        model=TestModel(
+            custom_output_args={
+                "animatable": True,
+                "subject": "math",
+                "topic": "Fourier Transform",
+                "reason": "Decomposes functions into sinusoidal frequencies suitable for Manim animation.",
+            }
+        ),
+        system_prompt=CLASSIFIER_SYSTEM_PROMPT,
+        output_type=VideoClassifyResponse,
+    )
+    result = await agent.run("Explain the Fourier Transform")
+    assert isinstance(result.output, VideoClassifyResponse)
+    assert result.output.animatable is True
+    assert result.output.subject == "math"
+    assert result.output.topic == "Fourier Transform"
+    assert "sinusoidal" in result.output.reason
 
 
 def test_fallback_plan_generation():
@@ -63,6 +131,17 @@ async def test_plan_stream_forwards_provider_reasoning_and_status(monkeypatch):
 
     import app.agents.hitl_agents as hitl_agents
     monkeypatch.setattr(hitl_agents, "get_composer_agent", fake_get_composer_agent)
+
+    async def fake_classify(*args, **kwargs):
+        from app.schemas.video_generation import VideoClassifyResponse
+        return VideoClassifyResponse(
+            animatable=True,
+            subject="math",
+            topic="Derivative",
+            reason="Calculus rate of change",
+        )
+
+    monkeypatch.setattr(manim_studio, "classify_text_for_manim", fake_classify)
 
     frames = [
         json.loads(frame.removeprefix("data: ").strip())

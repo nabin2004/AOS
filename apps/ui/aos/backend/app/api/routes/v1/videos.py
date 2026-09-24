@@ -111,7 +111,12 @@ async def classify_text(
     """Classify educational text for Manim visual animatability."""
     from app.services.manim_studio import classify_text_for_manim
     text = payload.get("text", "")
-    return classify_text_for_manim(text)
+    model_name = payload.get("model_name")
+    base_url = payload.get("base_url")
+    api_key = payload.get("api_key")
+    return await classify_text_for_manim(
+        text, model_name=model_name, base_url=base_url, api_key=api_key
+    )
 
 
 @router.post("/plan", response_model=None)

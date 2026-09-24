@@ -22,6 +22,7 @@ from pydantic_ai.providers.openrouter import OpenRouterProvider
 
 from app.agents.error_classifier import ClassifiedError, classify_error, get_repair_guidance
 from app.agents.openai_compatible_client import build_openai_provider
+from app.schemas.video_generation import VideoClassifyResponse
 from app.services.manim_code import preflight_manim_code, repair_manim_code
 
 logger = logging.getLogger(__name__)
@@ -56,6 +57,28 @@ class HitlRepairDeps:
 
 
 # ── System Prompts ────────────────────────────────────────────────────────────
+
+CLASSIFIER_SYSTEM_PROMPT = """\
+You are an expert pedagogical director and Manim visual animatability classifier for AOS.
+Your task is to analyze educational text and determine if it can and should be visualized/animated using Manim (Mathematical Animation Engine).
+
+Evaluate the content and return structured output matching the schema:
+1. `animatable` (boolean):
+   - True: The text contains mathematical formulas, theorems, calculus, linear algebra, geometry, algorithms, data structures, machine learning concepts, physics dynamics, or step-by-step conceptual derivations that strongly benefit from dynamic 2D/3D programmatic animation.
+   - False: The content is primarily biographical, historical narrative, general prose, conversational dialogue, or non-visual text unsuitable for Manim.
+2. `subject` (string):
+   - "math": Calculus, linear algebra, geometry, probability, statistics, trigonometry, analysis, discrete math.
+   - "cs": Algorithms, data structures, graph theory, automata, networking, systems, complexity theory.
+   - "ai": Machine learning, deep learning, backpropagation, optimization, neural networks, transformers, RL.
+   - "physics": Mechanics, electromagnetism, optics, waves, quantum representations.
+   - "unknown": Out of domain or non-animatable content.
+3. `topic` (string):
+   - A clean, concise 2-6 word title-cased topic name (e.g. "Taylor Series Approximation", "Binary Search Algorithm", "Fourier Transform").
+   - Do NOT include conversational prefixes like "Introduction to", "Explain", "How does", or trailing punctuation.
+   - If non-animatable, leave as empty string or a general subject label.
+4. `reason` (string):
+   - A concise 1-2 sentence explanation detailing why the content is or is not suited for Manim, highlighting visual elements (e.g., equations, geometric plots, node diagrams).
+"""
 
 COMPOSER_SYSTEM_PROMPT = """\
 You are an expert pedagogical animation director and Manim composer (following the manim-composer skill).
@@ -287,6 +310,22 @@ def build_hitl_model(
 
 
 # ── Agent Factory Functions ───────────────────────────────────────────────────
+
+def get_classifier_agent(
+    model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> Agent[None, VideoClassifyResponse]:
+    """Get the Pydantic AI agent for classifying text animatability for Manim."""
+    model = build_hitl_model(model_name, base_url, api_key)
+    return Agent(
+        model=model,
+        system_prompt=CLASSIFIER_SYSTEM_PROMPT,
+        name="hitl_classifier_agent",
+        output_type=VideoClassifyResponse,
+        retries=2,
+    )
+
 
 def get_composer_agent(
     model_name: str | None = None,
