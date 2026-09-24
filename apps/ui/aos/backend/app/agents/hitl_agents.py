@@ -361,13 +361,30 @@ class HitlAgentTools:
         }
 
     @staticmethod
-    async def validate_syntax_tool(ctx: RunContext[Any], code: str) -> dict[str, Any]:
+    async def validate_syntax_tool(ctx: RunContext[Any], code: str = "", **kwargs: Any) -> dict[str, Any]:
         """Tool wrapper for Pydantic AI agents to validate syntax."""
+        if not code and "args" in kwargs:
+            args_val = kwargs["args"]
+            if isinstance(args_val, dict) and "code" in args_val:
+                code = args_val["code"]
+            elif isinstance(args_val, str):
+                code = args_val
+        if not code:
+            code = kwargs.get("code", "")
         return HitlAgentTools.validate_syntax(code)
 
     @staticmethod
-    async def search_manim_docs_tool(ctx: RunContext[Any], query: str) -> str:
+    async def search_manim_docs_tool(ctx: RunContext[Any], query: str = "", **kwargs: Any) -> str:
         """Search ManimCE documentation and community examples for API usage and repair hints."""
+        if not query and "args" in kwargs:
+            args_val = kwargs["args"]
+            if isinstance(args_val, dict) and "query" in args_val:
+                query = args_val["query"]
+            elif isinstance(args_val, str):
+                query = args_val
+        if not query:
+            query = kwargs.get("query", "")
+
         try:
             from app.agents.tools.rag_tool import search_knowledge_base
 
