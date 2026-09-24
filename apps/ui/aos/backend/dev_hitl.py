@@ -381,6 +381,13 @@ async def run_code_stage(
     preflight = preflight_manim_code(repair.code)
     observer.show_preflight(preflight, repair)
 
+    # Save generated source to disk for immediate access
+    scene_dir = Path(__file__).parent / ".dev_logs" / "scenes"
+    scene_dir.mkdir(parents=True, exist_ok=True)
+    saved_scene_path = scene_dir / f"{detected_scene}.py"
+    saved_scene_path.write_text(repair.code, encoding="utf-8")
+    observer.step("CODE", f"Saved generated source to [bold cyan]{saved_scene_path.resolve()}[/bold cyan]")
+
     log_file = run_store.record_run(
         stage="code",
         topic=topic,
@@ -391,7 +398,7 @@ async def run_code_stage(
         messages=messages,
         preflight=preflight,
         repair=repair,
-        artifacts={"code": code, "repaired_code": repair.code, "scene_name": detected_scene},
+        artifacts={"code": code, "repaired_code": repair.code, "scene_name": detected_scene, "file_path": str(saved_scene_path.resolve())},
     )
     observer.step("SAVE", f"Code run recorded to {log_file.name}")
     return repair.code, detected_scene
@@ -557,40 +564,61 @@ def run_local_render_check(
     code: str,
     scene_name: str,
     observer: HitlTerminalObserver,
-) -> None:
-    """Optionally run 'manim -ql' on the generated code using local Manim CLI."""
+) -> Path | None:
+    """Optionally run 'manim -ql' on the generated code and preserve the output video."""
     import subprocess
-    import tempfile
+    import shutil
 
     observer.banner("Optional Local Render Verification", "Running `manim -ql` locally")
     observer.step("RENDER", f"Compiling Scene '{scene_name}' at low quality...")
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        scene_file = Path(tmpdir) / "scene.py"
-        scene_file.write_text(code, encoding="utf-8")
+    render_dir = Path(__file__).parent / ".dev_logs" / "renders" / scene_name
+    render_dir.mkdir(parents=True, exist_ok=True)
+    scene_file = render_dir / f"{scene_name}.py"
+    scene_file.write_text(code, encoding="utf-8")
 
+    # Check for direct 'manim' or 'uv'
+    if shutil.which("manim"):
         cmd = ["manim", "-ql", str(scene_file), scene_name]
-        try:
-            start_t = time.perf_counter()
-            proc = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=60,
-                cwd=tmpdir,
-            )
-            elapsed = time.perf_counter() - start_t
-            if proc.returncode == 0:
-                observer.success(f"Render completed cleanly in {elapsed:.2f}s!")
+    elif shutil.which("uv"):
+        cmd = ["uv", "run", "manim", "-ql", str(scene_file), scene_name]
+    else:
+        cmd = ["manim", "-ql", str(scene_file), scene_name]
+
+    try:
+        start_t = time.perf_counter()
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=180,
+            cwd=str(render_dir),
+        )
+        elapsed = time.perf_counter() - start_t
+        if proc.returncode == 0:
+            observer.success(f"Render completed cleanly in {elapsed:.2f}s!")
+            # Find the rendered video
+            video_candidates = list(render_dir.glob(f"**/videos/**/{scene_name}.mp4")) or list(render_dir.glob("**/*.mp4"))
+            if video_candidates:
+                target_video = video_candidates[0].resolve()
+                observer.step("VIDEO", f"Compiled video: [bold green]{target_video}[/bold green]")
+                return target_video
             else:
-                observer.error(f"Render failed with return code {proc.returncode}")
-                observer.console.print(f"[red]{proc.stderr[-1000:]}[/red]")
-        except FileNotFoundError:
-            observer.warning("`manim` executable not found in PATH. Skipping local render verification.")
-        except subprocess.TimeoutExpired:
-            observer.error("Manim render timed out after 60s.")
-        except Exception as exc:
-            observer.error(f"Render verification error: {exc}")
+                observer.step("OUTPUT", f"Render directory: [bold green]{render_dir.resolve()}[/bold green]")
+                return render_dir
+        else:
+            observer.error(f"Render failed with return code {proc.returncode}")
+            observer.console.print(f"[red]{proc.stderr[-1000:]}[/red]")
+            return None
+    except FileNotFoundError:
+        observer.warning("`manim` executable not found. Make sure Manim is installed or render via Docker.")
+        return None
+    except subprocess.TimeoutExpired:
+        observer.error("Manim render timed out after 180s.")
+        return None
+    except Exception as exc:
+        observer.error(f"Render verification error: {exc}")
+        return None
 
 
 # ── Inspect Last Run ──────────────────────────────────────────────────────────
@@ -783,7 +811,6 @@ async def async_main() -> None:
                 base_url=args.base_url,
                 api_key=args.api_key,
             )
-            code = repaired_code
             code = repaired_code
 
         # Optional local render
