@@ -403,6 +403,8 @@ class HitlAgentFactory:
         model_name: str | None = None,
         base_url: str | None = None,
         api_key: str | None = None,
+        *,
+        capabilities: list[Any] | None = None,
     ) -> Agent[None, VideoClassifyResponse]:
         """Create the Pydantic AI agent for classifying text animatability for Manim."""
         model = self.resolver.build_model(model_name, base_url, api_key)
@@ -411,6 +413,7 @@ class HitlAgentFactory:
             system_prompt=CLASSIFIER_SYSTEM_PROMPT,
             name="hitl_classifier_agent",
             output_type=VideoClassifyResponse,
+            capabilities=capabilities,
             retries=2,
         )
 
@@ -603,8 +606,12 @@ class HitlAgentService:
         model_name: str | None = None,
         base_url: str | None = None,
         api_key: str | None = None,
+        *,
+        capabilities: list[Any] | None = None,
     ) -> Agent[None, VideoClassifyResponse]:
-        return self.factory.create_classifier_agent(model_name=model_name, base_url=base_url, api_key=api_key)
+        return self.factory.create_classifier_agent(
+            model_name=model_name, base_url=base_url, api_key=api_key, capabilities=capabilities
+        )
 
     def get_composer_agent(
         self,
@@ -689,8 +696,12 @@ def get_classifier_agent(
     model_name: str | None = None,
     base_url: str | None = None,
     api_key: str | None = None,
+    *,
+    capabilities: list[Any] | None = None,
 ) -> Agent[None, VideoClassifyResponse]:
-    return hitl_agent_service.get_classifier_agent(model_name=model_name, base_url=base_url, api_key=api_key)
+    return hitl_agent_service.get_classifier_agent(
+        model_name=model_name, base_url=base_url, api_key=api_key, capabilities=capabilities
+    )
 
 
 def get_composer_agent(

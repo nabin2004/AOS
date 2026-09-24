@@ -39,6 +39,8 @@ apps/qwenCoder/data_narrated_dpo/
 apps/new_dataset/data/
 # Local caches and media
 .aos/
+.dev_logs/
+**/.dev_logs/
 .cache/
 .pytest_cache/
 media/

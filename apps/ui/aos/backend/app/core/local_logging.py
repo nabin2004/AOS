@@ -1,0 +1,557 @@
+"""Local logging and visual inspection system for HITL Pydantic AI pipeline.
+
+Provides zero-cloud, friction-free local observability:
+1. Disables Logfire cloud telemetry (send_to_logfire=False).
+2. Pretty-prints rich terminal outputs (agent steps, tool calls, AST issues, diffs, timing, tokens).
+3. Persists structured run JSON files locally (.dev_logs/hitl/) with full Pydantic AI message histories.
+4. Integrates with Pydantic AI Hooks for lifecycle interception.
+"""
+
+from __future__ import annotations
+
+import difflib
+import json
+import logging
+import os
+import sys
+import time
+from dataclasses import asdict, is_dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+from uuid import uuid4
+
+from pydantic import BaseModel
+from rich.box import ROUNDED, SIMPLE
+from rich.console import Console
+from rich.panel import Panel
+from rich.syntax import Syntax
+from rich.table import Table
+from rich.text import Text
+
+from app.schemas.video_generation import VideoClassifyResponse
+from app.services.manim_code import CodeRepair, PreflightResult
+
+logger = logging.getLogger(__name__)
+
+# Default directory for local development run logs
+DEFAULT_LOG_DIR = Path(__file__).resolve().parents[2] / ".dev_logs" / "hitl"
+
+
+# ── 1. Logfire Remote Disabler ───────────────────────────────────────────────
+
+def disable_logfire_remote() -> None:
+    """Ensure Logfire never sends telemetry across the network in local dev mode."""
+    try:
+        import logfire
+        logfire.configure(
+            send_to_logfire=False,
+            console=False,
+        )
+    except Exception as exc:
+        logger.debug("Logfire configuration skipped: %s", exc)
+
+
+# ── 2. Message History Serializer ─────────────────────────────────────────────
+
+def serialize_model_messages(messages: list[Any] | None) -> list[dict[str, Any]]:
+    """Convert Pydantic AI ModelMessage instances into JSON-serializable dictionaries."""
+    if not messages:
+        return []
+
+    serialized: list[dict[str, Any]] = []
+    for msg in messages:
+        if isinstance(msg, dict):
+            serialized.append(msg)
+            continue
+        if isinstance(msg, BaseModel):
+            try:
+                serialized.append(msg.model_dump(mode="json"))
+                continue
+            except Exception:
+                pass
+        elif is_dataclass(msg) and not isinstance(msg, type):
+            try:
+                serialized.append(asdict(msg))
+                continue
+            except Exception:
+                pass
+
+        # Fallback dictionary or string representation
+        if hasattr(msg, "__dict__"):
+            try:
+                clean_dict = {}
+                for k, v in msg.__dict__.items():
+                    if isinstance(v, (str, int, float, bool, list, dict)) or v is None:
+                        clean_dict[k] = v
+                    elif hasattr(v, "model_dump"):
+                        clean_dict[k] = v.model_dump(mode="json")
+                    else:
+                        clean_dict[k] = str(v)
+                serialized.append(clean_dict)
+                continue
+            except Exception:
+                pass
+
+        serialized.append({"type": type(msg).__name__, "content": str(msg)})
+
+    return serialized
+
+
+# ── 3. Local Run Storage ──────────────────────────────────────────────────────
+
+class HitlRunStore:
+    """Manages saving and reading structured execution runs locally."""
+
+    def __init__(self, log_dir: Path | str | None = None) -> None:
+        self.log_dir = Path(log_dir) if log_dir else DEFAULT_LOG_DIR
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+        self.last_run_file = self.log_dir / "last_run.json"
+
+    def record_run(
+        self,
+        *,
+        stage: str,
+        topic: str | None = None,
+        model_name: str | None = None,
+        duration: float = 0.0,
+        success: bool = True,
+        error_message: str | None = None,
+        usage: Any = None,
+        messages: list[Any] | None = None,
+        preflight: PreflightResult | None = None,
+        repair: CodeRepair | None = None,
+        artifacts: dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> Path:
+        """Save a structured execution log to disk and update last_run.json."""
+        run_id = str(uuid4())
+        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"run_{timestamp_str}_{stage}_{run_id[:8]}.json"
+        log_path = self.log_dir / filename
+
+        usage_dict: dict[str, Any] = {}
+        if usage:
+            if hasattr(usage, "model_dump"):
+                usage_dict = usage.model_dump(mode="json")
+            elif hasattr(usage, "__dict__"):
+                usage_dict = {
+                    k: v for k, v in usage.__dict__.items()
+                    if isinstance(v, (int, float, str, bool)) or v is None
+                }
+
+        preflight_dict: dict[str, Any] | None = None
+        if preflight:
+            preflight_dict = {
+                "valid": preflight.valid,
+                "status": preflight.status,
+                "blocking": preflight.blocking,
+                "errors": list(preflight.errors),
+                "issues": list(preflight.issues),
+            }
+
+        repair_dict: dict[str, Any] | None = None
+        if repair:
+            repair_dict = {
+                "changes_count": len(repair.changes),
+                "changes": list(repair.changes),
+                "semantic_warnings": list(repair.semantic_warnings),
+            }
+
+        record = {
+            "run_id": run_id,
+            "timestamp": datetime.now().isoformat(),
+            "stage": stage,
+            "topic": topic,
+            "model": model_name,
+            "success": success,
+            "error_message": error_message,
+            "duration_seconds": round(duration, 3),
+            "usage": usage_dict,
+            "preflight": preflight_dict,
+            "repair": repair_dict,
+            "messages": serialize_model_messages(messages),
+            "artifacts": artifacts or {},
+            "metadata": metadata or {},
+        }
+
+        content = json.dumps(record, indent=2, default=str)
+        log_path.write_text(content, encoding="utf-8")
+        try:
+            self.last_run_file.write_text(content, encoding="utf-8")
+        except Exception:
+            pass
+
+        return log_path
+
+    def get_last_run(self) -> dict[str, Any] | None:
+        """Read the most recent run record from disk."""
+        if not self.last_run_file.exists():
+            return None
+        try:
+            return json.loads(self.last_run_file.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+    def list_runs(self, limit: int = 10) -> list[Path]:
+        """List the newest run log files."""
+        files = sorted(
+            [f for f in self.log_dir.glob("run_*.json") if f.name != "last_run.json"],
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        return files[:limit]
+
+
+# ── 4. Rich Terminal Observer ─────────────────────────────────────────────────
+
+class HitlTerminalObserver:
+    """Renders real-time visual output, syntax formatting, diffs, and diagnostics in terminal."""
+
+    def __init__(self, console: Console | None = None, verbose: bool = False) -> None:
+        if sys.platform == "win32":
+            try:
+                if hasattr(sys.stdout, "reconfigure"):
+                    sys.stdout.reconfigure(encoding="utf-8")
+                if hasattr(sys.stderr, "reconfigure"):
+                    sys.stderr.reconfigure(encoding="utf-8")
+            except Exception:
+                pass
+        self.console = console or Console(legacy_windows=False)
+        self.verbose = verbose
+
+    def banner(self, title: str, subtitle: str = "") -> None:
+        """Render a major stage header banner."""
+        content = f"[bold white]{title}[/bold white]"
+        if subtitle:
+            content += f"\n[dim]{subtitle}[/dim]"
+        self.console.print(
+            Panel(
+                content,
+                box=ROUNDED,
+                style="cyan",
+                padding=(0, 2),
+            )
+        )
+
+    def step(self, badge: str, title: str, detail: str = "") -> None:
+        """Render an in-progress step status."""
+        badge_str = f"[{badge}]" if not badge.startswith("[") else badge
+        text = f"[bold cyan]{badge_str}[/bold cyan] [bold]{title}[/bold]"
+        if detail:
+            text += f" [dim]({detail})[/dim]"
+        self.console.print(text)
+
+    def success(self, msg: str) -> None:
+        """Render a success message."""
+        self.console.print(f"[bold green][OK][/bold green] {msg}")
+
+    def warning(self, msg: str) -> None:
+        """Render a warning message."""
+        self.console.print(f"[bold yellow][!][/bold yellow] {msg}")
+
+    def error(self, msg: str) -> None:
+        """Render an error message."""
+        self.console.print(f"[bold red][FAIL][/bold red] {msg}")
+
+    def show_prompt(self, system_prompt: str, user_prompt: str) -> None:
+        """Display prompt details when in verbose mode."""
+        if not self.verbose:
+            return
+        self.console.print(
+            Panel(
+                f"[bold cyan]System Prompt:[/bold cyan]\n[dim]{system_prompt[:500]}...[/dim]\n\n"
+                f"[bold cyan]User Prompt:[/bold cyan]\n{user_prompt[:800]}",
+                title="[dim]Prompt Preview[/dim]",
+                box=ROUNDED,
+                style="dim",
+            )
+        )
+
+    def show_tool_call(self, tool_name: str, args: dict[str, Any], result: Any = None, duration: float = 0.0) -> None:
+        """Render agent tool invocation and result."""
+        args_str = json.dumps(args, indent=2, default=str)
+        res_str = str(result)[:300] if result is not None else ""
+        content = f"[bold green]Tool:[/bold green] [bold]{tool_name}[/bold]"
+        if duration > 0:
+            content += f" [dim]({duration:.2f}s)[/dim]"
+        content += f"\n[cyan]Arguments:[/cyan]\n{args_str}"
+        if res_str:
+            content += f"\n[yellow]Result Preview:[/yellow]\n{res_str}"
+
+        self.console.print(
+            Panel(
+                content,
+                title="[bold magenta]Agent Tool Execution[/bold magenta]",
+                box=ROUNDED,
+                style="magenta",
+                padding=(0, 1),
+            )
+        )
+
+    def show_classification(self, result: VideoClassifyResponse, duration: float = 0.0, usage: Any = None) -> None:
+        """Render structured classification output."""
+        badge = "[bold green]ANIMATABLE[/bold green]" if result.animatable else "[bold red]NON-ANIMATABLE[/bold red]"
+        table = Table(box=SIMPLE, show_header=False, padding=(0, 1))
+        table.add_column("Key", style="bold cyan")
+        table.add_column("Value")
+
+        table.add_row("Decision", badge)
+        table.add_row("Subject", result.subject.upper())
+        table.add_row("Topic", result.topic or "[dim]N/A[/dim]")
+        table.add_row("Reasoning", result.reason)
+        if duration > 0:
+            table.add_row("Latency", f"{duration:.2f}s")
+        if usage and hasattr(usage, "total_tokens"):
+            table.add_row("Tokens", f"{usage.total_tokens} total ({getattr(usage, 'input_tokens', 0)} in, {getattr(usage, 'output_tokens', 0)} out)")
+
+        self.console.print(
+            Panel(
+                table,
+                title="[bold cyan]Stage 1: Pedagogical Classification[/bold cyan]",
+                box=ROUNDED,
+                style="cyan",
+            )
+        )
+
+    def show_plan(self, plan_markdown: str, topic: str, duration: float = 0.0, usage: Any = None) -> None:
+        """Render the generated scenes.md plan."""
+        scenes = [line for line in plan_markdown.splitlines() if line.startswith("## Scene")]
+        preview = plan_markdown if self.verbose else "\n".join(plan_markdown.splitlines()[:25])
+        if not self.verbose and len(plan_markdown.splitlines()) > 25:
+            preview += f"\n\n[dim]... (+{len(plan_markdown.splitlines()) - 25} more lines — use --verbose to view all)[/dim]"
+
+        meta_info = f"[bold cyan]Topic:[/bold cyan] {topic}  |  [bold cyan]Detected Scenes:[/bold cyan] {len(scenes)}"
+        if duration > 0:
+            meta_info += f"  |  [bold cyan]Time:[/bold cyan] {duration:.2f}s"
+        if usage and hasattr(usage, "total_tokens"):
+            meta_info += f"  |  [bold cyan]Tokens:[/bold cyan] {usage.total_tokens}"
+
+        self.console.print(
+            Panel(
+                f"{meta_info}\n\n{preview}",
+                title="[bold magenta]Stage 2: Composer Plan (scenes.md)[/bold magenta]",
+                box=ROUNDED,
+                style="magenta",
+            )
+        )
+
+    def show_code(self, code: str, scene_name: str, duration: float = 0.0, usage: Any = None) -> None:
+        """Render the synthesized Manim Python code with syntax highlighting."""
+        lines = code.splitlines()
+        line_count = len(lines)
+        syntax = Syntax(code, "python", theme="monokai", line_numbers=True)
+
+        meta = f"[bold green]Scene Class:[/bold green] {scene_name}  |  [bold green]Lines:[/bold green] {line_count}"
+        if duration > 0:
+            meta += f"  |  [bold green]Time:[/bold green] {duration:.2f}s"
+        if usage and hasattr(usage, "total_tokens"):
+            meta += f"  |  [bold green]Tokens:[/bold green] {usage.total_tokens}"
+
+        self.console.print(
+            Panel(
+                syntax,
+                title=f"[bold green]Stage 3: Manim Python Code ({scene_name})[/bold green]",
+                subtitle=meta,
+                box=ROUNDED,
+                style="green",
+            )
+        )
+
+    def show_preflight(self, preflight: PreflightResult, repair: CodeRepair | None = None) -> None:
+        """Render preflight AST static validation findings and deterministic fixes."""
+        if repair and repair.changes:
+            changes_table = Table(box=SIMPLE, show_header=True)
+            changes_table.add_column("#", style="dim", width=4)
+            changes_table.add_column("Deterministic AST Repair Applied", style="bold yellow")
+            for idx, change in enumerate(repair.changes, start=1):
+                changes_table.add_row(str(idx), change)
+
+            self.console.print(
+                Panel(
+                    changes_table,
+                    title="[bold yellow]Pre-Flight Deterministic AST Fixes[/bold yellow]",
+                    box=ROUNDED,
+                    style="yellow",
+                )
+            )
+
+        if repair and repair.semantic_warnings:
+            warnings_text = "\n".join(f"* [bold yellow]{w}[/bold yellow]" for w in repair.semantic_warnings)
+            self.console.print(
+                Panel(
+                    warnings_text,
+                    title="[bold yellow][!] Semantic Drift Warnings (Visual Review Recommended)[/bold yellow]",
+                    box=ROUNDED,
+                    style="yellow",
+                )
+            )
+
+        if preflight.valid:
+            self.console.print(
+                Panel(
+                    "[bold green][OK] Preflight Passed: Python syntax, AST structures, and ManimCE constructs are clean.[/bold green]",
+                    box=ROUNDED,
+                    style="green",
+                )
+            )
+            return
+
+        # Show table of static errors
+        table = Table(box=ROUNDED, show_header=True)
+        table.add_column("Line", style="cyan", width=6)
+        table.add_column("Type / Rule", style="bold red", width=24)
+        table.add_column("Diagnostic Message")
+        table.add_column("Severity", style="bold", width=12)
+
+        for err in preflight.errors:
+            line_no = str(err.get("line") or err.get("lineno") or "-")
+            err_type = str(err.get("type") or err.get("rule") or "StaticError")
+            msg = str(err.get("message") or err.get("msg") or "")
+            blocking = "[bold red]BLOCKING[/bold red]" if err.get("blocking", True) else "[yellow]WARNING[/yellow]"
+            table.add_row(line_no, err_type, msg, blocking)
+
+        self.console.print(
+            Panel(
+                table,
+                title=f"[bold red]Stage 4: Preflight Validation Failed ({len(preflight.errors)} issue(s))[/bold red]",
+                box=ROUNDED,
+                style="red",
+            )
+        )
+
+    def show_code_diff(self, old_code: str, new_code: str, title: str = "Code Diff") -> None:
+        """Render unified diff with colored additions and deletions."""
+        diff_lines = list(
+            difflib.unified_diff(
+                old_code.splitlines(),
+                new_code.splitlines(),
+                fromfile="original.py",
+                tofile="repaired.py",
+                lineterm="",
+            )
+        )
+        if not diff_lines:
+            self.console.print("[dim]No diff detected between original and repaired code.[/dim]")
+            return
+
+        diff_text = Text()
+        for line in diff_lines:
+            if line.startswith("+++") or line.startswith("---"):
+                diff_text.append(line + "\n", style="bold cyan")
+            elif line.startswith("@@"):
+                diff_text.append(line + "\n", style="bold magenta")
+            elif line.startswith("+"):
+                diff_text.append(line + "\n", style="bold green")
+            elif line.startswith("-"):
+                diff_text.append(line + "\n", style="bold red")
+            else:
+                diff_text.append(line + "\n", style="dim")
+
+        self.console.print(
+            Panel(
+                diff_text,
+                title=f"[bold yellow]{title}[/bold yellow]",
+                box=ROUNDED,
+                style="yellow",
+            )
+        )
+
+    def show_run_summary(
+        self,
+        *,
+        stage: str,
+        status: str,
+        duration: float,
+        usage: dict[str, Any],
+        log_path: Path,
+    ) -> None:
+        """Render execution summary footer."""
+        status_text = "[bold green]SUCCESS[/bold green]" if status == "success" else "[bold red]FAILED[/bold red]"
+        table = Table(box=SIMPLE, show_header=False, padding=(0, 2))
+        table.add_column("Metric", style="bold")
+        table.add_column("Value")
+
+        table.add_row("Stage", stage.upper())
+        table.add_row("Status", status_text)
+        table.add_row("Total Time", f"{duration:.2f}s")
+        if usage:
+            table.add_row("Token Usage", f"requests={usage.get('requests', 1)}, in={usage.get('input_tokens', 0)}, out={usage.get('output_tokens', 0)}, total={usage.get('total_tokens', 0)}")
+        table.add_row("Local Run Log", f"[underline cyan]{log_path}[/underline cyan]")
+
+        self.console.print(
+            Panel(
+                table,
+                title="[bold white]HITL Local Pipeline Summary[/bold white]",
+                box=ROUNDED,
+                style="white",
+            )
+        )
+
+
+# ── 5. Pydantic AI Lifecycle Hooks for Local Dev ──────────────────────────────
+
+def create_hitl_local_dev_hooks(
+    observer: HitlTerminalObserver | None = None,
+) -> Any:
+    """Create a Pydantic AI Hooks capability that logs lifecycle events to the terminal."""
+    try:
+        from pydantic_ai import RunContext, ToolDefinition
+        from pydantic_ai.capabilities import ValidatedToolArgs
+        from pydantic_ai.capabilities.hooks import Hooks
+        from pydantic_ai.messages import ToolCallPart
+        from pydantic_ai.models import ModelRequestContext
+    except ImportError:
+        logger.debug("Pydantic AI Hooks not available in this environment")
+        return None
+
+    obs = observer or HitlTerminalObserver()
+    hooks = Hooks()
+    tool_start_times: dict[str, float] = {}
+
+    @hooks.on.before_model_request
+    async def on_before_model_request(
+        ctx: RunContext[Any],
+        request_context: ModelRequestContext,
+    ) -> ModelRequestContext:
+        msg_count = len(request_context.messages) if hasattr(request_context, "messages") else 0
+        if obs.verbose:
+            obs.step("LLM", "Requesting LLM Completion", f"{msg_count} messages in context")
+        return request_context
+
+    @hooks.on.before_tool_execute
+    async def on_before_tool_execute(
+        ctx: RunContext[Any],
+        *,
+        call: ToolCallPart,
+        tool_def: ToolDefinition,
+        args: ValidatedToolArgs,
+    ) -> ValidatedToolArgs:
+        tool_start_times[call.tool_name] = time.perf_counter()
+        arg_dict = args.args if hasattr(args, "args") else {}
+        obs.step("TOOL", f"Invoking Tool: [bold]{call.tool_name}[/bold]")
+        return args
+
+    @hooks.on.after_tool_execute
+    async def on_after_tool_execute(
+        ctx: RunContext[Any],
+        *,
+        call: ToolCallPart,
+        tool_def: ToolDefinition,
+        args: ValidatedToolArgs,
+        result: Any,
+    ) -> Any:
+        start_t = tool_start_times.pop(call.tool_name, time.perf_counter())
+        elapsed = time.perf_counter() - start_t
+        arg_dict = args.args if hasattr(args, "args") else {}
+        obs.show_tool_call(call.tool_name, arg_dict if isinstance(arg_dict, dict) else {}, result, duration=elapsed)
+        return result
+
+    @hooks.on.run_error
+    async def on_run_error(
+        ctx: RunContext[Any],
+        exc: Exception,
+    ) -> None:
+        obs.error(f"Agent Run Exception: {type(exc).__name__} — {exc}")
+
+    return hooks
