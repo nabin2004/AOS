@@ -324,3 +324,117 @@ async def test_hitl_agent_skills():
     ):
         res_repair = await repair.run("Fix syntax error")
         assert "Repaired" in res_repair.output
+
+
+def test_oop_hitl_agent_architecture():
+    from app.agents.hitl_agents import (
+        HitlLLMResolver,
+        HitlCodeExtractor,
+        HitlAgentTools,
+        HitlAgentFactory,
+        HitlRepairRunner,
+        HitlAgentService,
+        hitl_agent_service,
+    )
+
+    resolver = HitlLLMResolver()
+    key, url, model = resolver.resolve(api_key="custom-key", base_url="http://localhost:11434", model_name="qwen2.5-coder")
+    assert key == "custom-key"
+    assert "localhost:11434" in url
+    assert model == "qwen2.5-coder"
+
+    extractor = HitlCodeExtractor()
+    code, scene = extractor.extract_code(
+        "```python\nfrom manim import *\nclass MyCoolScene(Scene):\n    def construct(self):\n        pass\n```",
+        default_scene="DefaultScene",
+    )
+    assert scene == "MyCoolScene"
+    assert "class MyCoolScene(Scene):" in code
+
+    tools = HitlAgentTools()
+    syntax_valid = tools.validate_syntax("x = 1 + 2")
+    assert syntax_valid["valid"] is True
+    syntax_invalid = tools.validate_syntax("def invalid syntax:")
+    assert syntax_invalid["valid"] is False
+
+    factory = HitlAgentFactory(resolver=resolver)
+    assert factory.resolver is resolver
+
+    runner = HitlRepairRunner(extractor=extractor, tools=tools)
+    assert runner.extractor is extractor
+    assert runner.tools is tools
+
+    custom_service = HitlAgentService(
+        resolver=resolver,
+        extractor=extractor,
+        tools=tools,
+        factory=factory,
+        repair_runner=runner,
+    )
+    assert custom_service.resolver is resolver
+    assert hitl_agent_service is not None
+
+
+@pytest.mark.anyio
+async def test_oop_manim_studio_architecture():
+    from app.services.manim_studio import (
+        ManimTextClassifier,
+        ManimPlanComposer,
+        ManimCodeSynthesizer,
+        ManimCodeRepairer,
+        ManimRenderEngine,
+        ManimStudioService,
+        manim_studio_service,
+        manim_studio,
+    )
+    from pathlib import Path
+    import tempfile
+
+    classifier = ManimTextClassifier()
+    res_heuristic = classifier.classify_heuristic("Integral of e^x dx is e^x + C")
+    assert res_heuristic.animatable is True
+    assert res_heuristic.subject == "math"
+
+    composer = ManimPlanComposer()
+    fallback_plan = composer.generate_fallback_plan("Derivation of Euler's formula", "Euler's Formula")
+    assert "Visualizing Euler's Formula" in fallback_plan
+    assert "## Scene 1:" in fallback_plan
+
+    synthesizer = ManimCodeSynthesizer()
+    fallback_code, scene_name = synthesizer.generate_fallback_code(fallback_plan)
+    assert "class EulerFormulaScene(Scene):" in fallback_code
+    assert scene_name == "EulerFormulaScene"
+
+    repairer = ManimCodeRepairer()
+    assert repairer is not None
+
+    renderer = ManimRenderEngine()
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        fake_path = Path(tmp_dir)
+        # Should gracefully return error log if no manim or docker is available or if execution fails
+        mp4_path, err = renderer.execute_render(
+            code="invalid code",
+            scene_name="TestScene",
+            quality="l",
+            workspace_dir=fake_path,
+        )
+        assert mp4_path is None
+        assert isinstance(err, str)
+
+    # Test master facade and dependency injection
+    studio = ManimStudioService(
+        classifier=classifier,
+        composer=composer,
+        synthesizer=synthesizer,
+        repairer=repairer,
+        renderer=renderer,
+    )
+    assert studio.classifier is classifier
+    assert studio.composer is composer
+    assert studio.synthesizer is synthesizer
+    assert studio.repairer is repairer
+    assert studio.renderer is renderer
+
+    assert manim_studio_service is not None
+    assert manim_studio is manim_studio_service
+
