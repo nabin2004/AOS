@@ -513,6 +513,8 @@ def create_hitl_local_dev_hooks(
     async def on_before_model_request(
         ctx: RunContext[Any],
         request_context: ModelRequestContext,
+        *args: Any,
+        **kwargs: Any,
     ) -> ModelRequestContext:
         msg_count = len(request_context.messages) if hasattr(request_context, "messages") else 0
         if obs.verbose:
@@ -522,36 +524,48 @@ def create_hitl_local_dev_hooks(
     @hooks.on.before_tool_execute
     async def on_before_tool_execute(
         ctx: RunContext[Any],
-        *,
-        call: ToolCallPart,
-        tool_def: ToolDefinition,
-        args: ValidatedToolArgs,
-    ) -> ValidatedToolArgs:
-        tool_start_times[call.tool_name] = time.perf_counter()
-        arg_dict = args.args if hasattr(args, "args") else {}
-        obs.step("TOOL", f"Invoking Tool: [bold]{call.tool_name}[/bold]")
-        return args
+        *args: Any,
+        call: ToolCallPart | None = None,
+        tool_def: ToolDefinition | None = None,
+        tool_args: ValidatedToolArgs | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        tool_call = call or kwargs.get("call")
+        t_args = tool_args or kwargs.get("args")
+        tool_name = getattr(tool_call, "tool_name", "unknown_tool")
+        tool_start_times[tool_name] = time.perf_counter()
+        obs.step("TOOL", f"Invoking Tool: [bold]{tool_name}[/bold]")
+        return t_args or args[0] if args else kwargs
 
     @hooks.on.after_tool_execute
     async def on_after_tool_execute(
         ctx: RunContext[Any],
-        *,
-        call: ToolCallPart,
-        tool_def: ToolDefinition,
-        args: ValidatedToolArgs,
-        result: Any,
+        *args: Any,
+        call: ToolCallPart | None = None,
+        tool_def: ToolDefinition | None = None,
+        tool_args: ValidatedToolArgs | None = None,
+        result: Any = None,
+        **kwargs: Any,
     ) -> Any:
-        start_t = tool_start_times.pop(call.tool_name, time.perf_counter())
+        tool_call = call or kwargs.get("call")
+        tool_name = getattr(tool_call, "tool_name", "unknown_tool")
+        start_t = tool_start_times.pop(tool_name, time.perf_counter())
         elapsed = time.perf_counter() - start_t
-        arg_dict = args.args if hasattr(args, "args") else {}
-        obs.show_tool_call(call.tool_name, arg_dict if isinstance(arg_dict, dict) else {}, result, duration=elapsed)
-        return result
+        t_args = tool_args or kwargs.get("args")
+        arg_dict = t_args.args if hasattr(t_args, "args") else (t_args if isinstance(t_args, dict) else {})
+        res = result if result is not None else kwargs.get("result")
+        obs.show_tool_call(tool_name, arg_dict if isinstance(arg_dict, dict) else {}, res, duration=elapsed)
+        return res
 
     @hooks.on.run_error
     async def on_run_error(
         ctx: RunContext[Any],
-        exc: Exception,
+        *args: Any,
+        error: Exception | None = None,
+        **kwargs: Any,
     ) -> None:
-        obs.error(f"Agent Run Exception: {type(exc).__name__} — {exc}")
+        exc = error or kwargs.get("exc") or (args[0] if args else "Unknown error")
+        exc_type = type(exc).__name__ if isinstance(exc, Exception) else "Error"
+        obs.error(f"Agent Run Exception: {exc_type} — {exc}")
 
     return hooks

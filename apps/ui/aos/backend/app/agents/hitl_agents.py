@@ -188,7 +188,7 @@ CRITICAL REPAIR RULES:
 class HitlLLMResolver:
     """Resolves LLM endpoints, API keys, and model names with fallback strategies."""
 
-    DEFAULT_FALLBACK_MODEL = "nex-agi/nex-n2.5-pro:free"
+    DEFAULT_FALLBACK_MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free"
     DEFAULT_OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
     def resolve(
@@ -215,6 +215,7 @@ class HitlLLMResolver:
             if env_file_override:
                 env_candidates.append(Path(env_file_override))
             env_candidates.extend([
+                Path(__file__).resolve().parents[2] / ".env",
                 Path(__file__).resolve().parents[6] / "apps" / "agents" / ".env",
                 Path(__file__).resolve().parents[5] / "apps" / "agents" / ".env",
                 Path("/app/apps/agents/.env"),
@@ -236,11 +237,7 @@ class HitlLLMResolver:
                     except Exception:
                         pass
         if not key:
-            raise ValueError(
-                "No API key found. Set OPENROUTER_API_KEY, AOS_OPENAI_API_KEY, or OPENAI_API_KEY "
-                "in the environment, in app settings, or point AOS_ENV_FILE to a .env file "
-                "containing one of those keys."
-            )
+            key = os.getenv("OPENROUTER_API_KEY", "").strip()
 
         custom_base = normalize_endpoint_url(base_url)
         if not custom_base:

@@ -45,6 +45,15 @@ backend_dir = Path(__file__).resolve().parent
 if str(backend_dir) not in sys.path:
     sys.path.insert(0, str(backend_dir))
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(backend_dir / ".env")
+    if (backend_dir.parents[2] / "agents" / ".env").exists():
+        load_dotenv(backend_dir.parents[2] / "agents" / ".env")
+except Exception:
+    pass
+
+
 if sys.platform == "win32":
     try:
         if hasattr(sys.stdout, "reconfigure"):
@@ -166,6 +175,8 @@ async def run_classify_stage(
     *,
     mock: bool = False,
     model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
 ) -> VideoClassifyResponse:
     """Execute Stage 1: Pedagogical Animatability Classification."""
     observer.banner("Stage 1: Manim Animatability Classification", "Pydantic AI Classifier Agent")
@@ -196,14 +207,51 @@ async def run_classify_stage(
         usage = getattr(result, "usage", None)
         messages = result.all_messages()
     else:
-        agent = hitl_agents.get_classifier_agent(model_name=model_name, capabilities=[hooks] if hooks else None)
+        agent = hitl_agents.get_classifier_agent(
+            model_name=model_name,
+            base_url=base_url,
+            api_key=api_key,
+            capabilities=[hooks] if hooks else None,
+        )
         prompt = f"Please classify the following educational content for Manim animatability:\n\n{text}"
         observer.show_prompt(hitl_agents.CLASSIFIER_SYSTEM_PROMPT, prompt)
-        with capture_run_messages() as captured:
-            result = await agent.run(prompt)
-            output = result.output
-            usage = getattr(result, "usage", None)
-            messages = result.all_messages() or captured
+        try:
+            with capture_run_messages() as captured:
+                result = await agent.run(prompt)
+                output = result.output
+                usage = getattr(result, "usage", None)
+                messages = result.all_messages() or captured
+        except Exception as exc:
+            messages = captured
+            recovered = None
+            for m in captured:
+                for part in getattr(m, "parts", []):
+                    content = getattr(part, "content", "")
+                    if isinstance(content, str) and "animatable" in content:
+                        import re
+                        match = re.search(r'\{[^{}]*"animatable"[\s\S]*?\}', content)
+                        if match:
+                            try:
+                                data = json.loads(match.group(0))
+                                recovered = VideoClassifyResponse(
+                                    animatable=bool(data.get("animatable", True)),
+                                    subject=str(data.get("subject", "cs")),
+                                    topic=str(data.get("topic", text[:30])),
+                                    reason=str(data.get("reason", "Recovered from model output")),
+                                )
+                                break
+                            except Exception:
+                                pass
+                if recovered:
+                    break
+
+            if recovered:
+                observer.step("RECOVER", "Extracted structured classification from raw model response")
+                output = recovered
+            else:
+                observer.warning(f"Classification agent fallback ({type(exc).__name__}: {exc})")
+                from app.services.manim_studio import classify_text_heuristic
+                output = classify_text_heuristic(text)
 
     duration = time.perf_counter() - start_t
     observer.show_classification(output, duration=duration, usage=usage)
@@ -230,6 +278,8 @@ async def run_compose_stage(
     *,
     mock: bool = False,
     model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
 ) -> str:
     """Execute Stage 2: scenes.md Visual Plan Composition."""
     observer.banner("Stage 2: scenes.md Visual Plan Composition", "Pydantic AI Composer Agent")
@@ -244,7 +294,12 @@ async def run_compose_stage(
         plan_markdown = MOCK_PLAN
         duration = time.perf_counter() - start_t
     else:
-        agent = hitl_agents.get_composer_agent(model_name=model_name, capabilities=[hooks] if hooks else None)
+        agent = hitl_agents.get_composer_agent(
+            model_name=model_name,
+            base_url=base_url,
+            api_key=api_key,
+            capabilities=[hooks] if hooks else None,
+        )
         deps = hitl_agents.HitlPlanDeps(topic=topic, source_text=text)
         user_prompt = f"Educational Content:\n{text}\n\nPlease construct a comprehensive scenes.md visual plan for Manim focusing on topic '{topic}'."
         observer.show_prompt(hitl_agents.COMPOSER_SYSTEM_PROMPT, user_prompt)
@@ -279,6 +334,8 @@ async def run_code_stage(
     *,
     mock: bool = False,
     model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
     inject_bug: bool = False,
 ) -> tuple[str, str]:
     """Execute Stage 3: Manim Python Code Synthesis with Preflight."""
@@ -295,7 +352,12 @@ async def run_code_stage(
         detected_scene = "BrokenMobjectScene" if inject_bug else "FourierTransformScene"
         duration = time.perf_counter() - start_t
     else:
-        agent = hitl_agents.get_coder_agent(model_name=model_name, capabilities=[hooks] if hooks else None)
+        agent = hitl_agents.get_coder_agent(
+            model_name=model_name,
+            base_url=base_url,
+            api_key=api_key,
+            capabilities=[hooks] if hooks else None,
+        )
         deps = hitl_agents.HitlCoderDeps(plan=plan, knowledge_text=topic)
         user_prompt = f"Approved Visual Plan (scenes.md):\n{plan}\n\nSynthesize a complete, elegant Manim Community scene implementing this plan."
         observer.show_prompt(hitl_agents.CODER_SYSTEM_PROMPT, user_prompt)
@@ -344,6 +406,8 @@ async def run_repair_stage(
     *,
     mock: bool = False,
     model_name: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
 ) -> tuple[str, str]:
     """Execute Stage 5: In-Place Self-Correcting Code Repair."""
     observer.banner("Stage 5: Self-Correcting Code Repair", "Pydantic AI Repair Agent + Preflight Loop")
@@ -400,7 +464,12 @@ Current source:
         duration = time.perf_counter() - start_t
     else:
         hooks = create_hitl_local_dev_hooks(observer)
-        agent = hitl_agents.get_repair_agent(model_name=model_name, capabilities=[hooks] if hooks else None)
+        agent = hitl_agents.get_repair_agent(
+            model_name=model_name,
+            base_url=base_url,
+            api_key=api_key,
+            capabilities=[hooks] if hooks else None,
+        )
         observer.show_prompt(hitl_agents.REPAIR_SYSTEM_PROMPT, prompt)
         with capture_run_messages() as captured:
             repaired_code, detected_scene = await hitl_agents.run_repair_with_self_correction(
@@ -576,7 +645,21 @@ def parse_args() -> argparse.Namespace:
         help="Pipeline stage to run (default: all)",
     )
     parser.add_argument("--mock", action="store_true", help="Run with Pydantic AI TestModel (offline, 0 API tokens)")
-    parser.add_argument("-m", "--model", default=None, help="LLM model override (e.g. nex-agi/nex-n2.5-pro:free or gpt-4o-mini)")
+    parser.add_argument(
+        "-m", "--model",
+        default=os.getenv("AI_MODEL") or os.getenv("AOS_OPENAI_MODEL") or "nvidia/nemotron-3-ultra-550b-a55b:free",
+        help="LLM model override (default: nvidia/nemotron-3-ultra-550b-a55b:free)",
+    )
+    parser.add_argument(
+        "-b", "--base-url",
+        default=os.getenv("AOS_OPENAI_BASE_URL", "https://openrouter.ai/api/v1"),
+        help="LLM base URL / endpoint (default: https://openrouter.ai/api/v1)",
+    )
+    parser.add_argument(
+        "-k", "--api-key",
+        default=os.getenv("OPENROUTER_API_KEY", "") or os.getenv("AOS_OPENAI_API_KEY", ""),
+        help="API key for OpenRouter or custom endpoint",
+    )
     parser.add_argument("-f", "--file", default=None, help="Python source file for preflight or repair stage")
     parser.add_argument("-e", "--error", default=None, help="Traceback or compiler error for repair stage")
     parser.add_argument("--inject-mobject-bug", action="store_true", help="Inject intentional mobject index error to test repair agent")
@@ -608,14 +691,18 @@ async def async_main() -> None:
     start_total_t = time.perf_counter()
     observer.banner(
         "AOS HITL Local Development Runner",
-        f"Mode: {'MOCK (Pydantic AI TestModel)' if args.mock else 'LIVE LLM'}  |  Stage: {args.stage.upper()}",
+        f"Mode: {'MOCK (Pydantic AI TestModel)' if args.mock else 'LIVE LLM'}  |  Stage: {args.stage.upper()}  |  Model: {args.model}",
     )
 
     try:
         # Check API key if not in mock mode
         if not args.mock:
             try:
-                hitl_agents._resolve_llm_config(model_name=args.model)
+                hitl_agents._resolve_llm_config(
+                    api_key=args.api_key,
+                    base_url=args.base_url,
+                    model_name=args.model,
+                )
             except ValueError as exc:
                 observer.error(str(exc))
                 observer.console.print(
@@ -627,7 +714,13 @@ async def async_main() -> None:
         # STAGE: CLASSIFY
         if args.stage in ("classify", "all"):
             classify_res = await run_classify_stage(
-                args.topic, observer, run_store, mock=args.mock, model_name=args.model
+                args.topic,
+                observer,
+                run_store,
+                mock=args.mock,
+                model_name=args.model,
+                base_url=args.base_url,
+                api_key=args.api_key,
             )
             if not classify_res.animatable and args.stage == "all":
                 observer.warning("Content classified as non-animatable. Halting pipeline.")
@@ -639,7 +732,14 @@ async def async_main() -> None:
         # STAGE: COMPOSE
         if args.stage in ("compose", "all"):
             plan = await run_compose_stage(
-                args.topic, current_topic, observer, run_store, mock=args.mock, model_name=args.model
+                args.topic,
+                current_topic,
+                observer,
+                run_store,
+                mock=args.mock,
+                model_name=args.model,
+                base_url=args.base_url,
+                api_key=args.api_key,
             )
         else:
             plan = MOCK_PLAN
@@ -647,8 +747,15 @@ async def async_main() -> None:
         # STAGE: CODE
         if args.stage in ("code", "all"):
             code, scene_name = await run_code_stage(
-                plan, current_topic, observer, run_store,
-                mock=args.mock, model_name=args.model, inject_bug=args.inject_mobject_bug
+                plan,
+                current_topic,
+                observer,
+                run_store,
+                mock=args.mock,
+                model_name=args.model,
+                base_url=args.base_url,
+                api_key=args.api_key,
+                inject_bug=args.inject_mobject_bug,
             )
         elif args.file:
             code = Path(args.file).read_text(encoding="utf-8")
@@ -666,8 +773,17 @@ async def async_main() -> None:
                 "IndexError: list index out of range"
             )
             repaired_code, scene_name = await run_repair_stage(
-                code, sample_err, scene_name, observer, run_store, mock=args.mock, model_name=args.model
+                code,
+                sample_err,
+                scene_name,
+                observer,
+                run_store,
+                mock=args.mock,
+                model_name=args.model,
+                base_url=args.base_url,
+                api_key=args.api_key,
             )
+            code = repaired_code
             code = repaired_code
 
         # Optional local render
