@@ -260,3 +260,60 @@ async def test_code_stream_sse_frames(monkeypatch):
     done_frame = next(f for f in frames if f["type"] == "done")
     assert done_frame["scene_name"] == "WaveScene"
     assert "class WaveScene(Scene):" in done_frame["code"]
+
+
+@pytest.mark.anyio
+async def test_hitl_agent_skills():
+    from app.agents.hitl_agents import (
+        get_composer_agent,
+        get_coder_agent,
+        get_repair_agent,
+    )
+    from pydantic_ai.models.test import TestModel
+
+    # 1. Composer Agent has manim-composer capability
+    composer = get_composer_agent()
+    assert any(
+        getattr(cap, "id", None) == "manim-composer"
+        for cap in composer.root_capability.capabilities
+    )
+    with composer.override(
+        model=TestModel(
+            call_tools=["read_composer_template"],
+            custom_output_text="# Scene Plan",
+        )
+    ):
+        res_comp = await composer.run("Create plan")
+        assert res_comp.output == "# Scene Plan"
+
+    # 2. Coder Agent has manimce-best-practices and deferred manim-render capability
+    coder = get_coder_agent()
+    cap_ids = [getattr(cap, "id", None) for cap in coder.root_capability.capabilities]
+    assert "manimce-best-practices" in cap_ids
+    assert "manim-render" in cap_ids
+
+    with coder.override(
+        model=TestModel(
+            call_tools=["read_manim_rule"],
+            custom_output_text="```python\nfrom manim import *\n```",
+        )
+    ):
+        res_coder = await coder.run("How to position objects")
+        assert "from manim import *" in res_coder.output
+
+    # 3. Repair Agent has both best practices and render capability
+    repair = get_repair_agent()
+    repair_cap_ids = [
+        getattr(cap, "id", None) for cap in repair.root_capability.capabilities
+    ]
+    assert "manimce-best-practices" in repair_cap_ids
+    assert "manim-render" in repair_cap_ids
+
+    with repair.override(
+        model=TestModel(
+            call_tools=["get_render_troubleshooting_guide"],
+            custom_output_text="```python\n# Repaired\n```",
+        )
+    ):
+        res_repair = await repair.run("Fix Docker mount error")
+        assert "Repaired" in res_repair.output
