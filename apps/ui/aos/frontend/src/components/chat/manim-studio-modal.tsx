@@ -39,6 +39,7 @@ import { useCritiqueStore } from "@/stores";
 import { useAuthStore } from "@/stores";
 import { useLlmProviderStore } from "@/stores/llm-provider-store";
 import { useAnimationSessionStore, type AnimationEmphasis } from "@/stores/animation-session-store";
+import { ManimHitlErrorInspector } from "./manim-hitl-error-inspector";
 
 interface PlannedMobject {
   type: string;
@@ -439,10 +440,14 @@ export function ManimStudioModal({
     }
   }, [isOpen, initialKnowledge, activeSession, conversationId, sourceMessageId, sourcePrompt, startSession]);
 
-  const handleRenderVideo = async () => {
+  const handleRenderVideo = async (skipPreflight = false) => {
     setIsRendering(true);
     setRenderError(null);
-    setRenderProgressMsg("Initiating Docker Manim compiler container...");
+    setRenderProgressMsg(
+      skipPreflight
+        ? "Bypassing preflight warnings, initiating Docker Manim compiler container..."
+        : "Initiating Docker Manim compiler container..."
+    );
     // One initial render plus one bundled repair pass. The repair endpoint
     // receives static findings and compiler diagnostics together, so repeated
     // blind render/repair cycles are unnecessary and make failures look hung.
@@ -454,7 +459,7 @@ export function ManimStudioModal({
       for (let attempt = 0; attempt < maxRepairAttempts; attempt += 1) {
         setRenderProgressMsg(
           attempt === 0
-            ? "Compiling and rendering the Manim scene..."
+            ? (skipPreflight ? "Compiling and rendering with Manim (preflight bypassed)..." : "Compiling and rendering the Manim scene...")
             : `Re-rendering repaired scene (attempt ${attempt + 1}/${maxRepairAttempts})...`,
         );
         const resp = await fetch("/api/videos/render-custom", {
@@ -470,6 +475,7 @@ export function ManimStudioModal({
             quality: quality,
             conversation_id: conversationId,
             prompt: `Manim Studio: ${sceneName}`,
+            skip_preflight: skipPreflight,
           }),
         });
         if (resp.ok) {
@@ -489,6 +495,25 @@ export function ManimStudioModal({
         lastError = typeof err.detail === "string"
           ? err.detail
           : JSON.stringify(err.detail || { message: "Rendering failed" }, null, 2);
+
+        // If this is a non-blocking preflight warning, do not blindly loop in automatic repair!
+        // Present the advisory to the human for HITL decision (Continue Anyway, Fix Automatically, Edit Code).
+        let isNonBlockingWarning = false;
+        try {
+          const parsed = typeof err.detail === "object" ? err.detail : JSON.parse(lastError);
+          if (parsed && (parsed.status === "warning" || parsed.blocking === false)) {
+            isNonBlockingWarning = true;
+          }
+        } catch {
+          // not json
+        }
+
+        if (isNonBlockingWarning) {
+          setRenderError(lastError);
+          setIsRendering(false);
+          return;
+        }
+
         if (attempt === maxRepairAttempts - 1) {
           setRenderError(`Automatic repair exhausted after ${maxRepairAttempts - 1} attempt(s).\n\n${lastError}`);
           return;
@@ -1087,6 +1112,26 @@ export function ManimStudioModal({
                 </div>
               )}
 
+              {/* In-Editor HITL Error / Preflight Review */}
+              {renderError && (
+                <ManimHitlErrorInspector
+                  error={renderError}
+                  sceneCode={sceneCode}
+                  isFixing={isSynthesizingCode}
+                  onContinueAnyway={() => {
+                    setCurrentStage("render");
+                    void handleRenderVideo(true);
+                  }}
+                  onFixAutomatically={(errText) => {
+                    void handleRepairFromCritique("render", errText);
+                  }}
+                  onEditCode={() => {
+                    setIsEditingCode(true);
+                  }}
+                  onDismiss={() => setRenderError(null)}
+                />
+              )}
+
               {/* Action Bar */}
               <div className="flex items-center justify-between pt-4 border-t border-border/40">
                 <Button
@@ -1145,35 +1190,24 @@ export function ManimStudioModal({
                 ))}
               </div>
 
-              {/* Compiler Error Box with One-Click Code Fix */}
+              {/* HITL Error & Preflight Inspector */}
               {renderError && !isRendering && (
-                <div className="rounded-2xl border border-red-500/30 bg-red-500/5 p-4 space-y-3 text-left shadow-sm">
-                  <div className="flex items-start gap-2.5 text-red-500 font-semibold text-xs">
-                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                    <div>
-                      <div>Manim Compilation / Render Error</div>
-                      <p className="text-[11px] text-muted-foreground font-normal mt-0.5">
-                        The Manim compiler reported an issue. Inspect the error log below and jump to Coder Agent to fix it.
-                      </p>
-                    </div>
-                  </div>
-                  <pre className="p-3 rounded-lg bg-black/60 border border-red-500/20 text-red-300 font-mono text-[11px] overflow-x-auto max-h-44 whitespace-pre-wrap leading-relaxed">
-                    {renderError}
-                  </pre>
-                  <div className="flex items-center gap-2 pt-1">
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        void handleRepairFromCritique("render", renderError);
-                      }}
-                      disabled={isSynthesizingCode}
-                      className="h-8 text-xs bg-red-600 hover:bg-red-700 text-white gap-1.5 font-medium shadow-sm"
-                    >
-                      <Edit3 className="h-3.5 w-3.5" />
-                      {isSynthesizingCode ? "Repairing with Manim Docsâ€¦" : "Fix Code in Coder Agent"}
-                    </Button>
-                  </div>
-                </div>
+                <ManimHitlErrorInspector
+                  error={renderError}
+                  sceneCode={sceneCode}
+                  isFixing={isSynthesizingCode}
+                  onContinueAnyway={() => {
+                    void handleRenderVideo(true);
+                  }}
+                  onFixAutomatically={(errText) => {
+                    void handleRepairFromCritique("render", errText);
+                  }}
+                  onEditCode={() => {
+                    setCurrentStage("code");
+                    setIsEditingCode(true);
+                  }}
+                  onDismiss={() => setRenderError(null)}
+                />
               )}
 
               {/* Rendering Status / Trigger Box */}
@@ -1206,7 +1240,7 @@ export function ManimStudioModal({
                     </div>
                     <Button
                       size="lg"
-                      onClick={handleRenderVideo}
+                      onClick={() => void handleRenderVideo(false)}
                       className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg px-8 gap-2 font-semibold"
                     >
                       <Play className="h-4 w-4" />

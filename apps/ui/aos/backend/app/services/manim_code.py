@@ -21,6 +21,9 @@ class CodeRepair:
 class PreflightResult:
     valid: bool
     errors: tuple[dict[str, object], ...] = ()
+    status: str = "safe"
+    blocking: bool = False
+    issues: tuple[dict[str, object], ...] = ()
 
 
 _COMMON_MANIM_NAMES = {
@@ -104,17 +107,21 @@ def preflight_manim_code(code: str) -> PreflightResult:
     try:
         tree = ast.parse(code)
     except SyntaxError as exc:
+        syntax_err = {
+            "type": "SyntaxError",
+            "severity": "error",
+            "blocking": True,
+            "message": exc.msg,
+            "line": exc.lineno,
+            "column": exc.offset,
+            "text": (exc.text or "").strip(),
+        }
         return PreflightResult(
             valid=False,
-            errors=(
-                {
-                    "type": "SyntaxError",
-                    "message": exc.msg,
-                    "line": exc.lineno,
-                    "column": exc.offset,
-                    "text": (exc.text or "").strip(),
-                },
-            ),
+            errors=(syntax_err,),
+            status="failed",
+            blocking=True,
+            issues=(syntax_err,),
         )
 
     collector = _NameCollector()
@@ -173,9 +180,19 @@ def preflight_manim_code(code: str) -> PreflightResult:
     errors.extend(_find_nonraw_tex_strings(code))
     errors.extend(_find_mobject_index_mismatches(tree, code))
 
+    for item in errors:
+        item["blocking"] = item.get("severity", "error") == "error"
+
+    has_blocking = any(item.get("blocking", False) for item in errors)
+    has_warning = any(item.get("severity", "error") == "warning" for item in errors)
+    status_val = "safe" if not errors else ("failed" if has_blocking else "warning")
+
     return PreflightResult(
-        valid=not any(item.get("severity", "error") == "error" for item in errors),
+        valid=not has_blocking,
         errors=tuple(errors),
+        status=status_val,
+        blocking=has_blocking,
+        issues=tuple(errors),
     )
 
 

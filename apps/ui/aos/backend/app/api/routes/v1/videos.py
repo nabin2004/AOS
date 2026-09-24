@@ -241,6 +241,7 @@ async def render_custom_scene(
     prompt = payload.get("prompt")
     conversation_id_raw = payload.get("conversation_id")
     conv_id = UUID(conversation_id_raw) if conversation_id_raw else None
+    skip_preflight = bool(payload.get("skip_preflight", False))
 
     async with get_db_context() as db:
         try:
@@ -252,6 +253,7 @@ async def render_custom_scene(
                 db=db,
                 conversation_id=conv_id,
                 prompt=prompt,
+                skip_preflight=skip_preflight,
             )
         except HTTPException:
             # The renderer returns a 4xx exception containing the Manim stderr
@@ -264,3 +266,28 @@ async def render_custom_scene(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Render execution failed: {exc!s}",
             ) from exc
+
+
+@router.post("/preflight", response_model=None)
+async def preflight_check(
+    payload: dict[str, Any],
+    user: CurrentUser,
+) -> Any:
+    """Run static preflight analysis on Manim code without rendering."""
+    from app.services.manim_code import preflight_manim_code, repair_manim_code
+
+    code = payload.get("code", "")
+    repaired = repair_manim_code(code)
+    preflight = preflight_manim_code(repaired.code)
+    has_blocking = any(item.get("blocking", False) or item.get("severity", "error") == "error" for item in preflight.errors)
+
+    return {
+        "valid": preflight.valid and not has_blocking,
+        "status": "safe" if not preflight.errors else ("failed" if has_blocking else "warning"),
+        "blocking": has_blocking,
+        "errors": list(preflight.errors),
+        "issues": list(preflight.issues or preflight.errors),
+        "repair_changes": list(repaired.changes),
+        "repaired_code": repaired.code if repaired.changes else None,
+    }
+

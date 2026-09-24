@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+RUN pip install --no-cache-dir uv && ln -sf /usr/local/bin/uv /bin/uv
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 
@@ -38,7 +38,10 @@ ENV PYTHONDONTWRITEBYTECODE=1
 WORKDIR /app
 
 # Install uv in runtime so Celery worker and agents sub-processes can execute uv commands
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+COPY --from=builder /usr/local/bin/uv /bin/uv
+COPY --from=builder /usr/local/bin/uv /usr/local/bin/uv
+COPY --from=builder /usr/local/bin/uvx /usr/local/bin/uvx
+RUN ln -sf /usr/local/bin/uvx /bin/uvx
 
 # System dependencies:
 # - ffmpeg, libcairo2, libpango for Manim, audio and media processing

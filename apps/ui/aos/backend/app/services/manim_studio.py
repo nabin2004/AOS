@@ -848,6 +848,7 @@ class ManimRenderEngine:
         db: AsyncSession,
         conversation_id: UUID | None = None,
         prompt: str | None = None,
+        skip_preflight: bool = False,
     ) -> VideoRenderCustomResponse:
         """Compile and render user-approved Manim code, upload to MinIO/storage, and return playback info."""
         repair = repair_manim_code(code)
@@ -855,18 +856,23 @@ class ManimRenderEngine:
         if repair.changes:
             logger.info("Applied deterministic Manim compatibility repairs: %s", "; ".join(repair.changes))
 
-        preflight = preflight_manim_code(effective_code)
-        if not preflight.valid:
-            diagnostic_bundle = {
-                "stage": "preflight",
-                "status": "failed",
-                "errors": list(preflight.errors),
-                "repair_changes": list(repair.changes),
-            }
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=json.dumps(diagnostic_bundle),
-            )
+        if not skip_preflight:
+            preflight = preflight_manim_code(effective_code)
+            has_blocking = any(item.get("blocking", False) or item.get("severity", "error") == "error" for item in preflight.errors)
+            has_warning = any(item.get("severity", "error") == "warning" for item in preflight.errors)
+            if not preflight.valid or has_blocking or has_warning:
+                diagnostic_bundle = {
+                    "stage": "preflight",
+                    "status": "failed" if has_blocking else "warning",
+                    "blocking": has_blocking,
+                    "errors": list(preflight.errors),
+                    "issues": list(preflight.issues or preflight.errors),
+                    "repair_changes": list(repair.changes),
+                }
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=json.dumps(diagnostic_bundle),
+                )
 
         effective_scene = "GeneratedScene"
         class_match = re.search(r"class\s+([A-Za-z0-9_]+)\s*\(", effective_code or "")
@@ -1124,6 +1130,7 @@ class ManimStudioService:
         db: AsyncSession,
         conversation_id: UUID | None = None,
         prompt: str | None = None,
+        skip_preflight: bool = False,
     ) -> VideoRenderCustomResponse:
         return await self.renderer.render_custom_code(
             code=code,
@@ -1133,6 +1140,7 @@ class ManimStudioService:
             db=db,
             conversation_id=conversation_id,
             prompt=prompt,
+            skip_preflight=skip_preflight,
         )
 
 
@@ -1295,6 +1303,7 @@ async def render_custom_code_service(
     db: AsyncSession,
     conversation_id: UUID | None = None,
     prompt: str | None = None,
+    skip_preflight: bool = False,
 ) -> VideoRenderCustomResponse:
     return await manim_studio_service.render_custom_code(
         code=code,
@@ -1304,4 +1313,5 @@ async def render_custom_code_service(
         db=db,
         conversation_id=conversation_id,
         prompt=prompt,
+        skip_preflight=skip_preflight,
     )
