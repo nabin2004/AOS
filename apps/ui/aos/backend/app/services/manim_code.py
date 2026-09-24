@@ -15,6 +15,9 @@ from dataclasses import dataclass
 class CodeRepair:
     code: str
     changes: tuple[str, ...] = ()
+    # Semantic-drift warnings: rewrites that are crash-safe but may change
+    # visual meaning.  Surfaced here so VLM / keyframe reviewers can inspect.
+    semantic_warnings: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -46,31 +49,48 @@ _BUILTIN_NAMES = set(dir(builtins)) | {"np", "numpy", "config", "self"}
 # larger token, so get_part_by_tex can return None even though it is visible.
 # Keep this repair deliberately narrow: only simple object expressions and a
 # single-line lookup are rewritten.
+#
+# NOTE: args group previously excluded parentheses, which rejected valid LaTeX
+# strings like "f(x)".  We now allow any non-newline chars (lazy) so args like
+# get_part_by_tex("f(x)") match correctly.
 _UNSAFE_TEX_CENTER = re.compile(
     r"(?P<object>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)"
-    r"\.get_part_by_tex\((?P<args>[^()\n]+)\)\.get_center\(\)"
+    r"\.get_part_by_tex\((?P<args>[^\n]+?)\)\.get_center\(\)"
 )
 _UNSAFE_TEX_SHIFT = re.compile(
     r"(?P<object>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)"
-    r"\.get_part_by_tex\((?P<args>[^()\n]+)\)\.shift\((?P<shift>[^()\n]+)\)"
+    r"\.get_part_by_tex\((?P<args>[^\n]+?)\)\.shift\((?P<shift>[^\n]+?)\)"
 )
 _UNSUPPORTED_SCENE_CAMERA = re.compile(
     r"(?m)^(?P<indent>\s*)self\.camera\.frame\.move_to\((?P<point>[^\n]+)\)\s*$"
 )
 _MULTI_TEX_LOOKUP = re.compile(
     r"(?P<object>[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)"
-    r"\.get_parts_by_tex\((?P<args>[^()\n]+)\)"
+    r"\.get_parts_by_tex\((?P<args>[^\n]+?)\)"
 )
+
+# Names of Mobject-producing callables that make integer indexing meaningful.
+# Used to gate the generic BrittleMobjectIndex check so we don't flag plain
+# list/dict subscripts that happen to use an integer key.
+_MOBJECT_CONSTRUCTORS = {"MathTex", "Tex", "VGroup", "Group", "VMobject", "Mobject"}
 _UNSUPPORTED_TEX_COMPILER = re.compile(
     r"(?m)^(?P<indent>\s*)config(?:\[\s*['\"]tex_compiler['\"]\s*\]|\.tex_compiler)\s*=.*$"
 )
 
 
 class _NameCollector(ast.NodeVisitor):
+    """Collect module-level and class-level name definitions.
+
+    Function parameters are scoped to their function so that a parameter
+    named ``n`` in method A does not suppress ``UndefinedName`` for bare ``n``
+    in method B where it was never defined.
+    """
+
     def __init__(self) -> None:
         self.defined: set[str] = set()
         self.loaded: list[ast.Name] = []
         self.has_manim_wildcard = False
+        self._function_param_sets: list[set[str]] = []
 
     def visit_Import(self, node: ast.Import) -> None:
         self.defined.update(alias.asname or alias.name.split(".")[0] for alias in node.names)
@@ -87,13 +107,24 @@ class _NameCollector(ast.NodeVisitor):
             self.defined.add(node.id)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        # The function name itself is module/class-level visible.
         self.defined.add(node.name)
-        self.defined.update(arg.arg for arg in (*node.args.posonlyargs, *node.args.args, *node.args.kwonlyargs))
+        # Collect parameter names as a scoped set for this function only.
+        param_names: set[str] = set()
+        param_names.update(arg.arg for arg in (*node.args.posonlyargs, *node.args.args, *node.args.kwonlyargs))
         if node.args.vararg:
-            self.defined.add(node.args.vararg.arg)
+            param_names.add(node.args.vararg.arg)
         if node.args.kwarg:
-            self.defined.add(node.args.kwarg.arg)
+            param_names.add(node.args.kwarg.arg)
+        # Push params into defined only for the duration of visiting this node.
+        self._function_param_sets.append(param_names)
+        self.defined |= param_names
         self.generic_visit(node)
+        # Pop: remove params that are not also defined at a higher scope.
+        self._function_param_sets.pop()
+        outer_params = set().union(*self._function_param_sets) if self._function_param_sets else set()
+        for p in param_names - outer_params:
+            self.defined.discard(p)
 
     visit_AsyncFunctionDef = visit_FunctionDef
 
@@ -148,6 +179,16 @@ def preflight_manim_code(code: str) -> PreflightResult:
     # cost a full Manim render before being discovered. Keep collecting rather
     # than returning on the first finding so one repair request gets the whole
     # diagnostic bundle.
+    #
+    # Build the set of names proven to be Mobject-backed so BrittleMobjectIndex
+    # is only emitted for actual Mobjects, not plain list/dict subscripts.
+    mobject_names = _collect_mobject_names(tree)
+    # Run the precise pass first so we can deduplicate against its line/col keys.
+    precise_findings = _find_mobject_index_mismatches(tree, code)
+    precise_keys: set[tuple[int, int]] = {
+        (int(f["line"]), int(f["column"])) for f in precise_findings
+    }
+
     for node in ast.walk(tree):
         if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load) and node.id == "BOTTOM":
             errors.append({
@@ -167,24 +208,36 @@ def preflight_manim_code(code: str) -> PreflightResult:
                 "line": node.lineno,
                 "column": node.col_offset + 1,
             })
-        elif isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant) and isinstance(node.slice.value, int):
-            errors.append({
-                "type": "BrittleMobjectIndex",
-                "severity": "warning",
-                "message": "Integer indexing of a generated Mobject may be out of range; use a checked submobject or get_part_by_tex.",
-                "line": node.lineno,
-                "column": node.col_offset + 1,
-                "index": node.slice.value,
-            })
+        elif (
+            isinstance(node, ast.Subscript)
+            and isinstance(node.slice, ast.Constant)
+            and isinstance(node.slice.value, int)
+        ):
+            col = node.col_offset + 1
+            # Skip sites already covered by the precise pass (deduplication).
+            if (node.lineno, col) in precise_keys:
+                continue
+            # Only flag names proven to be Mobject-backed; skip plain list/dict.
+            if isinstance(node.value, ast.Name) and node.value.id in mobject_names:
+                errors.append({
+                    "type": "BrittleMobjectIndex",
+                    "severity": "warning",
+                    "message": (
+                        "Integer indexing of a generated Mobject may be out of range; "
+                        "use a checked submobject or get_part_by_tex."
+                    ),
+                    "line": node.lineno,
+                    "column": col,
+                    "index": node.slice.value,
+                })
 
     errors.extend(_find_nonraw_tex_strings(code))
-    errors.extend(_find_mobject_index_mismatches(tree, code))
+    errors.extend(precise_findings)
 
     for item in errors:
         item["blocking"] = item.get("severity", "error") == "error"
 
     has_blocking = any(item.get("blocking", False) for item in errors)
-    has_warning = any(item.get("severity", "error") == "warning" for item in errors)
     status_val = "safe" if not errors else ("failed" if has_blocking else "warning")
 
     return PreflightResult(
@@ -196,6 +249,29 @@ def preflight_manim_code(code: str) -> PreflightResult:
     )
 
 
+def _collect_mobject_names(tree: ast.AST) -> set[str]:
+    """Return all names assigned from a known Mobject constructor.
+
+    Used to gate ``BrittleMobjectIndex`` warnings to proven-Mobject bases,
+    avoiding false positives for plain list/dict/tuple subscripts.
+    """
+    names: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
+            continue
+        callee: str | None = None
+        if isinstance(node.value.func, ast.Name):
+            callee = node.value.func.id
+        elif isinstance(node.value.func, ast.Attribute):
+            callee = node.value.func.attr
+        if callee not in _MOBJECT_CONSTRUCTORS:
+            continue
+        for target in node.targets:
+            if isinstance(target, ast.Name):
+                names.add(target.id)
+    return names
+
+
 def _find_mobject_index_mismatches(tree: ast.AST, code: str) -> list[dict[str, object]]:
     """Compare literal Mobject indexes with their local construction shape.
 
@@ -204,7 +280,7 @@ def _find_mobject_index_mismatches(tree: ast.AST, code: str) -> list[dict[str, o
     reported as warnings so valid code is not rejected merely because static
     analysis cannot prove its shape.
     """
-    definitions: dict[str, tuple[int | None, str, int]] = {}
+    definitions: dict[str, tuple[int | None, str, int, list[str]]] = {}
     for node in ast.walk(tree):
         if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
             continue
@@ -216,10 +292,16 @@ def _find_mobject_index_mismatches(tree: ast.AST, code: str) -> list[dict[str, o
             continue
         isolate = any(keyword.arg == "isolate" for keyword in call.keywords)
         count = None if isolate else len(call.args)
+        # Collect string literal args so auto-fix can suggest get_part_by_tex.
+        tex_args: list[str] = []
+        for arg in call.args:
+            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                tex_args.append(arg.value)
         definitions[node.targets[0].id] = (
             count,
             ast.get_source_segment(code, call) or callee,
             node.lineno,
+            tex_args,
         )
 
     findings: list[dict[str, object]] = []
@@ -232,22 +314,26 @@ def _find_mobject_index_mismatches(tree: ast.AST, code: str) -> list[dict[str, o
         definition = definitions.get(name)
         if definition is None:
             continue
-        count, expression, definition_line = definition
+        count, expression, definition_line, tex_args = definition
+        idx = node.slice.value
         finding: dict[str, object] = {
-            "type": "MobjectIndexOutOfRange" if count is not None and node.slice.value >= count else "MobjectIndexShapeCheck",
+            "type": "MobjectIndexOutOfRange" if count is not None and idx >= count else "MobjectIndexShapeCheck",
             "name": name,
-            "index": node.slice.value,
+            "index": idx,
             "definition_line": definition_line,
             "definition": expression,
             "line": node.lineno,
             "column": node.col_offset + 1,
             "message": (
-                f"{name}[{node.slice.value}] is not valid for this statically known construction with {count} top-level part(s)."
-                if count is not None and node.slice.value >= count
-                else f"Check {name}[{node.slice.value}] against the construction before indexing."
+                f"{name}[{idx}] is not valid for this statically known construction with {count} top-level part(s)."
+                if count is not None and idx >= count
+                else f"Check {name}[{idx}] against the construction before indexing."
             ),
             "suggestion": "split MathTex/Tex into explicit arguments, use isolate, or transform the whole mobject safely",
         }
+        # Attach auto-fix hint when tex args are statically known.
+        if tex_args and 0 <= idx < len(tex_args):
+            finding["auto_fix_hint"] = f"{name}.get_part_by_tex({tex_args[idx]!r})"
         if count is None:
             finding["severity"] = "warning"
         findings.append(finding)
@@ -291,38 +377,139 @@ def _find_nonraw_tex_strings(code: str) -> list[dict[str, object]]:
     return findings
 
 
+def _auto_fix_mobject_indexes(code: str) -> tuple[str, list[str]]:
+    """Replace statically-provable Mobject integer subscripts with get_part_by_tex calls.
+
+    Only rewrites sites where:
+    1. The variable is assigned from MathTex/Tex with plain string literal args.
+    2. The index is a non-negative integer within the known arg list.
+    3. isolate= is NOT used (which changes arg semantics).
+
+    Sites that don't meet these criteria are left for the LLM repair agent.
+    """
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return code, []
+
+    tex_constructors = {"MathTex", "Tex"}
+    definitions: dict[str, tuple[list[str], int]] = {}  # name → (tex_args, def_lineno)
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.Call):
+            continue
+        if len(node.targets) != 1 or not isinstance(node.targets[0], ast.Name):
+            continue
+        call = node.value
+        callee = call.func.id if isinstance(call.func, ast.Name) else None
+        if callee not in tex_constructors:
+            continue
+        if any(keyword.arg == "isolate" for keyword in call.keywords):
+            continue  # isolate= makes the shape dynamic; skip
+        tex_args: list[str] = []
+        for arg in call.args:
+            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                tex_args.append(arg.value)
+        if not tex_args:
+            continue
+        definitions[node.targets[0].id] = (tex_args, node.lineno)
+
+    # Collect replacement sites; sort in reverse source order to preserve offsets.
+    replacements: list[tuple[int, int, str, str]] = []  # (start, end, old, new)
+    lines = code.splitlines(keepends=True)
+    line_offsets: list[int] = []
+    pos = 0
+    for ln in lines:
+        line_offsets.append(pos)
+        pos += len(ln)
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Subscript) or not isinstance(node.value, ast.Name):
+            continue
+        if not isinstance(node.slice, ast.Constant) or not isinstance(node.slice.value, int):
+            continue
+        name = node.value.id
+        if name not in definitions:
+            continue
+        tex_args, _ = definitions[name]
+        idx = node.slice.value
+        if idx < 0 or idx >= len(tex_args):
+            continue  # out-of-range; leave for LLM
+        new_expr = f"{name}.get_part_by_tex({tex_args[idx]!r})"
+        seg = ast.get_source_segment(code, node)
+        if seg is None:
+            continue
+        start_offset = line_offsets[node.lineno - 1] + node.col_offset
+        end_offset = start_offset + len(seg)
+        replacements.append((start_offset, end_offset, seg, new_expr))
+
+    if not replacements:
+        return code, []
+
+    changes: list[str] = []
+    for start, end, old, new in sorted(replacements, key=lambda r: r[0], reverse=True):
+        code = code[:start] + new + code[end:]
+        changes.append(f"Auto-fixed Mobject index: {old!r} → {new!r}")
+    return code, changes
+
+
 def repair_manim_code(code: str) -> CodeRepair:
     """Make known generated-source compatibility fixes before compilation."""
     if not code:
         return CodeRepair(code="")
 
     changes: list[str] = []
+    semantic_warnings: list[str] = []
 
     def replace_unsafe_center(match: re.Match[str]) -> str:
-        changes.append(
-            "Replaced unsafe get_part_by_tex(...).get_center() lookup with a stable parent-mobject center"
+        obj = match.group("object")
+        part_expr = match.group("args")
+        # Record semantic drift: get_center() of the whole mobject vs the part.
+        semantic_warnings.append(
+            f"Rewrote {obj}.get_part_by_tex({part_expr}).get_center() → {obj}.get_center(): "
+            "now returns centroid of the whole mobject, not the specific part. "
+            "Verify arrow/label positioning in keyframe review."
         )
-        return f"{match.group('object')}.get_center()"
+        changes.append(
+            f"Replaced unsafe get_part_by_tex({part_expr}).get_center() with stable parent-mobject center "
+            "(semantic drift: centroid may differ — see semantic_warnings)"
+        )
+        return f"{obj}.get_center()  # REVIEW: was get_part_by_tex({part_expr}).get_center()"
 
     repaired = _UNSAFE_TEX_CENTER.sub(replace_unsafe_center, code)
 
     def replace_unsafe_shift(match: re.Match[str]) -> str:
-        changes.append(
-            "Replaced unsafe get_part_by_tex(...).shift(...) endpoint with a stable parent-mobject point"
+        obj = match.group("object")
+        part_expr = match.group("args")
+        shift_expr = match.group("shift")
+        semantic_warnings.append(
+            f"Rewrote {obj}.get_part_by_tex({part_expr}).shift({shift_expr}) → expression using {obj}.get_center(): "
+            "now shifts relative to the whole-mobject centroid. Verify positioning in keyframe review."
         )
-        return f"({match.group('object')}.get_center() + ({match.group('shift')}))"
+        changes.append(
+            f"Replaced unsafe get_part_by_tex({part_expr}).shift() with stable parent-mobject point "
+            "(semantic drift: centroid may differ — see semantic_warnings)"
+        )
+        return (
+            f"({obj}.get_center() + ({shift_expr}))"
+            f"  # REVIEW: was get_part_by_tex({part_expr}).shift({shift_expr})"
+        )
 
     repaired = _UNSAFE_TEX_SHIFT.sub(replace_unsafe_shift, repaired)
 
     def replace_multi_tex_lookup(match: re.Match[str]) -> str:
-        changes.append(
-            "Normalized multi-argument get_parts_by_tex lookup to supported single-token lookups"
-        )
+        # get_parts_by_tex returns ALL matching occurrences.  The previous
+        # rewrite used one get_part_by_tex per token, silently dropping
+        # duplicates.  Preserve cardinality with a VGroup comprehension that
+        # filters by tex_string membership.
         obj = match.group("object")
         args = match.group("args")
+        changes.append(
+            "Replaced get_parts_by_tex (all-matches) with a VGroup comprehension "
+            "that preserves cardinality across all matching parts"
+        )
         return (
-            f"VGroup(*[part for token in ({args},) "
-            f"if (part := {obj}.get_part_by_tex(token)) is not None])"
+            f"VGroup(*[p for p in {obj} if p.tex_string in ({args},)])"
+            f"  # was: {obj}.get_parts_by_tex({args})"
         )
 
     repaired = _MULTI_TEX_LOOKUP.sub(replace_multi_tex_lookup, repaired)
@@ -347,12 +534,20 @@ def repair_manim_code(code: str) -> CodeRepair:
         repaired = re.sub(r"\bBOTTOM\b", "DOWN", repaired)
         changes.append("Replaced unsupported BOTTOM direction constant with DOWN")
 
-    # Prefix plain string literals passed to Tex/MathTex with r. This fixes
-    # Python escape processing before LaTeX is invoked, without touching normal
-    # prose strings elsewhere in the scene.
+    # Prefix plain string literals passed to Tex/MathTex with r.
     repaired, raw_changes = _repair_nonraw_tex_strings(repaired)
     changes.extend(raw_changes)
-    return CodeRepair(code=repaired, changes=tuple(dict.fromkeys(changes)))
+
+    # Auto-fix provable integer Mobject subscripts → get_part_by_tex calls.
+    # Runs after raw-string pass so tex strings are already prefixed.
+    repaired, index_changes = _auto_fix_mobject_indexes(repaired)
+    changes.extend(index_changes)
+
+    return CodeRepair(
+        code=repaired,
+        changes=tuple(dict.fromkeys(changes)),
+        semantic_warnings=tuple(semantic_warnings),
+    )
 
 
 def _repair_nonraw_tex_strings(code: str) -> tuple[str, list[str]]:

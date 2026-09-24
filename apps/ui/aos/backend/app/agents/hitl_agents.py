@@ -208,13 +208,20 @@ class HitlLLMResolver:
                 or os.getenv("OPENAI_API_KEY", "").strip()
             )
         if not key:
-            for candidate in [
+            # Scan .env files in priority order.  Check AOS_ENV_FILE override
+            # first so any deployment layout can opt out of positional guessing.
+            env_file_override = os.getenv("AOS_ENV_FILE", "").strip()
+            env_candidates: list[Path] = []
+            if env_file_override:
+                env_candidates.append(Path(env_file_override))
+            env_candidates.extend([
                 Path(__file__).resolve().parents[6] / "apps" / "agents" / ".env",
                 Path(__file__).resolve().parents[5] / "apps" / "agents" / ".env",
                 Path("/app/apps/agents/.env"),
                 Path(__file__).resolve().parents[3] / "agents" / ".env",
                 Path("../agents/.env"),
-            ]:
+            ])
+            for candidate in env_candidates:
                 if candidate.exists():
                     try:
                         for line in candidate.read_text(encoding="utf-8").splitlines():
@@ -229,7 +236,11 @@ class HitlLLMResolver:
                     except Exception:
                         pass
         if not key:
-            key = "sk-local"
+            raise ValueError(
+                "No API key found. Set OPENROUTER_API_KEY, AOS_OPENAI_API_KEY, or OPENAI_API_KEY "
+                "in the environment, in app settings, or point AOS_ENV_FILE to a .env file "
+                "containing one of those keys."
+            )
 
         custom_base = normalize_endpoint_url(base_url)
         if not custom_base:
@@ -299,8 +310,15 @@ class HitlCodeExtractor:
     """Extracts, validates, and normalizes Python Manim code from model responses."""
 
     CODE_BLOCK_PATTERN = re.compile(r"```(?:python|py)?\s*([\s\S]+?)\s*```", re.IGNORECASE)
+    # Match a Scene subclass regardless of where the known Scene base appears
+    # in the inheritance list (first position, second, etc.).  The original
+    # pattern only anchored on the *first* base, so ``class Foo(Mixin, Scene):``
+    # would not match.
     SCENE_CLASS_PATTERN = re.compile(
-        r"class\s+([A-Za-z0-9_]+)\s*\((?:ThreeDScene|MovingCameraScene|VoiceoverScene|ZoomedScene|LinearTransformationScene|Scene)"
+        r"class\s+([A-Za-z0-9_]+)\s*\("
+        r"(?:[A-Za-z0-9_,\s]*?)"
+        r"(?:ThreeDScene|MovingCameraScene|VoiceoverScene|ZoomedScene|LinearTransformationScene|Scene)"
+        r"(?:[A-Za-z0-9_,\s]*?)\)"
     )
 
     def extract(self, raw_response: str, default_scene: str = "GeneratedScene") -> tuple[str, str]:
