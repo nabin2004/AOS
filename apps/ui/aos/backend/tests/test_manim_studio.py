@@ -269,51 +269,58 @@ async def test_hitl_agent_skills():
         get_coder_agent,
         get_repair_agent,
     )
+    from pydantic_ai_harness import Skills
     from pydantic_ai.models.test import TestModel
 
-    # 1. Composer Agent has manim-composer capability
+    # 1. Composer Agent has Skills capability exposing manim-composer
     composer = get_composer_agent()
-    assert any(
-        getattr(cap, "id", None) == "manim-composer"
-        for cap in composer.root_capability.capabilities
-    )
+    comp_skills = [
+        cap for cap in composer.root_capability.capabilities if isinstance(cap, Skills)
+    ]
+    assert len(comp_skills) == 1
+    assert "manim-composer" in comp_skills[0].include
+
     with composer.override(
         model=TestModel(
-            call_tools=["read_composer_template"],
+            call_tools=[],
             custom_output_text="# Scene Plan",
         )
     ):
         res_comp = await composer.run("Create plan")
         assert res_comp.output == "# Scene Plan"
 
-    # 2. Coder Agent has manimce-best-practices and deferred manim-render capability
+    # 2. Coder Agent has Skills capability exposing manimce-best-practices & manim-render
     coder = get_coder_agent()
-    cap_ids = [getattr(cap, "id", None) for cap in coder.root_capability.capabilities]
-    assert "manimce-best-practices" in cap_ids
-    assert "manim-render" in cap_ids
+    coder_skills = [
+        cap for cap in coder.root_capability.capabilities if isinstance(cap, Skills)
+    ]
+    assert len(coder_skills) == 1
+    assert "manimce-best-practices" in coder_skills[0].include
+    assert "manim-render" in coder_skills[0].include
 
     with coder.override(
         model=TestModel(
-            call_tools=["read_manim_rule"],
+            call_tools=[],
             custom_output_text="```python\nfrom manim import *\n```",
         )
     ):
         res_coder = await coder.run("How to position objects")
         assert "from manim import *" in res_coder.output
 
-    # 3. Repair Agent has both best practices and render capability
+    # 3. Repair Agent has Skills capability exposing manimce-best-practices & manim-render
     repair = get_repair_agent()
-    repair_cap_ids = [
-        getattr(cap, "id", None) for cap in repair.root_capability.capabilities
+    repair_skills = [
+        cap for cap in repair.root_capability.capabilities if isinstance(cap, Skills)
     ]
-    assert "manimce-best-practices" in repair_cap_ids
-    assert "manim-render" in repair_cap_ids
+    assert len(repair_skills) == 1
+    assert "manimce-best-practices" in repair_skills[0].include
+    assert "manim-render" in repair_skills[0].include
 
     with repair.override(
         model=TestModel(
-            call_tools=["get_render_troubleshooting_guide"],
+            call_tools=[],
             custom_output_text="```python\n# Repaired\n```",
         )
     ):
-        res_repair = await repair.run("Fix Docker mount error")
+        res_repair = await repair.run("Fix syntax error")
         assert "Repaired" in res_repair.output

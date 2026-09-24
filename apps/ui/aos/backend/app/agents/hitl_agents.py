@@ -25,9 +25,9 @@ from app.agents.openai_compatible_client import build_openai_provider
 from app.schemas.video_generation import VideoClassifyResponse
 from app.services.manim_code import preflight_manim_code, repair_manim_code
 from app.skills import (
-    get_manim_composer_capability,
-    get_manimce_best_practices_capability,
-    get_manim_render_capability,
+    get_composer_skills,
+    get_coder_skills,
+    get_repair_skills,
 )
 
 logger = logging.getLogger(__name__)
@@ -341,7 +341,7 @@ def get_composer_agent(
 ) -> Agent[HitlPlanDeps | None, str]:
     """Get the Pydantic AI agent for composing scenes.md plans with the manim-composer skill."""
     model = build_hitl_model(model_name, base_url, api_key)
-    caps = [get_manim_composer_capability()] if capabilities is None else capabilities
+    caps = [get_composer_skills()] if capabilities is None else capabilities
     return Agent(
         model=model,
         system_prompt=COMPOSER_SYSTEM_PROMPT,
@@ -358,15 +358,9 @@ def get_coder_agent(
     *,
     capabilities: list[Any] | None = None,
 ) -> Agent[HitlCoderDeps | None, str]:
-    """Get the Pydantic AI agent for synthesizing Manim code with manimce-best-practices skill."""
+    """Get the Pydantic AI agent for synthesizing Manim code with manimce-best-practices & manim-render skills."""
     model = build_hitl_model(model_name, base_url, api_key)
-    if capabilities is None:
-        caps = [
-            get_manimce_best_practices_capability(),
-            get_manim_render_capability(defer_loading=True),
-        ]
-    else:
-        caps = capabilities
+    caps = [get_coder_skills()] if capabilities is None else capabilities
     agent = Agent(
         model=model,
         system_prompt=CODER_SYSTEM_PROMPT,
@@ -386,15 +380,9 @@ def get_repair_agent(
     *,
     capabilities: list[Any] | None = None,
 ) -> Agent[HitlRepairDeps | None, str]:
-    """Get the Pydantic AI agent for repairing existing Manim code with best practices and render skills."""
+    """Get the Pydantic AI agent for repairing existing Manim code with best practices & render skills."""
     model = build_hitl_model(model_name, base_url, api_key)
-    if capabilities is None:
-        caps = [
-            get_manimce_best_practices_capability(),
-            get_manim_render_capability(defer_loading=False),
-        ]
-    else:
-        caps = capabilities
+    caps = [get_repair_skills()] if capabilities is None else capabilities
     agent = Agent(
         model=model,
         system_prompt=REPAIR_SYSTEM_PROMPT,
