@@ -180,6 +180,8 @@ CRITICAL REPAIR RULES:
 6. Method Compatibility:
    - Use only official Manim Community Edition (v0.18+) APIs. Never use legacy ManimCairo or ManimGL methods.
 7. Address all static validation findings in the diagnostic bundle in a single pass.
+8. LSP & Static Typing Diagnostics:
+   - Review and fix all errors reported under LSP / Pyright diagnostics: fix invalid attribute access (e.g. `VGroup.clear()` -> reinitialize `VGroup()`, `Camera.frame` on standard `Scene` -> inherit from `MovingCameraScene`), incompatible argument types, and undefined members.
 """
 
 
@@ -398,6 +400,26 @@ class HitlAgentTools:
             logger.debug("search_manim_docs_tool retrieval skipped: %s", exc)
             return "Documentation search unavailable in current environment."
 
+    @staticmethod
+    async def check_lsp_diagnostics_tool(ctx: RunContext[Any], code: str = "", **kwargs: Any) -> str:
+        """Run Pyright LSP type-checking and member diagnostics on Manim Python code to find attribute errors and typing bugs."""
+        if not code and "args" in kwargs:
+            args_val = kwargs["args"]
+            if isinstance(args_val, dict) and "code" in args_val:
+                code = args_val["code"]
+            elif isinstance(args_val, str):
+                code = args_val
+        if not code:
+            code = kwargs.get("code", "")
+        if not code:
+            return "No code provided to LSP."
+        try:
+            from app.services.lsp_service import run_pyright_lsp
+            report = run_pyright_lsp(code, is_code=True)
+            return report.format_feedback()
+        except Exception as exc:
+            return f"LSP check failed: {exc}"
+
 
 # ── OOP Class: HITL Agent Factory ─────────────────────────────────────────────
 
@@ -470,6 +492,7 @@ class HitlAgentFactory:
             retries=2,
         )
         agent.tool(self.tools.validate_syntax_tool)
+        agent.tool(self.tools.check_lsp_diagnostics_tool)
         return agent
 
     def create_repair_agent(
@@ -492,6 +515,7 @@ class HitlAgentFactory:
             retries=2,
         )
         agent.tool(self.tools.validate_syntax_tool)
+        agent.tool(self.tools.check_lsp_diagnostics_tool)
         agent.tool(self.tools.search_manim_docs_tool)
         return agent
 
@@ -557,21 +581,37 @@ class HitlRepairRunner:
             code = repair_manim_code(code).code
             preflight = preflight_manim_code(code)
 
-            if preflight.valid:
-                logger.info("Repair pass %d succeeded with valid preflight", attempt + 1)
+            # Run Pyright LSP diagnostics for deep attribute and type validation
+            lsp_report = None
+            try:
+                from app.services.lsp_service import run_pyright_lsp
+                lsp_report = run_pyright_lsp(code, is_code=True, timeout=30.0)
+            except Exception as lsp_exc:
+                logger.debug("LSP check skipped during repair loop: %s", lsp_exc)
+
+            has_lsp_errors = bool(lsp_report and lsp_report.has_errors)
+
+            if preflight.valid and not has_lsp_errors:
+                logger.info("Repair pass %d succeeded with valid preflight and clean LSP", attempt + 1)
                 return code, scene_name
 
             # If invalid and we have attempts remaining, feed findings back
             if attempt < max_attempts - 1:
-                logger.info("Preflight errors found (%s); requesting agent self-correction", list(preflight.errors))
+                feedback_parts = []
+                if preflight.errors:
+                    feedback_parts.append(f"Preflight Syntax Errors:\n{json.dumps(list(preflight.errors), indent=2)}")
+                if lsp_report and lsp_report.has_errors:
+                    feedback_parts.append(lsp_report.format_feedback())
+
+                logger.info("Preflight or LSP errors found; requesting agent self-correction")
                 current_prompt = (
-                    f"The repaired code still has static syntax/validation errors:\n"
-                    f"{json.dumps(list(preflight.errors), indent=2)}\n\n"
-                    "Please fix these specific errors and return the complete corrected code in a ```python ... ``` block."
+                    "The repaired code has remaining compiler/type issues that must be fixed:\n\n"
+                    + "\n\n".join(feedback_parts)
+                    + "\n\nPlease fix these specific errors and return the complete corrected code in a ```python ... ``` block."
                 )
                 message_history = result.all_messages()
             else:
-                logger.warning("Preflight errors remain after %d attempts: %s", max_attempts, list(preflight.errors))
+                logger.warning("Errors remain after %d attempts: preflight=%s, lsp=%s", max_attempts, list(preflight.errors), has_lsp_errors)
                 return code, scene_name
 
         return code, scene_name

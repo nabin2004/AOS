@@ -420,6 +420,32 @@ class HitlTerminalObserver:
             )
         )
 
+    def show_lsp(self, report: Any) -> None:
+        """Render Pyright LSP static analysis & typing findings in a formatted panel."""
+        if not report or not getattr(report, "success", False):
+            if report and getattr(report, "error_message", None):
+                self.console.print(f"[dim yellow][LSP Notice] {report.error_message}[/dim yellow]")
+            return
+
+        if not report.diagnostics:
+            self.console.print(
+                Panel(
+                    "[bold green][OK] LSP Diagnostics Clean: 0 type/attribute errors reported by Pyright.[/bold green]",
+                    box=ROUNDED,
+                    style="green",
+                )
+            )
+            return
+
+        self.console.print(
+            Panel(
+                report.to_rich_table(),
+                title=f"[bold {'red' if report.has_errors else 'yellow'}]LSP Type & Member Diagnostics ({report.error_count} error(s), {report.warning_count} warning(s))[/bold {'red' if report.has_errors else 'yellow'}]",
+                box=ROUNDED,
+                style="red" if report.has_errors else "yellow",
+            )
+        )
+
     def show_code_diff(self, old_code: str, new_code: str, title: str = "Code Diff") -> None:
         """Render unified diff with colored additions and deletions."""
         diff_lines = list(

@@ -18,7 +18,7 @@ RED = "#FF0000"
 GRAY = "#808080"
 ORANGE = "#FFA500"
 
-class FourierTransformScene(Scene):
+class FourierTransformScene(MovingCameraScene):
     def construct(self):
         self.scene1_title_hook()
         self.scene2_time_vs_frequency()
@@ -120,7 +120,7 @@ class FourierTransformScene(Scene):
         bar1_label = MathTex(r"A_1 \delta(\omega-\omega_1)", font_size=20, color=TEAL).next_to(bar1, UP, buff=0.1)
         bar2_label = MathTex(r"A_2 \delta(\omega-\omega_2)", font_size=20, color=YELLOW).next_to(bar2, UP, buff=0.1)
 
-        cursor = VerticalLine(UP * 0.1, DOWN * 0.1, color=ORANGE, stroke_width=3)
+        cursor = Line(UP * 0.1, DOWN * 0.1, color=ORANGE, stroke_width=3)
         cursor.move_to(left_axes.c2p(0, 0))
 
         self.play(
@@ -228,9 +228,8 @@ class FourierTransformScene(Scene):
 
         cos_curve = cos_graph_axes.plot(lambda t: np.cos(t), x_range=[0, 4*PI], color=YELLOW, stroke_width=1.5, stroke_opacity=0.6)
 
-        product_area = VGroup()
         def get_product_area():
-            product_area.clear()
+            area = VGroup()
             xs = np.linspace(0, 4*PI, 80)
             for i in range(len(xs)-1):
                 x1, x2 = xs[i], xs[i+1]
@@ -246,8 +245,8 @@ class FourierTransformScene(Scene):
                 ]
                 poly = Polygon(*pts, fill_opacity=0.4, stroke_width=0)
                 poly.set_fill(GREEN if (y1+y2)/2 > 0 else RED)
-                product_area.add(poly)
-            return product_area
+                area.add(poly)
+            return area
         product_area_updater = always_redraw(get_product_area)
 
         integral_line = NumberLine(
@@ -667,7 +666,7 @@ class FourierTransformScene(Scene):
 
         proj_lines = always_redraw(lambda: VGroup(*[
             DashedLine(
-                cplane.n2p(vec.get_end()[0], 0),
+                cplane.n2p(complex(vec.get_end()[0], 0)),
                 vec.get_end(),
                 color=YELLOW,
                 stroke_width=1,

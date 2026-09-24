@@ -78,6 +78,7 @@ from app.core.local_logging import (
     disable_logfire_remote,
 )
 from app.schemas.video_generation import VideoClassifyResponse
+from app.services.lsp_service import run_pyright_lsp, LspDiagnosticReport
 from app.services.manim_code import preflight_manim_code, repair_manim_code
 
 
@@ -381,6 +382,10 @@ async def run_code_stage(
     preflight = preflight_manim_code(repair.code)
     observer.show_preflight(preflight, repair)
 
+    # Pyright LSP Type & Member Diagnostics
+    lsp_report = run_pyright_lsp(repair.code, is_code=True)
+    observer.show_lsp(lsp_report)
+
     # Save generated source to disk for immediate access
     scene_dir = Path(__file__).parent / ".dev_logs" / "scenes"
     scene_dir.mkdir(parents=True, exist_ok=True)
@@ -393,12 +398,18 @@ async def run_code_stage(
         topic=topic,
         model_name="mock:TestModel" if mock else (model_name or "default"),
         duration=duration,
-        success=preflight.valid,
+        success=preflight.valid and not (lsp_report and lsp_report.has_errors),
         usage=usage,
         messages=messages,
         preflight=preflight,
         repair=repair,
-        artifacts={"code": code, "repaired_code": repair.code, "scene_name": detected_scene, "file_path": str(saved_scene_path.resolve())},
+        artifacts={
+            "code": code,
+            "repaired_code": repair.code,
+            "scene_name": detected_scene,
+            "file_path": str(saved_scene_path.resolve()),
+            "lsp_diagnostics": [d.__dict__ for d in lsp_report.diagnostics] if lsp_report else [],
+        },
     )
     observer.step("SAVE", f"Code run recorded to {log_file.name}")
     return repair.code, detected_scene
@@ -430,12 +441,17 @@ async def run_repair_stage(
     current_code = original_repair.code
     preflight = preflight_manim_code(current_code)
 
+    # Pyright LSP Diagnostics for deep attribute & member checking
+    lsp_report = run_pyright_lsp(current_code, is_code=True)
+    observer.show_lsp(lsp_report)
+
     diagnostic_bundle = {
         "stage": "repair",
         "category": classified.category.value,
         "guidance": guidance,
         "runtime_or_compiler": error_traceback[-4000:],
         "static_findings": list(preflight.errors),
+        "lsp_findings": lsp_report.format_feedback() if lsp_report else "",
         "deterministic_repairs_already_applied": list(original_repair.changes),
     }
 
@@ -546,15 +562,56 @@ def run_preflight_inspector(
 
     observer.show_preflight(preflight, repair)
 
+    # Pyright LSP Type & Member Diagnostics
+    lsp_report = run_pyright_lsp(repair.code, is_code=True)
+    observer.show_lsp(lsp_report)
+
     run_store.record_run(
         stage="preflight",
         topic=file_path or "inline_code",
         model_name="deterministic_ast",
         duration=0.01,
-        success=preflight.valid,
+        success=preflight.valid and not (lsp_report and lsp_report.has_errors),
         preflight=preflight,
         repair=repair,
-        artifacts={"original_code": code, "repaired_code": repair.code},
+        artifacts={"original_code": code, "repaired_code": repair.code, "lsp_feedback": lsp_report.format_feedback() if lsp_report else ""},
+    )
+
+
+def run_lsp_inspector(
+    file_path: str | None,
+    inline_code: str | None,
+    observer: HitlTerminalObserver,
+    run_store: HitlRunStore,
+) -> None:
+    """Inspect and test any Python file or inline string using Pyright LSP server."""
+    observer.banner("Manim Code Pyright LSP Inspector", "Type Checking & Member Diagnostics")
+
+    code = ""
+    if file_path:
+        p = Path(file_path)
+        if not p.exists():
+            observer.error(f"File not found: {file_path}")
+            return
+        code = p.read_text(encoding="utf-8")
+        observer.step("LOAD", f"Loaded source from [underline]{file_path}[/underline]")
+        report = run_pyright_lsp(p)
+    elif inline_code:
+        code = inline_code
+        report = run_pyright_lsp(inline_code, is_code=True)
+    else:
+        observer.error("No file or code provided. Use --file or provide inline code.")
+        return
+
+    observer.show_lsp(report)
+
+    run_store.record_run(
+        stage="lsp",
+        topic=file_path or "inline_code",
+        model_name="pyright_lsp",
+        duration=report.time_taken_sec,
+        success=report.success and not report.has_errors,
+        artifacts={"code": code, "feedback": report.format_feedback(), "error_count": report.error_count},
     )
 
 
@@ -668,7 +725,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("topic", nargs="?", default="Fourier Transform", help="Topic or educational text to process")
     parser.add_argument(
         "-s", "--stage",
-        choices=["all", "classify", "compose", "code", "preflight", "repair"],
+        choices=["all", "classify", "compose", "code", "preflight", "repair", "lsp"],
         default="all",
         help="Pipeline stage to run (default: all)",
     )
@@ -688,7 +745,7 @@ def parse_args() -> argparse.Namespace:
         default=os.getenv("OPENROUTER_API_KEY", "") or os.getenv("AOS_OPENAI_API_KEY", ""),
         help="API key for OpenRouter or custom endpoint",
     )
-    parser.add_argument("-f", "--file", default=None, help="Python source file for preflight or repair stage")
+    parser.add_argument("-f", "--file", default=None, help="Python source file for preflight, repair, or lsp stage")
     parser.add_argument("-e", "--error", default=None, help="Traceback or compiler error for repair stage")
     parser.add_argument("--inject-mobject-bug", action="store_true", help="Inject intentional mobject index error to test repair agent")
     parser.add_argument("--render", action="store_true", help="Verify scene compilation with local `manim -ql`")
@@ -709,6 +766,11 @@ async def async_main() -> None:
 
     if args.inspect_last:
         inspect_last_run(run_store, observer)
+        return
+
+    # Check for LSP inspection stage on file or text
+    if args.stage == "lsp":
+        run_lsp_inspector(args.file, None if args.file else args.topic, observer, run_store)
         return
 
     # Check for preflight stage on file or text
