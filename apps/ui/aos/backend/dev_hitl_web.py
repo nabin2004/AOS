@@ -24,7 +24,7 @@ import webbrowser
 from pathlib import Path
 from typing import Any
 
-from pydantic_ai import Agent, RunContext
+from pydantic_ai import Agent, DeferredToolRequests, RunContext
 from pydantic_ai.models.test import TestModel
 from rich.box import ROUNDED
 from rich.console import Console
@@ -118,6 +118,7 @@ def create_hitl_web_agent(
         system_prompt=HITL_WEB_SYSTEM_PROMPT,
         name="AOS HITL Web Director",
         capabilities=[get_composer_skills(), get_coder_skills()],
+        output_type=[str, DeferredToolRequests],
         retries=2,
     )
 

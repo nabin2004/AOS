@@ -35,6 +35,10 @@ def test_create_hitl_web_agent_tools(tmp_path: Path):
     assert tools["checkpoint_approve_visual_plan"].requires_approval is True
     assert tools["render_manim_scene"].requires_approval is True
 
+    # Verify that DeferredToolRequests is among output_types so deferred tool approval works
+    from pydantic_ai import DeferredToolRequests
+    assert DeferredToolRequests in agent._output_type
+
 
 def test_create_hitl_web_app_endpoints(tmp_path: Path):
     """Verify Starlette ASGI application health and configuration routes."""
