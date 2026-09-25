@@ -334,7 +334,8 @@ class HitlCodeExtractor:
         r"(?:[A-Za-z0-9_,\s]*?)\)"
     )
 
-    def extract(self, raw_response: str, default_scene: str = "GeneratedScene") -> tuple[str, str]:
+    @classmethod
+    def extract(cls, raw_response: str, default_scene: str = "GeneratedScene") -> tuple[str, str]:
         """Extract clean Python Manim code and detect the primary Scene class name.
 
         Handles markdown fences, bare code, and various Scene inheritance forms.
@@ -343,7 +344,7 @@ class HitlCodeExtractor:
         raw = (raw_response or "").strip()
         code = ""
 
-        match = self.CODE_BLOCK_PATTERN.search(raw)
+        match = cls.CODE_BLOCK_PATTERN.search(raw)
         if match:
             code = match.group(1).strip()
         else:
@@ -373,7 +374,7 @@ class HitlCodeExtractor:
             code = f"from manim import *\n\n{code}"
 
         detected_scene = default_scene
-        class_match = self.SCENE_CLASS_PATTERN.search(code)
+        class_match = cls.SCENE_CLASS_PATTERN.search(code)
         if class_match:
             detected_scene = class_match.group(1)
 

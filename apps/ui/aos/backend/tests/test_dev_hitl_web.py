@@ -25,6 +25,10 @@ def test_create_hitl_web_agent_tools(tmp_path: Path):
 
     assert "checkpoint_approve_classification" in tool_names
     assert "checkpoint_approve_visual_plan" in tool_names
+    assert "load_skill_reference" in tool_names
+    assert "synthesize_manim_code" in tool_names
+    assert "validate_code_with_lsp" in tool_names
+    assert "repair_manim_code" in tool_names
     assert "generate_and_validate_manim_code" in tool_names
     assert "render_manim_scene" in tool_names
     assert "inspect_hitl_workspace" in tool_names
@@ -130,3 +134,41 @@ async def test_generate_and_validate_manim_code_tool(tmp_path: Path):
     code, scene = ws.load_code()
     assert "FourierTransformScene" in code
     assert scene == "FourierTransformScene"
+
+
+@pytest.mark.anyio
+async def test_granular_streaming_tools(tmp_path: Path):
+    """Verify granular tools for streaming skill load, code synthesis, LSP diagnostics, and repair."""
+    ws = HitlWorkspace(workspace_dir=tmp_path)
+    agent = create_hitl_web_agent(mock=True, workspace_dir=tmp_path)
+    tools = agent._function_toolset.tools
+
+    # 1. Test load_skill_reference
+    skill_tool = tools["load_skill_reference"]
+    skill_res = skill_tool.function(skill="manimce-best-practices")
+    assert "manimce-best-practices" in skill_res
+
+    # 2. Test synthesize_manim_code
+    synth_tool = tools["synthesize_manim_code"]
+    synth_res = await synth_tool.function(
+        None,
+        topic="QuickSort",
+        plan_markdown="# QuickSort\n## Scene 1\n",
+    )
+    assert "synthesized successfully" in synth_res
+    assert ws.scene_file.exists()
+
+    # 3. Test validate_code_with_lsp
+    val_tool = tools["validate_code_with_lsp"]
+    val_res = val_tool.function(scene_name="FourierTransformScene")
+    assert "Pyright LSP Validation Report" in val_res
+
+    # 4. Test repair_manim_code
+    repair_tool = tools["repair_manim_code"]
+    repair_res = await repair_tool.function(
+        None,
+        error_feedback="NameError: name 'rect' is not defined",
+        scene_name="FourierTransformScene",
+    )
+    assert "repaired successfully" in repair_res
+
