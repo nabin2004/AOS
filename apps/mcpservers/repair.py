@@ -43,8 +43,10 @@ _COMMON_MANIM_NAMES = {
     "Scene", "ThreeDScene", "MovingCameraScene", "VoiceoverScene", "Text", "Tex", "MathTex", "VGroup",
     "Arrow", "Line", "SurroundingRectangle", "Write", "Create", "FadeIn", "FadeOut", "Transform",
     "ReplacementTransform", "TransformMatchingTex", "GrowArrow", "UP", "DOWN", "LEFT", "RIGHT",
-    "ORIGIN", "BLACK", "WHITE", "RED", "GREEN", "BLUE", "YELLOW", "TEAL", "PI",
-    "BLUE_C", "RED_C", "GREEN_C", "TEAL_C", "YELLOW_C", "GRAY_A", "GREY_A", "SMALL_BUFF",
+    "ORIGIN", "BLACK", "WHITE", "RED", "GREEN", "BLUE", "YELLOW", "TEAL", "GRAY", "GREY", "PI",
+    "BLUE_C", "RED_C", "GREEN_C", "TEAL_C", "YELLOW_C", "GRAY_A", "GREY_A", "GRAY_B", "GREY_B",
+    "GRAY_C", "GREY_C", "GRAY_D", "GREY_D", "GRAY_E", "GREY_E", "DARK_GRAY", "DARK_GREY",
+    "LIGHT_GRAY", "LIGHT_GREY", "GOLD", "PINK", "MAROON", "SMALL_BUFF",
     "MED_SMALL_BUFF", "MED_LARGE_BUFF", "LARGE_BUFF", "AnimationGroup", "LaggedStart", "Succession",
     "GrowFromCenter", "DEFAULT_FONT_SIZE", "DEGREES",
 }

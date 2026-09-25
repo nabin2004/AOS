@@ -990,7 +990,12 @@ def create_hitl_local_dev_hooks(
         tool_name = getattr(tool_call, "tool_name", "unknown_tool")
         tool_start_times[tool_name] = time.perf_counter()
         obs.step("TOOL", f"Invoking Tool: [bold]{tool_name}[/bold]")
-        return t_args or args[0] if args else kwargs
+        
+        if t_args is not None:
+            return t_args
+        if args:
+            return args[0]
+        return kwargs
 
     @hooks.on.after_tool_execute
     async def on_after_tool_execute(
@@ -1007,7 +1012,7 @@ def create_hitl_local_dev_hooks(
         start_t = tool_start_times.pop(tool_name, time.perf_counter())
         elapsed = time.perf_counter() - start_t
         t_args = tool_args or kwargs.get("args")
-        arg_dict = t_args.args if hasattr(t_args, "args") else (t_args if isinstance(t_args, dict) else {})
+        arg_dict = t_args.args_dict if hasattr(t_args, "args_dict") else (t_args if isinstance(t_args, dict) else {})
         res = result if result is not None else kwargs.get("result")
         obs.show_tool_call(tool_name, arg_dict if isinstance(arg_dict, dict) else {}, res, duration=elapsed)
         return res

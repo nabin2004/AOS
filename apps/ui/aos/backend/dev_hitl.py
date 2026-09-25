@@ -456,7 +456,7 @@ Introduce the initial problem state, animate the step-by-step state transitions,
         with capture_run_messages() as captured:
             result = await agent.run(user_prompt, deps=deps)
             plan_markdown = getattr(result, "output", getattr(result, "data", "")) or ""
-            usage = getattr(result, "usage", None)
+            # usage = getattr(result, "usage", None)
             messages = result.all_messages() or captured
         duration = time.perf_counter() - start_t
 

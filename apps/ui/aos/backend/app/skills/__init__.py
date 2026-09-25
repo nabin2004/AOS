@@ -33,12 +33,12 @@ def get_composer_skills() -> Skills:
 
 def get_coder_skills() -> Skills:
     """Get Skills capability for Coder Agent (manimce-best-practices, manim-render)."""
-    return Skills(SKILLS_DIR, include=["manimce-best-practices", "manim-render"])
+    return Skills(SKILLS_DIR, include=["manimce-best-practices"])
 
 
 def get_repair_skills() -> Skills:
     """Get Skills capability for Repair Agent (manimce-best-practices, manim-render)."""
-    return Skills(SKILLS_DIR, include=["manimce-best-practices", "manim-render"])
+    return Skills(SKILLS_DIR, include=["manimce-best-practices"])
 
 __all__ = [
     "SKILLS_DIR",

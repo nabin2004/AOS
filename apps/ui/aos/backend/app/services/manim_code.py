@@ -36,8 +36,10 @@ _COMMON_MANIM_NAMES = {
     "Write", "Create", "DrawBorderThenFill", "FadeIn", "FadeOut", "Uncreate", "Transform",
     "ReplacementTransform", "TransformMatchingTex", "GrowArrow", "Indicate", "Circumscribe",
     "UP", "DOWN", "LEFT", "RIGHT", "ORIGIN", "IN", "OUT", "UL", "UR", "DL", "DR", "PI",
-    "BLACK", "WHITE", "RED", "GREEN", "BLUE", "YELLOW", "ORANGE", "PURPLE", "TEAL", "GRAY",
-    "BLUE_C", "RED_C", "GREEN_C", "TEAL_C", "YELLOW_C", "GRAY_A", "GREY_A", "SMALL_BUFF",
+    "BLACK", "WHITE", "RED", "GREEN", "BLUE", "YELLOW", "ORANGE", "PURPLE", "TEAL", "GRAY", "GREY",
+    "BLUE_C", "RED_C", "GREEN_C", "TEAL_C", "YELLOW_C", "GRAY_A", "GREY_A", "GRAY_B", "GREY_B",
+    "GRAY_C", "GREY_C", "GRAY_D", "GREY_D", "GRAY_E", "GREY_E", "DARK_GRAY", "DARK_GREY",
+    "LIGHT_GRAY", "LIGHT_GREY", "GOLD", "PINK", "MAROON", "SMALL_BUFF",
     "MED_SMALL_BUFF", "MED_LARGE_BUFF", "LARGE_BUFF", "AnimationGroup", "LaggedStart", "Succession",
     "GrowFromCenter", "DEFAULT_FONT_SIZE", "DEGREES",
 }

@@ -143,22 +143,36 @@ Your job is to synthesize complete, bug-free, beautifully styled Python code usi
 
 CRITICAL MANIM RULES:
 1. ONLY import from manim: `from manim import *`. Do not import nonexistent packages.
-2. Name your Scene class after the topic in the plan (e.g. `class ExponentialEScene(Scene):`).
-   NEVER name it TaylorFormulaScene unless the topic is literally Taylor's Formula.
-3. Layout & Positioning (Crucial to avoid visual collision):
+2. Name your Scene class after the topic in the plan (e.g. `class DijkstrasAlgorithmScene(Scene):`).
+   NEVER invent classes that don't match the plan.
+3. Method & Class Guardrails (DO NOT HALLUCINATE):
+   - Scene has NO `self.add_title()` or `self.add_subtitle()` methods! Create titles as Mobjects:
+     ```python
+     title = Text("Title Text", font_size=36, color=BLUE_C).to_edge(UP, buff=0.5)
+     subtitle = Text("Subtitle", font_size=24, color=WHITE).next_to(title, DOWN, buff=0.2)
+     self.play(Write(title), FadeIn(subtitle))
+     ```
+   - Do NOT invent fake mobjects (e.g. `Polyline`, `Fill`, `Checkmark` DO NOT EXIST in ManimCE).
+     Use valid classes: `Line`, `Arrow`, `Dot`, `Circle`, `Rectangle`, `Polygon`, `SurroundingRectangle`.
+   - All points in Manim are 3D coordinates: `[x, y, 0]` (e.g. `Dot(point=[0.5, 0.5, 0], radius=0.08)`).
+     NEVER pass 2D points like `[0.5, 0.5]`.
+   - `Dot` constructor takes `point`, `radius`, `color` (NOT `size`!).
+   - `Line` constructor takes `start` and `end` separately: `Line(start=p1, end=p2, color=BLUE_C)`.
+     Do NOT pass a list `Line([p1, p2])`.
+4. Layout & Positioning (Crucial to avoid visual collision):
    - Camera frame is 16:9: width=14.22, height=8.0 (X from -7 to +7, Y from -4 to +4).
    - Place titles at top: `title.to_edge(UP, buff=0.5)`
    - Place subtitles below titles: `subtitle.next_to(title, DOWN, buff=0.3)`
-   - Use `VGroup` to organize multiple equations: `eqs.arrange(DOWN, buff=0.4)`
-   - Never let equations overlap each other! When transitioning to a new step, fade out earlier equations or use `ReplacementTransform`.
-4. LaTeX & Typography:
+   - Use `VGroup` to organize multiple elements: `group.arrange(DOWN, buff=0.4)`
+   - Never let equations or labels overlap each other! When transitioning to a new step, fade out earlier elements.
+5. LaTeX & Typography:
    - Use raw string syntax `r"..."` for all `MathTex`.
-   - Double backslash LaTeX symbols: e.g. `MathTex(r"e = \\lim_{n \\to \\infty}\\left(1+\\frac{1}{n}\\right)^n")`.
-   - Set readable font sizes: `font_size=36` or `font_size=40` for main equations, `font_size=28` for explanatory notes.
-5. Timing & Animations:
-   - Use smooth animations: `Write(...)`, `Create(...)`, `FadeIn(...)`, `Transform(...)`.
-   - Add sensible pacing pauses: `self.wait(1.5)` or `self.wait(2)`.
-6. Output Format:
+   - Double backslash LaTeX symbols: e.g. `MathTex(r"d(v) \\le d(u) + w(u,v)")`.
+   - Set readable font sizes: `font_size=36` for main headers, `font_size=24` for nodes and labels.
+6. Documentation Tools:
+   - Use `search_manim_docs_tool` to check if a class or function exists in Manim.
+   - Use `search_manim_signatures_tool` to verify constructor arguments and default parameters.
+7. Output Format:
    - Return ONLY the executable python code block, enclosed in ```python ... ```.
    - The code must be self-contained and render with `manim -ql scene.py <ClassName>`.
 """
@@ -332,8 +346,28 @@ class HitlCodeExtractor:
         match = self.CODE_BLOCK_PATTERN.search(raw)
         if match:
             code = match.group(1).strip()
-        elif "class " in raw and "def construct" in raw:
-            code = raw
+        else:
+            # Fallback: check if opening backticks exist but no closing backticks
+            lower_raw = raw.lower()
+            start_marker = "```python" if "```python" in lower_raw else "```py" if "```py" in lower_raw else "```"
+            if start_marker in lower_raw:
+                start_idx = lower_raw.find(start_marker)
+                nl_idx = raw.find("\n", start_idx)
+                if nl_idx != -1:
+                    code = raw[nl_idx+1:].strip()
+                else:
+                    code = raw[start_idx+len(start_marker):].strip()
+                
+                end_idx = code.rfind("```")
+                if end_idx != -1:
+                    code = code[:end_idx].strip()
+            elif "class " in raw and "def construct" in raw:
+                # Fallback: try to find start of Python syntax if no backticks
+                import_match = re.search(r"^(from manim import|import |class )", raw, re.MULTILINE)
+                if import_match:
+                    code = raw[import_match.start():].strip()
+                else:
+                    code = raw
 
         if code and "from manim import *" not in code:
             code = f"from manim import *\n\n{code}"
@@ -377,7 +411,7 @@ class HitlAgentTools:
 
     @staticmethod
     async def search_manim_docs_tool(ctx: RunContext[Any], query: str = "", **kwargs: Any) -> str:
-        """Search ManimCE documentation and community examples for API usage and repair hints."""
+        """Search ManimCE documentation for classes, functions, constants, and API usage."""
         if not query and "args" in kwargs:
             args_val = kwargs["args"]
             if isinstance(args_val, dict) and "query" in args_val:
@@ -387,6 +421,16 @@ class HitlAgentTools:
         if not query:
             query = kwargs.get("query", "")
 
+        # 1. Try local offline ManimDocsService (instant BM25 search over apps/mcpservers/manim_kb.md)
+        try:
+            from app.services.manim_docs_service import manim_docs_service
+            res = manim_docs_service.search_docs(query, top_k=4)
+            if res and not res.startswith("Manim documentation index unavailable"):
+                return res
+        except Exception as exc:
+            logger.debug("Local manim_docs_service query failed: %s", exc)
+
+        # 2. Fall back to vector store if available
         try:
             from app.agents.tools.rag_tool import search_knowledge_base
 
@@ -399,6 +443,25 @@ class HitlAgentTools:
         except Exception as exc:
             logger.debug("search_manim_docs_tool retrieval skipped: %s", exc)
             return "Documentation search unavailable in current environment."
+
+    @staticmethod
+    async def search_manim_signatures_tool(ctx: RunContext[Any], query: str = "", **kwargs: Any) -> str:
+        """Find exact constructor and method parameter signatures (arguments, types, defaults) for Manim classes."""
+        if not query and "args" in kwargs:
+            args_val = kwargs["args"]
+            if isinstance(args_val, dict) and "query" in args_val:
+                query = args_val["query"]
+            elif isinstance(args_val, str):
+                query = args_val
+        if not query:
+            query = kwargs.get("query", "")
+
+        try:
+            from app.services.manim_docs_service import manim_docs_service
+            return manim_docs_service.search_signatures(query, top_k=4)
+        except Exception as exc:
+            logger.debug("search_manim_signatures_tool failed: %s", exc)
+            return f"Signatures search unavailable: {exc}"
 
     @staticmethod
     async def check_lsp_diagnostics_tool(ctx: RunContext[Any], code: str = "", **kwargs: Any) -> str:
@@ -419,6 +482,39 @@ class HitlAgentTools:
             return report.format_feedback()
         except Exception as exc:
             return f"LSP check failed: {exc}"
+
+    @staticmethod
+    async def read_skill_reference_tool(ctx: RunContext[Any], path: str = "", **kwargs: Any) -> str:
+        """Read the content of a secondary reference file (e.g. 'rules/positioning.md') provided by an Agent Skill."""
+        if not path and "args" in kwargs:
+            args_val = kwargs["args"]
+            if isinstance(args_val, dict) and "path" in args_val:
+                path = args_val["path"]
+            elif isinstance(args_val, str):
+                path = args_val
+        if not path:
+            path = kwargs.get("path", "")
+            
+        if not path:
+            return "No file path provided."
+            
+        from pathlib import Path
+        
+        skill_base_dirs = [
+            Path(__file__).resolve().parent.parent / "skills" / "manim-composer",
+            Path(__file__).resolve().parent.parent / "skills" / "manimce-best-practices",
+        ]
+        
+        try:
+            for base in skill_base_dirs:
+                target = (base / path).resolve()
+                if target.is_file() and str(target).startswith(str(base)):
+                    return target.read_text(encoding="utf-8")
+                    
+            return f"File '{path}' not found in any registered skill references."
+        except Exception as exc:
+            logger.debug("Failed to read skill reference %s: %s", path, exc)
+            return f"Error reading file '{path}': {exc}"
 
 
 # ── OOP Class: HITL Agent Factory ─────────────────────────────────────────────
@@ -464,13 +560,15 @@ class HitlAgentFactory:
         """Create the Pydantic AI agent for composing scenes.md plans with the manim-composer skill."""
         model = self.resolver.build_model(model_name, base_url, api_key)
         caps = [get_composer_skills()] if capabilities is None else capabilities
-        return Agent(
+        agent = Agent(
             model=model,
             system_prompt=COMPOSER_SYSTEM_PROMPT,
             name="hitl_composer_agent",
             deps_type=HitlPlanDeps | None,
             capabilities=caps,
         )
+        agent.tool(self.tools.read_skill_reference_tool)
+        return agent
 
     def create_coder_agent(
         self,
@@ -493,6 +591,9 @@ class HitlAgentFactory:
         )
         agent.tool(self.tools.validate_syntax_tool)
         agent.tool(self.tools.check_lsp_diagnostics_tool)
+        agent.tool(self.tools.read_skill_reference_tool)
+        agent.tool(self.tools.search_manim_docs_tool)
+        agent.tool(self.tools.search_manim_signatures_tool)
         return agent
 
     def create_repair_agent(
@@ -516,7 +617,9 @@ class HitlAgentFactory:
         )
         agent.tool(self.tools.validate_syntax_tool)
         agent.tool(self.tools.check_lsp_diagnostics_tool)
+        agent.tool(self.tools.read_skill_reference_tool)
         agent.tool(self.tools.search_manim_docs_tool)
+        agent.tool(self.tools.search_manim_signatures_tool)
         return agent
 
 
@@ -572,7 +675,8 @@ class HitlRepairRunner:
                     return code, scene_name
                 current_prompt = (
                     "Your output did not include a valid Manim Scene with `def construct(self):`. "
-                    "Please provide the full Python script."
+                    "Please provide the full Python script inside a single ```python code block. "
+                    "Do NOT use conversational filler, just output the code."
                 )
                 message_history = result.all_messages()
                 continue
@@ -607,7 +711,8 @@ class HitlRepairRunner:
                 current_prompt = (
                     "The repaired code has remaining compiler/type issues that must be fixed:\n\n"
                     + "\n\n".join(feedback_parts)
-                    + "\n\nPlease fix these specific errors and return the complete corrected code in a ```python ... ``` block."
+                    + "\n\nPlease fix these specific errors and return the complete corrected code in a ```python ... ``` block. "
+                    "CRITICAL: Return ONLY the Python code. No Markdown commentary, no explanations, no conversational text."
                 )
                 message_history = result.all_messages()
             else:
@@ -744,6 +849,7 @@ def extract_manim_code(raw_response: str, default_scene: str = "GeneratedScene")
 
 validate_syntax_tool = HitlAgentTools.validate_syntax_tool
 search_manim_docs_tool = HitlAgentTools.search_manim_docs_tool
+search_manim_signatures_tool = HitlAgentTools.search_manim_signatures_tool
 
 
 def get_classifier_agent(
