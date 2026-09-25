@@ -8,6 +8,37 @@ description: |
   NOT for ManimGL/3b1b version (which uses `manimlib` imports and `manimgl` CLI).
 ---
 
+## Required reading before writing any scene code
+
+To prevent overlapping objects, off-screen clipping, and API hallucinations, you MUST consult the following rules before emitting code:
+
+### Tier 1 (Always Read, Every Task — Mandatory)
+These files establish core layout, coordinate constraints, and scene structures:
+- [rules/positioning.md](rules/positioning.md) — **CRITICAL**: `move_to`, `next_to`, `align_to`, `to_edge`, `to_corner`, `shift`. **MANDATORY RULE**: NEVER hardcode raw coordinate arrays (e.g. `[x, y, 0]`, `.move_to(np.array([...]))`, or raw float shifts) unless explicitly placing points on an `Axes` via `axes.c2p()`. Always use relative layouts: `.next_to()`, `.to_edge()`, `VGroup.arrange()`.
+- [rules/scenes.md](rules/scenes.md) — Standard Scene lifecycle (`construct`, `setup`), clean teardown between phases, camera types (`Scene`, `MovingCameraScene`, `ThreeDScene`).
+- [rules/config.md](rules/config.md) — Default camera resolution, frame dimensions (width: 14.22, height: 8.0, x: -7.11 to +7.11, y: -4.0 to +4.0), background color.
+- [rules/mobjects.md](rules/mobjects.md) — Fundamental Mobject properties, bounding boxes, coordinate centers, and grouping mechanics.
+
+### Tier 2 (Read if Task Matches Specific Features)
+Consult this lookup table based on elements in your plan:
+| Feature / Element | Rule File to Open & Follow |
+|---|---|
+| Equations, Math, TeX | [rules/latex.md](rules/latex.md), [rules/text.md](rules/text.md), [rules/text-animations.md](rules/text-animations.md) |
+| Multiple stacked objects, grids, lists | [rules/grouping.md](rules/grouping.md) (uses `VGroup.arrange(DOWN, buff=...)`) |
+| Graphs, function plots, axes | [rules/axes.md](rules/axes.md), [rules/graphing.md](rules/graphing.md) |
+| 3D geometry, camera orientation | [rules/3d.md](rules/3d.md), [rules/camera.md](rules/camera.md) |
+| Color palettes, fill, stroke, gradients | [rules/colors.md](rules/colors.md), [rules/styling.md](rules/styling.md) |
+| Animation transitions, timing, pacing | [rules/animations.md](rules/animations.md), [rules/creation-animations.md](rules/creation-animations.md), [rules/transform-animations.md](rules/transform-animations.md), [rules/timing.md](rules/timing.md) |
+| Dynamic tracking, ValueTracker, updaters | [rules/updaters.md](rules/updaters.md) |
+| Geometric primitives, arrows, connectors | [rules/shapes.md](rules/shapes.md), [rules/lines.md](rules/lines.md) |
+| CLI rendering flags, quality settings | [rules/cli.md](rules/cli.md) |
+
+### Mandatory Checklist
+Before generating code, verify in your output:
+- [ ] Tier 1 files consulted (`rules/positioning.md`, `rules/scenes.md`, `rules/config.md`, `rules/mobjects.md`)
+- [ ] All coordinates use relative positioning (`next_to`, `to_edge`, `arrange`) instead of raw float literals
+- [ ] No overlapping mobjects or un-faded lingering titles
+
 ## How to use
 
 Read individual rule files for detailed explanations and code examples:

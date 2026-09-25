@@ -22,6 +22,9 @@ from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.models.openrouter import OpenRouterModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
+from pydantic_ai.settings import ModelSettings
+
+HITL_MAX_TOKENS = int(os.getenv("AOS_MAX_TOKENS", "16384"))
 
 from app.agents.error_classifier import ClassifiedError, classify_error, get_repair_guidance
 from app.agents.openai_compatible_client import (
@@ -380,6 +383,8 @@ class HitlCodeExtractor:
 
         return code, detected_scene
 
+extract_manim_code = HitlCodeExtractor.extract
+
 
 
 def resolve_skill_reference_content(path: str = "", **kwargs: Any) -> str:
@@ -478,6 +483,59 @@ def resolve_skill_reference_content(path: str = "", **kwargs: Any) -> str:
         return f"Error reading file '{path}': {exc}"
 
 
+def get_manimce_tier1_preinjected_context() -> str:
+    """Pre-inject mandatory Tier 1 Manim Community Edition rules directly into model context.
+
+    Mandatory rules:
+    - rules/positioning.md (move_to, next_to, to_edge, arrange, align_to layout rules)
+    - rules/scenes.md (construct, scene types)
+    - rules/config.md (camera dimensions, background)
+    - rules/mobjects.md (mobject hierarchy, grouping)
+    """
+    tier1_files = [
+        ("rules/positioning.md", "MANDATORY POSITIONING & LAYOUT RULES"),
+        ("rules/scenes.md", "SCENE ARCHITECTURE & LIFECYCLE"),
+        ("rules/config.md", "CAMERA RESOLUTION & SCREEN DIMENSIONS"),
+        ("rules/mobjects.md", "MOBJECT HIERARCHY & GROUPING"),
+    ]
+    parts: list[str] = [
+        "================================================================================",
+        "MANDATORY MANIMCE TIER 1 RULES (Pre-Injected Context — Non-Negotiable)",
+        "================================================================================",
+        "CRITICAL POSITIONING DIRECTIVE:",
+        "1. NEVER hardcode raw coordinate tuples or lists (e.g. `[x, y, 0]`, `.move_to((x, y, 0))`).",
+        "2. ALWAYS arrange UI and text with `.to_edge(UP/DOWN/LEFT/RIGHT, buff=...)`, `.next_to(target, ...)` or `VGroup.arrange()`.",
+        "3. Only use coordinate points when placing dots on an explicit `Axes` via `axes.c2p(x, y)`.",
+        "================================================================================",
+    ]
+    for rel_path, title in tier1_files:
+        content = resolve_skill_reference_content(rel_path)
+        if content and not content.startswith("File '") and not content.startswith("Error"):
+            parts.append(f"\n--- {title} ({rel_path}) ---\n{content.strip()}\n")
+    parts.append("================================================================================")
+    return "\n".join(parts)
+
+
+def get_composer_tier1_preinjected_context() -> str:
+    """Pre-inject mandatory Tier 1 Manim Composer rules directly into model context."""
+    tier1_files = [
+        ("templates/scenes-template.md", "CANONICAL SCENES.MD TEMPLATE"),
+        ("references/narrative-patterns.md", "3BLUE1BROWN NARRATIVE PATTERNS"),
+        ("references/visual-techniques.md", "VISUAL STORYTELLING TECHNIQUES"),
+    ]
+    parts: list[str] = [
+        "================================================================================",
+        "MANDATORY MANIM COMPOSER TIER 1 RULES (Pre-Injected Context)",
+        "================================================================================",
+    ]
+    for rel_path, title in tier1_files:
+        content = resolve_skill_reference_content(rel_path)
+        if content and not content.startswith("File '") and not content.startswith("Error"):
+            parts.append(f"\n--- {title} ({rel_path}) ---\n{content.strip()}\n")
+    parts.append("================================================================================")
+    return "\n".join(parts)
+
+
 # ── OOP Class: Native Agent Tools ─────────────────────────────────────────────
 
 class HitlAgentTools:
@@ -574,13 +632,18 @@ class HitlAgentTools:
             return "No code provided to LSP."
         try:
             from app.services.lsp_service import run_pyright_lsp
+            from app.services.positioning_linter import lint_manim_positioning
             report = run_pyright_lsp(code, is_code=True)
-            return report.format_feedback()
+            pos_report = lint_manim_positioning(code)
+            feedback = report.format_feedback()
+            if pos_report.issues:
+                feedback += f"\n\n{pos_report.format_feedback()}"
+            return feedback
         except Exception as exc:
             return f"LSP check failed: {exc}"
 
     @staticmethod
-    async def read_skill_reference_tool(ctx: RunContext[Any] | None = None, path: str = "", **kwargs: Any) -> str:
+    async def read_skill_reference_tool(ctx: RunContext[Any], path: str = "", **kwargs: Any) -> str:
         """Read the content of a secondary reference file (e.g. 'rules/positioning.md') provided by an Agent Skill."""
         return resolve_skill_reference_content(path=path, **kwargs)
 
@@ -615,6 +678,7 @@ class HitlAgentFactory:
             output_type=VideoClassifyResponse,
             capabilities=capabilities,
             retries=2,
+            model_settings=ModelSettings(max_tokens=min(4096, HITL_MAX_TOKENS)),
         )
 
     def create_composer_agent(
@@ -634,6 +698,7 @@ class HitlAgentFactory:
             name="hitl_composer_agent",
             deps_type=HitlPlanDeps | None,
             capabilities=caps,
+            model_settings=ModelSettings(max_tokens=HITL_MAX_TOKENS),
         )
         agent.tool(self.tools.read_skill_reference_tool)
         return agent
@@ -656,6 +721,7 @@ class HitlAgentFactory:
             deps_type=HitlCoderDeps | None,
             capabilities=caps,
             retries=2,
+            model_settings=ModelSettings(max_tokens=HITL_MAX_TOKENS),
         )
         agent.tool(self.tools.validate_syntax_tool)
         agent.tool(self.tools.check_lsp_diagnostics_tool)
@@ -682,6 +748,7 @@ class HitlAgentFactory:
             deps_type=HitlRepairDeps | None,
             capabilities=caps,
             retries=2,
+            model_settings=ModelSettings(max_tokens=HITL_MAX_TOKENS),
         )
         agent.tool(self.tools.validate_syntax_tool)
         agent.tool(self.tools.check_lsp_diagnostics_tool)
@@ -723,12 +790,21 @@ class HitlRepairRunner:
             logger.info("Executing repair agent pass %d/%d", attempt + 1, max_attempts)
             if message_history:
                 result = await asyncio.wait_for(
-                    agent.run(current_prompt, message_history=message_history, deps=deps),
+                    agent.run(
+                        current_prompt,
+                        message_history=message_history,
+                        deps=deps,
+                        model_settings=ModelSettings(max_tokens=HITL_MAX_TOKENS),
+                    ),
                     timeout=timeout,
                 )
             else:
                 result = await asyncio.wait_for(
-                    agent.run(current_prompt, deps=deps),
+                    agent.run(
+                        current_prompt,
+                        deps=deps,
+                        model_settings=ModelSettings(max_tokens=HITL_MAX_TOKENS),
+                    ),
                     timeout=timeout,
                 )
 
@@ -771,6 +847,21 @@ class HitlRepairRunner:
                             line=ld.line,
                             character=ld.column,
                             rule="reportLaTeXCompilationError",
+                        )
+                    )
+
+                # Run Positioning Linter check
+                from app.services.positioning_linter import lint_manim_positioning
+                pos_report = lint_manim_positioning(code)
+                for issue in pos_report.issues:
+                    lsp_report.diagnostics.append(
+                        LspDiagnostic(
+                            file="scene.py",
+                            severity="error" if issue.severity == "error" else "warning",
+                            message=f"Positioning Lint: {issue.message}\n  Suggestion: {issue.suggestion}",
+                            line=issue.line,
+                            character=issue.col,
+                            rule="reportPositioningSmell",
                         )
                     )
             except Exception as lsp_exc:

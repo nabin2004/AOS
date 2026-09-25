@@ -26,6 +26,7 @@ from typing import Any
 
 from pydantic_ai import Agent, DeferredToolRequests, RunContext
 from pydantic_ai.models.test import TestModel
+from pydantic_ai.settings import ModelSettings
 from rich.box import ROUNDED
 from rich.console import Console
 from rich.panel import Panel
@@ -50,6 +51,7 @@ from app.core.local_logging import (
 from app.schemas.video_generation import VideoClassifyResponse
 from app.services.latex_validator import run_latex_diagnostics
 from app.services.lsp_service import run_pyright_lsp
+from app.services.positioning_linter import lint_manim_positioning
 from app.services.manim_code import preflight_manim_code
 from app.skills import get_coder_skills, get_composer_skills, get_repair_skills
 
@@ -126,6 +128,7 @@ def create_hitl_web_agent(
         capabilities=[get_composer_skills(), get_coder_skills()],
         output_type=[str, DeferredToolRequests],
         retries=2,
+        model_settings=ModelSettings(max_tokens=hitl_agents.HITL_MAX_TOKENS),
     )
 
     # ── Checkpoint Tool 1: Classification (Requires Approval) ─────────────────
@@ -278,20 +281,34 @@ def create_hitl_web_agent(
                 capabilities=[get_coder_skills()],
             )
             deps = hitl_agents.HitlCoderDeps(plan=plan_markdown, scene_name=scene_name)
+            tier1_context = hitl_agents.get_manimce_tier1_preinjected_context()
             coder_prompt = (
+                f"{tier1_context}\n\n"
                 f"Visual Plan (scenes.md):\n{plan_markdown}\n\n"
                 f"Topic: {topic}\n\n"
                 "Generate complete, executable Manim Community Edition Python code for this animation. "
-                "Follow the manimce-best-practices skill and avoid hallucinated APIs."
+                "Follow the pre-injected Tier 1 rules strictly: "
+                "NEVER use raw coordinate literals or manual float shifts. Use relative layouts (.next_to, .arrange, .to_edge) "
+                "or axes.c2p(), and avoid hallucinated APIs."
             )
             try:
-                res = await coder_agent.run(coder_prompt, deps=deps)
+                res = await coder_agent.run(
+                    coder_prompt,
+                    deps=deps,
+                    model_settings=ModelSettings(max_tokens=hitl_agents.HITL_MAX_TOKENS),
+                )
                 raw_output = getattr(res, "output", getattr(res, "data", "")) or ""
                 code, detected_scene = hitl_agents.extract_manim_code(raw_output, default_scene=scene_name)
                 if detected_scene:
                     scene_name = detected_scene
             except Exception as exc:
-                return f"Code generation encountered an error: {exc}"
+                # If generation hit an error but user already edited/saved scene.py, fallback to workspace code
+                existing_code, existing_scene = workspace.load_code()
+                if existing_code and "def construct" in existing_code:
+                    code = existing_code
+                    scene_name = existing_scene or scene_name
+                else:
+                    return f"Code generation encountered an error: {exc}"
 
         if not code:
             return "Code synthesis did not yield valid Python source code."
@@ -316,30 +333,34 @@ def create_hitl_web_agent(
 
         target_scene = scene_name or loaded_scene or "GeneratedScene"
 
-        preflight = preflight_manim_code(loaded_code)
         latex_diags = run_latex_diagnostics(loaded_code)
         lsp_report = run_pyright_lsp(loaded_code, is_code=True)
-        workspace.save_preflight(preflight, None, lsp_report)
+        pos_report = lint_manim_positioning(loaded_code)
+        workspace.save_preflight(None, None, lsp_report)
 
-        has_issues = bool((preflight and not preflight.valid) or (lsp_report and lsp_report.has_errors) or bool(latex_diags))
+        has_issues = bool(
+            (lsp_report and lsp_report.has_errors)
+            or bool(latex_diags)
+            or (pos_report and pos_report.has_errors)
+        )
 
         diag_lines = [
-            f"Pyright LSP Validation Report for `{target_scene}`:",
+            f"Pyright LSP Validation Report (with Positioning Lint) for `{target_scene}`:",
             f"- Pyright LSP: {lsp_report.error_count} error(s), {lsp_report.warning_count} warning(s)",
+            f"- Positioning Linter: {len(pos_report.issues)} issue(s) ({pos_report.relative_layout_calls} relative layout calls)",
             f"- LaTeX Validation: {len(latex_diags)} delimiter issue(s)",
-            f"- AST Preflight Syntax: {'Valid' if preflight.valid else 'Invalid'}",
         ]
 
-        if not has_issues:
-            diag_lines.append("\nAll Manim classes, mobject methods, and syntax are verified clean and error-free! Ready for render.")
+        if not has_issues and not pos_report.issues:
+            diag_lines.append("\nAll Manim classes, mobject methods, and positioning layouts are clean and error-free! Ready for render.")
         else:
             diag_lines.append("\nDetected Issues:")
             if lsp_report and lsp_report.has_errors:
                 diag_lines.append(f"Pyright LSP:\n{lsp_report.format_feedback()}")
+            if pos_report.issues:
+                diag_lines.append(f"Positioning Lint:\n{pos_report.format_feedback()}")
             if latex_diags:
                 diag_lines.append("LaTeX Diagnostics:\n" + "\n".join(f"- Line {d.line}: {d.message} in '{d.tex_string}'" for d in latex_diags))
-            if preflight and not preflight.valid:
-                diag_lines.append("AST Preflight:\n" + "\n".join(preflight.errors))
             diag_lines.append("\nPlease call repair_manim_code to auto-fix these diagnostics.")
 
         return "\n".join(diag_lines)
@@ -384,7 +405,11 @@ def create_hitl_web_agent(
             f"Current Code:\n```python\n{loaded_code}\n```"
         )
         try:
-            rep_res = await repair_agent.run(rep_prompt, deps=rep_deps)
+            rep_res = await repair_agent.run(
+                rep_prompt,
+                deps=rep_deps,
+                model_settings=ModelSettings(max_tokens=hitl_agents.HITL_MAX_TOKENS),
+            )
             rep_raw = getattr(rep_res, "output", getattr(rep_res, "data", "")) or ""
             repaired_code, rep_scene = hitl_agents.extract_manim_code(rep_raw, default_scene=target_scene)
             if repaired_code:
@@ -432,50 +457,66 @@ def create_hitl_web_agent(
                 capabilities=[get_coder_skills()],
             )
             deps = hitl_agents.HitlCoderDeps(plan=plan_markdown, scene_name=scene_name)
+            tier1_context = hitl_agents.get_manimce_tier1_preinjected_context()
             coder_prompt = (
+                f"{tier1_context}\n\n"
                 f"Visual Plan (scenes.md):\n{plan_markdown}\n\n"
                 f"Topic: {topic}\n\n"
                 "Generate complete, executable Manim Community Edition Python code for this animation. "
-                "Follow the manimce-best-practices skill and avoid hallucinated APIs."
+                "Follow the pre-injected Tier 1 rules strictly: "
+                "NEVER use raw coordinate literals or manual float shifts. Use relative layouts (.next_to, .arrange, .to_edge) "
+                "or axes.c2p(), and avoid hallucinated APIs."
             )
             try:
-                res = await coder_agent.run(coder_prompt, deps=deps)
+                res = await coder_agent.run(
+                    coder_prompt,
+                    deps=deps,
+                    model_settings=ModelSettings(max_tokens=hitl_agents.HITL_MAX_TOKENS),
+                )
                 raw_output = getattr(res, "output", getattr(res, "data", "")) or ""
                 code, detected_scene = hitl_agents.extract_manim_code(raw_output, default_scene=scene_name)
                 if detected_scene:
                     scene_name = detected_scene
             except Exception as exc:
-                return f"Code generation encountered an error: {exc}"
+                # If generation hit an error but user already edited/saved scene.py, fallback to workspace code
+                existing_code, existing_scene = workspace.load_code()
+                if existing_code and "def construct" in existing_code:
+                    code = existing_code
+                    scene_name = existing_scene or scene_name
+                else:
+                    return f"Code generation encountered an error: {exc}"
 
         if not code:
             return "Code synthesis did not yield valid Python source code."
 
-        # 1. AST Preflight Check
-        preflight = preflight_manim_code(code)
-
+        # 1. (Removed AST Preflight Check)
+        
         # 2. LaTeX Validation
         latex_diags = run_latex_diagnostics(code)
 
         # 3. Pyright LSP Diagnostics Check
         lsp_report = run_pyright_lsp(code, is_code=True)
 
-        # 4. Automatic Repair Pass if Diagnostics Fail
+        # 4. Positioning Linter Check
+        pos_report = lint_manim_positioning(code)
+
+        # 5. Automatic Repair Pass if Diagnostics Fail
         repair_pass_count = 0
         needs_repair = bool(
-            (preflight and not preflight.valid)
-            or (lsp_report and lsp_report.has_errors)
+            (lsp_report and lsp_report.has_errors)
             or bool(latex_diags)
+            or (pos_report and pos_report.has_errors)
         )
 
         if needs_repair and not mock:
             error_sections: list[str] = []
             if lsp_report and lsp_report.has_errors:
                 error_sections.append(f"Pyright LSP Diagnostics:\n{lsp_report.format_feedback()}")
+            if pos_report.issues:
+                error_sections.append(f"Positioning Lint Feedback:\n{pos_report.format_feedback()}")
             if latex_diags:
                 latex_feedback = "\n".join(f"- Line {d.line}: {d.message} in '{d.tex_string}'" for d in latex_diags)
                 error_sections.append(f"LaTeX Delimiter Diagnostics:\n{latex_feedback}")
-            if preflight and not preflight.valid:
-                error_sections.append("AST Preflight Syntax Errors:\n" + "\n".join(preflight.errors))
 
             error_bundle = "\n\n".join(error_sections)
 
@@ -507,7 +548,7 @@ def create_hitl_web_agent(
 
         # Save artifacts to workspace
         workspace.save_code(code, scene_name=scene_name, topic=topic)
-        workspace.save_preflight(preflight, None, lsp_report)
+        workspace.save_preflight(None, None, lsp_report)
 
         line_count = len(code.splitlines())
         lsp_summary = (

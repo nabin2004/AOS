@@ -413,17 +413,17 @@ class HitlWorkspace:
     # ── Preflight handling ──
     def save_preflight(
         self,
-        preflight: PreflightResult,
+        preflight: PreflightResult | None = None,
         repair: CodeRepair | None = None,
         lsp_report: Any = None,
     ) -> Path:
         """Save AST and LSP preflight results in JSON format (preflight.json)."""
         data = {
-            "valid": preflight.valid,
-            "status": preflight.status,
-            "blocking": preflight.blocking,
-            "errors": list(preflight.errors),
-            "issues": list(preflight.issues),
+            "valid": preflight.valid if preflight else True,
+            "status": preflight.status if preflight else "ok",
+            "blocking": preflight.blocking if preflight else False,
+            "errors": list(preflight.errors) if preflight else [],
+            "issues": list(preflight.issues) if preflight else [],
             "repair_changes": list(repair.changes) if repair else [],
             "lsp_errors": getattr(lsp_report, "has_errors", False) if lsp_report else False,
             "updated_at": datetime.now().isoformat(),

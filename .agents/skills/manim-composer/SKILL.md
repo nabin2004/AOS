@@ -8,6 +8,30 @@ description: |
   Use this BEFORE writing any Manim code. This skill plans the video; use manimce-best-practices or manimgl-best-practices for implementation.
 ---
 
+## Required reading before composing any visual plan
+
+To ensure pedagogical clarity, 3Blue1Brown-style narrative pacing, and seamless visual transitions, you MUST consult the following references before authoring `scenes.md`:
+
+### Tier 1 (Always Read, Every Task — Mandatory)
+These files establish core story architecture, pedagogical framing, and visual design rules:
+- [templates/scenes-template.md](templates/scenes-template.md) — **MANDATORY SCHEMA**: The strict structural template for `scenes.md` (Title, Overview, Hook, Target Audience, Estimated Length, Key Insight, Narrative Arc, Scene 1..N breakdown, Transitions & Flow, Color Palette, Mathematical Content).
+- [references/narrative-patterns.md](references/narrative-patterns.md) — **CORE PEDAGOGY**: The fundamental narrative models (Mystery → Investigation → Resolution, Build Up → Payoff, Two Perspectives → Unity, Specific → General). Choose and declare the pattern for your topic.
+- [references/visual-techniques.md](references/visual-techniques.md) — **VISUAL RULES**: Progressive disclosure (never show full formulas at once), Transform don't replace, Color as meaning, and spatial layout rules.
+
+### Tier 2 (Read if Task Matches Specific Scenarios)
+Consult this lookup table based on your topic domain:
+| Scenario / Topic Type | Reference File to Open & Follow |
+|---|---|
+| Concrete examples of storyboards (Calculus, Linear Algebra, Geometry) | [references/scene-examples.md](references/scene-examples.md) |
+| Complex derivations requiring step-by-step formula morphs | [references/visual-techniques.md](references/visual-techniques.md) |
+
+### Mandatory Checklist
+Before submitting a visual plan, verify in your output:
+- [ ] Tier 1 files consulted (`templates/scenes-template.md`, `references/narrative-patterns.md`, `references/visual-techniques.md`)
+- [ ] Hook clearly defined with a mystery, paradox, or intuitive question
+- [ ] Progressive disclosure applied to every scene (no wall-of-text or abrupt equations)
+- [ ] Color palette explicitly maps colors to conceptual roles
+
 ## Workflow
 
 ### Phase 1: Understand the Concept

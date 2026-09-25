@@ -65,6 +65,7 @@ if sys.platform == "win32":
 
 from pydantic_ai import Agent, capture_run_messages
 from pydantic_ai.models.test import TestModel
+from pydantic_ai.settings import ModelSettings
 from rich.box import ROUNDED, SIMPLE
 from rich.panel import Panel
 from rich.table import Table
@@ -746,18 +747,26 @@ class {detected_scene}(Scene):
             capabilities=caps,
         )
         deps = hitl_agents.HitlCoderDeps(plan=plan, knowledge_text=topic)
+        tier1_context = hitl_agents.get_manimce_tier1_preinjected_context()
         user_prompt = (
+            f"{tier1_context}\n\n"
             f"Approved scenes.md Visual Plan:\n{plan}\n\n"
             f"Topic: {topic}\n\n"
-            "Following the manimce-best-practices skill strictly, synthesize a complete, "
+            "Following the pre-injected manimce-best-practices Tier 1 rules strictly, synthesize a complete, "
             "production-quality Manim Community Edition Python scene that faithfully implements "
             "every scene described in the plan above. "
+            "NEVER use raw coordinate literals or manual float shifts. Use relative layouts (.next_to, .arrange, .to_edge) "
+            "or axes.c2p(). "
             "Name the Scene class after the topic (e.g. class DijkstrasAlgorithmScene(Scene):). "
             "Return only the executable Python code block inside ```python ... ```."
         )
         observer.show_prompt(hitl_agents.CODER_SYSTEM_PROMPT, user_prompt)
         with capture_run_messages() as captured:
-            result = await agent.run(user_prompt, deps=deps)
+            result = await agent.run(
+                user_prompt,
+                deps=deps,
+                model_settings=ModelSettings(max_tokens=hitl_agents.HITL_MAX_TOKENS),
+            )
             raw_response = getattr(result, "output", getattr(result, "data", "")) or ""
             usage = getattr(result, "usage", None)
             messages = result.all_messages() or captured
@@ -772,13 +781,13 @@ class {detected_scene}(Scene):
 
     # Deterministic formatting & string repairs pass
     repair = repair_manim_code(code)
-    preflight = preflight_manim_code(repair.code)
 
     # Stage 4: Pyright LSP & LaTeX Diagnostics (Primary Quality Gate)
     observer.banner("Stage 4: Pyright LSP Diagnostics & Code Validation", "Authoritative Type, Member & Syntax Guardrails")
     lsp_report = run_pyright_lsp(repair.code, is_code=True)
     
     from app.services.latex_validator import run_latex_diagnostics
+    from app.services.positioning_linter import lint_manim_positioning
     from app.services.lsp_service import LspDiagnostic
     for ld in run_latex_diagnostics(repair.code):
         lsp_report.diagnostics.append(
@@ -789,6 +798,18 @@ class {detected_scene}(Scene):
                 line=ld.line,
                 character=ld.column,
                 rule="reportLaTeXCompilationError",
+            )
+        )
+    pos_report = lint_manim_positioning(repair.code)
+    for issue in pos_report.issues:
+        lsp_report.diagnostics.append(
+            LspDiagnostic(
+                file="scene.py",
+                severity="error" if issue.severity == "error" else "warning",
+                message=f"Positioning Lint: {issue.message}\n  Suggestion: {issue.suggestion}",
+                line=issue.line,
+                character=issue.col,
+                rule="reportPositioningSmell",
             )
         )
     
@@ -813,7 +834,7 @@ class {detected_scene}(Scene):
         success=is_clean,
         usage=usage,
         messages=messages,
-        preflight=preflight,
+        preflight=None,
         repair=repair,
         artifacts={
             "code": code,
@@ -830,7 +851,7 @@ class {detected_scene}(Scene):
             repair.code,
             scene_name=detected_scene,
             topic=topic,
-            preflight=preflight,
+            preflight=None,
             repair=repair,
             lsp_report=lsp_report,
         )
@@ -864,7 +885,6 @@ async def run_repair_stage(
     start_t = time.perf_counter()
     original_repair = repair_manim_code(code)
     current_code = original_repair.code
-    preflight = preflight_manim_code(current_code)
 
     # Pyright LSP Diagnostics for deep attribute & member checking
     lsp_report = run_pyright_lsp(current_code, is_code=True)
@@ -875,7 +895,7 @@ async def run_repair_stage(
         "category": classified.category.value,
         "guidance": guidance,
         "runtime_or_compiler": error_traceback[-4000:],
-        "static_findings": list(preflight.errors),
+        "static_findings": [],
         "lsp_findings": lsp_report.format_feedback() if lsp_report else "",
         "deterministic_repairs_already_applied": list(original_repair.changes),
     }
@@ -940,7 +960,6 @@ Current source:
 
     # Post-repair validation with Pyright LSP
     final_repair = repair_manim_code(repaired_code)
-    final_preflight = preflight_manim_code(final_repair.code)
     final_lsp = run_pyright_lsp(final_repair.code, is_code=True)
     observer.show_lsp(final_lsp)
 
@@ -952,7 +971,7 @@ Current source:
         success=bool(final_lsp and not final_lsp.has_errors),
         usage=usage,
         messages=messages,
-        preflight=final_preflight,
+        preflight=None,
         repair=final_repair,
         artifacts={
             "original_code": code,
@@ -1007,7 +1026,6 @@ def run_preflight_inspector(
         return
 
     repair = repair_manim_code(code)
-    preflight = preflight_manim_code(repair.code)
 
     if repair.changes:
         observer.show_code_diff(code, repair.code, title="Deterministic Formatting Changes Applied")
@@ -1032,7 +1050,7 @@ def run_preflight_inspector(
     observer.show_lsp(lsp_report)
 
     if workspace:
-        workspace.save_preflight(preflight, repair, lsp_report)
+        workspace.save_preflight(None, repair, lsp_report)
         if repair.changes:
             workspace.scene_file.write_text(repair.code, encoding="utf-8")
             observer.step("WORKSPACE", f"Updated [bold cyan]{workspace.scene_file.name}[/bold cyan] with formatting fixes and saved [bold cyan]{workspace.preflight_file.name}[/bold cyan] (JSON format)")
@@ -1043,7 +1061,7 @@ def run_preflight_inspector(
         model_name="pyright_lsp",
         duration=lsp_report.time_taken_sec if lsp_report else 0.01,
         success=bool(lsp_report and not lsp_report.has_errors),
-        preflight=preflight,
+        preflight=None,
         repair=repair,
         artifacts={"original_code": code, "repaired_code": repair.code, "lsp_feedback": lsp_report.format_feedback() if lsp_report else ""},
     )
