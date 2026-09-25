@@ -381,7 +381,102 @@ class HitlCodeExtractor:
         return code, detected_scene
 
 
-    extract_code = extract
+
+def resolve_skill_reference_content(path: str = "", **kwargs: Any) -> str:
+    """Resolve and read the content of a secondary reference file across registered Agent Skills.
+
+    Supports exact relative paths (e.g. 'references/narrative-patterns.md', 'rules/positioning.md'),
+    naked filenames (e.g. 'narrative-patterns.md', 'visual-techniques.md'), and stem lookups.
+    """
+    if not path and "args" in kwargs:
+        args_val = kwargs["args"]
+        if isinstance(args_val, dict) and "path" in args_val:
+            path = args_val["path"]
+        elif isinstance(args_val, str):
+            path = args_val
+    if not path:
+        path = kwargs.get("path", "") or kwargs.get("file", "") or kwargs.get("filename", "")
+
+    if not path:
+        return "No file path provided."
+
+    clean_path = path.strip().strip("'\"").replace("\\", "/")
+    clean_path = clean_path.lstrip("/")
+    for prefix in ("manim-composer/", "manimce-best-practices/", "manim-render/"):
+        if clean_path.lower().startswith(prefix):
+            clean_path = clean_path[len(prefix):]
+            break
+
+    from pathlib import Path
+
+    current_file = Path(__file__).resolve()
+    backend_skills_dir = current_file.parent.parent / "skills"
+
+    candidate_bases: list[Path] = [
+        backend_skills_dir / "manim-composer",
+        backend_skills_dir / "manimce-best-practices",
+        backend_skills_dir / "manim-render",
+    ]
+
+    try:
+        repo_root = current_file.parents[5]
+        repo_skills = repo_root / ".agents" / "skills"
+        if repo_skills.is_dir():
+            for skill_dir in repo_skills.iterdir():
+                if skill_dir.is_dir() and skill_dir not in candidate_bases:
+                    candidate_bases.append(skill_dir)
+    except Exception:
+        pass
+
+    try:
+        # 1. Direct path check relative to each base
+        for base in candidate_bases:
+            if not base.is_dir():
+                continue
+            target = (base / clean_path).resolve()
+            if target.is_file() and str(target).startswith(str(base)):
+                return target.read_text(encoding="utf-8")
+
+        # 2. Check standard subdirectories (references/, rules/, templates/, examples/)
+        subdirs = ["references", "rules", "templates", "examples"]
+        for base in candidate_bases:
+            if not base.is_dir():
+                continue
+            for sub in subdirs:
+                target = (base / sub / clean_path).resolve()
+                if target.is_file() and str(target).startswith(str(base)):
+                    return target.read_text(encoding="utf-8")
+
+        # 3. Recursive lookup across all base directories
+        target_name = Path(clean_path).name.lower()
+        target_stem = Path(clean_path).stem.lower()
+
+        for base in candidate_bases:
+            if not base.is_dir():
+                continue
+            for md_file in base.rglob("*.md"):
+                if md_file.name.lower() == target_name or md_file.stem.lower() == target_stem:
+                    return md_file.read_text(encoding="utf-8")
+
+        # 4. If not found, list available references so the agent can self-correct
+        available: list[str] = []
+        for base in candidate_bases:
+            if not base.is_dir():
+                continue
+            for f in base.rglob("*.md"):
+                rel = f.relative_to(base).as_posix()
+                if rel != "SKILL.md":
+                    available.append(f"{base.name}/{rel}")
+
+        available_str = "\n".join(f"- {a}" for a in sorted(set(available))[:15])
+        return (
+            f"File '{path}' not found in any registered skill references.\n"
+            f"Available reference files:\n{available_str}"
+        )
+    except Exception as exc:
+        logger.debug("Failed to read skill reference %s: %s", path, exc)
+        return f"Error reading file '{path}': {exc}"
+
 
 # ── OOP Class: Native Agent Tools ─────────────────────────────────────────────
 
@@ -483,102 +578,6 @@ class HitlAgentTools:
             return report.format_feedback()
         except Exception as exc:
             return f"LSP check failed: {exc}"
-
-def resolve_skill_reference_content(path: str = "", **kwargs: Any) -> str:
-    """Resolve and read the content of a secondary reference file across registered Agent Skills.
-
-    Supports exact relative paths (e.g. 'references/narrative-patterns.md', 'rules/positioning.md'),
-    naked filenames (e.g. 'narrative-patterns.md', 'visual-techniques.md'), and stem lookups.
-    """
-    if not path and "args" in kwargs:
-        args_val = kwargs["args"]
-        if isinstance(args_val, dict) and "path" in args_val:
-            path = args_val["path"]
-        elif isinstance(args_val, str):
-            path = args_val
-    if not path:
-        path = kwargs.get("path", "") or kwargs.get("file", "") or kwargs.get("filename", "")
-
-    if not path:
-        return "No file path provided."
-
-    clean_path = path.strip().strip("'\"").replace("\\", "/")
-    clean_path = clean_path.lstrip("/")
-    for prefix in ("manim-composer/", "manimce-best-practices/", "manim-render/"):
-        if clean_path.lower().startswith(prefix):
-            clean_path = clean_path[len(prefix):]
-            break
-
-    from pathlib import Path
-
-    current_file = Path(__file__).resolve()
-    backend_skills_dir = current_file.parent.parent / "skills"
-
-    candidate_bases: list[Path] = [
-        backend_skills_dir / "manim-composer",
-        backend_skills_dir / "manimce-best-practices",
-        backend_skills_dir / "manim-render",
-    ]
-
-    try:
-        repo_root = current_file.parents[5]
-        repo_skills = repo_root / ".agents" / "skills"
-        if repo_skills.is_dir():
-            for skill_dir in repo_skills.iterdir():
-                if skill_dir.is_dir() and skill_dir not in candidate_bases:
-                    candidate_bases.append(skill_dir)
-    except Exception:
-        pass
-
-    try:
-        # 1. Direct path check relative to each base
-        for base in candidate_bases:
-            if not base.is_dir():
-                continue
-            target = (base / clean_path).resolve()
-            if target.is_file() and str(target).startswith(str(base)):
-                return target.read_text(encoding="utf-8")
-
-        # 2. Check standard subdirectories (references/, rules/, templates/, examples/)
-        subdirs = ["references", "rules", "templates", "examples"]
-        for base in candidate_bases:
-            if not base.is_dir():
-                continue
-            for sub in subdirs:
-                target = (base / sub / clean_path).resolve()
-                if target.is_file() and str(target).startswith(str(base)):
-                    return target.read_text(encoding="utf-8")
-
-        # 3. Recursive lookup across all base directories
-        target_name = Path(clean_path).name.lower()
-        target_stem = Path(clean_path).stem.lower()
-
-        for base in candidate_bases:
-            if not base.is_dir():
-                continue
-            for md_file in base.rglob("*.md"):
-                if md_file.name.lower() == target_name or md_file.stem.lower() == target_stem:
-                    return md_file.read_text(encoding="utf-8")
-
-        # 4. If not found, list available references so the agent can self-correct
-        available: list[str] = []
-        for base in candidate_bases:
-            if not base.is_dir():
-                continue
-            for f in base.rglob("*.md"):
-                rel = f.relative_to(base).as_posix()
-                if rel != "SKILL.md":
-                    available.append(f"{base.name}/{rel}")
-
-        available_str = "\n".join(f"- {a}" for a in sorted(set(available))[:15])
-        return (
-            f"File '{path}' not found in any registered skill references.\n"
-            f"Available reference files:\n{available_str}"
-        )
-    except Exception as exc:
-        logger.debug("Failed to read skill reference %s: %s", path, exc)
-        return f"Error reading file '{path}': {exc}"
-
 
     @staticmethod
     async def read_skill_reference_tool(ctx: RunContext[Any] | None = None, path: str = "", **kwargs: Any) -> str:
