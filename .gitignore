@@ -41,6 +41,8 @@ apps/new_dataset/data/
 .aos/
 .dev_logs/
 **/.dev_logs/
+hitl_workspace/
+**/hitl_workspace/
 .cache/
 .pytest_cache/
 media/

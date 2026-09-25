@@ -72,8 +72,10 @@ from rich.table import Table
 import app.agents.hitl_agents as hitl_agents
 from app.agents.error_classifier import classify_error, get_repair_guidance
 from app.core.local_logging import (
+    DEFAULT_WORKSPACE_DIR,
     HitlRunStore,
     HitlTerminalObserver,
+    HitlWorkspace,
     create_hitl_local_dev_hooks,
     disable_logfire_remote,
 )
@@ -174,6 +176,7 @@ async def run_classify_stage(
     observer: HitlTerminalObserver,
     run_store: HitlRunStore,
     *,
+    workspace: HitlWorkspace | None = None,
     mock: bool = False,
     model_name: str | None = None,
     base_url: str | None = None,
@@ -189,12 +192,30 @@ async def run_classify_stage(
     messages = []
 
     if mock:
+        mock_topic = "Fourier Transform"
+        mock_subject = "math"
+        lower_text = text.lower()
+        if "fourier" in lower_text:
+            mock_topic = "Fourier Transform"
+            mock_subject = "math"
+        elif "dijkstra" in lower_text:
+            mock_topic = "Dijkstra's Algorithm"
+            mock_subject = "cs"
+        elif "taylor" in lower_text:
+            mock_topic = "Taylor Series Approximation"
+            mock_subject = "math"
+        elif "binary search" in lower_text:
+            mock_topic = "Binary Search"
+            mock_subject = "cs"
+        elif text.strip():
+            mock_topic = text.strip()[:30]
+
         test_model = TestModel(
             custom_output_args={
                 "animatable": True,
-                "subject": "math",
-                "topic": "Fourier Transform",
-                "reason": "[Mock TestModel] Decomposes continuous signals into sinusoidal harmonics suitable for Manim animation.",
+                "subject": mock_subject,
+                "topic": mock_topic,
+                "reason": f"[Mock TestModel] Visualizable algorithmic and mathematical process for {mock_topic} suitable for Manim animation.",
             }
         )
         agent = Agent(
@@ -268,6 +289,11 @@ async def run_classify_stage(
         artifacts={"classification": output.model_dump()},
     )
     observer.step("SAVE", f"Run recorded to {log_file.name}")
+
+    if workspace:
+        workspace.save_classification(output, query=text)
+        observer.step("WORKSPACE", f"Saved classification to [bold cyan]{workspace.classification_file.name}[/bold cyan] (JSON format)")
+
     return output
 
 
@@ -277,6 +303,7 @@ async def run_compose_stage(
     observer: HitlTerminalObserver,
     run_store: HitlRunStore,
     *,
+    workspace: HitlWorkspace | None = None,
     mock: bool = False,
     model_name: str | None = None,
     base_url: str | None = None,
@@ -292,7 +319,43 @@ async def run_compose_stage(
     messages = []
 
     if mock:
-        plan_markdown = MOCK_PLAN
+        if topic and topic != "Fourier Transform":
+            plan_markdown = f"""# Visualizing {topic}
+
+## Overview
+- **Topic**: {topic}
+- **Hook**: How does {topic} operate intuitively and step-by-step?
+- **Target Audience**: Undergraduate STEM learners
+- **Estimated Length**: ~30 seconds
+- **Key Insight**: Dynamic visual transformations clarify core algorithmic and conceptual steps.
+
+## Narrative Arc
+Introduce the initial problem state, animate the step-by-step state transitions, and highlight the final solution.
+
+---
+
+## Scene 1: Initial Setup & Graph/Components
+**Duration**: ~10 seconds
+**Purpose**: Display the initial state, objects, and layout for {topic}.
+### Visual Elements
+- Title: Text("{topic}")
+- Coordinate layout or diagram nodes.
+
+---
+
+## Scene 2: Algorithmic Execution & Transitions
+**Duration**: ~15 seconds
+**Purpose**: Animate the core step-by-step updates and logic.
+### Visual Elements
+- Highlights, node visits, and state changes.
+
+## Color Palette
+- Primary: BLUE_C
+- Secondary: YELLOW
+- Accent: TEAL
+"""
+        else:
+            plan_markdown = MOCK_PLAN
         duration = time.perf_counter() - start_t
     else:
         agent = hitl_agents.get_composer_agent(
@@ -324,6 +387,11 @@ async def run_compose_stage(
         artifacts={"plan": plan_markdown},
     )
     observer.step("SAVE", f"Plan recorded to {log_file.name}")
+
+    if workspace:
+        workspace.save_plan(plan_markdown, topic=topic, source_text=text)
+        observer.step("WORKSPACE", f"Saved visual plan to [bold cyan]{workspace.plan_md_file.name}[/bold cyan] (Markdown) and [bold cyan]{workspace.plan_json_file.name}[/bold cyan] (JSON format)")
+
     return plan_markdown
 
 
@@ -333,6 +401,7 @@ async def run_code_stage(
     observer: HitlTerminalObserver,
     run_store: HitlRunStore,
     *,
+    workspace: HitlWorkspace | None = None,
     mock: bool = False,
     model_name: str | None = None,
     base_url: str | None = None,
@@ -349,8 +418,29 @@ async def run_code_stage(
     messages = []
 
     if mock:
-        code = MOCK_BROKEN_CODE_MOBJECT if inject_bug else MOCK_VALID_CODE
-        detected_scene = "BrokenMobjectScene" if inject_bug else "FourierTransformScene"
+        if inject_bug:
+            code = MOCK_BROKEN_CODE_MOBJECT
+            detected_scene = "BrokenMobjectScene"
+        elif topic and topic != "Fourier Transform":
+            import re
+            safe_name = "".join(w.capitalize() for w in re.sub(r"[^a-zA-Z0-9 ]", "", topic).split()) or "GeneratedScene"
+            detected_scene = f"{safe_name}Scene"
+            code = f"""from manim import *
+
+class {detected_scene}(Scene):
+    def construct(self):
+        title = Text("{topic}", font_size=40).to_edge(UP, buff=0.5)
+        subtitle = Text("Dynamic Visual Explanation", font_size=24, color=YELLOW)
+        subtitle.next_to(title, DOWN, buff=0.3)
+
+        self.play(Write(title))
+        self.play(FadeIn(subtitle, shift=UP * 0.2))
+        self.wait(1.5)
+        self.play(FadeOut(subtitle), FadeOut(title))
+"""
+        else:
+            code = MOCK_VALID_CODE
+            detected_scene = "FourierTransformScene"
         duration = time.perf_counter() - start_t
     else:
         agent = hitl_agents.get_coder_agent(
@@ -412,6 +502,18 @@ async def run_code_stage(
         },
     )
     observer.step("SAVE", f"Code run recorded to {log_file.name}")
+
+    if workspace:
+        workspace.save_code(
+            repair.code,
+            scene_name=detected_scene,
+            topic=topic,
+            preflight=preflight,
+            repair=repair,
+            lsp_report=lsp_report,
+        )
+        observer.step("WORKSPACE", f"Saved Manim scene to [bold cyan]{workspace.scene_file.name}[/bold cyan] (Python) and [bold cyan]{workspace.code_json_file.name}[/bold cyan] (JSON format)")
+
     return repair.code, detected_scene
 
 
@@ -422,6 +524,7 @@ async def run_repair_stage(
     observer: HitlTerminalObserver,
     run_store: HitlRunStore,
     *,
+    workspace: HitlWorkspace | None = None,
     mock: bool = False,
     model_name: str | None = None,
     base_url: str | None = None,
@@ -526,6 +629,17 @@ Current source:
         artifacts={"original_code": code, "repaired_code": final_repair.code, "error": error_traceback},
     )
     observer.step("SAVE", f"Repair run recorded to {log_file.name}")
+
+    if workspace:
+        workspace.save_repair(
+            repaired_code=final_repair.code,
+            scene_name=detected_scene,
+            error=error_traceback,
+            category=classified.category.value,
+            changes=list(original_repair.changes) + list(final_repair.changes),
+        )
+        observer.step("WORKSPACE", f"Updated [bold cyan]{workspace.scene_file.name}[/bold cyan] (Python) and saved [bold cyan]{workspace.repair_file.name}[/bold cyan] (JSON format)")
+
     return final_repair.code, detected_scene
 
 
@@ -536,6 +650,7 @@ def run_preflight_inspector(
     inline_code: str | None,
     observer: HitlTerminalObserver,
     run_store: HitlRunStore,
+    workspace: HitlWorkspace | None = None,
 ) -> None:
     """Inspect and test any Python file or inline string against preflight rules."""
     observer.banner("Manim Code Preflight & Deterministic AST Fixer", "Local Static Analysis")
@@ -550,8 +665,12 @@ def run_preflight_inspector(
         observer.step("LOAD", f"Loaded source from [underline]{file_path}[/underline]")
     elif inline_code:
         code = inline_code
+    elif workspace and workspace.scene_file.exists():
+        code = workspace.scene_file.read_text(encoding="utf-8")
+        file_path = str(workspace.scene_file)
+        observer.step("WORKSPACE", f"Loaded source from [bold cyan]{workspace.scene_file.name}[/bold cyan] (Python format)")
     else:
-        observer.error("No file or code provided. Use --file or provide inline code.")
+        observer.error("No file or code provided. Use --file, provide inline code, or run in a workspace.")
         return
 
     repair = repair_manim_code(code)
@@ -565,6 +684,12 @@ def run_preflight_inspector(
     # Pyright LSP Type & Member Diagnostics
     lsp_report = run_pyright_lsp(repair.code, is_code=True)
     observer.show_lsp(lsp_report)
+
+    if workspace:
+        workspace.save_preflight(preflight, repair, lsp_report)
+        if repair.changes:
+            workspace.scene_file.write_text(repair.code, encoding="utf-8")
+            observer.step("WORKSPACE", f"Updated [bold cyan]{workspace.scene_file.name}[/bold cyan] with AST fixes and saved [bold cyan]{workspace.preflight_file.name}[/bold cyan] (JSON format)")
 
     run_store.record_run(
         stage="preflight",
@@ -621,6 +746,7 @@ def run_local_render_check(
     code: str,
     scene_name: str,
     observer: HitlTerminalObserver,
+    workspace: HitlWorkspace | None = None,
 ) -> Path | None:
     """Optionally run 'manim -ql' on the generated code and preserve the output video."""
     import subprocess
@@ -629,10 +755,15 @@ def run_local_render_check(
     observer.banner("Optional Local Render Verification", "Running `manim -ql` locally")
     observer.step("RENDER", f"Compiling Scene '{scene_name}' at low quality...")
 
-    render_dir = Path(__file__).parent / ".dev_logs" / "renders" / scene_name
-    render_dir.mkdir(parents=True, exist_ok=True)
-    scene_file = render_dir / f"{scene_name}.py"
-    scene_file.write_text(code, encoding="utf-8")
+    if workspace:
+        render_dir = workspace.workspace_dir
+        scene_file = workspace.scene_file
+        scene_file.write_text(code, encoding="utf-8")
+    else:
+        render_dir = Path(__file__).parent / ".dev_logs" / "renders" / scene_name
+        render_dir.mkdir(parents=True, exist_ok=True)
+        scene_file = render_dir / f"{scene_name}.py"
+        scene_file.write_text(code, encoding="utf-8")
 
     # Check for direct 'manim' or 'uv'
     if shutil.which("manim"):
@@ -680,11 +811,17 @@ def run_local_render_check(
 
 # ── Inspect Last Run ──────────────────────────────────────────────────────────
 
-def inspect_last_run(run_store: HitlRunStore, observer: HitlTerminalObserver) -> None:
+def inspect_last_run(
+    run_store: HitlRunStore,
+    observer: HitlTerminalObserver,
+    workspace: HitlWorkspace | None = None,
+) -> None:
     """Display summary and diagnostics from the most recent run log."""
     last_run = run_store.get_last_run()
     if not last_run:
         observer.warning(f"No run logs found in {run_store.log_dir}")
+        if workspace:
+            observer.show_workspace_status(workspace)
         return
 
     observer.banner(f"Last Run Inspection: {last_run.get('stage', 'unknown').upper()}", f"Run ID: {last_run.get('run_id')}")
@@ -714,6 +851,9 @@ def inspect_last_run(run_store: HitlRunStore, observer: HitlTerminalObserver) ->
     messages = last_run.get("messages", [])
     observer.step("LOG", f"Recorded {len(messages)} Pydantic AI messages in conversation history")
 
+    if workspace:
+        observer.show_workspace_status(workspace)
+
 
 # ── CLI Entrypoint ────────────────────────────────────────────────────────────
 
@@ -722,12 +862,18 @@ def parse_args() -> argparse.Namespace:
         description="Frictionless Local Dev & Test Runner for Pydantic AI HITL Pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("topic", nargs="?", default="Fourier Transform", help="Topic or educational text to process")
+    parser.add_argument("topic", nargs="?", default=None, help="Topic or educational text to process (if omitted, loads from workspace)")
     parser.add_argument(
         "-s", "--stage",
         choices=["all", "classify", "compose", "code", "preflight", "repair", "lsp"],
         default="all",
         help="Pipeline stage to run (default: all)",
+    )
+    parser.add_argument(
+        "-d", "--dir", "--workspace",
+        dest="workspace_dir",
+        default=None,
+        help="Directory for structural JSON and Python artifacts (default: hitl_workspace/)",
     )
     parser.add_argument("--mock", action="store_true", help="Run with Pydantic AI TestModel (offline, 0 API tokens)")
     parser.add_argument(
@@ -762,10 +908,11 @@ async def async_main() -> None:
     disable_logfire_remote()
 
     run_store = HitlRunStore(log_dir=args.log_dir)
+    workspace = HitlWorkspace(workspace_dir=args.workspace_dir)
     observer = HitlTerminalObserver(verbose=args.verbose)
 
     if args.inspect_last:
-        inspect_last_run(run_store, observer)
+        inspect_last_run(run_store, observer, workspace=workspace)
         return
 
     # Check for LSP inspection stage on file or text
@@ -775,14 +922,15 @@ async def async_main() -> None:
 
     # Check for preflight stage on file or text
     if args.stage == "preflight":
-        run_preflight_inspector(args.file, None if args.file else args.topic, observer, run_store)
+        run_preflight_inspector(args.file, None if args.file else args.topic, observer, run_store, workspace=workspace)
         return
 
     start_total_t = time.perf_counter()
     observer.banner(
         "AOS HITL Local Development Runner",
-        f"Mode: {'MOCK (Pydantic AI TestModel)' if args.mock else 'LIVE LLM'}  |  Stage: {args.stage.upper()}  |  Model: {args.model}",
+        f"Mode: {'MOCK (Pydantic AI TestModel)' if args.mock else 'LIVE LLM'}  |  Stage: {args.stage.upper()}  |  Workspace: {workspace.workspace_dir.name}",
     )
+    observer.step("WORKSPACE", f"Active directory: [bold cyan]{workspace.workspace_dir}[/bold cyan]")
 
     try:
         # Check API key if not in mock mode
@@ -797,16 +945,28 @@ async def async_main() -> None:
                 observer.error(str(exc))
                 observer.console.print(
                     "\n[bold yellow]Tip:[/bold yellow] To test offline without an API key, add the [bold cyan]--mock[/bold cyan] flag:\n"
-                    f"  [green]uv run python dev_hitl.py --mock \"{args.topic}\"[/green]\n"
+                    f"  [green]uv run python dev_hitl.py --mock \"{args.topic or 'Fourier Transform'}\"[/green]\n"
                 )
                 return
 
         # STAGE: CLASSIFY
         if args.stage in ("classify", "all"):
+            text_to_classify = args.topic
+            if not text_to_classify:
+                inp = workspace.load_input()
+                if inp and inp.get("text"):
+                    text_to_classify = inp["text"]
+                    observer.step("WORKSPACE", f"Loaded input query from [bold cyan]{workspace.input_file.name}[/bold cyan] (JSON format)")
+                else:
+                    text_to_classify = "Fourier Transform"
+
+            workspace.save_input(text_to_classify)
+
             classify_res = await run_classify_stage(
-                args.topic,
+                text_to_classify,
                 observer,
                 run_store,
+                workspace=workspace,
                 mock=args.mock,
                 model_name=args.model,
                 base_url=args.base_url,
@@ -815,24 +975,48 @@ async def async_main() -> None:
             if not classify_res.animatable and args.stage == "all":
                 observer.warning("Content classified as non-animatable. Halting pipeline.")
                 return
-            current_topic = classify_res.topic or args.topic
+            current_topic = classify_res.topic or text_to_classify
+            current_text = text_to_classify
         else:
-            current_topic = args.topic
+            class_data = workspace.load_classification()
+            if args.topic:
+                current_topic = args.topic
+                current_text = args.topic
+            elif class_data:
+                current_topic = class_data.get("topic") or "Fourier Transform"
+                current_text = class_data.get("query") or current_topic
+                observer.step("WORKSPACE", f"Loaded topic '[bold green]{current_topic}[/bold green]' from [bold cyan]{workspace.classification_file.name}[/bold cyan] (JSON format)")
+            else:
+                inp = workspace.load_input()
+                if inp:
+                    current_topic = inp.get("topic") or inp.get("text", "Fourier Transform")[:30]
+                    current_text = inp.get("text") or current_topic
+                else:
+                    current_topic = "Fourier Transform"
+                    current_text = MOCK_TEXT
 
         # STAGE: COMPOSE
         if args.stage in ("compose", "all"):
             plan = await run_compose_stage(
-                args.topic,
+                current_text,
                 current_topic,
                 observer,
                 run_store,
+                workspace=workspace,
                 mock=args.mock,
                 model_name=args.model,
                 base_url=args.base_url,
                 api_key=args.api_key,
             )
         else:
-            plan = MOCK_PLAN
+            loaded_plan, loaded_topic = workspace.load_plan()
+            if loaded_plan:
+                plan = loaded_plan
+                if loaded_topic and not args.topic:
+                    current_topic = loaded_topic
+                observer.step("WORKSPACE", f"Loaded visual plan from [bold cyan]{workspace.plan_md_file.name}[/bold cyan] (Markdown format)")
+            else:
+                plan = MOCK_PLAN
 
         # STAGE: CODE
         if args.stage in ("code", "all"):
@@ -841,6 +1025,7 @@ async def async_main() -> None:
                 current_topic,
                 observer,
                 run_store,
+                workspace=workspace,
                 mock=args.mock,
                 model_name=args.model,
                 base_url=args.base_url,
@@ -851,12 +1036,18 @@ async def async_main() -> None:
             code = Path(args.file).read_text(encoding="utf-8")
             scene_name = "CustomScene"
         else:
-            code = MOCK_BROKEN_CODE_MOBJECT if args.inject_mobject_bug else MOCK_VALID_CODE
-            scene_name = "BrokenMobjectScene" if args.inject_mobject_bug else "FourierTransformScene"
+            loaded_code, loaded_scene = workspace.load_code()
+            if loaded_code and not args.inject_mobject_bug:
+                code = loaded_code
+                scene_name = loaded_scene or "GeneratedScene"
+                observer.step("WORKSPACE", f"Loaded existing scene from [bold cyan]{workspace.scene_file.name}[/bold cyan] (Python format)")
+            else:
+                code = MOCK_BROKEN_CODE_MOBJECT if args.inject_mobject_bug else MOCK_VALID_CODE
+                scene_name = "BrokenMobjectScene" if args.inject_mobject_bug else "FourierTransformScene"
 
         # STAGE: REPAIR (if explicitly requested, or if preflight failed during 'all')
         if args.stage == "repair" or (args.stage == "all" and args.inject_mobject_bug):
-            sample_err = args.error or (
+            sample_err = args.error or workspace.load_error() or (
                 "IndexError: list index out of range\n"
                 "  File 'scene.py', line 7, in construct\n"
                 "    square = formula[5]\n"
@@ -868,6 +1059,7 @@ async def async_main() -> None:
                 scene_name,
                 observer,
                 run_store,
+                workspace=workspace,
                 mock=args.mock,
                 model_name=args.model,
                 base_url=args.base_url,
@@ -877,7 +1069,7 @@ async def async_main() -> None:
 
         # Optional local render
         if args.render:
-            run_local_render_check(code, scene_name, observer)
+            run_local_render_check(code, scene_name, observer, workspace=workspace)
 
         total_elapsed = time.perf_counter() - start_total_t
         observer.show_run_summary(
@@ -887,6 +1079,7 @@ async def async_main() -> None:
             usage={},
             log_path=run_store.last_run_file,
         )
+        observer.show_workspace_status(workspace)
 
     except KeyboardInterrupt:
         observer.warning("Run aborted by user.")

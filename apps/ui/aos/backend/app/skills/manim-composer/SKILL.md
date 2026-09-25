@@ -5,7 +5,7 @@ description: |
 
   Transforms vague video ideas into detailed scene-by-scene plans (scenes.md). Conducts research, asks clarifying questions about audience/scope/focus, and outputs comprehensive scene specifications ready for implementation with ManimCE or ManimGL.
 
-  Use this BEFORE writing any Manim code. This skill plans the video; use manimce-best-practices or manimgl-best-practices for implementation.
+  Use this BEFORE writing any Manim code. This skill plans the video; use manimce-best-practices for implementation.
 ---
 
 ## Workflow

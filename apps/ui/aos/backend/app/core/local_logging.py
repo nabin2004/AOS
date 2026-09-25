@@ -36,6 +36,8 @@ logger = logging.getLogger(__name__)
 
 # Default directory for local development run logs
 DEFAULT_LOG_DIR = Path(__file__).resolve().parents[2] / ".dev_logs" / "hitl"
+# Default directory for structural HITL workspace artifacts (JSON and Python)
+DEFAULT_WORKSPACE_DIR = Path(__file__).resolve().parents[2] / "hitl_workspace"
 
 
 # ── 1. Logfire Remote Disabler ───────────────────────────────────────────────
@@ -203,7 +205,321 @@ class HitlRunStore:
         return files[:limit]
 
 
-# ── 4. Rich Terminal Observer ─────────────────────────────────────────────────
+# ── 4. Structural HITL Workspace Directory ───────────────────────────────────
+
+class HitlWorkspace:
+    """Manages structural file artifacts (JSON and Python) for HITL pipeline execution.
+
+    Keeps artifacts organized in clean, standardized file formats:
+    - input.json: Raw text/prompt inputs in JSON format
+    - classification.json: Pedagogical classification in JSON format
+    - scenes.md: Visual storyboard plan in Markdown format (human readable/editable)
+    - plan.json: Visual storyboard plan in JSON format
+    - scene.py: Synthesized Manim Community scene in Python code format
+    - code.json: Scene metadata, AST preflight status, and LSP diagnostics in JSON format
+    - preflight.json: Static AST & LSP diagnostic reports in JSON format
+    - error.json: Traceback and classified errors in JSON format
+    - repair.json: Self-correcting repair modifications in JSON format
+    - manifest.json: Index of active artifacts and latest stage state
+    """
+
+    def __init__(self, workspace_dir: Path | str | None = None) -> None:
+        self.workspace_dir = Path(workspace_dir).resolve() if workspace_dir else DEFAULT_WORKSPACE_DIR
+        self.workspace_dir.mkdir(parents=True, exist_ok=True)
+
+        self.input_file = self.workspace_dir / "input.json"
+        self.classification_file = self.workspace_dir / "classification.json"
+        self.plan_md_file = self.workspace_dir / "scenes.md"
+        self.plan_json_file = self.workspace_dir / "plan.json"
+        self.scene_file = self.workspace_dir / "scene.py"
+        self.code_json_file = self.workspace_dir / "code.json"
+        self.preflight_file = self.workspace_dir / "preflight.json"
+        self.error_file = self.workspace_dir / "error.json"
+        self.repair_file = self.workspace_dir / "repair.json"
+        self.manifest_file = self.workspace_dir / "manifest.json"
+
+    # ── Input handling ──
+    def save_input(self, text: str, topic: str | None = None) -> Path:
+        """Persist raw input text or query into input.json."""
+        data = {
+            "text": text,
+            "topic": topic,
+            "updated_at": datetime.now().isoformat(),
+        }
+        self.input_file.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        self.update_manifest(stage="input", topic=topic)
+        return self.input_file
+
+    def load_input(self) -> dict[str, Any] | None:
+        """Load raw input query/text from input.json if present."""
+        if not self.input_file.exists():
+            return None
+        try:
+            return json.loads(self.input_file.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+    # ── Classification handling ──
+    def save_classification(
+        self,
+        classification: VideoClassifyResponse | dict[str, Any],
+        query: str | None = None,
+    ) -> Path:
+        """Save classification output in structured JSON format (classification.json)."""
+        if isinstance(classification, VideoClassifyResponse):
+            data = {
+                "query": query,
+                "animatable": classification.animatable,
+                "subject": classification.subject,
+                "topic": classification.topic,
+                "reason": classification.reason,
+                "updated_at": datetime.now().isoformat(),
+            }
+            topic = classification.topic
+        else:
+            data = dict(classification)
+            if query:
+                data["query"] = query
+            data["updated_at"] = datetime.now().isoformat()
+            topic = data.get("topic")
+
+        self.classification_file.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        self.update_manifest(stage="classify", topic=topic)
+        return self.classification_file
+
+    def load_classification(self) -> dict[str, Any] | None:
+        """Read classification.json if present in workspace."""
+        if not self.classification_file.exists():
+            return None
+        try:
+            return json.loads(self.classification_file.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+    # ── Plan handling ──
+    def save_plan(
+        self,
+        plan_markdown: str,
+        topic: str,
+        source_text: str | None = None,
+    ) -> tuple[Path, Path]:
+        """Save visual plan in Markdown (scenes.md) and structured JSON (plan.json)."""
+        self.plan_md_file.write_text(plan_markdown, encoding="utf-8")
+
+        plan_data = {
+            "topic": topic,
+            "source_text": source_text,
+            "plan_markdown": plan_markdown,
+            "updated_at": datetime.now().isoformat(),
+        }
+        self.plan_json_file.write_text(json.dumps(plan_data, indent=2, ensure_ascii=False), encoding="utf-8")
+        self.update_manifest(stage="compose", topic=topic)
+        return self.plan_md_file, self.plan_json_file
+
+    def load_plan(self) -> tuple[str | None, str | None]:
+        """Load (plan_markdown, topic) from scenes.md and plan.json.
+
+        Prefers scenes.md content so any manual human edits in the file take effect.
+        """
+        plan_md = None
+        topic = None
+
+        if self.plan_md_file.exists():
+            plan_md = self.plan_md_file.read_text(encoding="utf-8")
+
+        if self.plan_json_file.exists():
+            try:
+                data = json.loads(self.plan_json_file.read_text(encoding="utf-8"))
+                topic = data.get("topic")
+                if not plan_md:
+                    plan_md = data.get("plan_markdown")
+            except Exception:
+                pass
+
+        if not topic and self.classification_file.exists():
+            try:
+                data = json.loads(self.classification_file.read_text(encoding="utf-8"))
+                topic = data.get("topic")
+            except Exception:
+                pass
+
+        return plan_md, topic
+
+    # ── Code handling ──
+    def save_code(
+        self,
+        code: str,
+        scene_name: str,
+        topic: str | None = None,
+        preflight: PreflightResult | None = None,
+        repair: CodeRepair | None = None,
+        lsp_report: Any = None,
+    ) -> tuple[Path, Path]:
+        """Save synthesized Manim code in Python (.py) and metadata in JSON (code.json)."""
+        self.scene_file.write_text(code, encoding="utf-8")
+
+        preflight_dict = None
+        if preflight:
+            preflight_dict = {
+                "valid": preflight.valid,
+                "status": preflight.status,
+                "blocking": preflight.blocking,
+                "errors": list(preflight.errors),
+                "issues": list(preflight.issues),
+            }
+
+        lsp_dict = None
+        if lsp_report:
+            lsp_dict = {
+                "has_errors": getattr(lsp_report, "has_errors", False),
+                "diagnostics": [d.__dict__ for d in getattr(lsp_report, "diagnostics", [])],
+            }
+
+        code_data = {
+            "topic": topic,
+            "scene_name": scene_name,
+            "scene_file": self.scene_file.name,
+            "preflight": preflight_dict,
+            "lsp": lsp_dict,
+            "updated_at": datetime.now().isoformat(),
+        }
+        self.code_json_file.write_text(json.dumps(code_data, indent=2, ensure_ascii=False), encoding="utf-8")
+        self.update_manifest(stage="code", topic=topic)
+        return self.scene_file, self.code_json_file
+
+    def load_code(self) -> tuple[str | None, str | None]:
+        """Load (code, scene_name) from scene.py and code.json."""
+        if not self.scene_file.exists():
+            return None, None
+
+        code = self.scene_file.read_text(encoding="utf-8")
+        scene_name = "GeneratedScene"
+
+        if self.code_json_file.exists():
+            try:
+                data = json.loads(self.code_json_file.read_text(encoding="utf-8"))
+                scene_name = data.get("scene_name") or scene_name
+            except Exception:
+                pass
+
+        if scene_name == "GeneratedScene":
+            import re
+            m = re.search(r"class\s+([A-Za-z0-9_]+)\s*\((?:.*?)Scene(?:.*?)\)", code)
+            if m:
+                scene_name = m.group(1)
+
+        return code, scene_name
+
+    # ── Preflight handling ──
+    def save_preflight(
+        self,
+        preflight: PreflightResult,
+        repair: CodeRepair | None = None,
+        lsp_report: Any = None,
+    ) -> Path:
+        """Save AST and LSP preflight results in JSON format (preflight.json)."""
+        data = {
+            "valid": preflight.valid,
+            "status": preflight.status,
+            "blocking": preflight.blocking,
+            "errors": list(preflight.errors),
+            "issues": list(preflight.issues),
+            "repair_changes": list(repair.changes) if repair else [],
+            "lsp_errors": getattr(lsp_report, "has_errors", False) if lsp_report else False,
+            "updated_at": datetime.now().isoformat(),
+        }
+        self.preflight_file.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        return self.preflight_file
+
+    def load_preflight(self) -> dict[str, Any] | None:
+        """Read preflight.json if present in workspace."""
+        if not self.preflight_file.exists():
+            return None
+        try:
+            return json.loads(self.preflight_file.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+    # ── Repair handling ──
+    def save_repair(
+        self,
+        repaired_code: str,
+        scene_name: str,
+        error: str,
+        category: str,
+        changes: list[str],
+    ) -> tuple[Path, Path]:
+        """Save repaired Python scene (updating scene.py, preserving scene_backup.py) and repair.json."""
+        if self.scene_file.exists():
+            backup_file = self.workspace_dir / "scene_backup.py"
+            backup_file.write_text(self.scene_file.read_text(encoding="utf-8"), encoding="utf-8")
+
+        self.scene_file.write_text(repaired_code, encoding="utf-8")
+
+        repair_data = {
+            "scene_name": scene_name,
+            "category": category,
+            "error": error,
+            "changes": changes,
+            "updated_at": datetime.now().isoformat(),
+        }
+        self.repair_file.write_text(json.dumps(repair_data, indent=2, ensure_ascii=False), encoding="utf-8")
+        self.update_manifest(stage="repair")
+        return self.scene_file, self.repair_file
+
+    def load_error(self) -> str | None:
+        """Load error string from error.json or error.txt if present."""
+        if self.error_file.exists():
+            try:
+                data = json.loads(self.error_file.read_text(encoding="utf-8"))
+                if isinstance(data, dict):
+                    return data.get("error") or data.get("traceback") or str(data)
+                return str(data)
+            except Exception:
+                return self.error_file.read_text(encoding="utf-8")
+        error_txt = self.workspace_dir / "error.txt"
+        if error_txt.exists():
+            return error_txt.read_text(encoding="utf-8")
+        return None
+
+    # ── Manifest handling ──
+    def update_manifest(self, stage: str, topic: str | None = None) -> Path:
+        """Update manifest.json tracking active files in the workspace directory."""
+        manifest_data = {
+            "workspace_dir": str(self.workspace_dir),
+            "last_stage": stage,
+            "topic": topic,
+            "updated_at": datetime.now().isoformat(),
+            "files": {
+                "input_json": self.input_file.name if self.input_file.exists() else None,
+                "classification_json": self.classification_file.name if self.classification_file.exists() else None,
+                "scenes_md": self.plan_md_file.name if self.plan_md_file.exists() else None,
+                "plan_json": self.plan_json_file.name if self.plan_json_file.exists() else None,
+                "scene_py": self.scene_file.name if self.scene_file.exists() else None,
+                "code_json": self.code_json_file.name if self.code_json_file.exists() else None,
+                "preflight_json": self.preflight_file.name if self.preflight_file.exists() else None,
+                "repair_json": self.repair_file.name if self.repair_file.exists() else None,
+            },
+        }
+        self.manifest_file.write_text(json.dumps(manifest_data, indent=2, ensure_ascii=False), encoding="utf-8")
+        return self.manifest_file
+
+    def get_status(self) -> dict[str, Any]:
+        """Inspect all available workspace files."""
+        return {
+            "workspace": str(self.workspace_dir),
+            "input": self.input_file.exists(),
+            "classification": self.classification_file.exists(),
+            "plan_md": self.plan_md_file.exists(),
+            "plan_json": self.plan_json_file.exists(),
+            "scene_py": self.scene_file.exists(),
+            "code_json": self.code_json_file.exists(),
+            "preflight": self.preflight_file.exists(),
+            "repair": self.repair_file.exists(),
+        }
+
+
+# ── 5. Rich Terminal Observer ─────────────────────────────────────────────────
 
 class HitlTerminalObserver:
     """Renders real-time visual output, syntax formatting, diffs, and diagnostics in terminal."""
@@ -514,8 +830,42 @@ class HitlTerminalObserver:
             )
         )
 
+    def show_workspace_status(self, workspace: HitlWorkspace) -> None:
+        """Render a summary table of structural files existing in the HITL workspace."""
+        table = Table(box=ROUNDED, show_header=True, header_style="bold magenta")
+        table.add_column("Artifact", style="bold")
+        table.add_column("Format", style="cyan")
+        table.add_column("Filename", style="white")
+        table.add_column("Status", style="green")
 
-# ── 5. Pydantic AI Lifecycle Hooks for Local Dev ──────────────────────────────
+        items = [
+            ("Raw Input", "JSON", workspace.input_file),
+            ("Classification", "JSON", workspace.classification_file),
+            ("Visual Plan (scenes.md)", "Markdown", workspace.plan_md_file),
+            ("Visual Plan (plan.json)", "JSON", workspace.plan_json_file),
+            ("Manim Scene Code", "Python (.py)", workspace.scene_file),
+            ("Code Metadata & LSP", "JSON", workspace.code_json_file),
+            ("Preflight AST Report", "JSON", workspace.preflight_file),
+            ("Repair Report", "JSON", workspace.repair_file),
+            ("Pipeline Manifest", "JSON", workspace.manifest_file),
+        ]
+        for name, fmt, path in items:
+            exists = path.exists()
+            status_str = f"[bold green]EXISTS ({path.stat().st_size} B)[/bold green]" if exists else "[dim]NOT CREATED[/dim]"
+            table.add_row(name, fmt, path.name, status_str)
+
+        self.console.print(
+            Panel(
+                table,
+                title=f"[bold white]HITL Workspace Artifacts ({workspace.workspace_dir.name})[/bold white]",
+                box=ROUNDED,
+                style="cyan",
+            )
+        )
+
+
+# ── 6. Pydantic AI Lifecycle Hooks for Local Dev ──────────────────────────────
+
 
 def create_hitl_local_dev_hooks(
     observer: HitlTerminalObserver | None = None,

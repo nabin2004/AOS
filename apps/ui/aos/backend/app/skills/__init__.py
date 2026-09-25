@@ -13,7 +13,6 @@ from pydantic_ai_harness import Skills
 
 SKILLS_DIR = Path(__file__).resolve().parent
 
-
 def get_skills(
     *,
     include: Sequence[str] | None = None,
@@ -40,7 +39,6 @@ def get_coder_skills() -> Skills:
 def get_repair_skills() -> Skills:
     """Get Skills capability for Repair Agent (manimce-best-practices, manim-render)."""
     return Skills(SKILLS_DIR, include=["manimce-best-practices", "manim-render"])
-
 
 __all__ = [
     "SKILLS_DIR",
