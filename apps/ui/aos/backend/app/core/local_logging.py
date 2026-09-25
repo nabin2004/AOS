@@ -524,7 +524,12 @@ class HitlWorkspace:
 class HitlTerminalObserver:
     """Renders real-time visual output, syntax formatting, diffs, and diagnostics in terminal."""
 
-    def __init__(self, console: Console | None = None, verbose: bool = False) -> None:
+    def __init__(
+        self,
+        console: Console | None = None,
+        verbose: bool = False,
+        mock_mode: bool = False,
+    ) -> None:
         if sys.platform == "win32":
             try:
                 if hasattr(sys.stdout, "reconfigure"):
@@ -535,9 +540,12 @@ class HitlTerminalObserver:
                 pass
         self.console = console or Console(legacy_windows=False)
         self.verbose = verbose
+        self.mock_mode = mock_mode
+        # Track whether any stage recovered from a model failure
+        self.recovered_stages: list[str] = []
 
     def banner(self, title: str, subtitle: str = "") -> None:
-        """Render a major stage header banner."""
+        """Render a major stage header banner (live mode — cyan)."""
         content = f"[bold white]{title}[/bold white]"
         if subtitle:
             content += f"\n[dim]{subtitle}[/dim]"
@@ -549,6 +557,66 @@ class HitlTerminalObserver:
                 padding=(0, 2),
             )
         )
+
+    def mock_banner(self, title: str, subtitle: str = "") -> None:
+        """Render a stage header with a loud MOCK watermark (amber/yellow).
+
+        Call this instead of banner() for every stage when mock=True so it's
+        impossible to mistake offline TestModel output for real LLM output.
+        """
+        content = (
+            f"[bold yellow]\u26a0 MOCK / OFFLINE MODE \u26a0[/bold yellow]\n"
+            f"[bold white]{title}[/bold white]"
+        )
+        if subtitle:
+            content += f"\n[dim yellow]{subtitle}  [dim](Pydantic AI TestModel — 0 tokens)[/dim][/dim]"
+        self.console.print(
+            Panel(
+                content,
+                box=ROUNDED,
+                style="yellow",
+                padding=(0, 2),
+                title="[bold yellow][ MOCK ][/bold yellow]",
+                title_align="right",
+            )
+        )
+
+    def recovery_alarm(
+        self,
+        stage: str,
+        exc: Exception,
+        method: str,
+        traceback_str: str = "",
+    ) -> None:
+        """Render a full-width RED alarm panel when the model failed structured output
+        and the pipeline is falling back to a heuristic/regex recovery.
+
+        This makes it impossible to silently treat recovered data as real LLM output.
+        """
+        self.recovered_stages.append(stage)
+        lines = [
+            f"[bold red]\u2718 STRUCTURED OUTPUT FAILURE — STAGE: {stage.upper()}[/bold red]",
+            "",
+            f"[red]Exception:[/red] [bold]{type(exc).__name__}[/bold]: {exc}",
+            "",
+            f"[bold yellow]Fallback method:[/bold yellow] {method}",
+            "[yellow]The data shown below was NOT produced by the LLM — it was recovered"
+            " heuristically or via regex from raw model output.[/yellow]",
+            "",
+            "[dim]Re-run with --verbose to see the full captured message trace.[/dim]",
+        ]
+        if traceback_str and self.verbose:
+            lines += ["", "[dim]── Full Traceback ──[/dim]", f"[dim]{traceback_str}[/dim]"]
+        self.console.print(
+            Panel(
+                "\n".join(lines),
+                box=ROUNDED,
+                style="red",
+                title="[bold red][ RECOVERY ALARM ][/bold red]",
+                padding=(0, 2),
+            )
+        )
+
 
     def step(self, badge: str, title: str, detail: str = "") -> None:
         """Render an in-progress step status."""
@@ -605,7 +673,14 @@ class HitlTerminalObserver:
             )
         )
 
-    def show_classification(self, result: VideoClassifyResponse, duration: float = 0.0, usage: Any = None) -> None:
+    def show_classification(
+        self,
+        result: VideoClassifyResponse,
+        duration: float = 0.0,
+        usage: Any = None,
+        is_mock: bool = False,
+        is_recovered: bool = False,
+    ) -> None:
         """Render structured classification output."""
         badge = "[bold green]ANIMATABLE[/bold green]" if result.animatable else "[bold red]NON-ANIMATABLE[/bold red]"
         table = Table(box=SIMPLE, show_header=False, padding=(0, 1))
@@ -616,6 +691,10 @@ class HitlTerminalObserver:
         table.add_row("Subject", result.subject.upper())
         table.add_row("Topic", result.topic or "[dim]N/A[/dim]")
         table.add_row("Reasoning", result.reason)
+        if is_mock:
+            table.add_row("Source", "[bold yellow]\u26a0 MOCK (TestModel)[/bold yellow]")
+        elif is_recovered:
+            table.add_row("Source", "[bold red]\u26a0 RECOVERED (heuristic fallback — NOT real LLM output)[/bold red]")
         if duration > 0:
             table.add_row("Latency", f"{duration:.2f}s")
         if usage and hasattr(usage, "total_tokens"):

@@ -79,7 +79,7 @@ from app.core.local_logging import (
     create_hitl_local_dev_hooks,
     disable_logfire_remote,
 )
-from app.skills import get_coder_skills, get_composer_skills
+from app.skills import get_coder_skills, get_composer_skills, get_repair_skills
 from app.schemas.video_generation import VideoClassifyResponse
 from app.services.lsp_service import run_pyright_lsp, LspDiagnosticReport
 from app.services.manim_code import preflight_manim_code, repair_manim_code
@@ -170,7 +170,58 @@ class BrokenMobjectScene(Scene):
 """
 
 
-# ── Stage Runners ─────────────────────────────────────────────────────────────
+# ── HITL Human Approval Gate ──────────────────────────────────────────────────
+
+def hitl_approve(
+    observer: "HitlTerminalObserver",
+    stage_label: str,
+    summary: str,
+    *,
+    auto_approve: bool = False,
+) -> bool:
+    """Prompt the human operator to approve the stage output before continuing.
+
+    Returns True to proceed, False to abort the pipeline.
+    Set auto_approve=True (via --no-hitl-approval) to skip for CI/batch runs.
+    """
+    if auto_approve:
+        observer.step("HITL", f"Auto-approved [{stage_label}] (--no-hitl-approval)")
+        return True
+
+    from rich.prompt import Prompt
+    from rich.panel import Panel
+    from rich.box import ROUNDED
+
+    observer.console.print(
+        Panel(
+            f"[bold cyan]{summary}[/bold cyan]\n\n"
+            "[bold]Proceed to next stage?[/bold]  "
+            "[green]y[/green] = yes / [red]n[/red] = abort / "
+            "[yellow]s[/yellow] = skip this stage",
+            title=f"[bold magenta]\U0001f9d1 HITL Checkpoint — {stage_label}[/bold magenta]",
+            box=ROUNDED,
+            style="magenta",
+            padding=(0, 2),
+        )
+    )
+    try:
+        choice = Prompt.ask(
+            "[bold magenta]Your decision[/bold magenta]",
+            choices=["y", "n", "s"],
+            default="y",
+        ).strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        observer.warning("HITL prompt interrupted — aborting pipeline.")
+        return False
+
+    if choice == "n":
+        observer.error(f"Pipeline aborted by operator at [{stage_label}] checkpoint.")
+        return False
+    if choice == "s":
+        observer.warning(f"Stage [{stage_label}] skipped by operator.")
+        return False
+    return True
+
 
 async def run_classify_stage(
     text: str,
@@ -211,12 +262,13 @@ async def run_classify_stage(
         elif text.strip():
             mock_topic = text.strip()[:30]
 
+        observer.mock_banner("Stage 1: Manim Animatability Classification", "Pydantic AI Classifier Agent")
         test_model = TestModel(
             custom_output_args={
                 "animatable": True,
                 "subject": mock_subject,
                 "topic": mock_topic,
-                "reason": f"[Mock TestModel] Visualizable algorithmic and mathematical process for {mock_topic} suitable for Manim animation.",
+                "reason": f"[Mock TestModel] Visualizable process for {mock_topic} suitable for Manim animation.",
             }
         )
         agent = Agent(
@@ -229,6 +281,8 @@ async def run_classify_stage(
         output = result.output
         usage = getattr(result, "usage", None)
         messages = result.all_messages()
+        is_mock = True
+        is_recovered = False
     else:
         agent = hitl_agents.get_classifier_agent(
             model_name=model_name,
@@ -238,13 +292,18 @@ async def run_classify_stage(
         )
         prompt = f"Please classify the following educational content for Manim animatability:\n\n{text}"
         observer.show_prompt(hitl_agents.CLASSIFIER_SYSTEM_PROMPT, prompt)
+        is_mock = False
+        is_recovered = False
+        captured: list[Any] = []
         try:
-            with capture_run_messages() as captured:
+            with capture_run_messages() as cm:
                 result = await agent.run(prompt)
                 output = result.output
                 usage = getattr(result, "usage", None)
-                messages = result.all_messages() or captured
+                messages = result.all_messages() or list(cm)
         except Exception as exc:
+            import traceback as _tb
+            captured = list(cm) if cm else []
             messages = captured
             recovered = None
             for m in captured:
@@ -262,22 +321,35 @@ async def run_classify_stage(
                                     topic=str(data.get("topic", text[:30])),
                                     reason=str(data.get("reason", "Recovered from model output")),
                                 )
-                                break
                             except Exception:
                                 pass
+                        if recovered:
+                            break
                 if recovered:
                     break
 
             if recovered:
-                observer.step("RECOVER", "Extracted structured classification from raw model response")
+                observer.recovery_alarm(
+                    stage="classify",
+                    exc=exc,
+                    method="Regex extraction from raw message parts",
+                    traceback_str=_tb.format_exc(),
+                )
                 output = recovered
+                is_recovered = True
             else:
-                observer.warning(f"Classification agent fallback ({type(exc).__name__}: {exc})")
+                observer.recovery_alarm(
+                    stage="classify",
+                    exc=exc,
+                    method="classify_text_heuristic() keyword fallback",
+                    traceback_str=_tb.format_exc(),
+                )
                 from app.services.manim_studio import classify_text_heuristic
                 output = classify_text_heuristic(text)
+                is_recovered = True
 
     duration = time.perf_counter() - start_t
-    observer.show_classification(output, duration=duration, usage=usage)
+    observer.show_classification(output, duration=duration, usage=usage, is_mock=is_mock, is_recovered=is_recovered)
 
     log_file = run_store.record_run(
         stage="classify",
@@ -320,6 +392,7 @@ async def run_compose_stage(
     messages = []
 
     if mock:
+        observer.mock_banner("Stage 2: scenes.md Visual Plan Composition", "Pydantic AI Composer Agent")
         if topic and topic != "Fourier Transform":
             plan_markdown = f"""# Visualizing {topic}
 
@@ -432,10 +505,12 @@ async def run_code_stage(
 
     if mock:
         if inject_bug:
+            observer.mock_banner("Stage 3: Manim Python Code Synthesis", "Pydantic AI Coder Agent [inject-bug]")
             code = MOCK_BROKEN_CODE_MOBJECT
             detected_scene = "BrokenMobjectScene"
             duration = time.perf_counter() - start_t
         else:
+            observer.mock_banner("Stage 3: Manim Python Code Synthesis", "Pydantic AI Coder Agent")
             # Build a realistic mock Manim scene directly from topic + plan.
             # Mock mode tests pipeline plumbing (preflight, LSP, workspace, logging),
             # not the Agent machinery itself (covered by live mode).
@@ -637,17 +712,22 @@ Current source:
     messages = []
 
     if mock:
+        observer.mock_banner("Stage 5: Self-Correcting Code Repair", "Pydantic AI Repair Agent + Preflight Loop")
         # Simulate successful repair that replaces bad indexing with safe get_part_by_tex or separate MathTex
         repaired_code = MOCK_VALID_CODE
         detected_scene = "FourierTransformScene"
         duration = time.perf_counter() - start_t
     else:
         hooks = create_hitl_local_dev_hooks(observer)
+        # Wire manimce-best-practices + manim-render skills for the repair agent.
+        repair_caps = [get_repair_skills()]
+        if hooks:
+            repair_caps.append(hooks)
         agent = hitl_agents.get_repair_agent(
             model_name=model_name,
             base_url=base_url,
             api_key=api_key,
-            capabilities=[hooks] if hooks else None,
+            capabilities=repair_caps,
         )
         observer.show_prompt(hitl_agents.REPAIR_SYSTEM_PROMPT, prompt)
         with capture_run_messages() as captured:
@@ -930,6 +1010,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--mock", action="store_true", help="Run with Pydantic AI TestModel (offline, 0 API tokens)")
     parser.add_argument(
+        "--no-hitl-approval",
+        action="store_true",
+        default=False,
+        help="Skip human approval gates between stages (CI/batch mode)",
+    )
+    parser.add_argument(
         "-m", "--model",
         default=os.getenv("AI_MODEL") or os.getenv("AOS_OPENAI_MODEL") or "nvidia/nemotron-3-ultra-550b-a55b:free",
         help="LLM model override (default: nvidia/nemotron-3-ultra-550b-a55b:free)",
@@ -962,7 +1048,7 @@ async def async_main() -> None:
 
     run_store = HitlRunStore(log_dir=args.log_dir)
     workspace = HitlWorkspace(workspace_dir=args.workspace_dir)
-    observer = HitlTerminalObserver(verbose=args.verbose)
+    observer = HitlTerminalObserver(verbose=args.verbose, mock_mode=args.mock)
 
     if args.inspect_last:
         inspect_last_run(run_store, observer, workspace=workspace)
@@ -981,7 +1067,11 @@ async def async_main() -> None:
     start_total_t = time.perf_counter()
     observer.banner(
         "AOS HITL Local Development Runner",
-        f"Mode: {'MOCK (Pydantic AI TestModel)' if args.mock else 'LIVE LLM'}  |  Stage: {args.stage.upper()}  |  Workspace: {workspace.workspace_dir.name}",
+        f"Mode: {'\u26a0  MOCK (Pydantic AI TestModel)  \u26a0' if args.mock else 'LIVE LLM'}  "
+        f"|  Stage: {args.stage.upper()}  |  Workspace: {workspace.workspace_dir.name}",
+    ) if not args.mock else observer.mock_banner(
+        "AOS HITL Local Development Runner",
+        f"Stage: {args.stage.upper()}  |  Workspace: {workspace.workspace_dir.name}",
     )
     observer.step("WORKSPACE", f"Active directory: [bold cyan]{workspace.workspace_dir}[/bold cyan]")
 
@@ -1030,6 +1120,15 @@ async def async_main() -> None:
                 return
             current_topic = classify_res.topic or text_to_classify
             current_text = text_to_classify
+            # ── HITL Checkpoint 1: Approve classification ──
+            if args.stage == "all":
+                summary = (
+                    f"Topic: [bold]{current_topic}[/bold]  |  "
+                    f"Animatable: {'YES' if classify_res.animatable else 'NO'}  |  "
+                    f"Subject: {classify_res.subject}"
+                )
+                if not hitl_approve(observer, "CLASSIFY", summary, auto_approve=args.no_hitl_approval):
+                    return
         else:
             class_data = workspace.load_classification()
             if args.topic:
@@ -1061,6 +1160,12 @@ async def async_main() -> None:
                 base_url=args.base_url,
                 api_key=args.api_key,
             )
+            # ── HITL Checkpoint 2: Approve visual plan ──
+            import re as _re
+            scene_count = len(_re.findall(r"## Scene \d+", plan))
+            summary = f"scenes.md plan generated  |  Detected scenes: {scene_count}  |  Topic: [bold]{current_topic}[/bold]"
+            if not hitl_approve(observer, "COMPOSE", summary, auto_approve=args.no_hitl_approval):
+                return
         else:
             loaded_plan, loaded_topic = workspace.load_plan()
             if loaded_plan:
@@ -1135,12 +1240,18 @@ async def async_main() -> None:
         observer.show_workspace_status(workspace)
 
     except KeyboardInterrupt:
-        observer.warning("Run aborted by user.")
+        observer.warning("Run aborted by user (KeyboardInterrupt).")
     except Exception as exc:
+        import traceback as _tb
+        tb_str = _tb.format_exc()
         observer.error(f"Pipeline failed: {type(exc).__name__}: {exc}")
-        if args.verbose:
-            import traceback
-            observer.console.print(traceback.format_exc())
+        # Always print full traceback — do not hide failures behind --verbose.
+        observer.console.print(f"[dim red]{tb_str}[/dim red]")
+        if observer.recovered_stages:
+            observer.warning(
+                f"Note: the following stages used fallback/recovery data (NOT real LLM output): "
+                + ", ".join(observer.recovered_stages)
+            )
 
 
 def main() -> None:
