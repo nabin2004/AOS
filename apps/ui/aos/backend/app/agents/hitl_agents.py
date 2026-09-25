@@ -683,9 +683,8 @@ class HitlRepairRunner:
 
             # Apply deterministic repairs first
             code = repair_manim_code(code).code
-            preflight = preflight_manim_code(code)
 
-            # Run Pyright LSP diagnostics for deep attribute and type validation
+            # Run Pyright LSP diagnostics as the authoritative type, member, and syntax validator
             lsp_report = None
             try:
                 from app.services.lsp_service import run_pyright_lsp
@@ -695,28 +694,23 @@ class HitlRepairRunner:
 
             has_lsp_errors = bool(lsp_report and lsp_report.has_errors)
 
-            if preflight.valid and not has_lsp_errors:
-                logger.info("Repair pass %d succeeded with valid preflight and clean LSP", attempt + 1)
+            if not has_lsp_errors:
+                logger.info("Repair pass %d succeeded with clean Pyright LSP diagnostics", attempt + 1)
                 return code, scene_name
 
-            # If invalid and we have attempts remaining, feed findings back
+            # If invalid and we have attempts remaining, feed LSP findings back
             if attempt < max_attempts - 1:
-                feedback_parts = []
-                if preflight.errors:
-                    feedback_parts.append(f"Preflight Syntax Errors:\n{json.dumps(list(preflight.errors), indent=2)}")
-                if lsp_report and lsp_report.has_errors:
-                    feedback_parts.append(lsp_report.format_feedback())
-
-                logger.info("Preflight or LSP errors found; requesting agent self-correction")
+                feedback = lsp_report.format_feedback() if lsp_report else "Compiler/syntax error detected."
+                logger.info("LSP errors found; requesting agent self-correction with line diagnostics")
                 current_prompt = (
                     "The repaired code has remaining compiler/type issues that must be fixed:\n\n"
-                    + "\n\n".join(feedback_parts)
+                    + feedback
                     + "\n\nPlease fix these specific errors and return the complete corrected code in a ```python ... ``` block. "
                     "CRITICAL: Return ONLY the Python code. No Markdown commentary, no explanations, no conversational text."
                 )
                 message_history = result.all_messages()
             else:
-                logger.warning("Errors remain after %d attempts: preflight=%s, lsp=%s", max_attempts, list(preflight.errors), has_lsp_errors)
+                logger.warning("Errors remain after %d attempts: lsp_errors=%d", max_attempts, lsp_report.error_count if lsp_report else 0)
                 return code, scene_name
 
         return code, scene_name

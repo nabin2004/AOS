@@ -160,22 +160,21 @@ def preflight_manim_code(code: str) -> PreflightResult:
     collector = _NameCollector()
     collector.visit(tree)
     errors: list[dict[str, object]] = []
-    for node in collector.loaded:
-        if node.id in collector.defined or node.id in _BUILTIN_NAMES:
-            continue
-        close = difflib.get_close_matches(node.id, _COMMON_MANIM_NAMES, n=1, cutoff=0.78)
-        if collector.has_manim_wildcard and (not close or node.id in _COMMON_MANIM_NAMES):
-            continue
-        errors.append(
-            {
-                "type": "UndefinedName" if not close else "PossibleTypo",
-                "name": node.id,
-                "suggestion": close[0] if close else None,
-                "message": f"Name '{node.id}' is not defined" if not close else f"Unknown Manim name '{node.id}'; did you mean '{close[0]}'?",
-                "line": node.lineno,
-                "column": node.col_offset + 1,
-            }
-        )
+    # If no wildcard import, check for obviously undefined names;
+    # otherwise let Pyright LSP perform authoritative type and symbol analysis.
+    if not collector.has_manim_wildcard:
+        for node in collector.loaded:
+            if node.id not in collector.defined and node.id not in _BUILTIN_NAMES:
+                errors.append(
+                    {
+                        "type": "UndefinedName",
+                        "name": node.id,
+                        "suggestion": None,
+                        "message": f"Name '{node.id}' is not defined",
+                        "line": node.lineno,
+                        "column": node.col_offset + 1,
+                    }
+                )
 
     # These are valid Python, but common generated-code failures that otherwise
     # cost a full Manim render before being discovered. Keep collecting rather

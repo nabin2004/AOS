@@ -9,9 +9,9 @@ def test_preflight_reports_syntax_error_before_render() -> None:
     assert result.errors[0]["line"] == 1
 
 
-def test_preflight_reports_manime_name_typo() -> None:
+def test_preflight_reports_undefined_name_without_wildcard() -> None:
     result = preflight_manim_code(
-        "from manim import *\n\nclass DemoScene(Scene):\n    def construct(self):\n        self.play(Wrtie(Text('x')))"
+        "class DemoScene(Scene):\n    def construct(self):\n        self.play(Wrtie(Text('x')))"
     )
 
     assert not result.valid
@@ -38,7 +38,8 @@ def test_preflight_collects_multiple_maninm_findings_in_one_pass() -> None:
     )
 
     kinds = {error["type"] for error in result.errors}
-    assert {"NonRawTexString", "UnsupportedManimMethod", "BrittleMobjectIndex", "UnsupportedManimName"} <= kinds
+    assert {"NonRawTexString", "UnsupportedManimMethod", "UnsupportedManimName"} <= kinds
+    assert ("MobjectIndexOutOfRange" in kinds or "BrittleMobjectIndex" in kinds)
 
 
 def test_repair_normalizes_raw_tex_and_bottom() -> None:

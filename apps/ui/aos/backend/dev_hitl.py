@@ -594,15 +594,17 @@ class {detected_scene}(Scene):
 
     observer.show_code(code, scene_name=detected_scene, duration=duration, usage=usage)
 
-    # Preflight Check
-    observer.banner("Stage 4: Static AST Validation & Preflight", "Deterministic Code Quality Guardrails")
+    # Deterministic formatting & string repairs pass
     repair = repair_manim_code(code)
     preflight = preflight_manim_code(repair.code)
-    observer.show_preflight(preflight, repair)
 
-    # Pyright LSP Type & Member Diagnostics
+    # Stage 4: Pyright LSP Type & Member Diagnostics (Primary Quality Gate)
+    observer.banner("Stage 4: Pyright LSP Diagnostics & Code Validation", "Authoritative Type, Member & Syntax Guardrails")
     lsp_report = run_pyright_lsp(repair.code, is_code=True)
     observer.show_lsp(lsp_report)
+
+    if repair.changes:
+        observer.step("FORMAT", f"Applied {len(repair.changes)} deterministic formatting/LaTeX improvement(s)")
 
     # Save generated source to disk for immediate access
     scene_dir = Path(__file__).parent / ".dev_logs" / "scenes"
@@ -611,12 +613,13 @@ class {detected_scene}(Scene):
     saved_scene_path.write_text(repair.code, encoding="utf-8")
     observer.step("CODE", f"Saved generated source to [bold cyan]{saved_scene_path.resolve()}[/bold cyan]")
 
+    is_clean = bool(lsp_report and not lsp_report.has_errors)
     log_file = run_store.record_run(
         stage="code",
         topic=topic,
         model_name="mock:TestModel" if mock else (model_name or "default"),
         duration=duration,
-        success=preflight.valid and not (lsp_report and lsp_report.has_errors),
+        success=is_clean,
         usage=usage,
         messages=messages,
         preflight=preflight,
@@ -744,22 +747,28 @@ Current source:
     # Show code diff
     observer.show_code_diff(code, repaired_code, title="Repaired Code Diff vs Original")
 
-    # Post-repair preflight
+    # Post-repair validation with Pyright LSP
     final_repair = repair_manim_code(repaired_code)
     final_preflight = preflight_manim_code(final_repair.code)
-    observer.show_preflight(final_preflight, final_repair)
+    final_lsp = run_pyright_lsp(final_repair.code, is_code=True)
+    observer.show_lsp(final_lsp)
 
     log_file = run_store.record_run(
         stage="repair",
         topic=scene_name,
         model_name="mock:TestModel" if mock else (model_name or "default"),
         duration=duration,
-        success=final_preflight.valid,
+        success=bool(final_lsp and not final_lsp.has_errors),
         usage=usage,
         messages=messages,
         preflight=final_preflight,
         repair=final_repair,
-        artifacts={"original_code": code, "repaired_code": final_repair.code, "error": error_traceback},
+        artifacts={
+            "original_code": code,
+            "repaired_code": final_repair.code,
+            "error": error_traceback,
+            "lsp_diagnostics": [d.__dict__ for d in final_lsp.diagnostics] if final_lsp else [],
+        },
     )
     observer.step("SAVE", f"Repair run recorded to {log_file.name}")
 
@@ -776,7 +785,7 @@ Current source:
     return final_repair.code, detected_scene
 
 
-# ── Standalone Preflight Inspector ────────────────────────────────────────────
+# ── Standalone Preflight / LSP Inspector ──────────────────────────────────────
 
 def run_preflight_inspector(
     file_path: str | None,
@@ -785,8 +794,8 @@ def run_preflight_inspector(
     run_store: HitlRunStore,
     workspace: HitlWorkspace | None = None,
 ) -> None:
-    """Inspect and test any Python file or inline string against preflight rules."""
-    observer.banner("Manim Code Preflight & Deterministic AST Fixer", "Local Static Analysis")
+    """Inspect and test any Python file or inline string against Pyright LSP rules."""
+    observer.banner("Manim Code LSP & Deterministic Inspector", "Pyright Type Checking & Formatting Analysis")
 
     code = ""
     if file_path:
@@ -810,9 +819,7 @@ def run_preflight_inspector(
     preflight = preflight_manim_code(repair.code)
 
     if repair.changes:
-        observer.show_code_diff(code, repair.code, title="Deterministic AST Changes Applied")
-
-    observer.show_preflight(preflight, repair)
+        observer.show_code_diff(code, repair.code, title="Deterministic Formatting Changes Applied")
 
     # Pyright LSP Type & Member Diagnostics
     lsp_report = run_pyright_lsp(repair.code, is_code=True)
@@ -822,14 +829,14 @@ def run_preflight_inspector(
         workspace.save_preflight(preflight, repair, lsp_report)
         if repair.changes:
             workspace.scene_file.write_text(repair.code, encoding="utf-8")
-            observer.step("WORKSPACE", f"Updated [bold cyan]{workspace.scene_file.name}[/bold cyan] with AST fixes and saved [bold cyan]{workspace.preflight_file.name}[/bold cyan] (JSON format)")
+            observer.step("WORKSPACE", f"Updated [bold cyan]{workspace.scene_file.name}[/bold cyan] with formatting fixes and saved [bold cyan]{workspace.preflight_file.name}[/bold cyan] (JSON format)")
 
     run_store.record_run(
         stage="preflight",
         topic=file_path or "inline_code",
-        model_name="deterministic_ast",
-        duration=0.01,
-        success=preflight.valid and not (lsp_report and lsp_report.has_errors),
+        model_name="pyright_lsp",
+        duration=lsp_report.time_taken_sec if lsp_report else 0.01,
+        success=bool(lsp_report and not lsp_report.has_errors),
         preflight=preflight,
         repair=repair,
         artifacts={"original_code": code, "repaired_code": repair.code, "lsp_feedback": lsp_report.format_feedback() if lsp_report else ""},
