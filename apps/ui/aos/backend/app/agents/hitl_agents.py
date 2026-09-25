@@ -687,8 +687,24 @@ class HitlRepairRunner:
             # Run Pyright LSP diagnostics as the authoritative type, member, and syntax validator
             lsp_report = None
             try:
-                from app.services.lsp_service import run_pyright_lsp
+                from app.services.lsp_service import run_pyright_lsp, LspDiagnostic
+                from app.services.latex_validator import run_latex_diagnostics
+                
                 lsp_report = run_pyright_lsp(code, is_code=True, timeout=30.0)
+                
+                # Run LaTeX check
+                latex_diags = run_latex_diagnostics(code)
+                for ld in latex_diags:
+                    lsp_report.diagnostics.append(
+                        LspDiagnostic(
+                            file="scene.py",
+                            severity="error",
+                            message=f"LaTeX Error: {ld.message}\n  In string: '{ld.tex_string}'",
+                            line=ld.line,
+                            character=ld.column,
+                            rule="reportLaTeXCompilationError",
+                        )
+                    )
             except Exception as lsp_exc:
                 logger.debug("LSP check skipped during repair loop: %s", lsp_exc)
 

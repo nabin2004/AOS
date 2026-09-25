@@ -598,9 +598,24 @@ class {detected_scene}(Scene):
     repair = repair_manim_code(code)
     preflight = preflight_manim_code(repair.code)
 
-    # Stage 4: Pyright LSP Type & Member Diagnostics (Primary Quality Gate)
+    # Stage 4: Pyright LSP & LaTeX Diagnostics (Primary Quality Gate)
     observer.banner("Stage 4: Pyright LSP Diagnostics & Code Validation", "Authoritative Type, Member & Syntax Guardrails")
     lsp_report = run_pyright_lsp(repair.code, is_code=True)
+    
+    from app.services.latex_validator import run_latex_diagnostics
+    from app.services.lsp_service import LspDiagnostic
+    for ld in run_latex_diagnostics(repair.code):
+        lsp_report.diagnostics.append(
+            LspDiagnostic(
+                file="scene.py",
+                severity="error",
+                message=f"LaTeX Error: {ld.message}\n  In string: '{ld.tex_string}'",
+                line=ld.line,
+                character=ld.column,
+                rule="reportLaTeXCompilationError",
+            )
+        )
+    
     observer.show_lsp(lsp_report)
 
     if repair.changes:
@@ -821,8 +836,23 @@ def run_preflight_inspector(
     if repair.changes:
         observer.show_code_diff(code, repair.code, title="Deterministic Formatting Changes Applied")
 
-    # Pyright LSP Type & Member Diagnostics
+    # Pyright LSP & LaTeX Diagnostics
     lsp_report = run_pyright_lsp(repair.code, is_code=True)
+    
+    from app.services.latex_validator import run_latex_diagnostics
+    from app.services.lsp_service import LspDiagnostic
+    for ld in run_latex_diagnostics(repair.code):
+        lsp_report.diagnostics.append(
+            LspDiagnostic(
+                file="scene.py",
+                severity="error",
+                message=f"LaTeX Error: {ld.message}\n  In string: '{ld.tex_string}'",
+                line=ld.line,
+                character=ld.column,
+                rule="reportLaTeXCompilationError",
+            )
+        )
+        
     observer.show_lsp(lsp_report)
 
     if workspace:
