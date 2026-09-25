@@ -17,6 +17,7 @@ from app.core.local_logging import (
 from app.schemas.video_generation import VideoClassifyResponse
 from app.services.manim_code import CodeRepair, PreflightResult
 from dev_hitl import (
+    hitl_classify_checkpoint,
     run_classify_stage,
     run_code_stage,
     run_compose_stage,
@@ -262,4 +263,85 @@ async def test_stage_chaining_via_workspace(tmp_path: Path):
     assert ws.code_json_file.exists()
     assert "DijkstrasAlgorithmScene" in scene_name
     assert "from manim import *" in code
+
+
+def test_hitl_classify_checkpoint_auto_approve():
+    """Verify that auto_approve=True returns immediately without prompting."""
+    obs = HitlTerminalObserver()
+    classify_res = VideoClassifyResponse(animatable=True, subject="cs", topic="Log", reason="Logging")
+    proceed, topic, res = hitl_classify_checkpoint(
+        obs, classify_res, "Log", "explain log", auto_approve=True
+    )
+    assert proceed is True
+    assert topic == "Log"
+    assert res.subject == "cs"
+
+
+def test_hitl_classify_checkpoint_approved_yes(monkeypatch):
+    """Verify that entering 'y' approves the classification without changes."""
+    obs = HitlTerminalObserver()
+    classify_res = VideoClassifyResponse(animatable=True, subject="math", topic="Calculus", reason="Derivatives")
+
+    from rich.prompt import Prompt
+    monkeypatch.setattr(Prompt, "ask", lambda *args, **kwargs: "y")
+
+    proceed, topic, res = hitl_classify_checkpoint(
+        obs, classify_res, "Calculus", "explain calculus"
+    )
+    assert proceed is True
+    assert topic == "Calculus"
+    assert res.subject == "math"
+
+
+def test_hitl_classify_checkpoint_override_to_math(monkeypatch, tmp_path: Path):
+    """Verify that entering 'n' lets operator pick 'math' and update topic, saving to workspace."""
+    from app.core.local_logging import HitlWorkspace
+
+    ws = HitlWorkspace(workspace_dir=tmp_path)
+    obs = HitlTerminalObserver()
+    classify_res = VideoClassifyResponse(animatable=True, subject="cs", topic="Logging", reason="CS logs")
+
+    # Sequence of prompt responses:
+    # 1. Decision: "n" (change subject)
+    # 2. Select subject: "1" (math)
+    # 3. Update topic name: "Logarithms"
+    responses = iter(["n", "1", "Logarithms"])
+    from rich.prompt import Prompt
+    monkeypatch.setattr(Prompt, "ask", lambda *args, **kwargs: next(responses))
+
+    proceed, topic, res = hitl_classify_checkpoint(
+        obs,
+        classify_res,
+        "Logging",
+        "Explain logarithms",
+        workspace=ws,
+    )
+
+    assert proceed is True
+    assert topic == "Logarithms"
+    assert res.subject == "math"
+    assert res.animatable is True
+    assert "[Operator Override]" in res.reason
+
+    # Verify classification.json was updated in workspace
+    saved = ws.load_classification()
+    assert saved is not None
+    assert saved["subject"] == "math"
+    assert saved["topic"] == "Logarithms"
+    assert saved["animatable"] is True
+
+
+def test_hitl_classify_checkpoint_abort(monkeypatch):
+    """Verify that entering 'a' aborts the pipeline."""
+    obs = HitlTerminalObserver()
+    classify_res = VideoClassifyResponse(animatable=True, subject="cs", topic="Log", reason="CS logs")
+
+    from rich.prompt import Prompt
+    monkeypatch.setattr(Prompt, "ask", lambda *args, **kwargs: "a")
+
+    proceed, topic, res = hitl_classify_checkpoint(
+        obs, classify_res, "Log", "explain log"
+    )
+    assert proceed is False
+
 

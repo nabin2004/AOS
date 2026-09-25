@@ -223,6 +223,178 @@ def hitl_approve(
     return True
 
 
+def hitl_classify_checkpoint(
+    observer: "HitlTerminalObserver",
+    classify_res: VideoClassifyResponse,
+    current_topic: str,
+    current_text: str,
+    *,
+    workspace: HitlWorkspace | None = None,
+    run_store: HitlRunStore | None = None,
+    auto_approve: bool = False,
+) -> tuple[bool, str, VideoClassifyResponse]:
+    """Prompt the human operator to approve or override the classification.
+
+    Allows overriding subject (and optionally topic) when the model misclassifies
+    (e.g., classifying 'log' as CS instead of Math).
+
+    Returns:
+        (proceed: bool, updated_topic: str, updated_classification: VideoClassifyResponse)
+    """
+    if auto_approve:
+        observer.step("HITL", "Auto-approved [CLASSIFY] (--no-hitl-approval)")
+        return True, current_topic, classify_res
+
+    from rich.prompt import Prompt
+    from rich.panel import Panel
+    from rich.table import Table
+    from rich.box import ROUNDED
+
+    summary = (
+        f"Topic: [bold]{current_topic}[/bold]  |  "
+        f"Animatable: {'YES' if classify_res.animatable else 'NO'}  |  "
+        f"Subject: [bold cyan]{classify_res.subject}[/bold cyan]"
+    )
+    if classify_res.reason:
+        summary += f"\n[dim]Reason: {classify_res.reason}[/dim]"
+
+    observer.console.print(
+        Panel(
+            f"[bold cyan]{summary}[/bold cyan]\n\n"
+            "[bold]Proceed to next stage?[/bold]  "
+            "[green]y[/green] = yes / [yellow]n[/yellow] = change subject / "
+            "[red]a[/red] = abort / [dim]s[/dim] = skip this stage",
+            title="[bold magenta]\U0001f9d1 HITL Checkpoint — CLASSIFY[/bold magenta]",
+            box=ROUNDED,
+            style="magenta",
+            padding=(0, 2),
+        )
+    )
+
+    try:
+        choice = Prompt.ask(
+            "[bold magenta]Your decision[/bold magenta]",
+            choices=["y", "n", "a", "s"],
+            default="y",
+        ).strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        observer.warning("HITL prompt interrupted — aborting pipeline.")
+        return False, current_topic, classify_res
+
+    if choice == "y":
+        return True, current_topic, classify_res
+
+    if choice == "a":
+        observer.error("Pipeline aborted by operator at [CLASSIFY] checkpoint.")
+        return False, current_topic, classify_res
+
+    if choice == "s":
+        observer.warning("Stage [CLASSIFY] skipped by operator.")
+        return False, current_topic, classify_res
+
+    # choice == "n": operator wants to change subject / classification
+    observer.step("HITL", "Manual classification override requested.")
+
+    available_subjects = [
+        ("1", "math", "Mathematics (Calculus, Linear Algebra, Logarithms, Geometry, etc.)"),
+        ("2", "cs", "Computer Science (Algorithms, Data Structures, Networks, Systems)"),
+        ("3", "ai", "Artificial Intelligence & ML (Neural Nets, Transformers, Optimization)"),
+        ("4", "physics", "Physics (Mechanics, Electromagnetism, Quantum, Optics, Waves)"),
+        ("5", "other", "Custom Subject (Enter custom subject domain)"),
+    ]
+
+    table = Table(
+        title="[bold yellow]Available Subjects for Manim Animation[/bold yellow]",
+        box=ROUNDED,
+        show_header=True,
+    )
+    table.add_column("Key", style="bold green", width=5, justify="center")
+    table.add_column("Subject ID", style="bold cyan", width=12)
+    table.add_column("Domain / Description", style="white")
+
+    for key, subj_id, desc in available_subjects:
+        table.add_row(key, subj_id, desc)
+    table.add_row("0", "abort", "[dim red]Abort pipeline[/dim red]")
+
+    observer.console.print(table)
+
+    default_key = "1" if classify_res.subject != "math" else "2"
+    try:
+        subj_choice = Prompt.ask(
+            "[bold yellow]Select correct subject[/bold yellow] (1-5, subject name, or 0 to abort)",
+            default=default_key,
+        ).strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        observer.warning("Input interrupted — aborting pipeline.")
+        return False, current_topic, classify_res
+
+    if subj_choice in ("0", "abort", "q", "quit"):
+        observer.error("Pipeline aborted by operator.")
+        return False, current_topic, classify_res
+
+    mapping = {
+        "1": "math", "math": "math",
+        "2": "cs", "cs": "cs",
+        "3": "ai", "ai": "ai",
+        "4": "physics", "physics": "physics",
+    }
+
+    if subj_choice in mapping:
+        chosen_subject = mapping[subj_choice]
+    elif subj_choice in ("5", "other", "custom"):
+        try:
+            custom_input = Prompt.ask("[bold yellow]Enter custom subject[/bold yellow]").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            return False, current_topic, classify_res
+        chosen_subject = custom_input if custom_input else "math"
+    else:
+        chosen_subject = subj_choice or "math"
+
+    # Also offer to adjust topic name if needed (e.g. "log" -> "Logarithms")
+    try:
+        topic_input = Prompt.ask(
+            f"[bold yellow]Update topic name[/bold yellow] (press Enter to keep '{current_topic}')",
+            default=current_topic,
+        ).strip()
+    except (EOFError, KeyboardInterrupt):
+        topic_input = current_topic
+
+    if topic_input:
+        current_topic = topic_input
+
+    # Apply overrides
+    old_subject = classify_res.subject
+    classify_res.subject = chosen_subject
+    classify_res.topic = current_topic
+    classify_res.animatable = True
+    classify_res.reason = f"[Operator Override] Subject changed from '{old_subject}' to '{chosen_subject}'"
+
+    observer.step(
+        "HITL",
+        f"Classification updated: Subject=[bold green]{chosen_subject}[/bold green], "
+        f"Topic='[bold green]{current_topic}[/bold green]'",
+    )
+
+    if workspace:
+        workspace.save_classification(classify_res, query=current_text)
+        observer.step(
+            "WORKSPACE",
+            f"Saved updated classification to [bold cyan]{workspace.classification_file.name}[/bold cyan] (JSON format)",
+        )
+
+    if run_store:
+        run_store.record_run(
+            stage="classify_override",
+            topic=current_topic,
+            model_name="human_override",
+            duration=0.0,
+            success=True,
+            artifacts={"classification": classify_res.model_dump()},
+        )
+
+    return True, current_topic, classify_res
+
+
 async def run_classify_stage(
     text: str,
     observer: HitlTerminalObserver,
@@ -381,6 +553,7 @@ async def run_compose_stage(
     model_name: str | None = None,
     base_url: str | None = None,
     api_key: str | None = None,
+    subject: str | None = None,
 ) -> str:
     """Execute Stage 2: scenes.md Visual Plan Composition."""
     observer.banner("Stage 2: scenes.md Visual Plan Composition", "Pydantic AI Composer Agent")
@@ -442,10 +615,13 @@ Introduce the initial problem state, animate the step-by-step state transitions,
             api_key=api_key,
             capabilities=caps,
         )
-        deps = hitl_agents.HitlPlanDeps(topic=topic, source_text=text)
+        hints_text = f"Subject Domain: {subject}" if subject else None
+        deps = hitl_agents.HitlPlanDeps(topic=topic, hints=hints_text, source_text=text)
+        subject_line = f"Subject Domain: {subject}\n" if subject else ""
         user_prompt = (
             f"Educational Content to visualize:\n{text}\n\n"
-            f"Topic: {topic}\n\n"
+            f"Topic: {topic}\n"
+            f"{subject_line}\n"
             "Using the manim-composer skill as your guide, compose a comprehensive "
             "scenes.md visual plan for a 3Blue1Brown-style Manim animation. "
             "Follow the scenes.md format exactly: include Overview, Narrative Arc, "
@@ -1073,12 +1249,32 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--render", action="store_true", help="Verify scene compilation with local `manim -ql`")
     parser.add_argument("--inspect-last", action="store_true", help="Inspect details of the most recent local run")
     parser.add_argument("-v", "--verbose", action="store_true", help="Show full prompts and verbose conversation traces")
+    parser.add_argument("--web", action="store_true", help="Launch Pydantic AI Web Chat UI in browser")
+    parser.add_argument("--host", default="127.0.0.1", help="Host for Web Chat UI (default: 127.0.0.1)")
+    parser.add_argument("--port", type=int, default=7932, help="Port for Web Chat UI (default: 7932)")
+    parser.add_argument("--no-browser", action="store_true", help="Do not automatically open the browser")
     parser.add_argument("--log-dir", default=None, help="Custom local log storage directory")
     return parser.parse_args()
 
 
 async def async_main() -> None:
     args = parse_args()
+
+    # 0. Check for Web Chat UI mode
+    if args.web:
+        from dev_hitl_web import run_web_server
+        run_web_server(
+            host=args.host,
+            port=args.port,
+            open_browser=not args.no_browser,
+            model_name=args.model,
+            base_url=args.base_url,
+            api_key=args.api_key,
+            mock=args.mock,
+            workspace_dir=args.workspace_dir,
+            log_dir=args.log_dir,
+        )
+        return
 
     # 1. Disable Logfire remote export for local development
     disable_logfire_remote()
@@ -1152,20 +1348,25 @@ async def async_main() -> None:
                 base_url=args.base_url,
                 api_key=args.api_key,
             )
-            if not classify_res.animatable and args.stage == "all":
-                observer.warning("Content classified as non-animatable. Halting pipeline.")
-                return
             current_topic = classify_res.topic or text_to_classify
             current_text = text_to_classify
             # ── HITL Checkpoint 1: Approve classification ──
-            if args.stage == "all":
-                summary = (
-                    f"Topic: [bold]{current_topic}[/bold]  |  "
-                    f"Animatable: {'YES' if classify_res.animatable else 'NO'}  |  "
-                    f"Subject: {classify_res.subject}"
+            if args.stage in ("classify", "all"):
+                proceed, current_topic, classify_res = hitl_classify_checkpoint(
+                    observer,
+                    classify_res,
+                    current_topic,
+                    current_text,
+                    workspace=workspace,
+                    run_store=run_store,
+                    auto_approve=args.no_hitl_approval,
                 )
-                if not hitl_approve(observer, "CLASSIFY", summary, auto_approve=args.no_hitl_approval):
+                if not proceed:
                     return
+
+            if not classify_res.animatable and args.stage == "all":
+                observer.warning("Content classified as non-animatable. Halting pipeline.")
+                return
         else:
             class_data = workspace.load_classification()
             if args.topic:
@@ -1186,6 +1387,14 @@ async def async_main() -> None:
 
         # STAGE: COMPOSE
         if args.stage in ("compose", "all"):
+            subject_to_pass = None
+            if "classify_res" in locals() and classify_res:
+                subject_to_pass = classify_res.subject
+            else:
+                class_data = workspace.load_classification()
+                if class_data:
+                    subject_to_pass = class_data.get("subject")
+
             plan = await run_compose_stage(
                 current_text,
                 current_topic,
@@ -1196,6 +1405,7 @@ async def async_main() -> None:
                 model_name=args.model,
                 base_url=args.base_url,
                 api_key=args.api_key,
+                subject=subject_to_pass,
             )
             # ── HITL Checkpoint 2: Approve visual plan ──
             import re as _re

@@ -258,7 +258,7 @@ dependencies = [
     { name = "pydantic", extra = ["email"] },
     { name = "pydantic-ai-harness", extra = ["skills"] },
     { name = "pydantic-ai-skills" },
-    { name = "pydantic-ai-slim", extra = ["duckduckgo", "openrouter", "web-fetch"] },
+    { name = "pydantic-ai-slim", extra = ["duckduckgo", "openrouter", "web", "web-fetch"] },
     { name = "pydantic-ai-todo" },
     { name = "pydantic-monty" },
     { name = "pydantic-settings" },
@@ -325,7 +325,7 @@ requires-dist = [
     { name = "pydantic", extras = ["email"], specifier = ">=2.12.0" },
     { name = "pydantic-ai-harness", extras = ["skills"], specifier = ">=0.34.0" },
     { name = "pydantic-ai-skills", specifier = ">=0.11.0" },
-    { name = "pydantic-ai-slim", extras = ["openrouter", "duckduckgo", "web-fetch"], specifier = ">=1.80.0" },
+    { name = "pydantic-ai-slim", extras = ["openrouter", "duckduckgo", "web-fetch", "web"], specifier = ">=1.80.0" },
     { name = "pydantic-ai-todo", extras = ["postgres"], specifier = ">=0.2.1" },
     { name = "pydantic-monty", specifier = ">=0.0.18" },
     { name = "pydantic-settings", specifier = ">=2.14.2" },
@@ -3690,6 +3690,10 @@ duckduckgo = [
 ]
 openrouter = [
     { name = "openai" },
+]
+web = [
+    { name = "starlette" },
+    { name = "uvicorn" },
 ]
 web-fetch = [
     { name = "markdownify" },
