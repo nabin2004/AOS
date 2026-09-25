@@ -37,6 +37,7 @@ from app.agents.hitl_agents import (
     HitlCodeExtractor,
     HitlLLMResolver,
     extract_manim_code,
+    resolve_skill_reference_content,
 )
 from app.core.local_logging import (
     DEFAULT_LOG_DIR,
@@ -128,28 +129,40 @@ def create_hitl_web_agent(
     )
 
     # ── Checkpoint Tool 1: Classification (Requires Approval) ─────────────────
+    # ── Checkpoint Tool 1: Classification (Requires Approval) ─────────────────
     @agent.tool_plain(requires_approval=True)
     def checkpoint_approve_classification(
-        topic: str,
-        subject: str,
-        animatable: bool,
-        reason: str,
+        topic: str = "",
+        subject: str = "cs",
+        animatable: bool | str = True,
+        reason: str = "",
+        **kwargs: Any,
     ) -> str:
         """[HITL Checkpoint 1] Request human operator approval for topic and subject classification.
 
         The operator can approve, reject, or edit the fields directly in the Web Chat UI
         (e.g., correcting subject from 'cs' to 'math' if logarithms were mistaken for logging).
         """
+        if isinstance(animatable, str):
+            animatable_bool = animatable.strip().lower() in ("true", "1", "yes", "y")
+        else:
+            animatable_bool = bool(animatable)
+
+        active_topic = topic or kwargs.get("title", "")
+        if not active_topic:
+            saved_input = workspace.load_input() or {}
+            active_topic = saved_input.get("topic") or saved_input.get("text") or "Educational Topic"
+
         resp = VideoClassifyResponse(
-            animatable=animatable,
-            subject=subject,
-            topic=topic,
-            reason=reason,
+            animatable=animatable_bool,
+            subject=subject or "cs",
+            topic=active_topic,
+            reason=reason or f"Topic '{active_topic}' in {subject}",
         )
-        workspace.save_classification(resp, query=topic)
+        workspace.save_classification(resp, query=active_topic)
         run_store.record_run(
             stage="classify",
-            topic=topic,
+            topic=active_topic,
             model_name="mock:TestModel" if mock else (model_name or "default"),
             duration=0.0,
             success=True,
@@ -157,9 +170,9 @@ def create_hitl_web_agent(
         )
         return (
             f"Classification confirmed by operator:\n"
-            f"- Topic: {topic}\n"
-            f"- Subject Domain: {subject}\n"
-            f"- Animatable: {animatable}\n"
+            f"- Topic: {active_topic}\n"
+            f"- Subject Domain: {subject or 'cs'}\n"
+            f"- Animatable: {animatable_bool}\n"
             f"- Saved to: {workspace.classification_file.name}\n\n"
             f"You may now proceed to Stage 2: compose the visual plan (scenes.md) and submit it to checkpoint_approve_visual_plan."
         )
@@ -167,27 +180,38 @@ def create_hitl_web_agent(
     # ── Checkpoint Tool 2: Visual Plan (Requires Approval) ────────────────────
     @agent.tool_plain(requires_approval=True)
     def checkpoint_approve_visual_plan(
-        topic: str,
-        subject: str,
-        plan_markdown: str,
+        topic: str = "",
+        subject: str = "",
+        plan_markdown: str = "",
+        plan: str = "",
+        scenes: str = "",
+        **kwargs: Any,
     ) -> str:
         """[HITL Checkpoint 2] Request human operator approval for the scenes.md visual plan.
 
         The operator can review the narrative progression, scene elements, and timings in the UI.
         """
-        workspace.save_plan(plan_markdown, topic=topic)
+        content = plan_markdown or plan or scenes or kwargs.get("content", "") or kwargs.get("plan_content", "")
+        if not content:
+            return "Error: No plan markdown provided. Please include the scene-by-scene visual plan."
+
+        saved_class = workspace.load_classification() or {}
+        active_topic = topic or saved_class.get("topic") or "Educational Topic"
+        active_subject = subject or saved_class.get("subject") or "general"
+
+        workspace.save_plan(content, topic=active_topic)
         run_store.record_run(
             stage="compose",
-            topic=topic,
+            topic=active_topic,
             model_name="mock:TestModel" if mock else (model_name or "default"),
             duration=0.0,
             success=True,
-            artifacts={"plan": plan_markdown},
+            artifacts={"plan": content},
         )
         return (
-            f"Visual plan confirmed by operator for '{topic}'.\n"
+            f"Visual plan confirmed by operator for '{active_topic}'.\n"
             f"- Saved to: {workspace.plan_md_file.name} and {workspace.plan_json_file.name}\n\n"
-            f"You may now proceed to Stage 3: call generate_and_validate_manim_code to produce clean, LSP-verified Manim code."
+            f"You may now proceed to Stage 3: call synthesize_manim_code or generate_and_validate_manim_code."
         )
 
     # ── Skill Loader Tool: Stream Skill Rules to UI ───────────────────────────
@@ -197,22 +221,22 @@ def create_hitl_web_agent(
 
         Args:
             skill: The skill to load ('manim-composer' for planning, 'manimce-best-practices' for coding).
-            path: Optional sub-rule path (e.g. 'rules/positioning.md', 'references/scene-examples.md').
+            path: Optional sub-rule path (e.g. 'rules/positioning.md', 'references/scene-examples.md', 'narrative-patterns.md').
         """
         skill_name = (skill or "").strip().lower()
         if "composer" in skill_name:
             if path:
-                content = HitlAgentTools.read_skill_reference_tool(None, path=path)
+                content = resolve_skill_reference_content(path=path)
                 return f"[Skill Loaded: manim-composer/{path}]\n{content[:600]}..."
             return (
                 "Loaded Skill: manim-composer (Pedagogical Animation Composer)\n"
                 "- Core Principles: 3Blue1Brown visual intuition, cognitive load management\n"
                 "- Required Format: scenes.md (Overview, Narrative Arc, Scenes 1..N, Transitions, Color Palette)\n"
-                "- Active References: narrative-patterns.md, visual-techniques.md"
+                "- Active References: references/narrative-patterns.md, references/visual-techniques.md"
             )
         elif "manim" in skill_name or "coder" in skill_name or "best-practices" in skill_name:
             if path:
-                content = HitlAgentTools.read_skill_reference_tool(None, path=path)
+                content = resolve_skill_reference_content(path=path)
                 return f"[Skill Loaded: manimce-best-practices/{path}]\n{content[:600]}..."
             return (
                 "Loaded Skill: manimce-best-practices (Manim Community Edition v0.18+)\n"
@@ -222,7 +246,7 @@ def create_hitl_web_agent(
                 "- LSP Guardrails: Strict Pyright validation, no hallucinated classes or deprecated methods"
             )
         else:
-            return HitlAgentTools.read_skill_reference_tool(None, path=path or skill)
+            return resolve_skill_reference_content(path=path or skill)
 
     # ── Granular Tool: Synthesize Code ────────────────────────────────────────
     @agent.tool
@@ -545,8 +569,8 @@ def create_hitl_web_agent(
     # ── Helper Tool: Read Skill Reference ────────────────────────────────────
     @agent.tool_plain
     def read_skill_reference(path: str = "") -> str:
-        """Read a reference file from the manim-composer or manimce-best-practices skills (e.g. 'rules/positioning.md')."""
-        return HitlAgentTools.read_skill_reference_tool(None, path=path)
+        """Read a reference file from the manim-composer or manimce-best-practices skills (e.g. 'rules/positioning.md', 'narrative-patterns.md')."""
+        return resolve_skill_reference_content(path=path)
 
     return agent
 

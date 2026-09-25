@@ -172,3 +172,61 @@ async def test_granular_streaming_tools(tmp_path: Path):
     )
     assert "repaired successfully" in repair_res
 
+
+def test_read_skill_reference_fuzzy_resolution(tmp_path: Path):
+    """Verify that read_skill_reference resolves naked filenames and subpaths correctly."""
+    agent = create_hitl_web_agent(mock=True, workspace_dir=tmp_path)
+    tool = agent._function_toolset.tools["read_skill_reference"]
+
+    # 1. Resolves narrative-patterns.md located in references/
+    res1 = tool.function(path="narrative-patterns.md")
+    assert "Narrative Arc Patterns" in res1 or "Narrative" in res1
+    assert "File 'narrative-patterns.md' not found" not in res1
+
+    # 2. Resolves visual-techniques.md located in references/
+    res2 = tool.function(path="visual-techniques.md")
+    assert "Visual Techniques" in res2 or "Techniques" in res2
+    assert "File 'visual-techniques.md' not found" not in res2
+
+    # 3. Resolves positioning.md located in rules/
+    res3 = tool.function(path="positioning.md")
+    assert "next_to" in res3 or "Positioning" in res3
+    assert "File 'positioning.md' not found" not in res3
+
+    # 4. Resolves exact relative path references/narrative-patterns.md
+    res4 = tool.function(path="references/narrative-patterns.md")
+    assert "Narrative" in res4
+
+    # 5. Non-existent file returns helpful available references
+    res_none = tool.function(path="totally-nonexistent-file.md")
+    assert "Available reference files" in res_none
+
+
+def test_checkpoint_resilient_parameters(tmp_path: Path):
+    """Verify that checkpoint tools handle omitted optional fields, aliases, and string booleans."""
+    ws = HitlWorkspace(workspace_dir=tmp_path)
+    agent = create_hitl_web_agent(mock=True, workspace_dir=tmp_path)
+    tools = agent._function_toolset.tools
+
+    # 1. Classification with string animatable="true" and omitted topic/reason
+    ws.save_input("Explain Euler's Formula", topic="Euler's Formula")
+    classify_tool = tools["checkpoint_approve_classification"]
+    res_cls = classify_tool.function(subject="math", animatable="true")
+    assert "Classification confirmed by operator" in res_cls
+    assert "Euler's Formula" in res_cls
+    loaded_cls = ws.load_classification()
+    assert loaded_cls["animatable"] is True
+    assert loaded_cls["subject"] == "math"
+
+    # 2. Visual plan with omitted subject and alias `plan` instead of `plan_markdown`
+    plan_tool = tools["checkpoint_approve_visual_plan"]
+    res_plan = plan_tool.function(
+        topic="Euler's Formula",
+        plan="# Scene 1: Euler Rotation\nContent here",
+    )
+    assert "Visual plan confirmed by operator for 'Euler's Formula'" in res_plan
+    loaded_plan, plan_topic = ws.load_plan()
+    assert "# Scene 1: Euler Rotation" in loaded_plan
+    assert plan_topic == "Euler's Formula"
+
+
