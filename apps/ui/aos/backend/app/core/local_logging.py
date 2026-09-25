@@ -569,7 +569,7 @@ class HitlTerminalObserver:
             f"[bold white]{title}[/bold white]"
         )
         if subtitle:
-            content += f"\n[dim yellow]{subtitle}  [dim](Pydantic AI TestModel — 0 tokens)[/dim][/dim]"
+            content += f"\n[dim yellow]{subtitle}[/dim yellow][dim]  (Pydantic AI TestModel \u2014 0 tokens)[/dim]"
         self.console.print(
             Panel(
                 content,
