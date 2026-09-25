@@ -79,6 +79,7 @@ from app.core.local_logging import (
     create_hitl_local_dev_hooks,
     disable_logfire_remote,
 )
+from app.skills import get_coder_skills, get_composer_skills
 from app.schemas.video_generation import VideoClassifyResponse
 from app.services.lsp_service import run_pyright_lsp, LspDiagnosticReport
 from app.services.manim_code import preflight_manim_code, repair_manim_code
@@ -358,14 +359,26 @@ Introduce the initial problem state, animate the step-by-step state transitions,
             plan_markdown = MOCK_PLAN
         duration = time.perf_counter() - start_t
     else:
+        # Always include manim-composer skill alongside the observer hooks.
+        caps = [get_composer_skills()]
+        if hooks:
+            caps.append(hooks)
         agent = hitl_agents.get_composer_agent(
             model_name=model_name,
             base_url=base_url,
             api_key=api_key,
-            capabilities=[hooks] if hooks else None,
+            capabilities=caps,
         )
         deps = hitl_agents.HitlPlanDeps(topic=topic, source_text=text)
-        user_prompt = f"Educational Content:\n{text}\n\nPlease construct a comprehensive scenes.md visual plan for Manim focusing on topic '{topic}'."
+        user_prompt = (
+            f"Educational Content to visualize:\n{text}\n\n"
+            f"Topic: {topic}\n\n"
+            "Using the manim-composer skill as your guide, compose a comprehensive "
+            "scenes.md visual plan for a 3Blue1Brown-style Manim animation. "
+            "Follow the scenes.md format exactly: include Overview, Narrative Arc, "
+            "numbered Scenes with Visual Elements / Content / Narration Notes / Technical Notes, "
+            "Transitions & Flow, Color Palette, and Mathematical Content sections."
+        )
         observer.show_prompt(hitl_agents.COMPOSER_SYSTEM_PROMPT, user_prompt)
         with capture_run_messages() as captured:
             result = await agent.run(user_prompt, deps=deps)
@@ -421,36 +434,76 @@ async def run_code_stage(
         if inject_bug:
             code = MOCK_BROKEN_CODE_MOBJECT
             detected_scene = "BrokenMobjectScene"
-        elif topic and topic != "Fourier Transform":
-            import re
-            safe_name = "".join(w.capitalize() for w in re.sub(r"[^a-zA-Z0-9 ]", "", topic).split()) or "GeneratedScene"
+            duration = time.perf_counter() - start_t
+        else:
+            # Build a realistic mock Manim scene directly from topic + plan.
+            # Mock mode tests pipeline plumbing (preflight, LSP, workspace, logging),
+            # not the Agent machinery itself (covered by live mode).
+            import re as _re
+            safe_name = (
+                "".join(w.capitalize() for w in _re.sub(r"[^a-zA-Z0-9 ]", "", topic).split())
+                or "Generated"
+            )
             detected_scene = f"{safe_name}Scene"
+            # Derive scene-specific step labels from the plan's ## Scene headings.
+            scene_headings = _re.findall(r"## Scene \d+[:\s]+(.+)", plan)
+            step_labels = [h.strip()[:40] for h in scene_headings[:3]] or [
+                "Initialize State",
+                "Animate Core Logic",
+                "Highlight Solution",
+            ]
+            step_items = "\n".join(
+                f'            Text("{lbl}", font_size=28, color=TEAL),' for lbl in step_labels
+            )
             code = f"""from manim import *
 
 class {detected_scene}(Scene):
     def construct(self):
-        title = Text("{topic}", font_size=40).to_edge(UP, buff=0.5)
-        subtitle = Text("Dynamic Visual Explanation", font_size=24, color=YELLOW)
-        subtitle.next_to(title, DOWN, buff=0.3)
+        title = Text("{topic}", font_size=42, weight=BOLD)
+        title.to_edge(UP, buff=0.5)
+        underline = Line(title.get_left(), title.get_right(), color=BLUE_C)
+        underline.next_to(title, DOWN, buff=0.1)
 
-        self.play(Write(title))
-        self.play(FadeIn(subtitle, shift=UP * 0.2))
+        self.play(Write(title), Create(underline))
+        self.wait(0.4)
+
+        steps = VGroup(
+{step_items}
+        ).arrange(DOWN, buff=0.35).next_to(underline, DOWN, buff=0.5)
+
+        for step in steps:
+            self.play(FadeIn(step, shift=RIGHT * 0.25))
+            self.wait(0.35)
+
         self.wait(1.5)
-        self.play(FadeOut(subtitle), FadeOut(title))
+        self.play(FadeOut(VGroup(title, underline, steps)))
 """
-        else:
-            code = MOCK_VALID_CODE
-            detected_scene = "FourierTransformScene"
-        duration = time.perf_counter() - start_t
+            # Run code through the same extraction/validation path as live output.
+            code, detected_scene = hitl_agents.extract_manim_code(
+                f"```python\n{code}\n```", default_scene=detected_scene
+            )
+            duration = time.perf_counter() - start_t
     else:
+        # Always wire manimce-best-practices + manim-render skills together with hooks.
+        caps = [get_coder_skills()]
+        if hooks:
+            caps.append(hooks)
         agent = hitl_agents.get_coder_agent(
             model_name=model_name,
             base_url=base_url,
             api_key=api_key,
-            capabilities=[hooks] if hooks else None,
+            capabilities=caps,
         )
         deps = hitl_agents.HitlCoderDeps(plan=plan, knowledge_text=topic)
-        user_prompt = f"Approved Visual Plan (scenes.md):\n{plan}\n\nSynthesize a complete, elegant Manim Community scene implementing this plan."
+        user_prompt = (
+            f"Approved scenes.md Visual Plan:\n{plan}\n\n"
+            f"Topic: {topic}\n\n"
+            "Following the manimce-best-practices skill strictly, synthesize a complete, "
+            "production-quality Manim Community Edition Python scene that faithfully implements "
+            "every scene described in the plan above. "
+            "Name the Scene class after the topic (e.g. class DijkstrasAlgorithmScene(Scene):). "
+            "Return only the executable Python code block inside ```python ... ```."
+        )
         observer.show_prompt(hitl_agents.CODER_SYSTEM_PROMPT, user_prompt)
         with capture_run_messages() as captured:
             result = await agent.run(user_prompt, deps=deps)
