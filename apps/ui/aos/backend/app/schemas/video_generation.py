@@ -63,7 +63,7 @@ class VideoClassifyResponse(BaseSchema):
     needs_graphing: bool = False
 
 
-AnimationMode = Literal["slide", "animation", "scivis"]
+AnimationMode = Literal["slide", "animation", "scivis", "marp"]
 
 
 class ModeSelectionResponse(BaseSchema):
@@ -74,6 +74,9 @@ class ModeSelectionResponse(BaseSchema):
     slide_count: int | None = None
     uses_3d: bool = False
     uses_camera_movement: bool = False
+    marp_layout: Literal["templated", "agentic", "hybrid"] = "hybrid"
+    marp_target: Literal["video", "slides"] = "video"
+    marp_theme: str = "default"
 
 
 class VideoPlanRequest(BaseSchema):

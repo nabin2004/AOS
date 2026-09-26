@@ -766,6 +766,12 @@ class {detected_scene}(Scene):
                 "MODE: SCIVIS MODE. Implement a standalone get_data() function before the Scene class, "
                 "call it in construct(), and map scientific data to Manim primitives with graceful fallbacks."
             )
+        elif mode == "marp":
+            tier1_context = hitl_agents.get_marp_tier1_context()
+            mode_guideline = (
+                "MODE: MARP MODE (Declarative Slide Presentation). Follow the 6-archetype layout vocabulary strictly: "
+                "title, bullets, two-col, code-focus, math-focus, quote. Group each slide in a VGroup and use clean FadeOut transitions."
+            )
         else:
             tier1_context = hitl_agents.get_animation_tier1_context(needs_3d=needs_3d)
             mode_guideline = (

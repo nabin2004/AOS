@@ -34,6 +34,7 @@ def test_create_hitl_web_agent_tools(tmp_path: Path):
     assert "render_manim_scene" in tool_names
     assert "inspect_hitl_workspace" in tool_names
     assert "read_skill_reference" in tool_names
+    assert "compile_marp_code" in tool_names
 
     # Verify that human checkpoints require operator approval
     assert tools["checkpoint_approve_classification"].requires_approval is True
@@ -273,6 +274,42 @@ def test_checkpoint_select_mode_tool(tmp_path: Path):
     assert "Mode confirmed by operator: **SLIDE**" in res_slide
     loaded_mode2 = ws.load_mode_selection()
     assert loaded_mode2["mode"] == "slide"
+
+    # 3. Select Marp mode
+    res_marp = mode_tool.function(
+        recommended_mode="marp",
+        reason="Declarative slide deck with code and bullet items",
+        marp_layout="hybrid",
+    )
+    assert "Mode confirmed by operator: **MARP**" in res_marp
+    loaded_mode3 = ws.load_mode_selection()
+    assert loaded_mode3["mode"] == "marp"
+    assert loaded_mode3["marp_layout"] == "hybrid"
+
+
+def test_compile_marp_code_tool(tmp_path: Path):
+    """Verify compile_marp_code compiles Marp markdown and writes scene.py and presentation.marp.md."""
+    ws = HitlWorkspace(workspace_dir=tmp_path)
+    agent = create_hitl_web_agent(mock=True, workspace_dir=tmp_path)
+    tools = agent._function_toolset.tools
+
+    marp_text = (
+        "---\nmarp: true\n---\n"
+        "<!-- _class: title -->\n# Transformer Attention\n### Query Key Value\n\n"
+        "---\n<!-- _class: bullets -->\n## Attention Steps\n- Scaled dot product\n- Softmax weights\n"
+    )
+
+    compile_tool = tools["compile_marp_code"]
+    res = compile_tool.function(marp_markdown=marp_text, scene_name="AttentionScene")
+
+    assert "Marp compiled deterministically" in res
+    assert "AttentionScene" in res
+    assert ws.scene_file.exists()
+    assert ws.marp_file.exists()
+
+    code_saved = ws.scene_file.read_text(encoding="utf-8")
+    assert "class AttentionScene(Scene):" in code_saved
+    assert "BulletedList" in code_saved
 
 
 def test_inspect_hitl_workspace_tool(tmp_path: Path):

@@ -559,6 +559,32 @@ def get_manimce_tier1_preinjected_context() -> str:
 
 # ── Mode Prompts and Bridge Constants ──────────────────────────────────────────
 
+MARP_LAYOUT_VOCABULARY_RULES = """\
+=== MARP TO MANIM LAYOUT VOCABULARY & AST RULES ===
+Marp mode bridges declarative markdown slide presentations into Manim animations
+using a deterministic 6-archetype layout vocabulary (avoiding arbitrary CSS fights):
+
+1. LAYOUT ARCHETYPES:
+   - `<!-- _class: title -->` -> Title slide: prominent Text header (font_size=48) + subtitle (font_size=28) centered.
+   - `<!-- _class: bullets -->` -> Sequential bullets: Title anchored UP, BulletedList with FadeIn(shift=0.25*UP).
+   - `<!-- _class: two-col -->` -> Comparative columns: Left VGroup (x=-3.4) and Right VGroup (x=+3.4) separated by a vertical Line.
+   - `<!-- _class: code-focus -->` -> Code walkthrough: Title + syntax-highlighted Code mobject (font_size=20, background='window').
+   - `<!-- _class: math-focus -->` -> Mathematical equations: Title + prominent MathTex (font_size=44) + explanatory bullets below.
+   - `<!-- _class: quote -->` -> Notable quotes: Serif italic Text (font_size=32) + author attribution aligned to RIGHT.
+
+2. MOBJECT MAPPING CONVENTIONS:
+   - Heading 1/2 -> `Title(...)` or `Text(..., font_size=38, color=BLUE_C).to_edge(UP, buff=0.5)`
+   - Bullet items -> `BulletedList(*items, font_size=28)`
+   - Code fences -> `Code(code=..., language=..., insert_line_no=True)`
+   - Math equations ($...$, $$...$$) -> `MathTex(r"...", font_size=44, color=YELLOW_B)`
+   - Slide bounds: keep within 16:9 safe zone X: [-7.11, 7.11], Y: [-4.0, 4.0].
+
+3. ANIMATION & TRANSITIONS:
+   - Each slide is isolated in a `VGroup` (e.g. `slide_1_group = VGroup(...)`).
+   - Clean transitions: `self.play(FadeOut(slide_1_group))` followed by `self.wait(0.5)` before rendering slide 2.
+   - For interactive decks (manim-slides): invoke `self.next_slide()` at pause points.
+"""
+
 SCIVIS_BRIDGE_RULES = """\
 === SCIVIS DATA BRIDGE RULES ===
 1. SEPARATE data computation from Manim visualization — never fetch or compute heavy data inside construct().
@@ -612,6 +638,29 @@ Directives:
 - Always plan a fallback synthetic dataset if the external library is absent.
 - Use ThreeDScene for molecular/orbital visualizations. Use MovingCameraScene for network graphs.
 """,
+    "marp": """\
+MODE: MARP MODE (Declarative Slide Presentation)
+You are composing a structured slide presentation using pure MARP MARKDOWN format.
+Directives:
+- Output valid Marp presentation markdown with YAML frontmatter and `---` slide breaks.
+- Use frontmatter at the top:
+  ```markdown
+  ---
+  marp: true
+  theme: default
+  paginate: true
+  ---
+  ```
+- Use standard Marp layout directives:
+  * `<!-- _class: title -->` for title slide (Title # + Subtitle ###)
+  * `<!-- _class: bullets -->` for structured bullet points
+  * `<!-- _class: two-col -->` for two-column comparisons
+  * `<!-- _class: code-focus -->` with fenced code blocks (```python)
+  * `<!-- _class: math-focus -->` with equations ($$ ... $$)
+  * `<!-- _class: quote -->` with blockquote (> Quote text) and attribution (— Author)
+- You may also include `voiceover: "..."` in slide frontmatter for audio narration cues.
+- Keep text concise, high-contrast, and focused on 1 core concept per slide.
+""",
 }
 
 
@@ -662,6 +711,8 @@ def get_composer_tier1_preinjected_context(mode: str = "animation") -> str:
     ]
     if mode_clean == "scivis":
         parts.insert(4, SCIVIS_BRIDGE_RULES.strip())
+    elif mode_clean == "marp":
+        parts.insert(4, MARP_LAYOUT_VOCABULARY_RULES.strip())
 
     for rel_path, title in tier1_files:
         content = resolve_skill_reference_content(rel_path)
@@ -773,6 +824,37 @@ def get_scivis_tier1_context(libraries: list[str] | None = None, needs_3d: bool 
         "================================================================================",
     ]
     return "\n".join(scivis_banner) + "\n\n" + base_anim_context
+
+
+def get_marp_tier1_context() -> str:
+    """Pre-inject Tier 1 rules tailored for Marp-to-Manim Mode (layout vocabulary, VGroup positioning, formatting)."""
+    marp_files = [
+        ("rules/positioning.md", "MANDATORY POSITIONING & SCREEN LAYOUT RULES"),
+        ("rules/scenes.md", "SCENE ARCHITECTURE & LIFECYCLE"),
+        ("rules/config.md", "CAMERA RESOLUTION & SCREEN DIMENSIONS"),
+        ("rules/mobjects.md", "MOBJECT HIERARCHY & GROUPING"),
+        ("rules/text.md", "TYPOGRAPHY & TEXT RULES"),
+        ("rules/text-animations.md", "TEXT ANIMATIONS RULES"),
+        ("rules/shapes.md", "SHAPES & CONTAINER BOXES"),
+        ("rules/lines.md", "CONNECTING LINES & ARROWS"),
+        ("rules/latex.md", "MATHEMATICAL LATEX RULES"),
+        ("rules/grouping.md", "VGROUP GROUPING RULES"),
+        ("rules/styling.md", "STYLING & VISUAL POLISH RULES"),
+        ("rules/colors.md", "COLOR PALETTES"),
+    ]
+    parts: list[str] = [
+        "================================================================================",
+        "MANIMCE MARP MODE RULES (Deterministic Layout Vocabulary & AST Bridge)",
+        "================================================================================",
+        MARP_LAYOUT_VOCABULARY_RULES.strip(),
+        "================================================================================",
+    ]
+    for rel_path, title in marp_files:
+        content = resolve_skill_reference_content(rel_path)
+        if content and not content.startswith("File '") and not content.startswith("Error"):
+            parts.append(f"\n--- {title} ({rel_path}) ---\n{content.strip()}\n")
+    parts.append("================================================================================")
+    return "\n".join(parts)
 
 
 # ── OOP Class: Native Agent Tools ─────────────────────────────────────────────

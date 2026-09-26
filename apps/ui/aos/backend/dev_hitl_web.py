@@ -56,6 +56,7 @@ from app.schemas.video_generation import ModeSelectionResponse, VideoClassifyRes
 from app.services.latex_validator import run_latex_diagnostics
 from app.services.lsp_service import run_pyright_lsp
 from app.services.positioning_linter import lint_manim_positioning
+from app.services.marp_compiler import MarpManimCompiler
 from app.services.manim_code import preflight_manim_code
 from app.skills import get_coder_skills, get_composer_skills, get_repair_skills, get_skills
 
@@ -81,6 +82,7 @@ To ensure the operator sees every single action and skill loading in real-time i
      * Simple sequential presentations, step-by-step concepts, or formula-heavy slides -> recommend "slide" mode.
      * Smooth continuous motion, updaters, ValueTracker, 3D, or moving camera -> recommend "animation" mode.
      * Scientific data, simulations, molecular structures, graphs, or astronomical orbits -> recommend "scivis" mode (and specify relevant scientific libraries such as numpy, scipy, astropy, networkx).
+     * Structured multi-slide presentations, lecture decks, bullet outlines, code walkthroughs, or explicit Marp markdown -> recommend "marp" mode (declarative slide-to-Manim layout vocabulary).
    - You MUST call `checkpoint_select_mode(recommended_mode, reason, scivis_libraries, scivis_domain)`.
    - IMPORTANT: This tool requires operator approval. The UI will display an interactive card allowing the operator to confirm or override the mode.
 
@@ -231,7 +233,7 @@ def create_hitl_web_agent(
         Call this AFTER checkpoint_approve_classification and BEFORE composing the visual plan.
         """
         mode_raw = (recommended_mode or kwargs.get("mode") or "animation").lower().strip()
-        if mode_raw not in ("slide", "animation", "scivis"):
+        if mode_raw not in ("slide", "animation", "scivis", "marp"):
             mode_raw = "animation"
 
         saved_class = workspace.load_classification() or {}
@@ -246,6 +248,9 @@ def create_hitl_web_agent(
             scivis_domain=scivis_domain or saved_class.get("subject", ""),
             uses_3d=needs_3d,
             uses_camera_movement=needs_camera,
+            marp_layout=kwargs.get("marp_layout", "hybrid"),
+            marp_target=kwargs.get("marp_target", "video"),
+            marp_theme=kwargs.get("marp_theme", "default"),
         )
         workspace.save_mode_selection(mode_resp, topic=active_topic)
         run_store.record_run(
@@ -290,6 +295,9 @@ def create_hitl_web_agent(
         active_mode = mode_data.get("mode", "animation")
 
         workspace.save_plan(content, topic=active_topic)
+        if active_mode == "marp":
+            workspace.save_marp_presentation(content, topic=active_topic)
+
         run_store.record_run(
             stage="compose",
             topic=active_topic,
@@ -388,6 +396,12 @@ def create_hitl_web_agent(
                 mode_guideline = (
                     "MODE: SCIVIS MODE. Implement a standalone get_data() function before the Scene class, "
                     "call it in construct(), and map scientific data to Manim primitives with graceful fallbacks."
+                )
+            elif mode == "marp":
+                tier1_context = hitl_agents.get_marp_tier1_context()
+                mode_guideline = (
+                    "MODE: MARP MODE (Declarative Slide Presentation). Follow the 6-archetype layout vocabulary strictly: "
+                    "title, bullets, two-col, code-focus, math-focus, quote. Group each slide in a VGroup and use clean FadeOut transitions."
                 )
             else:
                 tier1_context = hitl_agents.get_animation_tier1_context(needs_3d=needs_3d)
@@ -590,6 +604,12 @@ def create_hitl_web_agent(
                     "MODE: SCIVIS MODE. Implement a standalone get_data() function before the Scene class, "
                     "call it in construct(), and map scientific data to Manim primitives with graceful fallbacks."
                 )
+            elif mode == "marp":
+                tier1_context = hitl_agents.get_marp_tier1_context()
+                mode_guideline = (
+                    "MODE: MARP MODE (Declarative Slide Presentation). Follow the 6-archetype layout vocabulary strictly: "
+                    "title, bullets, two-col, code-focus, math-focus, quote. Group each slide in a VGroup and use clean FadeOut transitions."
+                )
             else:
                 tier1_context = hitl_agents.get_animation_tier1_context(needs_3d=needs_3d)
                 mode_guideline = (
@@ -753,6 +773,46 @@ def create_hitl_web_agent(
     def read_skill_reference(path: str = "") -> str:
         """Read a reference file from the manim-composer or manimce-best-practices skills (e.g. 'rules/positioning.md', 'narrative-patterns.md')."""
         return resolve_skill_reference_content(path=path)
+
+    # ── Marp Compiler Tool: Deterministic AST Compilation ────────────────────
+    @agent.tool_plain
+    def compile_marp_code(marp_markdown: str = "", scene_name: str | None = None) -> str:
+        """Compile a Marp slide markdown document directly into executable Manim Community Edition code using deterministic AST compilation.
+
+        Args:
+            marp_markdown: Optional raw Marp markdown string. If omitted, loads presentation.marp.md or scenes.md from workspace.
+            scene_name: Optional custom Scene class name (defaults to topic + 'Scene').
+        """
+        content = marp_markdown or workspace.load_marp_presentation()
+        if not content:
+            loaded_plan, _ = workspace.load_plan()
+            content = loaded_plan or ""
+        if not content:
+            return "Error: No Marp markdown found in workspace or arguments. Please compose a Marp plan first."
+
+        saved_class = workspace.load_classification() or {}
+        active_topic = saved_class.get("topic") or "MarpLecture"
+        clean_topic = active_topic.replace(" ", "").replace("-", "").replace("'", "")
+        clean_name = scene_name or f"{clean_topic}Scene"
+
+        compiler = MarpManimCompiler()
+        mode_data = workspace.load_mode_selection() or {}
+        target = mode_data.get("marp_target", "video")
+        res = compiler.compile(content, scene_name=clean_name, target=target)
+
+        workspace.save_marp_presentation(content, topic=active_topic)
+        workspace.save_code(res.code, scene_name=res.scene_name, topic=active_topic)
+        line_count = len(res.code.splitlines())
+        return (
+            f"Marp compiled deterministically into Manim Community Edition code!\n"
+            f"- Slides: {res.slide_count}\n"
+            f"- Scene Class: `{res.scene_name}`\n"
+            f"- Output Target: {res.target.upper()}\n"
+            f"- Lines of Code: {line_count}\n"
+            f"- Saved to: `{workspace.scene_file.name}` and `{workspace.marp_file.name}`\n\n"
+            f"```python\n{res.code}\n```\n\n"
+            f"Now call validate_code_with_lsp(scene_name='{res.scene_name}') to run Pyright LSP diagnostics."
+        )
 
     return agent
 

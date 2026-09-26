@@ -237,6 +237,7 @@ class HitlWorkspace:
         self.error_file = self.workspace_dir / "error.json"
         self.repair_file = self.workspace_dir / "repair.json"
         self.mode_file = self.workspace_dir / "mode_selection.json"
+        self.marp_file = self.workspace_dir / "presentation.marp.md"
         self.manifest_file = self.workspace_dir / "manifest.json"
 
     # ── Input handling ──
@@ -339,6 +340,19 @@ class HitlWorkspace:
         self.plan_json_file.write_text(json.dumps(plan_data, indent=2, ensure_ascii=False), encoding="utf-8")
         self.update_manifest(stage="compose", topic=topic)
         return self.plan_md_file, self.plan_json_file
+
+    # ── Marp presentation handling ──
+    def save_marp_presentation(self, marp_text: str, topic: str | None = None) -> Path:
+        """Save Marp presentation markdown (presentation.marp.md)."""
+        self.marp_file.write_text(marp_text, encoding="utf-8")
+        self.update_manifest(stage="marp_compose", topic=topic)
+        return self.marp_file
+
+    def load_marp_presentation(self) -> str | None:
+        """Read presentation.marp.md if present in workspace."""
+        if self.marp_file.exists():
+            return self.marp_file.read_text(encoding="utf-8")
+        return None
 
     def load_plan(self) -> tuple[str | None, str | None]:
         """Load (plan_markdown, topic) from scenes.md and plan.json.
@@ -524,6 +538,7 @@ class HitlWorkspace:
                 "preflight_json": self.preflight_file.name if self.preflight_file.exists() else None,
                 "repair_json": self.repair_file.name if self.repair_file.exists() else None,
                 "mode_selection_json": self.mode_file.name if self.mode_file.exists() else None,
+                "marp_md": self.marp_file.name if self.marp_file.exists() else None,
             },
         }
         self.manifest_file.write_text(json.dumps(manifest_data, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -536,6 +551,7 @@ class HitlWorkspace:
             "input": self.input_file.exists(),
             "classification": self.classification_file.exists(),
             "mode_selection": self.mode_file.exists(),
+            "marp_md": self.marp_file.exists(),
             "plan_md": self.plan_md_file.exists(),
             "plan_json": self.plan_json_file.exists(),
             "scene_py": self.scene_file.exists(),
@@ -550,6 +566,7 @@ class HitlWorkspace:
             "input": self.input_file,
             "classification": self.classification_file,
             "mode_selection": self.mode_file,
+            "marp_md": self.marp_file,
             "plan_md": self.plan_md_file,
             "plan_json": self.plan_json_file,
             "scene_py": self.scene_file,
