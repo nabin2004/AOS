@@ -458,7 +458,7 @@ def repair_manim_code(code: str) -> CodeRepair:
             f"Replaced unsafe get_part_by_tex({part_expr}).get_center() with stable parent-mobject center "
             "(semantic drift: centroid may differ — see semantic_warnings)"
         )
-        return f"{obj}.get_center()  # REVIEW: was get_part_by_tex({part_expr}).get_center()"
+        return f"{obj}.get_center()"
 
     repaired = _UNSAFE_TEX_CENTER.sub(replace_unsafe_center, code)
 
@@ -474,10 +474,7 @@ def repair_manim_code(code: str) -> CodeRepair:
             f"Replaced unsafe get_part_by_tex({part_expr}).shift() with stable parent-mobject point "
             "(semantic drift: centroid may differ — see semantic_warnings)"
         )
-        return (
-            f"({obj}.get_center() + ({shift_expr}))"
-            f"  # REVIEW: was get_part_by_tex({part_expr}).shift({shift_expr})"
-        )
+        return f"({obj}.get_center() + ({shift_expr}))"
 
     repaired = _UNSAFE_TEX_SHIFT.sub(replace_unsafe_shift, repaired)
 

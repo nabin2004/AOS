@@ -96,12 +96,19 @@ Evaluate the content and return structured output matching the schema:
 """
 
 COMPOSER_SYSTEM_PROMPT = """\
-You are an expert pedagogical animation director and Manim composer (following the manim-composer skill).
+You are an expert pedagogical animation director and Manim composer (following both the manim-composer and manimce-best-practices skills).
 Your job is to transform educational knowledge into a comprehensive, scene-by-scene animation plan formatted as Markdown (scenes.md).
 
 Requirements:
 1. Target Audience: High-school/undergraduate learner seeking conceptual intuition and mathematical rigor.
-2. Structure:
+2. Manim Best Practices & Technical Rigor:
+   - You MUST design each scene with practical Manim Community Edition layout and positioning principles in mind:
+     * Never place mobjects without spatial consideration. Use relative layouts (.next_to, .to_edge, VGroup.arrange).
+     * For coordinate plots, functions, or numeric mappings, explicitly specify Coordinate Axes (x_range, y_range) and specify that points must be placed via axes.c2p(x, y).
+     * Group related visual components into VGroups so they can be transformed and cleaned up as single entities.
+     * Keep the 16:9 safe zone in mind: X: [-7.11, 7.11], Y: [-4.0, 4.0]. Keep a 0.5 margin from screen edges.
+     * Design clean transitions between scenes (Transform, ReplacementTransform, FadeOut) to prevent screen clutter.
+3. Structure:
    # [Video Title]
    ## Overview
    - **Topic**: [Core concept]
@@ -123,6 +130,8 @@ Requirements:
    [Key teaching ideas]
    ### Technical Notes
    - [Manim classes: MathTex, VGroup, Write, Transform, FadeIn]
+   - [Positioning & Layout: e.g. title to_edge(UP), formula next_to(..., DOWN), VGroup.arrange()]
+   - [Coordinate Systems & Axes: e.g. Axes(x_range=[...], y_range=[...]), axes.c2p(x, y)]
    ---
    ## Scene 2: [Scene Name]
    ...
@@ -383,6 +392,8 @@ class HitlCodeExtractor:
 
         return code, detected_scene
 
+    extract_code = extract
+
 extract_manim_code = HitlCodeExtractor.extract
 
 
@@ -517,15 +528,33 @@ def get_manimce_tier1_preinjected_context() -> str:
 
 
 def get_composer_tier1_preinjected_context() -> str:
-    """Pre-inject mandatory Tier 1 Manim Composer rules directly into model context."""
+    """Pre-inject mandatory Tier 1 Manim Composer and ManimCE best practice rules directly into model context."""
     tier1_files = [
         ("templates/scenes-template.md", "CANONICAL SCENES.MD TEMPLATE"),
         ("references/narrative-patterns.md", "3BLUE1BROWN NARRATIVE PATTERNS"),
         ("references/visual-techniques.md", "VISUAL STORYTELLING TECHNIQUES"),
+        ("rules/positioning.md", "MANDATORY POSITIONING & SCREEN LAYOUT RULES"),
+        ("rules/axes.md", "COORDINATE AXES & GRAPHING RULES"),
+        ("rules/mobjects.md", "MOBJECT HIERARCHY & GROUPING"),
+        ("rules/transform-animations.md", "TRANSFORM & MORPHING ANIMATIONS"),
+        ("rules/colors.md", "COLOR PALETTE & CONTRAST GUIDELINES"),
     ]
     parts: list[str] = [
         "================================================================================",
-        "MANDATORY MANIM COMPOSER TIER 1 RULES (Pre-Injected Context)",
+        "MANDATORY MANIM COMPOSER & MANIMCE BEST PRACTICES (Pre-Injected Context)",
+        "================================================================================",
+        "SPATIAL LAYOUT & MANIMCE FEASIBILITY DIRECTIVES:",
+        "1. SCREEN BOUNDS & SAFE MARGINS:",
+        "   - Manim screen is 16:9 with coordinates X: [-7.11, 7.11], Y: [-4.0, 4.0]. Keep a 0.5 buff from edges.",
+        "   - Scene titles must always be anchored at the top: `.to_edge(UP, buff=0.5)`.",
+        "   - Multi-element layouts must use relative anchoring (.next_to, .to_edge) or `VGroup.arrange()`.",
+        "2. COORDINATE SYSTEMS & AXES:",
+        "   - For functions, plots, or geometric paths, explicitly specify `Axes(x_range=[...], y_range=[...])`.",
+        "   - Points on axes must map via `axes.c2p(x, y)` (never raw absolute coordinates).",
+        "   - Label axes with `axes.get_axis_labels()`.",
+        "3. GROUPING & TRANSFORMS:",
+        "   - Group related mobjects in `VGroup` so they can animate and clear together.",
+        "   - Clearly specify `Transform` vs `ReplacementTransform` vs `FadeOut` to avoid screen clutter.",
         "================================================================================",
     ]
     for rel_path, title in tier1_files:
@@ -701,6 +730,8 @@ class HitlAgentFactory:
             model_settings=ModelSettings(max_tokens=HITL_MAX_TOKENS),
         )
         agent.tool(self.tools.read_skill_reference_tool)
+        agent.tool(self.tools.search_manim_docs_tool)
+        agent.tool(self.tools.search_manim_signatures_tool)
         return agent
 
     def create_coder_agent(

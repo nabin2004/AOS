@@ -619,14 +619,16 @@ Introduce the initial problem state, animate the step-by-step state transitions,
         hints_text = f"Subject Domain: {subject}" if subject else None
         deps = hitl_agents.HitlPlanDeps(topic=topic, hints=hints_text, source_text=text)
         subject_line = f"Subject Domain: {subject}\n" if subject else ""
+        tier1_context = hitl_agents.get_composer_tier1_preinjected_context()
         user_prompt = (
+            f"{tier1_context}\n\n"
             f"Educational Content to visualize:\n{text}\n\n"
             f"Topic: {topic}\n"
             f"{subject_line}\n"
-            "Using the manim-composer skill as your guide, compose a comprehensive "
+            "Using both the manim-composer and manimce-best-practices skills as your guide, compose a comprehensive "
             "scenes.md visual plan for a 3Blue1Brown-style Manim animation. "
             "Follow the scenes.md format exactly: include Overview, Narrative Arc, "
-            "numbered Scenes with Visual Elements / Content / Narration Notes / Technical Notes, "
+            "numbered Scenes with Visual Elements / Content / Narration Notes / Technical Notes (explicitly specifying positioning, relative layouts, and coordinate axes via c2p), "
             "Transitions & Flow, Color Palette, and Mathematical Content sections."
         )
         observer.show_prompt(hitl_agents.COMPOSER_SYSTEM_PROMPT, user_prompt)

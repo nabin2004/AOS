@@ -279,6 +279,7 @@ async def test_hitl_agent_skills():
     ]
     assert len(comp_skills) == 1
     assert "manim-composer" in comp_skills[0].include
+    assert "manimce-best-practices" in comp_skills[0].include
 
     with composer.override(
         model=TestModel(

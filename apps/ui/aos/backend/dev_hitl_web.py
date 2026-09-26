@@ -7,8 +7,12 @@ Provides an interactive browser-based Chat UI using Pydantic AI's native `agent.
   * Checkpoint 3: Code generation with Pyright LSP diagnostics & self-repair
   * Checkpoint 4: Local Manim video rendering
 - Run via:
-  uv run python dev_hitl_web.py
+  uv run python dev_hitl_web.py [--reload]
   uv run uvicorn dev_hitl_web:app --host 127.0.0.1 --port 7932
+  # When using uvicorn with --reload, exclude hitl_workspace so saves do not restart the server:
+  uv run uvicorn dev_hitl_web:app --host 127.0.0.1 --port 7932 --reload --reload-dir app
+  # or:
+  uv run uvicorn dev_hitl_web:app --host 127.0.0.1 --port 7932 --reload --reload-exclude "hitl_workspace/*"
   uv run python dev_hitl.py --web
 """
 
@@ -53,7 +57,7 @@ from app.services.latex_validator import run_latex_diagnostics
 from app.services.lsp_service import run_pyright_lsp
 from app.services.positioning_linter import lint_manim_positioning
 from app.services.manim_code import preflight_manim_code
-from app.skills import get_coder_skills, get_composer_skills, get_repair_skills
+from app.skills import get_coder_skills, get_composer_skills, get_repair_skills, get_skills
 
 
 HITL_WEB_SYSTEM_PROMPT = """\
@@ -73,11 +77,12 @@ To ensure the operator sees every single action and skill loading in real-time i
    - IMPORTANT: This tool requires operator approval. The UI will pause and display an interactive card allowing the operator to verify or edit the subject (e.g. correcting "log" from CS to Math) before continuing.
 
 2. Stage 2 — Visual Plan Composition Checkpoint:
-   - Before composing, call `load_skill_reference(skill="manim-composer")` so the operator sees the pedagogical skill being loaded in the UI stream.
-   - Compose a comprehensive pedagogical scene-by-scene animation plan following the `manim-composer` skill format (scenes.md):
+   - Before composing, call `load_skill_reference(skill="manim-composer")` and/or `load_skill_reference(skill="manimce-best-practices", path="rules/positioning.md")` so the operator sees the pedagogical and ManimCE spatial layout skills being loaded in the UI stream.
+   - Compose a comprehensive pedagogical scene-by-scene animation plan following both `manim-composer` and `manimce-best-practices` (scenes.md):
      * Title, Overview, Hook, Target Audience, Estimated Length, Key Insight
      * Narrative Arc
      * Scene 1, Scene 2, ... (Duration, Purpose, Visual Elements, Content, Narration Notes, Technical Notes)
+     * In Technical Notes, explicitly specify layout positioning (.to_edge, .next_to, VGroup.arrange) and coordinate axes (Axes, c2p mapping) to ensure code synthesis is robust.
      * Transitions & Flow, Color Palette, and Mathematical Content
    - You MUST call `checkpoint_approve_visual_plan(topic, subject, plan_markdown)`.
    - IMPORTANT: This tool requires operator approval. The UI will display the plan for the operator to review, edit, or approve.
@@ -125,7 +130,7 @@ def create_hitl_web_agent(
         model=model,
         system_prompt=HITL_WEB_SYSTEM_PROMPT,
         name="AOS HITL Web Director",
-        capabilities=[get_composer_skills(), get_coder_skills()],
+        capabilities=[get_skills(include=["manim-composer", "manimce-best-practices", "manim-render"])],
         output_type=[str, DeferredToolRequests],
         retries=2,
         model_settings=ModelSettings(max_tokens=hitl_agents.HITL_MAX_TOKENS),
@@ -248,6 +253,10 @@ def create_hitl_web_agent(
                 "- Positioning: Safe spacing with next_to(..., buff=...), to_edge(UP), VGroup.arrange()\n"
                 "- LSP Guardrails: Strict Pyright validation, no hallucinated classes or deprecated methods"
             )
+        elif any(k in skill_name for k in ("position", "axe", "transform", "mobject", "shape", "color")):
+            target_path = path or (f"rules/{skill_name}.md" if not skill_name.endswith(".md") else skill_name)
+            content = resolve_skill_reference_content(path=target_path)
+            return f"[Skill Loaded: manimce-best-practices/{target_path}]\n{content[:600]}..."
         else:
             return resolve_skill_reference_content(path=path or skill)
 
@@ -659,6 +668,7 @@ def run_web_server(
     mock: bool = False,
     workspace_dir: Path | str | None = None,
     log_dir: Path | str | None = None,
+    reload: bool = False,
 ) -> None:
     """Run the ASGI Web Chat server using uvicorn and open the browser."""
     import uvicorn
@@ -703,7 +713,18 @@ def run_web_server(
 
         threading.Thread(target=_open, daemon=True).start()
 
-    uvicorn.run(web_app, host=host, port=port, log_level="info")
+    if reload:
+        uvicorn.run(
+            "dev_hitl_web:app",
+            host=host,
+            port=port,
+            reload=True,
+            reload_dirs=["app"],
+            reload_excludes=["hitl_workspace", "hitl_workspace/*", "hitl_workspace/**", ".dev_logs/*"],
+            log_level="info",
+        )
+    else:
+        uvicorn.run(web_app, host=host, port=port, log_level="info")
 
 
 def parse_args() -> argparse.Namespace:
@@ -712,6 +733,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--host", default="127.0.0.1", help="Host to bind to (default: 127.0.0.1)")
     parser.add_argument("--port", type=int, default=7932, help="Port to bind to (default: 7932)")
+    parser.add_argument("--reload", action="store_true", help="Enable auto-reload on code changes (excluding hitl_workspace)")
     parser.add_argument("--no-browser", action="store_true", help="Do not automatically open the browser")
     parser.add_argument("--mock", action="store_true", help="Run with Pydantic AI TestModel (offline, 0 tokens)")
     parser.add_argument(
@@ -746,6 +768,7 @@ def main() -> None:
         mock=args.mock,
         workspace_dir=args.workspace_dir,
         log_dir=args.log_dir,
+        reload=args.reload,
     )
 
 

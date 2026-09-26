@@ -44,6 +44,8 @@ def server_run(host: str, port: int, reload: bool):
         host=host,
         port=port,
         reload=reload,
+        reload_dirs=["app"] if reload else None,
+        reload_excludes=["hitl_workspace", "hitl_workspace/*", "hitl_workspace/**", ".dev_logs/*"] if reload else None,
     )
 
 
