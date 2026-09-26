@@ -54,6 +54,13 @@ class VideoClassifyResponse(BaseSchema):
     subject: str = "unknown"
     topic: str = ""
     reason: str = ""
+    scene_type: str = "Scene"
+    needs_3d: bool = False
+    needs_updaters: bool = False
+    needs_axes: bool = False
+    needs_camera_movement: bool = False
+    needs_timing_control: bool = False
+    needs_graphing: bool = False
 
 
 class VideoPlanRequest(BaseSchema):

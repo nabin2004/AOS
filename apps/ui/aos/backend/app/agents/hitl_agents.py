@@ -93,6 +93,14 @@ Evaluate the content and return structured output matching the schema:
    - If non-animatable, leave as empty string or a general subject label.
 4. `reason` (string):
    - A concise 1-2 sentence explanation detailing why the content is or is not suited for Manim, highlighting visual elements (e.g., equations, geometric plots, node diagrams).
+5. `scene_type` (string):
+   - "ThreeDScene" if explaining 3D concepts, "MovingCameraScene" if zooming/panning is needed, otherwise "Scene".
+6. `needs_3d` (boolean): True if a 3D canvas is required to explain the concept.
+7. `needs_updaters` (boolean): True if dynamic animations (Updaters, ValueTracker) are required.
+8. `needs_axes` (boolean): True if Cartesian coordinate axes (Axes, NumberPlane) are needed.
+9. `needs_camera_movement` (boolean): True if zooming, panning, or camera manipulation is required.
+10. `needs_timing_control` (boolean): True if specific runtime, rate functions (rate_func, easing, smooth, linear) control are required.
+11. `needs_graphing` (boolean): True if plotting, graphs, mathematical functions, parametric curves, or data visualization is required.
 """
 
 COMPOSER_SYSTEM_PROMPT = """\
@@ -508,6 +516,17 @@ def get_manimce_tier1_preinjected_context() -> str:
         ("rules/scenes.md", "SCENE ARCHITECTURE & LIFECYCLE"),
         ("rules/config.md", "CAMERA RESOLUTION & SCREEN DIMENSIONS"),
         ("rules/mobjects.md", "MOBJECT HIERARCHY & GROUPING"),
+        ("rules/text-animations.md", "TEXT ANIMATIONS RULES"),
+        ("rules/text.md", "TEXT RULES"),
+        ("rules/shapes.md", "SHAPES RULES"),
+        ("rules/lines.md", "LINES RULES"),
+        ("rules/latex.md", "LATEX RULES"),
+        # ("rules/graphing.md", "GRAPHING RULES"),
+        ("rules/creation-animations.md", "CREATION ANIMATIONS RULES"),
+        ("rules/axes.md", "AXES RULES"),
+        ("rules/grouping.md", "GROUPING RULES"),
+        ("rules/timing.md", "TIMING RULES"),
+        ("rules/styling.md", "STYLING RULES"),
     ]
     parts: list[str] = [
         "================================================================================",
@@ -538,6 +557,16 @@ def get_composer_tier1_preinjected_context() -> str:
         ("rules/mobjects.md", "MOBJECT HIERARCHY & GROUPING"),
         ("rules/transform-animations.md", "TRANSFORM & MORPHING ANIMATIONS"),
         ("rules/colors.md", "COLOR PALETTE & CONTRAST GUIDELINES"),
+        ("rules/text-animations.md", "TEXT ANIMATIONS RULES"),
+        ("rules/text.md", "TEXT RULES"),
+        ("rules/shapes.md", "SHAPES RULES"),
+        ("rules/lines.md", "LINES RULES"),
+        ("rules/latex.md", "LATEX RULES"),
+        ("rules/graphing.md", "GRAPHING RULES"),
+        ("rules/creation-animations.md", "CREATION ANIMATIONS RULES"),
+        ("rules/grouping.md", "GROUPING RULES"),
+        ("rules/timing.md", "TIMING RULES"),
+        ("rules/styling.md", "STYLING RULES"),
     ]
     parts: list[str] = [
         "================================================================================",

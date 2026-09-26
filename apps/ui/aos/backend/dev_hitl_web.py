@@ -161,11 +161,26 @@ def create_hitl_web_agent(
             saved_input = workspace.load_input() or {}
             active_topic = saved_input.get("topic") or saved_input.get("text") or "Educational Topic"
 
+        scene_type = kwargs.get("scene_type", "Scene")
+        needs_3d = kwargs.get("needs_3d", False)
+        needs_updaters = kwargs.get("needs_updaters", False)
+        needs_axes = kwargs.get("needs_axes", False)
+        needs_camera_movement = kwargs.get("needs_camera_movement", False)
+        needs_timing_control = kwargs.get("needs_timing_control", False)
+        needs_graphing = kwargs.get("needs_graphing", False)
+
         resp = VideoClassifyResponse(
             animatable=animatable_bool,
             subject=subject or "cs",
             topic=active_topic,
             reason=reason or f"Topic '{active_topic}' in {subject}",
+            scene_type=scene_type,
+            needs_3d=needs_3d,
+            needs_updaters=needs_updaters,
+            needs_axes=needs_axes,
+            needs_camera_movement=needs_camera_movement,
+            needs_timing_control=needs_timing_control,
+            needs_graphing=needs_graphing,
         )
         workspace.save_classification(resp, query=active_topic)
         run_store.record_run(
@@ -181,6 +196,8 @@ def create_hitl_web_agent(
             f"- Topic: {active_topic}\n"
             f"- Subject Domain: {subject or 'cs'}\n"
             f"- Animatable: {animatable_bool}\n"
+            f"- Scene Type: {scene_type}\n"
+            f"- Tools/Flags: 3D={needs_3d}, Updaters={needs_updaters}, Axes={needs_axes}, Camera={needs_camera_movement}, Timing={needs_timing_control}, Graphing={needs_graphing}\n"
             f"- Saved to: {workspace.classification_file.name}\n\n"
             f"You may now proceed to Stage 2: compose the visual plan (scenes.md) and submit it to checkpoint_approve_visual_plan."
         )
@@ -292,9 +309,9 @@ def create_hitl_web_agent(
             deps = hitl_agents.HitlCoderDeps(plan=plan_markdown, scene_name=scene_name)
             tier1_context = hitl_agents.get_manimce_tier1_preinjected_context()
             coder_prompt = (
-                f"{tier1_context}\n\n"
-                f"Visual Plan (scenes.md):\n{plan_markdown}\n\n"
                 f"Topic: {topic}\n\n"
+                f"Visual Plan (scenes.md):\n{plan_markdown}\n\n"
+                f"{tier1_context}\n\n"
                 "Generate complete, executable Manim Community Edition Python code for this animation. "
                 "Follow the pre-injected Tier 1 rules strictly: "
                 "NEVER use raw coordinate literals or manual float shifts. Use relative layouts (.next_to, .arrange, .to_edge) "
@@ -468,9 +485,9 @@ def create_hitl_web_agent(
             deps = hitl_agents.HitlCoderDeps(plan=plan_markdown, scene_name=scene_name)
             tier1_context = hitl_agents.get_manimce_tier1_preinjected_context()
             coder_prompt = (
-                f"{tier1_context}\n\n"
-                f"Visual Plan (scenes.md):\n{plan_markdown}\n\n"
                 f"Topic: {topic}\n\n"
+                f"Visual Plan (scenes.md):\n{plan_markdown}\n\n"
+                f"{tier1_context}\n\n"
                 "Generate complete, executable Manim Community Edition Python code for this animation. "
                 "Follow the pre-injected Tier 1 rules strictly: "
                 "NEVER use raw coordinate literals or manual float shifts. Use relative layouts (.next_to, .arrange, .to_edge) "

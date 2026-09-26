@@ -751,9 +751,9 @@ class {detected_scene}(Scene):
         deps = hitl_agents.HitlCoderDeps(plan=plan, knowledge_text=topic)
         tier1_context = hitl_agents.get_manimce_tier1_preinjected_context()
         user_prompt = (
-            f"{tier1_context}\n\n"
-            f"Approved scenes.md Visual Plan:\n{plan}\n\n"
             f"Topic: {topic}\n\n"
+            f"Approved scenes.md Visual Plan:\n{plan}\n\n"
+            f"{tier1_context}\n\n"
             "Following the pre-injected manimce-best-practices Tier 1 rules strictly, synthesize a complete, "
             "production-quality Manim Community Edition Python scene that faithfully implements "
             "every scene described in the plan above. "
