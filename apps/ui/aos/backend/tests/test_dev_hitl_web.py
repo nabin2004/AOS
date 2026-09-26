@@ -24,6 +24,7 @@ def test_create_hitl_web_agent_tools(tmp_path: Path):
     tool_names = set(tools.keys())
 
     assert "checkpoint_approve_classification" in tool_names
+    assert "checkpoint_select_mode" in tool_names
     assert "checkpoint_approve_visual_plan" in tool_names
     assert "load_skill_reference" in tool_names
     assert "synthesize_manim_code" in tool_names
@@ -36,6 +37,7 @@ def test_create_hitl_web_agent_tools(tmp_path: Path):
 
     # Verify that human checkpoints require operator approval
     assert tools["checkpoint_approve_classification"].requires_approval is True
+    assert tools["checkpoint_select_mode"].requires_approval is True
     assert tools["checkpoint_approve_visual_plan"].requires_approval is True
     assert tools["render_manim_scene"].requires_approval is True
 
@@ -228,5 +230,71 @@ def test_checkpoint_resilient_parameters(tmp_path: Path):
     loaded_plan, plan_topic = ws.load_plan()
     assert "# Scene 1: Euler Rotation" in loaded_plan
     assert plan_topic == "Euler's Formula"
+
+
+def test_checkpoint_select_mode_tool(tmp_path: Path):
+    """Verify checkpoint_select_mode writes mode_selection.json and handles slide, animation, and scivis."""
+    ws = HitlWorkspace(workspace_dir=tmp_path)
+    agent = create_hitl_web_agent(mock=True, workspace_dir=tmp_path)
+    tools = agent._function_toolset.tools
+
+    # Pre-seed classification
+    tools["checkpoint_approve_classification"].function(
+        topic="Orbit Simulation",
+        subject="physics",
+        animatable=True,
+        needs_3d=True,
+    )
+
+    mode_tool = tools["checkpoint_select_mode"]
+
+    # 1. Select SciVis mode with libraries
+    res_scivis = mode_tool.function(
+        recommended_mode="scivis",
+        reason="Scientific orbital simulation with astropy and scipy",
+        scivis_libraries=["astropy", "scipy"],
+        scivis_domain="astrophysics",
+    )
+    assert "Mode confirmed by operator: **SCIVIS**" in res_scivis
+    assert "astropy, scipy" in res_scivis
+    assert ws.mode_file.exists()
+
+    loaded_mode = ws.load_mode_selection()
+    assert loaded_mode is not None
+    assert loaded_mode["mode"] == "scivis"
+    assert loaded_mode["scivis_libraries"] == ["astropy", "scipy"]
+    assert loaded_mode["uses_3d"] is True
+
+    # 2. Select Slide mode
+    res_slide = mode_tool.function(
+        recommended_mode="slide",
+        reason="Clean slide presentation with step-by-step proofs",
+    )
+    assert "Mode confirmed by operator: **SLIDE**" in res_slide
+    loaded_mode2 = ws.load_mode_selection()
+    assert loaded_mode2["mode"] == "slide"
+
+
+def test_inspect_hitl_workspace_tool(tmp_path: Path):
+    """Verify inspect_hitl_workspace accurately lists artifacts including mode_selection."""
+    ws = HitlWorkspace(workspace_dir=tmp_path)
+    agent = create_hitl_web_agent(mock=True, workspace_dir=tmp_path)
+    tools = agent._function_toolset.tools
+
+    tools["checkpoint_approve_classification"].function(
+        topic="Logarithms",
+        subject="math",
+        animatable=True,
+    )
+    tools["checkpoint_select_mode"].function(
+        recommended_mode="animation",
+        reason="Visual logarithmic scaling curve",
+    )
+
+    inspect_tool = tools["inspect_hitl_workspace"]
+    status = inspect_tool.function()
+    assert "mode_selection: EXISTS" in status
+    assert "classification: EXISTS" in status
+
 
 

@@ -51,6 +51,7 @@ class HitlPlanDeps:
     topic: str
     hints: str | None = None
     source_text: str | None = None
+    mode: str = "animation"
 
 
 @dataclass
@@ -59,6 +60,16 @@ class HitlCoderDeps:
     plan: str
     knowledge_text: str | None = None
     scene_name: str | None = None
+    mode: str = "animation"
+
+
+@dataclass
+class HitlModeDeps:
+    """Runtime dependencies carrying the selected mode through the pipeline."""
+    mode: str = "animation"  # "slide" | "animation" | "scivis"
+    classification: VideoClassifyResponse | None = None
+    scivis_libraries: list[str] = field(default_factory=list)
+    scivis_domain: str = ""
 
 
 @dataclass
@@ -546,7 +557,65 @@ def get_manimce_tier1_preinjected_context() -> str:
     return "\n".join(parts)
 
 
-def get_composer_tier1_preinjected_context() -> str:
+# ── Mode Prompts and Bridge Constants ──────────────────────────────────────────
+
+SCIVIS_BRIDGE_RULES = """\
+=== SCIVIS DATA BRIDGE RULES ===
+1. SEPARATE data computation from Manim visualization — never fetch or compute heavy data inside construct().
+2. Define a standalone function `get_data() -> Any` (e.g. returning NumPy ndarray, dict, or data structures) OUTSIDE and ABOVE the Scene class.
+3. Call `get_data()` at the TOP of `construct()` and assign to a local variable (e.g. `data = get_data()`).
+4. Map scientific entities to clean Manim primitives:
+   - 3D atomic coordinates / celestial bodies -> `Sphere` / `Dot` / `Dot3D`
+   - Molecular bonds / network edges -> `Line` / `Line3D` / `Cylinder`
+   - NetworkX graphs -> `VGroup` of `Dot` nodes and `Line` edges mapped from `G.nodes()` / `G.edges()`
+   - Tabular / time-series data -> `Axes` coordinate frame with `axes.c2p(x, y)` plotting
+   - Orbital / parametric trajectories -> `ParametricFunction` or `VMobject.set_points_as_corners()`
+5. Scientific Libraries & Graceful Fallbacks:
+   - `numpy` and `math` are standard and always available.
+   - For optional scientific libraries (e.g. `astropy`, `scipy`, `networkx`, `rdkit`, `matplotlib`), put the import inside `get_data()` with a `try...except ImportError` fallback that generates synthetic demo data if the package is missing.
+6. Provenance & Annotations:
+   - Include a subtle data-provenance `Text` label at bottom edge (e.g. `Text("Data: simulation / astropy model", font_size=20).to_edge(DOWN, buff=0.3)`).
+"""
+
+MODE_COMPOSER_HINTS: dict[str, str] = {
+    "slide": """\
+MODE: SLIDE MODE (Dynamic Slide Presentation)
+You are composing a SLIDE-STYLE educational video — a dynamic, sequenced presentation.
+Directives:
+- Structure the video into distinct, ordered slides (each scene = 1 slide or slide transition).
+- Use generous self.wait() (2–4 seconds) between builds to allow comfortable reading.
+- Build elements SEQUENTIALLY: title/header first, then formula/diagram, then explanation bullets.
+- Group each slide's elements in a VGroup and FadeOut the whole group before proceeding to the next slide.
+- Avoid continuous motion (no updaters, no camera rotation). Focus on Write, FadeIn, Create, and clean fades.
+- Include 4–8 slides minimum. Each slide must convey ONE core concept.
+- Text & MathTex must have clear readable font_size (≥36 for headers, ≥28 for body).
+""",
+    "animation": """\
+MODE: ANIMATION MODE (Fluid Motion & Visual Intuition)
+You are composing a FLUID ANIMATION educational video — 3Blue1Brown / Grant Sanderson style.
+Directives:
+- Prioritize MOTION: updaters, ValueTracker, dynamic rates, continuous camera movement.
+- Scenes flow seamlessly without hard cuts — use Transform, ReplacementTransform, or morphing.
+- If 3D canvas is required: use ThreeDScene with ambient camera rotation.
+- If camera movements are required: use MovingCameraScene with self.camera.frame.animate zoom and pan.
+- Include dynamic rate_func choices (smooth, there_and_back, rush_into) for expressive timing.
+- Design for visual rhythm and conceptual intuition.
+""",
+    "scivis": """\
+MODE: SCIVIS MODE (Scientific Visualization & Real Data)
+You are composing a SCIENTIFICALLY ACCURATE visualization paired with computational scientific Python.
+Directives:
+- First scene MUST fetch or compute data using scientific libraries (e.g. NumPy, SciPy, Astropy, NetworkX).
+- Specify a standalone get_data() function defined OUTSIDE the construct() method.
+- Map scientific objects to Manim primitives (Sphere=atom, Line=bond, Dot=node, ParametricFunction=orbit).
+- Add a data-provenance Text label displaying source / simulation parameters (e.g. "Data: astropy.coordinates").
+- Always plan a fallback synthetic dataset if the external library is absent.
+- Use ThreeDScene for molecular/orbital visualizations. Use MovingCameraScene for network graphs.
+""",
+}
+
+
+def get_composer_tier1_preinjected_context(mode: str = "animation") -> str:
     """Pre-inject mandatory Tier 1 Manim Composer and ManimCE best practice rules directly into model context."""
     tier1_files = [
         ("templates/scenes-template.md", "CANONICAL SCENES.MD TEMPLATE"),
@@ -568,10 +637,15 @@ def get_composer_tier1_preinjected_context() -> str:
         ("rules/timing.md", "TIMING RULES"),
         ("rules/styling.md", "STYLING RULES"),
     ]
+    mode_clean = (mode or "animation").lower().strip()
+    mode_hint = MODE_COMPOSER_HINTS.get(mode_clean, MODE_COMPOSER_HINTS["animation"])
+
     parts: list[str] = [
         "================================================================================",
-        "MANDATORY MANIM COMPOSER & MANIMCE BEST PRACTICES (Pre-Injected Context)",
+        f"MANDATORY MANIM COMPOSER & MANIMCE BEST PRACTICES [{mode_clean.upper()} MODE]",
         "================================================================================",
+        mode_hint.strip(),
+        "--------------------------------------------------------------------------------",
         "SPATIAL LAYOUT & MANIMCE FEASIBILITY DIRECTIVES:",
         "1. SCREEN BOUNDS & SAFE MARGINS:",
         "   - Manim screen is 16:9 with coordinates X: [-7.11, 7.11], Y: [-4.0, 4.0]. Keep a 0.5 buff from edges.",
@@ -586,12 +660,119 @@ def get_composer_tier1_preinjected_context() -> str:
         "   - Clearly specify `Transform` vs `ReplacementTransform` vs `FadeOut` to avoid screen clutter.",
         "================================================================================",
     ]
+    if mode_clean == "scivis":
+        parts.insert(4, SCIVIS_BRIDGE_RULES.strip())
+
     for rel_path, title in tier1_files:
         content = resolve_skill_reference_content(rel_path)
         if content and not content.startswith("File '") and not content.startswith("Error"):
             parts.append(f"\n--- {title} ({rel_path}) ---\n{content.strip()}\n")
     parts.append("================================================================================")
     return "\n".join(parts)
+
+
+def get_slide_tier1_context() -> str:
+    """Pre-inject Tier 1 rules tailored for Slide Mode (static layout, typography, sequencing)."""
+    slide_files = [
+        ("rules/positioning.md", "MANDATORY POSITIONING & SCREEN LAYOUT RULES"),
+        ("rules/scenes.md", "SCENE ARCHITECTURE & LIFECYCLE"),
+        ("rules/config.md", "CAMERA RESOLUTION & SCREEN DIMENSIONS"),
+        ("rules/mobjects.md", "MOBJECT HIERARCHY & GROUPING"),
+        ("rules/text.md", "TYPOGRAPHY & TEXT RULES"),
+        ("rules/text-animations.md", "TEXT ANIMATIONS RULES"),
+        ("rules/shapes.md", "SHAPES & CONTAINER BOXES"),
+        ("rules/lines.md", "CONNECTING LINES & ARROWS"),
+        ("rules/latex.md", "MATHEMATICAL LATEX RULES"),
+        ("rules/grouping.md", "VGROUP GROUPING RULES"),
+        ("rules/styling.md", "STYLING & VISUAL POLISH RULES"),
+        ("rules/colors.md", "COLOR PALETTE & CONTRAST GUIDELINES"),
+    ]
+    parts: list[str] = [
+        "================================================================================",
+        "MANIMCE SLIDE MODE RULES (Pre-Injected Context — Non-Negotiable)",
+        "================================================================================",
+        "SLIDE MODE DIRECTIVES:",
+        "1. SEQUENTIAL PRESENTATION STRUCTURE:",
+        "   - Build scenes as distinct slides: Title/Header -> Diagram/Formula -> Explanatory Bullets.",
+        "   - Generous self.wait() (2.0–4.0 seconds) between visual builds for reader digestion.",
+        "2. CLEAN SLIDE TRANSITIONS:",
+        "   - Collect all mobjects of a slide into a `VGroup` (e.g. `slide1 = VGroup(...)`).",
+        "   - Transition between slides using `self.play(FadeOut(slide1))` before building `slide2`.",
+        "3. NO CONTINUOUS UPDATERS OR ROTATING CAMERAS:",
+        "   - Avoid `add_updater()`, `ValueTracker`, or rotating 3D cameras unless explicitly requested.",
+        "   - Use clean, discrete animations: `Write()`, `FadeIn()`, `Create()`, `TransformMatchingShapes()`.",
+        "4. TYPOGRAPHY & READABILITY:",
+        "   - Use clear, legible font sizes (Title >= 36, Subtitle >= 30, Body/Math >= 26).",
+        "   - Never overlap text with diagrams: anchor headers to `UP` with `.to_edge(UP, buff=0.5)`.",
+        "================================================================================",
+    ]
+    for rel_path, title in slide_files:
+        content = resolve_skill_reference_content(rel_path)
+        if content and not content.startswith("File '") and not content.startswith("Error"):
+            parts.append(f"\n--- {title} ({rel_path}) ---\n{content.strip()}\n")
+    parts.append("================================================================================")
+    return "\n".join(parts)
+
+
+def get_animation_tier1_context(needs_3d: bool = False) -> str:
+    """Pre-inject Tier 1 rules tailored for Animation Mode (fluid motion, updaters, camera, transforms)."""
+    anim_files = [
+        ("rules/positioning.md", "MANDATORY POSITIONING & SCREEN LAYOUT RULES"),
+        ("rules/scenes.md", "SCENE ARCHITECTURE & LIFECYCLE"),
+        ("rules/config.md", "CAMERA RESOLUTION & SCREEN DIMENSIONS"),
+        ("rules/mobjects.md", "MOBJECT HIERARCHY & GROUPING"),
+        ("rules/updaters.md", "DYNAMIC UPDATERS & VALUETRACKERS"),
+        ("rules/timing.md", "ANIMATION TIMING & RATE FUNCTIONS"),
+        ("rules/transform-animations.md", "TRANSFORM & MORPHING ANIMATIONS"),
+        ("rules/animation-groups.md", "ANIMATION GROUPS & SEQUENCING"),
+        ("rules/camera.md", "CAMERA CONTROL & MOVING CAMERA"),
+        ("rules/creation-animations.md", "CREATION ANIMATIONS RULES"),
+        ("rules/axes.md", "COORDINATE AXES RULES"),
+        ("rules/graphing.md", "GRAPHING & PLOTTING RULES"),
+        ("rules/latex.md", "MATHEMATICAL LATEX RULES"),
+        ("rules/styling.md", "STYLING RULES"),
+        ("rules/colors.md", "COLOR PALETTES"),
+    ]
+    if needs_3d:
+        anim_files.insert(5, ("rules/3d.md", "3D SCENE & THREE-D MOBJECTS RULES"))
+
+    parts: list[str] = [
+        "================================================================================",
+        "MANIMCE ANIMATION MODE RULES (Pre-Injected Context — Non-Negotiable)",
+        "================================================================================",
+        "ANIMATION MODE DIRECTIVES:",
+        "1. FLUID MOTION & CONTINUOUS DYNAMICS:",
+        "   - Prioritize dynamic motion: use `ValueTracker`, `.add_updater()`, and continuous mathematical flows.",
+        "   - Always remove updaters when done or clear the tracker (`mobject.clear_updaters()`).",
+        "2. CAMERA & SPATIAL EXPLORATION:",
+        "   - Use `MovingCameraScene` for zoom/pan reveals or `ThreeDScene` for 3D exploration.",
+        "   - Frame camera transitions smoothly with `self.camera.frame.animate.set(...)`.",
+        "3. SEAMLESS TRANSFORMS:",
+        "   - Favor morphing and transforms (`Transform`, `ReplacementTransform`, `TransformMatchingShapes`) over hard cuts.",
+        "   - Expressive timing: use tailored `rate_func` (`smooth`, `there_and_back`, `rush_into`).",
+        "================================================================================",
+    ]
+    for rel_path, title in anim_files:
+        content = resolve_skill_reference_content(rel_path)
+        if content and not content.startswith("File '") and not content.startswith("Error"):
+            parts.append(f"\n--- {title} ({rel_path}) ---\n{content.strip()}\n")
+    parts.append("================================================================================")
+    return "\n".join(parts)
+
+
+def get_scivis_tier1_context(libraries: list[str] | None = None, needs_3d: bool = False) -> str:
+    """Pre-inject Tier 1 rules tailored for SciVis Mode (data bridge, scientific libraries, visualization)."""
+    base_anim_context = get_animation_tier1_context(needs_3d=needs_3d)
+    libs_str = ", ".join(libraries) if libraries else "numpy, scipy"
+    scivis_banner = [
+        "================================================================================",
+        "MANIMCE SCIVIS MODE RULES — SCIENTIFIC DATA VISUALIZATION BRIDGE",
+        f"Target Libraries: {libs_str}",
+        "================================================================================",
+        SCIVIS_BRIDGE_RULES.strip(),
+        "================================================================================",
+    ]
+    return "\n".join(scivis_banner) + "\n\n" + base_anim_context
 
 
 # ── OOP Class: Native Agent Tools ─────────────────────────────────────────────

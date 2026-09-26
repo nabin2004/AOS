@@ -29,7 +29,7 @@ from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
 
-from app.schemas.video_generation import VideoClassifyResponse
+from app.schemas.video_generation import ModeSelectionResponse, VideoClassifyResponse
 from app.services.manim_code import CodeRepair, PreflightResult
 
 logger = logging.getLogger(__name__)
@@ -236,6 +236,7 @@ class HitlWorkspace:
         self.preflight_file = self.workspace_dir / "preflight.json"
         self.error_file = self.workspace_dir / "error.json"
         self.repair_file = self.workspace_dir / "repair.json"
+        self.mode_file = self.workspace_dir / "mode_selection.json"
         self.manifest_file = self.workspace_dir / "manifest.json"
 
     # ── Input handling ──
@@ -267,14 +268,10 @@ class HitlWorkspace:
     ) -> Path:
         """Save classification output in structured JSON format (classification.json)."""
         if isinstance(classification, VideoClassifyResponse):
-            data = {
-                "query": query,
-                "animatable": classification.animatable,
-                "subject": classification.subject,
-                "topic": classification.topic,
-                "reason": classification.reason,
-                "updated_at": datetime.now().isoformat(),
-            }
+            data = classification.model_dump(mode="json")
+            if query:
+                data["query"] = query
+            data["updated_at"] = datetime.now().isoformat()
             topic = classification.topic
         else:
             data = dict(classification)
@@ -293,6 +290,33 @@ class HitlWorkspace:
             return None
         try:
             return json.loads(self.classification_file.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+    # ── Mode selection handling ──
+    def save_mode_selection(
+        self,
+        mode: ModeSelectionResponse | dict[str, Any],
+        topic: str | None = None,
+    ) -> Path:
+        """Save animation mode selection in structured JSON format (mode_selection.json)."""
+        if isinstance(mode, ModeSelectionResponse):
+            data = mode.model_dump(mode="json")
+            data["updated_at"] = datetime.now().isoformat()
+        else:
+            data = dict(mode)
+            data["updated_at"] = datetime.now().isoformat()
+
+        self.mode_file.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        self.update_manifest(stage="mode_select", topic=topic)
+        return self.mode_file
+
+    def load_mode_selection(self) -> dict[str, Any] | None:
+        """Read mode_selection.json if present in workspace."""
+        if not self.mode_file.exists():
+            return None
+        try:
+            return json.loads(self.mode_file.read_text(encoding="utf-8"))
         except Exception:
             return None
 
@@ -499,6 +523,7 @@ class HitlWorkspace:
                 "code_json": self.code_json_file.name if self.code_json_file.exists() else None,
                 "preflight_json": self.preflight_file.name if self.preflight_file.exists() else None,
                 "repair_json": self.repair_file.name if self.repair_file.exists() else None,
+                "mode_selection_json": self.mode_file.name if self.mode_file.exists() else None,
             },
         }
         self.manifest_file.write_text(json.dumps(manifest_data, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -510,12 +535,28 @@ class HitlWorkspace:
             "workspace": str(self.workspace_dir),
             "input": self.input_file.exists(),
             "classification": self.classification_file.exists(),
+            "mode_selection": self.mode_file.exists(),
             "plan_md": self.plan_md_file.exists(),
             "plan_json": self.plan_json_file.exists(),
             "scene_py": self.scene_file.exists(),
             "code_json": self.code_json_file.exists(),
             "preflight": self.preflight_file.exists(),
             "repair": self.repair_file.exists(),
+        }
+
+    def list_artifacts(self) -> dict[str, Path]:
+        """Return a mapping of artifact names to Path objects."""
+        return {
+            "input": self.input_file,
+            "classification": self.classification_file,
+            "mode_selection": self.mode_file,
+            "plan_md": self.plan_md_file,
+            "plan_json": self.plan_json_file,
+            "scene_py": self.scene_file,
+            "code_json": self.code_json_file,
+            "preflight": self.preflight_file,
+            "repair": self.repair_file,
+            "manifest": self.manifest_file,
         }
 
 

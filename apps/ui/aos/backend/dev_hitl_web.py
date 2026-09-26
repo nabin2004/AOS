@@ -52,7 +52,7 @@ from app.core.local_logging import (
     HitlWorkspace,
     disable_logfire_remote,
 )
-from app.schemas.video_generation import VideoClassifyResponse
+from app.schemas.video_generation import ModeSelectionResponse, VideoClassifyResponse
 from app.services.latex_validator import run_latex_diagnostics
 from app.services.lsp_service import run_pyright_lsp
 from app.services.positioning_linter import lint_manim_positioning
@@ -76,9 +76,17 @@ To ensure the operator sees every single action and skill loading in real-time i
    - You MUST call `checkpoint_approve_classification(topic, subject, animatable, reason)`.
    - IMPORTANT: This tool requires operator approval. The UI will pause and display an interactive card allowing the operator to verify or edit the subject (e.g. correcting "log" from CS to Math) before continuing.
 
+1.5. Stage 1.5 — Mode Selection Checkpoint:
+   - After classification is approved, evaluate the topic and technical flags:
+     * Simple sequential presentations, step-by-step concepts, or formula-heavy slides -> recommend "slide" mode.
+     * Smooth continuous motion, updaters, ValueTracker, 3D, or moving camera -> recommend "animation" mode.
+     * Scientific data, simulations, molecular structures, graphs, or astronomical orbits -> recommend "scivis" mode (and specify relevant scientific libraries such as numpy, scipy, astropy, networkx).
+   - You MUST call `checkpoint_select_mode(recommended_mode, reason, scivis_libraries, scivis_domain)`.
+   - IMPORTANT: This tool requires operator approval. The UI will display an interactive card allowing the operator to confirm or override the mode.
+
 2. Stage 2 — Visual Plan Composition Checkpoint:
    - Before composing, call `load_skill_reference(skill="manim-composer")` and/or `load_skill_reference(skill="manimce-best-practices", path="rules/positioning.md")` so the operator sees the pedagogical and ManimCE spatial layout skills being loaded in the UI stream.
-   - Compose a comprehensive pedagogical scene-by-scene animation plan following both `manim-composer` and `manimce-best-practices` (scenes.md):
+   - Compose a comprehensive pedagogical scene-by-scene animation plan following the selected mode, `manim-composer`, and `manimce-best-practices` (scenes.md):
      * Title, Overview, Hook, Target Audience, Estimated Length, Key Insight
      * Narrative Arc
      * Scene 1, Scene 2, ... (Duration, Purpose, Visual Elements, Content, Narration Notes, Technical Notes)
@@ -199,7 +207,62 @@ def create_hitl_web_agent(
             f"- Scene Type: {scene_type}\n"
             f"- Tools/Flags: 3D={needs_3d}, Updaters={needs_updaters}, Axes={needs_axes}, Camera={needs_camera_movement}, Timing={needs_timing_control}, Graphing={needs_graphing}\n"
             f"- Saved to: {workspace.classification_file.name}\n\n"
-            f"You may now proceed to Stage 2: compose the visual plan (scenes.md) and submit it to checkpoint_approve_visual_plan."
+            f"You may now proceed to Stage 1.5: recommend an animation mode (slide, animation, scivis) and call checkpoint_select_mode."
+        )
+
+    # ── Checkpoint Tool 1.5: Mode Selection (Requires Approval) ──────────────
+    @agent.tool_plain(requires_approval=True)
+    def checkpoint_select_mode(
+        recommended_mode: str = "animation",
+        reason: str = "",
+        scivis_libraries: list[str] | None = None,
+        scivis_domain: str = "",
+        uses_3d: bool | None = None,
+        uses_camera_movement: bool | None = None,
+        **kwargs: Any,
+    ) -> str:
+        """[HITL Checkpoint 1.5] Request human operator confirmation or choice for animation mode.
+
+        Available Modes:
+        - 'slide': Clean, sequential slide presentation (VGroup per slide, FadeOut transitions, generous pauses).
+        - 'animation': Fluid, continuous motion animation (3B1B style, ValueTracker, updaters, camera moves).
+        - 'scivis': Scientific visualization with external data bridge (NumPy, SciPy, Astropy, NetworkX).
+
+        Call this AFTER checkpoint_approve_classification and BEFORE composing the visual plan.
+        """
+        mode_raw = (recommended_mode or kwargs.get("mode") or "animation").lower().strip()
+        if mode_raw not in ("slide", "animation", "scivis"):
+            mode_raw = "animation"
+
+        saved_class = workspace.load_classification() or {}
+        active_topic = saved_class.get("topic") or "Educational Topic"
+        needs_3d = uses_3d if uses_3d is not None else bool(kwargs.get("needs_3d", saved_class.get("needs_3d", False)))
+        needs_camera = uses_camera_movement if uses_camera_movement is not None else bool(kwargs.get("needs_camera_movement", saved_class.get("needs_camera_movement", False)))
+
+        mode_resp = ModeSelectionResponse(
+            mode=mode_raw,  # type: ignore[arg-type]
+            reason=reason or f"Mode selected for '{active_topic}'",
+            scivis_libraries=scivis_libraries or kwargs.get("libraries") or [],
+            scivis_domain=scivis_domain or saved_class.get("subject", ""),
+            uses_3d=needs_3d,
+            uses_camera_movement=needs_camera,
+        )
+        workspace.save_mode_selection(mode_resp, topic=active_topic)
+        run_store.record_run(
+            stage="mode_select",
+            topic=active_topic,
+            model_name="mock:TestModel" if mock else (model_name or "default"),
+            duration=0.0,
+            success=True,
+            artifacts={"mode_selection": mode_resp.model_dump()},
+        )
+        libs_info = f" (libraries: {', '.join(mode_resp.scivis_libraries)})" if mode_resp.scivis_libraries else ""
+        return (
+            f"Mode confirmed by operator: **{mode_raw.upper()}**{libs_info}\n"
+            f"- Reason: {mode_resp.reason}\n"
+            f"- 3D Canvas: {needs_3d}, Moving Camera: {needs_camera}\n"
+            f"- Saved to: {workspace.mode_file.name}\n\n"
+            f"You may now proceed to Stage 2: load relevant skills and call checkpoint_approve_visual_plan with a {mode_raw}-optimized scenes.md plan."
         )
 
     # ── Checkpoint Tool 2: Visual Plan (Requires Approval) ────────────────────
@@ -223,6 +286,8 @@ def create_hitl_web_agent(
         saved_class = workspace.load_classification() or {}
         active_topic = topic or saved_class.get("topic") or "Educational Topic"
         active_subject = subject or saved_class.get("subject") or "general"
+        mode_data = workspace.load_mode_selection() or {}
+        active_mode = mode_data.get("mode", "animation")
 
         workspace.save_plan(content, topic=active_topic)
         run_store.record_run(
@@ -231,10 +296,10 @@ def create_hitl_web_agent(
             model_name="mock:TestModel" if mock else (model_name or "default"),
             duration=0.0,
             success=True,
-            artifacts={"plan": content},
+            artifacts={"plan": content, "mode": active_mode},
         )
         return (
-            f"Visual plan confirmed by operator for '{active_topic}'.\n"
+            f"Visual plan confirmed by operator for '{active_topic}' [{active_mode.upper()} mode].\n"
             f"- Saved to: {workspace.plan_md_file.name} and {workspace.plan_json_file.name}\n\n"
             f"You may now proceed to Stage 3: call synthesize_manim_code or generate_and_validate_manim_code."
         )
@@ -306,12 +371,37 @@ def create_hitl_web_agent(
                 api_key=api_key,
                 capabilities=[get_coder_skills()],
             )
-            deps = hitl_agents.HitlCoderDeps(plan=plan_markdown, scene_name=scene_name)
-            tier1_context = hitl_agents.get_manimce_tier1_preinjected_context()
+            mode_data = workspace.load_mode_selection() or {}
+            mode = mode_data.get("mode", "animation")
+            saved_class = workspace.load_classification() or {}
+            needs_3d = bool(saved_class.get("needs_3d", False))
+
+            if mode == "slide":
+                tier1_context = hitl_agents.get_slide_tier1_context()
+                mode_guideline = (
+                    "MODE: SLIDE MODE. Structure the animation into distinct slides using VGroups, "
+                    "FadeOut transitions, and clear pauses (self.wait(2.0-3.0)). Do NOT use continuous updaters."
+                )
+            elif mode == "scivis":
+                libs = mode_data.get("scivis_libraries", [])
+                tier1_context = hitl_agents.get_scivis_tier1_context(libraries=libs, needs_3d=needs_3d)
+                mode_guideline = (
+                    "MODE: SCIVIS MODE. Implement a standalone get_data() function before the Scene class, "
+                    "call it in construct(), and map scientific data to Manim primitives with graceful fallbacks."
+                )
+            else:
+                tier1_context = hitl_agents.get_animation_tier1_context(needs_3d=needs_3d)
+                mode_guideline = (
+                    "MODE: ANIMATION MODE. Emphasize fluid motion, relative positioning, updaters, and seamless transforms."
+                )
+
+            deps = hitl_agents.HitlCoderDeps(plan=plan_markdown, scene_name=scene_name, mode=mode)
             coder_prompt = (
                 f"Topic: {topic}\n\n"
+                f"Mode: {mode.upper()}\n\n"
                 f"Visual Plan (scenes.md):\n{plan_markdown}\n\n"
                 f"{tier1_context}\n\n"
+                f"{mode_guideline}\n\n"
                 "Generate complete, executable Manim Community Edition Python code for this animation. "
                 "Follow the pre-injected Tier 1 rules strictly: "
                 "NEVER use raw coordinate literals or manual float shifts. Use relative layouts (.next_to, .arrange, .to_edge) "
@@ -482,12 +572,37 @@ def create_hitl_web_agent(
                 api_key=api_key,
                 capabilities=[get_coder_skills()],
             )
-            deps = hitl_agents.HitlCoderDeps(plan=plan_markdown, scene_name=scene_name)
-            tier1_context = hitl_agents.get_manimce_tier1_preinjected_context()
+            mode_data = workspace.load_mode_selection() or {}
+            mode = mode_data.get("mode", "animation")
+            saved_class = workspace.load_classification() or {}
+            needs_3d = bool(saved_class.get("needs_3d", False))
+
+            if mode == "slide":
+                tier1_context = hitl_agents.get_slide_tier1_context()
+                mode_guideline = (
+                    "MODE: SLIDE MODE. Structure the animation into distinct slides using VGroups, "
+                    "FadeOut transitions, and clear pauses (self.wait(2.0-3.0)). Do NOT use continuous updaters."
+                )
+            elif mode == "scivis":
+                libs = mode_data.get("scivis_libraries", [])
+                tier1_context = hitl_agents.get_scivis_tier1_context(libraries=libs, needs_3d=needs_3d)
+                mode_guideline = (
+                    "MODE: SCIVIS MODE. Implement a standalone get_data() function before the Scene class, "
+                    "call it in construct(), and map scientific data to Manim primitives with graceful fallbacks."
+                )
+            else:
+                tier1_context = hitl_agents.get_animation_tier1_context(needs_3d=needs_3d)
+                mode_guideline = (
+                    "MODE: ANIMATION MODE. Emphasize fluid motion, relative positioning, updaters, and seamless transforms."
+                )
+
+            deps = hitl_agents.HitlCoderDeps(plan=plan_markdown, scene_name=scene_name, mode=mode)
             coder_prompt = (
                 f"Topic: {topic}\n\n"
+                f"Mode: {mode.upper()}\n\n"
                 f"Visual Plan (scenes.md):\n{plan_markdown}\n\n"
                 f"{tier1_context}\n\n"
+                f"{mode_guideline}\n\n"
                 "Generate complete, executable Manim Community Edition Python code for this animation. "
                 "Follow the pre-injected Tier 1 rules strictly: "
                 "NEVER use raw coordinate literals or manual float shifts. Use relative layouts (.next_to, .arrange, .to_edge) "

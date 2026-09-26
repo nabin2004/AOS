@@ -748,12 +748,37 @@ class {detected_scene}(Scene):
             api_key=api_key,
             capabilities=caps,
         )
-        deps = hitl_agents.HitlCoderDeps(plan=plan, knowledge_text=topic)
-        tier1_context = hitl_agents.get_manimce_tier1_preinjected_context()
+        mode_data = workspace.load_mode_selection() if workspace else None
+        mode = (mode_data or {}).get("mode", "animation")
+        saved_class = workspace.load_classification() if workspace else None
+        needs_3d = bool((saved_class or {}).get("needs_3d", False))
+
+        if mode == "slide":
+            tier1_context = hitl_agents.get_slide_tier1_context()
+            mode_guideline = (
+                "MODE: SLIDE MODE. Structure into distinct slides with VGroups, "
+                "FadeOut transitions, and clear pauses (self.wait(2.0-3.0)). Do NOT use continuous updaters."
+            )
+        elif mode == "scivis":
+            libs = (mode_data or {}).get("scivis_libraries", [])
+            tier1_context = hitl_agents.get_scivis_tier1_context(libraries=libs, needs_3d=needs_3d)
+            mode_guideline = (
+                "MODE: SCIVIS MODE. Implement a standalone get_data() function before the Scene class, "
+                "call it in construct(), and map scientific data to Manim primitives with graceful fallbacks."
+            )
+        else:
+            tier1_context = hitl_agents.get_animation_tier1_context(needs_3d=needs_3d)
+            mode_guideline = (
+                "MODE: ANIMATION MODE. Emphasize fluid motion, relative positioning, updaters, and seamless transforms."
+            )
+
+        deps = hitl_agents.HitlCoderDeps(plan=plan, knowledge_text=topic, mode=mode)
         user_prompt = (
             f"Topic: {topic}\n\n"
+            f"Mode: {mode.upper()}\n\n"
             f"Approved scenes.md Visual Plan:\n{plan}\n\n"
             f"{tier1_context}\n\n"
+            f"{mode_guideline}\n\n"
             "Following the pre-injected manimce-best-practices Tier 1 rules strictly, synthesize a complete, "
             "production-quality Manim Community Edition Python scene that faithfully implements "
             "every scene described in the plan above. "

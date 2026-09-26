@@ -63,6 +63,19 @@ class VideoClassifyResponse(BaseSchema):
     needs_graphing: bool = False
 
 
+AnimationMode = Literal["slide", "animation", "scivis"]
+
+
+class ModeSelectionResponse(BaseSchema):
+    mode: AnimationMode = "animation"
+    reason: str = ""
+    scivis_libraries: list[str] = Field(default_factory=list)
+    scivis_domain: str = ""
+    slide_count: int | None = None
+    uses_3d: bool = False
+    uses_camera_movement: bool = False
+
+
 class VideoPlanRequest(BaseSchema):
     text: str = Field(min_length=1)
     hints: str | None = None
