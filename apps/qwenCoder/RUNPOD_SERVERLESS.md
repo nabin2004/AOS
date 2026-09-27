@@ -28,7 +28,7 @@ uv run python create_deploy_repo.py --mode adapter
 
 | Architecture | Hugging Face Repo | RunPod vLLM Configuration | Cold Start Speed | Recommendation |
 |---|---|---|---|---|
-| **Option A: Clean LoRA Adapter** | `nabin2004/qwen-Manimator-1-grpo-clean` (~95 MB) | `MODEL_NAME=Qwen/Qwen3-8B`<br/>`ENABLE_LORA=1`<br/>`LORA_MODULES=[{"name": "manimator", "path": "nabin2004/qwen-Manimator-1-grpo-clean"}]` | Fast (pulls base + 95 MB LoRA) | Good if sharing base model |
+| **Option A: Clean LoRA Adapter** | `nabin2004/qwen-Manimator-1-grpo-clean` (~95 MB) | `MODEL_NAME=Qwen/Qwen3-8B`<br/>`ENABLE_LORA=1`<br/>`LORA_MODULES=manimator=nabin2004/qwen-Manimator-1-grpo-clean` | Fast (pulls base + 95 MB LoRA) | Good if sharing base model |
 | **Option B: Merged Standalone** | `nabin2004/qwen-Manimator-1-grpo-merged` (~16 GB) | `MODEL_NAME=nabin2004/qwen-Manimator-1-grpo-merged` | **Fastest & Simplest** (Zero LoRA config) | **⭐ Recommended for Serverless** |
 
 To create the merged standalone model:
@@ -58,10 +58,11 @@ HF_TOKEN=your_hf_token_if_private
 ```env
 MODEL_NAME=Qwen/Qwen3-8B
 ENABLE_LORA=1
-LORA_MODULES=[{"name": "manimator", "path": "nabin2004/qwen-Manimator-1-grpo-clean"}]
+LORA_MODULES=manimator=nabin2004/qwen-Manimator-1-grpo-clean
 MAX_MODEL_LEN=32768
 HF_TOKEN=your_hf_token_if_private
 ```
+*(Note: Do NOT enclose `LORA_MODULES` in brackets `[...]` as a list; vLLM expects `name=path` or a single dictionary mapping `{"name": "...", "path": "..."}`).*
 
 6. Click **Deploy**.
 
