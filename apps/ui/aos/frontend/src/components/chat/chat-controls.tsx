@@ -26,7 +26,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useKnowledgeBases, useConversations } from "@/hooks";
 import { useConversationStore, useKBSelectionStore } from "@/stores";
-import { useChatModeStore, useLlmProviderStore } from "@/stores";
+import { useChatModeStore, useLlmProviderStore, type VideoMode } from "@/stores";
 import { LlmProviderForm } from "@/components/settings/llm-provider-form";
 import { cn } from "@/lib/utils";
 import type { KBScope, KnowledgeBase } from "@/types";
@@ -517,7 +517,7 @@ function SettingsPanel({
         <div className="relative">
           <select
             value={videoMode}
-            onChange={(e) => setVideoMode(e.target.value as any)}
+            onChange={(e) => setVideoMode(e.target.value as VideoMode)}
             className="w-full appearance-none rounded-md border border-foreground/15 bg-background px-3 py-2 text-xs font-medium text-foreground outline-none transition-colors hover:border-foreground/30 focus:border-primary focus:ring-1 focus:ring-primary"
           >
             <optgroup label="Standard Modes">
