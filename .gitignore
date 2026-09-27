@@ -70,3 +70,8 @@ apps/qwenCoder/*-gguf/
 node_modules/
 .claude/
 agent/
+
+apps/qwenCoder/runpod_config.json
+apps/qwenCoder/runpod_merged.env
+apps/qwenCoder/build_*
+
