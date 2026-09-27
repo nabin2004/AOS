@@ -286,6 +286,7 @@ export function ManimStudioModal({
   const { baseUrl, apiKey, modelId } = useLlmProviderStore();
   const accessToken = useAuthStore((state) => state.accessToken);
   const critiqueModeActive = useCritiqueStore((s) => s.critiqueModeActive);
+  const videoMode = useChatModeStore((s) => s.videoMode);
 
   // Track the last knowledge we generated a plan for so we can detect a new query
   const lastKnowledgeRef = useRef<string>("");
@@ -306,6 +307,7 @@ export function ManimStudioModal({
         },
         body: JSON.stringify({
           text: sourceText,
+            mode: videoMode !== "off" ? videoMode : "lecture",
           model_name: modelId,
           base_url: baseUrl,
           api_key: apiKey,
@@ -371,6 +373,7 @@ export function ManimStudioModal({
         },
         body: JSON.stringify({
           plan: planMarkdown,
+            mode: videoMode !== "off" ? videoMode : "lecture",
           knowledge_text: knowledgeText,
           model_name: modelId,
           base_url: baseUrl,

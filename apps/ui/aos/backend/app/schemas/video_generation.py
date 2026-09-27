@@ -43,6 +43,7 @@ class VideoGenerationCreate(BaseSchema):
     mode: VideoMode
     conversation_id: UUID
     user_message_id: UUID | None = None
+    narration_enabled: bool = False
 
 
 class VideoClassifyRequest(BaseSchema):

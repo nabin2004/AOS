@@ -330,8 +330,9 @@ services:
   # MinIO (S3 Video & Asset Storage)
   # ----------------------------------------------------------------------------
   minio:
-    image: quay.io/minio/minio:RELEASE.2025-02-18T16-25-55Z
+    image: cgr.dev/chainguard/minio:latest
     container_name: aos_minio
+    user: "0:0"
     ports:
       - "${MINIO_API_PORT:-9010}:9000"
       - "${MINIO_CONSOLE_PORT:-9011}:9001"
@@ -344,7 +345,7 @@ services:
     networks:
       - aos_net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && exec 3<&-"]
       interval: 20s
       timeout: 10s
       retries: 5

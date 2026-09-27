@@ -370,6 +370,7 @@ class VideoGenerationService:
         llm_base_url: str | None = None,
         llm_api_key: str | None = None,
         model_name: str | None = None,
+        narration_enabled: bool = False,
     ) -> str:
         """Enqueue Celery task; returns task id.
 
@@ -382,5 +383,6 @@ class VideoGenerationService:
             llm_base_url=llm_base_url,
             llm_api_key=llm_api_key,
             model_name=model_name,
+            narration_enabled=narration_enabled,
         )
         return str(async_result.id)

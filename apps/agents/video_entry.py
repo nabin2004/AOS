@@ -230,6 +230,7 @@ async def run_animate(
     length: str = "medium",
     cinematic: bool = False,
     mode: str = "keyframe",
+    narration_enabled: bool = False,
 ) -> VideoArtifact:
     """Classify → plan → Manim coder/compile; resolve scene MP4."""
     import asyncio
@@ -244,6 +245,7 @@ async def run_animate(
             cinematic=cinematic,
             mode=mode,
             output_dir=output_dir,
+            narration_enabled=narration_enabled,
         )
     except Exception as exc:
         return VideoArtifact(

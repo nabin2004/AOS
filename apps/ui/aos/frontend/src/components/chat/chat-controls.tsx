@@ -17,6 +17,7 @@ import {
   Sparkles,
   Film,
   Users,
+  Mic,
 } from "lucide-react";
 
 import type { LucideIcon } from "lucide-react";
@@ -169,6 +170,10 @@ export function ChatControls({
     if (videoMode === "animate") parts.push("Animate");
     if (videoMode === "teaching") parts.push("Teaching");
     if (videoMode === "lecture") parts.push("Lecture");
+    if (videoMode === "slide") parts.push("Slide");
+    if (videoMode === "scivis") parts.push("SciVis");
+    if (videoMode === "marp") parts.push("Marp");
+    if (videoMode === "cinematic") parts.push("Cinematic");
     if (activeCount > 0) parts.push(`${activeCount} KB${activeCount === 1 ? "" : "s"}`);
     if (customProvider) parts.push("BYOK");
     if (effectiveModelLabel) parts.push(effectiveModelLabel);
@@ -476,7 +481,7 @@ function ModelPanel({
         </div>
       )}
       {customProvider && (
-        <p className="text-foreground/55 text-[11px] leading-relaxed">
+        <p suppressHydrationWarning className="text-foreground/55 text-[11px] leading-relaxed">
           Custom base URL is set — use the model id field above instead of the OpenRouter catalog.
         </p>
       )}
@@ -509,41 +514,59 @@ function SettingsPanel({
             Video generation
           </span>
         </div>
-        <div className="grid grid-cols-4 gap-1">
-          {(
-            [
-              { value: "off", label: "Off", hint: "Simple conversation mode" },
-              { value: "keyframe", label: "Keyframe", hint: "Keyframe Producer-Consumer engine (1-shot)" },
-              { value: "teaching", label: "Teaching", hint: "Visual anchor + extended narration (1-shot)" },
-              { value: "lecture", label: "Lecture", hint: "Full IR + assemble (1-shot)" },
-            ] as const
-          ).map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              title={opt.hint}
-              onClick={() => setVideoMode(opt.value)}
-              className={cn(
-                "rounded-md px-2 py-1.5 text-xs font-medium transition-colors text-center",
-                videoMode === opt.value
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10",
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
+        <div className="relative">
+          <select
+            value={videoMode}
+            onChange={(e) => setVideoMode(e.target.value as any)}
+            className="w-full appearance-none rounded-md border border-foreground/15 bg-background px-3 py-2 text-xs font-medium text-foreground outline-none transition-colors hover:border-foreground/30 focus:border-primary focus:ring-1 focus:ring-primary"
+          >
+            <optgroup label="Standard Modes">
+              <option value="off">Off (Standard Chat)</option>
+              <option value="animate">Animate (Continuous)</option>
+              <option value="keyframe">Keyframe (Pedagogical)</option>
+            </optgroup>
+            <optgroup label="Specialized Styles">
+              <option value="slide">Slides Mode</option>
+              <option value="scivis">Science Viz Mode</option>
+              <option value="marp">Marp Mode</option>
+              <option value="cinematic">Cinematic Mode</option>
+            </optgroup>
+            <optgroup label="Orchestration Pipelines">
+              <option value="teaching">Teaching (Visual + Narration)</option>
+              <option value="lecture">Lecture (Full Assembly)</option>
+            </optgroup>
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-foreground/50">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+          </div>
         </div>
-        <p className="text-foreground/55 text-[11px] leading-relaxed">
-          {videoMode === "off"
-            ? "Simple conversation mode: chat replies normally without compiling a video."
-            : videoMode === "keyframe"
-              ? "1-Shot Keyframe: Discrete pedagogical slides + synchronized Pocket TTS narration and frame freezing via Keyframe Engine."
-              : videoMode === "animate"
-                ? "1-Shot Animate: Pure Pydantic AI agent graph (agent_graph.py: Classify → Plan → TeachingScript → Coder) compiling continuous Manim code."
-                : videoMode === "teaching"
-                  ? "1-Shot Visual Anchor: Informative Manim visual anchor + decoupled in-depth teaching narration, then returns to conversation mode."
-                  : "1-Shot Lecture: Full IR pipeline + video assembly, then returns to conversation mode."}
+        <p suppressHydrationWarning className="text-foreground/55 text-[11px] leading-relaxed">
+          {videoMode === "off" && "Simple conversation mode: chat replies normally without compiling a video."}
+          {videoMode === "animate" && "1-Shot Animate: Continuous fluid Manim animation."}
+          {videoMode === "keyframe" && "1-Shot Keyframe: Discrete pedagogical slides + synchronized TTS."}
+          {videoMode === "slide" && "Slides Mode: Clean, sequential slide presentation with FadeOut transitions."}
+          {videoMode === "scivis" && "Science Viz: Scientific visualization with external data (NumPy/SciPy)."}
+          {videoMode === "marp" && "Marp Mode: Markdown-to-presentation (Marp) export."}
+          {videoMode === "cinematic" && "Cinematic Mode: High-production aesthetic, multi-axis camera orbits."}
+          {videoMode === "teaching" && "1-Shot Visual Anchor: Informative visual anchor + extended teaching narration."}
+          {videoMode === "lecture" && "1-Shot Lecture: Full multi-agent IR pipeline and video assembly."}
+        </p>
+      </div>
+
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between">
+          <span className="text-foreground inline-flex items-center gap-1.5 text-sm font-semibold">
+            <Mic className="h-3.5 w-3.5" />
+            Voice Narration
+          </span>
+          <Checkbox 
+            checked={useChatModeStore((s) => s.narrationEnabled)}
+            onCheckedChange={(checked) => useChatModeStore.getState().setNarrationEnabled(!!checked)}
+            className="h-4 w-4 rounded-[4px]"
+          />
+        </div>
+        <p suppressHydrationWarning className="text-foreground/55 text-[11px] leading-relaxed">
+          When enabled, synthesizes audio narration using Pocket TTS for the generated video.
         </p>
       </div>
 

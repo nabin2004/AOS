@@ -194,7 +194,7 @@ class AgentSession:
             )
             return
 
-        if video_mode in ("animate", "keyframe", "teaching", "lecture") and self.current_conversation_id:
+        if video_mode in ("animate", "keyframe", "teaching", "lecture", "slide", "scivis", "marp", "cinematic") and self.current_conversation_id:
             await self._process_video_turn(
                 user_message=user_message,
                 video_mode=video_mode,
@@ -202,6 +202,7 @@ class AgentSession:
                 llm_base_url=llm_base_url,
                 llm_api_key=llm_api_key,
                 model_name=data.get("model"),
+                narration_enabled=bool(data.get("narration_enabled", False)),
             )
             return
 
@@ -224,17 +225,34 @@ class AgentSession:
                 ctx_manager_cap = caps.context_manager
             else:
                 deep_research = False
-            assistant = get_agent(
-                model_name=data.get("model"),
-                thinking_effort=data.get("thinking_effort"),
-                temperature=data.get("temperature"),
-                deep_research=deep_research,
-                todo_capability=todo_cap,
-                subagent_capability=subagent_cap,
-                context_manager_capability=ctx_manager_cap,
-                base_url=llm_base_url,
-                api_key=llm_api_key,
-            )
+                        if video_mode == "hitl":
+                import sys
+                from pathlib import Path
+                agents_dir = str(Path(__file__).resolve().parent.parent.parent.parent.parent.parent / "apps" / "agents")
+                if agents_dir not in sys.path:
+                    sys.path.append(agents_dir)
+                from agent_graph import animation_agent
+                
+                class HitlAgentWrapper:
+                    def __init__(self, ag):
+                        self.agent = ag
+                    async def prepare(self):
+                        pass
+                
+                assistant = HitlAgentWrapper(animation_agent)
+                deep_research = False
+            else:
+                assistant = get_agent(
+                    model_name=data.get("model"),
+                    thinking_effort=data.get("thinking_effort"),
+                    temperature=data.get("temperature"),
+                    deep_research=deep_research,
+                    todo_capability=todo_cap,
+                    subagent_capability=subagent_cap,
+                    context_manager_capability=ctx_manager_cap,
+                    base_url=llm_base_url,
+                    api_key=llm_api_key,
+                )
             model_history = build_message_history(self.conversation_history)
             user_input = await self._build_multimodal_input(user_message, file_ids)
             self.deps.kb_collection_names = await resolve_kb_collections(
@@ -438,6 +456,7 @@ class AgentSession:
         llm_base_url: str | None = None,
         llm_api_key: str | None = None,
         model_name: str | None = None,
+        narration_enabled: bool = False,
     ) -> None:
         """Enqueue a Manim video job and stream status over this WebSocket."""
         from datetime import UTC, datetime
@@ -471,6 +490,7 @@ class AgentSession:
                             mode=video_mode,  # type: ignore[arg-type]
                             conversation_id=UUIDType(self.current_conversation_id),
                             user_message_id=UUIDType(user_message_id) if user_message_id else None,
+                            narration_enabled=narration_enabled,
                         ),
                     )
                 generation_id = str(row.id)
@@ -603,6 +623,7 @@ class AgentSession:
                                 llm_base_url=llm_base_url,
                                 llm_api_key=llm_api_key,
                                 model_name=model_name,
+                                narration_enabled=narration_enabled,
                             )
                             await svc.set_celery_task(generation_uuid, task_id)
                             enqueued_msg = "Queued — waiting for an available generation worker…"
@@ -635,6 +656,7 @@ class AgentSession:
                                 llm_base_url=llm_base_url,
                                 llm_api_key=llm_api_key,
                                 model_name=model_name,
+                                narration_enabled=narration_enabled,
                             )
                         )
                 except Exception as e:

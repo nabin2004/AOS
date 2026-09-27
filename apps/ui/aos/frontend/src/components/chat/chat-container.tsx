@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useChat } from "@/hooks";
 import { ChatControls } from "./chat-controls";
@@ -356,6 +356,8 @@ function ChatUI({
 }: ChatUIProps) {
   const tc = useTranslations("common");
   const videoMode = useChatModeStore((s) => s.videoMode);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const setVideoMode = useChatModeStore((s) => s.setVideoMode);
   const currentTurnId = useResearchStore((s) => s.currentTurnId);
   const hasPlanData = useResearchStore((s) => {
@@ -447,22 +449,22 @@ function ChatUI({
 
                 <button
                   type="button"
-                  onClick={() => setVideoMode(videoMode === "keyframe" ? "off" : "keyframe")}
+                  onClick={() => setVideoMode((mounted && videoMode === "keyframe") ? "off" : "keyframe")}
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[11px] font-medium tracking-wider transition-all",
-                    videoMode === "keyframe"
+                    (mounted && videoMode === "keyframe")
                       ? "bg-amber-500 text-white shadow-sm shadow-amber-500/25 ring-1 ring-amber-500/30 dark:bg-amber-600"
                       : "bg-foreground/5 text-foreground/60 hover:bg-foreground/10 hover:text-foreground",
                   )}
                   title={
-                    videoMode === "keyframe"
+                    (mounted && videoMode === "keyframe")
                       ? "Keyframe engine active (discrete pedagogical slides + voiceover). Automatically returns to simple conversation mode after sending."
                       : "Click to generate keyframe slides with narration (1-shot; reverts to conversation mode after sending)"
                   }
                 >
                   <Layers className="h-3.5 w-3.5" />
                   <span>Keyframe</span>
-                  {videoMode === "keyframe" ? (
+                  {(mounted && videoMode === "keyframe") ? (
                     <>
                       <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
                       <span className="text-[9px] font-semibold opacity-90 uppercase">1-shot</span>

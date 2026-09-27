@@ -89,6 +89,7 @@ async def _run_animate_pipeline(
     length: str = "medium",
     cinematic: bool = False,
     mode: str = "keyframe",
+    narration_enabled: bool = False,
 ) -> dict:
     from agent_graph import animation_graph as animate_graph
     from agent_graph import AnimationState as AnimateState
@@ -101,6 +102,7 @@ async def _run_animate_pipeline(
         target_length=length,
         cinematic=cinematic_active,
         animation_mode=mode,
+        narration_enabled=narration_enabled,
     )
     async with animate_graph.iter(state=state) as run:
         async for step in run:
@@ -234,6 +236,11 @@ def animate(
             "+ synchronized voiceover narration with bookmark anchors), or 'continuous' (monolithic script)."
         ),
     ),
+    narration_enabled: bool = typer.Option(
+        False,
+        "--narration-enabled",
+        help="Enable AI voiceover generation and narration hints",
+    ),
 ) -> None:
     """Run the animation pipeline (classify → plan → Manim coder → compile)."""
     import os
@@ -292,6 +299,7 @@ def animate(
                 length=chosen_length,
                 cinematic=cinematic,
                 mode=mode,
+                narration_enabled=narration_enabled,
             )
         )
         payload = artifact.model_dump(mode="json")
@@ -323,7 +331,7 @@ def animate(
     try:
         result = asyncio.run(
             _run_animate_pipeline(
-                request, length=chosen_length, cinematic=cinematic, mode=mode
+                request, length=chosen_length, cinematic=cinematic, mode=mode, narration_enabled=narration_enabled
             )
         )
     except Exception as exc:

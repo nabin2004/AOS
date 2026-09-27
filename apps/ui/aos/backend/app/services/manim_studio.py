@@ -349,10 +349,13 @@ Derived from source material: {text_hint}
             result = await agent.run(user_prompt, deps=deps)
             plan_markdown = getattr(result, "output", getattr(result, "data", "")) or ""
         except Exception as exc:
-            logger.warning("Plan LLM call failed (%s); using topic-aware fallback plan.", exc)
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"Composer Plan Agent failed: {exc}",
+            ) from exc
 
         if not plan_markdown or len(plan_markdown.strip()) < 100:
-            plan_markdown = self.generate_fallback_plan(text, topic)
+            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Composer Plan Agent returned an empty or invalid plan.")
 
         return VideoPlanResponse(
             plan=plan_markdown,
@@ -398,19 +401,13 @@ Derived from source material: {text_hint}
                     yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
         except Exception as exc:
             logger.warning("Streaming plan generation failed: %s", exc)
-            stream_failed = True
+            yield f"data: {json.dumps({\'type\': \'error\', \'detail\': f\'Composer Plan generation failed: {exc}\'})}}\n\n"
+            return
 
         full_plan = "".join(accumulated).strip()
-        if stream_failed or len(full_plan) < 100:
-            yield f"data: {json.dumps({'type': 'status', 'message': 'Completing the visual plan with the local fallback…'})}\n\n"
-            fallback = self.generate_fallback_plan(text, topic)
-            if not accumulated:
-                chunk_size = 64
-                for i in range(0, len(fallback), chunk_size):
-                    chunk = fallback[i : i + chunk_size]
-                    yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
-                    await asyncio.sleep(0.01)
-                full_plan = fallback
+        if len(full_plan) < 100:
+            yield f"data: {json.dumps({\'type\': \'error\', \'detail\': \'Composer Plan generation returned an empty or invalid plan.\'})}}\n\n"
+            return
 
         yield f"data: {json.dumps({'type': 'status', 'message': 'Visual plan complete.'})}\n\n"
         yield f"data: {json.dumps({'type': 'done', 'plan': full_plan, 'topic': topic, 'title': f'Visual Plan: {topic}'})}\n\n"
@@ -555,7 +552,7 @@ class {scene_name}(Scene):
                     status_code=status.HTTP_502_BAD_GATEWAY,
                     detail=f"Code generation failed: {llm_error}",
                 )
-            code, detected_scene = self.generate_fallback_code(plan, knowledge_text)
+            raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Coder Agent returned empty or invalid Manim code.")
 
         return VideoCodeResponse(code=code, scene_name=detected_scene)
 
@@ -605,18 +602,12 @@ class {scene_name}(Scene):
         raw_response = "".join(accumulated).strip()
         code, detected_scene = hitl_agents.extract_manim_code(raw_response, default_scene=detected_scene)
 
-        if stream_failed or not code or "def construct" not in code:
-            yield f"data: {json.dumps({'type': 'status', 'message': 'Checking the generated scene and preparing a fallback if needed…'})}\n\n"
-            fallback_code, detected_scene = self.generate_fallback_code(plan, knowledge_text)
-            if not accumulated:
-                chunk_size = 64
-                for i in range(0, len(fallback_code), chunk_size):
-                    chunk = fallback_code[i : i + chunk_size]
-                    yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
-                    await asyncio.sleep(0.01)
-                code = fallback_code
-            elif not code:
-                code = fallback_code
+        if stream_failed:
+            yield f"data: {json.dumps({\'type\': \'error\', \'detail\': \'Streaming code synthesis failed or timed out.\'})}}\n\n"
+            return
+        if not code or "def construct" not in code:
+            yield f"data: {json.dumps({\'type\': \'error\', \'detail\': \'Coder Agent returned empty or invalid Manim code.\'})}}\n\n"
+            return
 
         yield f"data: {json.dumps({'type': 'status', 'message': 'Manim scene code complete.'})}\n\n"
         yield f"data: {json.dumps({'type': 'done', 'code': code, 'scene_name': detected_scene})}\n\n"

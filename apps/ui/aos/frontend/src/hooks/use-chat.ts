@@ -674,6 +674,7 @@ export function useChat(options: UseChatOptions = {}) {
       const activeKBIds = useKBSelectionStore.getState().activeKBIds;
       if (activeKBIds.length) payload.active_knowledge_base_ids = activeKBIds;
       payload.deep_research = useChatModeStore.getState().deepResearch;
+      payload.narration_enabled = useChatModeStore.getState().narrationEnabled;
       const videoMode = useChatModeStore.getState().videoMode;
       if (videoMode === "animate" || videoMode === "keyframe" || videoMode === "teaching" || videoMode === "lecture") {
         payload.video_mode = videoMode;

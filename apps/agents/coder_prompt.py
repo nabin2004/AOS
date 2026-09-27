@@ -176,6 +176,7 @@ def build_coder_user_prompt(
     length: str | None = None,
     cinematic: bool = False,
     mode: str = "keyframe",
+    narration_enabled: bool = False,
 ) -> str:
     import os
 
@@ -217,7 +218,8 @@ def build_coder_user_prompt(
 
     if include_codemode_hint:
         bits.append(LOCAL_CODER_CODEMODE_HINT.rstrip("\n"))
-    bits.append(CODER_SCRIPT_HINT.rstrip("\n"))
+    if narration_enabled:
+        bits.append(CODER_SCRIPT_HINT.rstrip("\n"))
     bits.append(CINEMATIC_HINT_LEGEND.rstrip("\n"))
     template_boilerplate = get_template_for_duration(length or "medium", cinematic=cinematic_active)
     bits.append(

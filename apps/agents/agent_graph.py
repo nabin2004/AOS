@@ -87,6 +87,7 @@ async def run_coder_step(
     length: str = "medium",
     cinematic: bool = False,
     animation_mode: str = "keyframe",
+    narration_enabled: bool = False,
 ) -> CoderRunResult:
     """Write/compile Manim for a topic; shared by the graph node and web tools."""
 
@@ -117,6 +118,7 @@ async def run_coder_step(
         length=length,
         cinematic=cinematic,
         mode=animation_mode,
+        narration_enabled=narration_enabled,
     )
     if feedback and existing_run_dir:
         from pathlib import Path
@@ -346,6 +348,7 @@ async def run_pipeline(
     prompt_index: int | None = None,
     mode: str = "keyframe",
     output_dir: str | Path | None = None,
+    narration_enabled: bool = False,
 ) -> dict:
 
     # Integrated Keyframe Producer-Consumer Engine for UI Animate Mode
@@ -365,6 +368,7 @@ async def run_pipeline(
             user_query,
             output_dir=output_dir,
             total_slides=total_slides,
+            narration_enabled=narration_enabled,
         )
         if res.get("scene_file") and not res.get("scene_path"):
             res["scene_path"] = res["scene_file"]
@@ -378,6 +382,7 @@ async def run_pipeline(
         cinematic=cinematic_active,
         prompt_index=prompt_index,
         animation_mode=mode,
+        narration_enabled=narration_enabled,
     )
     # Prefer iter so UI/Celery can stream ``-> {node_id}`` on stderr.
     summary = ""

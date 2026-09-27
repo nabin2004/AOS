@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type VideoMode = "off" | "animate" | "keyframe" | "teaching" | "lecture";
+export type VideoMode = "off" | "animate" | "keyframe" | "teaching" | "lecture" | "slide" | "scivis" | "marp" | "cinematic" | "hitl";
 export type HarnessMode = "off" | "educlaw";
 
 /**
@@ -25,6 +25,8 @@ interface ChatModeState {
   setHarnessMode: (mode: HarnessMode) => void;
   headless: boolean;
   setHeadless: (val: boolean) => void;
+  narrationEnabled: boolean;
+  setNarrationEnabled: (val: boolean) => void;
   autoApprove: boolean;
   setAutoApprove: (val: boolean) => void;
 }
@@ -41,20 +43,23 @@ export const useChatModeStore = create<ChatModeState>()(
       setHarnessMode: (mode) => set({ harnessMode: mode }),
       headless: true,
       setHeadless: (val) => set({ headless: val }),
+      narrationEnabled: false,
+      setNarrationEnabled: (val) => set({ narrationEnabled: val }),
       autoApprove: true,
       setAutoApprove: (val) => set({ autoApprove: val }),
     }),
     {
       name: "chat-mode",
-      version: 5,
+      version: 7,
       migrate: (persisted, version) => {
         const state = (persisted ?? {}) as Partial<ChatModeState>;
-        if (version < 5) {
+        if (version < 7) {
           return {
             deepResearch: Boolean(state.deepResearch),
-            videoMode: "off" as VideoMode,
+            videoMode: (state.videoMode || "off") as VideoMode,
             harnessMode: (state.harnessMode || "off") as HarnessMode,
             headless: state.headless ?? true,
+            narrationEnabled: state.narrationEnabled ?? false,
             autoApprove: state.autoApprove ?? true,
           };
         }

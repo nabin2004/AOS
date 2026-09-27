@@ -1780,6 +1780,7 @@ def _process_single_slide(
     run_dir: Path,
     quality: str,
     _notify: Callable[[str, str], None],
+    narration_enabled: bool = False,
 ) -> SlideProcessResult:
     """Generates visual anchor, performs visual critic check, synthesizes speech, and produces video chunk."""
     _notify("PlanTeachingScriptNode", f"Planning TeachingSegment {i} (Rich Visual Anchor & Pedagogy)")
@@ -1887,9 +1888,14 @@ def _process_single_slide(
 
     # Step 2: Synthesize Authoritative Pedagogical Narration
     audio_path = run_dir / f"slide_{i}_audio.wav"
-    narr_dur, is_real_audio = synthesize_teaching_audio(segment.narration, audio_path, return_status=True)
-    segment.audio_path = str(audio_path)
-    segment.narration_duration = narr_dur
+    if narration_enabled:
+        narr_dur, is_real_audio = synthesize_teaching_audio(segment.narration, audio_path, return_status=True)
+        segment.audio_path = str(audio_path)
+        segment.narration_duration = narr_dur
+    else:
+        is_real_audio = False
+        segment.audio_path = ""
+        segment.narration_duration = 0.0
     if not is_real_audio:
         if segment.visual_verdict is None:
             segment.visual_verdict = {}
@@ -1925,6 +1931,7 @@ def run_producer_consumer(
     total_slides: int = 3,
     quality: str = "low_quality",
     on_progress: Callable[[str, str], None] | None = None,
+    narration_enabled: bool = False,
 ) -> dict[str, Any]:
     """Coordinates decoupled visual anchor rendering and deep pedagogical narration in one go."""
     if output_dir:
@@ -1989,6 +1996,7 @@ def run_producer_consumer(
                     run_dir=run_dir,
                     quality=quality,
                     _notify=_notify,
+                    narration_enabled=narration_enabled,
                 )
                 for i in range(1, total_slides + 1)
             ]
@@ -2007,6 +2015,7 @@ def run_producer_consumer(
                     run_dir=run_dir,
                     quality=quality,
                     _notify=_notify,
+                    narration_enabled=narration_enabled,
                 )
             )
 

@@ -256,13 +256,14 @@ def _run_agents_cli(
     generation_id: str | None = None,
     conversation_id: str | None = None,
     user_id: str | None = None,
+    narration_enabled: bool = False,
 ) -> dict[str, Any]:
     """Invoke ``cli.py animate|generate --json`` and parse the VideoArtifact.
 
     Streams ``-> {node}`` progress lines to Redis while the process runs.
     """
     agents_dir = _resolve_agents_dir()
-    command = "animate" if mode in ("animate", "keyframe", "teaching") else "generate"
+    command = "animate" if mode in ("animate", "keyframe", "teaching", "slide", "scivis", "marp", "cinematic") else "generate"
     
     # In Docker, check if container virtualenv Python has agents packages ready
     venv_python = Path("/app/.venv/bin/python")
@@ -291,6 +292,13 @@ def _run_agents_cli(
         cmd.extend(["--mode", "keyframe"])
     elif mode == "animate":
         cmd.append("--fast")
+        cmd.extend(["--mode", "continuous"])
+    elif mode in ("slide", "scivis", "marp"):
+        cmd.append("--fast")
+        cmd.extend(["--mode", mode])
+    elif mode == "cinematic":
+        cmd.append("--fast")
+        cmd.extend(["--cinematic"])
         cmd.extend(["--mode", "continuous"])
 
     # Do not rely on the CLI's medium/5-minute default for UI videos. Keep it
@@ -637,6 +645,7 @@ async def _run_generate_video(
     llm_base_url: str | None = None,
     llm_api_key: str | None = None,
     model_name: str | None = None,
+    narration_enabled: bool = False,
 ) -> dict[str, Any]:
     from app.services.video_generation import VideoGenerationService
     from app.services.video_storage import get_video_storage
@@ -678,6 +687,7 @@ async def _run_generate_video(
         generation_id=generation_id,
         conversation_id=str(conversation_id),
         user_id=str(user_id),
+        narration_enabled=narration_enabled,
     )
     run_dir = artifact.get("run_dir")
 
@@ -900,6 +910,7 @@ def generate_video_task(
     llm_base_url: str | None = None,
     llm_api_key: str | None = None,
     model_name: str | None = None,
+    narration_enabled: bool = False,
 ) -> dict[str, Any]:
     """Run Manim pipeline via agents CLI, upload MP4 to MinIO, update DB."""
     logger.info("generate_video_task start: %s", generation_id)
@@ -918,6 +929,7 @@ def generate_video_task(
                 llm_base_url=llm_base_url,
                 llm_api_key=llm_api_key,
                 model_name=model_name,
+                narration_enabled=narration_enabled,
             )
         )
     except Exception as exc:

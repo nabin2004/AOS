@@ -37,6 +37,8 @@ export function ChatInput({
   commands,
 }: ChatInputProps) {
   const videoMode = useChatModeStore((s) => s.videoMode);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [message, setMessage] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<FileUploadResponse[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -331,7 +333,7 @@ export function ChatInput({
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={
-            videoMode === "keyframe"
+            !mounted ? "Type a message (click Keyframe or Animate to generate video)..." : videoMode === "keyframe"
               ? "Describe topic for Keyframe slide animation (1-shot)..."
               : videoMode === "animate"
                 ? "Describe what you want to animate with agent_graph.py (1-shot)..."

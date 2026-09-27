@@ -181,6 +181,23 @@ flowchart TD
 
 ---
 
+
+---
+
+## Narration Toggle Integration
+
+This mode supports the **Narration Toggle**, which allows the user to explicitly enable or disable AI-generated voiceover during the generation process.
+
+### Architecture & Data Flow
+1. **Frontend**: The `chat-mode-store.ts` tracks `narrationEnabled` boolean state, controlled by a toggle button in `chat-controls.tsx`.
+2. **WebSocket & Backend**: The flag is passed to the backend (`VideoGenerationCreate` schema) and injected into the Celery worker task arguments in `agent_session.py`.
+3. **CLI Arguments**: The orchestrator appends the `--narration-enabled` flag when calling `animus animate` or `animus generate` in `cli.py`.
+4. **Agent Pipeline & Graph**:
+   - In **Keyframe Mode** (`keyframe_engine.py`): The pipeline checks this boolean. If false, it explicitly skips the Text-to-Speech (TTS) call (`synthesize_teaching_audio`), assigning a narration duration of `0.0s`, yielding a purely visual anchor output.
+   - In **Continuous Mode** (Standard agent graph): `AnimationState` passes the boolean into the `coder_prompt.py`, where it conditionally injects instructions requiring the usage of `VoiceoverScene` (using Edge TTS or Pocket TTS) alongside speech bookmarks. If false, standard visual timing operations like `self.wait()` are used instead.
+
+This enables presenters to rapidly iterate on visual aesthetics or create silent instructional looping videos without burning computational overhead on high-fidelity audio synthesis, while also seamlessly pivoting to full, narrated lectures with a single switch.
+
 ## 7. Failure Modes & Known Limitations
 
 1. **Host Environment Missing Scientific Packages**:
