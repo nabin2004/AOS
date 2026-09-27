@@ -225,7 +225,8 @@ class AgentSession:
                 ctx_manager_cap = caps.context_manager
             else:
                 deep_research = False
-                        if video_mode == "hitl":
+
+            if video_mode == "hitl":
                 import sys
                 from pathlib import Path
                 agents_dir = str(Path(__file__).resolve().parent.parent.parent.parent.parent.parent / "apps" / "agents")
