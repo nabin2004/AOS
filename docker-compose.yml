@@ -58,7 +58,7 @@ services:
     build:
       context: ./apps/ui/aos/backend
       dockerfile: Dockerfile
-    image: aos_backend:latest
+    image: aos_backend:dev
     container_name: aos_init_db
     command: alembic upgrade head
     volumes:
@@ -87,7 +87,7 @@ services:
     build:
       context: ./apps/ui/aos/backend
       dockerfile: Dockerfile
-    image: aos_backend:latest
+    image: aos_backend:dev
     container_name: aos_backend
     ports:
       - "8000:8000"
@@ -162,7 +162,7 @@ services:
   # Celery Worker (Video generation, agents execution, RAG pipelines)
   # ----------------------------------------------------------------------------
   celery_worker:
-    image: aos_backend:latest
+    image: aos_backend:dev
     pull_policy: build
     container_name: aos_celery_worker
     command: celery -A app.worker.celery_app worker --loglevel=info
@@ -236,7 +236,7 @@ services:
   # Celery Beat (Periodic task scheduler)
   # ----------------------------------------------------------------------------
   celery_beat:
-    image: aos_backend:latest
+    image: aos_backend:dev
     pull_policy: build
     container_name: aos_celery_beat
     command: celery -A app.worker.celery_app beat --loglevel=info
@@ -262,7 +262,7 @@ services:
   # Celery Flower (Real-time task monitoring dashboard)
   # ----------------------------------------------------------------------------
   flower:
-    image: aos_backend:latest
+    image: aos_backend:dev
     pull_policy: build
     container_name: aos_flower
     command: celery -A app.worker.celery_app flower --port=5555
@@ -355,7 +355,7 @@ services:
   # MinIO Bucket Auto-Provisioner (One-shot)
   # ----------------------------------------------------------------------------
   create_buckets:
-    image: quay.io/minio/mc:latest
+    image: minio/mc:latest
     container_name: aos_minio_init
     depends_on:
       minio:
