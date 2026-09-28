@@ -63,6 +63,8 @@ class AgentModelsResponse(BaseModel):
     ollama_running: bool = False
     ollama_models: list[str] = []
     ollama_base_url: str | None = None
+    remote_running: bool = False
+    remote_models: list[str] = []
 
 
 

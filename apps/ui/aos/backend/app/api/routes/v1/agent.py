@@ -23,8 +23,11 @@ from app.agents.openai_compatible_client import normalize_endpoint_url
 
 
 @router.get("/agent/models", response_model=AgentModelsResponse)
-async def list_models() -> dict[str, Any]:
-    """Return available LLM models and auto-discover locally running Ollama models."""
+async def list_models(
+    base_url: str | None = None,
+    api_key: str | None = None,
+) -> dict[str, Any]:
+    """Return available LLM models, auto-discover locally running Ollama models, and optional remote models."""
     ollama_running = False
     ollama_models: list[str] = []
     # Test Ollama through normalized endpoint (handles Docker host mapping)
@@ -52,12 +55,40 @@ async def list_models() -> dict[str, Any]:
         except Exception:
             continue
 
+    # Probe remote endpoint if user provided custom base_url
+    remote_running = False
+    remote_models: list[str] = []
+    if base_url:
+        normalized_remote = normalize_endpoint_url(base_url)
+        remote_models_endpoint = (
+            f"{normalized_remote}/models"
+            if not normalized_remote.endswith("/models")
+            else normalized_remote
+        )
+        headers = {}
+        if api_key and api_key.strip() != "local":
+            headers["Authorization"] = f"Bearer {api_key.strip()}"
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                res = await client.get(remote_models_endpoint, headers=headers)
+                if res.status_code == 200:
+                    data = res.json()
+                    remote_running = True
+                    if "data" in data and isinstance(data["data"], list):
+                        remote_models = [m["id"] for m in data["data"] if "id" in m]
+                    elif "models" in data and isinstance(data["models"], list):
+                        remote_models = [m.get("name") for m in data["models"] if m.get("name")]
+        except Exception:
+            pass
+
     return {
         "default": settings.AI_MODEL,
         "models": settings.AI_AVAILABLE_MODELS,
         "ollama_running": ollama_running,
         "ollama_models": ollama_models,
         "ollama_base_url": "http://localhost:11434/v1",
+        "remote_running": remote_running,
+        "remote_models": remote_models,
     }
 
 

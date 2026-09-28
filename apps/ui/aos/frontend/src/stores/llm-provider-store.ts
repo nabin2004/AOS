@@ -29,6 +29,7 @@ interface LlmProviderState extends LlmProviderConfig {
   setModelId: (modelId: string) => void;
   setConfig: (partial: Partial<LlmProviderConfig>) => void;
   setOllama: (modelId?: string) => void;
+  setRunpod: (baseUrl?: string, modelId?: string) => void;
   reset: () => void;
   /** Fields to merge into the chat WebSocket send payload. */
   toRequestPayload: () => LlmProviderRequestPayload;
@@ -36,6 +37,9 @@ interface LlmProviderState extends LlmProviderConfig {
 
 export const OLLAMA_DEFAULT_BASE_URL = "http://localhost:11434/v1";
 export const OLLAMA_DEFAULT_MODEL_ID = "hf.co/Qwen/Qwen3-8B-GGUF:latest";
+
+export const DEFAULT_RUNPOD_BASE_URL = "https://vllm-b948r5you52m6i.api.runpod.ai/v1";
+export const DEFAULT_RUNPOD_MODEL_ID = "nabin2004/qwen-Manimator-1-grpo-merged";
 
 export const DEFAULT_MODAL_BASE_URL =
   "https://nabinoli2004--aosqwen-server.us-east.modal.direct/v1";
@@ -52,14 +56,33 @@ export function llmProviderToRequestPayload(
 ): LlmProviderRequestPayload {
   const baseUrl = (config.baseUrl || "").trim();
   const apiKey = (config.apiKey || "").trim();
-  const modelId = (config.modelId || "").trim();
+  let modelId = (config.modelId || "").trim();
   const payload: LlmProviderRequestPayload = {};
+
   if (baseUrl) {
     payload.llm_base_url = baseUrl;
     payload.llm_api_key = apiKey || "local";
+
+    const isLocalOllama =
+      baseUrl.includes("11434") ||
+      baseUrl.includes("localhost") ||
+      baseUrl.includes("127.0.0.1") ||
+      baseUrl.includes("host.docker.internal");
+
+    // Remote endpoints (RunPod vLLM, Modal, TGI) expect clean HF identifiers
+    // Strip Ollama's 'hf.co/' prefix and ':latest' tag if present
+    if (!isLocalOllama && modelId) {
+      if (modelId.startsWith("hf.co/")) {
+        modelId = modelId.slice(6);
+      }
+      if (modelId.endsWith(":latest")) {
+        modelId = modelId.slice(0, -7);
+      }
+    }
   } else if (apiKey) {
     payload.llm_api_key = apiKey;
   }
+
   if (modelId) payload.model = modelId;
   return payload;
 }
@@ -78,6 +101,12 @@ export const useLlmProviderStore = create<LlmProviderState>()(
           apiKey: "local",
           modelId: modelId || OLLAMA_DEFAULT_MODEL_ID,
         }),
+      setRunpod: (baseUrl, modelId) =>
+        set({
+          baseUrl: baseUrl || DEFAULT_RUNPOD_BASE_URL,
+          apiKey: get().apiKey || "",
+          modelId: modelId || DEFAULT_RUNPOD_MODEL_ID,
+        }),
       reset: () => set({ ...EMPTY }),
       toRequestPayload: () => {
         const { baseUrl, apiKey, modelId } = get();
@@ -94,4 +123,3 @@ export const useLlmProviderStore = create<LlmProviderState>()(
     },
   ),
 );
-

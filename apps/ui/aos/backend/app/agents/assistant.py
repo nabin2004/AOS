@@ -61,6 +61,17 @@ def _build_model(
     key = (api_key or "").strip()
 
     if custom_base:
+        # Strip Ollama-specific 'hf.co/' prefix and ':latest' tag when calling remote vLLM / RunPod endpoints
+        base_lower = custom_base.lower()
+        is_local_ollama = any(
+            h in base_lower for h in ('localhost:11434', '127.0.0.1:11434', 'host.docker.internal:11434')
+        )
+        if not is_local_ollama:
+            if name.startswith('hf.co/'):
+                name = name[len('hf.co/'):]
+            if name.endswith(':latest'):
+                name = name[:-len(':latest')]
+
         return OpenAIChatModel(
             name,
             provider=build_openai_provider(

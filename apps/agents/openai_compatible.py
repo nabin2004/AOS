@@ -117,7 +117,11 @@ def openai_compatible_api_key() -> str:
 def strip_provider_prefix(model: str) -> str:
     for prefix in ("openrouter:", "openai:", "ollama:"):
         if model.startswith(prefix):
-            return model[len(prefix) :]
+            model = model[len(prefix) :]
+    if model.startswith("hf.co/"):
+        model = model[len("hf.co/") :]
+    if model.endswith(":latest"):
+        model = model[:-len(":latest")]
     return model
 
 
