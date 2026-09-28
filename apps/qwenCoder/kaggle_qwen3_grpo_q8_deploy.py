@@ -24,6 +24,7 @@ from pathlib import Path
 # ==============================================================================
 BASE_MODEL_ID = "Qwen/Qwen3-8B"
 ADAPTER_MODEL_ID = "nabin2004/qwen-Manimator-1-grpo-clean"
+MERGED_REPO_ID = "nabin2004/qwen-Manimator-1-grpo-merged"
 GGUF_REPO_ID = "nabin2004/qwen-Manimator-1-grpo-GGUF"
 QUANT_TYPE = "Q8_0"
 CONTEXT_LENGTH = 32768
@@ -276,6 +277,95 @@ def step_03_merge_lora(hf_token: str) -> Path:
     print(f"✔ Merged model successfully saved: {merged_size_gb:.2f} GB")
     show_disk_usage("After 03_merge_lora")
     return MERGED_DIR
+
+
+# ==============================================================================
+# 03b_upload_merged_model
+# ==============================================================================
+def step_03b_upload_merged_model(hf_token: str) -> bool:
+    print_step_header("03b", f"Upload Merged Safetensors Model to {MERGED_REPO_ID}")
+    from huggingface_hub import HfApi
+
+    api = HfApi(token=hf_token)
+    api.create_repo(MERGED_REPO_ID, repo_type="model", exist_ok=True, token=hf_token)
+
+    # Generate Model Card for Merged Safetensors
+    readme_path = MERGED_DIR / "README.md"
+    readme_content = f"""---
+license: apache-2.0
+base_model: {BASE_MODEL_ID}
+library_name: transformers
+pipeline_tag: text-generation
+language:
+  - en
+tags:
+  - safetensors
+  - manim
+  - manimce
+  - manim-voiceover
+  - aos
+  - grpo
+  - code-generation
+  - math
+---
+
+# {MERGED_REPO_ID}
+
+Full-weight merged release (**bfloat16/float16 Safetensors**) of **qwen-Manimator-1-grpo-clean**, fine-tuned from `{BASE_MODEL_ID}` for **Manim Community Edition (ManimCE)** animation generation.
+
+- **Base Model**: [`{BASE_MODEL_ID}`](https://huggingface.co/{BASE_MODEL_ID})
+- **LoRA Adapter**: [`{ADAPTER_MODEL_ID}`](https://huggingface.co/{ADAPTER_MODEL_ID})
+- **Merged Model Repo**: [`{MERGED_REPO_ID}`](https://huggingface.co/{MERGED_REPO_ID})
+- **Quantized GGUF**: [`{GGUF_REPO_ID}`](https://huggingface.co/{GGUF_REPO_ID})
+
+---
+
+## Direct vLLM Deployment
+
+You can deploy this model directly in vLLM without needing dynamic LoRA adapter loading:
+
+```bash
+python3 -m vllm.entrypoints.openai.api_server \\
+    --model {MERGED_REPO_ID} \\
+    --host 0.0.0.0 \\
+    --port 8000 \\
+    --max-model-len 32768 \\
+    --gpu-memory-utilization 0.90
+```
+
+---
+
+## Python / Transformers Quickstart
+
+```python
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model_id = "{MERGED_REPO_ID}"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    torch_dtype=torch.bfloat16,
+    device_map="auto"
+)
+
+prompt = "<|im_start|>user\\nWrite a ManimCE script animating a circle and a title 'GRPO'.<|im_end|>\\n<|im_start|>assistant\\n"
+inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+outputs = model.generate(**inputs, max_new_tokens=512, temperature=0.2)
+print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+```
+"""
+    readme_path.write_text(readme_content, encoding="utf-8")
+
+    print(f"Uploading merged Safetensors model folder to {MERGED_REPO_ID}...")
+    api.upload_folder(
+        folder_path=str(MERGED_DIR),
+        repo_id=MERGED_REPO_ID,
+        repo_type="model",
+        token=hf_token,
+    )
+    print(f"✔ Merged Safetensors model live at https://huggingface.co/{MERGED_REPO_ID}")
+    return True
 
 
 # ==============================================================================
@@ -640,24 +730,45 @@ ollama run manimator-q8
 # ==============================================================================
 # 10_verify_upload
 # ==============================================================================
-def step_10_verify_upload(hf_token: str) -> bool:
-    print_step_header("10", f"Verify Uploaded Repository: {GGUF_REPO_ID}")
+def step_10_verify_upload(hf_token: str, verify_merged: bool = True) -> tuple[bool, bool]:
+    print_step_header("10", f"Verify Uploaded Repositories: {MERGED_REPO_ID} & {GGUF_REPO_ID}")
 
     from huggingface_hub import HfApi
 
     api = HfApi(token=hf_token)
-    files = list(api.list_repo_files(GGUF_REPO_ID, repo_type="model", token=hf_token))
-    print(f"Files in {GGUF_REPO_ID}: {files}")
+    
+    # Verify Merged Safetensors Repo
+    merged_pass = False
+    if verify_merged:
+        try:
+            merged_files = list(api.list_repo_files(MERGED_REPO_ID, repo_type="model", token=hf_token))
+            print(f"Files in {MERGED_REPO_ID} ({len(merged_files)} files): {merged_files[:10]}...")
+            has_config = "config.json" in merged_files
+            has_safetensors = any(f.endswith(".safetensors") for f in merged_files)
+            merged_pass = has_config and has_safetensors
+            if merged_pass:
+                print("✔ Merged Safetensors verification: PASS")
+            else:
+                print(f"❌ Merged Safetensors verification: FAIL (missing config or safetensors in {merged_files})")
+        except Exception as e:
+            print(f"Notice: Failed to verify {MERGED_REPO_ID}: {e}")
 
-    has_gguf = Q8_GGUF_PATH.name in files
-    has_readme = "README.md" in files
+    # Verify GGUF Repo
+    gguf_pass = False
+    try:
+        gguf_files = list(api.list_repo_files(GGUF_REPO_ID, repo_type="model", token=hf_token))
+        print(f"Files in {GGUF_REPO_ID}: {gguf_files}")
+        has_gguf = Q8_GGUF_PATH.name in gguf_files
+        has_readme = "README.md" in gguf_files
+        gguf_pass = has_gguf and has_readme
+        if gguf_pass:
+            print("✔ GGUF verification: PASS")
+        else:
+            print(f"❌ GGUF verification: FAIL (missing {Q8_GGUF_PATH.name} or README.md in {gguf_files})")
+    except Exception as e:
+        print(f"Notice: Failed to verify {GGUF_REPO_ID}: {e}")
 
-    if has_gguf and has_readme:
-        print("✔ Verification SUCCESS: Both Q8_0 GGUF and README.md are live on Hugging Face Hub.")
-        return True
-    else:
-        print(f"❌ Verification FAILED: Missing required files in {files}")
-        return False
+    return merged_pass, gguf_pass
 
 
 # ==============================================================================
@@ -666,7 +777,7 @@ def step_10_verify_upload(hf_token: str) -> bool:
 def main() -> int:
     print(f"""
 ************************************************************************
-*  Kaggle Pipeline: Qwen3-8B + Manimator GRPO -> Q8_0 GGUF Deployment  *
+*  Kaggle Pipeline: Qwen3-8B + Manimator GRPO Deploy (Merged & GGUF)   *
 ************************************************************************
 """)
 
@@ -678,6 +789,9 @@ def main() -> int:
 
     # 03. Merge LoRA
     step_03_merge_lora(hf_token)
+
+    # 03b. Upload Merged Safetensors to new Hugging Face Repo
+    merged_upload_pass = step_03b_upload_merged_model(hf_token)
 
     # 04. Convert to GGUF F16
     step_04_convert_to_gguf()
@@ -695,22 +809,20 @@ def main() -> int:
     # 08. Test Manim Generation & Rendering
     gen_pass, render_pass, _ = step_08_test_manim()
 
-    # 09. Upload to Hugging Face
-    upload_pass = False
+    # 09. Upload GGUF to Hugging Face
+    gguf_upload_pass = False
     if gguf_val_pass and ctx_pass:
-        upload_pass = step_09_upload_to_huggingface(hf_token, actual_size_gb)
+        gguf_upload_pass = step_09_upload_to_huggingface(hf_token, actual_size_gb)
     else:
-        print("Skipping upload due to validation failure.")
+        print("Skipping GGUF upload due to validation failure.")
 
-    # 10. Verify Upload
-    verify_pass = False
-    if upload_pass:
-        verify_pass = step_10_verify_upload(hf_token)
+    # 10. Verify Uploads
+    merged_verified, gguf_verified = step_10_verify_upload(hf_token, verify_merged=merged_upload_pass)
 
     # Concise Final Deployment Summary
     summary = f"""
 ========================================
-MANIMATOR GGUF DEPLOYMENT COMPLETE
+MANIMATOR GGUF & MERGED DEPLOYMENT COMPLETE
 ========================================
 
 Base:
@@ -718,6 +830,12 @@ Base:
 
 Adapter:
 {ADAPTER_MODEL_ID}
+
+Merged Model (Safetensors):
+https://huggingface.co/{MERGED_REPO_ID}
+
+Merged Upload:
+{"PASS" if (merged_upload_pass and merged_verified) else "FAIL"}
 
 Quantization:
 {QUANT_TYPE}
@@ -740,15 +858,15 @@ Manim generation:
 Manim rendering:
 {"PASS" if render_pass else "FAIL"}
 
-Hugging Face:
+Hugging Face GGUF:
 https://huggingface.co/{GGUF_REPO_ID}
 
-Upload:
-{"PASS" if verify_pass else "FAIL"}
+GGUF Upload:
+{"PASS" if (gguf_upload_pass and gguf_verified) else "FAIL"}
 ========================================
 """
     print(summary)
-    return 0 if (gguf_val_pass and ctx_pass and upload_pass and verify_pass) else 1
+    return 0 if (merged_verified and gguf_verified and gguf_val_pass and ctx_pass) else 1
 
 
 if __name__ == "__main__":
