@@ -26,7 +26,7 @@ HUB_DATASET_REPO = "nabin2004/AOS-Qwen-Trajectories"
 HUB_QWEN3_8B_SFT_REPO = "nabin2004/AOS-qwen3-8b-adapter"
 HUB_QWEN3_8B_MERGED_REPO = "nabin2004/AOS-Qwen3-8B-Merged"
 HUB_QWEN3_8B_GGUF_REPO = "nabin2004/AOS-Qwen3-8B-GGUF"
-HUB_QWEN3_8B_DATASET_REPO = "nabin2004/manim-aos-5k400"
+HUB_QWEN3_8B_DATASET_REPO = "nabin2004/qwen3-8b-manimator-gold-sft"
 
 HUB_QWEN25_CODER_7B_MERGED_REPO = "nabin2004/qwen2.5-coder-7b-manim-merged"
 

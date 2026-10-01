@@ -1,14 +1,18 @@
-# Kaggle P100 End-to-End Pipeline: `Qwen/Qwen3-8B`
+# Kaggle P100 / T4 End-to-End Pipeline: `Qwen/Qwen3-8B`
 
-Complete end-to-end SFT fine-tuning, adapter merging, multi-quantization GGUF export (`Q4_K_M` and `Q8_0`), and dual Hugging Face repository upload pipeline for **`Qwen/Qwen3-8B`** on **Kaggle P100 GPUs (16 GB VRAM)**.
+Complete end-to-end SFT fine-tuning, adapter merging, multi-quantization GGUF export (`Q4_K_M` and `Q8_0`), and dual Hugging Face repository upload pipeline for **`Qwen/Qwen3-8B`** on **Kaggle P100 (16 GB) / T4 GPUs**.
 
 ---
 
 ## Datasets & Curated Mix
 
-The training pipeline uses the combined single-pass **~5,400-sample dataset** ([`nabin2004/manim-aos-5k400`](https://huggingface.co/datasets/nabin2004/manim-aos-5k400)):
-1. **5,000 Targeted Manim Code Examples**: API grounding, traceback error corrections, updaters, scientific compute (`numpy`, `scipy`, `sympy`), and pedagogical LaTeX scenes.
-2. **400 AOS Agent Trajectories**: Multi-turn tool calling and neural network visualization prompts (Andrej Karpathy prompt suite).
+The training pipeline fine-tunes on the gold-standard dataset:
+- **Dataset**: [`nabin2004/qwen3-8b-manimator-gold-sft`](https://huggingface.co/datasets/nabin2004/qwen3-8b-manimator-gold-sft)
+- **Size**: **733 gold samples** in standard chat format (`messages: [system, user, assistant]`).
+- **Pedagogical Features**:
+  1. Complete `<Plan>` blocks specifying visual goals, keyframes, mathematical formulas, and required animation components.
+  2. Executable **Manim CE** scripts with **`VoiceoverScene`** architecture and precision audio bookmark synchronization (`wait_until_bookmark`).
+  3. Clean API compliance with up-to-date Manim Community Edition standards.
 
 ---
 
@@ -16,12 +20,14 @@ The training pipeline uses the combined single-pass **~5,400-sample dataset** ([
 
 | Setting | Value |
 |---------|--------|
-| **Accelerator** | GPU P100 (16 GB VRAM, Pascal `sm_60`) |
+| **Accelerator** | GPU P100 (16 GB VRAM, Pascal `sm_60`) or T4 (16 GB VRAM, Turing `sm_75`) |
 | **Internet** | On |
-| **Session Length** | ~9 hours |
+| **Session Length** | ~9 hours (Training takes ~35 minutes for 3 epochs) |
 | **Precision** | QLoRA 4-bit (`nf4`), `fp16` compute, FP32 adapter dtypes |
 | **Optimizer** | `paged_adamw_8bit` |
-| **Sequence Length** | `2048` |
+| **Sequence Length** | `4096` (Covers 100% of gold dataset examples without truncation) |
+| **Epochs** | `3` (~275 total optimizer steps with batch size 1 and grad accum 8) |
+| **Checkpointing** | Every `50` steps |
 | **Packing** | Disabled (`--no-packing` avoids cross-sample contamination without Flash Attention) |
 
 > [!NOTE]
@@ -66,8 +72,10 @@ In a Kaggle Notebook code cell (Bash or Python), simply run:
 > `run_kaggle.py` automatically:
 > 1. Extracts `HF_TOKEN` from Kaggle Secrets (Add-ons → Secrets).
 > 2. Skips downloading 2.5 GB of PyTorch wheels if existing PyTorch already works on CUDA.
-> 3. Curates the 5.4k dataset automatically if not present.
-> 4. Runs QLoRA SFT, adapter merging, GGUF multi-quantization (`Q4_K_M` & `Q8_0`), and pushes all artifacts to HuggingFace!
+> 3. Streams `nabin2004/qwen3-8b-manimator-gold-sft` directly from Hugging Face Datasets.
+> 4. Runs QLoRA SFT (3 epochs, seq_len 4096, 4-bit NF4).
+> 5. Merges LoRA adapter into full bf16 base model weights.
+> 6. Quantizes merged model to GGUFs (`Q4_K_M` & `Q8_0`) and pushes all releases to Hugging Face!
 
 ---
 
@@ -75,24 +83,34 @@ In a Kaggle Notebook code cell (Bash or Python), simply run:
 
 | Artifact | Output Location / Hugging Face Repository |
 |----------|-------------------------------------------|
-| **Curated Dataset** | [`nabin2004/manim-aos-5k400`](https://huggingface.co/datasets/nabin2004/manim-aos-5k400) |
+| **Gold Dataset** | [`nabin2004/qwen3-8b-manimator-gold-sft`](https://huggingface.co/datasets/nabin2004/qwen3-8b-manimator-gold-sft) |
 | **LoRA Adapter** | [`nabin2004/AOS-qwen3-8b-adapter`](https://huggingface.co/nabin2004/AOS-qwen3-8b-adapter) |
 | **Merged Base Model** | [`nabin2004/AOS-Qwen3-8B-Merged`](https://huggingface.co/nabin2004/AOS-Qwen3-8B-Merged) |
 | **Quantized GGUFs & Modelfile** | [`nabin2004/AOS-Qwen3-8B-GGUF`](https://huggingface.co/nabin2004/AOS-Qwen3-8B-GGUF) (`Q4_K_M` & `Q8_0`) |
 
 ---
 
-## Custom Environment Overrides
+## Custom CLI Options & Environment Overrides
 
-You can prefix environment variables before invoking the bash script:
+You can pass command-line arguments to `run_kaggle.py`:
 
 ```bash
-MODEL_ID="Qwen/Qwen3-8B"
-DATASET_REPO="nabin2004/manim-aos-5k400"
-HUB_ADAPTER_REPO="nabin2004/AOS-qwen3-8b-adapter"
-HUB_MERGED_REPO="nabin2004/AOS-Qwen3-8B-Merged"
-HUB_GGUF_REPO="nabin2004/AOS-Qwen3-8B-GGUF"
-EPOCHS=1
-SEQ_LEN=2048
-SAVE_STEPS=200
+python3 /kaggle/working/AOS/apps/qwenCoder/run_kaggle.py \
+  --dataset-repo nabin2004/qwen3-8b-manimator-gold-sft \
+  --epochs 3 \
+  --seq-len 4096 \
+  --save-steps 50 \
+  --hub-adapter-repo nabin2004/AOS-qwen3-8b-adapter \
+  --hub-merged-repo nabin2004/AOS-Qwen3-8B-Merged \
+  --hub-gguf-repo nabin2004/AOS-Qwen3-8B-GGUF
+```
+
+Or via environment variables when running `kaggle_qwen3_8b_e2e.sh`:
+
+```bash
+DATASET_REPO="nabin2004/qwen3-8b-manimator-gold-sft"
+EPOCHS=3
+SEQ_LEN=4096
+SAVE_STEPS=50
+bash /kaggle/working/AOS/apps/qwenCoder/kaggle_qwen3_8b_e2e.sh
 ```

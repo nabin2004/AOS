@@ -112,57 +112,83 @@ def setup_environment(force_reinstall_torch: bool = False) -> None:
     subprocess.run([python_exe, "-m", "pip", "install", "-e", str(QWEN_ROOT), "--no-deps"], check=True)
 
 
-def ensure_dataset(curate_if_missing: bool = True, push_dataset: bool = True) -> None:
-    """Ensure dataset (train.jsonl) is present or curate it automatically."""
-    dataset_file = QWEN_ROOT / "curated_sft_5k_400" / "train.jsonl"
-    if not dataset_file.exists() and curate_if_missing:
-        print("\n==> Dataset file not found locally. Running automatic curation (5,400 samples)...")
-        cmd = [sys.executable, str(QWEN_ROOT / "curate_sft_5k_400.py")]
-        if push_dataset and os.environ.get("HF_TOKEN"):
-            cmd.extend(["--push", "--repo-id", "nabin2004/manim-aos-5k400"])
-        subprocess.run(cmd, check=True)
+from identity import (
+    HUB_QWEN3_8B_DATASET_REPO,
+    HUB_QWEN3_8B_GGUF_REPO,
+    HUB_QWEN3_8B_MERGED_REPO,
+    HUB_QWEN3_8B_SFT_REPO,
+    QWEN3_8B_MODEL_ID,
+)
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Super Simple Kaggle One-Click Qwen3-8B Pipeline")
-    parser.add_argument("--epochs", type=int, default=1, help="Number of training epochs")
-    parser.add_argument("--save-steps", type=int, default=200, help="Checkpoint save steps")
-    parser.add_argument("--seq-len", type=int, default=2048, help="Sequence length")
-    parser.add_argument("--max-samples", type=int, default=0, help="Max samples to train (0 = full dataset)")
-    parser.add_argument("--val-split", type=float, default=0.0, help="Validation split ratio e.g. 0.05")
-    parser.add_argument("--curate", action="store_true", help="Force dataset curation before training")
-    parser.add_argument("--force-reinstall-torch", action="store_true", help="Force reinstall PyTorch cu118")
-    parser.add_argument("--skip-train", action="store_true", help="Skip training step")
-    parser.add_argument("--skip-merge", action="store_true", help="Skip merge step")
-    parser.add_argument("--skip-gguf", action="store_true", help="Skip GGUF quantization step")
-    args = parser.parse_args()
-
-    print("=================================================================")
-    print("🚀 Starting Simple Kaggle Qwen3-8B Pipeline")
-    print("=================================================================")
-
-    setup_kaggle_secrets()
-
-    if not os.environ.get("HF_TOKEN"):
-        print("WARNING: HF_TOKEN is not set. Hugging Face uploads will fail unless HF_TOKEN is exported or in Kaggle Secrets.")
-
-    setup_environment(force_reinstall_torch=args.force_reinstall_torch)
-
-    if args.curate:
-        print("\n==> Force curating dataset...")
+def ensure_dataset(dataset_repo: str, force_curate: bool = False) -> None:
+    """Ensure dataset is present or curate manually if requested."""
+    if force_curate:
+        print("\n==> Force curating local 5.4k dataset...")
         cmd = [sys.executable, str(QWEN_ROOT / "curate_sft_5k_400.py")]
         if os.environ.get("HF_TOKEN"):
             cmd.extend(["--push", "--repo-id", "nabin2004/manim-aos-5k400"])
         subprocess.run(cmd, check=True)
     else:
-        ensure_dataset(curate_if_missing=True, push_dataset=True)
+        print(f"\n✔ Using Hub dataset: {dataset_repo} (will be loaded directly by Hugging Face Datasets)")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Super Simple Kaggle One-Click Qwen3-8B Pipeline")
+    parser.add_argument("--model-id", default=QWEN3_8B_MODEL_ID, help="Base HF model ID")
+    parser.add_argument("--dataset-repo", default=HUB_QWEN3_8B_DATASET_REPO, help="Dataset repo ID")
+    parser.add_argument("--hub-adapter-repo", default=HUB_QWEN3_8B_SFT_REPO, help="HF repo for adapter")
+    parser.add_argument("--hub-merged-repo", default=HUB_QWEN3_8B_MERGED_REPO, help="HF repo for merged model")
+    parser.add_argument("--hub-gguf-repo", default=HUB_QWEN3_8B_GGUF_REPO, help="HF repo for quantized GGUF")
+    parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs (default: 3)")
+    parser.add_argument("--save-steps", type=int, default=50, help="Checkpoint save steps (default: 50)")
+    parser.add_argument("--seq-len", type=int, default=4096, help="Sequence length (default: 4096)")
+    parser.add_argument("--max-samples", type=int, default=0, help="Max samples to train (0 = full dataset)")
+    parser.add_argument("--val-split", type=float, default=0.0, help="Validation split ratio e.g. 0.05")
+    parser.add_argument("--curate", action="store_true", help="Force local 5k dataset curation before training")
+    parser.add_argument("--force-reinstall-torch", action="store_true", help="Force reinstall PyTorch cu118")
+    parser.add_argument("--skip-train", action="store_true", help="Skip training step")
+    parser.add_argument("--skip-merge", action="store_true", help="Skip merge step")
+    parser.add_argument("--skip-gguf", action="store_true", help="Skip GGUF quantization step")
+    parser.add_argument("--no-push", action="store_true", help="Dry run: skip pushing to Hugging Face Hub")
+    args = parser.parse_args()
+
+    print("=================================================================")
+    print("🚀 Starting Simple Kaggle Qwen3-8B Pipeline")
+    print(f"   Model:        {args.model_id}")
+    print(f"   Dataset:      {args.dataset_repo}")
+    print(f"   Epochs:       {args.epochs}")
+    print(f"   Seq Len:      {args.seq_len}")
+    print(f"   Save Steps:   {args.save_steps}")
+    print(f"   Adapter Hub:  {args.hub_adapter_repo}")
+    print(f"   Merged Hub:   {args.hub_merged_repo}")
+    print(f"   GGUF Hub:     {args.hub_gguf_repo}")
+    print("=================================================================")
+
+    setup_kaggle_secrets()
+
+    if not os.environ.get("HF_TOKEN") and not args.no_push:
+        print("WARNING: HF_TOKEN is not set. Hugging Face uploads will fail unless HF_TOKEN is exported or in Kaggle Secrets.")
+
+    setup_environment(force_reinstall_torch=args.force_reinstall_torch)
+
+    ensure_dataset(dataset_repo=args.dataset_repo, force_curate=args.curate)
 
     print("\n==> Launching Master Qwen3-8B End-to-End Pipeline...")
     e2e_cmd = [
         sys.executable,
         str(QWEN_ROOT / "run_e2e_qwen3.py"),
         "--kaggle",
-        "--push-to-hub",
+        "--model-id",
+        args.model_id,
+        "--dataset-repo",
+        args.dataset_repo,
+        "--hub-adapter-repo",
+        args.hub_adapter_repo,
+        "--hub-merged-repo",
+        args.hub_merged_repo,
+        "--hub-gguf-repo",
+        args.hub_gguf_repo,
         "--epochs",
         str(args.epochs),
         "--save-steps",
@@ -174,6 +200,8 @@ def main() -> int:
         "--val-split",
         str(args.val_split),
     ]
+    if not args.no_push:
+        e2e_cmd.append("--push-to-hub")
     if args.skip_train:
         e2e_cmd.append("--skip-train")
     if args.skip_merge:

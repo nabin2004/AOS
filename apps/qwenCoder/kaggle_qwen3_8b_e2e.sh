@@ -26,13 +26,13 @@ if [[ "${KEEP_WANDB_ENV:-0}" != "1" ]]; then
 fi
 
 MODEL_ID="${MODEL_ID:-Qwen/Qwen3-8B}"
-DATASET_REPO="${DATASET_REPO:-nabin2004/manim-aos-5k400}"
+DATASET_REPO="${DATASET_REPO:-nabin2004/qwen3-8b-manimator-gold-sft}"
 HUB_ADAPTER_REPO="${HUB_ADAPTER_REPO:-nabin2004/AOS-qwen3-8b-adapter}"
 HUB_MERGED_REPO="${HUB_MERGED_REPO:-nabin2004/AOS-Qwen3-8B-Merged}"
 HUB_GGUF_REPO="${HUB_GGUF_REPO:-nabin2004/AOS-Qwen3-8B-GGUF}"
-EPOCHS="${EPOCHS:-1}"
-SEQ_LEN="${SEQ_LEN:-2048}"
-SAVE_STEPS="${SAVE_STEPS:-200}"
+EPOCHS="${EPOCHS:-3}"
+SEQ_LEN="${SEQ_LEN:-4096}"
+SAVE_STEPS="${SAVE_STEPS:-50}"
 
 if [[ "${ON_KAGGLE}" == "1" ]]; then
   WORKSPACE="${WORKSPACE:-/kaggle/working}"

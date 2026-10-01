@@ -24,6 +24,7 @@ _NATIVE_HF_REPOS = frozenset(
         "nabin2004/manim-sft-10k",
         "nabin2004/educlaw-manim-sft",
         "nabin2004/manim-aos-5k400",
+        "nabin2004/qwen3-8b-manimator-gold-sft",
     }
 )
 

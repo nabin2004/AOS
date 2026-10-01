@@ -62,9 +62,9 @@ def main() -> int:
     parser.add_argument("--hub-gguf-repo", default=HUB_QWEN3_8B_GGUF_REPO, help="HF repo for quantized GGUF")
     parser.add_argument("--quantize-types", nargs="+", default=["Q4_K_M", "Q8_0"], help="GGUF quant types")
 
-    parser.add_argument("--epochs", type=int, default=1)
-    parser.add_argument("--seq-len", type=int, default=2048)
-    parser.add_argument("--save-steps", type=int, default=200)
+    parser.add_argument("--epochs", type=int, default=3)
+    parser.add_argument("--seq-len", type=int, default=4096)
+    parser.add_argument("--save-steps", type=int, default=50)
     parser.add_argument("--max-samples", type=int, default=0, help="0 = all samples")
     parser.add_argument("--val-split", type=float, default=0.0, help="Validation split ratio e.g. 0.05")
     parser.add_argument("--kaggle", action="store_true", help="Apply Kaggle P100 hardware preset")
