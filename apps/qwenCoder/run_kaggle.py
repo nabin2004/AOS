@@ -147,6 +147,7 @@ def main() -> int:
     parser.add_argument("--val-split", type=float, default=0.0, help="Validation split ratio e.g. 0.05")
     parser.add_argument("--curate", action="store_true", help="Force local 5k dataset curation before training")
     parser.add_argument("--force-reinstall-torch", action="store_true", help="Force reinstall PyTorch cu118")
+    parser.add_argument("--resume", action="store_true", help="Resume from an existing checkpoint instead of fresh start")
     parser.add_argument("--skip-train", action="store_true", help="Skip training step")
     parser.add_argument("--skip-merge", action="store_true", help="Skip merge step")
     parser.add_argument("--skip-gguf", action="store_true", help="Skip GGUF quantization step")
@@ -160,6 +161,7 @@ def main() -> int:
     print(f"   Epochs:       {args.epochs}")
     print(f"   Seq Len:      {args.seq_len}")
     print(f"   Save Steps:   {args.save_steps}")
+    print(f"   Fresh Run:    {not args.resume}")
     print(f"   Adapter Hub:  {args.hub_adapter_repo}")
     print(f"   Merged Hub:   {args.hub_merged_repo}")
     print(f"   GGUF Hub:     {args.hub_gguf_repo}")
@@ -173,6 +175,13 @@ def main() -> int:
     setup_environment(force_reinstall_torch=args.force_reinstall_torch)
 
     ensure_dataset(dataset_repo=args.dataset_repo, force_curate=args.curate)
+
+    if not args.resume:
+        local_adapter_dir = QWEN_ROOT / "qwen3-8b-manim-ft"
+        if local_adapter_dir.exists():
+            print(f"\n==> Ensuring fresh start: cleaning stale checkpoint directory {local_adapter_dir}...")
+            import shutil
+            shutil.rmtree(local_adapter_dir, ignore_errors=True)
 
     print("\n==> Launching Master Qwen3-8B End-to-End Pipeline...")
     e2e_cmd = [
@@ -200,6 +209,8 @@ def main() -> int:
         "--val-split",
         str(args.val_split),
     ]
+    if args.resume:
+        e2e_cmd.append("--resume")
     if not args.no_push:
         e2e_cmd.append("--push-to-hub")
     if args.skip_train:

@@ -70,6 +70,7 @@ def main() -> int:
     parser.add_argument("--kaggle", action="store_true", help="Apply Kaggle P100 hardware preset")
     parser.add_argument("--push-to-hub", action="store_true", help="Push outputs to Hugging Face Hub")
 
+    parser.add_argument("--resume", action="store_true", help="Resume from checkpoint if available")
     parser.add_argument("--skip-train", action="store_true", help="Skip SFT training phase")
     parser.add_argument("--skip-merge", action="store_true", help="Skip adapter merging phase")
     parser.add_argument("--skip-gguf", action="store_true", help="Skip GGUF quantization phase")
@@ -101,6 +102,19 @@ def main() -> int:
             "--use-4bit",
             "--no-packing",
         ]
+        if not args.resume:
+            train_cmd.extend(["--no-resume", "--no-sync-trainer-checkpoint"])
+            if adapter_dir.exists():
+                print(f"==> Fresh training run: purging any stale checkpoints in {adapter_dir}...")
+                for ckpt in adapter_dir.glob("checkpoint-*"):
+                    if ckpt.is_dir():
+                        shutil.rmtree(ckpt, ignore_errors=True)
+                for stale_file in ("trainer_state.json", "adapter_model.safetensors", "adapter_config.json", "training_args.bin"):
+                    p = adapter_dir / stale_file
+                    if p.exists():
+                        p.unlink(missing_ok=True)
+        else:
+            train_cmd.append("--resume")
         if args.kaggle:
             train_cmd.append("--kaggle")
         if args.push_to_hub:

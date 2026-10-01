@@ -146,6 +146,11 @@ else
   RUN_PY=(uv run python)
 fi
 
+EXTRA_E2E_ARGS=()
+if [[ "${RESUME:-0}" == "1" ]]; then
+  EXTRA_E2E_ARGS+=("--resume")
+fi
+
 echo "==> Launching Master Pipeline: run_e2e_qwen3.py"
 "${RUN_PY[@]}" run_e2e_qwen3.py \
   --model-id "${MODEL_ID}" \
@@ -161,6 +166,7 @@ echo "==> Launching Master Pipeline: run_e2e_qwen3.py"
   --seq-len "${SEQ_LEN}" \
   --save-steps "${SAVE_STEPS}" \
   --kaggle \
-  --push-to-hub
+  --push-to-hub \
+  "${EXTRA_E2E_ARGS[@]}"
 
 echo "==> Qwen3-8B End-to-End Pipeline Finished Successfully!"

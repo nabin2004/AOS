@@ -252,8 +252,8 @@ class TrainingConfig:
             config = replace(config, save_steps=args.save_steps)
         elif os.environ.get("SAVE_STEPS", "").strip():
             config = replace(config, save_steps=int(os.environ["SAVE_STEPS"]))
-        if getattr(args, "no_resume", False):
-            config = replace(config, resume="never")
+        if getattr(args, "fresh", False) or getattr(args, "no_resume", False):
+            config = replace(config, resume="never", sync_trainer_checkpoint=False)
         elif getattr(args, "resume", False):
             config = replace(config, resume="always")
         if getattr(args, "resume_from", None) is not None:
@@ -268,6 +268,8 @@ class TrainingConfig:
             )
         if getattr(args, "no_sync_trainer_checkpoint", False):
             config = replace(config, sync_trainer_checkpoint=False)
+        elif getattr(args, "sync_trainer_checkpoint", False):
+            config = replace(config, sync_trainer_checkpoint=True)
         if not config.hub_checkpoint_id:
             config = replace(config, hub_checkpoint_id=config.hub_model_id)
         return apply_gpu_precision(config.resolve_paths())
@@ -384,7 +386,7 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
         save_total_limit=2,
         report_to=report_to,
         output_dir=default_kaggle_output_dir(),
-        sync_trainer_checkpoint=True,
+        sync_trainer_checkpoint=False,
     )
 
 
@@ -426,7 +428,7 @@ def apply_t4x2_preset(config: TrainingConfig) -> TrainingConfig:
         warmup_steps_override=10,  # ~5% of 115 total steps; warmup_ratio removed in TRL v5.2
         report_to=report_to,
         output_dir=default_kaggle_output_dir(),
-        sync_trainer_checkpoint=True,
+        sync_trainer_checkpoint=False,
     )
 
 
@@ -554,6 +556,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Start from step 0 even if checkpoint-* exists",
     )
+    resume.add_argument(
+        "--fresh",
+        action="store_true",
+        help="Force fresh training from step 0 without resuming any local or Hub checkpoint",
+    )
     parser.add_argument(
         "--resume-from",
         type=Path,
@@ -564,6 +571,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--no-sync-trainer-checkpoint",
         action="store_true",
         help="Do not upload/download last-trainer-checkpoint on the Hub",
+    )
+    parser.add_argument(
+        "--sync-trainer-checkpoint",
+        action="store_true",
+        help="Download/upload last-trainer-checkpoint from/to Hub",
     )
     parser.add_argument("--smoke", action="store_true", help="Tiny overfit smoke run")
     return parser
