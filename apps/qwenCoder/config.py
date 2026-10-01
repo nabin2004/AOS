@@ -54,7 +54,7 @@ class TrainingConfig:
     output_dir: Path = QWEN_ROOT / SFT_OUTPUT_DIR_NAME
     use_4bit: bool = True
     seq_len: int = 4096
-    epochs: int = 1
+    epochs: int = 3
     batch_size: int = 1
     grad_accum: int = 8
     learning_rate: float = 2e-4
@@ -375,6 +375,7 @@ def apply_kaggle_preset(config: TrainingConfig) -> TrainingConfig:
         batch_size=1,
         grad_accum=8,
         seq_len=2048,
+        epochs=3,
         num_proc=2,
         packing=False,
         lora_r=16,
