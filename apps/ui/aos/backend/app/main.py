@@ -124,7 +124,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[LifespanState, None]:
     await close_db()
 
 
-SHOW_DOCS_ENVIRONMENTS = ("local", "staging", "development")
+SHOW_DOCS_ENVIRONMENTS = ("local", "staging", "development", "production")
 
 
 def create_app() -> FastAPI:
