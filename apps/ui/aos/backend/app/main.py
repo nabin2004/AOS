@@ -1,6 +1,7 @@
 # ruff: noqa: I001 - Imports structured for Jinja2 template conditionals
 """FastAPI application entry point."""
 
+import asyncio
 import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager, suppress
@@ -89,10 +90,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[LifespanState, None]:
     if embedder is not None:
         try:
             vector_store = MilvusVectorStore(settings=settings.rag, embedding_service=embedder)
-            await vector_store.client.list_collections()
+            await asyncio.wait_for(vector_store.client.list_collections(), timeout=2.0)
             state["vector_store"] = vector_store
         except Exception as e:
-            logger.error("Milvus connection failed: %s. Vector store will not be available.", e)
+            logger.error("Milvus connection failed or timed out: %s. Vector store will not be available.", e)
 
     _telegram_adapter = TelegramAdapter()
     register_adapter(_telegram_adapter)

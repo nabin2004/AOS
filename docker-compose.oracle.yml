@@ -1,0 +1,354 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: aos_db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-aos}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: aos_redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    container_name: aos_minio
+    user: "0:0"
+    ports:
+      - "${MINIO_API_PORT:-9010}:9000"
+      - "${MINIO_CONSOLE_PORT:-9011}:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+    command: server /data --console-address ":9001"
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && exec 3<&-"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  create_buckets:
+    image: aos_backend:dev
+    pull_policy: never
+    container_name: aos_minio_init
+    healthcheck:
+      disable: true
+    depends_on:
+      minio:
+        condition: service_healthy
+    command: python -c "import boto3, time; time.sleep(1); s3 = boto3.client('s3', endpoint_url='http://minio:9000', aws_access_key_id='minioadmin', aws_secret_access_key='minioadmin'); [s3.create_bucket(Bucket=b) for b in ['aos-videos', 'aos-rag']]; print('Buckets created successfully')"
+    networks:
+      - aos_net
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.6.13
+    container_name: aos_etcd
+    command: >
+      etcd --advertise-client-urls http://etcd:2379
+      --listen-client-urls http://0.0.0.0:2379
+      --data-dir /var/lib/etcd
+    volumes:
+      - etcd_data:/var/lib/etcd
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  milvus:
+    image: milvusdb/milvus:v2.6.19
+    container_name: aos_milvus
+    command: ["milvus", "run", "standalone"]
+    ports:
+      - "${MILVUS_PORT:-19530}:19530"
+      - "9091:9091"
+    volumes:
+      - milvus_data:/var/lib/milvus
+    environment:
+      - ETCD_ENDPOINTS=etcd:2379
+      - MINIO_ADDRESS=minio:9000
+    depends_on:
+      etcd:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - aos_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      start_period: 90s
+      interval: 30s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  init_db:
+    image: aos_backend:dev
+    pull_policy: never
+    container_name: aos_init_db
+    healthcheck:
+      disable: true
+    command: alembic upgrade head
+    volumes:
+      - ./apps/ui/aos/backend/app:/app/app:ro
+      - ./apps/ui/aos/backend/alembic:/app/alembic:ro
+      - ./apps/ui/aos/backend/alembic.ini:/app/alembic.ini:ro
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-aos}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production-use-openssl-rand-hex-32}
+    networks:
+      - aos_net
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    image: aos_backend:dev
+    pull_policy: never
+    container_name: aos_backend
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --ws websockets-sansio
+    volumes:
+      - ./apps/ui/aos/backend/app:/app/app:ro
+      - ./apps/ui/aos/backend/cli:/app/cli:ro
+      - ./apps/ui/aos/emails:/app/emails:ro
+      - ./apps/educlaw:/app/apps/educlaw:rw
+      - ./apps/agents:/app/apps/agents:rw
+      - ./apps/slidestemp:/app/apps/slidestemp:rw
+      - ./apps/audio_service:/app/apps/audio_service:rw
+      - ./apps/mcpservers:/app/apps/mcpservers:rw
+      - ./apps/training:/app/apps/training:ro
+      - ./packages:/app/packages:rw
+      - ./pyproject.toml:/app/pyproject.toml:ro
+      - ./uv.lock:/app/uv.lock:rw
+      - media_data:/app/media
+    env_file:
+      - ./apps/ui/aos/backend/.env
+    environment:
+      - DEBUG=false
+      - ENVIRONMENT=production
+      - PYTHONUNBUFFERED=1
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-aos}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - S3_VIDEO_ENDPOINT=http://minio:9000
+      - S3_VIDEO_ACCESS_KEY=${S3_VIDEO_ACCESS_KEY:-minioadmin}
+      - S3_VIDEO_SECRET_KEY=${S3_VIDEO_SECRET_KEY:-minioadmin}
+      - S3_VIDEO_BUCKET=${S3_VIDEO_BUCKET:-aos-videos}
+      - S3_RAG_ENDPOINT=http://minio:9000
+      - S3_RAG_ACCESS_KEY=${S3_RAG_ACCESS_KEY:-minioadmin}
+      - S3_RAG_SECRET_KEY=${S3_RAG_SECRET_KEY:-minioadmin}
+      - S3_RAG_BUCKET=${S3_RAG_BUCKET:-aos-rag}
+      - AGENTS_DIR=/app/apps/agents
+      - AGENTS_UV_CMD=uv
+      - PYTHONPATH=/app:/app/apps/agents:/app/packages/ir/src:/app/packages/store/src
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - aos_net
+    depends_on:
+      init_db:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    restart: unless-stopped
+
+  celery_worker:
+    image: aos_backend:dev
+    pull_policy: never
+    container_name: aos_celery_worker
+    healthcheck:
+      disable: true
+    command: celery -A app.worker.celery_app worker --loglevel=info --pool=solo
+    volumes:
+      - ./apps/ui/aos/backend/app:/app/app:ro
+      - ./apps/ui/aos/backend/cli:/app/cli:ro
+      - ./apps/ui/aos/emails:/app/emails:ro
+      - ./apps/educlaw:/app/apps/educlaw:rw
+      - ./apps/agents:/app/apps/agents:rw
+      - ./apps/slidestemp:/app/apps/slidestemp:rw
+      - ./apps/audio_service:/app/apps/audio_service:rw
+      - ./apps/mcpservers:/app/apps/mcpservers:rw
+      - ./apps/training:/app/apps/training:ro
+      - ./packages:/app/packages:rw
+      - ./pyproject.toml:/app/pyproject.toml:ro
+      - ./uv.lock:/app/uv.lock:rw
+      - media_data:/app/media
+    env_file:
+      - ./apps/ui/aos/backend/.env
+    environment:
+      - DEBUG=false
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-aos}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - S3_VIDEO_ENDPOINT=http://minio:9000
+      - S3_VIDEO_ACCESS_KEY=${S3_VIDEO_ACCESS_KEY:-minioadmin}
+      - S3_VIDEO_SECRET_KEY=${S3_VIDEO_SECRET_KEY:-minioadmin}
+      - S3_VIDEO_BUCKET=${S3_VIDEO_BUCKET:-aos-videos}
+      - S3_RAG_ENDPOINT=http://minio:9000
+      - S3_RAG_ACCESS_KEY=${S3_RAG_ACCESS_KEY:-minioadmin}
+      - S3_RAG_SECRET_KEY=${S3_RAG_SECRET_KEY:-minioadmin}
+      - S3_RAG_BUCKET=${S3_RAG_BUCKET:-aos-rag}
+      - AGENTS_DIR=/app/apps/agents
+      - AGENTS_UV_CMD=uv
+      - PYTHONPATH=/app:/app/apps/agents:/app/packages/ir/src:/app/packages/store/src
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - aos_net
+    depends_on:
+      app:
+        condition: service_started
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    restart: unless-stopped
+
+  celery_beat:
+    image: aos_backend:dev
+    pull_policy: never
+    container_name: aos_celery_beat
+    healthcheck:
+      disable: true
+    command: celery -A app.worker.celery_app beat --loglevel=info
+    volumes:
+      - ./apps/ui/aos/backend/app:/app/app:ro
+    env_file:
+      - ./apps/ui/aos/backend/.env
+    environment:
+      - DEBUG=false
+      - REDIS_HOST=redis
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - aos_net
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  flower:
+    image: aos_backend:dev
+    pull_policy: never
+    container_name: aos_flower
+    healthcheck:
+      disable: true
+    command: celery -A app.worker.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    env_file:
+      - ./apps/ui/aos/backend/.env
+    environment:
+      - DEBUG=false
+      - REDIS_HOST=redis
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - aos_net
+    depends_on:
+      app:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:alpine
+    container_name: aos_caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - aos_net
+    depends_on:
+      - app
+    restart: unless-stopped
+
+networks:
+  aos_net:
+    driver: bridge
+
+volumes:
+  media_data:
+  postgres_data:
+  redis_data:
+  etcd_data:
+  minio_data:
+  milvus_data:
+  caddy_data:
+  caddy_config:

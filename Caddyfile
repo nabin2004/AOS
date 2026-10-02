@@ -1,0 +1,7 @@
+{
+    admin off
+}
+
+aos-api.olinabin.com.np {
+    reverse_proxy app:8000
+}
