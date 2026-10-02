@@ -2,6 +2,22 @@ from __future__ import annotations
 
 import os
 
+# Guard against incompatible torchao versions in Kaggle / Colab (e.g. torchao==0.10.0 breaks PEFT >=0.19.1)
+try:
+    import peft.import_utils
+
+    _orig_is_torchao = getattr(peft.import_utils, "is_torchao_available", None)
+    if _orig_is_torchao is not None:
+        def _safe_is_torchao() -> bool:
+            try:
+                return _orig_is_torchao()
+            except Exception:
+                return False
+
+        peft.import_utils.is_torchao_available = _safe_is_torchao
+except Exception:
+    pass
+
 import torch
 from transformers import (
     AutoModelForCausalLM,

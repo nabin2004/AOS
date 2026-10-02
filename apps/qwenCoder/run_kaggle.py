@@ -108,8 +108,34 @@ def setup_environment(force_reinstall_torch: bool = False) -> None:
     subprocess.run([python_exe, "-m", "pip", "install", "--upgrade", "pip"], check=True)
     subprocess.run([python_exe, "-m", "pip", "install"] + deps, check=True)
 
+    # Kaggle pre-installs incompatible torchao==0.10.0 which breaks PEFT adapter loading/merging (>0.16.0 required)
+    subprocess.run([python_exe, "-m", "pip", "uninstall", "-y", "torchao"], check=False)
+
     print("==> Installing qwenCoder package in editable mode (--no-deps)...")
     subprocess.run([python_exe, "-m", "pip", "install", "-e", str(QWEN_ROOT), "--no-deps"], check=True)
+
+
+def ensure_llama_cpp(target_dir: Path) -> Path:
+    """Clone and compile llama.cpp if not already present."""
+    convert_script = target_dir / "convert_hf_to_gguf.py"
+    quant_bin = target_dir / "build" / "bin" / "llama-quantize"
+
+    if convert_script.is_file() and quant_bin.is_file():
+        print(f"✔ Using existing llama.cpp build at {target_dir}")
+        return target_dir
+
+    print(f"\n==> Building llama.cpp in {target_dir} for GGUF quantization...")
+    if not target_dir.is_dir():
+        subprocess.run(
+            ["git", "clone", "--depth", "1", "https://github.com/ggml-org/llama.cpp", str(target_dir)],
+            check=True,
+        )
+
+    build_dir = target_dir / "build"
+    subprocess.run(["cmake", "-S", str(target_dir), "-B", str(build_dir)], check=True)
+    subprocess.run(["cmake", "--build", str(build_dir), "-j"], check=True)
+    print("✔ llama.cpp built successfully.")
+    return target_dir
 
 
 from identity import (
@@ -176,12 +202,18 @@ def main() -> int:
 
     ensure_dataset(dataset_repo=args.dataset_repo, force_curate=args.curate)
 
-    if not args.resume:
+    if not args.resume and not args.skip_train:
         local_adapter_dir = QWEN_ROOT / "qwen3-8b-manim-ft"
         if local_adapter_dir.exists():
             print(f"\n==> Ensuring fresh start: cleaning stale checkpoint directory {local_adapter_dir}...")
             import shutil
             shutil.rmtree(local_adapter_dir, ignore_errors=True)
+
+    llama_dir = None
+    if not args.skip_gguf:
+        target_llama = Path("/kaggle/working/llama.cpp") if Path("/kaggle/working").is_dir() else (REPO_ROOT / "llama.cpp")
+        llama_dir = ensure_llama_cpp(target_llama)
+        os.environ["LLAMA_CPP_DIR"] = str(llama_dir)
 
     print("\n==> Launching Master Qwen3-8B End-to-End Pipeline...")
     e2e_cmd = [
@@ -209,6 +241,8 @@ def main() -> int:
         "--val-split",
         str(args.val_split),
     ]
+    if llama_dir:
+        e2e_cmd.extend(["--llama-cpp-dir", str(llama_dir)])
     if args.resume:
         e2e_cmd.append("--resume")
     if not args.no_push:

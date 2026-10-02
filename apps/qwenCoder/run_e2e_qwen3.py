@@ -24,6 +24,22 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Guard against incompatible torchao versions in Kaggle / Colab (e.g. torchao==0.10.0 breaks PEFT >=0.19.1)
+try:
+    import peft.import_utils
+
+    _orig_is_torchao = getattr(peft.import_utils, "is_torchao_available", None)
+    if _orig_is_torchao is not None:
+        def _safe_is_torchao() -> bool:
+            try:
+                return _orig_is_torchao()
+            except Exception:
+                return False
+
+        peft.import_utils.is_torchao_available = _safe_is_torchao
+except Exception:
+    pass
+
 QWEN_ROOT = Path(__file__).resolve().parent
 if str(QWEN_ROOT) not in sys.path:
     sys.path.insert(0, str(QWEN_ROOT))
@@ -74,6 +90,7 @@ def main() -> int:
     parser.add_argument("--skip-train", action="store_true", help="Skip SFT training phase")
     parser.add_argument("--skip-merge", action="store_true", help="Skip adapter merging phase")
     parser.add_argument("--skip-gguf", action="store_true", help="Skip GGUF quantization phase")
+    parser.add_argument("--llama-cpp-dir", type=Path, default=None, help="Path to compiled llama.cpp repository")
     args = parser.parse_args()
 
     adapter_dir = args.adapter_dir.expanduser().resolve()
@@ -162,6 +179,10 @@ def main() -> int:
                 "--quantize", q_type,
                 "--model-name", OLLAMA_QWEN3_8B_TAG,
             ]
+            if args.llama_cpp_dir:
+                gguf_cmd.extend(["--llama-cpp-dir", str(args.llama_cpp_dir)])
+            elif os.environ.get("LLAMA_CPP_DIR"):
+                gguf_cmd.extend(["--llama-cpp-dir", os.environ["LLAMA_CPP_DIR"]])
             _run_cmd(gguf_cmd, cwd=QWEN_ROOT)
 
         if args.push_to_hub:
