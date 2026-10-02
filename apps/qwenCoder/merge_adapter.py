@@ -58,10 +58,31 @@ def _hub_token() -> str | None:
 def resolve_adapter_path(adapter_input: str, token: str | None) -> str:
     """Resolve an adapter input string to a local directory or download it from HF Hub."""
     local_path = Path(adapter_input).expanduser()
-    if local_path.is_dir() and (local_path / "adapter_config.json").is_file():
-        return str(local_path.resolve())
+    if local_path.is_dir():
+        if (local_path / "adapter_config.json").is_file():
+            return str(local_path.resolve())
+        # Check subdirectories for trainer checkpoints
+        for sub in sorted(local_path.glob("checkpoint-*"), reverse=True):
+            if (sub / "adapter_config.json").is_file():
+                print(f"✔ Found adapter in checkpoint directory: {sub}")
+                return str(sub.resolve())
+        if (local_path / "last-trainer-checkpoint" / "adapter_config.json").is_file():
+            print(f"✔ Found adapter in last-trainer-checkpoint directory")
+            return str((local_path / "last-trainer-checkpoint").resolve())
 
-    # If it's a directory without adapter_config, or not a directory, try HF Hub download
+    # Detect if adapter_input looks like a filesystem path rather than a valid HF repo_id
+    is_path_like = (
+        adapter_input.startswith(("/", "\\", ".", "~"))
+        or ":\\" in adapter_input
+        or ":/" in adapter_input
+        or local_path.is_absolute()
+    )
+    if is_path_like:
+        raise FileNotFoundError(
+            f"Local adapter path '{adapter_input}' was not found or contains no 'adapter_config.json'."
+        )
+
+    # If not a local path, try Hugging Face Hub download
     print(f"Resolving adapter from Hugging Face Hub: {adapter_input}...")
     try:
         downloaded = snapshot_download(
@@ -72,9 +93,6 @@ def resolve_adapter_path(adapter_input: str, token: str | None) -> str:
         print(f"✔ Downloaded adapter snapshot to {downloaded}")
         return downloaded
     except Exception as exc:
-        if local_path.is_dir():
-            print(f"Warning: Hub download failed ({exc}), using local dir {local_path}")
-            return str(local_path.resolve())
         raise FileNotFoundError(
             f"Could not resolve adapter '{adapter_input}' as a local path or Hugging Face repository: {exc}"
         )
@@ -123,6 +141,11 @@ def main() -> int:
         help=f"Target HF repo ID for merged weights (default: {HUB_MERGED_REPO})",
     )
     parser.add_argument(
+        "--hub-fallback-repo",
+        default=None,
+        help="Optional HF repo ID to download adapter from if local adapter directory is missing",
+    )
+    parser.add_argument(
         "--hub-private",
         action="store_true",
         help="Upload as a private repository",
@@ -130,7 +153,15 @@ def main() -> int:
     args = parser.parse_args()
 
     token = _hub_token()
-    resolved_adapter = resolve_adapter_path(args.adapter_id, token)
+    try:
+        resolved_adapter = resolve_adapter_path(args.adapter_id, token)
+    except FileNotFoundError as err:
+        if args.hub_fallback_repo:
+            print(f"Notice: {err}\nAttempting fallback to Hub repo: {args.hub_fallback_repo}...")
+            resolved_adapter = resolve_adapter_path(args.hub_fallback_repo, token)
+        else:
+            raise
+
     output_dir = args.output_dir.expanduser().resolve()
 
     print(f"Loading base {args.model_id} (dtype=bf16, device={args.device})...")

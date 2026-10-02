@@ -154,6 +154,8 @@ def main() -> int:
             "--output-dir", str(merged_dir),
             "--model-id", args.model_id,
         ]
+        if args.hub_adapter_repo:
+            merge_cmd.extend(["--hub-fallback-repo", args.hub_adapter_repo])
         if args.push_to_hub:
             merge_cmd.extend(["--push-to-hub", "--hub-repo-id", args.hub_merged_repo])
 
