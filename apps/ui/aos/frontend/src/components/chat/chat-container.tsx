@@ -29,6 +29,8 @@ import {
   videoGenerationToChatMessage,
   type VideoGenerationDto,
 } from "@/lib/video-status";
+import { useAnimationSessionStore } from "@/stores/animation-session-store";
+import { ManimStudioModal } from "./manim-studio-modal";
 
 const SCROLL_NEAR_BOTTOM_THRESHOLD_PX = 150;
 
@@ -258,6 +260,66 @@ export function ChatContainer() {
     [messages, sendMessage],
   );
 
+  const isStudioOpen = useAnimationSessionStore((s) => s.isStudioOpen);
+  const openStudioInStore = useAnimationSessionStore((s) => s.openStudio);
+  const closeStudioInStore = useAnimationSessionStore((s) => s.closeStudio);
+  const activeSession = useAnimationSessionStore((s) => s.activeSession);
+
+  const handleOpenStudio = useCallback(
+    (prompt?: string) => {
+      // 1. If explicit prompt/topic provided in slash command (e.g. /animate Euler's formula)
+      if (prompt && prompt.trim()) {
+        openStudioInStore({
+          conversationId: currentConversationId ?? undefined,
+          sourcePrompt: prompt.trim(),
+          sourceText: prompt.trim(),
+        });
+        return;
+      }
+
+      // 2. Otherwise, check conversation messages for the latest assistant explanation
+      const currentMsgs = useChatStore.getState().messages;
+      const latestAssistant = [...currentMsgs]
+        .reverse()
+        .find((m) => m.role === "assistant" && (m.content?.trim() || m.parts?.length));
+
+      if (latestAssistant) {
+        const textContent =
+          latestAssistant.content ||
+          latestAssistant.parts
+            ?.filter((p) => p.type === "text" && p.content)
+            .map((p) => p.content)
+            .join("\n") ||
+          "";
+
+        const idx = currentMsgs.findIndex((m) => m.id === latestAssistant.id);
+        let userQuery: string | undefined;
+        for (let i = idx - 1; i >= 0; i--) {
+          if (currentMsgs[i]?.role === "user") {
+            userQuery = currentMsgs[i]?.content;
+            break;
+          }
+        }
+
+        openStudioInStore({
+          conversationId: currentConversationId ?? undefined,
+          sourceMessageId: latestAssistant.id,
+          sourcePrompt: userQuery,
+          sourceText: textContent,
+        });
+        return;
+      }
+
+      // 3. Fallback: open blank studio ready for user input
+      openStudioInStore({
+        conversationId: currentConversationId ?? undefined,
+        sourcePrompt: "",
+        sourceText: "",
+      });
+    },
+    [currentConversationId, openStudioInStore],
+  );
+
   // Slash command handlers — passed down to ChatInput so the / palette can
   // run them locally without going through the agent.
   const slashContext = {
@@ -274,33 +336,44 @@ export function ChatContainer() {
     openSettings: () => {
       document.querySelector<HTMLButtonElement>("[data-chat-settings-trigger]")?.click();
     },
+    openStudio: handleOpenStudio,
   };
 
   return (
-    <ChatUI
-      messages={messages}
-      isConnected={isConnected}
-      isProcessing={isProcessing}
-      isLoadingConversation={
-        currentConversationId !== null && isConversationLoading && messages.length === 0
-      }
-      sendMessage={sendMessage}
-      onModelChange={setModel}
-      onTemperatureChange={setTemperature}
-      onThinkingEffortChange={setThinkingEffort}
-      onRegenerate={handleRegenerate}
-      slashContext={slashContext}
-      slashCommands={slashCommands}
-      queuedMessages={queuedMessages}
-      onCancelQueued={cancelQueued}
-      messagesEndRef={messagesEndRef}
-      scrollContainerRef={scrollContainerRef}
-      pendingApproval={pendingApproval}
-      onResumeDecisions={sendResumeDecisions}
-      pendingQuestions={pendingQuestions}
-      onAnswerQuestions={sendAskUserResponses}
-      onStop={stopGeneration}
-    />
+    <>
+      <ChatUI
+        messages={messages}
+        isConnected={isConnected}
+        isProcessing={isProcessing}
+        isLoadingConversation={
+          currentConversationId !== null && isConversationLoading && messages.length === 0
+        }
+        sendMessage={sendMessage}
+        onModelChange={setModel}
+        onTemperatureChange={setTemperature}
+        onThinkingEffortChange={setThinkingEffort}
+        onRegenerate={handleRegenerate}
+        slashContext={slashContext}
+        slashCommands={slashCommands}
+        queuedMessages={queuedMessages}
+        onCancelQueued={cancelQueued}
+        messagesEndRef={messagesEndRef}
+        scrollContainerRef={scrollContainerRef}
+        pendingApproval={pendingApproval}
+        onResumeDecisions={sendResumeDecisions}
+        pendingQuestions={pendingQuestions}
+        onAnswerQuestions={sendAskUserResponses}
+        onStop={stopGeneration}
+      />
+      <ManimStudioModal
+        isOpen={isStudioOpen}
+        onClose={closeStudioInStore}
+        initialKnowledge={activeSession?.sourceText || ""}
+        conversationId={activeSession?.conversationId || currentConversationId || undefined}
+        sourceMessageId={activeSession?.sourceMessageId || "studio-session"}
+        sourcePrompt={activeSession?.sourcePrompt}
+      />
+    </>
   );
 }
 

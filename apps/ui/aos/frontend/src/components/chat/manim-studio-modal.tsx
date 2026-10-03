@@ -7,17 +7,14 @@ import {
   Code2,
   Play,
   RotateCcw,
-  CheckCircle2,
   Edit3,
   Eye,
   Sliders,
   AlertCircle,
   X,
-  ExternalLink,
   ChevronRight,
   Terminal,
   Loader2,
-  Wand2,
   Layers,
   Palette,
   Clock,
@@ -226,8 +223,8 @@ export function ManimStudioModal({
 }: ManimStudioModalProps) {
   const [currentStage, setCurrentStage] = useState<StudioStage>("plan");
   
-  // Knowledge state
   const [knowledgeText, setKnowledgeText] = useState(initialKnowledge);
+  const [isEditingSource, setIsEditingSource] = useState(false);
 
   // Stage 1: Plan
   const [planMarkdown, setPlanMarkdown] = useState("");
@@ -283,12 +280,47 @@ export function ManimStudioModal({
   const [videoStreamUrl, setVideoStreamUrl] = useState<string | null>(null);
 
   const { baseUrl, apiKey, modelId } = useLlmProviderStore();
-  const accessToken = useAuthStore((state) => state.accessToken);
   const critiqueModeActive = useCritiqueStore((s) => s.critiqueModeActive);
   const videoMode = useChatModeStore((s) => s.videoMode);
 
   // Track the last knowledge we generated a plan for so we can detect a new query
   const lastKnowledgeRef = useRef<string>("");
+
+  // Authenticated fetch wrapper that transparently refreshes expired access tokens
+  const fetchWithAuth = useCallback(async (url: string, init: RequestInit) => {
+    const doFetch = (token?: string | null) =>
+      fetch(url, {
+        ...init,
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...init.headers,
+        },
+      });
+
+    const currentToken = useAuthStore.getState().accessToken;
+    let res = await doFetch(currentToken);
+
+    if (res.status === 401) {
+      try {
+        const refreshRes = await fetch("/api/auth/refresh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (refreshRes.ok) {
+          const data = await refreshRes.json();
+          if (data?.access_token) {
+            useAuthStore.getState().setAccessToken(data.access_token);
+            res = await doFetch(data.access_token);
+          }
+        }
+      } catch {
+        // Refresh failed
+      }
+    }
+    return res;
+  }, []);
 
   // ── API handlers (defined before useEffect so they are stable references) ─
   const handleGeneratePlan = useCallback(async (sourceText: string) => {
@@ -297,16 +329,11 @@ export function ManimStudioModal({
     setPlanMarkdown("");
     setPlanActivity([]);
     try {
-      const resp = await fetch("/api/videos/plan/stream", {
+      const resp = await fetchWithAuth("/api/videos/plan/stream", {
         method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
         body: JSON.stringify({
           text: sourceText,
-            mode: videoMode !== "off" ? videoMode : "lecture",
+          mode: videoMode !== "off" ? videoMode : "lecture",
           model_name: modelId,
           base_url: baseUrl,
           api_key: apiKey,
@@ -338,7 +365,7 @@ export function ManimStudioModal({
     } finally {
       setIsGeneratingPlan(false);
     }
-  }, [modelId, baseUrl, apiKey, accessToken, updateSession]);
+  }, [modelId, baseUrl, apiKey, videoMode, updateSession, fetchWithAuth]);
 
   const handleCreatePlan = useCallback(() => {
     const emphasisInstruction: Record<AnimationEmphasis, string> = {
@@ -363,16 +390,11 @@ export function ManimStudioModal({
     setCodeActivity([]);
     setCurrentStage("code");
     try {
-      const resp = await fetch("/api/videos/code/stream", {
+      const resp = await fetchWithAuth("/api/videos/code/stream", {
         method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
         body: JSON.stringify({
           plan: planMarkdown,
-            mode: videoMode !== "off" ? videoMode : "lecture",
+          mode: videoMode !== "off" ? videoMode : "lecture",
           knowledge_text: knowledgeText,
           model_name: modelId,
           base_url: baseUrl,
@@ -408,7 +430,7 @@ export function ManimStudioModal({
     } finally {
       setIsSynthesizingCode(false);
     }
-  }, [planMarkdown, knowledgeText, modelId, baseUrl, apiKey, accessToken, updateSession]);
+  }, [planMarkdown, knowledgeText, videoMode, modelId, baseUrl, apiKey, updateSession, fetchWithAuth]);
 
   // Reset or initialize when opened, or when initialKnowledge changes
   useEffect(() => {
@@ -464,13 +486,8 @@ export function ManimStudioModal({
             ? (skipPreflight ? "Compiling and rendering with Manim (preflight bypassed)..." : "Compiling and rendering the Manim scene...")
             : `Re-rendering repaired scene (attempt ${attempt + 1}/${maxRepairAttempts})...`,
         );
-        const resp = await fetch("/api/videos/render-custom", {
+        const resp = await fetchWithAuth("/api/videos/render-custom", {
           method: "POST",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json",
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          },
           body: JSON.stringify({
             code: candidateCode,
             scene_name: sceneName,
@@ -528,13 +545,8 @@ export function ManimStudioModal({
         setRenderProgressMsg(
           `Manim failed. Repair ${attempt + 1}/${maxRepairAttempts - 1}: retrieving documentation and repairing the code...`,
         );
-        const repairResp = await fetch("/api/videos/repair", {
+        const repairResp = await fetchWithAuth("/api/videos/repair", {
           method: "POST",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json",
-            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          },
           body: JSON.stringify({
             code: candidateCode,
             error: lastError,
@@ -578,13 +590,8 @@ export function ManimStudioModal({
     setCurrentStage("code");
     setRenderError(null);
     try {
-      const resp = await fetch("/api/videos/code", {
+      const resp = await fetchWithAuth("/api/videos/code", {
         method: "POST",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        },
         body: JSON.stringify({
           plan: `${planMarkdown}\n\n### REPAIR DIRECTIVE (${category.toUpperCase()}):\n${feedback}`,
           knowledge_text: knowledgeText,
@@ -727,9 +734,30 @@ export function ManimStudioModal({
             <div className="space-y-4 max-w-4xl mx-auto">
               <section className="space-y-4 rounded-2xl border border-primary/25 bg-primary/5 p-4 sm:p-5">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">Source</p>
-                  {sourcePrompt && <p className="mt-1 text-sm font-medium text-foreground">{sourcePrompt}</p>}
-                  <p className="mt-2 max-h-24 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">{knowledgeText}</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">Topic / Source Concept</p>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingSource(!isEditingSource)}
+                      className="text-[11px] text-primary hover:underline font-medium"
+                    >
+                      {isEditingSource ? "Done editing" : "Edit topic / source"}
+                    </button>
+                  </div>
+                  {isEditingSource || !knowledgeText ? (
+                    <textarea
+                      value={knowledgeText}
+                      onChange={(e) => setKnowledgeText(e.target.value)}
+                      rows={3}
+                      className="mt-2 w-full rounded-lg border border-input bg-background p-2.5 text-xs leading-relaxed focus:outline-none focus:ring-1 focus:ring-primary"
+                      placeholder="Describe what you want to animate (e.g. Euler's formula e^(i*pi) + 1 = 0, Fourier Transform, Pythagoras theorem)..."
+                    />
+                  ) : (
+                    <>
+                      {sourcePrompt && <p className="mt-1 text-sm font-medium text-foreground">{sourcePrompt}</p>}
+                      <p className="mt-2 max-h-24 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">{knowledgeText}</p>
+                    </>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-semibold text-foreground">What should the animation communicate?</p>

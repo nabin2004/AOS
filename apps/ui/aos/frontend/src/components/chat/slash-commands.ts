@@ -16,11 +16,11 @@
 import type { UserSlashCommandRecord } from "@/lib/slash-commands-api";
 
 export type SlashCommandAction =
-  | { kind: "client"; run: (ctx: SlashCommandContext) => void }
-  | { kind: "send-as-message"; replaceWith: string };
+  | { kind: "client"; run: (ctx: SlashCommandContext, args?: string) => void }
+  | { kind: "send-as-message"; replaceWith: string | ((args?: string) => string) };
 
 export interface SlashCommand {
-  /** No leading slash — e.g. "clear", "regen". */
+  /** No leading slash — e.g. "clear", "regen", "animate". */
   name: string;
   /** One-line description shown in the palette. */
   description: string;
@@ -38,9 +38,21 @@ export interface SlashCommandContext {
   regenerateLast: () => void;
   /** Open the model picker / chat settings panel. */
   openSettings: () => void;
+  /** Open the Manim Animation Studio HITL modal. */
+  openStudio: (prompt?: string) => void;
 }
 
 export const BUILTIN_COMMANDS: SlashCommand[] = [
+  {
+    name: "animate",
+    description: "Open Animation Studio (HITL) to compose, code, and render a Manim animation.",
+    aliases: ["studio", "manim", "hitl"],
+    action: {
+      kind: "client",
+      run: (ctx, args) => ctx.openStudio(args),
+    },
+    source: "builtin",
+  },
   {
     name: "clear",
     description: "Clear the current chat (does not delete the conversation).",
@@ -127,20 +139,21 @@ function previewPrompt(prompt: string): string {
 
 /**
  * Filter commands by a query — matches name + aliases by prefix, falls back
- * to substring on description.
+ * to substring on description. Supports query containing trailing arguments.
  */
 export function searchCommands(commands: SlashCommand[], query: string): SlashCommand[] {
-  const q = query.toLowerCase().replace(/^\/+/, "");
-  if (!q) return commands;
+  const raw = query.toLowerCase().replace(/^\/+/, "").trim();
+  const firstWord = raw.split(/\s+/)[0] || "";
+  if (!firstWord) return commands;
   const prefix = commands.filter((c) =>
-    [c.name, ...(c.aliases ?? [])].some((s) => s.startsWith(q)),
+    [c.name, ...(c.aliases ?? [])].some((s) => s.startsWith(firstWord)),
   );
   if (prefix.length > 0) return prefix;
   return commands.filter(
     (c) =>
-      c.name.includes(q) ||
-      c.aliases?.some((a) => a.includes(q)) ||
-      c.description.toLowerCase().includes(q),
+      c.name.includes(firstWord) ||
+      c.aliases?.some((a) => a.includes(firstWord)) ||
+      c.description.toLowerCase().includes(firstWord),
   );
 }
 

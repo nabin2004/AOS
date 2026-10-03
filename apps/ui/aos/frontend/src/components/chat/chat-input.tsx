@@ -76,20 +76,31 @@ export function ChatInput({
 
   const runSlashCommand = useCallback(
     (cmd: SlashCommand) => {
+      const raw = message.trim().replace(/^\/+/, "");
+      const spaceIdx = raw.indexOf(" ");
+      const args = spaceIdx !== -1 ? raw.slice(spaceIdx + 1).trim() : undefined;
+
       if (cmd.action.kind === "client") {
-        cmd.action.run(slashContext!);
+        cmd.action.run(slashContext!, args);
         setMessage("");
         return;
       }
       // send-as-message — replace the slash with the canned prompt and send
       // through the normal flow so it lands as a regular user turn.
+      const replaceText =
+        typeof cmd.action.replaceWith === "function"
+          ? cmd.action.replaceWith(args)
+          : args
+            ? `${cmd.action.replaceWith}\n\nAdditional topic / instructions: ${args}`
+            : cmd.action.replaceWith;
+
       const fileIds = attachedFiles.length > 0 ? attachedFiles.map((f) => f.id) : undefined;
       const files = attachedFiles.length > 0 ? attachedFiles : undefined;
-      onSend(cmd.action.replaceWith, fileIds, files);
+      onSend(replaceText, fileIds, files);
       setMessage("");
       setAttachedFiles([]);
     },
-    [attachedFiles, onSend, slashContext],
+    [attachedFiles, message, onSend, slashContext],
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -98,6 +109,20 @@ export function ChatInput({
       runSlashCommand(filteredCommands[paletteIndex]);
       return;
     }
+
+    // Direct slash command submit even if palette wasn't clicked
+    if (message.startsWith("/")) {
+      const raw = message.trim().replace(/^\/+/, "");
+      const firstWord = (raw.split(/\s+/)[0] || "").toLowerCase();
+      const matched = allCommands.find(
+        (c) => c.name.toLowerCase() === firstWord || c.aliases?.map((a) => a.toLowerCase()).includes(firstWord),
+      );
+      if (matched) {
+        runSlashCommand(matched);
+        return;
+      }
+    }
+
     const trimmed = message.trim();
     if (!trimmed && attachedFiles.length === 0) return;
     if (disabled || isUploading) return;
@@ -333,7 +358,7 @@ export function ChatInput({
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={
-            !mounted ? "Type a message (click Keyframe or Animate to generate video)..." : videoMode === "keyframe"
+            !mounted ? "Type a message or /animate to start Animation Studio..." : videoMode === "keyframe"
               ? "Describe topic for Keyframe slide animation (1-shot)..."
               : videoMode === "animate"
                 ? "Describe what you want to animate with agent_graph.py (1-shot)..."
@@ -341,7 +366,7 @@ export function ChatInput({
                   ? "Enter topic for 1-shot visual anchor lecture..."
                   : videoMode === "lecture"
                     ? "Enter topic for 1-shot full lecture..."
-                    : "Type a message (click Keyframe or Animate to generate video)..."
+                    : "Type a message or /animate to start Animation Studio..."
           }
           disabled={disabled}
           rows={1}

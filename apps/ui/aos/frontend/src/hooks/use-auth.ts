@@ -55,9 +55,12 @@ function runAuthCheck(setUser: (u: User | null) => void): Promise<void> {
       const { access_token, ...userData } = data;
       setUser(userData as User);
       useAuthStore.getState().setAccessToken(access_token ?? null);
-    } catch {
-      setUser(null);
-      useAuthStore.getState().setAccessToken(null);
+    } catch (err) {
+      // Only invalidate authenticated session if server explicitly returns 401
+      if (err instanceof ApiError && err.status === 401) {
+        setUser(null);
+        useAuthStore.getState().setAccessToken(null);
+      }
     } finally {
       authChecked = true;
       authCheckPromise = null;
