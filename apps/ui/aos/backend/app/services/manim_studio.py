@@ -42,6 +42,11 @@ from app.services.video_storage import get_video_storage, video_object_key, code
 
 logger = logging.getLogger(__name__)
 
+
+def _sse(event: dict[str, Any]) -> str:
+    """Format a dict as a Server-Sent-Events data frame."""
+    return f"data: {json.dumps(event)}\n\n"
+
 # ── LLM generation limits ────────────────────────────────────────────────────
 MANIM_MAX_OUTPUT_TOKENS: int = 3_000
 MANIM_MAX_CONTEXT_CHARS: int = 4_000
@@ -373,9 +378,13 @@ Derived from source material: {text_hint}
         api_key: str | None = None,
     ) -> AsyncGenerator[str, None]:
         """Stream scenes.md visual plan generation events via SSE."""
-        classification = await classify_text_for_manim(
-            text, model_name=model_name, base_url=base_url, api_key=api_key
-        )
+        try:
+            classification = await classify_text_for_manim(
+                text, model_name=model_name, base_url=base_url, api_key=api_key
+            )
+        except Exception as exc:  # never let classification kill the stream
+            logger.warning("Classification failed in plan stream (%s); using heuristic.", exc)
+            classification = manim_studio_service.classify_heuristic(text)
         topic = classification.topic or "Mathematical Concept"
 
         yield f"data: {json.dumps({'type': 'start', 'topic': topic, 'title': f'Visual Plan: {topic}'})}\n\n"
@@ -400,13 +409,17 @@ Derived from source material: {text_hint}
                     accumulated.append(chunk)
                     yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
         except Exception as exc:
-            logger.warning("Streaming plan generation failed: %s", exc)
-            yield f"data: {json.dumps({\'type\': \'error\', \'detail\': f\'Composer Plan generation failed: {exc}\'})}}\n\n"
+            logger.exception("Streaming plan generation failed")
+            detail = f"Composer Plan generation failed with model '{model_name or 'default'}': {exc}"
+            yield _sse({"type": "error", "detail": detail})
             return
 
         full_plan = "".join(accumulated).strip()
         if len(full_plan) < 100:
-            yield f"data: {json.dumps({\'type\': \'error\', \'detail\': \'Composer Plan generation returned an empty or invalid plan.\'})}}\n\n"
+            yield _sse({
+                "type": "error",
+                "detail": f"Model '{model_name or 'default'}' returned an empty or too-short plan. Try again or choose a stronger model.",
+            })
             return
 
         yield f"data: {json.dumps({'type': 'status', 'message': 'Visual plan complete.'})}\n\n"
@@ -588,6 +601,7 @@ class {scene_name}(Scene):
 
         accumulated: list[str] = []
         stream_failed = False
+        stream_error = ""
         try:
             agent = hitl_agents.get_coder_agent(model_name, base_url, api_key)
             deps = hitl_agents.HitlCoderDeps(plan=capped_plan, knowledge_text=capped_knowledge, scene_name=detected_scene)
@@ -596,17 +610,21 @@ class {scene_name}(Scene):
                     accumulated.append(chunk)
                     yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
         except Exception as exc:
-            logger.warning("Streaming code synthesis failed: %s", exc)
+            logger.exception("Streaming code synthesis failed")
             stream_failed = True
+            stream_error = str(exc)
 
         raw_response = "".join(accumulated).strip()
         code, detected_scene = hitl_agents.extract_manim_code(raw_response, default_scene=detected_scene)
 
         if stream_failed:
-            yield f"data: {json.dumps({\'type\': \'error\', \'detail\': \'Streaming code synthesis failed or timed out.\'})}}\n\n"
+            yield _sse({
+                "type": "error",
+                "detail": f"Code synthesis failed with model '{model_name or 'default'}': {stream_error}",
+            })
             return
         if not code or "def construct" not in code:
-            yield f"data: {json.dumps({\'type\': \'error\', \'detail\': \'Coder Agent returned empty or invalid Manim code.\'})}}\n\n"
+            yield _sse({"type": "error", "detail": "Coder Agent returned empty or invalid Manim code."})
             return
 
         yield f"data: {json.dumps({'type': 'status', 'message': 'Manim scene code complete.'})}\n\n"

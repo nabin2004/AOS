@@ -287,7 +287,8 @@ class HitlLLMResolver:
             key = os.getenv("OPENROUTER_API_KEY", "").strip()
 
         custom_base = normalize_endpoint_url(base_url)
-        if not custom_base:
+        user_supplied_key = bool((api_key or "").strip())
+        if not custom_base and not user_supplied_key:
             env_base = (
                 getattr(settings, "AOS_OPENAI_BASE_URL", "")
                 or os.getenv("AOS_OPENAI_BASE_URL", "")
