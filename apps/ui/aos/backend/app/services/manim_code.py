@@ -62,6 +62,8 @@ _MOBJECT_CONSTRUCTORS = {"MathTex", "Tex", "VGroup", "Group", "VMobject", "Mobje
 _UNSUPPORTED_TEX_COMPILER = re.compile(
     r"(?m)^(?P<indent>\s*)config(?:\[\s*['\"]tex_compiler['\"]\s*\]|\.tex_compiler)\s*=.*$"
 )
+_UNSUPPORTED_AXES_LABEL = re.compile(r""",\s*(?P<name>[xy]_axis_label)\s*=\s*(?P<value>(?:r?['"][^'"]*['"]|[A-Za-z_][A-Za-z0-9_]*))""")
+_LEADING_UNSUPPORTED_AXES_LABEL = re.compile(r"""(?P<open>\b(?:Three)?Axes\s*\(\s*)(?P<name>[xy]_axis_label)\s*=\s*(?P<value>(?:r?['"][^'"]*['"]|[A-Za-z_][A-Za-z0-9_]*))\s*,?""")
 
 
 class _NameCollector(ast.NodeVisitor):
@@ -504,6 +506,12 @@ def repair_manim_code(code: str) -> CodeRepair:
         return f"{match.group('indent')}pass  # LaTeX compiler is managed by Manim configuration"
 
     repaired = _UNSUPPORTED_TEX_COMPILER.sub(remove_tex_compiler_override, repaired)
+
+    before_axes_labels = repaired
+    repaired = _UNSUPPORTED_AXES_LABEL.sub("", repaired)
+    repaired = _LEADING_UNSUPPORTED_AXES_LABEL.sub(r"\g<open>", repaired)
+    if repaired != before_axes_labels:
+        changes.append("Removed unsupported Axes x_axis_label/y_axis_label constructor kwargs")
 
     def remove_scene_camera_move(match: re.Match[str]) -> str:
         changes.append(

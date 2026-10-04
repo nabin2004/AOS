@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import os
 import re
@@ -20,6 +21,27 @@ OPENAI_MAX_RETRIES = 6
 WARMUP_MAX_WAIT_S = 150.0
 _warmup_attempted: set[str] = set()
 _warmed_bases: set[str] = set()
+
+
+class _UniformToolStrictnessTransport(httpx.AsyncBaseTransport):
+    """Normalize function-tool strictness for strict OpenAI-compatible APIs."""
+    def __init__(self) -> None:
+        self._transport = httpx.AsyncHTTPTransport()
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        if request.method in {"POST", "PUT", "PATCH"} and request.headers.get("content-type", "").startswith("application/json"):
+            try:
+                payload = json.loads(await request.aread())
+                tools = payload.get("tools") if isinstance(payload, dict) else None
+                if isinstance(tools, list):
+                    for tool in tools:
+                        if isinstance(tool, dict) and isinstance(tool.get("function"), dict):
+                            tool["function"]["strict"] = False
+                    body = json.dumps(payload).encode("utf-8")
+                    request.stream = httpx.ByteStream(body)
+                    request.headers["Content-Length"] = str(len(body))
+            except (json.JSONDecodeError, TypeError):
+                pass
+        return await self._transport.handle_async_request(request)
 
 
 def normalize_endpoint_url(base_url: str | None) -> str:
@@ -249,11 +271,13 @@ def build_openai_provider(base_url: str, api_key: str) -> OpenAIProvider:
     """Provider with ~300s timeout and SDK retries (covers HTTP 503 and local CPU models)."""
     resolved_base = normalize_endpoint_url(base_url)
     resolved_key = (api_key or "").strip() or LOCAL_API_KEY_PLACEHOLDER
+    http_client = httpx.AsyncClient(timeout=HTTP_TIMEOUT, transport=_UniformToolStrictnessTransport())
     client = AsyncOpenAI(
         base_url=resolved_base,
         api_key=resolved_key,
         timeout=300.0,
         max_retries=OPENAI_MAX_RETRIES,
+        http_client=http_client,
     )
     try:
         return OpenAIProvider(openai_client=client)
@@ -264,4 +288,3 @@ def build_openai_provider(base_url: str, api_key: str) -> OpenAIProvider:
             api_key=resolved_key,
             http_client=http_client,
         )
-
