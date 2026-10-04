@@ -351,6 +351,27 @@ async def run_pipeline(
     narration_enabled: bool = False,
 ) -> dict:
 
+    # Static Slide Producer-Consumer Engine (Pure still-image presentation generation)
+    if mode in ("static_slides", "slides", "static"):
+        import time
+        from static_slide_engine import run_static_slide_pipeline
+
+        total_slides = 3
+        if length in ("5m", "medium", "5"):
+            total_slides = 3
+        elif length in ("10m", "long", "10"):
+            total_slides = 4
+        elif length in ("short", "1m", "1"):
+            total_slides = 2
+
+        out = output_dir or Path(__file__).resolve().parent / "workspace" / f"slides_{int(time.time()*1000)}"
+        return await asyncio.to_thread(
+            run_static_slide_pipeline,
+            user_query,
+            output_dir=out,
+            total_slides=total_slides,
+        )
+
     # Integrated Keyframe Producer-Consumer Engine for UI Animate Mode
     if mode == "keyframe":
         from keyframe_engine import run_producer_consumer
