@@ -140,7 +140,7 @@ services:
       - AOS_VISUAL_CRITIC_BACKEND=${AOS_VISUAL_CRITIC_BACKEND:-moondream}
       - AOS_VISUAL_CRITIC_MAX_RETRIES=${AOS_VISUAL_CRITIC_MAX_RETRIES:-3}
       - AOS_VISUAL_CRITIC_RETRY_TIMEOUT=${AOS_VISUAL_CRITIC_RETRY_TIMEOUT:-20.0}
-      - PYTHONPATH=/app:/app/apps/agents:/app/packages/ir/src:/app/packages/store/src:/app/packages/motiongram/src
+      - PYTHONPATH=/app:/app/apps/agents:/app/apps/audio_service:/app/packages/ir/src:/app/packages/store/src:/app/packages/motiongram/src
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -212,7 +212,7 @@ services:
       - AOS_VISUAL_CRITIC_BACKEND=${AOS_VISUAL_CRITIC_BACKEND:-moondream}
       - AOS_VISUAL_CRITIC_MAX_RETRIES=${AOS_VISUAL_CRITIC_MAX_RETRIES:-3}
       - AOS_VISUAL_CRITIC_RETRY_TIMEOUT=${AOS_VISUAL_CRITIC_RETRY_TIMEOUT:-20.0}
-      - PYTHONPATH=/app:/app/apps/agents:/app/packages/ir/src:/app/packages/store/src:/app/packages/motiongram/src
+      - PYTHONPATH=/app:/app/apps/agents:/app/apps/audio_service:/app/packages/ir/src:/app/packages/store/src:/app/packages/motiongram/src
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:

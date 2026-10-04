@@ -25,8 +25,19 @@ PREVIEW = config.pixel_height <= 480
 try:
     from manim_voiceover import VoiceoverScene
 except ImportError:
-    from tools.aos_speech_service import VoiceoverSceneFallback as VoiceoverScene
-from tools.aos_speech_service import AOSSpeechService
+    try:
+        from tools.aos_speech_service import VoiceoverSceneFallback as VoiceoverScene
+    except ImportError:
+        from manim import Scene as VoiceoverScene
+
+try:
+    from tools.aos_speech_service import AOSSpeechService
+except ImportError:
+    try:
+        from motiongram.audio.dytto import AOSSpeechService
+    except ImportError:
+        class AOSSpeechService:  # type: ignore[no-redef]
+            def __init__(self, *args, **kwargs): pass
 {% endif %}
 
 # Diagram component imports

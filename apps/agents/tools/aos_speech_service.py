@@ -1,24 +1,119 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import numpy as np
-import scipy.io.wavfile
-from manim_voiceover.services.base import SpeechService
-from narrator import DEFAULT_VOICE, Narrator
+
+try:
+    import scipy.io.wavfile
+except ImportError:
+    scipy = None
+
+try:
+    from manim_voiceover import VoiceoverScene
+    from manim_voiceover.services.base import SpeechService
+    VoiceoverSceneFallback = VoiceoverScene
+except ImportError:
+    from manim import Scene
+
+    class SpeechService:  # type: ignore[no-redef]
+        """Fallback base class when manim_voiceover is not installed."""
+        def __init__(self, cache_dir: str | Path | None = None, **kwargs: Any):
+            self.cache_dir = cache_dir or "voiceover_cache"
+            self.kwargs = kwargs
+
+        def get_cached_result(self, input_data: dict, cache_path: Path) -> dict | None:
+            return None
+
+        def get_audio_basename(self, input_data: dict) -> str:
+            import hashlib, json
+            return hashlib.sha256(json.dumps(input_data, sort_keys=True).encode()).hexdigest()[:16]
+
+    class VoiceoverTrackerFallback:
+        def __init__(self, duration: float = 2.0, bookmarks: dict[str, float] | None = None):
+            self.duration = duration
+            self.bookmarks = bookmarks or {}
+
+        def get_bookmark_offset(self, mark: str) -> float:
+            return self.bookmarks.get(mark, 0.0)
+
+    class VoiceoverContextFallback:
+        def __init__(self, scene: Any, text: str, subcaption: str | None = None, **kwargs: Any):
+            self.scene = scene
+            self.text = text
+            self.subcaption = subcaption
+            self.kwargs = kwargs
+            self.tracker = VoiceoverTrackerFallback(duration=2.0)
+
+        def __enter__(self) -> VoiceoverTrackerFallback:
+            speech_service = getattr(self.scene, "speech_service", None)
+            if speech_service is not None and hasattr(speech_service, "generate_from_text"):
+                try:
+                    data = speech_service.generate_from_text(self.text)
+                    if isinstance(data, dict):
+                        audio_path = data.get("final_audio") or data.get("original_audio")
+                        dur = data.get("duration", 2.0)
+                        bms = data.get("bookmarks", {})
+                        if audio_path and Path(audio_path).exists():
+                            try:
+                                self.scene.add_sound(str(audio_path))
+                            except Exception:
+                                pass
+                        self.tracker = VoiceoverTrackerFallback(duration=dur, bookmarks=bms)
+                except Exception as exc:
+                    import logging
+                    logging.getLogger(__name__).warning("Fallback voiceover audio generation failed: %s", exc)
+            return self.tracker
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+    class VoiceoverSceneFallback(Scene):
+        """Fallback implementation when manim_voiceover is not installed."""
+
+        def __init__(self, **kwargs: Any):
+            super().__init__(**kwargs)
+            self.speech_service = None
+            self._current_tracker = None
+
+        def set_speech_service(self, speech_service: Any) -> None:
+            self.speech_service = speech_service
+
+        def voiceover(self, text: str = "", **kwargs: Any) -> VoiceoverContextFallback:
+            ctx = VoiceoverContextFallback(self, text, **kwargs)
+            self._current_tracker = ctx.tracker
+            return ctx
+
+        def wait_until_bookmark(self, mark: str) -> None:
+            self.wait(0.5)
+
+try:
+    from narrator import DEFAULT_VOICE, Narrator
+except ImportError:
+    try:
+        from audio_service.narrator import DEFAULT_VOICE, Narrator
+    except ImportError:
+        try:
+            from apps.audio_service.narrator import DEFAULT_VOICE, Narrator
+        except ImportError:
+            DEFAULT_VOICE = "alba"
+            Narrator = None
 
 from .speech_markup import (
     build_segment_word_boundaries,
     parse_bookmarks,
 )
 
-_narrator: Narrator | None = None
+_narrator: Any | None = None
 _narrator_voice: str | None = None
 _narrator_language: str | None = None
 
 
-def _get_narrator(voice: str, language: str | None) -> Narrator:
+def _get_narrator(voice: str, language: str | None) -> Any:
     global _narrator, _narrator_voice, _narrator_language
+    if Narrator is None:
+        return None
     if _narrator is None or _narrator_voice != voice or _narrator_language != language:
         _narrator = Narrator(voice=voice, language=language)
         _narrator_voice = voice
@@ -31,6 +126,8 @@ def _write_concat_wav(
     sample_rate: int,
     chunks: list[np.ndarray],
 ) -> None:
+    if scipy is None or not hasattr(scipy, "io") or not hasattr(scipy.io, "wavfile"):
+        return
     if not chunks:
         scipy.io.wavfile.write(out_path, sample_rate, np.zeros(0, dtype=np.float32))
         return
@@ -39,7 +136,7 @@ def _write_concat_wav(
 
 
 class AOSSpeechService(SpeechService):
-    """Manim Voiceover speech service backed by AOS Pocket TTS (audio_service).
+    """Manim Voiceover speech service backed by AOS Pocket TTS (audio_service) or Dytto.
 
     Bookmarks use segment-split synthesis: text is split at
     ``<bookmark mark='…'/>`` tags, each segment is synthesized with Pocket TTS,
@@ -52,11 +149,15 @@ class AOSSpeechService(SpeechService):
         voice: str = DEFAULT_VOICE,
         language: str | None = None,
         cache_dir: str | Path | None = None,
-        **kwargs,
+        backend: str | None = None,
+        model: str | None = None,
+        **kwargs: Any,
     ):
-        super().__init__(cache_dir=cache_dir, **kwargs)
+        self.backend = backend
+        self.model = model
         self.voice = voice
         self.language = language
+        super().__init__(cache_dir=cache_dir, **kwargs)
 
     def generate_from_text(
         self,
@@ -91,8 +192,29 @@ class AOSSpeechService(SpeechService):
         else:
             audio_path = path
 
+        # If a backend is specified or if Pocket TTS narrator is unavailable, delegate to DyttoSpeechService
+        if self.backend or _get_narrator(self.voice, self.language) is None:
+            try:
+                from motiongram.audio.dytto import DyttoSpeechService
+                dytto = DyttoSpeechService(
+                    model=self.backend or "auto",
+                    voice=self.voice,
+                    cache_dir=cache_path,
+                )
+                return dytto.generate_from_text(text, cache_dir=cache_path, path=path, **kwargs)
+            except Exception:
+                pass
+
         narrator = _get_narrator(self.voice, self.language)
         out_file = cache_path / audio_path
+
+        if narrator is None:
+            return {
+                "input_text": text,
+                "input_data": input_data,
+                "original_audio": audio_path,
+                "duration": 2.0,
+            }
 
         if not parsed.has_bookmarks:
             narrator.synthesize(parsed.clean_text, out_file)
