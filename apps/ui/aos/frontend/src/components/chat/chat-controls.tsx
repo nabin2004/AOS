@@ -525,6 +525,9 @@ function SettingsPanel({
               <option value="animate">Animate (Continuous)</option>
               <option value="keyframe">Keyframe (Pedagogical)</option>
             </optgroup>
+            <optgroup label="MotionGram (Kinetic & Reliable)">
+              <option value="visual">MotionGram Visual (/visual)</option>
+            </optgroup>
             <optgroup label="Specialized Styles">
               <option value="slide">Slides Mode</option>
               <option value="scivis">Science Viz Mode</option>
@@ -542,6 +545,7 @@ function SettingsPanel({
         </div>
         <p suppressHydrationWarning className="text-foreground/55 text-[11px] leading-relaxed">
           {videoMode === "off" && "Simple conversation mode: chat replies normally without compiling a video."}
+          {videoMode === "visual" && "MotionGram Visual: Reliable declarative animation with kinetic synchronized voiceover."}
           {videoMode === "animate" && "1-Shot Animate: Continuous fluid Manim animation."}
           {videoMode === "keyframe" && "1-Shot Keyframe: Discrete pedagogical slides + synchronized TTS."}
           {videoMode === "slide" && "Slides Mode: Clean, sequential slide presentation with FadeOut transitions."}

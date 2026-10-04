@@ -194,7 +194,7 @@ class AgentSession:
             )
             return
 
-        if video_mode in ("animate", "keyframe", "teaching", "lecture", "slide", "scivis", "marp", "cinematic") and self.current_conversation_id:
+        if video_mode in ("animate", "keyframe", "teaching", "lecture", "slide", "scivis", "marp", "cinematic", "visual", "motiongram") and self.current_conversation_id:
             await self._process_video_turn(
                 user_message=user_message,
                 video_mode=video_mode,

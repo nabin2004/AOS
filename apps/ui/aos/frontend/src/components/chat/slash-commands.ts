@@ -40,9 +40,21 @@ export interface SlashCommandContext {
   openSettings: () => void;
   /** Open the Manim Animation Studio HITL modal. */
   openStudio: (prompt?: string) => void;
+  /** Open the MotionGram Visual Studio for narrated animations. */
+  openVisual: (prompt?: string) => void;
 }
 
 export const BUILTIN_COMMANDS: SlashCommand[] = [
+  {
+    name: "visual",
+    description: "Generate a reliable ManimCE teaching animation with synchronized voice narration using MotionGram.",
+    aliases: ["motiongram", "visualize", "mg"],
+    action: {
+      kind: "client",
+      run: (ctx, args) => ctx.openVisual(args),
+    },
+    source: "builtin",
+  },
   {
     name: "animate",
     description: "Open Animation Studio (HITL) to compose, code, and render a Manim animation.",

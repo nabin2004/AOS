@@ -19,3 +19,4 @@ export { useSourcesPanelStore } from "./sources-panel-store";
 export { useDebugPanelStore } from "./debug-panel-store";
 export { useCritiqueStore } from "./critique-store";
 export { useAnimationSessionStore } from "./animation-session-store";
+export { useMotionGramStore } from "./motiongram-store";

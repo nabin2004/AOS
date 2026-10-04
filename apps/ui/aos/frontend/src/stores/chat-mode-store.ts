@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type VideoMode = "off" | "animate" | "keyframe" | "teaching" | "lecture" | "slide" | "scivis" | "marp" | "cinematic" | "hitl";
+export type VideoMode = "off" | "animate" | "keyframe" | "teaching" | "lecture" | "slide" | "scivis" | "marp" | "cinematic" | "hitl" | "visual";
 export type HarnessMode = "off" | "educlaw";
 
 /**

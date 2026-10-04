@@ -31,6 +31,8 @@ import {
 } from "@/lib/video-status";
 import { useAnimationSessionStore } from "@/stores/animation-session-store";
 import { ManimStudioModal } from "./manim-studio-modal";
+import { useMotionGramStore } from "@/stores/motiongram-store";
+import { MotionGramVisualModal } from "./motiongram-visual-modal";
 
 const SCROLL_NEAR_BOTTOM_THRESHOLD_PX = 150;
 
@@ -320,6 +322,35 @@ export function ChatContainer() {
     [currentConversationId, openStudioInStore],
   );
 
+  const openVisualInStore = useMotionGramStore((s) => s.openVisual);
+
+  const handleOpenVisual = useCallback(
+    (prompt?: string) => {
+      if (prompt && prompt.trim()) {
+        openVisualInStore(prompt.trim());
+        return;
+      }
+      const currentMsgs = useChatStore.getState().messages;
+      const latestAssistant = [...currentMsgs]
+        .reverse()
+        .find((m) => m.role === "assistant" && (m.content?.trim() || m.parts?.length));
+
+      if (latestAssistant) {
+        const textContent =
+          latestAssistant.content ||
+          latestAssistant.parts
+            ?.filter((p) => p.type === "text" && p.content)
+            .map((p) => p.content)
+            .join("\n") ||
+          "";
+        openVisualInStore(textContent.slice(0, 300));
+        return;
+      }
+      openVisualInStore();
+    },
+    [openVisualInStore],
+  );
+
   // Slash command handlers — passed down to ChatInput so the / palette can
   // run them locally without going through the agent.
   const slashContext = {
@@ -337,6 +368,7 @@ export function ChatContainer() {
       document.querySelector<HTMLButtonElement>("[data-chat-settings-trigger]")?.click();
     },
     openStudio: handleOpenStudio,
+    openVisual: handleOpenVisual,
   };
 
   return (
@@ -372,6 +404,9 @@ export function ChatContainer() {
         conversationId={activeSession?.conversationId || currentConversationId || undefined}
         sourceMessageId={activeSession?.sourceMessageId || "studio-session"}
         sourcePrompt={activeSession?.sourcePrompt}
+      />
+      <MotionGramVisualModal
+        conversationId={currentConversationId || undefined}
       />
     </>
   );

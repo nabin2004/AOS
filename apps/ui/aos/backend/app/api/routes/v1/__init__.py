@@ -31,6 +31,7 @@ from app.api.routes.v1 import org_integrations
 from app.api.routes.v1 import educlaw
 from app.api.routes.v1 import system_logs
 from app.api.routes.v1 import critique
+from app.api.routes.v1 import motiongram
 
 v1_router = APIRouter()
 
@@ -56,6 +57,7 @@ v1_router.include_router(rag.router, prefix="/rag", tags=["rag"])
 
 v1_router.include_router(files.router, tags=["files"])
 v1_router.include_router(videos.router, tags=["videos"])
+v1_router.include_router(motiongram.router)
 v1_router.include_router(critique.router)
 
 

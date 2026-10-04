@@ -639,6 +639,125 @@ async def _persist_assistant_result(
         return msg.id
 
 
+async def _run_motiongram_pipeline(
+    prompt: str,
+    *,
+    generation_id: str,
+    conversation_id: str,
+    user_id: str,
+    llm_base_url: str | None = None,
+    llm_api_key: str | None = None,
+    model_name: str | None = None,
+) -> dict[str, Any]:
+    """Execute MotionGram self-healing generation and ManimCE rendering."""
+    import yaml
+    from app.services.manim_studio import manim_studio_service
+    from app.services.motiongram_service import motiongram_service
+
+    await _notify_video_status(
+        {
+            "type": "video_status",
+            "video_generation_id": generation_id,
+            "conversation_id": conversation_id,
+            "user_id": user_id,
+            "status": "running",
+            "stage": "storyboard",
+            "message": "Generating MotionGram visual specification with self-healing…",
+            "mode": "visual",
+            "prompt": prompt,
+        }
+    )
+
+    gen_res = await motiongram_service.generate_with_healing(
+        prompt=prompt,
+        model_name=model_name,
+        base_url=llm_base_url,
+        api_key=llm_api_key,
+    )
+    if not gen_res.success or not gen_res.spec_yaml:
+        return {
+            "ok": False,
+            "error": gen_res.error or "MotionGram storyboard generation failed",
+        }
+
+    await _notify_video_status(
+        {
+            "type": "video_status",
+            "video_generation_id": generation_id,
+            "conversation_id": conversation_id,
+            "user_id": user_id,
+            "status": "running",
+            "stage": "compile",
+            "message": "Compiling MotionGram specification to ManimCE with voiceover…",
+            "mode": "visual",
+            "prompt": prompt,
+        }
+    )
+
+    try:
+        compiled_code = motiongram_service.compile_spec(gen_res.spec_yaml)
+    except Exception as exc:
+        return {"ok": False, "error": f"DSL Compilation failed: {exc}"}
+
+    scene_name = "GeneratedScene"
+    try:
+        data = yaml.safe_load(gen_res.spec_yaml)
+        if isinstance(data, dict) and "scene" in data:
+            scene_name = data["scene"].get("class_name", scene_name)
+    except Exception:
+        pass
+
+    temp_base = Path(tempfile.gettempdir()) / "aos_renders"
+    temp_base.mkdir(parents=True, exist_ok=True)
+    run_dir = temp_base / f"motiongram_{generation_id[:8]}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    scene_file = run_dir / f"{scene_name}.py"
+    scene_file.write_text(compiled_code, encoding="utf-8")
+
+    await _notify_video_status(
+        {
+            "type": "video_status",
+            "video_generation_id": generation_id,
+            "conversation_id": conversation_id,
+            "user_id": user_id,
+            "status": "running",
+            "stage": "render",
+            "message": "Rendering ManimCE animation video…",
+            "mode": "visual",
+            "prompt": prompt,
+        }
+    )
+
+    rendered_mp4, compile_err = await asyncio.to_thread(
+        manim_studio_service.renderer.execute_render,
+        compiled_code,
+        scene_name,
+        "m",
+        run_dir,
+    )
+
+    if not rendered_mp4 or not rendered_mp4.exists():
+        return {
+            "ok": False,
+            "error": compile_err or "Manim render did not produce an MP4.",
+            "run_dir": str(run_dir),
+            "scene_file": str(scene_file),
+        }
+
+    return {
+        "ok": True,
+        "video_path": str(rendered_mp4),
+        "scene_file": str(scene_file),
+        "run_dir": str(run_dir),
+        "mode": "visual",
+        "detail": {
+            "yaml": gen_res.spec_yaml,
+            "scene_name": scene_name,
+            "repair_attempts": gen_res.repair_attempts,
+        },
+    }
+
+
 async def _run_generate_video(
     generation_id: str,
     *,
@@ -677,18 +796,29 @@ async def _run_generate_video(
         }
     )
 
-    artifact = await asyncio.to_thread(
-        _run_agents_cli,
-        mode,
-        prompt,
-        llm_base_url=llm_base_url,
-        llm_api_key=llm_api_key,
-        model_name=model_name,
-        generation_id=generation_id,
-        conversation_id=str(conversation_id),
-        user_id=str(user_id),
-        narration_enabled=narration_enabled,
-    )
+    if mode in ("visual", "motiongram"):
+        artifact = await _run_motiongram_pipeline(
+            prompt,
+            generation_id=generation_id,
+            conversation_id=str(conversation_id),
+            user_id=str(user_id),
+            llm_base_url=llm_base_url,
+            llm_api_key=llm_api_key,
+            model_name=model_name,
+        )
+    else:
+        artifact = await asyncio.to_thread(
+            _run_agents_cli,
+            mode,
+            prompt,
+            llm_base_url=llm_base_url,
+            llm_api_key=llm_api_key,
+            model_name=model_name,
+            generation_id=generation_id,
+            conversation_id=str(conversation_id),
+            user_id=str(user_id),
+            narration_enabled=narration_enabled,
+        )
     run_dir = artifact.get("run_dir")
 
     if not artifact.get("ok") or not artifact.get("video_path"):
