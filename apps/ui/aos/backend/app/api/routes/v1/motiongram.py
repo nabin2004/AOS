@@ -7,7 +7,7 @@ from typing import Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.api.deps import CurrentUser, DBSession
 from app.schemas.video_generation import VideoRenderCustomResponse
@@ -49,6 +49,17 @@ class MotionGramRenderRequest(BaseModel):
     conversation_id: UUID | None = Field(default=None, description="Linked conversation ID")
     prompt: str | None = Field(default=None, description="Original user prompt or title")
 
+    @field_validator("quality", mode="before")
+    @classmethod
+    def normalize_quality(cls, v: Any) -> str:
+        if isinstance(v, str):
+            v_clean = v.strip().lower()
+            if v_clean.startswith("q") and len(v_clean) == 2 and v_clean[1] in ("l", "m", "h", "k"):
+                return v_clean[1]
+            if v_clean in ("l", "m", "h", "k"):
+                return v_clean
+        return v
+
 
 class MotionGramOneShotRequest(BaseModel):
     prompt: str = Field(..., description="Educational topic to storyboard, compile, and render")
@@ -59,6 +70,17 @@ class MotionGramOneShotRequest(BaseModel):
     model_name: str | None = Field(default=None)
     base_url: str | None = Field(default=None)
     api_key: str | None = Field(default=None)
+
+    @field_validator("quality", mode="before")
+    @classmethod
+    def normalize_quality(cls, v: Any) -> str:
+        if isinstance(v, str):
+            v_clean = v.strip().lower()
+            if v_clean.startswith("q") and len(v_clean) == 2 and v_clean[1] in ("l", "m", "h", "k"):
+                return v_clean[1]
+            if v_clean in ("l", "m", "h", "k"):
+                return v_clean
+        return v
 
 
 # ==========================================

@@ -472,7 +472,7 @@ export function MotionGramVisualModal({ conversationId }: MotionGramVisualModalP
                 <label className="text-[10px] text-zinc-400 block mb-1">Render Resolution</label>
                 <div className="flex gap-2">
                   {[
-                    { id: "ql", label: "Preview (480p)", desc: "Instant draft" },
+                    { id: "l", label: "Preview (480p)", desc: "Instant draft" },
                     { id: "m", label: "Medium (720p)", desc: "Recommended" },
                     { id: "h", label: "High (1080p)", desc: "Production HD" },
                   ].map((q) => (

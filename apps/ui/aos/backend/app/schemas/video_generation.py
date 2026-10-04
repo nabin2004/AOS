@@ -1,10 +1,10 @@
 """Schemas for video generation jobs."""
 
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from app.schemas.base import BaseSchema
 
@@ -114,6 +114,17 @@ class VideoRenderCustomRequest(BaseSchema):
     quality: Literal["l", "m", "h", "k"] = "l"
     conversation_id: UUID | None = None
     prompt: str | None = None
+
+    @field_validator("quality", mode="before")
+    @classmethod
+    def normalize_quality(cls, v: Any) -> str:
+        if isinstance(v, str):
+            v_clean = v.strip().lower()
+            if v_clean.startswith("q") and len(v_clean) == 2 and v_clean[1] in ("l", "m", "h", "k"):
+                return v_clean[1]
+            if v_clean in ("l", "m", "h", "k"):
+                return v_clean
+        return v
 
 
 class VideoRenderCustomResponse(BaseSchema):
