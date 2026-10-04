@@ -753,6 +753,30 @@ Rules:
         return VideoCodeResponse(code=repaired_code, scene_name=detected_scene)
 
 
+def _extract_concise_tex_error(log_text: str) -> str:
+    """Extract only the actionable error lines from a LaTeX .log file, filtering noise."""
+    if not log_text:
+        return ""
+    lines = log_text.splitlines()
+    error_start_idx = -1
+    for idx, line in enumerate(lines):
+        if line.startswith("!") or "LaTeX Error" in line or "Fatal error" in line:
+            error_start_idx = idx
+            break
+
+    if error_start_idx != -1:
+        # Collect lines from the first ! error until TeX memory stats
+        error_slice = lines[error_start_idx : error_start_idx + 25]
+        cleaned: list[str] = []
+        for l in error_slice:
+            if "Here is how much of TeX's memory" in l:
+                break
+            cleaned.append(l)
+        return "\n".join(cleaned).strip()
+
+    return "\n".join(lines[-15:]).strip()
+
+
 # ── OOP Class 5: Render Engine ────────────────────────────────────────────────
 
 class ManimRenderEngine:
@@ -838,11 +862,14 @@ class ManimRenderEngine:
             candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)
             return candidates[0], ""
 
-        # Include LaTeX log diagnostics if available
+        # Include concise LaTeX log diagnostics if available (filtering package loading noise)
         log_files = sorted(workspace_dir.rglob("*.log"), key=lambda p: p.stat().st_mtime)[-5:]
         for log_file in log_files:
             try:
-                error_log += f"\n--- {log_file.name} (tail) ---\n{log_file.read_text(encoding='utf-8', errors='replace')[-6000:]}"
+                raw_log = log_file.read_text(encoding="utf-8", errors="replace")
+                concise_log = _extract_concise_tex_error(raw_log)
+                if concise_log:
+                    error_log += f"\n--- {log_file.name} (LaTeX Diagnostic) ---\n{concise_log}"
             except OSError:
                 continue
 

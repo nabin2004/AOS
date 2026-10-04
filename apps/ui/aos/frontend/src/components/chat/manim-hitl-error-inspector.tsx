@@ -155,23 +155,41 @@ function parseHitlDiagnostic(errorRaw: string, code: string): ParsedDiagnostic {
     /([A-Za-z0-9_]+Error|[A-Za-z0-9_]+Exception|LaTeX Error)/.test(remainingText);
 
   if (isTraceback) {
-    // Find exception name and message (usually the last non-empty line)
-    const lines = remainingText.split("\n").map((l) => l.trim()).filter(Boolean);
+    // Check specifically for LaTeX math mode errors (! Missing $ inserted)
+    const isMissingDollar = /(!\s*Missing\s*\$\s*inserted|Missing\s*\$\s*inserted)/i.test(remainingText);
+    const mathCmdMatch = remainingText.match(/\\(times|frac|cdot|sqrt|sum|int|prod|alpha|beta|gamma|delta|theta|pi|sigma|lambda|omega|approx|leq|geq|neq|sim|propto|infty|partial|nabla)/);
+    const offendingCmd = mathCmdMatch ? `\\${mathCmdMatch[1]}` : undefined;
+
     let exceptionType = "ManimExecutionError";
     let exceptionMessage = "Runtime error during scene execution";
 
-    for (let i = lines.length - 1; i >= 0; i--) {
-      const line = lines[i]!;
-      const match = line.match(/^([A-Za-z0-9_]+(?:Error|Exception)):\s*(.*)$/);
-      if (match && match[1]) {
-        exceptionType = match[1];
-        exceptionMessage = match[2] || "Error executing scene";
-        break;
-      }
-      if (/LaTeX Error/i.test(line)) {
-        exceptionType = "LaTeXCompilationError";
-        exceptionMessage = line;
-        break;
+    if (isMissingDollar) {
+      exceptionType = "LaTeXMathModeError";
+      exceptionMessage = offendingCmd
+        ? `LaTeX command '${offendingCmd}' used outside math mode in Tex(). In Manim, Tex() runs in text mode; use MathTex() or enclose in '$...$'.`
+        : "Missing $ inserted in LaTeX expression. In Manim, Tex() runs in text mode; use MathTex() or wrap formulas in '$...$'.";
+    } else if (/latex error converting to dvi|! Undefined control sequence|! LaTeX Error/i.test(remainingText)) {
+      const undefMatch = remainingText.match(/! Undefined control sequence\.\s*(?:\n.*)?\n(?:l\.\d+\s+)?(\\[a-zA-Z]+)/);
+      exceptionType = "LaTeXCompilationError";
+      exceptionMessage = undefMatch
+        ? `Undefined LaTeX command: '${undefMatch[1]}'. Check command spelling or required LaTeX packages.`
+        : "LaTeX compilation failed while converting to DVI/SVG. Check mathematical notation and syntax.";
+    } else {
+      // Find exception name and message
+      const lines = remainingText.split("\n").map((l) => l.trim()).filter(Boolean);
+      for (let i = lines.length - 1; i >= 0; i--) {
+        const line = lines[i]!;
+        const match = line.match(/^([A-Za-z0-9_]+(?:Error|Exception)):\s*(.*)$/);
+        if (match && match[1]) {
+          exceptionType = match[1];
+          exceptionMessage = match[2] || "Error executing scene";
+          break;
+        }
+        if (/LaTeX Error/i.test(line)) {
+          exceptionType = "LaTeXCompilationError";
+          exceptionMessage = line;
+          break;
+        }
       }
     }
 
@@ -472,6 +490,20 @@ export function ManimHitlErrorInspector({
                 </div>
               )}
             </div>
+
+            {/* LaTeX Math Mode Guidance Tip */}
+            {diag.exceptionType === "LaTeXMathModeError" && (
+              <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">
+                <Lightbulb className="h-4 w-4 shrink-0 text-amber-400 mt-0.5" />
+                <div className="space-y-1 leading-snug">
+                  <span className="font-semibold text-amber-300">How to fix in Manim:</span>
+                  <p className="text-[11px] text-zinc-300 leading-relaxed">
+                    Manim&apos;s <code className="bg-black/50 px-1 py-0.5 rounded text-amber-300">Tex()</code> runs in LaTeX text mode. Math symbols (e.g. <code className="text-amber-200">\times</code>, <code className="text-amber-200">\frac</code>) require math mode.
+                    Replace with <code className="bg-black/50 px-1 py-0.5 rounded text-emerald-300 font-semibold">MathTex(r&quot;...&quot;)</code> or wrap math in <code className="bg-black/50 px-1 py-0.5 rounded text-cyan-300 font-semibold">$...$</code> inside Tex.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Context snippet of crashed code */}
             {diag.crashedSnippet && (

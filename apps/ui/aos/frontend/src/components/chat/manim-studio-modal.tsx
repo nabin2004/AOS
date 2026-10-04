@@ -13,6 +13,9 @@ import {
   AlertCircle,
   X,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Wand2,
   Terminal,
   Loader2,
   Layers,
@@ -208,6 +211,200 @@ function LiveActivityFeed({ activity }: { activity: StreamActivity[] }) {
         </details>
       ) : (
         <p className="text-[11px] text-muted-foreground">Waiting for the model&apos;s first streamed update…</p>
+      )}
+    </div>
+  );
+}
+
+function extractConciseErrorSummary(raw: string): { title: string; summary: string; isLaTeX: boolean; isWarning: boolean } {
+  const clean = (raw || "").trim();
+
+  // 1. Check for LaTeX math mode errors (! Missing $ inserted)
+  if (/(!\s*Missing\s*\$\s*inserted|Missing\s*\$\s*inserted)/i.test(clean)) {
+    const mathCmdMatch = clean.match(/\\(times|frac|cdot|sqrt|sum|int|prod|alpha|beta|gamma|delta|theta|pi|sigma|lambda|omega|approx|leq|geq|neq|sim|propto|infty|partial|nabla)/);
+    const cmd = mathCmdMatch ? `\\${mathCmdMatch[1]}` : "";
+    return {
+      title: "LaTeX Math Error",
+      summary: cmd
+        ? `LaTeX command '${cmd}' used outside math mode in Tex(). Use MathTex() or wrap in '$...$'.`
+        : "Missing $ inserted in LaTeX expression. In Manim, Tex() runs in text mode; use MathTex() or wrap in '$...$'.",
+      isLaTeX: true,
+      isWarning: false,
+    };
+  }
+
+  // 2. Check for LaTeX compilation failure
+  if (/latex error converting to dvi/i.test(clean)) {
+    const logErrMatch = clean.match(/!\s*([^\n]+)/);
+    const detail = logErrMatch?.[1]?.trim();
+    return {
+      title: "LaTeX Render Error",
+      summary: detail
+        ? `LaTeX compiler failed: ${detail}`
+        : "LaTeX error converting expression to DVI/SVG. Check mathematical notation and syntax.",
+      isLaTeX: true,
+      isWarning: false,
+    };
+  }
+
+  // 3. Check for Preflight / Validation JSON
+  try {
+    const parsed = JSON.parse(clean);
+    if (parsed && (parsed.errors || parsed.issues)) {
+      const isWarn = parsed.status === "warning" || parsed.blocking === false;
+      const issues = parsed.issues || parsed.errors || [];
+      const firstMsg = issues[0]?.message || "Static preflight issue detected";
+      return {
+        title: isWarn ? "Preflight Advisory" : "Preflight Error",
+        summary: firstMsg,
+        isLaTeX: false,
+        isWarning: isWarn,
+      };
+    }
+  } catch {
+    // not JSON
+  }
+
+  // 4. Check for Python Traceback exception line
+  const excMatch = clean.match(/(?:^|\n)([A-Za-z0-9_]+(?:Error|Exception)):\s*([^\n]+)/);
+  if (excMatch && excMatch[1]) {
+    return {
+      title: excMatch[1],
+      summary: (excMatch[2] || "").trim(),
+      isLaTeX: false,
+      isWarning: false,
+    };
+  }
+
+  // 5. Fallback: single line, clamped
+  const firstLine = clean.split("\n").map((l) => l.trim()).find(Boolean) || "Manim render encountered an issue";
+  return {
+    title: "Render Failed",
+    summary: firstLine.replace(/^Manim render failed:\s*/i, ""),
+    isLaTeX: false,
+    isWarning: false,
+  };
+}
+
+interface TopLiveErrorBannerProps {
+  error: string;
+  isSynthesizingCode: boolean;
+  onFixWithAi: () => void;
+  onEditCode: () => void;
+  onDismiss: () => void;
+}
+
+function TopLiveErrorBanner({
+  error,
+  isSynthesizingCode,
+  onFixWithAi,
+  onEditCode,
+  onDismiss,
+}: TopLiveErrorBannerProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const info = useMemo(() => extractConciseErrorSummary(error), [error]);
+
+  return (
+    <div
+      className={`border-b transition-colors ${
+        info.isWarning
+          ? "bg-amber-500/10 border-amber-500/30 text-amber-200"
+          : "bg-rose-500/10 border-rose-500/30 text-rose-200"
+      }`}
+    >
+      {/* Concise single-line live banner pinned on top */}
+      <div className="flex items-center justify-between gap-3 px-4 py-2.5 max-w-full">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <span
+            className={`flex h-2 w-2 rounded-full shrink-0 animate-pulse ${
+              info.isWarning ? "bg-amber-400" : "bg-rose-400"
+            }`}
+          />
+          <Badge
+            variant="outline"
+            className={`text-[10px] font-mono uppercase tracking-wider shrink-0 font-semibold px-2 py-0.5 ${
+              info.isWarning
+                ? "border-amber-500/50 bg-amber-500/15 text-amber-300"
+                : "border-rose-500/50 bg-rose-500/15 text-rose-300"
+            }`}
+          >
+            {info.title}
+          </Badge>
+          <span className="font-mono text-xs text-foreground/90 truncate max-w-xl" title={info.summary}>
+            {info.summary}
+          </span>
+        </div>
+
+        {/* Quick action buttons on top */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onFixWithAi}
+            disabled={isSynthesizingCode}
+            className="h-7 px-2.5 text-[11px] gap-1.5 font-medium bg-primary/10 hover:bg-primary/20 text-primary border border-primary/25"
+          >
+            {isSynthesizingCode ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Wand2 className="h-3 w-3" />
+            )}
+            Fix with AI
+          </Button>
+
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onEditCode}
+            className="h-7 px-2 text-[11px] gap-1 text-muted-foreground hover:text-foreground border border-border/40"
+          >
+            <Edit3 className="h-3 w-3" />
+            Edit Code
+          </Button>
+
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-7 px-2 text-[11px] gap-1 text-muted-foreground hover:text-foreground"
+            title="Toggle full diagnostic details"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="h-3 w-3" />
+                Hide
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3 w-3" />
+                Details
+              </>
+            )}
+          </Button>
+
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors ml-1"
+            title="Dismiss error banner"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Collapsible details drawer, capped at max-h-40 so it NEVER covers fullscreen */}
+      {isExpanded && (
+        <div className="px-4 pb-3 pt-1 border-t border-border/20 bg-black/40">
+          <div className="flex items-center justify-between pb-1.5">
+            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+              Diagnostic & Traceback Details:
+            </span>
+          </div>
+          <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-zinc-300 p-2.5 rounded-lg bg-zinc-950/90 border border-border/40">
+            {error}
+          </pre>
+        </div>
       )}
     </div>
   );
@@ -739,19 +936,20 @@ export function ManimStudioModal({
           </button>
         </div>
 
-        {/* Global Error Banner if any */}
+        {/* Concise Top-Docked Live Error Banner */}
         {renderError && (
-          <div className="flex items-center gap-2 bg-red-500/10 border-b border-red-500/20 px-4 py-2 text-xs text-red-400">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            <span className="flex-1 font-mono">{renderError}</span>
-            <button
-              type="button"
-              onClick={() => setRenderError(null)}
-              className="text-red-400 hover:text-red-300"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </div>
+          <TopLiveErrorBanner
+            error={renderError}
+            isSynthesizingCode={isSynthesizingCode}
+            onFixWithAi={() => {
+              void handleRepairFromCritique("render", renderError);
+            }}
+            onEditCode={() => {
+              setCurrentStage("code");
+              setIsEditingCode(true);
+            }}
+            onDismiss={() => setRenderError(null)}
+          />
         )}
 
         {/* Main Stage Content */}

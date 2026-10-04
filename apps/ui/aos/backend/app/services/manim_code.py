@@ -217,6 +217,7 @@ def preflight_manim_code(code: str) -> PreflightResult:
                 })
 
     errors.extend(_find_nonraw_tex_strings(code))
+    errors.extend(_find_tex_math_mode_issues(code))
     errors.extend(precise_findings)
 
     for item in errors:
@@ -520,6 +521,10 @@ def repair_manim_code(code: str) -> CodeRepair:
     repaired, raw_changes = _repair_nonraw_tex_strings(repaired)
     changes.extend(raw_changes)
 
+    # Auto-fix Tex(...) calls using math commands outside math mode ($...$) → MathTex or $...$
+    repaired, tex_math_changes = _repair_tex_math_mode(repaired)
+    changes.extend(tex_math_changes)
+
     # Auto-fix provable integer Mobject subscripts → get_part_by_tex calls.
     # Runs after raw-string pass so tex strings are already prefixed.
     repaired, index_changes = _auto_fix_mobject_indexes(repaired)
@@ -560,3 +565,107 @@ def _repair_nonraw_tex_strings(code: str) -> tuple[str, list[str]]:
     for start, end, value in reversed(replacements):
         code = code[:start] + value + code[end:]
     return code, [f"Converted {len(replacements)} non-raw Tex/MathTex literal(s) to raw strings"] if replacements else []
+
+
+_LATEX_MATH_COMMANDS: tuple[str, ...] = (
+    r"\times", r"\cdot", r"\div", r"\pm", r"\mp", r"\ast", r"\star",
+    r"\frac", r"\sqrt", r"\sum", r"\int", r"\prod", r"\coprod", r"\oint",
+    r"\alpha", r"\beta", r"\gamma", r"\delta", r"\epsilon", r"\zeta",
+    r"\eta", r"\theta", r"\iota", r"\kappa", r"\lambda", r"\mu",
+    r"\nu", r"\xi", r"\pi", r"\rho", r"\sigma", r"\tau", r"\upsilon",
+    r"\phi", r"\chi", r"\psi", r"\omega",
+    r"\Gamma", r"\Delta", r"\Theta", r"\Lambda", r"\Xi", r"\Pi",
+    r"\Sigma", r"\Upsilon", r"\Phi", r"\Psi", r"\Omega",
+    r"\approx", r"\leq", r"\geq", r"\neq", r"\sim", r"\simeq",
+    r"\equiv", r"\propto", r"\ll", r"\gg", r"\in", r"\notin",
+    r"\subset", r"\subseteq", r"\cap", r"\cup", r"\forall", r"\exists",
+    r"\infty", r"\partial", r"\nabla", r"\to", r"\rightarrow", r"\leftarrow",
+    r"\Rightarrow", r"\Leftarrow", r"\Leftrightarrow",
+    r"\sin", r"\cos", r"\tan", r"\log", r"\ln", r"\exp", r"\lim",
+)
+
+
+def _find_tex_math_mode_issues(code: str) -> list[dict[str, object]]:
+    """Detect Tex(...) literals that use LaTeX math-mode commands without $ delimiters."""
+    findings: list[dict[str, object]] = []
+    lines = code.splitlines()
+    offsets: list[int] = []
+    curr = 0
+    for line in lines:
+        offsets.append(curr)
+        curr += len(line) + 1
+
+    pattern = re.compile(r'\bTex\s*\(\s*(r?)([\'"]{1,3})([\s\S]*?)\2', re.MULTILINE)
+    for match in pattern.finditer(code):
+        content = match.group(3)
+        math_cmds = [cmd for cmd in _LATEX_MATH_COMMANDS if cmd in content]
+        has_math_mode = "$" in content or r"\begin{" in content
+        if math_cmds and not has_math_mode:
+            start_pos = match.start()
+            # Calculate line and column
+            line_no = 1
+            col_no = start_pos + 1
+            for idx, off in enumerate(offsets):
+                if start_pos >= off:
+                    line_no = idx + 1
+                    col_no = start_pos - off + 1
+                else:
+                    break
+            findings.append({
+                "type": "TexMathModeMismatch",
+                "severity": "warning",
+                "blocking": False,
+                "message": (
+                    f"Tex(...) contains LaTeX math command '{math_cmds[0]}' in text mode. "
+                    "In Manim, Tex() runs in text mode without math mode delimiters; "
+                    "use MathTex(...) or enclose math expressions in $...$."
+                ),
+                "suggestion": f"Change Tex to MathTex or wrap {math_cmds[0]} in $...$",
+                "line": line_no,
+                "column": col_no,
+                "text": content[:60],
+            })
+    return findings
+
+
+def _repair_tex_math_mode(code: str) -> tuple[str, list[str]]:
+    """Auto-fix Tex(...) calls using math commands outside math mode ($...$) -> MathTex or $...$."""
+    changes: list[str] = []
+    pattern = re.compile(r'\bTex\s*\(\s*(r?)([\'"]{1,3})([\s\S]*?)\2', re.MULTILINE)
+
+    def replacer(m: re.Match[str]) -> str:
+        raw_prefix = m.group(1)
+        quote = m.group(2)
+        content = m.group(3)
+
+        math_cmds_found = [cmd for cmd in _LATEX_MATH_COMMANDS if cmd in content]
+        has_dollar = "$" in content or r"\begin{" in content
+
+        if math_cmds_found and not has_dollar:
+            # Check if this is primarily an equation/formula or a sentence with math
+            words = re.findall(r'[a-zA-Z]{3,}', re.sub(r'\\[a-zA-Z]+', '', content))
+            if len(words) <= 2:
+                # Primarily math expression: convert Tex(...) to MathTex(...)
+                changes.append(
+                    f"Converted Tex to MathTex for math expression: {content.strip()[:40]!r}"
+                )
+                return f"MathTex({raw_prefix or 'r'}{quote}{content}{quote}"
+            else:
+                # Sentence containing math commands: wrap the naked math commands in $...$
+                fixed_content = content
+                for cmd in math_cmds_found:
+                    escaped_cmd = re.escape(cmd)
+                    fixed_content = re.sub(
+                        rf"(?<!\$){escaped_cmd}(?!\$)",
+                        lambda _m, c=cmd: f"${c}$",
+                        fixed_content,
+                    )
+                changes.append(
+                    f"Wrapped math commands in $...$ inside Tex: {content.strip()[:40]!r}"
+                )
+                return f"Tex({raw_prefix or 'r'}{quote}{fixed_content}{quote}"
+        return m.group(0)
+
+    repaired = pattern.sub(replacer, code)
+    return repaired, changes
+
