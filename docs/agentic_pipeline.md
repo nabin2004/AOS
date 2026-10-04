@@ -44,6 +44,7 @@ graph TD
 
 | Pipeline | Primary Module | Execution Paradigm | Narration / TTS | Latency Profile | Best Use Case |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| **MotionGram (`/visual`)** | `apps/ui/aos/backend/app/services/motiongram_service.py` | Declarative YAML/JSON DSL compiled to ManimCE; self-healing Pydantic v2 reflection loop | Frame-accurate `<bookmark/>` sync via Edge-TTS / Pocket TTS / DSM | **15–25s** (deterministic DSL compilation) | Short, bulletproof explainer animations, zero hallucinations (see [docs/motiongram_architecture.md](motiongram_architecture.md)) |
 | **UI "Animate" (Keyframe)** | `apps/agents/keyframe_engine.py` | Concurrently renders discrete visual slides; freezes last frame via FFmpeg `tpad` for full narration length | Resident Pocket TTS (Kyutai 100M) | **15–35s** (parallelized across CPU/GPU cores) | Web UI quick animations, high-fidelity explainer cards |
 | **Agent Graph (Interactive)** | `apps/agents/agent_graph.py` | Multi-agent Pydantic Graph (Classify → Plan → Script → Code Mode) | In-scene `VoiceoverScene` with bookmark sync | **45–75s** (iterative compiler self-healing) | Complex multi-concept mathematical derivations with active tool use |
 | **EduClaw Streaming** | `apps/educlaw/streaming_engine/` | Asynchronous Producer-Consumer queue with 16s branding compute buffer & CRT TV Static fallback | `manim-voiceover` with `<bookmark/>` tags | **0s perceived** (streams frame 1 during intro) | Live interactive teaching sessions, real-time WebSocket lectures |
