@@ -436,23 +436,40 @@ async def run_pipeline(
     }
 
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from pydantic_ai_skills import SkillsCapability
+
+SKILLS_DIR = (Path(__file__).resolve().parents[2] / ".agents" / "skills").resolve()
 
 class PipelineResult(BaseModel):
     result: str
     stopped_reason: str
     compile_ok: bool
-    scene_name: str | None
-    run_dir: str | None
-    audio: int | None
-    error: str | None
-    message: str | None
+    scene_name: str | None = None
+    run_dir: str | None = None
+    audio: int | None = None
+    error: str | None = None
+    message: str | None = None
+    video_path: str | None = None
+    minio_url: str | None = None
+    minio_key: str | None = None
+    code: str | None = None
+    scene_file: str | None = None
 
 animation_agent = Agent(
     model_for_agent("animation"),
     name="Manim Animation Pipeline",
-    description="Runs the full educational animation graph pipeline.",
+    description="Runs the full educational animation graph pipeline adhering to manimce-best-practices.",
     model_settings=settings_for("animation"),
+    deps_type=Any,
+    capabilities=[
+        SkillsCapability(
+            directories=[SKILLS_DIR],
+            include=["manimce-best-practices", "manim-composer"],
+            defer_loading=False,
+            description="Manim Community Edition best practices and educational video composer guidelines.",
+        ),
+    ],
     system_prompt=(
         "You are the interactive frontend for the Manim animation pipeline.\n"
         "Call `generate_educational_animation` with the user's exact query to start the generation.\n"
@@ -464,17 +481,38 @@ animation_agent = Agent(
 @animation_agent.tool
 async def generate_educational_animation(ctx: RunContext, user_query: str) -> PipelineResult:
     """Execute the full animation pipeline (classify, plan, script, code, compile) for the user's query."""
-    result = await run_pipeline(user_query)
-    
+    try:
+        result = await run_pipeline(user_query)
+    except Exception as exc:
+        return PipelineResult(
+            result="",
+            stopped_reason="pipeline_exception",
+            compile_ok=False,
+            error=str(exc),
+            message=f"Animation pipeline failed: {exc}",
+        )
+
+    video_path = None
+    run_dir_val = result.get("run_dir")
+    if run_dir_val:
+        found_video = _find_compiled_video(run_dir_val)
+        if found_video:
+            video_path = str(found_video)
+
     return PipelineResult(
         result=result.get("result", result.get("summary", "")),
         stopped_reason=result.get("stopped_reason", "unknown"),
         compile_ok=result.get("compile_ok", False),
         scene_name=result.get("scene_name"),
-        run_dir=result.get("run_dir"),
-        audio=len(result.get("audio_paths", [])),
+        run_dir=run_dir_val,
+        audio=len(result.get("audio_paths") or []),
         error=result.get("error"),
         message=result.get("message"),
+        video_path=video_path,
+        minio_url=result.get("minio_url"),
+        minio_key=result.get("minio_key"),
+        code=result.get("code"),
+        scene_file=result.get("scene_file"),
     )
 
 

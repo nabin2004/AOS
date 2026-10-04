@@ -374,9 +374,22 @@ export function ManimStudioModal({
       derivation: "Emphasize the mathematical derivation and its steps.",
       ai: "Choose the strongest pedagogical visual emphasis for this explanation.",
     };
+    const cleanKnowledge = (knowledgeText || "").trim();
+    const cleanPrompt = (sourcePrompt || "").trim();
+
+    let topicText = cleanKnowledge;
+    if (cleanPrompt && cleanPrompt !== cleanKnowledge) {
+      topicText = cleanKnowledge
+        ? `Original question: ${cleanPrompt}\n\nAssistant explanation:\n${cleanKnowledge}`
+        : `Topic: ${cleanPrompt}`;
+    } else if (cleanKnowledge) {
+      topicText = `Topic: ${cleanKnowledge}`;
+    } else if (cleanPrompt) {
+      topicText = `Topic: ${cleanPrompt}`;
+    }
+
     const composerContext = [
-      sourcePrompt ? `Original question: ${sourcePrompt}` : "",
-      `Assistant explanation:\n${knowledgeText}`,
+      topicText,
       `Animation direction: ${emphasisInstruction[emphasis]}`,
       additionalInstructions ? `Additional instructions: ${additionalInstructions}` : "",
     ].filter(Boolean).join("\n\n");
@@ -461,8 +474,18 @@ export function ManimStudioModal({
           sourceText: initialKnowledge,
         });
       }
+
+      // Auto-trigger plan generation if opened with an explicit topic/prompt from /animate
+      if (initialKnowledge.trim()) {
+        const cleanPrompt = (sourcePrompt || "").trim();
+        const cleanKnowledge = initialKnowledge.trim();
+        const promptContent = cleanPrompt && cleanPrompt !== cleanKnowledge
+          ? `Original question: ${cleanPrompt}\n\nAssistant explanation:\n${cleanKnowledge}`
+          : `Topic: ${cleanKnowledge}`;
+        void handleGeneratePlan(promptContent);
+      }
     }
-  }, [isOpen, initialKnowledge, activeSession, conversationId, sourceMessageId, sourcePrompt, startSession]);
+  }, [isOpen, initialKnowledge, activeSession, conversationId, sourceMessageId, sourcePrompt, startSession, handleGeneratePlan]);
 
   const handleRenderVideo = async (skipPreflight = false) => {
     setIsRendering(true);
@@ -559,7 +582,12 @@ export function ManimStudioModal({
         });
         if (!repairResp.ok) {
           const repairError = await repairResp.json().catch(() => ({ detail: "Automatic repair failed" }));
-          throw new Error(repairError.detail || "Automatic repair failed");
+          const repairMsg = typeof repairError?.detail === "string"
+            ? repairError.detail
+            : typeof repairError?.detail === "object"
+            ? JSON.stringify(repairError.detail, null, 2)
+            : "Automatic repair failed";
+          throw new Error(repairMsg);
         }
         const repaired = await repairResp.json();
         if (typeof repaired.code !== "string" || !repaired.code.trim()) {

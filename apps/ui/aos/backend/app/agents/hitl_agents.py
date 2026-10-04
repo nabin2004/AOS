@@ -173,7 +173,9 @@ You are an expert Manim Community Edition coding agent (strictly following the m
 Your job is to synthesize complete, bug-free, beautifully styled Python code using `from manim import *`.
 
 CRITICAL MANIM RULES:
-1. ONLY import from manim: `from manim import *`. Do not import nonexistent packages.
+1. ONLY import from manim: `from manim import *`.
+   - For voiceover: `from manim_voiceover import VoiceoverScene` and `from tools.aos_speech_service import AOSSpeechService`
+   - Dual Inheritance (CRITICAL): If using 3D axes or camera moves with voiceover, subclass both: `class MyScene(VoiceoverScene, ThreeDScene):`.
 2. Name your Scene class after the topic in the plan (e.g. `class DijkstrasAlgorithmScene(Scene):`).
    NEVER invent classes that don't match the plan.
 3. Method & Class Guardrails (DO NOT HALLUCINATE):
@@ -190,20 +192,26 @@ CRITICAL MANIM RULES:
    - `Dot` constructor takes `point`, `radius`, `color` (NOT `size`!).
    - `Line` constructor takes `start` and `end` separately: `Line(start=p1, end=p2, color=BLUE_C)`.
      Do NOT pass a list `Line([p1, p2])`.
-4. Layout & Positioning (Crucial to avoid visual collision):
-   - Camera frame is 16:9: width=14.22, height=8.0 (X from -7 to +7, Y from -4 to +4).
+4. Layout & Positioning (Mandatory Tier 1 Rules — Avoid Visual Collision):
+   - Camera frame is 16:9: width=14.22, height=8.0 (X: [-7.11, 7.11], Y: [-4.0, 4.0]).
+   - MANDATORY RULE: NEVER hardcode raw coordinate arrays (e.g. `[x, y, 0]`, `.move_to(np.array([...]))`, or raw float shifts) unless explicitly placing points on an `Axes` via `axes.c2p()`.
+   - Always use relative layouts: `.next_to()`, `.to_edge()`, `VGroup.arrange()`.
    - Place titles at top: `title.to_edge(UP, buff=0.5)`
    - Place subtitles below titles: `subtitle.next_to(title, DOWN, buff=0.3)`
    - Use `VGroup` to organize multiple elements: `group.arrange(DOWN, buff=0.4)`
-   - Never let equations or labels overlap each other! When transitioning to a new step, fade out earlier elements.
-5. LaTeX & Typography:
+   - SCREEN HYGIENE: Explicitly clear/FadeOut previous elements before drawing new coordinate frames or equations. Never let equations or labels overlap!
+5. Voiceover & Audio Sync (if VoiceoverScene is used):
+   - Wrap each beat in `with self.voiceover(text="...") as tracker:` blocks.
+   - Synchronize duration: `self.play(..., run_time=tracker.duration)`.
+   - NEVER place hardcoded `self.wait(...)` inside `voiceover` blocks.
+6. LaTeX & Typography:
    - Use raw string syntax `r"..."` for all `MathTex`.
    - Double backslash LaTeX symbols: e.g. `MathTex(r"d(v) \\le d(u) + w(u,v)")`.
    - Set readable font sizes: `font_size=36` for main headers, `font_size=24` for nodes and labels.
-6. Documentation Tools:
+7. Documentation Tools:
    - Use `search_manim_docs_tool` to check if a class or function exists in Manim.
    - Use `search_manim_signatures_tool` to verify constructor arguments and default parameters.
-7. Output Format:
+8. Output Format:
    - Return ONLY the executable python code block, enclosed in ```python ... ```.
    - The code must be self-contained and render with `manim -ql scene.py <ClassName>`.
 """
@@ -362,7 +370,7 @@ class HitlCodeExtractor:
     SCENE_CLASS_PATTERN = re.compile(
         r"class\s+([A-Za-z0-9_]+)\s*\("
         r"(?:[A-Za-z0-9_,\s]*?)"
-        r"(?:ThreeDScene|MovingCameraScene|VoiceoverScene|ZoomedScene|LinearTransformationScene|Scene)"
+        r"(?:ThreeDScene|MovingCameraScene|VoiceoverSlideScene|VoiceoverScene|ZoomedScene|LinearTransformationScene|Slide|Scene)"
         r"(?:[A-Za-z0-9_,\s]*?)\)"
     )
 
@@ -993,12 +1001,13 @@ class HitlAgentFactory:
     ) -> Agent[None, VideoClassifyResponse]:
         """Create the Pydantic AI agent for classifying text animatability for Manim."""
         model = self.resolver.build_model(model_name, base_url, api_key)
+        caps = [get_composer_skills()] if capabilities is None else capabilities
         return Agent(
             model=model,
             system_prompt=CLASSIFIER_SYSTEM_PROMPT,
             name="hitl_classifier_agent",
             output_type=VideoClassifyResponse,
-            capabilities=capabilities,
+            capabilities=caps,
             retries=2,
             model_settings=ModelSettings(max_tokens=min(4096, HITL_MAX_TOKENS)),
         )

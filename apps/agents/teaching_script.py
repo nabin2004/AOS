@@ -6,14 +6,18 @@ import json
 import re
 from typing import Any
 
+from pathlib import Path
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from pydantic_ai import Agent, ModelRetry
+from pydantic_ai_skills import SkillsCapability
 
 from llm_config import model_for_agent, settings_for
 from tools.voiceover_quality import is_filler_narration
 
 load_dotenv()
+
+SKILLS_DIR = (Path(__file__).resolve().parents[2] / ".agents" / "skills").resolve()
 
 TEACHING_SCRIPT_PROMPT = """\
 You write the spoken teaching script for one AOS Manim animation.
@@ -25,6 +29,12 @@ A later coding agent will implement Manim. Do not write Python.
 Narration is the teacher. Visuals are the demonstration.
 Never generate narration whose sole purpose is to announce that an object
 is appearing.
+
+ManimCE Visual Layout & Spatial Constraints (CRITICAL):
+- Strictly respect Manim Community Edition frame boundaries: 16:9 safe zone width 14.22, height 8.0 (X: [-7.11, 7.11], Y: [-4.0, 4.0]).
+- Always plan relative positioning: titles to top edge (to_edge(UP)), formulas centered or next_to, lists arranged vertically (VGroup.arrange(DOWN, buff=...)).
+- Clear the screen (FadeOut previous elements) between major chapters/acts so equations and diagrams do NOT overlap!
+- Never describe visuals that stack 3D surfaces on top of 2D algebraic derivations without clearing the board.
 
 Pacing, Calmness & Depth (CRITICAL):
 - Speak with calm, patient clarity like 3Blue1Brown or a master lecturer.
@@ -213,6 +223,14 @@ teaching_script_agent = Agent(
     output_type=TeachingScript,
     model_settings=settings_for("planner"),
     retries=4,
+    capabilities=[
+        SkillsCapability(
+            directories=[SKILLS_DIR],
+            include=["manimce-best-practices", "manim-composer"],
+            defer_loading=False,
+            description="Manim Community Edition best practices and educational video composer guidelines. Provides rules, layout constraints, and 3b1b pedagogical pacing.",
+        ),
+    ],
 )
 
 

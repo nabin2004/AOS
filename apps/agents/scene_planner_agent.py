@@ -1,9 +1,13 @@
+from pathlib import Path
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import Scene, StoryboardStep
 from llm_config import model_for_agent, settings_for
+from pydantic_ai_skills import SkillsCapability
 
 load_dotenv()
+
+SKILLS_DIR = (Path(__file__).resolve().parents[2] / ".agents" / "skills").resolve()
 
 SCENE_PROMPT = """\
 You translate **one storyboard step** into a **scene brief** for downstream planners.
@@ -37,4 +41,12 @@ scene_planner_agent = Agent(
     deps_type=StoryboardStep,
     model_settings=settings_for("planner"),
     retries=4,
+    capabilities=[
+        SkillsCapability(
+            directories=[SKILLS_DIR],
+            include=["manimce-best-practices", "manim-composer"],
+            defer_loading=False,
+            description="Manim Community Edition best practices and educational video composer guidelines.",
+        ),
+    ],
 )

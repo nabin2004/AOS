@@ -1,9 +1,13 @@
+from pathlib import Path
 from pydantic_ai import Agent
 from dotenv import load_dotenv
 from ir.manim_ir import Storyboard
 from llm_config import model_for_agent, settings_for
+from pydantic_ai_skills import SkillsCapability
 
 load_dotenv()
+
+SKILLS_DIR = (Path(__file__).resolve().parents[2] / ".agents" / "skills").resolve()
 
 STORYBOARD_PROMPT = """
 You are an expert storyboard designer for educational animations (Manim style). Your task is to take a **Lecture** (a structured explanation of a concept) and produce a **Storyboard** that answers:
@@ -89,8 +93,16 @@ Now, given the following Lecture, produce a Storyboard that follows all the abov
 storyboard_planner_agent = Agent(
     model_for_agent("planner"),
     name='Storyboard Planner Agent',
-    description='Generates a storyboard from a lecture plan.',
+    description='Generates a storyboard from a lecture plan adhering to manim-composer and manimce-best-practices.',
     system_prompt=STORYBOARD_PROMPT,
     output_type=Storyboard,
     model_settings=settings_for("planner"),
+    capabilities=[
+        SkillsCapability(
+            directories=[SKILLS_DIR],
+            include=["manim-composer", "manimce-best-practices"],
+            defer_loading=False,
+            description="Manim Community Edition best practices and pedagogical video composer guidelines.",
+        ),
+    ],
 )

@@ -229,17 +229,21 @@ class AgentSession:
             if video_mode == "hitl":
                 import sys
                 from pathlib import Path
-                agents_dir = str(Path(__file__).resolve().parent.parent.parent.parent.parent.parent / "apps" / "agents")
+                agents_dir = str(Path(__file__).resolve().parents[6] / "apps" / "agents")
+                if not Path(agents_dir).exists():
+                    agents_dir = str(Path(__file__).resolve().parents[5] / "agents")
                 if agents_dir not in sys.path:
                     sys.path.append(agents_dir)
+
                 from agent_graph import animation_agent
-                
+
                 class HitlAgentWrapper:
                     def __init__(self, ag):
                         self.agent = ag
+                        self.model_name = getattr(ag, "model_name", "manim-pipeline")
                     async def prepare(self):
                         pass
-                
+
                 assistant = HitlAgentWrapper(animation_agent)
                 deep_research = False
             else:
