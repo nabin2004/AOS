@@ -24,15 +24,26 @@ import yaml
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# Ensure ManimLite/src is in sys.path if motiongram is not installed as site-package
-MANIMLITE_SRC = Path(r"C:\Users\nabin\Desktop\myall\ManimLite\src")
-if MANIMLITE_SRC.exists() and str(MANIMLITE_SRC) not in sys.path:
-    sys.path.insert(0, str(MANIMLITE_SRC))
+# Resolve paths for motiongram package and AOS repo root
+_current_file = Path(__file__).resolve()
+_potential_roots: list[Path] = [Path("/app")]
+for _parent in _current_file.parents:
+    if (_parent / "packages" / "motiongram").exists() or (_parent / "pyproject.toml").exists():
+        _potential_roots.insert(0, _parent)
 
-# Also ensure AOS repo root is in sys.path for tools.aos_speech_service
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+_candidate_paths: list[Path] = [
+    Path("/app/packages/motiongram/src"),
+    Path("/app/packages/motiongram"),
+    Path(r"C:\Users\nabin\Desktop\myall\ManimLite\src"),
+]
+for _r in _potential_roots:
+    _candidate_paths.append(_r / "packages" / "motiongram" / "src")
+    _candidate_paths.append(_r / "packages" / "motiongram")
+    _candidate_paths.append(_r)
+
+for _p in _candidate_paths:
+    if _p.exists() and str(_p) not in sys.path:
+        sys.path.insert(0, str(_p))
 
 # MotionGram imports
 try:
@@ -47,6 +58,7 @@ try:
     )
     from motiongram.manimgram.schema import ManimGramScene
     MOTIONGRAM_AVAILABLE = True
+    logging.getLogger(__name__).info("MotionGram package successfully loaded into AOS backend.")
 except ImportError as exc:
     logging.getLogger(__name__).warning("MotionGram failed to import: %s", exc)
     MOTIONGRAM_AVAILABLE = False

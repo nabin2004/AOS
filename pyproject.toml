@@ -43,6 +43,7 @@ members = [
     "packages/ir",
     "packages/schemas",
     "packages/store",
+    "packages/motiongram",
     "apps/agents",
     "apps/server",
     "apps/audio_service",

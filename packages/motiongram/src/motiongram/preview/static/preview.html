@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MotionGram Preview</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #1e2127;
+      --panel: #282c34;
+      --text: #abb2bf;
+      --accent: #61afef;
+      --error: #e06c75;
+      --ok: #98c379;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 12px 16px;
+      background: var(--panel);
+      border-bottom: 1px solid #3e4451;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .status { font-size: 0.85rem; }
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--error); }
+    .error-banner {
+      display: none;
+      padding: 10px 16px;
+      background: #3b2024;
+      color: var(--error);
+      border-bottom: 1px solid #5c2a30;
+      white-space: pre-wrap;
+      font-family: ui-monospace, monospace;
+      font-size: 0.8rem;
+    }
+    .error-banner.visible { display: block; }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      gap: 16px;
+    }
+    .frame-wrap {
+      background: #000;
+      border: 1px solid #3e4451;
+      border-radius: 4px;
+      overflow: hidden;
+      max-width: 100%;
+      line-height: 0;
+    }
+    #frame {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    .controls {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .scrub-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input[type="range"] { flex: 1; }
+    .time-label {
+      font-variant-numeric: tabular-nums;
+      min-width: 4.5rem;
+      text-align: right;
+      font-size: 0.85rem;
+    }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    button {
+      background: #3e4451;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    button:hover { background: #4b5263; }
+    .video-section {
+      width: 100%;
+      max-width: 960px;
+      display: none;
+    }
+    .video-section.visible { display: block; }
+    #preview-video {
+      width: 100%;
+      border-radius: 4px;
+      border: 1px solid #3e4451;
+      background: #000;
+    }
+    .video-label {
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MotionGram Preview</h1>
+    <span id="status" class="status">Loading…</span>
+  </header>
+  <div id="error-banner" class="error-banner"></div>
+  <main>
+    <div class="frame-wrap">
+      <img id="frame" alt="Scene frame" />
+    </div>
+    <div class="controls">
+      <div class="scrub-row">
+        <input type="range" id="scrub" min="0" max="1" step="0.01" value="0" />
+        <span id="time-label" class="time-label">0.00s</span>
+      </div>
+      <div class="btn-row">
+        <button id="play-btn" type="button">Play frames</button>
+        <button id="pause-btn" type="button" style="display:none">Pause</button>
+      </div>
+    </div>
+    <div id="video-section" class="video-section">
+      <div class="video-label">Background video (updates after save)</div>
+      <video id="preview-video" controls loop muted playsinline></video>
+    </div>
+  </main>
+  <script>
+    const frame = document.getElementById("frame");
+    const scrub = document.getElementById("scrub");
+    const timeLabel = document.getElementById("time-label");
+    const statusEl = document.getElementById("status");
+    const errorBanner = document.getElementById("error-banner");
+    const playBtn = document.getElementById("play-btn");
+    const pauseBtn = document.getElementById("pause-btn");
+    const videoSection = document.getElementById("video-section");
+    const previewVideo = document.getElementById("preview-video");
+
+    let duration = 1;
+    let playing = false;
+    let playStart = 0;
+    let playFrom = 0;
+    let rafId = null;
+
+    function frameUrl(t) {
+      return `/frame.png?t=${t.toFixed(3)}&_=${Date.now()}`;
+    }
+
+    function refreshFrame() {
+      const t = parseFloat(scrub.value);
+      frame.src = frameUrl(t);
+      timeLabel.textContent = `${t.toFixed(2)}s`;
+    }
+
+    function setDuration(d, f) {
+      duration = Math.max(0.01, d);
+      scrub.max = String(duration);
+      if (parseFloat(scrub.value) > duration) {
+        scrub.value = String(duration);
+      }
+    }
+
+    async function fetchStatus() {
+      const res = await fetch("/status.json");
+      return res.json();
+    }
+
+    function applyStatus(data) {
+      if (data.duration != null) {
+        setDuration(data.duration, data.fps);
+      }
+      if (data.ok) {
+        statusEl.textContent = `${data.duration.toFixed(1)}s @ ${data.fps} fps · ${data.width}×${data.height}`;
+        statusEl.className = "status ok";
+        errorBanner.classList.remove("visible");
+        errorBanner.textContent = "";
+      } else {
+        statusEl.textContent = "Manifest error";
+        statusEl.className = "status err";
+        errorBanner.textContent = data.error || "Unknown error";
+        errorBanner.classList.add("visible");
+      }
+      if (data.video_ready) {
+        videoSection.classList.add("visible");
+        const src = `/preview.mp4?_=${Date.now()}`;
+        previewVideo.src = src;
+        previewVideo.load();
+      }
+    }
+
+    scrub.addEventListener("input", () => {
+      refreshFrame();
+      if (playing) stopPlay();
+    });
+
+    function stopPlay() {
+      playing = false;
+      playBtn.style.display = "";
+      pauseBtn.style.display = "none";
+      if (rafId != null) cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+
+    function startPlay() {
+      playing = true;
+      playBtn.style.display = "none";
+      pauseBtn.style.display = "";
+      playFrom = parseFloat(scrub.value);
+      playStart = performance.now();
+      tick();
+    }
+
+    function tick() {
+      if (!playing) return;
+      const elapsed = (performance.now() - playStart) / 1000;
+      let t = playFrom + elapsed;
+      if (t >= duration) {
+        t = duration;
+        scrub.value = String(t);
+        refreshFrame();
+        stopPlay();
+        return;
+      }
+      scrub.value = String(t);
+      refreshFrame();
+      rafId = requestAnimationFrame(tick);
+    }
+
+    playBtn.addEventListener("click", startPlay);
+    pauseBtn.addEventListener("click", stopPlay);
+
+    async function onReload() {
+      const data = await fetchStatus();
+      applyStatus(data);
+      refreshFrame();
+    }
+
+    fetchStatus().then((data) => {
+      applyStatus(data);
+      refreshFrame();
+    });
+
+    const events = new EventSource("/events");
+    events.addEventListener("reload", () => onReload());
+    events.addEventListener("error", () => onReload());
+    events.addEventListener("video_ready", () => onReload());
+  </script>
+</body>
+</html>
