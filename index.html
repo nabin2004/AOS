@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Verifiable reward modelling for automated Manim animation and audio synthesis by Nabin Oli.">
+  <meta name="theme-color" content="#0a3a63">
+  <title>Verifiable Reward Modelling for Manim | Nabin Oli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="stylesheet" href="./static/css/project.css">
+</head>
+<body>
+  <nav class="navbar page-nav" aria-label="Main navigation">
+    <div class="container is-max-desktop">
+      <div class="navbar-brand"><a class="navbar-item brand" href="#top">NO<span>.</span></a></div>
+      <div class="navbar-menu is-active">
+        <div class="navbar-end">
+          <a class="navbar-item" href="#overview">Overview</a>
+          <a class="navbar-item" href="#method">Method</a>
+          <a class="navbar-item" href="#results">Results</a>
+          <a class="navbar-item" href="#videos">Generated videos</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top">
+    <section class="hero hero-research">
+      <div class="hero-body">
+        <div class="container is-max-desktop has-text-centered">
+          <p class="eyebrow">CMP6200 · Individual Honours Project</p>
+          <h1 class="title is-1 publication-title">Verifiable Reward Modelling for Automated Manim Animation and Audio Synthesis</h1>
+          <p class="author-line">Nabin Oli <span>·</span> 23189629</p>
+          <p class="hero-summary">A renderer-grounded approach to checking whether generated educational animations run, teach the intended idea, and align with narration.</p>
+          <div class="hero-links">
+            <a class="button is-rounded is-dark" href="https://github.com/nabin2004/AOS"><span class="icon"><i class="fab fa-github"></i></span><span>Code</span></a>
+            <a class="button is-rounded is-dark" href="https://huggingface.co/datasets/nabin2004/qwen3-8b-manimator-gold-sft"><span class="icon"><i class="fas fa-database"></i></span><span>Verified SFT data</span></a>
+            <a class="button is-rounded is-dark" href="https://huggingface.co/datasets/nabin2004/Manim-grpo-dataset-200"><span class="icon"><i class="fas fa-list"></i></span><span>Prompt set</span></a>
+          </div>
+          <a class="scroll-cue" href="#overview">Explore the research <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-soft" id="overview">
+      <div class="container is-max-desktop">
+        <div class="section-heading has-text-centered">
+          <p class="eyebrow">The research</p>
+          <h2 class="title is-2">Make generated animation verifiable</h2>
+        </div>
+        <div class="content research-copy">
+          <p>Language models can produce Manim code that looks plausible but fails to run or drifts from the mathematical idea it should explain. This project studies a generation pipeline that checks animations against executable and pedagogical criteria, with rendered output as evidence.</p>
+          <p>The proposed reward is designed to be recomputable without a learned preference model. Its four weighted buckets are executability (45%), visual alignment (20%), narration and timing (15%), and pedagogical coverage with penalties (20%).</p>
+        </div>
+        <div class="columns is-multiline metric-grid">
+          <div class="column is-4"><article class="metric-card"><strong>19</strong><span>models evaluated</span></article></div>
+          <div class="column is-4"><article class="metric-card"><strong>12</strong><span>pilot benchmark tasks</span></article></div>
+          <div class="column is-4"><article class="metric-card"><strong>4</strong><span>recomputable reward buckets</span></article></div>
+        </div>
+        <p class="note has-text-centered">These figures describe the pilot reported in the project poster; they are not a claim of broad benchmark coverage.</p>
+      </div>
+    </section>
+
+    <section class="section" id="method">
+      <div class="container is-max-desktop">
+        <div class="section-heading has-text-centered">
+          <p class="eyebrow">How it works</p>
+          <h2 class="title is-2">Render, inspect, and repair</h2>
+          <p class="section-intro">A generated scene moves through explicit checks. Compilation and rendering expose failures that source-code review alone can miss.</p>
+        </div>
+        <div class="columns is-variable is-5 research-figures">
+          <div class="column">
+            <figure class="figure-card">
+              <img src="./static/images/fig_ritl_topology.png" alt="Renderer-in-the-loop topology with a policy model, CPU renderer, and vision grader">
+              <figcaption><strong>Renderer-in-the-loop.</strong> Generation, rendering, and visual grading run as separate roles so evaluation can use rendered evidence.</figcaption>
+            </figure>
+          </div>
+          <div class="column">
+            <figure class="figure-card">
+              <img src="./static/images/fig_motiongram_pipeline.png" alt="MotionGram pipeline showing validation, compilation, rendering, and repair">
+              <figcaption><strong>MotionGram workflow.</strong> Validation and compile errors feed bounded repair attempts before a scene is accepted.</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="method-strip">
+          <div><span>01</span><p>Plan lesson beats and visual claims.</p></div>
+          <div><span>02</span><p>Generate code and run static checks.</p></div>
+          <div><span>03</span><p>Render the scene and inspect its output.</p></div>
+          <div><span>04</span><p>Score, record, and repair bounded failures.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-soft" id="results">
+      <div class="container is-max-desktop">
+        <div class="section-heading has-text-centered">
+          <p class="eyebrow">Pilot evaluation</p>
+          <h2 class="title is-2">What the poster reports</h2>
+          <p class="section-intro">The results are early pilot measurements. The SFT comparison uses more trials than most listed baselines.</p>
+        </div>
+        <div class="columns is-variable is-5 is-vcentered">
+          <div class="column is-7">
+            <div class="table-container result-table-wrap">
+              <table class="table is-fullwidth result-table">
+                <thead><tr><th>Model</th><th>Exec.</th><th>VCER</th><th>Trials</th></tr></thead>
+                <tbody>
+                  <tr><td>Claude Sonnet 4</td><td>0.667</td><td>0.000</td><td>12</td></tr>
+                  <tr><td>Kimi-K2.5</td><td>0.667</td><td>0.083</td><td>12</td></tr>
+                  <tr class="highlight-row"><td>Qwen2.5-Coder-7B (SFT)</td><td>0.333</td><td>0.000</td><td>36</td></tr>
+                  <tr><td>Gemini 2.5 Pro</td><td>0.333</td><td>0.000</td><td>12</td></tr>
+                  <tr><td>Qwen3-235B-A22B</td><td>0.250</td><td>0.000</td><td>12</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="note">Exec. is Pass@1 executability. VCER is version-conflict error rate. These values are copied from the poster’s comparison table.</p>
+          </div>
+          <div class="column is-5">
+            <figure class="figure-card compact-figure">
+              <img src="./static/images/fig_eval_scatter.png" alt="Poster evaluation scatter plot showing executability and version-conflict error across models">
+              <figcaption>Primary outcomes across the pilot model set.</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="columns is-variable is-5 is-vcentered reward-row">
+          <div class="column is-6">
+            <figure class="figure-card compact-figure">
+              <img src="./static/images/fig_training_reward_channels.png" alt="Training reward channel plot comparing compliance, narration, and pedagogical coverage">
+              <figcaption>Reward channels diverge: the poster reports high compliance and narration scores, with lower pedagogical coverage.</figcaption>
+            </figure>
+          </div>
+          <div class="column is-6">
+            <div class="finding-card">
+              <p class="eyebrow">Interpretation</p>
+              <h3 class="title is-4">Execution is only one part of quality</h3>
+              <p>The poster reports that pedagogical coverage remains a constraint even when outputs satisfy compliance and narration checks. The 12-task pilot is small, and its base-model row is explicitly an estimate.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section generated-section" id="videos">
+      <div class="container is-max-desktop">
+        <div class="section-heading has-text-centered">
+          <p class="eyebrow">Generated examples</p>
+          <h2 class="title is-2">Short Manim lessons, with narration</h2>
+          <p class="section-intro">Play any example with sound using the controls. Audio is included in each supplied MP4.</p>
+        </div>
+        <div class="columns is-multiline video-grid">
+          <div class="column is-half">
+            <article class="video-card">
+              <video controls playsinline preload="metadata" aria-label="Play the logarithms lesson with audio"><source src="./static/videos/01-logarithms.mp4" type="video/mp4">Your browser does not support MP4 video.</video>
+              <div class="video-caption"><span class="video-index">01</span><div><h3>Logarithms</h3><p>A compact narrated lesson using a worked power example.</p></div></div>
+            </article>
+          </div>
+          <div class="column is-half">
+            <article class="video-card">
+              <video controls playsinline preload="metadata" aria-label="Play Euler's formula lesson with audio"><source src="./static/videos/02-euler-formula.mp4" type="video/mp4">Your browser does not support MP4 video.</video>
+              <div class="video-caption"><span class="video-index">02</span><div><h3>Euler’s Formula</h3><p>The identity is introduced as a formula slide with spoken explanation.</p></div></div>
+            </article>
+          </div>
+          <div class="column is-half">
+            <article class="video-card">
+              <video controls playsinline preload="metadata" aria-label="Play the exponential function lesson with audio"><source src="./static/videos/03-exponential-function.mp4" type="video/mp4">Your browser does not support MP4 video.</video>
+              <div class="video-caption"><span class="video-index">03</span><div><h3>The Exponential Function</h3><p>A text-first example introducing the function e to the x.</p></div></div>
+            </article>
+          </div>
+          <div class="column is-half">
+            <article class="video-card">
+              <video controls playsinline preload="metadata" aria-label="Play the exponentials lesson with audio"><source src="./static/videos/04-exponentials.mp4" type="video/mp4">Your browser does not support MP4 video.</video>
+              <div class="video-caption"><span class="video-index">04</span><div><h3>Exponentials</h3><p>A short narrated introduction to exponential expressions.</p></div></div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-soft" id="data">
+      <div class="container is-max-desktop">
+        <div class="columns is-variable is-6">
+          <div class="column is-7">
+            <p class="eyebrow">Data and reproducibility</p>
+            <h2 class="title is-3">Artifacts for further study</h2>
+            <p>The project poster describes a verified supervised fine-tuning corpus, a 200-brief GRPO prompt set, and a 12-task pilot benchmark. The linked datasets are hosted on Hugging Face.</p>
+            <div class="artifact-links">
+              <a href="https://huggingface.co/datasets/nabin2004/qwen3-8b-manimator-gold-sft">Verified SFT corpus <span aria-hidden="true">↗</span></a>
+              <a href="https://huggingface.co/datasets/nabin2004/Manim-grpo-dataset-200">GRPO prompt set <span aria-hidden="true">↗</span></a>
+              <a href="https://github.com/nabin2004/AOS">AOS source repository <span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+          <div class="column is-5">
+            <aside class="limitations-card">
+              <h3 class="title is-5">Scope and limitations</h3>
+              <p>The pilot uses 12 tasks and a convenience sample. Alignment does not fully measure timing, some reward channels share code with the benchmark, and the poster marks the base comparison as an estimate.</p>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer project-footer">
+    <div class="content has-text-centered">
+      <p><strong>Nabin Oli</strong> · Verifiable reward modelling for Manim</p>
+      <p>Page adapted from the <a href="https://github.com/ripl/nerfies-template/tree/website">Nerfies project-page template</a>.</p>
+      <p><a href="https://github.com/nabin2004/AOS">Source code</a> · <a href="#top">Back to top ↑</a></p>
+    </div>
+  </footer>
+</body>
+</html>
