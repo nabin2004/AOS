@@ -1,0 +1,91 @@
+:root {
+  --ink: #172b3a;
+  --muted: #5c6b76;
+  --blue: #0a3a63;
+  --orange: #c2611b;
+  --pale: #f2f6fa;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 4rem; }
+body { color: var(--ink); }
+.page-nav { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,.96); border-bottom: 1px solid #e6edf2; }
+.page-nav .container { width: 100%; }
+.brand { font-family: 'Google Sans', sans-serif; font-size: 1.2rem; font-weight: 800; letter-spacing: -.08em; color: var(--blue); }
+.brand span { color: var(--orange); }
+.navbar-menu.is-active { box-shadow: none; }
+.navbar-item { color: #405563; font-size: .92rem; }
+.hero-research { background: linear-gradient(145deg, #f5f9fc 0%, #fff 65%, #fdf6f0 100%); }
+.hero-research .hero-body { padding: 5.5rem 1.5rem 4.5rem; }
+.eyebrow { margin-bottom: .8rem; color: var(--orange); font-size: .73rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.publication-title { max-width: 850px; margin: 0 auto 1.15rem !important; color: var(--blue); font-size: clamp(2.1rem, 5vw, 3.55rem) !important; line-height: 1.12; }
+.author-line { margin: .8rem 0; font-size: 1.18rem; font-weight: 650; }
+.author-line span { color: var(--orange); }
+.hero-summary { max-width: 690px; margin: 1rem auto 1.6rem; color: var(--muted); font-size: 1.13rem; line-height: 1.7; }
+.hero-links { display: flex; justify-content: center; flex-wrap: wrap; gap: .5rem; }
+.hero-links .button { background: var(--blue); }
+.scroll-cue { display: inline-block; margin-top: 2.5rem; color: var(--muted); font-size: .85rem; }
+.scroll-cue span { display: block; margin-top: .3rem; color: var(--orange); font-size: 1.5rem; }
+.section-soft { background: var(--pale); }
+.section-heading { max-width: 760px; margin: 0 auto 2.5rem; }
+.section-heading .title { color: var(--blue); }
+.section-intro { color: var(--muted); font-size: 1.04rem; line-height: 1.65; }
+.research-copy { max-width: 790px; margin: 0 auto; color: #425563; font-size: 1.08rem; line-height: 1.85; }
+.metric-grid { margin-top: 1.2rem; }
+.metric-card { display: flex; align-items: center; gap: .85rem; height: 100%; padding: 1.1rem 1.25rem; border: 1px solid #e1eaf0; border-radius: 12px; background: white; box-shadow: 0 8px 24px rgba(22,54,77,.04); }
+.metric-card strong { color: var(--orange); font-size: 2.2rem; line-height: 1; }
+.metric-card span { color: var(--muted); font-size: .94rem; }
+.note { color: #71818b; font-size: .83rem; line-height: 1.6; }
+.research-figures { margin-top: 1.4rem; }
+.figure-card { height: 100%; padding: 1rem; border: 1px solid #e4ebef; border-radius: 14px; background: white; box-shadow: 0 10px 30px rgba(22,54,77,.05); }
+.figure-card img { display: block; width: 100%; height: auto; border-radius: 7px; }
+.figure-card figcaption { padding: .9rem .25rem .15rem; color: var(--muted); font-size: .87rem; line-height: 1.55; }
+.figure-card figcaption strong { color: var(--blue); }
+.method-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: .85rem; margin-top: 1.5rem; }
+.method-strip > div { min-height: 124px; padding: 1rem; border-radius: 12px; background: #f7f9fb; }
+.method-strip span { color: var(--orange); font-size: .75rem; font-weight: 800; letter-spacing: .1em; }
+.method-strip p { margin-top: .65rem; color: var(--ink); font-size: .9rem; font-weight: 600; line-height: 1.45; }
+.result-table-wrap { overflow: hidden; border: 1px solid #e1eaf0; border-radius: 12px; background: white; }
+.result-table { margin: 0; font-size: .9rem; }
+.result-table thead th { background: var(--blue); color: white; }
+.result-table td, .result-table th { vertical-align: middle; }
+.result-table td:not(:first-child), .result-table th:not(:first-child) { text-align: right; }
+.highlight-row td { background: #fff6ed; font-weight: 700; }
+.compact-figure { padding: .75rem; }
+.compact-figure figcaption { font-size: .8rem; }
+.reward-row { margin-top: 2rem; }
+.finding-card { padding: 1.5rem; border-left: 4px solid var(--orange); border-radius: 0 12px 12px 0; background: white; }
+.finding-card .title { color: var(--blue); }
+.finding-card p:last-child { color: var(--muted); line-height: 1.75; }
+.generated-section { background: #0c1d2b; }
+.generated-section .title { color: white; }
+.generated-section .section-intro { color: #bbcad4; }
+.generated-section .eyebrow { color: #ffb16c; }
+.video-card { height: 100%; overflow: hidden; border: 1px solid rgba(255,255,255,.12); border-radius: 14px; background: #142b3d; }
+.video-card video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #050b10; object-fit: contain; }
+.video-caption { display: flex; align-items: flex-start; gap: .85rem; min-height: 98px; padding: 1rem 1.1rem; }
+.video-index { color: #ffb16c; font-size: .76rem; font-weight: 800; letter-spacing: .1em; }
+.video-caption h3 { margin: 0 0 .35rem; color: white; font-size: 1rem; font-weight: 700; }
+.video-caption p { margin: 0; color: #bbcad4; font-size: .85rem; line-height: 1.5; }
+.artifact-links { display: grid; gap: .35rem; margin-top: 1.2rem; }
+.artifact-links a { display: flex; justify-content: space-between; padding: .75rem .9rem; border-radius: 8px; background: white; color: var(--blue); font-weight: 650; }
+.limitations-card { padding: 1.2rem 1.35rem; border: 1px solid #dce6ed; border-radius: 12px; background: #fff; }
+.limitations-card .title { color: var(--blue); }
+.limitations-card p { color: var(--muted); line-height: 1.7; }
+.project-footer { padding: 2.5rem 1.5rem; background: #071522; color: #b9c8d2; }
+.project-footer strong { color: white; }
+.project-footer a { color: #91cafa; }
+
+@media (max-width: 768px) {
+  .page-nav .navbar-menu.is-active { display: flex; justify-content: center; padding: 0; }
+  .page-nav .navbar-end { display: flex; flex-wrap: wrap; justify-content: center; }
+  .navbar-item { padding: .5rem .65rem; }
+  .hero-research .hero-body { padding: 3.4rem 1.2rem 2.8rem; }
+  .method-strip { grid-template-columns: repeat(2,1fr); }
+  .metric-card { min-height: 82px; }
+}
+
+@media (max-width: 420px) {
+  .method-strip { grid-template-columns: 1fr; }
+  .method-strip > div { min-height: 0; }
+  .result-table { font-size: .76rem; }
+}
