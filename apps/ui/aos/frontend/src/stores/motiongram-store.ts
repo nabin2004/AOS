@@ -54,8 +54,8 @@ interface MotionGramState {
 export const useMotionGramStore = create<MotionGramState>((set) => ({
   isOpen: false,
   prompt: "",
-  voiceBackend: "edge-tts",
-  voiceName: "en-US-ChristopherNeural",
+  voiceBackend: "pocket-tts",
+  voiceName: "alba",
   quality: "m",
   stage: "idle",
   yamlSpec: "",

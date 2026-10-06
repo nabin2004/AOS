@@ -25,7 +25,7 @@ router = APIRouter(prefix="/motiongram", tags=["motiongram"])
 class MotionGramGenerateRequest(BaseModel):
     prompt: str = Field(..., description="Educational topic or scene description")
     voice_backend: Literal["edge-tts", "pocket-tts", "dsm", "kitten"] = Field(
-        default="edge-tts",
+        default="pocket-tts",
         description="Speech model backend for kinetic voice narration",
     )
     voice_name: str = Field(default="alba", description="Voice identifier")
@@ -63,7 +63,7 @@ class MotionGramRenderRequest(BaseModel):
 
 class MotionGramOneShotRequest(BaseModel):
     prompt: str = Field(..., description="Educational topic to storyboard, compile, and render")
-    voice_backend: Literal["edge-tts", "pocket-tts", "dsm", "kitten"] = Field(default="edge-tts")
+    voice_backend: Literal["edge-tts", "pocket-tts", "dsm", "kitten"] = Field(default="pocket-tts")
     voice_name: str = Field(default="alba")
     quality: Literal["l", "m", "h", "k"] = Field(default="m")
     conversation_id: UUID | None = Field(default=None)

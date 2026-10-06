@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -153,8 +154,11 @@ class AOSSpeechService(SpeechService):
         model: str | None = None,
         **kwargs: Any,
     ):
-        self.backend = backend
-        self.model = model
+        # An explicit Pocket TTS selection must stay on the local narrator
+        # path instead of being interpreted as a Dytto backend name.
+        configured_backend = backend or os.getenv("AOS_TTS_BACKEND")
+        self.backend = configured_backend.lower() if configured_backend else None
+        self.model = model.lower() if isinstance(model, str) else model
         self.voice = voice
         self.language = language
         super().__init__(cache_dir=cache_dir, **kwargs)
@@ -173,7 +177,15 @@ class AOSSpeechService(SpeechService):
         cache_path.mkdir(parents=True, exist_ok=True)
 
         parsed = parse_bookmarks(text)
-        config: dict = {"voice": self.voice, "language": self.language}
+        # The selected backend comes from the frontend control; do not let a
+        # model hint emitted in the storyboard override that choice.
+        selected_model = self.backend or self.model
+        config: dict = {
+            "voice": self.voice,
+            "language": self.language,
+            "backend": selected_model or "pocket-tts",
+            "model": selected_model,
+        }
         if parsed.has_bookmarks:
             config["alignment"] = "segment_split"
 
@@ -192,12 +204,25 @@ class AOSSpeechService(SpeechService):
         else:
             audio_path = path
 
-        # If a backend is specified or if Pocket TTS narrator is unavailable, delegate to DyttoSpeechService
-        if self.backend or _get_narrator(self.voice, self.language) is None:
+        pocket_aliases = {"pocket", "pocket-tts", "pocket_tts"}
+        use_pocket = selected_model in pocket_aliases
+
+        # Pocket TTS is native to this service. Other explicit backends, or
+        # missing local Pocket TTS support in auto mode, may use Dytto.
+        try:
+            narrator = _get_narrator(self.voice, self.language) if selected_model != "edge-tts" else None
+        except Exception as exc:
+            if use_pocket:
+                raise RuntimeError(
+                    "Pocket TTS was explicitly selected but its local model could not load. "
+                    "Check the Pocket TTS installation and model cache in the render environment."
+                ) from exc
+            raise
+        if (selected_model and not use_pocket) or (not selected_model and narrator is None):
             try:
                 from motiongram.audio.dytto import DyttoSpeechService
                 dytto = DyttoSpeechService(
-                    model=self.backend or "auto",
+                    model=selected_model or "auto",
                     voice=self.voice,
                     cache_dir=cache_path,
                 )
@@ -205,7 +230,13 @@ class AOSSpeechService(SpeechService):
             except Exception:
                 pass
 
-        narrator = _get_narrator(self.voice, self.language)
+        if use_pocket and narrator is None:
+            raise RuntimeError(
+                "Pocket TTS was explicitly selected but is unavailable. "
+                "Install the audio-service dependencies, including pocket-tts and scipy."
+            )
+
+        narrator = narrator or _get_narrator(self.voice, self.language)
         out_file = cache_path / audio_path
 
         if narrator is None:

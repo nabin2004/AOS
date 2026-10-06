@@ -23,9 +23,16 @@ $AosRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $RepoRoot = Resolve-Path (Join-Path $AosRoot "..\..\..")
 $BackendRoot = Join-Path $AosRoot "backend"
 $AgentsRoot = Join-Path $RepoRoot "apps\agents"
+$MotionGramSources = @(
+    (Join-Path $RepoRoot "packages\motiongram\src\motiongram\manimgram\compiler.py"),
+    (Join-Path $RepoRoot "packages\motiongram\src\motiongram\manimgram\llm.py"),
+    (Join-Path $RepoRoot "packages\motiongram\src\motiongram\audio\dytto.py"),
+    (Join-Path $BackendRoot "app\services\motiongram_service.py")
+)
 $ComposeFile = Join-Path $AosRoot "docker-compose.dev.yml"
 $ComposeArgs = @("-f", $ComposeFile)
 $LogDir = Join-Path $AosRoot ".local"
+$UvCacheRoot = Join-Path $LogDir "uv-cache"
 $HostCeleryLog = Join-Path $LogDir "celery-worker.log"
 $HostCeleryPid = Join-Path $LogDir "celery-worker.pid"
 
@@ -84,11 +91,22 @@ function Start-HostCelery {
 
     $existing = Test-HostCeleryRunning
     if ($existing) {
-        Write-Host ("Host Celery already running (PID " + $existing + ").") -ForegroundColor Green
-        return $existing
+        $procInfo = Get-Process -Id $existing -ErrorAction SilentlyContinue
+        $latestSource = $MotionGramSources | Where-Object { Test-Path -LiteralPath $_ } |
+            ForEach-Object { Get-Item -LiteralPath $_ } |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if ($procInfo -and $latestSource -and $latestSource.LastWriteTime -gt $procInfo.StartTime) {
+            Write-Host "MotionGram source changed after Celery started; restarting the stale worker..." -ForegroundColor Yellow
+            Stop-HostCelery
+            Start-Sleep -Seconds 1
+        } else {
+            Write-Host ("Host Celery already running (PID " + $existing + ").") -ForegroundColor Green
+            return $existing
+        }
     }
 
     New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
+    New-Item -ItemType Directory -Force -Path $UvCacheRoot | Out-Null
     if (Test-Path $HostCeleryLog) {
         Move-Item $HostCeleryLog ($HostCeleryLog + ".bak") -Force -ErrorAction SilentlyContinue
     }
@@ -103,13 +121,14 @@ function Start-HostCelery {
 Set-Location -LiteralPath '$BackendRoot'
 `$env:AGENTS_DIR = '$AgentsRoot'
 `$env:AGENTS_UV_CMD = 'uv'
+`$env:UV_CACHE_DIR = '$UvCacheRoot'
 `$env:CELERY_BROKER_URL = 'redis://localhost:6379/0'
 `$env:CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 `$env:S3_VIDEO_ENDPOINT = 'http://localhost:9010'
 `$env:POSTGRES_HOST = 'localhost'
 `$env:REDIS_HOST = 'localhost'
 Remove-Item Env:VIRTUAL_ENV -ErrorAction SilentlyContinue
-uv run celery -A app.worker.celery_app worker --loglevel=info --pool=solo --concurrency=1 2>&1 | Tee-Object -FilePath '$HostCeleryLog' -Append
+uv run --no-sync celery -A app.worker.celery_app worker --loglevel=info --pool=solo --concurrency=1 2>&1 | Tee-Object -FilePath '$HostCeleryLog' -Append
 "@
 
     $proc = Start-Process -FilePath "powershell.exe" `
@@ -135,10 +154,21 @@ function Stop-HostCelery {
     if ($pidVal) {
         Write-Host ("Stopping host Celery PID " + $pidVal + "...") -ForegroundColor DarkGray
         try {
-            Stop-Process -Id $pidVal -Force -ErrorAction SilentlyContinue
-            Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
-                Where-Object { $_.ParentProcessId -eq $pidVal } |
-                ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+            $allProcesses = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue)
+            $tree = [System.Collections.Generic.List[int]]::new()
+            $tree.Add([int]$pidVal)
+            $frontier = @([int]$pidVal)
+            while ($frontier.Count -gt 0) {
+                $children = @($allProcesses | Where-Object { $_.ParentProcessId -in $frontier } |
+                    ForEach-Object { [int]$_.ProcessId })
+                foreach ($childId in $children) { if (-not $tree.Contains($childId)) { $tree.Add($childId) } }
+                $frontier = $children
+            }
+            $processIds = $tree.ToArray()
+            [Array]::Reverse($processIds)
+            foreach ($processId in $processIds) {
+                Stop-Process -Id $processId -Force -ErrorAction SilentlyContinue
+            }
         } catch {}
     }
     Remove-Item $HostCeleryPid -Force -ErrorAction SilentlyContinue

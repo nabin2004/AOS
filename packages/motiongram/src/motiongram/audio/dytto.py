@@ -13,11 +13,11 @@ Supports pluggable, changeable speech models:
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
 import re
 import shutil
 import subprocess
-import sys
 import wave
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
@@ -36,6 +36,8 @@ except ImportError:
 
 
 from .dsm_aligner import TimestampedWord, convert_words_to_boundaries
+
+logger = logging.getLogger(__name__)
 
 # =============================================================================
 # Audio Utilities & WAV Helpers
@@ -464,13 +466,13 @@ class DyttoCustomSpeechModel(BaseSpeechModel):
         voice: str | None = None,
         **kwargs: Any,
     ) -> Path:
-        # Route to Edge-TTS or Pocket TTS based on availability
-        if EdgeTTSSpeechModel.is_available():
-            v = voice or "en-US-ChristopherNeural"
-            return EdgeTTSSpeechModel().synthesize(text, out_path, voice=v)
-        elif PocketTTSSpeechModel.is_available():
+        # Prefer on-device speech for local runs; use cloud Edge-TTS only when
+        # Pocket TTS is unavailable and explicitly configured by the caller.
+        if PocketTTSSpeechModel.is_available():
             return PocketTTSSpeechModel().synthesize(text, out_path, voice=voice or "alba")
-        return MockSpeechModel().synthesize(text, out_path, voice=voice)
+        if EdgeTTSSpeechModel.is_available():
+            return EdgeTTSSpeechModel().synthesize(text, out_path, voice=voice or EdgeTTSSpeechModel.DEFAULT_VOICE)
+        raise RuntimeError("No speech backend is available; install pocket-tts for local narration.")
 
 
 # =============================================================================
@@ -531,12 +533,13 @@ class DyttoSpeechService(SpeechService):
 
     def __init__(
         self,
-        model: str = "auto",
+        model: str = "pocket-tts",
         voice: str = "alba",
         cache_dir: str | Path = "voiceover_cache",
         sample_rate: int = 24000,
         **kwargs: Any,
     ) -> None:
+        model = kwargs.pop("backend", model)
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.sample_rate = sample_rate
@@ -564,26 +567,22 @@ class DyttoSpeechService(SpeechService):
         env_backend = os.getenv("AOS_TTS_BACKEND", "").lower().strip()
         env_dytto = os.getenv("DYTTO_MODEL", "").lower().strip()
 
-        # Resolve 'auto' mode or environment override
-        resolved_key = env_dytto or env_backend or model_key
+        # A caller's explicit model choice always wins. Environment settings
+        # only select a backend when the caller requested automatic routing.
+        resolved_key = model_key
         if resolved_key in ("auto", ""):
-            if EdgeTTSSpeechModel.is_available():
-                resolved_key = "edge-tts"
-                if self.voice == "alba":
-                    self.voice = os.getenv("AOS_TTS_VOICE", EdgeTTSSpeechModel.DEFAULT_VOICE)
-            elif PocketTTSSpeechModel.is_available():
+            resolved_key = env_dytto or env_backend or "auto"
+        if resolved_key in ("auto", ""):
+            if PocketTTSSpeechModel.is_available():
                 resolved_key = "pocket-tts"
+            elif EdgeTTSSpeechModel.is_available():
+                resolved_key = "edge-tts"
             else:
                 resolved_key = "mock"
 
         model_cls = self.MODEL_REGISTRY.get(resolved_key, PocketTTSSpeechModel)
         self._active_model_name = resolved_key
-        try:
-            self._active_model_instance = model_cls(**kwargs)
-        except Exception:
-            # Fallback to mock if initialization failed
-            self._active_model_instance = MockSpeechModel()
-            self._active_model_name = "mock"
+        self._active_model_instance = model_cls(**kwargs)
 
     @property
     def active_model(self) -> BaseSpeechModel:
@@ -635,18 +634,24 @@ class DyttoSpeechService(SpeechService):
         # Cache key based on text, active model name, and voice
         text_hash = hash((clean_text, self._active_model_name, self.voice)) & 0xFFFFFFFF
         filename = f"dytto_{self._active_model_name}_{self.voice}_{text_hash:08x}.wav"
-        audio_path = Path(path) if path else (c_dir / filename)
+        requested_path = Path(path) if path else Path(filename)
+        # Manim Voiceover may pass a cache basename or a path containing the
+        # cache directory. Always store one canonical file inside cache_dir.
+        audio_path = c_dir / requested_path.name
+        audio_path.parent.mkdir(parents=True, exist_ok=True)
 
         if not audio_path.is_file() or audio_path.stat().st_size == 0:
             try:
                 self.synthesize(clean_text, audio_path, voice=self.voice)
             except Exception as exc:
-                print(
-                    f"[Dytto Warning] Synthesis with {self._active_model_name} failed: {exc}. "
-                    "Falling back to mock.",
-                    file=sys.stderr,
-                )
-                MockSpeechModel().synthesize(clean_text, audio_path, voice=self.voice)
+                if self._active_model_name != "pocket-tts" and PocketTTSSpeechModel.is_available():
+                    logger.warning("TTS backend %s failed; retrying with local Pocket TTS: %s", self._active_model_name, exc)
+                    self.set_model("pocket-tts", voice=self.voice)
+                    self.synthesize(clean_text, audio_path, voice=self.voice)
+                else:
+                    raise RuntimeError(
+                        f"Speech synthesis failed with {self._active_model_name}; refusing to produce silent narration."
+                    ) from exc
 
         duration = get_audio_duration(audio_path)
         word_boundaries = self.active_model.get_word_boundaries(clean_text, audio_path)
@@ -668,7 +673,11 @@ class DyttoSpeechService(SpeechService):
             bookmark_dict[mark_name] = round(matched_time, 3)
 
         return {
-            "final_audio": str(audio_path),
+            # SpeechService._wrap_generate_from_text requires original_audio;
+            # VoiceoverScene resolves it relative to speech_service.cache_dir.
+            "original_audio": audio_path.name,
+            "final_audio": str(audio_path.resolve()),
+            "input_text": text,
             "text": clean_text,
             "bookmarks": bookmark_dict,
             "word_boundaries": word_boundaries,

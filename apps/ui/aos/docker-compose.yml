@@ -73,9 +73,11 @@ services:
     volumes:
       - ./backend/app:/app/app:ro
       - ./backend/cli:/app/cli:ro
+      - ../../../packages/motiongram:/app/packages/motiongram:ro
       - ../../educlaw:/app/apps/educlaw:ro
       - media_data:/app/media
       - ./emails:/app/emails:ro
+      - pocket_tts_cache:/app/models_cache
 
     env_file:
       - ./backend/.env
@@ -88,7 +90,11 @@ services:
       - MILVUS_PORT=19530
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - AOS_TTS_BACKEND=pocket-tts
+      - HF_HOME=/app/models_cache/huggingface
+      - HUGGINGFACE_HUB_CACHE=/app/models_cache/huggingface/hub
       - OLLAMA_BASE_URL=http://host.docker.internal:11434/v1
+      - PYTHONPATH=/app:/app/packages/motiongram/src
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --ws websockets-sansio
     networks:
       - backend
@@ -212,8 +218,10 @@ services:
     container_name: aos_celery_worker
     volumes:
       - ./backend/app:/app/app:ro
+      - ../../../packages/motiongram:/app/packages/motiongram:ro
       - media_data:/app/media
       - ./emails:/app/emails:ro
+      - pocket_tts_cache:/app/models_cache
     command: celery -A app.worker.celery_app worker --loglevel=debug
     env_file:
       - ./backend/.env
@@ -225,6 +233,10 @@ services:
       - MILVUS_PORT=19530
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - AOS_TTS_BACKEND=pocket-tts
+      - HF_HOME=/app/models_cache/huggingface
+      - HUGGINGFACE_HUB_CACHE=/app/models_cache/huggingface/hub
+      - PYTHONPATH=/app:/app/packages/motiongram/src
     networks:
       - backend
     depends_on:
@@ -290,6 +302,7 @@ networks:
 
 volumes:
   media_data:
+  pocket_tts_cache:
   postgres_data:
   redis_data:
   etcd_data:

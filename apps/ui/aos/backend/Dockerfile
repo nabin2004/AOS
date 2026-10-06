@@ -55,10 +55,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && npm install -g @llamaindex/liteparse \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Manim Voiceover and MotionGram's Dytto narration pipeline invoke the SoX CLI.
+RUN apt-get update && apt-get install -y --no-install-recommends sox libsox-fmt-all \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 # Create non-root user and writable directories
 RUN adduser --disabled-password --gecos "" appuser && \
-    mkdir -p /app/media /app/data /app/chroma_data /app/models_cache
+    mkdir -p /app/media /app/data /app/chroma_data /app/models_cache && \
+    chown appuser:appuser /app/models_cache
 
 # Copy the complete application once.  ``--chown`` avoids a costly recursive
 # ownership walk over the large Manim/Python virtual environment at build time.

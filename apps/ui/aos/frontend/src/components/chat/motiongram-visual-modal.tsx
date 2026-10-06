@@ -446,8 +446,8 @@ export function MotionGramVisualModal({ conversationId }: MotionGramVisualModalP
                     onChange={(e) => setVoiceBackend(e.target.value as MotionGramVoiceBackend)}
                     className="w-full appearance-none rounded-lg border border-white/10 bg-zinc-800 px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-500"
                   >
+                    <option value="pocket-tts">Pocket TTS (Local CPU)</option>
                     <option value="edge-tts">Edge-TTS (Neural Cloud)</option>
-                    <option value="pocket-tts">Pocket TTS (Fast CPU)</option>
                     <option value="dsm">Kyutai DSM (Streaming)</option>
                     <option value="kitten">KittenTTS (Local)</option>
                   </select>
@@ -460,9 +460,10 @@ export function MotionGramVisualModal({ conversationId }: MotionGramVisualModalP
                     onChange={(e) => setVoiceName(e.target.value)}
                     className="w-full appearance-none rounded-lg border border-white/10 bg-zinc-800 px-2.5 py-1.5 text-xs text-white outline-none focus:border-cyan-500"
                   >
-                    <option value="en-US-ChristopherNeural">Christopher (Natural Explainer)</option>
-                    <option value="en-US-JennyNeural">Jenny (Expressive & Clear)</option>
                     <option value="alba">Alba (Pocket TTS Default)</option>
+                    <option value="anna">Anna (Pocket TTS)</option>
+                    <option value="en-US-ChristopherNeural">Christopher (Edge-TTS)</option>
+                    <option value="en-US-JennyNeural">Jenny (Edge-TTS)</option>
                     <option value="en-GB-SoniaNeural">Sonia (British Academic)</option>
                   </select>
                 </div>

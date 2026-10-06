@@ -199,7 +199,7 @@ class MotionGramService:
         self,
         prompt: str,
         *,
-        voice_backend: Literal["edge-tts", "pocket-tts", "dsm", "kitten"] = "edge-tts",
+        voice_backend: Literal["edge-tts", "pocket-tts", "dsm", "kitten"] = "pocket-tts",
         voice_name: str = "alba",
         model_name: str | None = None,
         base_url: str | None = None,
@@ -220,6 +220,7 @@ VOICEOVER BACKEND PREFERENCE:
 - Preferred Speech Backend: {voice_backend}
 - Preferred Voice: {voice_name}
 - Ensure 'scene.type: VoiceoverScene' is set.
+- Set 'scene.config.backend' to '{voice_backend}' and 'scene.config.voice' to '{voice_name}'.
 - Ensure audio cache_dir is 'voiceover_cache'.
 """
 
@@ -233,9 +234,12 @@ VOICEOVER BACKEND PREFERENCE:
             messages.append({"role": "assistant", "content": ex["yaml"]})
 
         user_content = (
-            f"Create a high-impact, short educational animation with synchronized voice narration for:\n"
+            f"Create a high-impact, short educational animation with narrated visual beats for:\n"
             f"Topic: {prompt}\n\n"
-            f"Return ONLY valid MotionGram YAML. Embed <bookmark mark='...'/> tags for kinetic reveals."
+            f"Return ONLY valid MotionGram YAML. For each beat, put visual Write/Create/FadeIn actions "
+            f"in a voiceover_block; the compiler reveals them before narration and clears between beats. "
+            f"Do not add bookmark tags or WaitUntilBookmark actions. Use params.keep_previous=true only "
+            f"when objects intentionally belong on screen together."
         )
         messages.append({"role": "user", "content": user_content})
 
@@ -252,6 +256,22 @@ VOICEOVER BACKEND PREFERENCE:
                     api_key=api_key,
                 )
                 current_spec = self._clean_yaml_response(raw_response)
+                # Apply the UI choice deterministically; the model must not
+                # silently switch a local request to a cloud speech backend.
+                parsed_spec = yaml.safe_load(current_spec)
+                if isinstance(parsed_spec, dict):
+                    scene_data = parsed_spec.setdefault("scene", {})
+                    if isinstance(scene_data, dict):
+                        scene_data.setdefault("type", "VoiceoverScene")
+                        config = scene_data.setdefault("config", {})
+                        if isinstance(config, dict):
+                            config["backend"] = voice_backend
+                            config["voice"] = voice_name
+                        voiceover = scene_data.get("voiceover")
+                        if isinstance(voiceover, dict):
+                            voiceover["backend"] = voice_backend
+                            voiceover["voice"] = voice_name
+                    current_spec = yaml.safe_dump(parsed_spec, sort_keys=False, allow_unicode=True)
             except Exception as exc:
                 err_msg = f"Attempt {attempt}: LLM call failed: {exc}"
                 logger.warning(err_msg)

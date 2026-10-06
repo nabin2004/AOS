@@ -28,16 +28,58 @@ CORE PRINCIPLES:
 VOICEOVER & BOOKMARKS:
 When creating narrated educational scenes:
 1. Set 'scene.type: VoiceoverScene' with 'config: {voice: "alba", cache_dir: "voiceover_cache"}'.
-2. Use 'type: voiceover_block' on the timeline with spoken narrative in 'text'.
-3. Embed '<bookmark mark='TAG_NAME'/>' inside 'text' to synchronize visual reveals:
-   - Place bookmarks exactly at the moment an object should appear or transform.
-   - Use descriptive, uppercase tags (e.g. '<bookmark mark=\"SHOW_A\"/>').
-   - In 'voiceover_block.actions', place '{action: WaitUntilBookmark, mark: "TAG_NAME"}'
-     immediately before the corresponding visual animation.
-4. Keep narration conversational, concise, and focused on visual intuition.
+2. Use one 'voiceover_block' per visual beat. Put its Write/Create/FadeIn actions in
+   'actions'; the compiler reveals them first and starts the narration afterward.
+3. The compiler fades the previous visual before a new Write/Create/FadeIn, then
+   clears the beat after its narration when another timeline item follows. Do not
+   add WaitUntilBookmark actions or bookmark tags for ordinary narration.
+4. Set 'params: {keep_previous: true}' on a reveal action only when its object
+   should intentionally remain beside the previous object (for example, parts of
+   one diagram). Otherwise each reveal replaces the previous visual.
+5. Keep narration conversational, concise, and focused on the visible idea.
 """
 
 FEW_SHOT_EXAMPLES = [
+    {
+        "prompt": "Explain tanh by showing its formula, then a concise takeaway, narrating each visual after it appears.",
+        "yaml": """scene:
+  class_name: TanhExplainerScene
+  type: VoiceoverScene
+  background_color: "#141414"
+  config:
+    voice: alba
+
+mobjects:
+  - id: formula
+    type: MathTex
+    props:
+      tex: '\\tanh(x) = \\frac{e^x - e^{-x}}{e^x + e^{-x}}'
+      color: WHITE
+    layout:
+      center: true
+
+  - id: graph_label
+    type: Text
+    props:
+      text: "tanh(x) stays between -1 and 1"
+      color: YELLOW
+    layout:
+      center: true
+
+timeline:
+  - type: voiceover_block
+    text: "This formula defines tanh as a ratio of exponentials."
+    actions:
+      - action: Write
+        target: formula
+
+  - type: voiceover_block
+    text: "Its output smoothly approaches negative one and positive one."
+    actions:
+      - action: Write
+        target: graph_label
+"""
+    },
     {
         "prompt": (
             "Show a 2x2 matrix A and morph the top-left element into the letter B above the matrix."

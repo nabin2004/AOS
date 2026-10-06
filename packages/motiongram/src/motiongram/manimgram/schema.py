@@ -15,7 +15,7 @@ class CanvasConfig(BaseModel):
     pixel_height: int = 1080
     frame_rate: int = 30
     voice: str = "alba"
-    backend: str = "auto"
+    backend: str = "pocket-tts"
     model: str | None = None
     cache_dir: str = "voiceover_cache"
     speech_service: str = "AOSSpeechService"
@@ -26,7 +26,7 @@ class VoiceoverConfig(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     voice: str = "alba"
-    backend: str = "auto"
+    backend: str = "pocket-tts"
     model: str | None = None
     cache_dir: str = "voiceover_cache"
     speech_service: str = "AOSSpeechService"

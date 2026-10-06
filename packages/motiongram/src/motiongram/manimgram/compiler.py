@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +21,27 @@ from motiongram.manimgram.schema import (
 from motiongram.manimgram.selectors import EMBEDDED_SELECTOR_RESOLVER_CODE
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
+_REVEAL_ACTIONS = {"Create", "Write", "FadeIn"}
+_REMOVE_ACTIONS = {"Unwrite", "FadeOut"}
+_REPLACE_ACTIONS = {"ReplacementTransform", "TransformMatchingTex", "TransformMatchingShapes", "RoutedTransform"}
+
+
+def _safe_mobject_id(value: str | None, known_ids: set[str]) -> str | None:
+    """Only emit references to declared Python-identifier mobjects."""
+    if not value:
+        return None
+    root = value.split(".", 1)[0]
+    return root if root in known_ids and re.fullmatch(r"[A-Za-z_]\w*", root) else None
+
+
+def _active_cleanup_lines(active: str, exclude: str | None = None) -> list[str]:
+    condition = f"mob is not {exclude}" if exclude else "True"
+    return [
+        f"{active} = [mob for mob in {active} if any(mob is current for current in self.mobjects) and {condition}]",
+        f"if {active}:",
+        f"    self.play(*[FadeOut(mob) for mob in {active}])",
+        f"{active} = []",
+    ]
 
 
 def _format_py_value(val: Any) -> str:
@@ -270,21 +292,49 @@ def compile_dsl(spec_data: str | dict[str, Any] | ManimGramScene) -> str:
         for item in scene_spec.timeline
     )
     voice = getattr(scene_spec.scene.config, "voice", "alba")
+    backend = getattr(scene_spec.scene.config, "backend", "pocket-tts")
+    model = getattr(scene_spec.scene.config, "model", None)
     cache_dir = getattr(scene_spec.scene.config, "cache_dir", "voiceover_cache")
     if scene_spec.scene.voiceover is not None:
         voice = scene_spec.scene.voiceover.voice or voice
+        backend = scene_spec.scene.voiceover.backend or backend
+        model = scene_spec.scene.voiceover.model or model
         cache_dir = scene_spec.scene.voiceover.cache_dir or cache_dir
-    voiceover_config = {"voice": voice, "cache_dir": cache_dir}
+    voiceover_config = {"voice": voice, "backend": backend, "model": model, "cache_dir": cache_dir}
 
     # Pre-render timeline actions
     rendered_timeline: list[dict[str, Any]] = []
+    known_ids = {mob.id for mob in scene_spec.mobjects}
     for idx, item in enumerate(scene_spec.timeline):
         if isinstance(item, VoiceoverBlockSpec) or getattr(item, "type", None) == "voiceover_block":
-            block_lines = [f"with self.voiceover(text={json.dumps(item.text)}) as tracker:"]
+            active = f"_motiongram_active_{idx}"
+            block_lines = [
+                f"{active} = []",
+                "# MotionGram timeline mode: reveal-first; previous visuals are cleaned automatically.",
+            ]
             for sub_idx, sub_act in enumerate(item.actions):
+                # Bookmark waits outside the voiceover context can deadlock.
+                if sub_act.action == "WaitUntilBookmark":
+                    block_lines.append("# WaitUntilBookmark omitted in reveal-first mode.")
+                    continue
+                target = _safe_mobject_id(sub_act.target, known_ids)
+                source = _safe_mobject_id(sub_act.source, known_ids)
+                if sub_act.action in _REVEAL_ACTIONS and not sub_act.params.get("keep_previous", False):
+                    block_lines.extend(_active_cleanup_lines(active, target))
                 sub_name, sub_code = render_action_code(sub_act, f"{idx}_{sub_idx}")
                 for line in sub_code.splitlines():
-                    block_lines.append(f"    {line}")
+                    block_lines.append(line)
+                if sub_act.action in _REMOVE_ACTIONS and target:
+                    block_lines.append(f"{active} = [mob for mob in {active} if mob is not {target}]")
+                elif sub_act.action in _REPLACE_ACTIONS and source:
+                    block_lines.append(f"{active} = [mob for mob in {active} if mob is not {source}]")
+                    if target:
+                        block_lines.append(f"if not any(mob is {target} for mob in {active}): {active}.append({target})")
+                elif sub_act.action not in ("Wait", "WaitUntilBookmark", "Transform") and target:
+                    block_lines.append(f"if any(mob is {target} for mob in self.mobjects) and not any(mob is {target} for mob in {active}): {active}.append({target})")
+            block_lines.extend([f"with self.voiceover(text={json.dumps(item.text)}) as tracker:", "    pass"])
+            if idx < len(scene_spec.timeline) - 1:
+                block_lines.extend(_active_cleanup_lines(active))
             rendered_timeline.append({
                 "name": f"voiceover_block ({item.text[:28]}...)",
                 "code": "\n".join(block_lines),
